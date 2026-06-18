@@ -20,6 +20,7 @@ body {
    flex-flow: column nowrap;
    align-items: center;
    justify-content: space-between;
+   transition: background-color 0.25s, color 0.25s;
 }
 
 header { align-self: center; font-weight: 700; }
