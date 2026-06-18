@@ -2,7 +2,7 @@
 @import url("https://cdn.ratcode.dev/css/default.css");
 @import url("./css/animations.css");
 
-:root { --color: red; }
+:root { --bg: white; --fg: black; }
     * { font-family: "Hubot Sans"; line-height: 1; }
 
 a { color: currentcolor; }
@@ -13,9 +13,9 @@ body  { z-index: 1; }
 #logo { z-index: 2; }
 
 body {
-  background: white;
-    color: red;
-    padding: 1rem;
+  background: var(--bg);
+  color: var(--fg);
+  padding: 1rem;
    display: flex;
    flex-flow: column nowrap;
    align-items: center;
