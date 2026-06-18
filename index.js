@@ -17,13 +17,8 @@ export function define ({ key, target, type }) {
 }
 export function update ({ key, value, target }) {
   let { type } = definitions.get(key) ?? {};
-
-  let method = {
-    dataset  : 'updateDataset',
-    property : 'updateProperty',
-  }[type] ?? null;
-
-  if (method) aufbau[method]({ key, value, target });
+  if (type === 'dataset')  updateDataset  ({ key, value, target });
+  if (type === 'property') updateProperty ({ key, value, target });
 }
 export function updateProperty ({ key, value, target }) {
   key = toKebabCase(key);
