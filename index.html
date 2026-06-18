@@ -38,6 +38,32 @@
       ...
     </div>
   </footer>
-  
+
+<script type='module'>
+import * as aufbau from './index.js';
+	
+aufbau.define({ key: 'bg', type: 'property' });
+aufbau.define({ key: 'fg', type: 'property' });
+
+function switchColors ({ bg, fg }){
+	aufbau.update({ key: 'bg', value: bg });
+	aufbau.update({ key: 'fg', value: fg });
+}
+
+let colors = [
+  { bg: '#000000', fg: '#ffffff' },
+  { bg: 'white', fg: 'black' },
+];
+
+let index = 0;
+
+setInterval(() => {
+  const { bg, fg } = colors[index];
+  switchColors({ bg, fg });
+
+  index = (index + 1) % colors.length;
+}, 1000); // alle 2 Sekunden
+</script>
+	
 </body>
   </html>
