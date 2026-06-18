@@ -22,7 +22,7 @@ export function update ({ key, value, target }) {
 }
 export function updateProperty ({ key, value, target }) {
   key = toKebabCase(key);
-  key = prefix(key, '--');
+  key = prefixed(key, '--');
   (target || root).style.setProperty(key, value);
 }
 export function updateDataset ({ key, value, target }) {
