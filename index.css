@@ -6,18 +6,6 @@
     * { font-family: "Hubot Sans"; line-height: 1; }
 
 a { color: currentcolor; }
-a:hover {
-   animation-name: pulse;
-   --duration: var(--duration,  100ms);
-   animation-iteration-count: infinite;
-   --atf: linear;
-   animation-direction: var(--direction, normal);
-   animation-duration: var(--duration, 1000ms);
-   animation-iteration-count: var(--iterations, infinite);
-   animation-fill-mode: both;
-   transform-origin: var(--origin, center);
-   animation-timing-function: var(--atf);
-}
 
 html, body { font-size: 14px; }
 
@@ -26,7 +14,7 @@ body  { z-index: 1; }
 
 body {
   background: white;
-    color: black;
+    color: red;
     padding: 1rem;
    display: flex;
    flex-flow: column nowrap;
