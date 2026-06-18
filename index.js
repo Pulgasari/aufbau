@@ -2,7 +2,7 @@
 
 // Helpers
 let root = document.documentElement;
-let prefixed = (str, prerix) => str.startsWith(prefix) ? str : (prefix + str);
+let prefixed = (str, prefix) => str.startsWith(prefix) ? str : (prefix + str);
 let toWords        = str => str.replace(/([a-z\d])([A-Z])/g, '$1 $2').replace(/[-_.\s]+/g, ' ').trim().toLowerCase().split(' ').filter(Boolean);
 let toCamelCase    = str => toWords(str).map( (word, i) => i === 0 ? word : word[0].toUpperCase() + word.slice(1)) .join('');
 let toKebabCase    = str => toWords(str).join('-');
