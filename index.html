@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset="UTF-8">
+  <meta name='viewport' content="width=device-width, initial-scale=1.0" />
+  <title>RAT</title>
+  <link rel='stylesheet' href="./index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+</head>
+
+<svg style="display: none;">
+    <filter id="wave-shader">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="20" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <svg style="display: none;">
+    <filter id="glitch-rgb">
+      <feOffset dx="-5" dy="0" in="SourceGraphic" result="red-channel" />
+      <feColorMatrix type="matrix" in="red-channel" result="red-isolated"
+        values="1 0 0 0 0
+                0 0 0 0 0
+                0 0 0 0 0
+                0 0 0 1 0" />
+  
+      <feOffset dx="5" dy="0" in="SourceGraphic" result="blue-channel" />
+      <feColorMatrix type="matrix" in="blue-channel" result="blue-isolated"
+        values="0 0 0 0 0
+                0 0 0 0 0
+                0 0 1 0 0
+                0 0 0 1 0" />
+  
+      <feColorMatrix type="matrix" in="SourceGraphic" result="green-isolated"
+        values="0 0 0 0 0
+                0 1 0 0 0
+                0 0 0 0 0
+                0 0 0 1 0" />
+  
+      <feBlend mode="screen" in="red-isolated" in2="green-isolated" result="red-green" />
+      <feBlend mode="screen" in="red-green" in2="blue-isolated" />
+    </filter>
+  </svg>
+
+<svg style="display: none;">
+  <filter id="live-glitch">
+    
+    <feOffset dx="0" dy="0" in="SourceGraphic" result="red-channel">
+      <animate attributeName="dx" 
+               values="0; -8; 2; -10; 0; 5; -2; 0" 
+               keyTimes="0; 0.05; 0.07; 0.1; 0.12; 0.2; 0.25; 1" 
+               dur="2s" 
+               repeatCount="indefinite" />
+    </feOffset>
+    <feColorMatrix type="matrix" in="red-channel" result="red-isolated"
+      values="1 0 0 0 0
+              0 0 0 0 0
+              0 0 0 0 0
+              0 0 0 1 0" />
+
+    <feOffset dx="0" dy="0" in="SourceGraphic" result="blue-channel">
+      <animate attributeName="dx" 
+               values="0; 5; -3; 8; 0; -4; 0" 
+               keyTimes="0; 0.03; 0.08; 0.12; 0.18; 0.22; 1" 
+               dur="2s" 
+               repeatCount="indefinite" />
+    </feOffset>
+    <feColorMatrix type="matrix" in="blue-channel" result="blue-isolated"
+      values="0 0 0 0 0
+              0 0 0 0 0
+              0 0 1 0 0
+              0 0 0 1 0" />
+
+    <feColorMatrix type="matrix" in="SourceGraphic" result="green-isolated"
+      values="0 0 0 0 0
+              0 1 0 0 0
+              0 0 0 0 0
+              0 0 0 1 0" />
+
+    <feBlend mode="screen" in="red-isolated" in2="green-isolated" result="red-green" />
+    <feBlend mode="screen" in="red-green" in2="blue-isolated" />
+  </filter>
+</svg>
+
+<svg style="display: none;">
+  <filter id="heavy-cyber-glitch">
+    
+    <feTurbulence type="fractalNoise" baseFrequency="0.0 0.95" numOctaves="1" result="noise">
+      <animate attributeName="baseFrequency" 
+               values="0.0 0.95; 0.0 0.1; 0.0 0.8; 0.0 0.95" 
+               dur="0.4s" repeatCount="indefinite" />
+    </feTurbulence>
+
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="displaced-image">
+      <animate attributeName="scale" 
+               values="0; 40; 0; 0; 70; 0; 10; 0" 
+               keyTimes="0; 0.05; 0.08; 0.4; 0.43; 0.46; 0.8; 1" 
+               dur="1.5s" repeatCount="indefinite" />
+    </feDisplacementMap>
+
+    <feOffset dx="0" dy="0" in="displaced-image" result="red-channel">
+      <animate attributeName="dx" values="0; -15; 0; 10; 0" keyTimes="0; 0.05; 0.1; 0.43; 1" dur="1.5s" repeatCount="indefinite" />
+    </feOffset>
+    <feColorMatrix type="matrix" in="red-channel" result="red-isolated"
+      values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+
+    <feOffset dx="0" dy="0" in="displaced-image" result="blue-channel">
+      <animate attributeName="dx" values="0; 15; 0; -10; 0" keyTimes="0; 0.03; 0.08; 0.45; 1" dur="1.5s" repeatCount="indefinite" />
+    </feOffset>
+    <feColorMatrix type="matrix" in="blue-channel" result="blue-isolated"
+      values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" />
+
+    <feColorMatrix type="matrix" in="displaced-image" result="green-isolated"
+      values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+
+    <feBlend mode="screen" in="red-isolated" in2="green-isolated" result="red-green" />
+    <feBlend mode="screen" in="red-green" in2="blue-isolated" />
+    
+  </filter>
+</svg>
+
+<body class='mobilefix'>
+
+  <header>
+    <nav>
+      <a href='#'>About</a>
+      <a href='#'>Docs</a>
+      <a href='#'>Examples</a>
+      <a href='#'>@GitHub</a>
+    </nav>
+  </header>
+  
+  <div id='welcome'>
+    <div id='logo' data-animate='vibrate' style='filter: url(#heavy-cyber-glitch);'>
+      <img src='./logo.svg' />
+      <div class='sub'>version: 0.1.0</div>
+    </div>
+  </div>
+
+  <footer>
+    <div style='filter: url(#heavy-cyber-glitch);'>
+      ...
+    </div>
+  </footer>
+  
+</body>
+  </html>
