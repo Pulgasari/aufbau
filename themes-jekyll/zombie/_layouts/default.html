@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html data-theme="dracula">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ page.title | default: site.title }}</title>
+    <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
+</head>
+<body>
+    <div id="app>
+        <div id="app-header">{% include menu.html %}</div>
+        <div id="app-body">{{ content }}</div>
+    </div>
+    <script type="module" src="{{ "/assets/js/menu.js" | relative_url }}></script>
+</body>
+</html>
