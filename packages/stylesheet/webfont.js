@@ -1,43 +1,39 @@
-// Vordefinierte Font-Map
+// @aufbau/packages/stylesheet/src/webfont.js
+
+const GOOGLE_FONTS_BASE = 'https://fonts.googleapis.com/css2?family=';
+
 const WEBFONT_MAP = {
-  'jetbrains mono': {
-    url: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap',
-    fallback: 'monospace',
-  },
-  'inter': {
-    url: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
-    fallback: 'sans-serif',
-  },
-  'fira code': {
-    url: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap',
-    fallback: 'monospace',
-  },
-  'roboto': {
-    url: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap',
-    fallback: 'sans-serif',
-  },
+  'JetBrains Mono' : { wght: '400;500;700' , fallback: 'monospace'  },
+  'Inter'          : { wght: '400;500;700' , fallback: 'sans-serif' },
+  'Fira Code'      : { wght: '400;700'     , fallback: 'monospace'  },
+  'Roboto'         : { wght: '400;700'     , fallback: 'sans-serif' },
 };
 
-/**
- * Sucht `aufbau-webfont: "Font Name";`
- * Gibt den transformierten Code und eine Liste der zu importierenden URLs zurück.
- */
-export function transformWebfonts(code) {
+
+function buildFontUrl (fontFamily, wght = '400;500;700') {
+  const formattedFamily = encodeURIComponent(fontFamily).replace(/%20/g, '+');
+  return `${GOOGLE_FONTS_BASE}${formattedFamily}:wght@${wght}&display=swap`;
+}
+
+export function transformWebfonts (code) {
   const imports = new Set();
 
   const transformedCode = code.replace(/aufbau-webfont:\s*["']?([^;"'\n]+)["']?;?/g, (_, fontName) => {
-    const cleanName = fontName.trim();
-    const fontKey   = cleanName.toLowerCase();
-    const config    = WEBFONT_MAP[fontKey];
+    const rawName    = fontName.trim();
+    const matchedKey = Object.keys(WEBFONT_MAP).find( key => key.toLowerCase() === rawName.toLowerCase() );
 
-    if (config) {
-      imports.add(config.url);
-      return `font-family: "${cleanName}", ${config.fallback};`;
+    if (matchedKey) {
+      const { wght, fallback } = WEBFONT_MAP[matchedKey];
+      imports.add(buildFontUrl(matchedKey, wght));
+      return `font-family: "${matchedKey}", ${fallback};`;
     }
 
-    // Fallback falls der Font nicht in der Map ist
-    return `font-family: "${cleanName}", sans-serif;`;
+    // Dynamic Google Font Fallback (falls der Font nicht in der Map steht)
+    imports.add(buildFontUrl(rawName));
+    return `font-family: "${rawName}", sans-serif;`;
   });
 
   return { code: transformedCode, imports: Array.from(imports) };
 }
+
+export default transformWebfonts;
