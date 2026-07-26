@@ -34,7 +34,7 @@ body {
 }
 ```
 
-## use worker
+## usage in browser worker
 
 ```html
 <!DOCTYPE html>
@@ -64,3 +64,17 @@ body {
 </body>
 </html>
 ```
+
+## usage with vite
+
+```javascript
+import { defineConfig } from 'vite';
+import aufbauStylesheet from '@aufbau/stylesheet/vite';
+
+export default defineConfig({
+  plugins: [
+    aufbauStylesheet()
+  ]
+});
+```
+
