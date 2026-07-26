@@ -44,7 +44,7 @@ import aufbau, { html } from '@aufbau/kit';
 
 ## @aufbau/hyperfetch
 
-## aufbau-import
+## @aufbau/import
 
 It can import the following file formats:
 
