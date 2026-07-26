@@ -12,6 +12,7 @@
 @aufbau/hyperfetch
 @aufbau/patterns
 @aufbau/shapeshift
+@aufbau/templates
 @aufbau/themes
 @aufbau/workers
 
