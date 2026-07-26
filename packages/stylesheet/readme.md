@@ -5,8 +5,10 @@ Aufbau Stylesheets are an enhancement of CSS.
 ## overview
 
 ```css
+aufbau-center
 aufbau-flex
 aufbau-grid
+aufbau-icon
 aufbau-webfont
 
 @aufbau <property>
@@ -45,9 +47,34 @@ button       { aufbau-colors: oled;          }
 button:hover { aufbau-colors: oled inverted; }
 ```
 
+shade engine:
+
+```css
+@aufbau color {
+  brand : #5865f2;
+}
+
+.card {
+  background   : brand-a20;
+  border-color : brand-d15;
+}
+```
+
 ## aufbau-flex
 
 ## aufbau-grid
+
+## aufbau-icon
+
+```css
+.search-btn {
+  aufbau-icon : 'bx:search' size(1.5rem) color(brand-d30);
+}
+
+.close-btn {
+  aufbau-icon : 'lucide:x';
+}
+```
 
 ## aufbau-webfont
 
