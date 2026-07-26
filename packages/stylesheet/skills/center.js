@@ -1,4 +1,4 @@
-// @aufbau/stylesheet/center.js
+// @aufbau/stylesheet/skills/center.js
 
 /**
  * Wandelt `aufbau-center: flex | grid | absolute | fixed;` um
