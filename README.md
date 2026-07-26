@@ -4,7 +4,15 @@
 
 **aufbau** is build  for in-browser vanilla JS.
 
-## @aufbau/kit
+[@aufbau/kit](#aufbau-kit)
+
+[@aufbau/import](#aufbau-import)
+[@aufbau/shaders](#aufbau-shaders)
+[@aufbau/stylesheet](#aufbau-stylesheet)
+
+---
+
+# @aufbau/kit
 
 the **kit** bundles all the following packages with **Preact** and **HTM** to deliver a *batteries-included* JS-framework made in and for the browser.
 
@@ -16,7 +24,7 @@ import aufbau, { html } from '@aufbau/kit';
 
 # packages
 
-## aufbau-import.
+## aufbau-import
 
 It can import the following file formats:
 
