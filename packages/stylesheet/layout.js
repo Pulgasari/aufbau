@@ -1,6 +1,6 @@
-// @aufbau/stylesheet/layout.js
+// @aufbau/stylesheet/skills/layout.js
 
-import { resolveToken } from './tokens.js';
+import { resolveToken } from './../tokens.js';
 
 const FLEX_DIRECTIONS  = new Set(['row', 'column', 'row-reverse', 'column-reverse']);
 const FLEX_WRAPS       = new Set(['wrap', 'nowrap', 'wrap-reverse']);
@@ -9,7 +9,7 @@ const ALIGNMENT_TOKENS = new Set([
   'space-between', 'space-around', 'space-evenly', 'stretch', 'baseline'
 ]);
 
-export function transformFlex(value, tokens) {
+export function transformFlex (value, tokens) {
   let val = value.trim();
   const declarations = ['display: flex;'];
   const alignments = [];
