@@ -1,4 +1,4 @@
-// @aufbau/packages/stylesheet/src/webfont.js
+// @aufbau/stylesheet/skills/webfont.js
 
 const GOOGLE_FONTS_BASE = 'https://fonts.googleapis.com/css2?family=';
 
