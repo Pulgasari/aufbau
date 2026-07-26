@@ -74,7 +74,7 @@ const config = await aufbau.import('config.jsonc');
 
 ## @aufbau/stylesheet
 
-**Aufbau Stylesheets ** (`.ass` or `.aufbau.css`)
+**Aufbau Stylesheets** (`.ass` or `.aufbau.css`)
 
 ```
 deno install jsr:@aufbau/stylesheet
