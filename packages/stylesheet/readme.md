@@ -110,6 +110,26 @@ body {
 }
 ```
 
+## @aufbau-media
+
+```css
+@aufbau-media breakpoints {
+  mobile  : 480px;
+  tablet  : 768px;
+  desktop : 1024px;
+}
+
+.card {
+  aufbau-flex : column;
+  box-shadow  : md;
+
+  @media-media (>= tablet) {
+    aufbau-flex : row;
+    box-shadow  : lg;
+  }
+}
+```
+
 ---
 
 # usage
