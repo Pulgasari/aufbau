@@ -7,25 +7,70 @@ import transformIcons    from './icon.js';
 import transformLayouts  from './layout.js';
 import transformMedia    from './media.js';
 import transformWebfonts from './webfont.js';
+import { transformFlex, transformGrid } from './layout.js';
 
-export default function transform (code) {
-  if (!code) return '';
+// :::::: pre-compiled RegExp rules
 
-  // 1. Tokens extrahieren & @aufbau Blöcke entfernen
+const REGEX_AUFBAU_PROPERTIES = /(aufbau-[a-z-]+)\s*:\s*([^;}\n]+);?/g;
+
+// :::::: cache
+
+const TRANSFORM_CACHE = new Map();
+const MAX_CACHE_SIZE  = 500;
+
+function fastHash (str) {
+  let hash = 5381;
+  let i    = str.length;
+  while (i) hash = (hash * 33) ^ str.charCodeAt(--i);
+  return hash >>> 0;
+}
+
+/**
+ * Level 3: Single-Pass Property Matcher
+ * Verarbeitet alle `aufbau-*` Custom Properties in EINEM EINZIGEN Durchlauf.
+ */
+function transformSmartProperties (code, tokens) {
+  return code.replace(REGEX_AUFBAU_PROPERTIES, (fullMatch, prop, rawVal) => {
+    switch (prop) {
+      case 'aufbau-flex'   : return transformFlex(rawVal, tokens);
+      case 'aufbau-grid'   : return transformGrid(rawVal, tokens);
+      case 'aufbau-center' : return transformCenter(rawVal);
+      case 'aufbau-icon'   : return transformIcons(rawVal, tokens);
+      case 'aufbau-colors' : {
+        const parts      = rawVal.trim().split(/\s+/);
+        const pairName   = parts[0];
+        const isInverted = parts.includes('inverted') || parts.includes('invert');
+        const pair       = tokens.colors?.[pairName];
+        if (!pair) return fullMatch;
+        const bg = isInverted ? pair.fg : pair.bg;
+        const fg = isInverted ? pair.bg : pair.fg;
+        return `background-color: ${bg}; color: ${fg};`;
+      }
+      default: return fullMatch;
+    }
+  });
+}
+
+/**
+ * Pipeline Execution Function
+ */
+function runPipeline (code) {
+  // 1. Extract @aufbau blocks and generate tokens
   const { tokens, code: step1 } = extractTokens(code);
 
-  // 2. Webfonts verarbeiten (@imports)
+  // 2. Webfonts processing (@imports)
   const { code: step2, imports } = transformWebfonts(step1);
 
-  // 3. Smart Properties verarbeiten
-  let result = transformLayouts(step2, tokens);
-  result = transformCenter(result);
-  result = transformIcons(result, tokens);
+  // 3. Level 3: Single-Pass Smart Properties (flex, grid, center, icon, colors in 1 pass)
+  let result = transformSmartProperties(step2, tokens);
 
-  // 4. Tokens & Shades auflösen
+  // 4. Media Queries & Breakpoints
+  result = transformMedia(result, tokens);
+
+  // 5. Token Properties & Shadows
   result = transformTokenProperties(result, tokens);
 
-  // 5. Google Font @imports oben einfügen
+  // 6. Font @imports insertion
   if (imports.length > 0) {
     const importStatements = imports.map(url => `@import url("${url}");`).join('\n');
     result = `${importStatements}\n\n${result}`;
@@ -34,37 +79,28 @@ export default function transform (code) {
   return result;
 }
 
-
-
-
-
-export default function transform(code) {
+/**
+ * Haupt-Transform-Funktion für Aufbau Stylesheet mit Level 1 In-Memory Caching
+ */
+export default function transform (code) {
   if (!code) return '';
 
-  // 1. Tokens extrahieren & Blöcke aus dem Code entfernen
-  const { tokens, code: step1 } = extractTokens(code);
-
-  // 2. Webfonts verarbeiten (@imports)
-  const { code: step2, imports } = transformWebfonts(step1);
-
-  // 3. Smart Properties verarbeiten
-  let result = transformLayouts(step2, tokens);
-  result = transformCenter(result);
-  result = transformIcons(result, tokens);
-  result = transformAufbauColors(result, tokens);
-
-  // 4. Media Queries & Breakpoint Tokens transformieren
-  result = transformMedia(result, tokens);
-
-  // 5. Standard Property Tokens & Shadows auflösen
-  result = transformTokenProperties(result, tokens);
-
-  // 6. Font @imports oben anfügen
-  if (imports.length > 0) {
-    const importStatements = imports.map(url => `@import url("${url}");`).join('\n');
-    result = `${importStatements}\n\n${result}`;
+  // Level 1: Fast Cache-Hit Check (0ms)
+  const cacheKey = fastHash(code);
+  if (TRANSFORM_CACHE.has(cacheKey)) {
+    return TRANSFORM_CACHE.get(cacheKey);
   }
 
+  // Cache Miss: Perform Pipeline
+  const result = runPipeline(code);
+
+  // Maintain max cache size (LRU eviction)
+  if (TRANSFORM_CACHE.size >= MAX_CACHE_SIZE) {
+    const oldestKey = TRANSFORM_CACHE.keys().next().value;
+    TRANSFORM_CACHE.delete(oldestKey);
+  }
+
+  TRANSFORM_CACHE.set(cacheKey, result);
   return result;
 }
 
@@ -93,7 +129,5 @@ export function initBrowser (options = {}) {
   observeDom();
 
   // Service Worker optional mit-registrieren
-  if (options.useWorker) {
-    registerServiceWorker(options.workerPath);
-  }
+  if (options.useWorker) registerServiceWorker(options.workerPath);
 }
