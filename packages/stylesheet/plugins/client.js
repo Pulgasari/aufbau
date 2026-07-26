@@ -2,33 +2,37 @@
 
 import transform from './../index.js';
 
-// Transformiert ein einzelnes Style-Element
-function processStyleElement(styleEl) {
+/**
+ * Transforms a single <style type="text/aufbau"> element
+ */
+export function processStyleElement (styleEl) {
   if (styleEl.dataset.aufbauProcessed) return;
 
-  const rawCode = styleEl.textContent;
+  const rawCode        = styleEl.textContent;
   const transformedCss = transform(rawCode);
 
-  // Ersetze den Inhalt und markiere den Tag
   styleEl.textContent = transformedCss;
-  styleEl.type = 'text/css';
+  styleEl.type        = 'text/css';
   styleEl.dataset.aufbauProcessed = 'true';
 }
 
-// Scant das Dokument nach allen <style type="text/aufbau"> Blöcken
-export function processAllStyles() {
+/**
+ * Scans the document for all <style type="text/aufbau"> elements
+ */
+export function processAllStyles () {
+  if (typeof document === 'undefined') return;
   const styles = document.querySelectorAll('style[type="text/aufbau"]');
   styles.forEach(processStyleElement);
 }
 
-// Startet den MutationObserver für dynamisch injizierten Code
-export function observeDom() {
+/**
+ * Starts the MutationObserver for dynamically injected style elements
+ */
+export function observeDom () {
   if (typeof window === 'undefined' || !window.document) return;
 
-  // Initialer Scan
   processAllStyles();
 
-  // Observer für dynamische Änderungen
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
@@ -45,7 +49,7 @@ export function observeDom() {
   });
 
   observer.observe(document.documentElement, {
-    childList : true,
-    subtree   : true
+    childList: true,
+    subtree: true
   });
 }
