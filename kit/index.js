@@ -12,10 +12,10 @@ export {
 };
 
 // ::: AUFBAU
-import cache     from '@aufbau/cache';
-import importeur from '@aufbau/import';
-export *         from '@aufbau/shaders';
-export *         from '@aufbau/stylesheet';
+import cache           from '@aufbau/cache';
+import importeur       from '@aufbau/import';
+import * as shaders    from '@aufbau/shaders';
+import * as stylesheet from '@aufbau/stylesheet';
 
 // Default Import Map configuration
 const DEFAULT_IMPORT_MAP = {
