@@ -29,7 +29,7 @@ const DEFAULT_IMPORT_MAP = {
  * Automatically injects or extends the browser's <script type="importmap"> tag
  * @param {Record<string, string>} [customImports={}]
  */
-export function injectImportMap(customImports = {}) {
+export function injectImportMap (customImports = {}) {
   if (typeof document === 'undefined') return;
 
   let script = document.querySelector('script[type="importmap"]');
@@ -52,17 +52,17 @@ export function injectImportMap(customImports = {}) {
 }
 
 // Internal Kit Configuration State
-const configState = {
-  autoClient: true,
-  autoImportMap: true,
-  imports: {}
+export const configs = {
+  autoClient    : true,
+  autoImportMap : true,
+  imports       : {}
 };
 
 /**
  * Configure global Aufbau settings
  * @param {Partial<typeof configState>} options
  */
-export function configure(options = {}) {
+export function config (options = {}) {
   Object.assign(configState, options);
 
   if (configState.autoImportMap && options.imports) {
@@ -77,7 +77,7 @@ export function configure(options = {}) {
  * @param {import('preact').ComponentChild} Component
  * @param {HTMLElement} [container=document.body]
  */
-export function createApp(Component, container = document.body) {
+export function createApp (Component, container = document.body) {
   if (typeof window !== 'undefined') {
     if (configState.autoImportMap) {
       injectImportMap(configState.imports);
@@ -97,19 +97,17 @@ export function createApp(Component, container = document.body) {
  * Central Aufbau Singleton Instance
  */
 export const aufbau = {
-  // Config Manager
-  config: configState,
-  configure,
+  // AUFBAU
+  config, configs,
+  cache, import: importeur,
+  createApp, injectImportMap,
+  shaders, stylesheet,
 
-  // Direct Utilities
-  import: importFile,
-  cache,
-  html,
-  createApp,
-
-  // Core Modules
-  stylesheet,
-  shaders
+  // Preact + HTM
+  render, cloneElement, createContext, Component,
+  useCallback, useContext, useEffect, useMemo, useState, useRef,
+  batch, computed, effect, signal, useComputed, useSignal, useSignalEffect,   
+  h, html,
 };
 
 export default aufbau;
