@@ -12,6 +12,15 @@ async function fetchText(path) {
   return response.text();
 }
 
+// Helper: Prüft, ob ein Objekt serialisierbar für IndexedDB ist
+const isCacheable = (val) => {
+  if (!val || typeof val !== 'object') return typeof val !== 'function';
+  if (val instanceof Node || val instanceof CSSStyleSheet) return false;
+  // Module oder Objekte mit Funktionen ausschließen
+  return !Object.values(val).some(v => typeof v === 'function');
+};
+
+
 function transformCSSResult(cssCode, asOption) {
   if (asOption === 'css') return cssCode;
   if (asOption === 'style') {
@@ -238,6 +247,7 @@ export async function importFile(path, options = {}) {
   const result = await handler(path, options);
 
   // 2. Cache result if serializable (skip DOM nodes, CSSStyleSheets or functions)
+  /*
   if (
     useCache &&
     !(result instanceof Node) &&
@@ -245,6 +255,15 @@ export async function importFile(path, options = {}) {
     typeof result !== 'function'
   ) {
     await cache.set(cacheKey, result);
+  }
+  */
+  
+  if (useCache && isCacheable(result)) {
+    try {
+      await cache.set(cacheKey, result);
+    } catch (e) {
+      console.warn(`[@aufbau/import] Could not cache "${path}":`, e);
+    }
   }
 
   return result;
