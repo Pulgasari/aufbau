@@ -6,6 +6,7 @@ import transformCenter   from './skills/center.js';
 import transformIcons    from './skills/icon.js';
 import transformLayouts  from './skills/layout.js';
 import transformMedia    from './skills/media.js';
+import transformShader   from './skills/shader.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
 
