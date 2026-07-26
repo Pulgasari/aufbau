@@ -1,10 +1,8 @@
-// @aufbau/packages/stylesheet/src/client.js
+// @aufbau/stylesheet/plugins/client.js
 
-import transform from './index.js';
+import transform from './../index.js';
 
-/**
- * Transformiert ein einzelnes Style-Element
- */
+// Transformiert ein einzelnes Style-Element
 function processStyleElement(styleEl) {
   if (styleEl.dataset.aufbauProcessed) return;
 
@@ -17,17 +15,13 @@ function processStyleElement(styleEl) {
   styleEl.dataset.aufbauProcessed = 'true';
 }
 
-/**
- * Scant das Dokument nach allen <style type="text/aufbau"> Blöcken
- */
+// Scant das Dokument nach allen <style type="text/aufbau"> Blöcken
 export function processAllStyles() {
   const styles = document.querySelectorAll('style[type="text/aufbau"]');
   styles.forEach(processStyleElement);
 }
 
-/**
- * Startet den MutationObserver für dynamisch injizierten Code
- */
+// Startet den MutationObserver für dynamisch injizierten Code
 export function observeDom() {
   if (typeof window === 'undefined' || !window.document) return;
 
