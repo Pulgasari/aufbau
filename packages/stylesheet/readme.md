@@ -61,6 +61,10 @@ body {
 }
 ```
 
+---
+
+# @aufbau
+
 ## default values
 
 ```css
@@ -72,6 +76,10 @@ body {
   huge   : 3.00rem;
 }
 ```
+
+---
+
+# usage
 
 ## usage in browser worker
 
