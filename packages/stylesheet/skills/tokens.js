@@ -197,3 +197,166 @@ export function transformTokenProperties(code, tokens) {
     return fullMatch;
   });
 }
+
+
+
+// @aufbau/packages/stylesheet/src/tokens.js
+import { warnMissingToken } from './debug.js';
+
+const DEFAULT_TOKENS = {
+  gap: {
+    tiny   : '0.25rem',
+    small  : '0.50rem',
+    normal : '1.00rem',
+    big    : '2.00rem',
+    huge   : '3.00rem',
+  },
+  'aspect-ratio': {
+    square   : '1 / 1',
+    video    : '16 / 9',
+    portrait : '4 / 5',
+    cinema   : '21 / 9',
+    photo    : '3 / 2',
+  },
+  media: {
+    mobile  : '480px',
+    tablet  : '768px',
+    desktop : '1024px',
+    wide    : '1280px',
+  },
+  'box-shadow': {
+    sm   : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    md   : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+    lg   : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+    xl   : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+    none : 'none',
+  }
+};
+
+const PROPERTY_FAMILY_MAP = [
+  {
+    category : 'border',
+    match    : /^border(-top|-right|-bottom|-left|-inline|-block|-inline-start|-inline-end|-block-start|-block-end)?$/
+  },
+  {
+    category : 'padding',
+    match    : /^padding(-top|-right|-bottom|-left|-inline|-block|-inline-start|-inline-end|-block-start|-block-end)?$/
+  },
+  {
+    category : 'margin',
+    match    : /^margin(-top|-right|-bottom|-left|-inline|-block|-inline-start|-inline-end|-block-start|-block-end)?$/
+  },
+  {
+    category : 'gap',
+    match    : /^(gap|row-gap|column-gap)$/
+  },
+  {
+    category : 'border-radius',
+    match    : /^border(-top-left|-top-right|-bottom-left|-bottom-right|-start-start|-start-end|-end-start|-end-end)?-radius$/
+  },
+  {
+    category : 'aspect-ratio',
+    match    : /^aspect-ratio$/
+  },
+  {
+    category : 'box-shadow',
+    match    : /^(box-shadow|shadow)$/
+  },
+  {
+    category : 'color',
+    match    : /^(color|background-color|border-color|border-top-color|border-right-color|border-bottom-color|border-left-color|outline-color|fill|stroke)$/
+  }
+];
+
+function parseBodyLines(body, targetObj) {
+  const lines = body.split('\n');
+  for (const line of lines) {
+    const parts = line.split(':');
+    if (parts.length === 2) {
+      const key = parts[0].trim();
+      const value = parts[1].replace(';', '').trim();
+      if (key && value) {
+        targetObj[key] = value;
+      }
+    }
+  }
+}
+
+export function extractTokens(code) {
+  const tokens = {
+    ...JSON.parse(JSON.stringify(DEFAULT_TOKENS)),
+    color: {},
+    colors: {}
+  };
+
+  let cleanedCode = code;
+
+  // 1. Parse @aufbau-media breakpoints { ... }
+  cleanedCode = cleanedCode.replace(/@aufbau-media\s+(?:breakpoints\s*)?\{([^}]*)\}/gi, (_, body) => {
+    parseBodyLines(body, tokens.media);
+    return '';
+  });
+
+  // 2. Parse @aufbau color { ... }
+  cleanedCode = cleanedCode.replace(/@aufbau\s+color\s*\{([^}]*)\}/gi, (_, body) => {
+    parseBodyLines(body, tokens.color);
+    return '';
+  });
+
+  // 3. Parse @aufbau colors { ... }
+  cleanedCode = cleanedCode.replace(/@aufbau\s+colors\s*\{([^}]*)\}/gi, (_, body) => {
+    const rawPairs = {};
+    parseBodyLines(body, rawPairs);
+
+    for (const [key, val] of Object.entries(rawPairs)) {
+      const parts = val.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        const bg = tokens.color[parts[0]] || parts[0];
+        const fg = tokens.color[parts[1]] || parts[1];
+        tokens.colors[key] = { bg, fg };
+      }
+    }
+    return '';
+  });
+
+  // 4. Other @aufbau blocks
+  cleanedCode = cleanedCode.replace(/@aufbau\s+([a-zA-Z0-9-]+)\s*\{([^}]*)\}/g, (_, category, body) => {
+    const catKey = category.trim().toLowerCase();
+    if (!tokens[catKey]) tokens[catKey] = {};
+    parseBodyLines(body, tokens[catKey]);
+    return '';
+  });
+
+  return { tokens, code: cleanedCode };
+}
+
+export function transformTokenProperties(code, tokens) {
+  return code.replace(/([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g, (fullMatch, prop, rawValue) => {
+    const cleanProp = prop.trim();
+    const cleanValue = rawValue.trim();
+
+    if (cleanProp.startsWith('aufbau-')) return fullMatch;
+
+    let category = null;
+    for (const family of PROPERTY_FAMILY_MAP) {
+      if (family.match.test(cleanProp)) {
+        category = family.category;
+        break;
+      }
+    }
+    if (!category) category = cleanProp;
+
+    const categoryTokens = tokens[category];
+
+    if (categoryTokens) {
+      if (categoryTokens[cleanValue]) {
+        return `${cleanProp}: ${categoryTokens[cleanValue]};`;
+      }
+      // Trigger warning for potential typo if value is not resolved
+      warnMissingToken(cleanProp, cleanValue, categoryTokens);
+    }
+
+    return fullMatch;
+  });
+}
+
