@@ -155,3 +155,20 @@ export function transformTokenProperties(code, tokens) {
     return fullMatch;
   });
 }
+
+/**
+ * Löste einen Token-Namen (z.B. 'small' für 'gap') in den entsprechenden CSS-Wert auf.
+ * Falls der Schlüssel nicht im Token-Set existiert (z.B. bei Werten wie '1rem' oder '15px'),
+ * wird der übergebene Wert direkt als Fallback zurückgegeben.
+ */
+export function resolveToken(tokens, category, key) {
+  if (!key) return '';
+  const categoryTokens = tokens?.[category];
+  
+  if (categoryTokens && categoryTokens[key] !== undefined) {
+    return categoryTokens[key];
+  }
+  
+  return key; // Fallback für direkte Wertangaben wie gap(1rem)
+}
+
