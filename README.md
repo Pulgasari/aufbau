@@ -8,6 +8,13 @@
 [@aufbau/shaders](#aufbau-shaders)
 [@aufbau/stylesheet](#aufbau-stylesheet)
 
+@aufbau/cache
+@aufbau/hyperfetch
+@aufbau/patterns
+@aufbau/shapeshift
+@aufbau/themes
+@aufbau/workers
+
 ---
 
 # @aufbau/kit
