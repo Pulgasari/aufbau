@@ -1,9 +1,15 @@
 // @aufbau/stylesheet/skills/media.js
 
-// Wandelt Breakpoint-Operatoren und Token in valides CSS-Media-Query-Syntax um
-// Example: (>= tablet) -> (min-width: 768px)
+// :::::: pre-compiled RegExp rules
+
+const REGEX_MEDIA_CONDITION = /\(\s*([><]=?)\s*([a-zA-Z0-9_-]+)\s*\)/g;
+const REGEX_MEDIA_MEDIA     = /@media-media/g;
+const REGEX_MEDIA_BLOCK     = /@media\s*([^{]+)\{/g;
+
+// :::::: helpers
+
 function resolveMediaCondition(conditionStr, mediaTokens) {
-  return conditionStr.replace(/\(\s*([><]=?)\s*([a-zA-Z0-9_-]+)\s*\)/g, (match, operator, tokenKey) => {
+  return conditionStr.replace(REGEX_MEDIA_CONDITION, (match, operator, tokenKey) => {
     const val = mediaTokens?.[tokenKey] || tokenKey;
 
     switch (operator) {
@@ -19,18 +25,13 @@ function resolveMediaCondition(conditionStr, mediaTokens) {
   });
 }
 
-// Transformiert @aufbau-media Blöcke & @media-media Anweisungen
-export function transformMedia (code, tokens) {
-  let result = code;
+// :::::: main export
 
-  // 1. Convert @media-media -> @media
-  result = result.replace(/@media-media/g, '@media');
-
-  // 2. Resolve Breakpoint tokens in @media conditions
-  result = result.replace(/@media\s*([^{]+)\{/g, (match, condition) => {
-    const resolvedCondition = resolveMediaCondition(condition, tokens?.media);
-    return `@media ${resolvedCondition}{`;
-  });
-
-  return result;
+export default function (code, tokens) {
+  return code
+    .replace(REGEX_MEDIA_MEDIA, '@media')
+    .replace(REGEX_MEDIA_BLOCK, (match, condition) => {
+      const resolvedCondition = resolveMediaCondition(condition, tokens?.media);
+      return `@media ${resolvedCondition}{`;
+    });
 }
