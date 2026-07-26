@@ -3,8 +3,9 @@
 const GOOGLE_FONTS_BASE = 'https://fonts.googleapis.com/css2?family=';
 
 const WEBFONT_MAP = {
-  'JetBrains Mono' : { wght: '400;500;700' , fallback: 'monospace'  },
+  'Hubot Sans'     : { wght: 'ital,wght@0,200..900;1,200..900', fallback: 'monospace' },
   'Inter'          : { wght: '400;500;700' , fallback: 'sans-serif' },
+  'JetBrains Mono' : { wght: '400;500;700' , fallback: 'monospace'  },
   'Fira Code'      : { wght: '400;700'     , fallback: 'monospace'  },
   'Roboto'         : { wght: '400;700'     , fallback: 'sans-serif' },
 };
