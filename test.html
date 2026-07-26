@@ -81,7 +81,7 @@
 
     async function runImportTests() {
       try {
-        // A) Test test.json
+        // A) Test test.jsonc
         const jsonData = await aufbau.import('./test/test.jsonc');
         jsonState.value = jsonData;
 
@@ -111,7 +111,7 @@
           </section>
 
           <section style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 8px;">
-            <h3 style="margin-top: 0; color: #d19a66;">2. JSON Data (.json)</h3>
+            <h3 style="margin-top: 0; color: #d19a66;">2. JSONC Data (.jsonc)</h3>
             <pre style="background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; overflow-x: auto;">
 ${JSON.stringify(jsonState.value, null, 2)}
             </pre>
