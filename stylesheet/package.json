@@ -7,6 +7,7 @@
   "module": "./index.js",
   "types": "./dev/index.d.ts",
   "dependencies": {
+    "@aufbau/cache": "workspace:*",
     "@aufbau/shaders": "workspace:*"
   },
   "exports": {
