@@ -6,6 +6,9 @@
   "main": "./index.js",
   "module": "./index.js",
   "types": "./dev/index.d.ts",
+  "dependencies": {
+    "@aufbau/shaders": "workspace:*"
+  },
   "exports": {
     ".": {
       "types": "./dev/index.d.ts",
