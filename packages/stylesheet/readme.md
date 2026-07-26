@@ -33,3 +33,34 @@ body {
   huge   : 3.00rem;
 }
 ```
+
+## use worker
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="module">
+    import { initBrowser } from './node_modules/@aufbau/stylesheet/src/index.js';
+    initBrowser({ useWorker: true, workerPath: '/sw.js' });
+  </script>
+
+  <style type="text/aufbau">
+    @aufbau gap {
+      small : 0.5rem;
+      big   : 2.0rem;
+    }
+
+    body {
+      aufbau-webfont : "JetBrains Mono";
+      aufbau-flex    : column center gap(big);
+    }
+  </style>
+
+  <link rel="stylesheet" href="/styles/main.aufbau.css">
+</head>
+<body>
+  <h1>Aufbau CSS läuft!</h1>
+</body>
+</html>
+```
