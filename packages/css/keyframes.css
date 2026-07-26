@@ -1,0 +1,27 @@
+/* @aufbau/css/keyframes.css */
+
+keyframes slide-in-leftwards {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0);    }
+}
+@keyframes slide-out-leftwards {
+  from { transform: translateX(0);     }
+  to   { transform: translateX(-100%); }
+}
+@keyframes slide-in-rightwards {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0);     }
+}
+@keyframes slide-out-rightwards {
+  from { transform: translateX(0);    }
+  to   { transform: translateX(100%); }
+}
+
+/*
+
+@keyframes slideIn     { from { transform: translateX(-110%); } to { transform: translateX(    0); } }
+@keyframes slideOut    { from { transform: translateX(    0); } to { transform: translateX(-110%); } }
+@keyframes slideInRTL  { from { transform: translateX(+110%); } to { transform: translateX(    0); } }
+@keyframes slideOutRTL { from { transform: translateX(    0); } to { transform: translateX(+110%); } }
+
+*/
