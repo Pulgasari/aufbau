@@ -1,6 +1,6 @@
 // @aufbau/stylesheet
 
-import { extractTokens, transformTokenProperties, transformAufbauColors } from './skills/tokens.js';
+import { extractTokens, transformTokenProperties } from './skills/tokens.js';
 import { observeDom }    from './plugins/client.js';
 import transformCenter   from './skills/center.js';
 import transformIcons    from './skills/icon.js';
