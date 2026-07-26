@@ -36,6 +36,7 @@ function transformSmartProperties (code, tokens) {
       case 'aufbau-grid'   : return transformGrid(rawVal, tokens);
       case 'aufbau-center' : return transformCenter(rawVal);
       case 'aufbau-icon'   : return transformIcons(rawVal, tokens);
+      case 'aufbau-shader' : return transformShader(fullMatch);
       case 'aufbau-colors' : {
         const parts      = rawVal.trim().split(/\s+/);
         const pairName   = parts[0];
