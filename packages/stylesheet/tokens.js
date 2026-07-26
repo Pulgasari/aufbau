@@ -1,7 +1,5 @@
 // @aufbau/stylesheet/tokens.js
 
-// @aufbau/packages/stylesheet/src/tokens.js
-
 const DEFAULT_TOKENS = {
   gap: {
     tiny   : '0.25rem',
@@ -9,6 +7,13 @@ const DEFAULT_TOKENS = {
     normal : '1.00rem',
     big    : '2.00rem',
     huge   : '3.00rem',
+  },
+  'aspect-ratio': {
+    square   : '1 / 1',
+    video    : '16 / 9',
+    portrait : '4 / 5',
+    cinema   : '21 / 9',
+    photo    : '3 / 2',
   }
 };
 
@@ -34,11 +39,50 @@ const PROPERTY_FAMILY_MAP = [
     match    : /^border(-top-left|-top-right|-bottom-left|-bottom-right|-start-start|-start-end|-end-start|-end-end)?-radius$/
   },
   {
+    category : 'aspect-ratio',
+    match    : /^aspect-ratio$/
+  },
+  {
     category : 'color',
-    // Deckt alle Eigenschaften ab, die Einzel-Farben erwarten
-    match    : /^(color|background-color|border-color|border-top-color|border-right-color|border-bottom-color|border-left-color|outline-color|fill|stroke)$/   
+    match    : /^(color|background-color|border-color|border-top-color|border-right-color|border-bottom-color|border-left-color|outline-color|fill|stroke)$/
   }
 ];
+
+/**
+ * Löst relative Farb-Shades wie brand-d20, brand-l15 oder brand-a50 auf
+ */
+function resolveColorShade(val, colorTokens) {
+  if (!colorTokens) return null;
+
+  // Exakte Farbe vorhanden?
+  if (colorTokens[val]) return colorTokens[val];
+
+  // Match Pattern: <colorName>-(d|l|a)<percentage>
+  const shadeMatch = val.match(/^([a-zA-Z0-9_-]+)-(d|l|a)(\d+)$/);
+  if (!shadeMatch) return null;
+
+  const [, baseName, type, pctStr] = shadeMatch;
+  const baseColor = colorTokens[baseName];
+  if (!baseColor) return null;
+
+  const pct = parseInt(pctStr, 10);
+  if (isNaN(pct) || pct < 0 || pct > 100) return null;
+
+  const basePct = 100 - pct;
+
+  if (type === 'd') {
+    // Dunkler (d): Base-Farbe + Schwarz
+    return `color-mix(in srgb, ${baseColor} ${basePct}%, black)`;
+  } else if (type === 'l') {
+    // Heller (l): Base-Farbe + Weiß
+    return `color-mix(in srgb, ${baseColor} ${basePct}%, white)`;
+  } else if (type === 'a') {
+    // Alpha (a): Base-Farbe + Transparent
+    return `color-mix(in srgb, ${baseColor} ${pct}%, transparent)`;
+  }
+
+  return null;
+}
 
 function parseBodyLines(body, targetObj) {
   const lines = body.split('\n');
@@ -54,9 +98,6 @@ function parseBodyLines(body, targetObj) {
   }
 }
 
-/**
- * Extrahiert @aufbau Blöcke und baut das Token-Objekt auf
- */
 export function extractTokens(code) {
   const tokens = {
     ...JSON.parse(JSON.stringify(DEFAULT_TOKENS)),
@@ -66,13 +107,13 @@ export function extractTokens(code) {
 
   let cleanedCode = code;
 
-  // 1. @aufbau color { ... } parsen (Einzel-Farben)
+  // @aufbau color
   cleanedCode = cleanedCode.replace(/@aufbau\s+color\s*\{([^}]*)\}/gi, (_, body) => {
     parseBodyLines(body, tokens.color);
     return '';
   });
 
-  // 2. @aufbau colors { ... } parsen (Farbpaare: bg fg)
+  // @aufbau colors
   cleanedCode = cleanedCode.replace(/@aufbau\s+colors\s*\{([^}]*)\}/gi, (_, body) => {
     const rawPairs = {};
     parseBodyLines(body, rawPairs);
@@ -80,16 +121,15 @@ export function extractTokens(code) {
     for (const [key, val] of Object.entries(rawPairs)) {
       const parts = val.trim().split(/\s+/);
       if (parts.length >= 2) {
-        // Löst optional vorhandene Namen aus @aufbau color auf (z.B. name2 -> #987654)
-        const bg = tokens.color[parts[0]] || parts[0];
-        const fg = tokens.color[parts[1]] || parts[1];
+        const bg = resolveColorShade(parts[0], tokens.color) || parts[0];
+        const fg = resolveColorShade(parts[1], tokens.color) || parts[1];
         tokens.colors[key] = { bg, fg };
       }
     }
     return '';
   });
 
-  // 3. Alle weiteren Blöcke (@aufbau border, @aufbau padding, etc.)
+  // Sonstige @aufbau Blöcke
   cleanedCode = cleanedCode.replace(/@aufbau\s+([a-zA-Z0-9-]+)\s*\{([^}]*)\}/g, (_, category, body) => {
     const catKey = category.trim().toLowerCase();
     if (!tokens[catKey]) tokens[catKey] = {};
@@ -100,9 +140,6 @@ export function extractTokens(code) {
   return { tokens, code: cleanedCode };
 }
 
-/**
- * Wandelt `aufbau-colors: <pair> [inverted];` um
- */
 export function transformAufbauColors(code, tokens) {
   return code.replace(/aufbau-colors:\s*([^;}\n]+);?/g, (fullMatch, rawVal) => {
     const parts = rawVal.trim().split(/\s+/);
@@ -116,28 +153,22 @@ export function transformAufbauColors(code, tokens) {
     let fg = pair.fg;
 
     if (isInverted) {
-      [bg, fg] = [fg, bg]; // Werte tauschen
+      [bg, fg] = [fg, bg];
     }
 
     return `background-color: ${bg}; color: ${fg};`;
   });
 }
 
-/**
- * Löst Einzel-Token-Ersetzungen in CSS-Eigenschaften auf
- */
 export function transformTokenProperties(code, tokens) {
-  // 1. Zuerst aufbau-colors auflösen
   let result = transformAufbauColors(code, tokens);
 
-  // 2. Normale CSS Properties mit Einzel-Tokens (z.B. background-color: name1;)
-  result = result.replace(/([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g, (fullMatch, prop, rawValue) => {
+  return result.replace(/([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g, (fullMatch, prop, rawValue) => {
     const cleanProp = prop.trim();
     const cleanValue = rawValue.trim();
 
     if (cleanProp.startsWith('aufbau-')) return fullMatch;
 
-    // Passende Kategorie finden (z.B. background-color -> 'color')
     let category = null;
     for (const family of PROPERTY_FAMILY_MAP) {
       if (family.match.test(cleanProp)) {
@@ -149,12 +180,20 @@ export function transformTokenProperties(code, tokens) {
 
     const categoryTokens = tokens[category];
 
-    if (categoryTokens && categoryTokens[cleanValue]) {
-      return `${cleanProp}: ${categoryTokens[cleanValue]};`;
+    if (categoryTokens) {
+      // 1. Direktes Token?
+      if (categoryTokens[cleanValue]) {
+        return `${cleanProp}: ${categoryTokens[cleanValue]};`;
+      }
+      // 2. Relative Color Shade? (z.B. brand-d20)
+      if (category === 'color') {
+        const resolvedShade = resolveColorShade(cleanValue, categoryTokens);
+        if (resolvedShade) {
+          return `${cleanProp}: ${resolvedShade};`;
+        }
+      }
     }
 
     return fullMatch;
   });
-
-  return result;
 }
