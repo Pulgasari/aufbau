@@ -5,7 +5,7 @@ const ICONIFY_BASE = 'https://api.iconify.design/';
 /**
  * Wandelt `aufbau-icon: 'prefix:name' size(...) color(...);` um
  */
-export function transformIcons (code, tokens) {
+export default function transformIcons (code, tokens) {
   return code.replace(/aufbau-icon:\s*([^;}\n]+);?/g, (fullMatch, rawVal) => {
     let val = rawVal.trim();
 
