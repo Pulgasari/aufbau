@@ -2,21 +2,29 @@
 
 import { extractTokens, transformTokenProperties } from './tokens.js';
 import { observeDom }    from './client.js';
+import transformCenter   from './center.js';
+import transformIcons    from './icon.js';
 import transformLayouts  from './layout.js';
 import transformWebfonts from './webfont.js';
 
-/**
- * Haupt-Transform-Funktion
- */
 export default function transform (code) {
   if (!code) return '';
 
-  const { tokens,  code: codeWithoutBlocks   } = extractTokens(code);
-  const { imports, code: codeFontTransformed } = transformWebfonts(codeWithoutBlocks);
-  
-  let result = transformLayouts(codeFontTransformed, tokens);
+  // 1. Tokens extrahieren & @aufbau Blöcke entfernen
+  const { tokens, code: step1 } = extractTokens(code);
+
+  // 2. Webfonts verarbeiten (@imports)
+  const { code: step2, imports } = transformWebfonts(step1);
+
+  // 3. Smart Properties verarbeiten
+  let result = transformLayouts(step2, tokens);
+  result = transformCenter(result);
+  result = transformIcons(result, tokens);
+
+  // 4. Tokens & Shades auflösen
   result = transformTokenProperties(result, tokens);
 
+  // 5. Google Font @imports oben einfügen
   if (imports.length > 0) {
     const importStatements = imports.map(url => `@import url("${url}");`).join('\n');
     result = `${importStatements}\n\n${result}`;
@@ -24,6 +32,7 @@ export default function transform (code) {
 
   return result;
 }
+
 
 /**
  * Helper: Registriert den Service Worker für .aufbau.css / .ass Dateien
