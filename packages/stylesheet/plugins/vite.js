@@ -3,16 +3,16 @@
 import transform from './../index.js';
 
 /**
- * Vite Plugin für Aufbau Stylesheet
- * @param {Object} options
- * @param {RegExp} [options.include=/\.(aufbau\.css|ass)$/] - Regex für Dateiendungen
+ * Vite Plugin for Aufbau Stylesheet
+ * @param {Object} [options]
+ * @param {RegExp} [options.include=/\.(aufbau\.css|ass)$/] - Regex for targeted file extensions
  */
 export default function aufbauStylesheetPlugin (options = {}) {
   const fileRegex = options.include || /\.(aufbau\.css|ass)$/;
 
   return {
-    name: 'vite-plugin-aufbau-stylesheet',
-    enforce: 'pre', // Läuft VOR den Standard-CSS Plugins von Vite
+    name    : 'vite-plugin-aufbau-stylesheet',
+    enforce : 'pre',
 
     transform(code, id) {
       if (!fileRegex.test(id)) return null;
@@ -20,11 +20,11 @@ export default function aufbauStylesheetPlugin (options = {}) {
       try {
         const transformedCss = transform(code);
         return {
-          code: transformedCss,
-          map: null // In Phase 1 ohne Source Maps
+          code : transformedCss,
+          map  : null
         };
       } catch (err) {
-        this.error(`[Aufbau Vite Plugin] Fehler in ${id}: ${err.message}`);
+        this.error(`[Aufbau Vite Plugin] Error processing ${id}: ${err.message}`);
       }
     }
   };
