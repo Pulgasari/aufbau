@@ -1,4 +1,4 @@
-// @aufbau/stylesheet/tokens.js
+// @aufbau/stylesheet/skills/tokens.js
 
 const DEFAULT_TOKENS = {
   gap: {
