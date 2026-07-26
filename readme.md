@@ -96,5 +96,5 @@ deno install jsr:@aufbau/stylesheet
 
 ## @aufbau/webfonts
 
-handpicked collection of free webfonts looking great on webdev projects.
+handpicked collection of free webfonts looking great in webdev projects.
 
