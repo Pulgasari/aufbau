@@ -13,14 +13,11 @@ function resolveMediaCondition(conditionStr, mediaTokens) {
     const val = mediaTokens?.[tokenKey] || tokenKey;
 
     switch (operator) {
-      case '>=':
-      case '>':
-        return `(min-width: ${val})`;
-      case '<=':
-      case '<':
-        return `(max-width: ${val})`;
-      default:
-        return match;
+      case '>=' :
+      case '>'  : return `(min-width: ${val})`;
+      case '<=' :
+      case '<'  : return `(max-width: ${val})`;
+      default   : return match;
     }
   });
 }
