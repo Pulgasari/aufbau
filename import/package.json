@@ -4,6 +4,9 @@
   "description": "Dynamic multi-format asset loader for the browser (CSV, JSON5, JSX, Less, MD, Sass, TOML, TS, WASM, XML, YAML).",
   "type": "module",
   "main": "./index.js",
+  "dependencies": {
+    "@aufbau/cache": "workspace:*"
+  },
   "exports": {
     ".": "./index.js"
   },
