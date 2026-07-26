@@ -46,9 +46,7 @@
   </div>
 
   <footer>
-    <div>
-      ...
-    </div>
+    <div></div>
   </footer>
 
   <script type="module">
@@ -58,7 +56,6 @@
     }
     aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
     const { define, update, signal, effect } = aufbau;
-    alert('aufbau!');
 
     // Register custom CSS custom properties
     define({ key: 'bg', type: 'property' });
