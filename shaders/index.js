@@ -16,7 +16,7 @@ export const presets = {
   'cyber-glitch'       : heavyCyberGlitch,
 };
 
-export {6
+export {
   waveShader,
   glitchRgb,
   liveGlitch,
