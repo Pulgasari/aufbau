@@ -1,4 +1,4 @@
-// @aufbau/stylesheet/skills/shaders.js
+// @aufbau/stylesheet/skills/shader.js
 
 import { presets } from '@aufbau/shaders';
 
