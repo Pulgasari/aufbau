@@ -1,5 +1,7 @@
 # aufbau
 
+![Logo](logo.svg)
+
 ## aufbau stylesheets
 
 ```
