@@ -1,6 +1,8 @@
 ![Logo](logo.svg)
 
-**aufbau** is build  for in-browser vanilla JS.
+**aufbau** is a browser-focused JS toolkit, library and framework. It's made for being used without any offline build-steps.
+
+***Note:** It's also working with deno, node, vite etc. but working 100% client-side is the main focus.*
 
 #### the kit
 
