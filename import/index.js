@@ -1,5 +1,7 @@
 // @aufbau/import
 
+import cache from '@aufbau/cache';
+
 // :::::: HELPERS
 
 async function fetchText(path) {
@@ -214,15 +216,33 @@ const extensionMap = {
 };
 
 /**
- * Dynamically import files of various extensions directly in the browser
+ * Dynamically import files with automatic caching
  * @param {string} path
  * @param {Object} [options]
+ * @param {boolean} [options.useCache=true] - Toggle caching behavior
  */
 export async function importFile (path, options = {}) {
+  const useCache = options.useCache !== false;
+  const cacheKey = `import:${path}:${JSON.stringify(options)}`;
+
+  // 1. Try reading from @aufbau/cache
+  if (useCache) {
+    const cachedResult = await cache.get(cacheKey);
+    if (cachedResult !== null) return cachedResult;
+  }
+
   const ext = path.split('.').pop().toLowerCase();
   const handler = extensionMap[ext];
   if (!handler) throw new Error(`[@aufbau/import] The file extension .${ext} is not supported.`);
-  return handler(path, options);
+
+  const result = await handler(path, options);
+
+  // 2. Cache result if it is serializable (skip DOM elements or raw functions)
+  if (useCache && !(result instanceof Node) && typeof result !== 'function') {
+    await cache.set(cacheKey, result);
+  }
+
+  return result;
 }
 
 export default importFile;
