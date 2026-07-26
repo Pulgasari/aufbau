@@ -1,6 +1,8 @@
+![Logo](logo.svg)
+
 # aufbau
 
-![Logo](logo.svg)
+**aufbau** is build  for in-browser vanilla JS.
 
 ## aufbau stylesheets
 
