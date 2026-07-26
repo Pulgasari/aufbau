@@ -82,7 +82,7 @@
     async function runImportTests() {
       try {
         // A) Test test.json
-        const jsonData = await aufbau.import('./test/test.json');
+        const jsonData = await aufbau.import('./test/test.jsonc');
         jsonState.value = jsonData;
 
         // B) Test test.md
