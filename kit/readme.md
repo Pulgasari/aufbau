@@ -53,12 +53,11 @@ aufbau.config({ autoClient: true });
 const count = aufbau.signal(0);
 ```
 
-## Option B: Destructuring from `aufbau` Singleton
+### Option B: Destructuring from `aufbau` Singleton
 
 ```javascript
-import { aufbau } from '@aufbau/kit';
-
-const { signal, html, effect, config, cache, import: importFile, createApp } = aufbau;
+import aufbau from '@aufbau/kit';
+const { signal, html, effect, config, cache, createApp } = aufbau;
 
 // Config setzen
 config({
