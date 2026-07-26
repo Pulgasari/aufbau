@@ -1,6 +1,6 @@
 // @aufbau/stylesheet/plugins/vite.js
 
-import transform from './index.js';
+import transform from './../index.js';
 
 /**
  * Vite Plugin für Aufbau Stylesheet
