@@ -216,12 +216,12 @@ const extensionMap = {
 };
 
 /**
- * Dynamically import files with automatic caching
+ * Dynamically import files of various extensions with automatic L1/L2 caching
  * @param {string} path
  * @param {Object} [options]
  * @param {boolean} [options.useCache=true] - Toggle caching behavior
  */
-export async function importFile (path, options = {}) {
+export async function importFile(path, options = {}) {
   const useCache = options.useCache !== false;
   const cacheKey = `import:${path}:${JSON.stringify(options)}`;
 
@@ -237,8 +237,13 @@ export async function importFile (path, options = {}) {
 
   const result = await handler(path, options);
 
-  // 2. Cache result if it is serializable (skip DOM elements or raw functions)
-  if (useCache && !(result instanceof Node) && typeof result !== 'function') {
+  // 2. Cache result if serializable (skip DOM nodes, CSSStyleSheets or functions)
+  if (
+    useCache &&
+    !(result instanceof Node) &&
+    !(result instanceof CSSStyleSheet) &&
+    typeof result !== 'function'
+  ) {
     await cache.set(cacheKey, result);
   }
 
