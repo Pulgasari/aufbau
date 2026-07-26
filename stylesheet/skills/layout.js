@@ -1,6 +1,6 @@
 // @aufbau/stylesheet/skills/layout.js
 
-import { resolveToken } from './../tokens.js';
+import { resolveToken } from './tokens.js';
 
 const FLEX_DIRECTIONS  = new Set(['row', 'column', 'row-reverse', 'column-reverse']);
 const FLEX_WRAPS       = new Set(['wrap', 'nowrap', 'wrap-reverse']);
