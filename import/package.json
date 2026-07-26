@@ -1,0 +1,19 @@
+{
+  "name": "@aufbau/import",
+  "version": "0.1.0",
+  "description": "Dynamic multi-format asset loader for the browser (CSV, JSON5, JSX, Less, MD, Sass, TOML, TS, WASM, XML, YAML).",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "packages/import"
+  }
+}
