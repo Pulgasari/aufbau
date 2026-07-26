@@ -102,6 +102,12 @@ body {
   big    : 2.00rem;
   huge   : 3.00rem;
 }
+
+@aufbau-media breakpoints {
+  mobile  : 480px;
+  tablet  : 768px;
+  desktop : 1024px;
+}
 ```
 
 ---
