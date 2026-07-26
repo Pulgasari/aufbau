@@ -1,4 +1,4 @@
-// @aufbau/packages/stylesheet/index.js
+// @aufbau/stylesheet
 
 import { extractTokens, transformTokenProperties } from './tokens.js';
 import { observeDom }    from './client.js';
