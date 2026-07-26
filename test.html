@@ -44,7 +44,7 @@
 
   <script type="module">
     import aufbau, { html } from './kit/index.js';
-    import { importFile } from '@aufbau/import';
+    //import { importFile } from '@aufbau/import';
 
     // 1. Footer Component & Theme Swapper (Bestehende Logik)
     function FooterNav () {
@@ -81,22 +81,22 @@
 
     // 2. @aufbau/import Test Suite
     const jsonState = signal(null);
-    const mdState = signal('Lade Markdown...');
-    const tsState = signal('Lade TypeScript...');
+    const   mdState = signal('Lade Markdown...');
+    const   tsState = signal('Lade TypeScript...');
 
     async function runImportTests() {
       try {
         // A) Test test.json
-        const jsonData = await importFile('./test/test.json');
+        const jsonData = await aufbau.import('./test/test.json');
         jsonState.value = jsonData;
 
         // B) Test test.md
-        const mdHtml = await importFile('./test/test.md');
+        const mdHtml = await aufbau.import('./test/test.md');
         mdState.value = mdHtml;
 
         // C) Test test.ts
-        const tsModule = await importFile('./test/test.ts');
-        const service = new tsModule.TestService('Aufbau Kit');
+        const tsModule = await aufbau.import('./test/test.ts');
+        const service  = new tsModule.TestService('Aufbau Kit');
         tsState.value = service.getGreeting(tsModule.defaultUser);
       } catch (err) {
         console.error('[Import Test Error]:', err);
