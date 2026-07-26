@@ -40,6 +40,10 @@ import aufbau, { html } from '@aufbau/kit';
 
 # packages
 
+## @aufbau/cache
+
+## @aufbau/hyperfetch
+
 ## aufbau-import
 
 It can import the following file formats:
@@ -62,12 +66,35 @@ import aufbau from '@aufbau/kit';
 const config = await aufbau.import('config.jsonc');
 ```
 
-## aufbau stylesheets
+## @aufbau/patterns
+
+## @aufbau/shaders
+
+## @aufbau/shapeshift
+
+## @aufbau/stylesheet
+
+**Aufbau Stylesheets ** (`.ass` or `.aufbau.css`)
 
 ```
 deno install jsr:@aufbau/stylesheet
 ```
 
-## aufbau shaders
+## @aufbau/templates
 
-## aufbau css utils
+## @aufbau/themes
+
+## @aufbau/workers
+
+---
+
+# pure resources
+
+## @aufbau/css
+
+## @aufbau/svg
+
+## @aufbau/webfonts
+
+handpicked collection of free webfonts looking great on webdev projects.
+
