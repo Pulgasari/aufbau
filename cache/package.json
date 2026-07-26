@@ -1,0 +1,19 @@
+{
+  "name": "@aufbau/cache",
+  "version": "1.0.0",
+  "description": "High-speed unified in-memory and IndexedDB cache engine for Browser and Service Worker environments.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "packages/cache"
+  }
+}
