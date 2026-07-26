@@ -41,3 +41,42 @@
 </body>
 </html>
 ```
+
+##
+
+### Option A: Namespace 
+
+```javascript
+import aufbau from '@aufbau/kit';
+
+aufbau.config({ autoClient: true });
+const count = aufbau.signal(0);
+```
+
+## Option B: Destructuring from `aufbau` Singleton
+
+```javascript
+import { aufbau } from '@aufbau/kit';
+
+const { signal, html, effect, config, cache, import: importFile, createApp } = aufbau;
+
+// Config setzen
+config({
+  imports: { "three": "https://esm.sh/three" }
+});
+
+const count = signal(0);
+```
+
+### Option C: Direct Named Imports
+
+```javascript
+import { signal, html, config, createApp } from '@aufbau/kit';
+
+config({ autoClient: true });
+const count = signal(0);
+```
+
+
+
+
