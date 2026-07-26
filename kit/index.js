@@ -4,7 +4,7 @@
 import { render, h, Component, createContext, cloneElement } from 'preact';
 import { useState, useEffect, useMemo, useCallback, useRef, useContext } from 'preact/hooks';
 import { signal, computed, effect, batch, useSignal, useComputed, useSignalEffect } from '@preact/signals';   
-import htm from 'htm'; export const html = htm.bind(h); window.html = html;
+import htm from 'htm'; export const html = htm.bind(h); //window.html = html;
 export {
   render, h, Component, createContext, cloneElement,
   useState, useEffect, useMemo, useCallback, useRef, useContext,
