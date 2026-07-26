@@ -2,7 +2,11 @@
 
 **aufbau** is build  for in-browser vanilla JS.
 
+#### the kit
+
 [@aufbau/kit](#aufbau-kit)
+
+#### packages
 
 [@aufbau/import](#aufbau-import)
 [@aufbau/shaders](#aufbau-shaders)
@@ -15,6 +19,12 @@
 @aufbau/templates
 @aufbau/themes
 @aufbau/workers
+
+#### pure resources
+
+@aufbau/css
+@aufbau/svg
+@aufbau/webfonts
 
 ---
 
