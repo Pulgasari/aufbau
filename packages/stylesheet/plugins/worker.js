@@ -1,6 +1,6 @@
 // @aufbau/stylesheet/plugins/worker.js
 
-import transform from './index.js';
+import transform from './../index.js';
 
 // Dateiendungen, die abgefangen werden
 const TARGET_EXTENSIONS = ['.aufbau.css', '.ass'];
