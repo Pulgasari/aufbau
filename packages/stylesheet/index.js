@@ -1,18 +1,18 @@
 // @aufbau/packages/stylesheet/index.js
 
 import { extractTokens, transformTokenProperties } from './tokens.js';
-import { transformWebfonts } from './webfont.js';
-import { transformLayouts } from './layout.js';
-import { observeDom } from './client.js';
+import { observeDom }    from './client.js';
+import transformLayouts  from './layout.js';
+import transformWebfonts from './webfont.js';
 
 /**
  * Haupt-Transform-Funktion
  */
-export default function transform(code) {
+export default function transform (code) {
   if (!code) return '';
 
-  const { tokens, code: codeWithoutBlocks } = extractTokens(code);
-  const { code: codeFontTransformed, imports } = transformWebfonts(codeWithoutBlocks);
+  const { tokens,  code: codeWithoutBlocks   } = extractTokens(code);
+  const { imports, code: codeFontTransformed } = transformWebfonts(codeWithoutBlocks);
   
   let result = transformLayouts(codeFontTransformed, tokens);
   result = transformTokenProperties(result, tokens);
@@ -28,7 +28,7 @@ export default function transform(code) {
 /**
  * Helper: Registriert den Service Worker für .aufbau.css / .ass Dateien
  */
-export async function registerServiceWorker(swPath = '/aufbau-worker.js') {
+export async function registerServiceWorker (swPath = '/aufbau-worker.js') {
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     try {
       const reg = await navigator.serviceWorker.register(swPath, { scope: '/' });
@@ -42,7 +42,7 @@ export async function registerServiceWorker(swPath = '/aufbau-worker.js') {
 /**
  * Helper: Startet die vollständige Browser-Runtime (Client Observer + Worker)
  */
-export function initBrowser(options = {}) {
+export function initBrowser (options = {}) {
   if (typeof window === 'undefined') return;
 
   // DOM Observer für <style type="text/aufbau">
