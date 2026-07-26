@@ -1,0 +1,50 @@
+{
+  "name": "@aufbau/stylesheet",
+  "version": "1.0.0",
+  "description": "Declarative, performance-optimized CSS extensions engine and preprocessor.",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./dev/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dev/index.d.ts",
+      "import": "./index.js"
+    },
+    "./vite": {
+      "import": "./plugins/vite.js"
+    },
+    "./client": {
+      "import": "./plugins/client.js"
+    },
+    "./worker": {
+      "import": "./plugins/worker.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "skills",
+    "plugins",
+    "dev"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "css",
+    "stylesheet",
+    "aufbau",
+    "flexbox",
+    "grid",
+    "design-tokens",
+    "vite-plugin",
+    "service-worker"
+  ],
+  "author": "Aufbau",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "packages/stylesheet"
+  }
+}
