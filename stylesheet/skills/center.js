@@ -3,7 +3,7 @@
 /**
  * Wandelt `aufbau-center: flex | grid | absolute | fixed;` um
  */
-export function transformCenter(code) {
+export function transformCenter (code) {
   return code.replace(/aufbau-center:\s*([^;}\n]*);?/g, (_, rawVal) => {
     const mode = rawVal.trim().toLowerCase();
 
@@ -22,3 +22,5 @@ export function transformCenter(code) {
     }
   });
 }
+
+export default transformCenter;
