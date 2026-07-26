@@ -1,0 +1,15 @@
+/* @aufbau/css/reset.css */
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; padding: 0;
+}
+
+a   { text-decoration: none; }
+img { max-width: 100%; }
+
+
+button, label { user-select: none; }
+
+ input:focus { border: none; outline: none; }
+select:focus { border: none; outline: none; }
