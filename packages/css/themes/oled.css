@@ -1,0 +1,11 @@
+/* @aufbau/css/themes/oled.css */
+
+:root, [data-theme="oled"] {
+   --aufbau-bg     : black;
+   --aufbau-fg     : white;
+   --aufbau-blue   : blue;
+   --aufbau-green  : green;
+   --aufbau-red    : red;
+   --aufbau-purple : purple;
+   --aufbau-yellow : yellow;
+}
