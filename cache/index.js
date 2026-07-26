@@ -2,21 +2,25 @@
 
 /**
  * @typedef {Object} CacheOptions
- * @property {string} [name='aufbau-cache'] - Name des IndexedDB Storage
- * @property {number} [ttl] - Standard-Ablaufzeit in Millisekunden
+ * @property {string} [name='aufbau-cache'] - IndexedDB storage database name
+ * @property {number} [ttl] - Default time-to-live in milliseconds
  */
 
 export class AufbauCache {
   /**
    * @param {CacheOptions} [options]
    */
-  constructor (options = {}) {
-    this.dbName     = options.name || 'aufbau-cache';
+  constructor(options = {}) {
+    this.dbName = options.name || 'aufbau-cache';
     this.defaultTTL = options.ttl || null;
-    this.memory     = new Map();
-    this.dbPromise  = this._initDB();
+    this.memory = new Map();
+    this.dbPromise = this._initDB();
   }
 
+  /**
+   * Initialize IndexedDB database connection
+   * @private
+   */
   async _initDB() {
     if (typeof indexedDB === 'undefined') return null;
     return new Promise((resolve, reject) => {
@@ -25,12 +29,12 @@ export class AufbauCache {
         request.result.createObjectStore('kv');
       };
       request.onsuccess = () => resolve(request.result);
-      request.onerror   = () => reject(request.error);
+      request.onerror = () => reject(request.error);
     });
   }
 
   /**
-   * Liest einen Wert (L1 Memory -> L2 IndexedDB)
+   * Retrieve a cached value (L1 Memory -> L2 IndexedDB)
    * @template T
    * @param {string} key
    * @returns {Promise<T|null>}
@@ -50,9 +54,9 @@ export class AufbauCache {
     if (!db) return null;
 
     return new Promise((resolve) => {
-      const tx    = db.transaction('kv', 'readonly');
+      const tx = db.transaction('kv', 'readonly');
       const store = tx.objectStore('kv');
-      const req   = store.get(key);
+      const req = store.get(key);
 
       req.onsuccess = () => {
         const entry = req.result;
@@ -63,7 +67,7 @@ export class AufbauCache {
           return resolve(null);
         }
 
-        // Cache in L1 nachladen
+        // Populate L1 memory cache for faster subsequent reads
         this.memory.set(key, entry);
         resolve(entry.value);
       };
@@ -72,12 +76,12 @@ export class AufbauCache {
   }
 
   /**
-   * Speichert einen Wert im Cache
+   * Store a key-value pair in both L1 memory and L2 IndexedDB
    * @param {string} key
    * @param {any} value
-   * @param {number} [ttl] - TTL in ms
+   * @param {number} [ttl] - TTL in milliseconds
    */
-  async set (key, value, ttl = this.defaultTTL) {
+  async set(key, value, ttl = this.defaultTTL) {
     const expire = ttl ? Date.now() + ttl : null;
     const entry = { value, expire };
 
@@ -88,26 +92,26 @@ export class AufbauCache {
     const db = await this.dbPromise;
     if (!db) return;
 
-    return new Promise ((resolve, reject) => {
-      const tx    = db.transaction('kv', 'readwrite');
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('kv', 'readwrite');
       const store = tx.objectStore('kv');
-      const req   = store.put(entry, key);
+      const req = store.put(entry, key);
       req.onsuccess = () => resolve();
-      req.onerror   = () => reject(req.error);
+      req.onerror = () => reject(req.error);
     });
   }
 
   /**
-   * Löscht einen Schlüssel aus allen Layer-Stufen
+   * Delete an entry from all cache layers
    * @param {string} key
    */
-  async delete (key) {
+  async delete(key) {
     this.memory.delete(key);
     const db = await this.dbPromise;
     if (!db) return;
 
     return new Promise((resolve) => {
-      const tx    = db.transaction('kv', 'readwrite');
+      const tx = db.transaction('kv', 'readwrite');
       const store = tx.objectStore('kv');
       store.delete(key);
       tx.oncomplete = () => resolve();
@@ -115,15 +119,15 @@ export class AufbauCache {
   }
 
   /**
-   * Leert den gesamten Cache
+   * Clear all entries from cache
    */
-  async clear () {
+  async clear() {
     this.memory.clear();
     const db = await this.dbPromise;
     if (!db) return;
 
     return new Promise((resolve) => {
-      const tx    = db.transaction('kv', 'readwrite');
+      const tx = db.transaction('kv', 'readwrite');
       const store = tx.objectStore('kv');
       store.clear();
       tx.oncomplete = () => resolve();
@@ -131,5 +135,7 @@ export class AufbauCache {
   }
 }
 
-// Singleton Default-Instanz für globale Nutzung
+// Default singleton instance for quick global usage
 export const cache = new AufbauCache();
+export default cache;
+
