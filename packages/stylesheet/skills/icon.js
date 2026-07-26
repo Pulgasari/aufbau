@@ -1,4 +1,4 @@
-// @aufbau/stylesheet/icon.js
+// @aufbau/stylesheet/skills/icon.js
 
 const ICONIFY_BASE = 'https://api.iconify.design/';
 
