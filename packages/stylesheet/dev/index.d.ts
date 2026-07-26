@@ -1,4 +1,4 @@
-// @aufbau/packages/stylesheet/meta/index.d.ts
+// @aufbau/stylesheet/dev/index.d.ts
 
 export interface TransformOptions {
   dev?: boolean;
