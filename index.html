@@ -53,6 +53,10 @@
 
   <script type="module">
     import aufbau from './kit/index.js';
+    function Test () {
+      return html`<div>moin!</div>`;
+    }
+    aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
     const { define, update, signal, effect } = aufbau;
     alert('aufbau!');
 
