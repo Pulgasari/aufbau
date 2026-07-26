@@ -83,3 +83,6 @@ export function transformLayouts (code, tokens) {
     .replace(/aufbau-flex:\s*([^;}\n]+);?/g, (_, val) => transformFlex(val, tokens))
     .replace(/aufbau-grid:\s*([^;}\n]+);?/g, (_, val) => transformGrid(val, tokens));
 }
+
+
+export default transformLayouts;
