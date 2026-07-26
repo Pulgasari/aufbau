@@ -1,0 +1,19 @@
+{
+  "name": "@aufbau/stylesheet",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./index.js",
+    "./vite": "./plugins/vite.js",
+    "./client": "./plugins/client.js",
+    "./worker": "./plugins/worker.js"
+  },
+  "publish": {
+    "include": [
+      "index.js",
+      "skills/**/*.js",
+      "plugins/**/*.js",
+      "dev/**/*",
+      "readme.md"
+    ]
+  }
+}
