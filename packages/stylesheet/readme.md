@@ -8,7 +8,40 @@ Aufbau Stylesheets are an enhancement of CSS.
 aufbau-flex
 aufbau-grid
 aufbau-webfont
+
+@aufbau <property>
+@aufbau colors
 ```
+
+---
+
+# aufbau-props
+
+ASS provides several additional properties mostly for nice shorthands.
+
+## aufbau-colors
+
+shorthand for `background-color` and `color`.
+
+```css
+div { aufbau-colors: black white; }
+```
+
+advanced usage:
+
+```css
+@aufbau colors {
+  oled  : black white;
+  light : #D5D5D5 #222222;
+}
+
+button       { aufbau-colors: oled;          }
+button:hover { aufbau-colors: oled inverted; }
+```
+
+## aufbau-flex
+
+## aufbau-grid
 
 ## aufbau-webfont
 
