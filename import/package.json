@@ -1,6 +1,6 @@
 {
   "name": "@aufbau/import",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Dynamic multi-format asset loader for the browser (CSV, JSON5, JSX, Less, MD, Sass, TOML, TS, WASM, XML, YAML).",
   "type": "module",
   "main": "./index.js",
