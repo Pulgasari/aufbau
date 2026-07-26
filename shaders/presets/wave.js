@@ -8,7 +8,7 @@
  * @param {number} [options.octaves=2] Number of turbulence octaves.
  * @returns {string} SVG filter markup string.
  */
-export function default (options = {}) {
+export default function (options = {}) {
   const {
     id        = 'wave-shader',
     scale     = 20,
