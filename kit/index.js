@@ -157,6 +157,11 @@ export function createApp (Component, container = document.body) {
 
   return render(Component, container);
 }
+export function init () {
+  if (typeof window !== 'undefined') {
+    import('@aufbau/stylesheet/plugins/client.js').then(({ initAufbauClient }) => { initAufbauClient(); });
+  }
+}
 
 /**
  * Central Aufbau Singleton Instance
