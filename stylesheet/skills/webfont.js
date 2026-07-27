@@ -4,16 +4,16 @@ const GOOGLE_FONTS_BASE = 'https://fonts.googleapis.com/css2?family=';
 
 const WEBFONT_MAP = {
   'Hubot Sans'     : { wght: 'ital,wght@0,200..900;1,200..900', fallback: 'monospace' },
-  'Inter'          : { wght: '400;500;700' , fallback: 'sans-serif' },
-  'JetBrains Mono' : { wght: '400;500;700' , fallback: 'monospace'  },
-  'Fira Code'      : { wght: '400;700'     , fallback: 'monospace'  },
-  'Roboto'         : { wght: '400;700'     , fallback: 'sans-serif' },
+  'Inter'          : { wght: 'wght@400;500;700' , fallback: 'sans-serif' },
+  'JetBrains Mono' : { wght: 'wght@400;500;700' , fallback: 'monospace'  },
+  'Fira Code'      : { wght: 'wght@400;700'     , fallback: 'monospace'  },
+  'Roboto'         : { wght: 'wght@400;700'     , fallback: 'sans-serif' },
 };
 
 
-function buildFontUrl (fontFamily, wght = '400;500;700') {
+function buildFontUrl (fontFamily, wght = 'wght@400;500;700') {
   const formattedFamily = encodeURIComponent(fontFamily).replace(/%20/g, '+');
-  return `${GOOGLE_FONTS_BASE}${formattedFamily}:wght@${wght}&display=swap`;
+  return `${GOOGLE_FONTS_BASE}${formattedFamily}:${wght}&display=swap`;
 }
 
 export function transformWebfonts (code) {
