@@ -1,4 +1,5 @@
 // @aufbau/stylesheet/skills/config.js
+// [at-rule] @aufbau-config
 
 const BASE_CSS_URL   = 'https://github.com/pulgasari/aufbau/css/';
 const BASE_THEME_URL = 'https://github.com/pulgasari/aufbau/css/themes/';
