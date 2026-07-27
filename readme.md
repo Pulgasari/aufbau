@@ -38,6 +38,8 @@ the **kit** bundles all the following packages with **Preact** and **HTM** to de
 import aufbau, { html } from '@aufbau/kit';
 ```
 
+***note:** multiple other kits are planned as well.*
+
 ---
 
 # packages
