@@ -1,0 +1,182 @@
+// @aufbau/stylesheet/skills/config.js
+
+const BASE_CSS_URL   = 'https://github.com/pulgasari/aufbau/css/';
+const BASE_THEME_URL = 'https://github.com/pulgasari/aufbau/css/themes/';
+
+const FONT_SELECTOR_ALIASES = {
+  default   : 'body',
+  body      : 'body',
+  monospace : 'code, pre, kbd, samp',
+  mono      : 'code, pre, kbd, samp',
+  heading   : 'h1, h2, h3, h4, h5, h6',
+  headings  : 'h1, h2, h3, h4, h5, h6',
+};
+
+function formatCssFileName (name) {
+  const clean = name.trim();
+  return clean.endsWith('.css') ? clean : `${clean}.css`;
+}
+
+function normalizeFontValue (val) {
+  const clean = val.trim().replace(/^['"]|['"]$/g, '');
+  return `'${clean}'`;
+}
+
+function parseConfigBlock (body) {
+  const config = {
+    charset : null,
+    font    : null,
+    import  : [],
+    theme   : null,
+    themes  : []
+  };
+
+  let i = 0;
+  const len = body.length;
+
+  while (i < len) {
+    while (i < len && /[\s;]/.test(body[i])) i++;
+    if (i >= len) break;
+
+    const colonIdx = body.indexOf(':', i);
+    if (colonIdx === -1) break;
+
+    const key = body.slice(i, colonIdx).trim().toLowerCase();
+    i = colonIdx + 1;
+
+    while (i < len && /\s/.test(body[i])) i++;
+    if (i >= len) break;
+
+    // Verschachtelter Block (z.B. font: { ... })
+    if (body[i] === '{') {
+      let depth = 1;
+      const blockStart = i + 1;
+      i++;
+      while (i < len && depth > 0) {
+             if (body[i] === '{') depth++;
+        else if (body[i] === '}') depth--;
+        i++;
+      }
+      const blockContent = body.slice(blockStart, i - 1);
+
+      while (i < len && /[\s;]/.test(body[i])) i++;
+
+      if (key === 'font') {
+        const fontObj = {};
+        const entries = blockContent.split(';');
+        for (const entry of entries) {
+          const parts = entry.split(':');
+          if (parts.length >= 2) {
+            const propKey = parts[0].trim();
+            const propVal = parts.slice(1).join(':').trim();
+            if (propKey && propVal) {
+              fontObj[propKey] = propVal;
+            }
+          }
+        }
+        config.font = fontObj;
+      }
+    } else {
+      // Einzelner Wert
+      let valEnd = i;
+      while (valEnd < len && body[valEnd] !== ';' && body[valEnd] !== '}') {
+        valEnd++;
+      }
+      const val = body.slice(i, valEnd).trim();
+      i = valEnd + 1;
+
+      if (key === 'charset') {
+        config.charset = val.replace(/['"]/g, '').trim();
+      } else if (key === 'font') {
+        config.font = val;
+      } else if (key === 'theme') {
+        config.theme = val.replace(/['"]/g, '').trim();
+      } else if (key === 'import') {
+        config.import = val.split(',').map(s => s.replace(/['"]/g, '').trim()).filter(Boolean);    
+      } else if (key === 'themes') {
+        config.themes = val.split(',').map(s => s.replace(/['"]/g, '').trim()).filter(Boolean);
+      }
+    }
+  }
+
+  return config;
+}
+
+export function transformConfig (code) {
+  if (!code || !code.includes('@aufbau-config')) {
+    return { code, imports: [], charset: '', fontRules: [] };
+  }
+
+  const configRegex = /@aufbau-config\s*\{/g;
+  let match;
+  let cleanedCode = code;
+  const imports = [];
+  let charsetStr = '';
+  const fontRules = [];
+
+  while ((match = configRegex.exec(code)) !== null) {
+    const startIdx = match.index;
+    let depth = 1;
+    let i = match.index + match[0].length;
+
+    while (i < code.length && depth > 0) {
+      if (code[i] === '{') depth++;
+      else if (code[i] === '}') depth--;
+      i++;
+    }
+
+    const fullBlock   = code.slice(startIdx, i);
+    const bodyContent = code.slice(startIdx + match[0].length, i - 1);
+
+    cleanedCode = cleanedCode.replace(fullBlock, '');
+
+    const parsed = parseConfigBlock(bodyContent);
+
+    // 1. Charset
+    if (parsed.charset) {
+      charsetStr = `@charset "${parsed.charset}";`;
+    }
+
+    // 2. Import CSS Files
+    if (parsed.import && parsed.import.length > 0) {
+      for (const file of parsed.import) {
+        const fileName = formatCssFileName(file);
+        imports.push(`@import url('${BASE_CSS_URL}${fileName}');`);
+      }
+    }
+
+    // 3. Themes (Theme kommt als Default-Theme ans Ende)
+    let themeList = [...parsed.themes];
+    if (parsed.theme) {
+      const activeBase = parsed.theme.replace(/\.css$/, '');
+      themeList = themeList.filter(t => t.replace(/\.css$/, '') !== activeBase);
+      themeList.push(parsed.theme);
+    }
+
+    for (const theme of themeList) {
+      const themeFileName = formatCssFileName(theme);
+      imports.push(`@import url('${BASE_THEME_URL}${themeFileName}');`);
+    }
+
+    // 4. Font Webfonts
+    if (parsed.font) {
+      if (typeof parsed.font === 'string') {
+        fontRules.push(`body { aufbau-webfont: ${normalizeFontValue(parsed.font)}; }`);
+      } else if (typeof parsed.font === 'object') {
+        for (const [key, fontVal] of Object.entries(parsed.font)) {
+          const selector = FONT_SELECTOR_ALIASES[key] || key;
+          fontRules.push(`${selector} { aufbau-webfont: ${normalizeFontValue(fontVal)}; }`);
+        }
+      }
+    }
+  }
+
+  return {
+    code: cleanedCode,
+    imports,
+    charset: charsetStr,
+    fontRules
+  };
+}
+
+export default transformConfig;
