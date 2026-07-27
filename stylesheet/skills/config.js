@@ -1,8 +1,8 @@
 // @aufbau/stylesheet/skills/config.js
 // [at-rule] @aufbau-config
 
-const BASE_CSS_URL   = 'https://github.com/pulgasari/aufbau/css/';
-const BASE_THEME_URL = 'https://github.com/pulgasari/aufbau/css/themes/';
+const BASE_CSS_URL   = 'https://pulgasari.github.io/aufbau/css/';
+const BASE_THEME_URL = BASE_CSS_URL + 'themes/';
 
 const FONT_SELECTOR_ALIASES = {
   default   : 'body',
