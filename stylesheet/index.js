@@ -81,6 +81,18 @@ function runPipeline (code) {
   // 5. Token Properties & Shadows
   result = transformTokenProperties(result, tokens);
 
+  // 6. Header assembly (@import & @charset)
+  const allImportUrls = [...configImports, ...webfontImports];
+  let prefix = '';
+  if (allImportUrls.length > 0) {
+    prefix += allImportUrls.map(url => `@import url('${url}');`).join('\n') + '\n\n';
+  }
+  if (charset) {
+    prefix += `${charset}\n\n`;
+  }
+  return `${prefix}${result}`.trim();
+
+  /*
   // 6. Header Zusammensetzung (@import & @charset)
   const allImports = [...configImports];
   if (webfontImports.length > 0) {
@@ -88,16 +100,11 @@ function runPipeline (code) {
       allImports.push(`@import url("${url}");`);
     }
   }
-
   let prefix = '';
-  if (allImports.length > 0) {
-    prefix += `${allImports.join('\n')}\n\n`;
-  }
-  if (charset) {
-    prefix += `${charset}\n\n`;
-  }
-
+  if (allImports.length > 0) prefix += `${allImports.join('\n')}\n\n`;
+  if (charset)               prefix += `${charset}\n\n`;
   return `${prefix}${result}`.trim();
+  */
 }
 
 /**
