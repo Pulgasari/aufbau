@@ -54,11 +54,27 @@ export function observeDom () {
   });
 }
 
-// stylesheet/plugins/client.js
+/**
+ * Registers the Aufbau stylesheet Service Worker in the browser environment.
+ */
+export async function initAufbauClient () {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
+
+  try {
+    const registration = await navigator.serviceWorker.register(
+      new URL('./worker.js', import.meta.url),
+      { type: 'module', scope: '/' }
+    );
+    console.log('[@aufbau/stylesheet] Service worker registered:', registration.scope);
+  } catch (error) {
+    console.error('[@aufbau/stylesheet] Service worker registration failed:', error);
+  }
+}
 
 /**
  * Client-side stylesheet processor using a Web Worker.
  */
+/*
 export function initAufbauClient() {
   if (typeof window === 'undefined') return;
 
@@ -95,4 +111,4 @@ export function initAufbauClient() {
   // Process existing link tags
   document.querySelectorAll('link[rel="stylesheet"]').forEach(processStylesheet);
 }
-
+*/
