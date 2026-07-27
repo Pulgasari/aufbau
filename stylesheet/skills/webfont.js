@@ -1,6 +1,7 @@
 // @aufbau/stylesheet/skills/webfont.js
 
 const GOOGLE_FONTS_BASE = 'https://fonts.googleapis.com/css2?family=';
+const WEBFONT_REGEX     = /aufbau-webfont\s*:\s*['"]?([^;'"]+)['"]?;?/g;
 
 const WEBFONT_MAP = {
   'Hubot Sans'     : { wght: 'ital,wght@0,200..900;1,200..900', fallback: 'monospace' },
@@ -19,7 +20,7 @@ function buildFontUrl (fontFamily, wght = 'wght@400;500;700') {
 export function transformWebfonts (code) {
   const imports = new Set();
 
-  const transformedCode = code.replace(/aufbau-webfont:\s*["']?([^;"'\n]+)["']?;?/g, (_, fontName) => {
+  const transformedCode = code.replace(WEBFONT_REGEX, (_, fontName) => {
     const rawName    = fontName.trim();
     const matchedKey = Object.keys(WEBFONT_MAP).find( key => key.toLowerCase() === rawName.toLowerCase() );
 
