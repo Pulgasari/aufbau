@@ -16,8 +16,8 @@ import cache           from '@aufbau/cache';
 import importeur       from '@aufbau/import';
 import * as shaders    from '@aufbau/shaders';
 import * as stylesheet from '@aufbau/stylesheet';
-import { observeStylesheets }    from '@aufbau/plugins/client';
-import { handleStylesheetFetch } from '@aufbau/plugins/worker';
+import { observeStylesheets }       from '@aufbau/plugins/client';
+import { interceptFetchStylesheet } from '@aufbau/plugins/worker';
 
 // Default Import Map configuration
 const DEFAULT_IMPORT_MAP = {
