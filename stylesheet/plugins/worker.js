@@ -62,7 +62,7 @@ async function fetchAndRevalidate (request, cacheKey) {
 
     const hashKey     = `${cacheKey}:hash`;
     const response    = await fetch(request); if (!response.ok) return response;
-    const rawCode     = await networkResponse.text();
+    const rawCode     = await response.text();
     const contentHash = simpleHash(rawCode);
     const prevHash    = await stylesheetCache.get(hashKey); // check if underlying source code has changed
     
