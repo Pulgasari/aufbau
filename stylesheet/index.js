@@ -67,7 +67,7 @@ function runPipeline (code) {
     : step0;
   
   // 1. Extract @aufbau blocks and generate tokens
-  const { tokens, code: step1 } = extractTokens(code);
+  const { tokens, code: step1 } = extractTokens(codeWithFonts);
 
   // 2. Webfonts processing (@imports)
   const { code: step2, imports: webfontImports } = transformWebfonts(step1);
