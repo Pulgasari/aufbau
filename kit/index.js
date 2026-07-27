@@ -16,6 +16,7 @@ import cache           from '@aufbau/cache';
 import importeur       from '@aufbau/import';
 import * as shaders    from '@aufbau/shaders';
 import * as stylesheet from '@aufbau/stylesheet';
+import { observeStylesheets } from '@aufbau/plugins/client';
 
 // Default Import Map configuration
 const DEFAULT_IMPORT_MAP = {
@@ -157,9 +158,20 @@ export function createApp (Component, container = document.body) {
 
   return render(Component, container);
 }
+/*
 export function init () {
   if (typeof window !== 'undefined') {
     import('@aufbau/stylesheet/plugins/client.js').then(({ initAufbauClient, observeDom }) => { initAufbauClient(); observeDom(); });
+  }
+}
+*/
+
+/**
+ * Initializes the Aufbau runtime in the browser out-of-the-box.
+ */
+export function init() {
+  if (typeof window !== 'undefined') {
+    observeStylesheets();
   }
 }
 
