@@ -112,6 +112,7 @@ export function transformConfig (code) {
   let match;
   let cleanedCode = code;
   const imports = [];
+  const rawImportUrls = [];
   let charsetStr = '';
   const fontRules = [];
 
@@ -139,10 +140,10 @@ export function transformConfig (code) {
     }
 
     // 2. Import CSS Files
+    
     if (parsed.import && parsed.import.length > 0) {
       for (const file of parsed.import) {
-        const fileName = formatCssFileName(file);
-        imports.push(`@import url('${BASE_CSS_URL}${fileName}');`);
+        rawImportUrls.push(`${BASE_CSS_URL}${formatCssFileName(file)}`);
       }
     }
 
@@ -153,10 +154,9 @@ export function transformConfig (code) {
       themeList = themeList.filter(t => t.replace(/\.css$/, '') !== activeBase);
       themeList.push(parsed.theme);
     }
-
+    
     for (const theme of themeList) {
-      const themeFileName = formatCssFileName(theme);
-      imports.push(`@import url('${BASE_THEME_URL}${themeFileName}');`);
+      rawImportUrls.push(`${BASE_THEME_URL}${formatCssFileName(theme)}`);
     }
 
     // 4. Font Webfonts
@@ -171,10 +171,10 @@ export function transformConfig (code) {
       }
     }
   }
-
+  
   return {
     code: cleanedCode,
-    imports,
+    imports: rawImportUrls, // Plain URL strings
     charset: charsetStr,
     fontRules
   };
