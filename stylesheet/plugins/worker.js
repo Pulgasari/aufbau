@@ -26,6 +26,7 @@ function simpleHash(str) {
 }
 
 export function setupServiceWorker() {
+  console.log('[@aufbau/stylesheet] worker initialized.');
   self.addEventListener('fetch', (event) => {
     const request = event.request;
 
