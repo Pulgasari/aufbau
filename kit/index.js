@@ -189,7 +189,7 @@ export * from '@aufbau/plugins/worker';
  */
 export async function interceptFetch (event) {
   // 1. Check stylesheet plugin
-  const stylesheetResponse = await handleStylesheetFetch(event);
+  const stylesheetResponse = await interceptFetchStylesheet(event);
   if (stylesheetResponse) return stylesheetResponse;
   return null;
 }
@@ -200,7 +200,7 @@ export async function interceptFetch (event) {
 export const aufbau = {
   // AUFBAU
   config, configs, 
-  init, interceptFetch,
+  init, interceptFetch, interceptFetchStylesheet,
   cache, import: importeur,
   createApp, injectImportMap,
   shaders, stylesheet,
