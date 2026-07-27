@@ -4,6 +4,7 @@ import transform from '@aufbau/stylesheet';
 
 const TARGET_EXTENSIONS = ['.aufbau.css', '.ass'];
 const REGEX_TARGET_EXT  = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replace('.', '\\.')).join('|')})$`, 'i');    
+const shouldIntercept   = (url) => REGEX_TARGET_EXT.test(new URL(url).pathname);
 
 /**
  * Service Worker fetch handler for intercepting .aufbau.css / .ass network requests.
