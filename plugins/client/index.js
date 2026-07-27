@@ -43,11 +43,11 @@ export function processStylesheetElement (node) {
 /**
  * Scans and transforms all existing stylesheets and inline styles in the DOM.
  */
-export function processAllStylesheets () {
+export function processStylesheets (ctx) {
   if (typeof window === 'undefined' || !window.document) return;
-
-  document.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
-  document.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
+  ctx ??= document;
+  ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
+  ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
 }
 
 /**
@@ -58,18 +58,13 @@ export function observeStylesheets () {
 
   processAllStylesheets();
 
-  observer = new MutationObserver((mutations) => {
+  observer = new MutationObserver ((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === 1) { // Node.ELEMENT_NODE
-          if (node.tagName === 'LINK') {
-            processStylesheetLink(node);
-          } else if (node.tagName === 'STYLE') {
-            processStylesheetElement(node);
-          } else if (node.querySelectorAll) {
-            node.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
-            node.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
-          }
+               if (node.tagName === 'LINK')  processStylesheetLink    (node);
+          else if (node.tagName === 'STYLE') processStylesheetElement (node);
+          else if (node.querySelectorAll)    processStylesheets       (node);
         }
       }
     }
