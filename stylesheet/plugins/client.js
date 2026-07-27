@@ -53,3 +53,46 @@ export function observeDom () {
     subtree: true
   });
 }
+
+// stylesheet/plugins/client.js
+
+/**
+ * Client-side stylesheet processor using a Web Worker.
+ */
+export function initAufbauClient() {
+  if (typeof window === 'undefined') return;
+
+  // Initialize Web Worker for background CSS processing
+  const url    = new URL('./worker.js', import.meta.url);
+  const worker = new Worker(url, { type: 'module' });
+
+  const processStylesheet = async (link) => {
+    if (!link.href || !link.href.includes('.aufbau.css')) return;
+
+    try {
+      const response = await fetch(link.href);
+      const rawCss = await response.text();
+
+      // Send CSS to background worker
+      worker.postMessage({ id: link.href, code: rawCss });
+
+      // Listen for transformed CSS response
+      const handleMessage = (event) => {
+        if (event.data.id === link.href) {
+          const styleElement = document.createElement('style');
+          styleElement.textContent = event.data.code;
+          link.replaceWith(styleElement);
+          worker.removeEventListener('message', handleMessage);
+        }
+      };
+
+      worker.addEventListener('message', handleMessage);
+    } catch (error) {
+      console.error(`[aufbau] Failed to process stylesheet: ${link.href}`, error);
+    }
+  };
+
+  // Process existing link tags
+  document.querySelectorAll('link[rel="stylesheet"]').forEach(processStylesheet);
+}
+
