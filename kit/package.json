@@ -10,6 +10,7 @@
   "dependencies": {
     "@aufbau/cache": "workspace:*",
     "@aufbau/import": "workspace:*",
+    "@aufbau/plugins": "workspace:*",
     "@aufbau/shaders": "workspace:*",
     "@aufbau/stylesheet": "workspace:*",
     "@preact/signals": "^1.3.0",
