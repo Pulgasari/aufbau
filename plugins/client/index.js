@@ -56,7 +56,7 @@ export function processStylesheets (ctx) {
 export function observeStylesheets () {
   if (typeof window === 'undefined' || !window.document || observer) return;
 
-  processAllStylesheets();
+  processStylesheets();
 
   observer = new MutationObserver ((mutations) => {
     for (const mutation of mutations) {
