@@ -159,7 +159,7 @@ export function createApp (Component, container = document.body) {
 }
 export function init () {
   if (typeof window !== 'undefined') {
-    import('@aufbau/stylesheet/plugins/client.js').then(({ initAufbauClient }) => { initAufbauClient(); });
+    import('@aufbau/stylesheet/plugins/client.js').then(({ initAufbauClient, observeDom }) => { initAufbauClient(); observeDom(); });
   }
 }
 
