@@ -38,13 +38,9 @@ export function setupServiceWorker() {
         
         // 1. Try serving from @aufbau/cache first for ultra-fast response
         const cachedCss = await stylesheetCache.get(cacheKey);
-
-        if (cachedCss) {
-          // Trigger background revalidation asynchronously
+        if (cachedCss) { // Trigger background revalidation asynchronously
           fetchAndRevalidate(request, cacheKey);
-          return new Response(cachedCss, {
-            headers: { 'Content-Type': 'text/css; charset=utf-8' }
-          });
+          return new Response(cachedCss, { headers: { 'Content-Type': 'text/css; charset=utf-8' } });
         }
 
         // 2. Cache miss: fetch, transform, and store
@@ -60,20 +56,17 @@ export function setupServiceWorker() {
  * @param {string} cacheKey
  * @returns {Promise<Response>}
  */
-async function fetchAndRevalidate(request, cacheKey) {
+async function fetchAndRevalidate (request, cacheKey) {
   try {
-    const networkResponse = await fetch(request);
-    if (!networkResponse.ok) return networkResponse;
-
-    const rawCode = await networkResponse.text();
-    const contentHash = simpleHash(rawCode);
-    const hashKey     = `${cacheKey}:hash`;
-
-    // Check if underlying source code has changed
-    const previousHash = await stylesheetCache.get(hashKey);
     let transformedCss;
 
-    if (previousHash === contentHash) {
+    const hashKey     = `${cacheKey}:hash`;
+    const response    = await fetch(request); if (!response.ok) return response;
+    const rawCode     = await networkResponse.text();
+    const contentHash = simpleHash(rawCode);
+    const prevHash    = await stylesheetCache.get(hashKey); // check if underlying source code has changed
+    
+    if (prevHash === contentHash) {
       transformedCss = await stylesheetCache.get(cacheKey);
     }
 
@@ -83,14 +76,12 @@ async function fetchAndRevalidate(request, cacheKey) {
       await stylesheetCache.set(cacheKey, transformedCss);
     }
 
-    return new Response(transformedCss, {
-      headers: { 'Content-Type': 'text/css; charset=utf-8' }
-    });
+    return new Response(transformedCss, { headers: { 'Content-Type': 'text/css; charset=utf-8' } });
   } catch (err) {
     console.error('[Aufbau Worker] Fetch/Transform Error:', err);
-    const fallbackCss = await stylesheetCache.get(cacheKey);
-    return fallbackCss
-      ? new Response(fallbackCss, { headers: { 'Content-Type': 'text/css; charset=utf-8' } })
+    const fallbackCSS = await stylesheetCache.get(cacheKey);
+    return fallbackCSS
+      ? new Response(fallbackCSS, { headers: { 'Content-Type': 'text/css; charset=utf-8' } })
       : new Response('/* Aufbau SW Fetch Error */', { status: 500 });
   }
 }
