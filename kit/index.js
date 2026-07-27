@@ -168,7 +168,7 @@ export function init () {
  */
 export const aufbau = {
   // AUFBAU
-  config, configs,
+  config, configs, init,
   cache, import: importeur,
   createApp, injectImportMap,
   shaders, stylesheet,
