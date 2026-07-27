@@ -13,6 +13,8 @@ aufbau-webfont
 
 @aufbau <property>
 @aufbau colors
+
+@aufbau-config
 ```
 
 ---
@@ -107,6 +109,22 @@ body {
   mobile  : 480px;
   tablet  : 768px;
   desktop : 1024px;
+}
+```
+
+## @aufbau-config
+
+```css
+@aufbau-config {
+  charset : utf-8;
+  font    : {
+    body       : 'Hubot Sans';
+    textarea   : 'JetBrains Mono';
+    blockquote : 'Vollkorn';
+  };
+  import  : reset, default;
+  theme   : oled;
+  themes  : monochrome, oled, zombie;
 }
 ```
 
