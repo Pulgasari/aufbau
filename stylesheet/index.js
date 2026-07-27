@@ -129,6 +129,7 @@ export default function transform (code) {
 /**
  * Helper: Registriert den Service Worker für .aufbau.css / .ass Dateien
  */
+/*
 export async function registerServiceWorker (swPath = '/aufbau-worker.js') {
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     try {
@@ -139,10 +140,12 @@ export async function registerServiceWorker (swPath = '/aufbau-worker.js') {
     }
   }
 }
+*/
 
 /**
  * Helper: Startet die vollständige Browser-Runtime (Client Observer + Worker)
  */
+/*
 export function initBrowser (options = {}) {
   if (typeof window === 'undefined') return;
 
@@ -152,3 +155,4 @@ export function initBrowser (options = {}) {
   // Service Worker optional mit-registrieren
   if (options.useWorker) registerServiceWorker(options.workerPath);
 }
+*/
