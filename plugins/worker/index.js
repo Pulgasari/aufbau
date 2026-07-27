@@ -10,7 +10,7 @@ const REGEX_TARGET_EXT  = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replac
  * @param {FetchEvent} event
  * @returns {Promise<Response>|null}
  */
-export async function handleStylesheetFetch (event) {
+export async function interceptFetchStylesheet (event) {
   const request = event.request; if (request.method !== 'GET') return null;
   
   const url = new URL(request.url);
