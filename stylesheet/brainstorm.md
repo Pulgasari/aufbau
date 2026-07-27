@@ -19,7 +19,7 @@ Ich will jetzt `/stylesheet` erweitern, sodass das hier möglich wird:
   font    : {
     body       : 'Hubot Sans';
     textarea   : 'JetBrains Mono';
-    blockquote : 'Vollkorn' italic;
+    blockquote : 'Vollkorn';
   };
   import  : reset, default;
   theme   : oled;
