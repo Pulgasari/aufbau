@@ -10,7 +10,7 @@ const REGEX_SHADE_PATTERN  = /^([a-zA-Z0-9_-]+)-(d|l|a)(\d+)$/;
 const REGEX_AUFBAU_MEDIA   = /@aufbau-media\s+(?:breakpoints\s*)?\{([^}]*)\}/gi;
 const REGEX_AUFBAU_COLOR   = /@aufbau\s+color\s*\{([^}]*)\}/gi;
 const REGEX_AUFBAU_COLORS  = /@aufbau\s+colors\s*\{([^}]*)\}/gi;
-const REGEX_AUFBAU_GENERIC = /@aufbau\s+([a-zA-Z0-9-]+)\s*\{([^}]*)\}/g;
+const REGEX_AUFBAU_GENERIC = /@aufbau\s+([a-zA-Z0-9-_,\s]+?)\s*\{([^}]*)\}/g;
 const REGEX_DECLARATION    = /([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g;
 
 // :::::: defaults
@@ -113,10 +113,15 @@ export function extractTokens(code) {
       }
       return '';
     })
-    .replace(REGEX_AUFBAU_GENERIC, (_, category, body) => {
-      const catKey = category.trim().toLowerCase();
-      if (!tokens[catKey]) tokens[catKey] = {};
-      parseBodyLines(body, tokens[catKey]);
+    .replace(REGEX_AUFBAU_GENERIC, (_, categories, body) => {
+      const parsed  = {}; parseBodyLines(body, parsed);
+      const catKeys = categories.split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+
+      for (const catKey of catKeys) {
+        if (!tokens[catKey]) tokens[catKey] = {};
+        Object.assign(tokens[catKey], parsed);
+      }
+
       return '';
     });
 
