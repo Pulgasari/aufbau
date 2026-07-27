@@ -70,7 +70,7 @@ function runPipeline (code) {
   const { tokens, code: step1 } = extractTokens(code);
 
   // 2. Webfonts processing (@imports)
-  const { code: step2, imports } = transformWebfonts(step1);
+  const { code: step2, imports: webfontImports } = transformWebfonts(step1);
 
   // 3. Level 3: Single-Pass Smart Properties (flex, grid, center, icon, colors in 1 pass)
   let result = transformSmartProperties(step2, tokens);
