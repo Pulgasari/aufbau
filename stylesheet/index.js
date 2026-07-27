@@ -3,6 +3,7 @@
 import { extractTokens, transformTokenProperties } from './skills/tokens.js';
 import { observeDom }    from './plugins/client.js';
 import transformCenter   from './skills/center.js';
+import transformConfig   from './skills/config.js';
 import transformIcons    from './skills/icon.js';
 import transformLayouts  from './skills/layout.js';
 import transformMedia    from './skills/media.js';
@@ -57,6 +58,14 @@ function transformSmartProperties (code, tokens) {
  * Pipeline Execution Function
  */
 function runPipeline (code) {
+  // 0. Config-Verarbeitung (@aufbau-config)
+  const { code: step0, imports: configImports, charset, fontRules } = transformConfig(code);
+
+  // Generierte Font-Regeln einfügen, damit webfont.js sie aufgreift
+  const codeWithFonts = fontRules.length > 0
+    ? `${fontRules.join('\n')}\n\n${step0}`
+    : step0;
+  
   // 1. Extract @aufbau blocks and generate tokens
   const { tokens, code: step1 } = extractTokens(code);
 
@@ -72,13 +81,23 @@ function runPipeline (code) {
   // 5. Token Properties & Shadows
   result = transformTokenProperties(result, tokens);
 
-  // 6. Font @imports insertion
-  if (imports.length > 0) {
-    const importStatements = imports.map(url => `@import url("${url}");`).join('\n');
-    result = `${importStatements}\n\n${result}`;
+  // 6. Header Zusammensetzung (@import & @charset)
+  const allImports = [...configImports];
+  if (webfontImports.length > 0) {
+    for (const url of webfontImports) {
+      allImports.push(`@import url("${url}");`);
+    }
   }
 
-  return result;
+  let prefix = '';
+  if (allImports.length > 0) {
+    prefix += `${allImports.join('\n')}\n\n`;
+  }
+  if (charset) {
+    prefix += `${charset}\n\n`;
+  }
+
+  return `${prefix}${result}`.trim();
 }
 
 /**
