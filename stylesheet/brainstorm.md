@@ -47,7 +47,7 @@ blockquote { aufbau-webfont: 'Vollkorn'; }
 
 - `import` importiert die files in reihenfolge wie angegeben
 - `themes` ebenfalls aber wenn `theme` angegeben ist kommt dieses zuletzt (quasi das default-theme)  
-- wir bauen das am besten als weitere file in `/stylesheet/skills/config.js`.
+- wir bauen das am besten als weitere file in `/stylesheet/skills/config.js`, müssen aber schauen, ob wir dann auch an anderer stelle im package noch was anpassen müssen. also vorher die files des packages gut anschauen.
 - um die weitere verarbeitung von `aufbau-webfont` kümmert sich dann das jeweilige andere skill
 
 
