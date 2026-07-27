@@ -16,7 +16,8 @@ import cache           from '@aufbau/cache';
 import importeur       from '@aufbau/import';
 import * as shaders    from '@aufbau/shaders';
 import * as stylesheet from '@aufbau/stylesheet';
-import { observeStylesheets } from '@aufbau/plugins/client';
+import { observeStylesheets }    from '@aufbau/plugins/client';
+import { handleStylesheetFetch } from '@aufbau/plugins/worker';
 
 // Default Import Map configuration
 const DEFAULT_IMPORT_MAP = {
@@ -175,12 +176,31 @@ export function init() {
   }
 }
 
+
+
+export * from '@aufbau/plugins/worker';
+
+/**
+ * Combined master fetch handler for Service Workers.
+ * Checks all registered Aufbau plugins in sequence.
+ * 
+ * @param {FetchEvent} event
+ * @returns {Promise<Response>|null}
+ */
+export async function interceptFetch (event) {
+  // 1. Check stylesheet plugin
+  const stylesheetResponse = await handleStylesheetFetch(event);
+  if (stylesheetResponse) return stylesheetResponse;
+  return null;
+}
+
 /**
  * Central Aufbau Singleton Instance
  */
 export const aufbau = {
   // AUFBAU
-  config, configs, init,
+  config, configs, 
+  init, interceptFetch,
   cache, import: importeur,
   createApp, injectImportMap,
   shaders, stylesheet,
