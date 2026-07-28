@@ -1,6 +1,6 @@
-import Registry from "../core/Registry.js";
-import Property from "../objects/Property.js";
-import { normalizeName } from "../core/normalize.js";
+import Registry           from "../core/Registry.js";
+import Property           from "../objects/Property.js";
+import { normalizeName }  from "../core/normalize.js";
 import PropertyDefinition from "../nodes/PropertyDefinition.js";
 
 
@@ -22,7 +22,16 @@ export default class PropertyRegistry {
     return property;
   }
   resolve (name) {
-    return this.#properties.get(normalizeName(name));
+    const normalized = normalizeName(name);
+    const direct = this.#properties.get(normalized);
+    if (direct) {
+      return direct;
+    }
+    if (name.startsWith("--")) {
+      return this.register(name, {
+        css: name
+      });
+    }
   }
   has (name) {
     return this.#properties.has(normalizeName(name));
