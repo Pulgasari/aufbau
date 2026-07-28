@@ -10,14 +10,7 @@ export function pseudoClass () {
         token("PAREN_OPEN")
       )
     ),
-    ([, name]) => {
-      return createSelector(
-        "pseudoClass",
-        {
-          name: name.value
-        }
-      );
-    }
+    ([, name]) => createSelector ("pseudoClass", { name: name.value });
   );
 }
 
