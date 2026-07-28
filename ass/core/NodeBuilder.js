@@ -16,7 +16,8 @@ export default function NodeBuilder (node) {
     return rule;
   };
   node.rule = function (selector) {
-    const rule = new RuleNode(this.ass, selector);
+    const parsed = this.ass.selector(selector);
+    const rule   = new RuleNode (this.ass, parsed);
     this.append(rule);
     return rule;
   };
