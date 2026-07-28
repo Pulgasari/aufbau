@@ -15,6 +15,7 @@
 - [x] multi-deklaration ermöglichen: `@aufbau gap, margin, padding {`
 - [ ] integration von `@aufbau color` und `@aufbau-colors` mit `light-dark()`
 - [x] at-rule: `@aufbau-config`
+- [ ] at-rule: `@aufbau-include`
 - [x] at-rule: `@aufbau-trait`
 - [ ] property: `aufbau-animate`
 - [x] property: `aufbau-colors`
