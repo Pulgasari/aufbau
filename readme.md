@@ -135,6 +135,8 @@ body > * { padding: small; }
 
 ## @aufbau/css
 
+[themes](/css/themes)
+
 ## @aufbau/svg
 
 ## @aufbau/webfonts
