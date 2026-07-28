@@ -14,3 +14,16 @@ export default function createAtRuleAST (
     }
   );
 }
+
+export default function createDeclarationAST (
+  property,
+  value
+) {
+  return createNodeAST(
+    "declaration",
+    {
+      property,
+      value
+    }
+  );
+}
