@@ -12,6 +12,7 @@ export default class PropertyRegistry {
   }
   register (name, config = {}) {
     const property = new PropertyDefinition(this.#ass, name, config);
+    property.register();
     this.#properties.set(normalizeName(name), property);
     if (config.aliases) {
       for (const alias of config.aliases) {
