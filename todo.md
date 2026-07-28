@@ -98,4 +98,23 @@ CSSMathClamp
 CSSNumericValue
 ```
 
+## 3. CSS Properties & Values API (Houdini)
+
+Erlaubt eigene CSS-Properties zu registrieren.
+
+Dadurch werden Custom Properties animierbar.
+
+```css
+@property --progress {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+}
+```
+
+```javascript
+CSS.registerProperty(...)
+```
+
+
 
