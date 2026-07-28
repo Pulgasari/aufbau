@@ -12,6 +12,7 @@ export default class ASS {
   #properties;
   #renderer;
   #scheduler;
+  #selectorParser;
   #sheet;
   #values;
   
@@ -24,31 +25,24 @@ export default class ASS {
     this.#sheet      = new SheetNode(this);
     this.#values     = new ValueParser();
   }
-  get sheet  () { return this.#sheet; }
+  
+  get sheet  () { return this.#sheet;  }
   get events () { return this.#events; }
-  rule (selector) {
-    return this.#sheet.rule(selector);
-  }
-  layer (name) {
-    return this.#sheet.layer(name);
-  }
-  media (query) {
-    return this.#sheet.media(query);
-  }
-  prop (name, value) {
-    return this.#sheet.prop(name, value);
-  }
+  
+  dirty () { this.#scheduler.queue(); }
+  
+  rule     (selector)    { return this.#sheet.rule(selector); }
+  layer    (name)        { return this.#sheet.layer(name); }
+  media    (query)       { return this.#sheet.media(query); }
+  prop     (name, value) { return this.#sheet.prop(name, value); }
+  property (name)        { return this.#properties.resolve(name); }
+  selector (value)       { return this.#selectorParser.parse(value); }
+
   props (definitions) {
     for (const [name, config] of Object.entries(definitions)) {
       this.#properties.register(name, config);
     }
     return this;
-  }
-  property (name) {
-    return this.#properties.resolve(name);
-  }
-  dirty () {
-    this.#scheduler.queue();
   }
   render () {
     this.#sheet.clean();
