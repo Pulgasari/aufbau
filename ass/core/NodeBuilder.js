@@ -1,3 +1,22 @@
+import DeclarationNode from "../nodes/DeclarationNode.js";
+
+export default function NodeBuilder (node) {
+  node.prop = function (name, value) {
+    const definition = this.ass.property(name);
+    const property = definition ?? {
+      cssName: name,
+      format: value => value
+    };
+    const declaration = new DeclarationNode(
+      this.ass,
+      property.cssName,
+      property.format(value)
+    );
+    this.append(declaration);
+    return declaration;
+  };
+}
+
 import     RuleNode from "../nodes/RuleNode.js";
 import    MediaNode from "../nodes/MediaNode.js";
 import    LayerNode from "../nodes/LayerNode.js";
