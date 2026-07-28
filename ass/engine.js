@@ -4,26 +4,48 @@ export class ASSEngine {
   constructor ( options = {} ) {
     this.options = options;
     this.traits = new Map();
+    this.tokens = new Map();
   }
 
   evaluate ( ast ) {
     if ( !Array.isArray( ast ) ) return ast;
     this.traits.clear();
-    this.collectTraits( ast );
+    this.tokens.clear();
+    this.collectDefinitions( ast );
     return this.flattenStatements( ast );
   }
 
-  collectTraits ( statements ) {
+  collectDefinitions ( statements ) {
     for ( const node of statements ) {
       if ( !node ) continue;
-      if ( node.type === 'AtRule' && node.name?.value === '@trait' ) {
-        const name = node.params ? node.params.map( ( p ) => p.value ).join( '' ) : '';
-        if ( name ) {
-          this.traits.set( name, node.body || [] );
-          if ( name.startsWith( '.' ) ) this.traits.set( name.slice( 1 ), node.body || [] );
-        }
+      if ( node.type === 'AtRule' ) {
+        if ( node.name?.value === '@trait' ) this.registerTrait( node );
+        if ( node.name?.value === '@tokens' ) this.registerTokens( node );
       }
-      if ( node.body && Array.isArray( node.body ) ) this.collectTraits( node.body );
+      if ( node.body && Array.isArray( node.body ) ) this.collectDefinitions( node.body );
+    }
+  }
+
+  registerTrait ( node ) {
+    const name = node.params ? node.params.map( ( p ) => p.value ).join( '' ) : '';
+    if ( !name ) return;
+    this.traits.set( name, node.body || [] );
+    if ( name.startsWith( '.' ) ) this.traits.set( name.slice( 1 ), node.body || [] );
+  }
+
+  registerTokens ( node ) {
+    const targetProps = ( node.params || [] ).map( ( p ) => p.value ).join( '' ).split( ',' ).map( ( s ) => s.trim() ).filter( Boolean );
+    const tokenMap = new Map();
+
+    for ( const item of ( node.body || [] ) ) {
+      if ( item.type === 'Declaration' && item.name?.value ) {
+        const valStr = Array.isArray( item.value ) ? item.value.map( ( v ) => v.value ).join( ' ' ) : ( item.value?.value || '' );
+        tokenMap.set( item.name.value, valStr );
+      }
+    }
+
+    for ( const prop of targetProps ) {
+      this.tokens.set( prop, tokenMap );
     }
   }
 
@@ -31,11 +53,13 @@ export class ASSEngine {
     const result = [];
     for ( const node of statements ) {
       if ( !node ) continue;
-      if ( node.type === 'AtRule' && node.name?.value === '@trait' ) {
-        const name = node.params ? node.params.map( ( p ) => p.value ).join( '' ) : '';
-        if ( name.startsWith( '.' ) ) {
-          const implicitRule = { type: 'Rule', selector: name, body: node.body || [] };
-          result.push( ...this.processRule( implicitRule, parentSelector ) );
+      if ( node.type === 'AtRule' && ( node.name?.value === '@trait' || node.name?.value === '@tokens' ) ) {
+        if ( node.name?.value === '@trait' && node.params ) {
+          const name = node.params.map( ( p ) => p.value ).join( '' );
+          if ( name.startsWith( '.' ) ) {
+            const implicitRule = { type: 'Rule', selector: name, body: node.body || [] };
+            result.push( ...this.processRule( implicitRule, parentSelector ) );
+          }
         }
         continue;
       }
@@ -60,7 +84,7 @@ export class ASSEngine {
     for ( const child of ( node.body || [] ) ) {
       if ( child.type === 'Declaration' ) {
         if ( child.name?.value === 'use' ) this.applyTraits( child, decls, nestedNodes );
-        else decls.push( child );
+        else decls.push( this.resolveTokens( child ) );
       } else {
         nestedNodes.push( child );
       }
@@ -84,10 +108,30 @@ export class ASSEngine {
       if ( !traitBody ) continue;
 
       for ( const item of traitBody ) {
-        if ( item.type === 'Declaration' ) decls.push( item );
+        if ( item.type === 'Declaration' ) decls.push( this.resolveTokens( item ) );
         else nestedNodes.push( item );
       }
     }
+  }
+
+  resolveTokens ( decl ) {
+    const propName = decl.name?.value;
+    if ( !propName ) return decl;
+
+    const category = getPropertyCategory( propName );
+    const tokenMap = this.tokens.get( category );
+    if ( !tokenMap ) return decl;
+
+    if ( Array.isArray( decl.value ) ) {
+      const resolvedValue = decl.value.map( ( item ) => {
+        if ( item.type === 'IDENTIFIER' && tokenMap.has( item.value ) ) {
+          return { ...item, value: tokenMap.get( item.value ) };
+        }
+        return item;
+      } );
+      return { ...decl, value: resolvedValue };
+    }
+    return decl;
   }
 
   processAtRule ( node, parentSelector = '' ) {
@@ -101,6 +145,13 @@ export class ASSEngine {
   handleScope ( node ) {
     return { ...node, isAssScope: true };
   }
+}
+
+function getPropertyCategory ( prop ) {
+  if ( prop === 'margin' || prop.startsWith( 'margin-' ) ) return 'margin';
+  if ( prop === 'padding' || prop.startsWith( 'padding-' ) ) return 'padding';
+  if ( prop === 'gap' || prop.endsWith( '-gap' ) ) return 'gap';
+  return prop;
 }
 
 function combineSelectors ( parent, child ) {
