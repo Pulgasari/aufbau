@@ -1,9 +1,9 @@
-import { many, map, seq, token } from "@cosmonaut/blocks";
+import { many, many1, map, seq, token } from "@cosmonaut/blocks";
 
-import rule from "./rule.js";
 import value from "./value.js";
 
 import createDeclarationAST from "../ast/DeclarationAST.js";
+import createRuleAST from "../ast/RuleAST.js";
 
 export default function declaration () {
   return map(
@@ -17,6 +17,23 @@ export default function declaration () {
       return createDeclarationAST(
         property.value,
         value
+      );
+    }
+  );
+}
+
+export default function rule () {
+  return map(
+    seq(
+      token("IDENTIFIER"),
+      token("BRACE_OPEN"),
+      many(declaration()),
+      token("BRACE_CLOSE")
+    ),
+    ([selector, , children]) => {
+      return createRuleAST(
+        selector.value,
+        children
       );
     }
   );
