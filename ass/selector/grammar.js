@@ -1,7 +1,27 @@
-import { choice,  map, seq, token } from "@cosmonaut/blocks";
+import { choice,  map, optional, seq, token } from "@cosmonaut/blocks";
 import * from "./ast.js";
 
-export default function simple () {
+export function pseudoClass () {
+  return map(
+    seq(
+      token("COLON"),
+      token("IDENTIFIER"),
+      optional(
+        token("PAREN_OPEN")
+      )
+    ),
+    ([, name]) => {
+      return createSelector(
+        "pseudoClass",
+        {
+          name: name.value
+        }
+      );
+    }
+  );
+}
+
+export function simple () {
   return choice(
     map(
       token("IDENTIFIER"),
@@ -32,3 +52,4 @@ export default function simple () {
     )
   );
 }
+
