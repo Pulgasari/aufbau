@@ -1,11 +1,7 @@
-import Node from "./Node.js";
+import ASSNode from "../core/ASSNode.js";
 
-export default class SheetNode extends Node{
-
-    constructor(){
-
-        super("sheet","root");
-
-    }
-
+export default class SheetNode extends ASSNode {
+  constructor (ass) {
+    super(ass, "sheet", "root");
+  }
 }
