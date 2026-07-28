@@ -4,6 +4,7 @@ import { extractTokens, transformTokenProperties } from './skills/tokens.js';
 import { observeDom }    from './plugins/client.js';
 import transformCenter   from './skills/center.js';
 import transformConfig   from './skills/config.js';
+import transformDirty    from './skills/dirty.js';
 import transformIcons    from './skills/icon.js';
 import transformLayouts  from './skills/layout.js';
 import transformMedia    from './skills/media.js';
@@ -81,9 +82,14 @@ function runPipeline (code) {
   const codeWithFonts = fontRules.length > 0
     ? `${fontRules.join('\n')}\n\n${step0}`
     : step0;
+
+  // 0b. Expand aufbau-dirty shorthands early
+  const step0b = codeWithFonts.replace(/aufbau-dirty\s*:\s*([^;}\n]+);?/g, (_, rawVal) => {
+    return transformDirty(rawVal);
+  });
   
   // 1. Extract @aufbau blocks and generate tokens
-  const { tokens, code: step1 } = extractTokens(codeWithFonts);
+  const { tokens, code: step1 } = extractTokens(step0b);
 
   // 1b. Process traits (@aufbau-trait & aufbau-use)
   const step1b = transformTraits(step1);
