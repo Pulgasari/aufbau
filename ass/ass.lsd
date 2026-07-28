@@ -4,7 +4,7 @@
 
 # //////////// META ////////////////////////////////////////////////////
 
-META LIST :: keywords == @scope @theme @layer @keyframes @media @aufbau @trait
+META LIST :: keywords == @scope @theme @layer @keyframes @media @aufbau @trait @tokens
 META LIST :: puncts   == { } : ; , ( ) . # & > + ~ * [ ] =
 
 # //////////// TOKENIZER ///////////////////////////////////////////////
