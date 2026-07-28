@@ -68,4 +68,34 @@ CSSStyleRule
 CSSStyleDeclaration
 ```
 
+## 2. CSS Typed OM
+
+Eine moderne, typisierte Alternative zum klassischen CSSOM.
+
+```javascript
+// Anstatt
+element.style.width = "100px";
+// schreibt man
+element.attributeStyleMap.set("width", CSS.px(100));
+```
+
+Vorteile:
+- keine Stringparsing-Probleme
+- Einheiten bleiben erhalten
+- schneller
+- besser für Animationen
+
+Klassen:
+```
+StylePropertyMap
+CSSUnitValue
+CSSKeywordValue
+CSSMathSum
+CSSMathProduct
+CSSMathMin
+CSSMathMax
+CSSMathClamp
+CSSNumericValue
+```
+
 
