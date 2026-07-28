@@ -8,6 +8,7 @@ import transformIcons    from './skills/icon.js';
 import transformLayouts  from './skills/layout.js';
 import transformMedia    from './skills/media.js';
 import transformShader   from './skills/shader.js';
+import transformTraits   from './skills/trait.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
 
@@ -82,8 +83,11 @@ function runPipeline (code) {
   // 1. Extract @aufbau blocks and generate tokens
   const { tokens, code: step1 } = extractTokens(codeWithFonts);
 
+  // 1b. Process traits (@aufbau-trait & aufbau-use)
+  const step1b = transformTraits(step1);
+
   // 2. Webfonts processing (@imports)
-  const { code: step2, imports: webfontImports } = transformWebfonts(step1);
+  const { code: step2, imports: webfontImports } = transformWebfonts(step1b);
 
   // 3. Level 3: Single-Pass Smart Properties (flex, grid, center, icon, colors in 1 pass)
   let result = transformSmartProperties(step2, tokens);
