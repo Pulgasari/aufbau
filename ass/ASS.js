@@ -1,3 +1,4 @@
+import CSSRenderer from "./renderer/CSSRenderer.js";
 import EventEmitter from "./core/EventEmitter.js";
 import Scheduler    from "./core/Scheduler.js";
 import SheetNode    from "./nodes/SheetNode.js";
@@ -8,10 +9,9 @@ export default class ASS {
   #sheet;
   constructor () {
     this.#events    = new EventEmitter();
-    this.#scheduler = new Scheduler(() => {
-      this.render();
-    });
-    this.#sheet = new SheetNode(this);
+    this.#scheduler = new Scheduler(() => { this.render(); });
+    this.#renderer  = new CSSRenderer();
+    this.#sheet     = new SheetNode(this);
   }
   get sheet () {
     return this.#sheet;
@@ -37,5 +37,8 @@ export default class ASS {
   render () {
     this.#sheet.clean();
     this.#events.emit("render", this);
+  }
+  toCSS () {
+    return this.#renderer.render(this.#sheet);
   }
 }
