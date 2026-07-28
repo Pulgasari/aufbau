@@ -29,3 +29,20 @@
 # brainstorming
 
 - möglichkeit zur on-the-fly image-compression + caching ?
+
+```css
+.button {
+  /* Setzt transition-property, duration, timing-function */
+  aufbau-motion: transform 0.2s spring, opacity 0.15s ease;
+}
+
+.button {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+```
