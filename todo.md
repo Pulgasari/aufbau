@@ -30,6 +30,7 @@
 
 - möglichkeit zur on-the-fly image-compression + caching ?
 - stylesheet: iwas mit clamp
+- stylesheet: iwas mit scrollbars
 
 ```css
 .button {
