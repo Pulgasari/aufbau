@@ -6,6 +6,7 @@ Aufbau Stylesheets are an enhancement of CSS.
 
 ```css
 aufbau-center
+aufbau-colors
 aufbau-dirty
 aufbau-flex
 aufbau-grid
