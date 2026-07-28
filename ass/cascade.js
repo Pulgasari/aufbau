@@ -37,3 +37,30 @@ export class RuleMatcher {
     return true;
   }
 }
+
+export class StyleResolver {
+  resolve (rules) {
+    const result = {};
+    for (const rule of rules) {
+      for (const declaration of rule.children) {
+        result[declaration.property] = declaration.value;
+      }
+    }
+    return result;
+  }
+}
+
+
+export class StyleResolver {
+  resolve (rules) {
+    return {} += rules |> .children |> [.property] = .value;   
+  }
+}
+
+export class StyleResolver {
+  resolve (rules) {
+    return {} += rules |> .children |> { .property: .value };   
+  }
+}
+
+
