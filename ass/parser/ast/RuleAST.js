@@ -1,9 +1,14 @@
-export function createRuleAST (selector, children = []) {
+import createNodeAST from "./NodeAST.js";
 
-  return {
-    type: "rule",
-    selector,
-    children
-  };
-
+export default function createRuleAST (
+  selector,
+  children
+) {
+  return createNodeAST(
+    "rule",
+    {
+      selector,
+      children
+    }
+  );
 }
