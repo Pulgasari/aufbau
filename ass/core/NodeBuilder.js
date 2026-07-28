@@ -7,10 +7,11 @@ export default function NodeBuilder (node) {
       cssName: name,
       format: value => value
     };
+    const parsed = this.ass.parseValue(value, property);
     const declaration = new DeclarationNode(
       this.ass,
       property.cssName,
-      property.format(value)
+      parsed
     );
     this.append(declaration);
     return declaration;
