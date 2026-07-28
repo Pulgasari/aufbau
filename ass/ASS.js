@@ -1,8 +1,9 @@
-import CSSRenderer from "./renderer/CSSRenderer.js";
-import EventEmitter from "./core/EventEmitter.js";
-import Scheduler    from "./core/Scheduler.js";
-import SheetNode    from "./nodes/SheetNode.js";
+import CSSRenderer      from "./renderer/CSSRenderer.js";
+import EventEmitter     from "./core/EventEmitter.js";
+import Scheduler        from "./core/Scheduler.js";
+import SheetNode        from "./nodes/SheetNode.js";
 import PropertyRegistry from "./registries/PropertyRegistry.js";
+import ValueParser      from "./core/ValueParser.js";
 
 export default class ASS {
   #events;
@@ -10,6 +11,7 @@ export default class ASS {
   #renderer;
   #scheduler;
   #sheet;
+  #values;
   
   constructor () {
     this.#events     = new EventEmitter();
@@ -17,6 +19,7 @@ export default class ASS {
     this.#properties = new PropertyRegistry(this);
     this.#renderer   = new CSSRenderer();
     this.#sheet      = new SheetNode(this);
+    this.#values     = new ValueParser();
   }
   get sheet () {
     return this.#sheet;
@@ -54,5 +57,8 @@ export default class ASS {
   }
   toCSS () {
     return this.#renderer.render(this.#sheet);
+  }
+  parseValue (value, definition) {
+    return this.#values.parse(value, definition);
   }
 }
