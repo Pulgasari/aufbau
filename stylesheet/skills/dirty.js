@@ -19,7 +19,7 @@ const DIRTY_VALUE_MAP = {
   cursive      : 'font-family',
   fantasy      : 'font-family',
   monospace    : 'font-family',
-  sans-serif   : 'font-family',
+  'sans-serif' : 'font-family',
   serif        : 'font-family',
 
   // font-style
