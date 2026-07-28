@@ -1,4 +1,4 @@
-import { choice, map, optional, seq, token } from "@cosmonaut/blocks";
+import { choice, many1, map, optional, seq, token } from "@cosmonaut/blocks";
 import * from "./ast.js";
 
 export default function attribute () {
@@ -9,6 +9,20 @@ export default function attribute () {
       token("BRACKET_CLOSE")
     ),
     ([, name]) => createSelector ("attribute", { name:name.value });
+  );
+}
+
+export function compound () {
+  return map(
+    many1(
+      choice(
+        pseudoElement(),
+        pseudoClass(),
+        attribute(),
+        simple()
+      )
+    ),
+    children => ({ type:"compound", children })
   );
 }
 
