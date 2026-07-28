@@ -1,4 +1,4 @@
-import { choice,  map, optional, seq, token } from "@cosmonaut/blocks";
+import { choice, map, optional, seq, token } from "@cosmonaut/blocks";
 import * from "./ast.js";
 
 export function pseudoClass () {
@@ -11,6 +11,16 @@ export function pseudoClass () {
       )
     ),
     ([, name]) => createSelector ("pseudoClass", { name: name.value });
+  );
+}
+
+export default function pseudoElement () {
+  return map(
+    seq(
+      token("DOUBLE_COLON"),
+      token("IDENTIFIER")
+    ),
+    ([, name]) => createSelector ("pseudoElement", { name:name.value });  
   );
 }
 
