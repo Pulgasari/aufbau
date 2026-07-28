@@ -1,6 +1,14 @@
 // @aufbau/ass
 
-function pref (key, value) {
+function prefers (key, value) {
+  if (key === undefined) {
+    return {
+      contrast : pref('contrast'),
+      motion   : pref('motion'),
+      scheme   : pref('scheme'),
+    };
+  }
+
   const map = {
     'scheme'         : 'color-scheme',
     'color-scheme'   : 'color-scheme',
@@ -46,23 +54,9 @@ function pref (key, value) {
   };
 }
 
+const ass = {};
+ass.client = { prefers };
 
-
-const prefersContrast = () => window.matchMedia("(prefers-contrast: more)").matches;
-const prefersDark     = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
-const prefersLight    = () => window.matchMedia("(prefers-color-scheme: light)").matches;  
-const prefersReduced  = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches);          
-
-const prefersContrast = () => pref('contrast', 'more');
-const prefersDark     = () => pref('scheme', 'dark');
-const prefersLight    = () => pref('scheme', 'light');
-const prefersReduced  = () => pref('motion', 'reduce');          
-
-const prefers = () => ({
-  contrast : prefersContrast () ? true   : false,
-  motion   : prefersReduced  () ? false  : true,
-  scheme   : prefersDark     () ? 'dark' : 'light',
-});
 
 
 /*
