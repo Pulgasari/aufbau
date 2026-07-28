@@ -20,6 +20,39 @@
 
 https://github.com/pulgasari/aufbau/
 
+```js
+const ass = {
+  propsMap : new Map,
+  props (obj) {
+    const entries = Object.entries(obj);
+    for (let [k,v] of entries) {
+      ass.propsMap.set(k,v);
+    }
+  }
+  prop (k,v) {
+    if (!k && !v) return null;
+    if (!v) return // get value
+
+    // set value
+    
+  }
+}
+
+ass.props({
+  font-size : {
+    default-value : 16,
+    default-unit  : px,
+    inherits      : true,
+    target        : ':root',
+  },
+  line-height : {
+    default-value : 1.25,
+    inherits      : true,
+    target        : ':root',
+  }
+});
+```
+
 ```css
 @aufbau-props {
   font-size : {
