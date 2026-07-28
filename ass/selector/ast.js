@@ -1,27 +1,15 @@
-export default function ComplexSelector (
-  children
-) {
-  return {
-    type: "complex",
-    children
-  };
+function createSelector (type, data = {}) {
+  return { type, ...data };
 }
 
-export default function CompoundSelector (
-  children
-) {
-  return {
-    type: "compound",
-    children
-  };
+function ComplexSelector (children) {
+  return { type: "complex", children };
 }
 
-export default function SimpleSelector (
-  type,
-  value
-) {
-  return {
-    type,
-    value
-  };
+function CompoundSelector (children) {
+  return { type: "compound", children };
+}
+
+function SimpleSelector (type, value) {
+  return { type, value };
 }
