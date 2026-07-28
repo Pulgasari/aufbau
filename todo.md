@@ -116,5 +116,23 @@ Dadurch werden Custom Properties animierbar.
 CSS.registerProperty(...)
 ```
 
+## 4. CSS Painting API (Paint Worklet)
 
+Teil von Houdini.
+
+Man kann eigene Hintergründe zeichnen.
+
+```css
+background: paint(myPainter);
+```
+
+```javascript
+registerPaint(...)
+```
+
+Verwendung:
+- Muster
+- Noise
+- Raster
+- Effekte
 
