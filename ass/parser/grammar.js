@@ -54,11 +54,16 @@ export default function rule () {
 
 export default function stylesheet () {
   return map(
-    many(rule()),
-    rules => {
+    many(
+      choice(
+        rule(),
+        atRule()
+      )
+    ),
+    children => {
       return {
         type: "stylesheet",
-        children: rules
+        children
       };
     }
   );
