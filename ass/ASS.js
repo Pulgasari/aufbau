@@ -1,3 +1,6 @@
+// ass
+
+import CascadeEngine    from "./cascade/CascadeEngine.js";
 import CSSRenderer      from "./renderer/CSSRenderer.js";
 import EventEmitter     from "./core/EventEmitter.js";
 import Scheduler        from "./core/Scheduler.js";
@@ -7,6 +10,7 @@ import PropertyRegistry from "./registries/PropertyRegistry.js";
 import ValueParser      from "./core/ValueParser.js";
 
 export default class ASS {
+  #cascade;
   #events;
   #parser;
   #properties;
@@ -17,6 +21,7 @@ export default class ASS {
   #values;
   
   constructor () {
+    this.#cascade    = new CascadeEngine();
     this.#events     = new EventEmitter();
     this.#scheduler  = new Scheduler(() => { this.render(); });
     this.#parser     = new Parser(this);
@@ -30,7 +35,8 @@ export default class ASS {
   get events () { return this.#events; }
   
   dirty () { this.#scheduler.queue(); }
-  
+
+  compute  (element)     { return this.#cascade.compute(this.#sheet, element); }
   rule     (selector)    { return this.#sheet.rule(selector); }
   layer    (name)        { return this.#sheet.layer(name); }
   media    (query)       { return this.#sheet.media(query); }
