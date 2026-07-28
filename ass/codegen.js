@@ -2,15 +2,36 @@
 import Generator, { concat, hardline, indent, print, text } from '@cosmonaut/generator';
 
 const methods = {
-  genIDENTIFIER : ( g, node ) => text( node.value ),
-  genNUMBER     : ( g, node ) => text( node.value ),
-  genSTRING     : ( g, node ) => text( node.value ),
-  genAT_KEYWORD : ( g, node ) => text( node.value ),
-  genPUNCT      : ( g, node ) => text( node.value ),
+  genAT_KEYWORD : (g, node) => text(node.value),
+  genIDENTIFIER : (g, node) => text(node.value),
+  genNUMBER     : (g, node) => text(node.value),
+  genPUNCT      : (g, node) => text(node.value),
+  genSTRING     : (g, node) => text(node.value),
+
+  genAtRule : ( g, node ) => {
+    const params = node.params ? node.params.map( ( p ) => p.value ).join( ' ' ) : '';
+    const header = params ? `${node.name.value} ${params}` : node.name.value;
+    if ( !node.body ) return concat( text( header ), text( ';' ) );
+    const bodyDocs = node.body.map( ( stmt ) => g.genNode( stmt ) );
+    return concat(
+      text( header ), text( ' {' ),
+      indent( concat( hardline, bodyDocs.reduce( ( acc, curr ) => concat( acc, curr, hardline ), text( '' ) ) ) ),
+      text( '}' )
+    );
+  }
 
   genDeclaration : ( g, node ) => {
     const val = Array.isArray( node.value ) ? node.value.map( ( v ) => v.value ).join( ' ' ) : g.genNode( node.value );
     return concat( text( node.name.value ), text( ': ' ), text( val ), text( ';' ) );
+  },
+
+  genMapDeclaration : ( g, node ) => {
+    const entriesDocs = ( node.entries || [] ).map( ( stmt ) => g.genNode( stmt ) );
+    return concat(
+      text( node.name.value ), text( ': {' ),
+      indent( concat( hardline, entriesDocs.reduce( ( acc, curr ) => concat( acc, curr, hardline ), text( '' ) ) ) ),
+      text( '};' )
+    );
   },
 
   genRule : ( g, node ) => {
@@ -23,17 +44,6 @@ const methods = {
     );
   },
   
-  genAtRule : ( g, node ) => {
-    const params = node.params ? node.params.map( ( p ) => p.value ).join( ' ' ) : '';
-    const header = params ? `${node.name.value} ${params}` : node.name.value;
-    if ( !node.body ) return concat( text( header ), text( ';' ) );
-    const bodyDocs = node.body.map( ( stmt ) => g.genNode( stmt ) );
-    return concat(
-      text( header ), text( ' {' ),
-      indent( concat( hardline, bodyDocs.reduce( ( acc, curr ) => concat( acc, curr, hardline ), text( '' ) ) ) ),
-      text( '}' )
-    );
-  }
 };
 
 const generator = new Generator ({ methods });
