@@ -1,9 +1,7 @@
-import { many, many1, map, seq, token } from "@cosmonaut/blocks";
-
-import value from "./value.js";
+import { any, choice, many, many1, map, seq, token } from "@cosmonaut/blocks";      
 
 import createDeclarationAST from "../ast/DeclarationAST.js";
-import createRuleAST from "../ast/RuleAST.js";
+import createRuleAST        from "../ast/RuleAST.js";
 
 export default function declaration () {
   return map(
@@ -47,6 +45,23 @@ export default function stylesheet () {
         type: "stylesheet",
         children: rules
       };
+    }
+  );
+}
+
+export default function value () {
+  return map(
+    many1(
+      choice(
+        token("VALUE"),
+        token("IDENTIFIER"),
+        token("CHAR")
+      )
+    ),
+    tokens => {
+      return tokens
+        .map(token => token.value)
+        .join("");
     }
   );
 }
