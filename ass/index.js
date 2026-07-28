@@ -1,5 +1,51 @@
 // @aufbau/ass
 
+function pref(key, value) {
+  const map = {
+    'scheme'         : 'color-scheme',
+    'color-scheme'   : 'color-scheme',
+    'contrast'       : 'contrast',
+    'motion'         : 'reduced-motion',
+    'reduced-motion' : 'reduced-motion',
+    'no'             : 'no-preference',
+    'no-preference'  : 'no-preference',
+  };
+  const feature = map[key];
+  if (!feature) throw new Error(`Unbekannte Preference: "${key}"`);
+
+  const possible = {
+    'color-scheme'   : ['no-preference', 'dark', 'light'],
+    'contrast'       : ['no-preference', 'custom', 'less', 'more'],
+    'reduced-motion' : ['no-preference', 'reduce'],
+  };
+
+  // Zwei Parameter: expliziter Check
+  if (value !== undefined) {
+    const bool = window.matchMedia(`(prefers-${feature}: ${value})`).matches;
+    return {
+      bool, string: value,
+      valueOf  () { return this.bool; },
+      toString () { return this.string; }
+    };
+  }
+
+  // Ein Parameter: automatische Erkennung
+  let matched = 'no-preference';
+  for (const v of possible[feature]) {
+    if (window.matchMedia(`(prefers-${feature}: ${v})`).matches) {
+      matched = v;
+      break;
+    }
+  }
+
+  const bool = matched !== 'no-preference';
+  return {
+    bool, string: matched,
+    valueOf  () { return this.bool; },
+    toString () { return this.string; }
+  };
+}
+
 // 1. Farbmodus: "dark", "light" oder "no-preference"
 function getColorScheme() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
