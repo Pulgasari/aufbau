@@ -25,4 +25,15 @@ stylesheet/
 
     parser/
     renderer/
+
+
+cascade/
+
+  CascadeEngine.js
+  StyleResolver.js
+  RuleMatcher.js
+  CascadeSorter.js
+
+  MatchResult.js
+
     ```
