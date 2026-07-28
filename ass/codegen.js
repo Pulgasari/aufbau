@@ -14,7 +14,7 @@ const methods = {
   },
 
   genRule : ( g, node ) => {
-    const sel = Array.isArray( node.selector ) ? node.selector.map( ( s ) => s.value ).join( '' ) : g.genNode( node.selector );
+    const sel = typeof node.selector === 'string' ? node.selector : Array.isArray( node.selector ) ? node.selector.map( ( s ) => s.value ).join( '' ) : g.genNode( node.selector );
     const bodyDocs = ( node.body || [] ).map( ( stmt ) => g.genNode( stmt ) );
     return concat(
       text( sel ), text( ' {' ),
@@ -22,7 +22,7 @@ const methods = {
       text( '}' )
     );
   },
-
+  
   genAtRule : ( g, node ) => {
     const params = node.params ? node.params.map( ( p ) => p.value ).join( ' ' ) : '';
     const header = params ? `${node.name.value} ${params}` : node.name.value;
