@@ -23,10 +23,48 @@ function getContrast() {
   return 'no-preference';
 }
 
+const pref = (key, value, type = Bool) => {
+  const resolvedKey = {
+    // color-scheme
+    'color-scheme' : 'color-scheme',
+    'scheme'       : 'color-scheme',
+    // contrast
+    'contrast' : 'contrast',
+    // reduced-motion
+    'motion'         : 'reduced-motion',
+    'reduced-motion' : 'reduced-motion',
+  }[key] ?? null;
+
+  if (type === Bool) {
+    window.matchMedia(`(prefers-${key}: ${value})`).matches;
+  } else {
+    if (key === 'color-scheme') {
+      for (const value of ['dark', 'light', 'no-preference']) {
+        if (pref(key, value)) return true;
+      }
+    }
+    if (key === 'contrast') {
+      for (const value of ['custom', 'less', 'more', 'no-preference']) {
+        if (pref(key, value)) return true;
+      }
+    }
+    if (key === 'reduced-motion') {
+      for (const value of ['reduce', 'no-preference']) {
+        if (pref(key, value)) return true;
+      }
+    }
+  }
+}
+
 const prefersContrast = () => window.matchMedia("(prefers-contrast: more)").matches;
 const prefersDark     = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
 const prefersLight    = () => window.matchMedia("(prefers-color-scheme: light)").matches;  
 const prefersReduced  = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches);          
+
+const prefersContrast = () => pref('contrast', 'more');
+const prefersDark     = () => pref('scheme', 'dark');
+const prefersLight    = () => pref('scheme', 'light');
+const prefersReduced  = () => pref('motion', 'reduce');          
 
 const prefers = () => ({
   contrast : prefersContrast () ? true   : false,
