@@ -12,6 +12,15 @@ export default function attribute () {
   );
 }
 
+export function combinator () {
+  return choice(
+    map(
+      token("COMBINATOR"),
+      token => ({ type:"combinator", value:token.value })
+    )
+  );
+}
+
 export function compound () {
   return map(
     many1(
