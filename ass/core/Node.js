@@ -52,4 +52,42 @@ export default class Node {
     return this;
   }
 
+  find(fn){
+
+    for(const child of this.children){
+
+        if(fn(child)) return child;
+
+        const found = child.find(fn);
+
+        if(found) return found;
+
+    }
+
+    return null;
+
+}
+
+findAll(fn){
+
+    const out=[];
+
+    const walk=node=>{
+
+        for(const child of node.children){
+
+            if(fn(child)) out.push(child);
+
+            walk(child);
+
+        }
+
+    };
+
+    walk(this);
+
+    return out;
+
+}
+
 }
