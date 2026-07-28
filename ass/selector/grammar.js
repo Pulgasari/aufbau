@@ -1,6 +1,17 @@
 import { choice, map, optional, seq, token } from "@cosmonaut/blocks";
 import * from "./ast.js";
 
+export default function attribute () {
+  return map(
+    seq(
+      token("BRACKET_OPEN"),
+      token("IDENTIFIER"),
+      token("BRACKET_CLOSE")
+    ),
+    ([, name]) => createSelector ("attribute", { name:name.value });
+  );
+}
+
 export function pseudoClass () {
   return map(
     seq(
