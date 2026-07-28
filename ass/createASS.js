@@ -1,11 +1,9 @@
-import ASS from "./ASS.js";
+import ASS    from "./ASS.js";
+import Source from "./core/Source.js";
 
-export default function createASS(source) {
-
-    const ass = new ASS();
-
-    // später normalizeSource(source)
-
-    return ass;
-
+export default function createASS (input) {
+  const ass = new ASS();
+  const source = Source.normalize(input);
+  ass.load(source);
+  return ass;
 }
