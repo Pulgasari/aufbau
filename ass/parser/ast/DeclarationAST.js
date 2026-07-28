@@ -1,9 +1,14 @@
-export function createDeclarationAST (property, value) {
+import createNodeAST from "./NodeAST.js";
 
-  return {
-    type: "declaration",
-    property,
-    value
-  };
-
+export default function createDeclarationAST (
+  property,
+  value
+) {
+  return createNodeAST(
+    "declaration",
+    {
+      property,
+      value
+    }
+  );
 }
