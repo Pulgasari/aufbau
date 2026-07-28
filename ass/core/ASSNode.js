@@ -1,3 +1,73 @@
+import EventEmitter from "./EventEmitter.js";
+import NodeBuilder from "./NodeBuilder.js";
+let NEXT_ID = 1;
+export default class ASSNode {
+  #ass;
+  id = NEXT_ID++;
+  type;
+  name;
+  parent = null;
+  children = [];
+  data = {};
+  meta = {};
+  state = {
+    dirty: false
+  };
+  events = new EventEmitter();
+  constructor (ass, type, name, data = {}) {
+    this.#ass = ass;
+    this.type = type;
+    this.name = name;
+    this.data = data;
+    NodeBuilder(this);
+  }
+  get ass () {
+    return this.#ass;
+  }
+  append (...nodes) {
+    for (const node of nodes) {
+      node.remove();
+      node.parent = this;
+      this.children.push(node);
+      this.events.emit("append", node);
+    }
+    this.markDirty();
+    return this;
+  }
+  remove () {
+    if (!this.parent) {
+      return this;
+    }
+    const index = this.parent.children.indexOf(this);
+    if (index !== -1) {
+      this.parent.children.splice(index, 1);
+    }
+    this.parent.markDirty();
+    this.parent = null;
+    this.events.emit("remove", this);
+    return this;
+  }
+  markDirty () {
+    if (this.state.dirty) {
+      return this;
+    }
+    this.state.dirty = true;
+    if (this.parent) {
+      this.parent.markDirty();
+    }
+    this.ass.dirty();
+    return this;
+  }
+  clean () {
+    this.state.dirty = false;
+    for (const child of this.children) {
+      child.clean();
+    }
+    return this;
+  }
+}
+
+
 let NEXT_ID = 1;
 
 export default class ASSNode {
