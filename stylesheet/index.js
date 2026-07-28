@@ -7,6 +7,7 @@ import transformConfig   from './skills/config.js';
 import transformIcons    from './skills/icon.js';
 import transformLayouts  from './skills/layout.js';
 import transformMedia    from './skills/media.js';
+import transformPattern  from './skills/pattern.js';
 import transformShader   from './skills/shader.js';
 import transformTraits   from './skills/trait.js';
 import transformWebfonts from './skills/webfont.js';
@@ -48,12 +49,13 @@ function fastHash (str) {
 function transformSmartProperties (code, tokens) {
   return code.replace(REGEX_AUFBAU_PROPERTIES, (fullMatch, prop, rawVal) => {
     switch (prop) {
-      case 'aufbau-flex'   : return transformFlex(rawVal, tokens);
-      case 'aufbau-grid'   : return transformGrid(rawVal, tokens);
-      case 'aufbau-center' : return transformCenter(rawVal);
-      case 'aufbau-icon'   : return transformIcons(rawVal, tokens);
-      case 'aufbau-shader' : return transformShader(fullMatch);
-      case 'aufbau-colors' : {
+      case 'aufbau-flex'    : return transformFlex    (rawVal, tokens);
+      case 'aufbau-grid'    : return transformGrid    (rawVal, tokens);
+      case 'aufbau-center'  : return transformCenter  (rawVal);
+      case 'aufbau-icon'    : return transformIcons   (rawVal, tokens);
+      case 'aufbau-pattern' : return transformPattern (rawVal, tokens);
+      case 'aufbau-shader'  : return transformShader  (fullMatch);
+      case 'aufbau-colors'  : {
         const parts      = rawVal.trim().split(/\s+/);
         const pairName   = parts[0];
         const isInverted = parts.includes('inverted') || parts.includes('invert');
