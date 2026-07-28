@@ -1,5 +1,29 @@
 // cascade.js
 
+export default class CascadeEngine {
+  #matcher;
+  #resolver
+  #sorter;
+
+  constructor () {
+    this.#matcher  = new RuleMatcher();
+    this.#sorter   = new CascadeSorter();
+    this.#resolver = new StyleResolver();
+  }
+
+  compute (sheet, element) {
+    const matched = [];
+    for (const rule of sheet.children) {
+      if (this.#matcher.match(rule, element)) {
+        matched.push(rule);
+      }
+    }
+    const sorted = this.#sorter.sort(matched);
+    return this.#resolver.resolve(sorted);
+  }
+
+}
+
 export default class CascadeSorter {
   sort (rules) {
     return rules.sort(
@@ -7,10 +31,8 @@ export default class CascadeSorter {
         if (a.important !== b.important) {
           return (Number(b.important) - Number(a.important));
         }
-
         const specificity = this.compareSpecificity (a.specificity, b.specificity);
         if (specificity !== 0) return specificity;
-
         return a.order - b.order;
       }
     );
