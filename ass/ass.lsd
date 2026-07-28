@@ -4,7 +4,7 @@
 
 # //////////// META ////////////////////////////////////////////////////
 
-META LIST :: keywords == @scope @theme @layer @keyframes @media @aufbau @trait @tokens
+META LIST :: keywords == @scope @theme @layer @keyframes @media @aufbau @trait @tokens @config
 META LIST :: puncts   == { } : ; , ( ) . # & > + ~ * [ ] =
 
 # //////////// TOKENIZER ///////////////////////////////////////////////
@@ -25,6 +25,11 @@ RULE :: Statement  == AtRule | Rule | Declaration
 RULE :: Block      == `{` Statement* `}` => 2
 
 # ------------ Declarations --------------------------------------------
+
+#### MapDeclaration
+META :: MapDeclaration
+NODE == { name, entries }
+RULE == IDENTIFIER `:` `{` Declaration* `}` `;` => name:1 entries:4
 
 #### Declaration
 META :: Declaration
