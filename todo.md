@@ -29,6 +29,7 @@
 # brainstorming
 
 - möglichkeit zur on-the-fly image-compression + caching ?
+- stylesheet: iwas mit clamp
 
 ```css
 .button {
