@@ -1,5 +1,8 @@
 import { many, map, seq, token } from "@cosmonaut/blocks";
 import declaration from "./declaration.js";
+import {
+  createRuleAST
+} from "../ast/RuleAST.js";
 
 export default function rule () {
   return map(
@@ -9,10 +12,11 @@ export default function rule () {
       many(declaration()),
       token("BRACE_CLOSE")
     ),
-    ([selector, , declarations]) => ({
-      type     : "rule",
-      selector : selector.value,
-      children : declarations
-    })
+    ([selector, , children]) => {
+      return createRuleAST(
+        selector.value,
+        children
+      );
+    }
   );
 }
