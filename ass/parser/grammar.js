@@ -1,7 +1,22 @@
 import { any, choice, many, many1, map, seq, token } from "@cosmonaut/blocks";      
+import * from "./ast.js";
 
-import createDeclarationAST from "../ast/DeclarationAST.js";
-import createRuleAST        from "../ast/RuleAST.js";
+export default function atRule () {
+  return map(
+    seq(
+      token("AT"),
+      token("IDENTIFIER"),
+      many(rule())
+    ),
+    ([, name, children]) => {
+      return createAtRuleAST(
+        name.value,
+        "",
+        children
+      );
+    }
+  );
+}
 
 export default function declaration () {
   return map(
