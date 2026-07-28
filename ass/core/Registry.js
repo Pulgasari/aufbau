@@ -37,3 +37,37 @@ export default class Registry extends ASSObject {
     }
 
 }
+
+export default class Registry{
+
+    #ids = new Map();
+
+    #names = new Map();
+
+    add(node){
+
+        this.#ids.set(node.id,node);
+
+        if(node.name){
+
+            this.#names.set(node.name,node);
+
+        }
+
+        return node;
+
+    }
+
+    get(id){
+
+        return this.#ids.get(id);
+
+    }
+
+    resolve(name){
+
+        return this.#names.get(name);
+
+    }
+
+    }
