@@ -1,4 +1,7 @@
 import { map, seq, token } from "@cosmonaut/blocks";
+import {
+  createDeclarationAST
+} from "../ast/DeclarationAST.js";
 
 export default function declaration () {
   return map(
@@ -8,9 +11,10 @@ export default function declaration () {
       token("IDENTIFIER")
     ),
     ([property, , value]) => ({
-      type     : "declaration",
-      property : property.value,
-      value    : value.value
+      return createDeclarationAST(
+        property.value,
+        value.value
+      );
     })
   );
 }
