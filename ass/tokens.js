@@ -1,5 +1,21 @@
 // @ass/tokens.js
 
+export const defaultUnits = {
+  fontSize     : 'px',
+  width        : 'px',
+  height       : 'px',
+  margin       : 'px',
+  padding      : 'px',
+  gap          : 'px',
+  borderRadius : 'px',
+  top          : 'px',
+  right        : 'px',
+  bottom       : 'px',
+  left         : 'px',
+  opacity      : '',
+  zIndex       : ''
+};
+
 export const defaultTokens = {
   gap: {
     tiny   : '0.25rem',
