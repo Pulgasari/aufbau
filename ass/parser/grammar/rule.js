@@ -1,8 +1,6 @@
-import { many, map, seq, token } from "@cosmonaut/blocks";
+import { many, many1, map, seq, token } from "@cosmonaut/blocks";
 import declaration from "./declaration.js";
-import {
-  createRuleAST
-} from "../ast/RuleAST.js";
+import createRuleAST from "../ast/RuleAST.js";
 
 export default function rule () {
   return map(
