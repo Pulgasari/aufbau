@@ -1,9 +1,19 @@
 // @aufbau/ass
 
-function toKebabCase (str) {
+import { transformPattern } from '../skills/pattern.js';
+import { transformDirty }   from '../skills/dirty.js';
+import { transformUnset }   from '../skills/unset.js';
+
+/**
+ * Converts camelCase strings to kebab-case.
+ */
+function toKebabCase(str) {
   return str.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
 }
 
+/**
+ * Property aliases for @aufbau shorthands.
+ */
 const AUFBAU_ALIASES = {
   pattern : 'aufbau-pattern',
   use     : 'aufbau-use',
@@ -19,59 +29,135 @@ const AUFBAU_ALIASES = {
   shader  : 'aufbau-shader'
 };
 
-function normalizeProperty (key) {
+function normalizeProperty(key) {
   const kebab = toKebabCase(key);
   return AUFBAU_ALIASES[kebab] || kebab;
 }
 
-export class AufbauStylesheet {
-  constructor() {
-    // Stores rules as: Map<selector, Map<property, value>>
-    this._rules = new Map();
+/**
+ * Parses a raw CSS string into property-value pairs on a target map.
+ */
+function parseCssDeclarationString(cssString, ruleMap) {
+  if (!cssString) return;
+  const declarations = cssString.split(';');
+  for (const decl of declarations) {
+    const colonIdx = decl.indexOf(':');
+    if (colonIdx !== -1) {
+      const prop = decl.slice(0, colonIdx).trim();
+      const val  = decl.slice(colonIdx + 1).trim();
+      if (prop && val) {
+        ruleMap.set(prop, val);
+      }
+    }
+  }
+}
+
+/**
+ * Processor class that compiles ASS declarations into native CSS.
+ */
+export class AufbauStylesheetProcessor {
+  constructor(tokens = {}) {
+    this._tokens = tokens;
   }
 
   /**
-   * Declare CSS rules with object syntax.
-   * Supports single/multiple selectors, camelCase, aufbau aliases, and nested rules.
+   * Compiles an AufbauStylesheet instance into a new, fully processed AufbauStylesheet.
    */
-  rule (selector, declarations) {
+  process(stylesheet) {
+    const processedSheet = new AufbauStylesheet();
+    processedSheet._isProcessed = true;
+
+    for (const [selector, props] of stylesheet._rules) {
+      for (const [prop, val] of props) {
+        const cleanProp = prop.toLowerCase();
+
+        // 1. Process aufbau skills
+        if (cleanProp === 'aufbau-pattern') {
+          const nativeCss = transformPattern(val, this._tokens);
+          const targetMap = processedSheet._getOrCreateRuleMap(selector);
+          parseCssDeclarationString(nativeCss, targetMap);
+        } else if (cleanProp === 'aufbau-dirty') {
+          const nativeCss = transformDirty(val);
+          const targetMap = processedSheet._getOrCreateRuleMap(selector);
+          parseCssDeclarationString(nativeCss, targetMap);
+        } else if (cleanProp === 'aufbau-unset') {
+          const nativeCss = transformUnset(val);
+          parseCssDeclarationString(targetMap);
+        } else {
+          // Standard CSS properties pass through
+          processedSheet._getOrCreateRuleMap(selector).set(prop, val);
+        }
+      }
+    }
+
+    return processedSheet;
+  }
+}
+
+/**
+ * Core Stylesheet AST & Declaration Store.
+ */
+export class AufbauStylesheet {
+  constructor() {
+    this._rules = new Map();
+    this._isProcessed = false;
+  }
+
+  _getOrCreateRuleMap(selector) {
+    if (!this._rules.has(selector)) {
+      this._rules.set(selector, new Map());
+    }
+    return this._rules.get(selector);
+  }
+
+  /**
+   * Declare CSS rules using object syntax.
+   */
+  rule(selector, declarations) {
     if (!selector || !declarations) return this;
 
-    // 1. Normalize selector input into an array
     const selectors = Array.isArray(selector)
       ? selector
       : selector.split(',').map(s => s.trim());
 
     for (const sel of selectors) {
-      if (!this._rules.has(sel)) {
-        this._rules.set(sel, new Map());
-      }
-      const ruleMap = this._rules.get(sel);
+      const ruleMap = this._getOrCreateRuleMap(sel);
 
       for (const [key, value] of Object.entries(declarations)) {
-        // 2. Handle nested rule objects (e.g. '> main' or '&:hover')
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-          let nestedSelector = key;
-          if (nestedSelector.startsWith('&')) {
-            nestedSelector = nestedSelector.replace('&', sel);
-          } else {
-            nestedSelector = `${sel} ${nestedSelector}`;
-          }
-          // Recursively add nested rule
-          this.rule(nestedSelector, value);
+          let nestedSel = key.startsWith('&') ? key.replace('&', sel) : `${sel} ${key}`;
+          this.rule(nestedSel, value);
         } else {
-          // 3. Regular property declaration
           const propName = normalizeProperty(key);
           ruleMap.set(propName, String(value));
         }
       }
     }
 
-    return this; // Enable method chaining
+    return this;
   }
 
   /**
-   * Generates formatted CSS output.
+   * Compiles the stylesheet using the processor.
+   */
+  process(tokens = {}) {
+    const processor = new AufbauStylesheetProcessor(tokens);
+    return processor.process(this);
+  }
+
+  /**
+   * Returns the plain object representation of the stylesheet.
+   */
+  asObject() {
+    const result = {};
+    for (const [sel, props] of this._rules) {
+      result[sel] = Object.fromEntries(props);
+    }
+    return result;
+  }
+
+  /**
+   * Formats the stylesheet as a CSS string (raw ASS or native CSS depending on state).
    */
   asString() {
     let css = '';
@@ -84,50 +170,41 @@ export class AufbauStylesheet {
     }
     return css.trim();
   }
-}
 
-export class AufbauStylesheetProcessor {
+  /**
+   * Returns an HTMLStyleElement containing the compiled CSS.
+   */
+  asElement(id = 'aufbau-stylesheet') {
+    if (typeof document === 'undefined') return null;
 
-  process () {
-    for (const [key, value] of Object.entries(declarations)) {
-        const cleanKey = key.toLowerCase();
-
-        // 1. Direct Skill Evaluation
-        if (cleanKey === 'pattern' || cleanKey === 'aufbau-pattern') {
-          const nativeCss = transformPattern(value, this._tokens);
-          parseCssDeclarationString(nativeCss, ruleMap);
-        } 
-        else if (cleanKey === 'dirty' || cleanKey === 'aufbau-dirty') {
-          const nativeCss = transformDirty(value);
-          parseCssDeclarationString(nativeCss, ruleMap);
-        } 
-        else if (cleanKey === 'unset' || cleanKey === 'aufbau-unset') {
-          const nativeCss = transformUnset(value);
-          parseCssDeclarationString(nativeCss, ruleMap);
-        }
-        // 2. Nested rules handling (&:hover, > main)
-        else if (typeof value === 'object' && value !== null) {
-          let nestedSel = key.startsWith('&') ? key.replace('&', sel) : `${sel}${key}`;
-          this.rule(nestedSel, value);
-        }
-        // 3. Standard CSS property
-        else {
-          const kebabProp = key.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-          ruleMap.set(kebabProp, String(value));
-        }
+    let styleEl = document.getElementById(id);
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = id;
+      styleEl.type = 'text/css';
     }
+    styleEl.textContent = this.asString();
+    return styleEl;
+  }
+
+  /**
+   * Appends the stylesheet directly to the document head.
+   */
+  toHead(id = 'aufbau-stylesheet') {
+    const el = this.asElement(id);
+    if (el && !document.head.contains(el)) {
+      document.head.appendChild(el);
+    }
+    return el;
   }
 }
 
-const sheet = ass.new(); // returns new AufbauStylesheet
-sheet.rules(...);
+// Module Export API
+export const ass = {
+  new: () => new AufbauStylesheet()
+};
 
-const stillASS = sheet.asString();
-
-const nowCSS = sheet.process().asString();
-const nowCSSStyleElement = sheet.process().asElement();
-
-
+export default ass;
 
 function prefers (key, value) {
   if (key === undefined) {
