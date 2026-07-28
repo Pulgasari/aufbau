@@ -20,3 +20,34 @@
 
 https://github.com/pulgasari/aufbau/
 
+```css
+@aufbau-props {
+  font-size : {
+    default-value : 16;
+    default-unit  : px;
+    
+  },
+  line-height :
+}
+```
+
+```css
+@property --canBeAnything {
+  syntax: "*";
+  inherits: true;
+}
+
+@property --rotation {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 45deg;
+}
+
+@property --defaultSize {
+  syntax: "<length> | <percentage>";
+  inherits: true;
+  initial-value: 200px;
+}
+```
+
+
