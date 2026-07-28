@@ -25,13 +25,30 @@ https://github.com/pulgasari/aufbau/
   font-size : {
     default-value : 16;
     default-unit  : px;
-    
-  },
-  line-height :
+    inherits      : true;
+    target        : ':root';
+  };
+  line-height : {
+    default-value : 1.25;
+    inherits      : true;
+    target        : ':root';
+  }
 }
 ```
 
 ```css
+@property --font-size {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16px;
+}
+
+@property --line-height {
+  syntax: "<length> | <percentage>";
+  inherits: true;
+  initial-value: 1.25;
+}
+
 @property --canBeAnything {
   syntax: "*";
   inherits: true;
