@@ -281,7 +281,18 @@ Nützlich für:
 - Suchergebnisse
 - Kommentare
 
+## 24. Media Query API
 
+JavaScript-Zugriff.
+
+```javascript
+matchMedia("(prefers-color-scheme: dark)")
+// auch:
+prefers-reduced-motion
+prefers-contrast
+width
+height
+```
 
 
 
