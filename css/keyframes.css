@@ -17,6 +17,46 @@ keyframes slide-in-leftwards {
   to   { transform: translateX(100%); }
 }
 
+/* @patterns */
+
+/* Seamless 20px pattern tile slide animations */
+@keyframes aufbau-pattern-slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 20px 20px;
+  }
+}
+
+@keyframes aufbau-pattern-slide-x {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 20px 0;
+  }
+}
+
+@keyframes aufbau-pattern-slide-y {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 20px;
+  }
+}
+
+/* Opacity pulse animation for background patterns */
+@keyframes aufbau-pattern-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
 /*
 
 @keyframes slideIn     { from { transform: translateX(-110%); } to { transform: translateX(    0); } }
