@@ -57,6 +57,8 @@ function prefers (key, value) {
 const ass = {};
 ass.client = { prefers };
 
+const stylesheet = ass.new();
+
 
 
 /*
