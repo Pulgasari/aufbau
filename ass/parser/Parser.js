@@ -1,12 +1,22 @@
+import Tokenizer   from "./Tokenizer.js";
+import TokenStream from "./TokenStream.js";
+
 export default class Parser {
   #ass;
+  #tokenizer
+  
   constructor (ass) {
-    this.#ass = ass;
+    this.#ass       = ass;
+    this.#tokenizer = new Tokenizer();
   }
   parse (css) {
-    console.log("parse css", css);
-    return this.#ass;
+    const tokens = this.#tokenizer.tokenize(css);
+    const stream = new TokenStream(tokens);
+    const ast    = this.parseStylesheet(stream);
+    
+    return this.#ass.import(ast);
   }
+
   fromNode (node) {
     if (node.tagName === "STYLE") {
       return this.parse(node.textContent);
