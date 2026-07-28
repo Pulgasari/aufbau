@@ -1,24 +1,18 @@
 import { any, choice, many, many1, map, seq, token } from "@cosmonaut/blocks";      
 import * from "./ast.js";
 
-export default function atRule () {
+export function atRule () {
   return map(
     seq(
       token("AT"),
       token("IDENTIFIER"),
       many(rule())
     ),
-    ([, name, children]) => {
-      return createAtRuleAST(
-        name.value,
-        "",
-        children
-      );
-    }
+    ([, name, children]) => createAtRuleAST (name.value, "", children)
   );
 }
 
-export default function declaration () {
+export function declaration () {
   return map(
     seq(
       token("IDENTIFIER"),
@@ -26,16 +20,11 @@ export default function declaration () {
       value(),
       token("SEMICOLON")
     ),
-    ([property, , value]) => {
-      return createDeclarationAST(
-        property.value,
-        value
-      );
-    }
+    ([property, , value]) => createDeclarationAST (property.value, value)
   );
 }
 
-export default function rule () {
+export function rule () {
   return map(
     seq(
       token("IDENTIFIER"),
@@ -43,16 +32,11 @@ export default function rule () {
       many(declaration()),
       token("BRACE_CLOSE")
     ),
-    ([selector, , children]) => {
-      return createRuleAST(
-        selector.value,
-        children
-      );
-    }
+    ([selector, , children]) => createRuleAST (selector.value, children)
   );
 }
 
-export default function stylesheet () {
+export function stylesheet () {
   return map(
     many(
       choice(
@@ -60,16 +44,11 @@ export default function stylesheet () {
         atRule()
       )
     ),
-    children => {
-      return {
-        type: "stylesheet",
-        children
-      };
-    }
+    children => ({ type: "stylesheet", children })
   );
 }
 
-export default function value () {
+export function value () {
   return map(
     many1(
       choice(
@@ -78,10 +57,6 @@ export default function value () {
         token("CHAR")
       )
     ),
-    tokens => {
-      return tokens
-        .map(token => token.value)
-        .join("");
-    }
+    tokens => tokens.map(token => token.value).join("")
   );
 }
