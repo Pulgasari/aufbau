@@ -1,23 +1,9 @@
 // /ass/runtime/resolver.js
 // resolve tokens, default units, and property normalization
 
-import { defaultTokens } from '../tokens.js';
+import { defaultUnits, defaultTokens } from '../tokens.js';
 
-const defaultUnits = {
-  fontSize     : 'px',
-  width        : 'px',
-  height       : 'px',
-  margin       : 'px',
-  padding      : 'px',
-  gap          : 'px',
-  borderRadius : 'px',
-  top          : 'px',
-  right        : 'px',
-  bottom       : 'px',
-  left         : 'px',
-  opacity      : '',
-  zIndex       : ''
-};
+
 
 export function normalizeProp ( prop ) {
   return prop.replace( /-([a-z])/g, ( _, char ) => char.toUpperCase() );
