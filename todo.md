@@ -136,3 +136,40 @@ Verwendung:
 - Raster
 - Effekte
 
+## 5. CSS Layout API (Layout Worklet)
+
+Eigene Layout-Algorithmen entwickeln.
+
+Beispiele:
+- Masonry
+- Magazine Layout
+- Flow Layouts
+
+Noch kaum implementiert.
+
+## 6. CSS Animation Worklet
+
+Animationen unabhängig vom Main Thread.
+
+Ideal für:
+
+- Scrollanimationen
+- flüssige Animationen
+
+Wird teilweise von moderneren APIs ersetzt.
+
+## 7. CSS Typed OM Geometry Interfaces
+
+Arbeitet mit:
+```
+DOMRect
+DOMMatrix
+DOMPoint
+```
+
+für Transformationen.
+
+
+
+
+
