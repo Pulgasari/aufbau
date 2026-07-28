@@ -1,3 +1,12 @@
+export default function ComplexSelector (
+  children
+) {
+  return {
+    type: "complex",
+    children
+  };
+}
+
 export default function CompoundSelector (
   children
 ) {
