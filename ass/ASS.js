@@ -2,11 +2,13 @@ import CSSRenderer      from "./renderer/CSSRenderer.js";
 import EventEmitter     from "./core/EventEmitter.js";
 import Scheduler        from "./core/Scheduler.js";
 import SheetNode        from "./nodes/SheetNode.js";
+import Parser           from "./parser/Parser.js";
 import PropertyRegistry from "./registries/PropertyRegistry.js";
 import ValueParser      from "./core/ValueParser.js";
 
 export default class ASS {
   #events;
+  #parser;
   #properties;
   #renderer;
   #scheduler;
@@ -16,17 +18,14 @@ export default class ASS {
   constructor () {
     this.#events     = new EventEmitter();
     this.#scheduler  = new Scheduler(() => { this.render(); });
+    this.#parser     = new Parser(this);
     this.#properties = new PropertyRegistry(this);
     this.#renderer   = new CSSRenderer();
     this.#sheet      = new SheetNode(this);
     this.#values     = new ValueParser();
   }
-  get sheet () {
-    return this.#sheet;
-  }
-  get events () {
-    return this.#events;
-  }
+  get sheet  () { return this.#sheet; }
+  get events () { return this.#events; }
   rule (selector) {
     return this.#sheet.rule(selector);
   }
@@ -60,5 +59,14 @@ export default class ASS {
   }
   parseValue (value, definition) {
     return this.#values.parse(value, definition);
+  }
+  load (source) {
+    switch (source.type) {
+      case "text"       : this.#parser.parse          (source.value); break;
+      case "node"       : this.#parser.fromNode       (source.value); break;
+      case "stylesheet" : this.#parser.fromStyleSheet (source.value); break;       
+      case "url"        : this.#parser.fromURL        (source.value); break;
+    }
+    return this;
   }
 }
