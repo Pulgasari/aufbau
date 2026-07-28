@@ -1,4 +1,4 @@
-import { choice, many1, map, optional, seq, token } from "@cosmonaut/blocks";
+import { choice, many, many1, map, optional, seq, token } from "@cosmonaut/blocks";
 import * from "./ast.js";
 
 export default function attribute () {
@@ -18,6 +18,21 @@ export function combinator () {
       token("COMBINATOR"),
       token => ({ type:"combinator", value:token.value })
     )
+  );
+}
+
+export function complex () {
+  return map(
+    seq(
+      compound(),
+      many(
+        seq(
+          combinator(),
+          compound()
+        )
+      )
+    ),
+    ([first, rest]) => ({ type:"complex", children: [first, ...rest.flat()] })    
   );
 }
 
@@ -62,30 +77,21 @@ export function simple () {
   return choice(
     map(
       token("IDENTIFIER"),
-      token => SimpleSelector(
-        "type",
-        token.value
-      )
+      token => SimpleSelector ("type", token.value)
     ),
     map(
       seq(
         token("CLASS"),
         token("IDENTIFIER")
       ),
-      ([, token]) => SimpleSelector(
-        "class",
-        token.value
-      )
+      ([, token]) => SimpleSelector ("class", token.value)
     ),
     map(
       seq(
         token("ID"),
         token("IDENTIFIER")
       ),
-      ([, token]) => SimpleSelector(
-        "id",
-        token.value
-      )
+      ([, token]) => SimpleSelector ("id", token.value)
     )
   );
 }
