@@ -6,15 +6,21 @@ Aufbau Stylesheets are an enhancement of CSS.
 
 ```css
 aufbau-center
+aufbau-dirty
 aufbau-flex
 aufbau-grid
 aufbau-icon
+aufbau-pattern
+aufbau-unset
+aufbau-use
 aufbau-webfont
 
 @aufbau <property>
 @aufbau colors
 
 @aufbau-config
+@aufbau-media
+@aufbau-trait
 ```
 
 ---
@@ -62,6 +68,8 @@ shade engine:
 }
 ```
 
+## aufbau-dirty
+
 ## aufbau-flex
 
 ## aufbau-grid
@@ -75,6 +83,18 @@ shade engine:
 
 .close-btn {
   aufbau-icon : 'lucide:x';
+}
+```
+
+## aufbau-pattern
+
+## aufbau-unset
+
+unset multiple properties at once.
+
+```css
+.clean-button {
+  aufbau-unset: margin padding border background color;
 }
 ```
 
