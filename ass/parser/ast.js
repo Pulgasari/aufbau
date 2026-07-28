@@ -1,5 +1,14 @@
 import createNodeAST from "./NodeAST.js";
 
+export default function createNodeAST (type, data = {}) {
+  return {
+    type,
+    ...data
+  };
+}
+
+// ==================
+
 export default function createAtRuleAST (
   name,
   prelude,
