@@ -169,6 +169,26 @@ DOMPoint
 
 für Transformationen.
 
+## 8. Constructable Stylesheets
+
+Stylesheets als JavaScript-Objekte.
+
+```javascript
+const sheet = new CSSStyleSheet();
+
+sheet.replaceSync(`
+div {
+    color:red;
+}
+`);
+
+document.adoptedStyleSheets = [sheet];
+```
+
+Ideal für:
+- Web Components
+- Shadow DOM
+
 
 
 
