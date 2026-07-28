@@ -13,10 +13,9 @@ export default class ASTImporter {
   }
   visit (node, parent) {
     switch (node.type) {
-      case "rule":
-        return this.rule(node, parent);
-      case "declaration":
-        return this.declaration(node, parent);
+      case "rule"        : return this.rule        (node, parent);
+      case "declaration" : return this.declaration (node, parent);
+      case "atRule"      : return this.atRule      (node, parent);
     }
   }
   rule (node, parent) {
