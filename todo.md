@@ -48,3 +48,24 @@
   }
 }
 ```
+
+# APIs
+
+## 1. CSSOM (CSS Object Model)
+
+Die grundlegende JavaScript-API zum Lesen und Verändern von Stylesheets.
+Wofür?
+- Stylesheets auslesen
+- Regeln hinzufügen/löschen
+- CSS-Eigenschaften ändern
+
+Beispiele:
+
+```
+document.styleSheets
+stylesheet.cssRules
+CSSStyleRule
+CSSStyleDeclaration
+```
+
+
