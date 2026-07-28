@@ -1,17 +1,18 @@
 // ass runtime semantics and evaluation engine
+import { createDefaultTokenMap } from './tokens.js';
 
 export class ASSEngine {
   constructor ( options = {} ) {
     this.options = options;
     this.traits = new Map();
-    this.tokens = new Map();
+    this.tokens = createDefaultTokenMap( options.tokens );
     this.config = {};
   }
 
   evaluate ( ast ) {
     if ( !Array.isArray( ast ) ) return ast;
     this.traits.clear();
-    this.tokens.clear();
+    this.tokens = createDefaultTokenMap( this.options.tokens );
     this.config = {};
 
     this.collectDefinitions( ast );
@@ -82,15 +83,17 @@ export class ASSEngine {
 
   registerTokens ( node ) {
     const targetProps = ( node.params || [] ).map( ( p ) => p.value ).join( '' ).split( ',' ).map( ( s ) => s.trim() ).filter( Boolean );
-    const tokenMap = new Map();
 
-    for ( const item of ( node.body || [] ) ) {
-      if ( item.type === 'Declaration' && item.name?.value ) {
-        tokenMap.set( item.name.value, extractString( item.value ) );
+    for ( const prop of targetProps ) {
+      if ( !this.tokens.has( prop ) ) this.tokens.set( prop, new Map() );
+      const tokenMap = this.tokens.get( prop );
+
+      for ( const item of ( node.body || [] ) ) {
+        if ( item.type === 'Declaration' && item.name?.value ) {
+          tokenMap.set( item.name.value, extractString( item.value ) );
+        }
       }
     }
-
-    for ( const prop of targetProps ) this.tokens.set( prop, tokenMap );
   }
 
   flattenStatements ( statements, parentSelector = '' ) {
@@ -203,9 +206,9 @@ function extractList ( val ) {
 }
 
 function getPropertyCategory ( prop ) {
-  if ( prop === 'margin' || prop.startsWith( 'margin-' ) ) return 'margin';
-  if ( prop === 'padding' || prop.startsWith( 'padding-' ) ) return 'padding';
-  if ( prop === 'gap' || prop.endsWith( '-gap' ) ) return 'gap';
+  if ( prop === 'margin'  || prop.startsWith('margin-'))  return 'margin';
+  if ( prop === 'padding' || prop.startsWith('padding-')) return 'padding';
+  if ( prop === 'gap'     || prop.  endsWith('-gap'))     return 'gap';
   return prop;
 }
 
