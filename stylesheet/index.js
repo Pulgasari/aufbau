@@ -11,6 +11,7 @@ import transformMedia    from './skills/media.js';
 import transformPattern  from './skills/pattern.js';
 import transformShader   from './skills/shader.js';
 import transformTraits   from './skills/trait.js';
+import transformUnset    from './skills/unset.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
 
@@ -87,9 +88,14 @@ function runPipeline (code) {
   const step0b = codeWithFonts.replace(/aufbau-dirty\s*:\s*([^;}\n]+);?/g, (_, rawVal) => {
     return transformDirty(rawVal);
   });
+
+  // 0c. Expand aufbau-unset shorthands early
+  const step0c = step0b.replace(/aufbau-unset\s*:\s*([^;}\n]+);?/g, (_, rawVal) => {
+    return transformUnset(rawVal);
+  });
   
   // 1. Extract @aufbau blocks and generate tokens
-  const { tokens, code: step1 } = extractTokens(step0b);
+  const { tokens, code: step1 } = extractTokens(step0c);
 
   // 1b. Process traits (@aufbau-trait & aufbau-use)
   const step1b = transformTraits(step1);
