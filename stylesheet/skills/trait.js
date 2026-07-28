@@ -22,12 +22,12 @@ export function transformTraits (code) {
     let i = match.index + fullMatchStr.length;
 
     while (i < code.length && depth > 0) {
-      if (code[i] === '{') depth++;
+           if (code[i] === '{') depth++;
       else if (code[i] === '}') depth--;
       i++;
     }
 
-    const fullBlock = code.slice(startIdx, i);
+    const fullBlock   = code.slice(startIdx, i);
     const bodyContent = code.slice(startIdx + fullMatchStr.length, i - 1).trim();
 
     // Register trait with and without leading dot for flexible lookup
@@ -46,14 +46,23 @@ export function transformTraits (code) {
     }
   }
 
-  // 2. Extract standard CSS classes defined in the document (first occurrence wins)
+  // 2. Extract standard CSS classes using proper brace counting (supports nesting)
   const classMap = new Map();
-  const classRegex = /(?:^|\s|\})\s*(\.[a-zA-Z0-9_-]+)\s*\{([^}]+)\}/g;
+  const classHeaderRegex = /(?:^|\s|\})\s*(\.[a-zA-Z0-9_-]+)\s*\{/g;
   let classMatch;
 
-  while ((classMatch = classRegex.exec(cleanCode)) !== null) {
+  while ((classMatch = classHeaderRegex.exec(cleanCode)) !== null) {
     const className = classMatch[1];
-    const classBody = classMatch[2].trim();
+    let depth = 1;
+    let i = classMatch.index + classMatch[0].length;
+
+    while (i < cleanCode.length && depth > 0) {
+           if (cleanCode[i] === '{') depth++;
+      else if (cleanCode[i] === '}') depth--;
+      i++;
+    }
+
+    const classBody = cleanCode.slice(classMatch.index + classMatch[0].length, i - 1).trim();
 
     if (!classMap.has(className)) {
       classMap.set(className, classBody);
