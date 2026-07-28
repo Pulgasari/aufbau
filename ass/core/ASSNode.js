@@ -1,6 +1,8 @@
 import EventEmitter from "./EventEmitter.js";
-import NodeBuilder from "./NodeBuilder.js";
+import NodeBuilder  from "./NodeBuilder.js";
+
 let NEXT_ID = 1;
+
 export default class ASSNode {
   #ass;
   id = NEXT_ID++;
@@ -8,11 +10,9 @@ export default class ASSNode {
   name;
   parent = null;
   children = [];
-  data = {};
-  meta = {};
-  state = {
-    dirty: false
-  };
+  data   = {};
+  meta   = {};
+  state  = { dirty: false };
   events = new EventEmitter();
   constructor (ass, type, name, data = {}) {
     this.#ass = ass;
