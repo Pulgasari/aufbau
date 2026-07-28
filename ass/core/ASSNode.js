@@ -112,13 +112,15 @@ export default class ASSNode {
     if (this.state.dirty) {
       return this;
     }
-
+  
     this.state.dirty = true;
-
+  
     if (this.parent) {
       this.parent.markDirty();
     }
-
+  
+    this.ass.dirty();
+  
     return this;
 
   }
