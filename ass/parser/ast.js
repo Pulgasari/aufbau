@@ -1,4 +1,4 @@
-import createNodeAST from "./NodeAST.js";
+// parser/ast.js
 
 export default function createNodeAST (type, data = {}) {
   return {
@@ -36,3 +36,17 @@ export default function createDeclarationAST (
     }
   );
 }
+
+export default function createRuleAST (
+  selector,
+  children
+) {
+  return createNodeAST(
+    "rule",
+    {
+      selector,
+      children
+    }
+  );
+}
+
