@@ -18,6 +18,19 @@ export default class ASTImporter {
       case "atRule"      : return this.atRule      (node, parent);
     }
   }
+
+  atRule (node, parent) {
+    const rule = new AtRuleNode(
+      this.ass,
+      node.name,
+      node.prelude
+    );
+    parent.append(rule);
+    for (const child of node.children) {
+      this.visit(child, rule);
+    }
+    return rule;
+  }
   rule (node, parent) {
     const rule = new RuleNode(
       this.ass,
