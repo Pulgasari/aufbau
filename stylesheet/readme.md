@@ -78,6 +78,10 @@ shade engine:
 }
 ```
 
+## aufbau-use
+
+Look at: [@aufbau-trait](#aufbau-trait)
+
 ## aufbau-webfont
 
 Use a Google Webfont with ease.
@@ -155,6 +159,20 @@ body {
     box-shadow  : lg;
   }
 }
+```
+
+## @aufbaut-trait
+
+```css
+@aufbaut-trait .vert { 
+  display   : flex; 
+  flex-flow : column;
+
+  > * { flex: 1 0 auto; }
+}
+
+body { aufbau-use: .vert; }
+#app { aufbau-use: .vert; }
 ```
 
 ---
