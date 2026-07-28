@@ -1,3 +1,5 @@
+import Token from "./Token.js";
+
 export default class Tokenizer {
   tokenize (input) {
     const tokens = [];
@@ -13,66 +15,50 @@ export default class Tokenizer {
         continue;
       }
       if (char === "{") {
-        tokens.push({
-          type: "BRACE_OPEN",
-          value: char
-        });
-        index++;
+        tokens.push(new Token("BRACE_OPEN", char, index, ++index));
         continue;
       }
       if (char === "}") {
-        tokens.push({
-          type: "BRACE_CLOSE",
-          value: char
-        });
-        index++;
+        tokens.push(new Token("BRACE_CLOSE", char, index, ++index));
         continue;
       }
       if (char === ":") {
-        tokens.push({
-          type: "COLON",
-          value: char
-        });
-        index++;
+        tokens.push(new Token("COLON", char, index, ++index));
         continue;
       }
       if (char === ";") {
-        tokens.push({
-          type: "SEMICOLON",
-          value: char
-        });
-        index++;
+        tokens.push(new Token("SEMICOLON", char, index, ++index));
         continue;
       }
       if (char === "@") {
-        tokens.push({
-          type: "AT",
-          value: char
-        });
-        index++;
+        tokens.push(new Token("AT", char, index, ++index));
         continue;
       }
       if (char === "#") {
-        tokens.push(this.hash(input, index));
-        index = tokens.at(-1).end;
+        const token = this.hash(input, index);
+        tokens.push(token);
+        index = token.end;
         continue;
       }
       if (/[0-9.-]/.test(char)) {
-        tokens.push(this.number(input, index));
-        index = tokens.at(-1).end;
+        const token = this.number(input, index);
+        tokens.push(token);
+        index = token.end;
         continue;
       }
       if (/[a-zA-Z_-]/.test(char)) {
-        tokens.push(this.identifier(input, index));
-        index = tokens.at(-1).end;
+        const token = this.identifier(input, index);
+        tokens.push(token);
+        index = token.end;
         continue;
       }
-      index++;
+      tokens.push(
+        new Token("CHAR", char, index, ++index)
+      );
     }
-    tokens.push({
-      type: "EOF",
-      value: null
-    });
+    tokens.push(
+      new Token("EOF", null, index, index)
+    );
     return tokens;
   }
   identifier (input, start) {
@@ -83,25 +69,27 @@ export default class Tokenizer {
     ) {
       index++;
     }
-    return {
-      type: "IDENTIFIER",
-      value: input.slice(start, index),
-      end: index
-    };
+    return new Token(
+      "IDENTIFIER",
+      input.slice(start, index),
+      start,
+      index
+    );
   }
   number (input, start) {
     let index = start;
     while (
       index < input.length &&
-      /[0-9.-]/.test(input[index])
+      /[0-9a-zA-Z.%_-]/.test(input[index])
     ) {
       index++;
     }
-    return {
-      type: "NUMBER",
-      value: input.slice(start, index),
-      end: index
-    };
+    return new Token(
+      "VALUE",
+      input.slice(start, index),
+      start,
+      index
+    );
   }
   hash (input, start) {
     let index = start + 1;
@@ -111,11 +99,12 @@ export default class Tokenizer {
     ) {
       index++;
     }
-    return {
-      type: "HASH",
-      value: input.slice(start, index),
-      end: index
-    };
+    return new Token(
+      "VALUE",
+      input.slice(start, index),
+      start,
+      index
+    );
   }
   comment (input, start) {
     const end = input.indexOf("*/", start + 2);
