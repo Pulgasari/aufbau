@@ -189,6 +189,98 @@ Ideal für:
 - Web Components
 - Shadow DOM
 
+## 9. CSSStyleSheet API
+
+Teil des CSSOM.
+
+Methoden:
+```javascript
+replace()
+replaceSync()
+insertRule()
+deleteRule()
+```
+
+## 10. CSS.escape()
+
+Hilfsfunktion.
+
+```javascript
+CSS.escape(id)
+```
+
+Escaped Selektoren sicher.
+
+## 11. CSS.supports()
+
+Feature Detection.
+
+```javascript
+CSS.supports("display", "grid")
+//oder
+CSS.supports("(display:grid)")
+```
+
+## 12. getComputedStyle()
+
+Eine der ältesten CSS-APIs.
+
+```javascript
+const style = getComputedStyle(element);
+```
+
+Liest:
+- tatsächliche Farben
+- Größen
+- Fonts
+- Positionen
+
+## 13. Element.computedStyleMap()
+
+Teil des Typed OM.
+
+```javascript
+element.computedStyleMap()
+```
+
+Liefert typisierte Werte statt Strings.
+
+## 14. StylePropertyMap
+
+Neue API zum Lesen und Schreiben.
+
+```javascript
+element.attributeStyleMap
+```
+
+## 15. CSS Font Loading API
+
+Schriften dynamisch laden.
+
+```javascript
+const font = new FontFace(...)
+document.fonts.add(font)
+// außerdem:
+document.fonts.ready
+```
+
+## 16. CSS Font Palette API
+
+Für Variable Fonts mit Farbpaletten. Noch wenig verbreitet.
+
+## 17. CSS Highlight API
+
+Eigene Textmarkierungen.
+
+```javascript
+CSS.highlights.set(...)
+```
+
+Nützlich für:
+- Editoren
+- Suchergebnisse
+- Kommentare
+
 
 
 
