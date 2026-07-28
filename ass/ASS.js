@@ -1,24 +1,32 @@
-import PropertyRegistry from "./registries/PropertyRegistry.js";
+import EventEmitter from "./core/EventEmitter.js";
+import Scheduler    from "./core/Scheduler.js";
+import SheetNode    from "./nodes/SheetNode.js";
 
 export default class ASS {
 
-    props;
+  #events;
+  #scheduler;
+  #sheet;
 
-    constructor() {
+  constructor () {
+    this.#events = new EventEmitter();
+    this.#scheduler = new Scheduler(() => {
+      this.render();
+    });
+    this.#sheet = new SheetNode(this);
+  }
 
-        this.props = new PropertyRegistry(this);
+  get sheet  () { return this.#sheet; }
+  get events () { return this.#events; }
 
-    }
+  dirty () {
+    this.#scheduler.queue();
+    return this;
+  }
 
-}
-
-import SheetNode from "./nodes/SheetNode.js";
-import Registry from "./core/Registry.js";
-
-export default class ASS{
-
-    sheet = new SheetNode();
-
-    registry = new Registry();
+  render () {
+    this.#sheet.clean();
+    this.#events.emit("render", this);
+  }
 
 }
