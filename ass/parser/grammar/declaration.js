@@ -1,8 +1,6 @@
 import { map, seq, token } from "@cosmonaut/blocks";
 import value from "./value.js";
-import {
-  createDeclarationAST
-} from "../ast/DeclarationAST.js";
+import createDeclarationAST from "../ast/DeclarationAST.js";
 
 export default function declaration () {
   return map(
@@ -12,11 +10,11 @@ export default function declaration () {
       value(),
       token("SEMICOLON")
     ),
-    ([property, , value]) => ({
+    ([property, , value]) => {
       return createDeclarationAST(
         property.value,
         value
       );
-    })
+    }
   );
 }
