@@ -38,7 +38,7 @@ export class RuleMatcher {
   }
 }
 
-export class StyleResolver {
+class StyleResolver {
   resolve (rules) {
     const result = {};
     for (const rule of rules) {
@@ -49,18 +49,3 @@ export class StyleResolver {
     return result;
   }
 }
-
-
-export class StyleResolver {
-  resolve (rules) {
-    return {} += rules |> .children |> [.property] = .value;   
-  }
-}
-
-export class StyleResolver {
-  resolve (rules) {
-    return {} += rules |> .children |> { .property: .value };   
-  }
-}
-
-
