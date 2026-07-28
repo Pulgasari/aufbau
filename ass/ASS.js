@@ -11,3 +11,14 @@ export default class ASS {
     }
 
 }
+
+import SheetNode from "./nodes/SheetNode.js";
+import Registry from "./core/Registry.js";
+
+export default class ASS{
+
+    sheet = new SheetNode();
+
+    registry = new Registry();
+
+}
