@@ -11,6 +11,19 @@ import transformShader   from './skills/shader.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
 
+// const unique = [...new Set(array)];
+// const unique = Array.from(new Set(array));
+function mergeUnique (...arrays) {
+  const set = new Set();
+  for (let i = 0; i < arrays.length; i++) {
+    const arr = arrays[i];
+    for (let j = 0; j < arr.length; j++) {
+      set.add(arr[j]);
+    }
+  }
+  return Array.from(set);
+}
+
 // :::::: pre-compiled RegExp rules
 
 const REGEX_AUFBAU_PROPERTIES = /(aufbau-[a-z-]+)\s*:\s*([^;}\n]+);?/g;
@@ -82,14 +95,13 @@ function runPipeline (code) {
   result = transformTokenProperties(result, tokens);
 
   // 6. Header assembly (@import & @charset)
-  const allImportUrls = [...configImports, ...webfontImports];
+  //const allImportUrls = [...configImports, ...webfontImports];
+  const allImportUrls = mergeUnique(configImports, webfontImports);
   let prefix = '';
   if (allImportUrls.length > 0) {
     prefix += allImportUrls.map(url => `@import url('${url}');`).join('\n') + '\n\n';
   }
-  if (charset) {
-    prefix += `${charset}\n\n`;
-  }
+  if (charset) prefix += `${charset}\n\n`;
   return `${prefix}${result}`.trim();
 
   /*
