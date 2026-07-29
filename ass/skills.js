@@ -119,3 +119,24 @@ export function expandShader(decl) {
 
   return [{ type: 'Declaration', name: { value: 'filter' }, value: [{ type: 'STRING', value: `url('${dataUri}#${filterId}')` }] }];
 }
+
+export function expandWebfont(decl, webfontSet) {
+  const rawItems = (decl.value || []).filter(item => item.type !== 'PUNCT').map(item => item.value.replace(/['"]/g, ''));
+  if (rawItems.length === 0) return [decl];
+
+  const fontName      = rawItems[0];
+  const formattedName = fontName.replace(/\s+/g, '+');
+  const fontUrl       = `https://fonts.googleapis.com/css2?family=${formattedName}:wght@400;700&display=swap`;
+
+  if (webfontSet) webfontSet.add(fontUrl);
+
+  const fontLower = fontName.toLowerCase();
+  const fallback = fontLower.includes('mono') ? 'monospace' : fontLower.includes('serif') ? 'serif' : 'sans-serif';
+
+  return [{
+    type: 'Declaration',
+    name: { value: 'font-family' },
+    value: [{ type: 'STRING', value: `"${fontName}", ${fallback}` }]
+  }];
+}
+
