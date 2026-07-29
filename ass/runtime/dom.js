@@ -31,3 +31,19 @@ export function attachAssToDOM (options = {}) {
     configurable: true
   } );
 }
+
+const ass = {};
+get = function (key, withUnit = true) {
+
+};
+set = function (key, value, unit) {
+  this.attributeStyleMap.set(key, CSS[unit](value);
+}
+
+
+// Anstatt
+element.style.width = "100px";
+// schreibt man
+element.attributeStyleMap.set("width", CSS.px(100));
+
+
