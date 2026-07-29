@@ -32,7 +32,7 @@ export function attachAssToDOM (options = {}) {
   } );
 }
 
-
+/*
 
 export function normalizeUnit (unit) {
   if (typeof unit === 'function') return unit;
@@ -64,3 +64,36 @@ element.style.width = "100px";
 element.attributeStyleMap.set("width", CSS.px(100));
 
 
+// generell
+
+element.ass.fontSize
+element.ass.['fontSize']
+element.ass.['font-size']
+
+// setting values
+
+element.ass.fontSize =  20;
+element.ass.fontSize = '20';
+element.ass.fontSize = '20px';
+
+element.ass.fontSize.set( 20 );
+element.ass.fontSize.set('20');
+
+element.ass.fontSize.set( 20,  'px');
+element.ass.fontSize.set('20', 'px');
+
+element.ass.fontSize.set( 20,  CSS.px);
+element.ass.fontSize.set('20', CSS.px);
+
+// getting values
+
+element.ass.fontSize;
+element.ass.fontSize.get(); // 20px
+element.ass.fontSize.getTyped(); // { value: 20, unit: CSS.px }
+
+
+
+
+
+
+*/
