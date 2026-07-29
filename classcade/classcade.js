@@ -1,6 +1,6 @@
 // classcade.js
 
-class Classcade {
+export default class Classcade {
 
   constructor (options={}) {
     this.options   = options;
@@ -10,9 +10,7 @@ class Classcade {
     this.resolver  = new Resolver (this.registry);
     this.runtime   = new Runtime  (this);
   }
-
   
-
   method  (id) { this.registry.method  (id); return this; }
   rule    (id) { this.registry.rule    (id); return this; }
   variant (id) { this.registry.variant (id); return this; }
