@@ -1,5 +1,59 @@
 // runtime.js
 
+export class Observer {
+
+  constructor (runtime) {
+    this.runtime  = runtime;
+    this.observer = null;
+  }
+
+  start() {
+
+    if (this.observer)
+      return;
+
+    this.observer = new MutationObserver(mutations => {
+
+      for (const mutation of mutations) {
+
+        mutation.addedNodes.forEach(node => {
+
+          if (node.nodeType === 1)
+            this.runtime.process(node);
+
+        });
+
+        if (
+          mutation.type === "attributes"
+        ) {
+
+          this.runtime.process(mutation.target);
+
+        }
+
+      }
+
+    });
+
+    this.observer.observe(document.documentElement, {
+
+      childList: true,
+      subtree: true,
+      attributes: true
+
+    });
+
+  }
+
+  stop() {
+
+    this.observer?.disconnect();
+    this.observer = null;
+
+  }
+
+}
+
 export class Scanner {
 
   constructor (options = {}) {
