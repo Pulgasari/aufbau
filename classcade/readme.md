@@ -23,7 +23,8 @@ await Deno.writeTextFile("classcade.css", css);
 ### browser
 
 ```javascript
-const css = compiler.compile(document.documentElement.outerHTML);
+const html = document.documentElement.outerHTML;
+const css  = compiler.compile(html);
 ```
 
 ### vite
