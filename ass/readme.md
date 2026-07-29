@@ -6,6 +6,31 @@ While syntax-wise close to CSS (using `{ ... }`, `:`, `;`, and `@directives`), A
 
 ---
 
+## prüfen
+
+@color
+@colors
+@defaults
+@font / @webfont
+@plugin
+@theme
+
+## at-rules
+
+[@config]()
+[@tokens]()
+[@trait]()
+
+## props
+
+[colors]()
+[pattern]()
+[shader]()
+[use]()
+
+
+---
+
 ## Architecture Overview
 
 ```
