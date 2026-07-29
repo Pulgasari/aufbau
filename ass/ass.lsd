@@ -13,6 +13,9 @@ TKN :: COMMENT     == /\/\*[\s\S]*?\*\/|\/\/.*/y
 TKN :: WHITESPACE  == /[ \t\n\r]+/y
 
 TKN :: AT_KEYWORD  == /@[a-zA-Z0-9_-]+/y
+TKN :: VARIABLE    == /\$[a-zA-Z0-9_-]+/y
+TKN :: CUSTOM_PROP == /--[a-zA-Z0-9_-]+/y
+TKN :: OPERATOR    == /\+|\-|\*|\//y
 TKN :: PUNCT       == @puncts
 TKN :: NUMBER      == /-?\d+(?:\.\d+)?(?:[a-zA-Z%]+)?/y
 TKN :: STRING      == /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/y
@@ -21,10 +24,15 @@ TKN :: IDENTIFIER  == /[a-zA-Z_][a-zA-Z0-9_-]*/y
 # //////////// RULES ///////////////////////////////////////////////////
 
 RULE :: Sheet      == Statement*
-RULE :: Statement  == AtRule | Rule | Declaration
+RULE :: Statement  == VarDecl | AtRule | Rule | Declaration
 RULE :: Block      == `{` Statement* `}` => 2
 
-# ------------ Declarations --------------------------------------------
+# ------------ Declarations & Variables --------------------------------
+
+#### VarDecl
+META :: VarDecl
+NODE == { name, value }
+RULE == VARIABLE `:` Value `;` => name:1 value:3
 
 #### MapDeclaration
 META :: MapDeclaration
@@ -34,10 +42,17 @@ RULE == IDENTIFIER `:` `{` Declaration* `}` `;` => name:1 entries:4
 #### Declaration
 META :: Declaration
 NODE == { name, value }
-RULE == IDENTIFIER `:` Value `;` => name:1 value:3
+RULE == ( IDENTIFIER | CUSTOM_PROP ) `:` Value `;` => name:1 value:3
 
 RULE :: Value      == ValueItem+
-RULE :: ValueItem  == FuncCall | IDENTIFIER | NUMBER | STRING | PUNCT
+RULE :: ValueItem  == BinaryExpr | FuncCall | VARIABLE | CUSTOM_PROP | IDENTIFIER | NUMBER | STRING | OPERATOR | PUNCT
+
+#### BinaryExpr
+META :: BinaryExpr
+NODE == { left, operator, right }
+RULE == Primary OPERATOR Primary => left:1 operator:2 right:3
+
+RULE :: Primary    == FuncCall | VARIABLE | CUSTOM_PROP | IDENTIFIER | NUMBER | STRING
 
 #### FuncCall
 META :: FuncCall
