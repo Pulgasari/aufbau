@@ -4,6 +4,16 @@ import { defaultTokens } from 'meta.js';
 
 // :::::: Helpers
 
+// ::: Checks
+
+
+const isNumber        = value => typeof value === 'number';
+const isNumericString = value => typeof value === 'string' && /^-?\d+(?:\.\d+)?$/.test(value.trim());   
+const isNumeric       = value => isNumber(value) || isNumericString(value);
+const isString        = value => typeof value === 'string';
+
+// :::
+
 export function normalizeProp (prop) {
   if (typeof prop !== 'string') return prop;
   return prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
