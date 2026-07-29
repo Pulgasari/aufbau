@@ -6,7 +6,6 @@ import { defaultTokens } from 'meta.js';
 
 // ::: Checks
 
-
 const isNumber        = value => typeof value === 'number';
 const isNumericString = value => typeof value === 'string' && /^-?\d+(?:\.\d+)?$/.test(value.trim());   
 const isNumeric       = value => isNumber(value) || isNumericString(value);
