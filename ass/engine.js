@@ -1,22 +1,24 @@
 // ass runtime semantics and evaluation engine
 import { createDefaultTokenMap } from './tokens.js';
-import { expandColors, expandPattern, expandShader } from './skills.js';
+import * from './skills.js';
 
 export class ASSEngine {
-  constructor(options = {}) {
-    this.options = options;
+  constructor (options = {}) {
+    this.config    = {};
+    this.options   = options;
+    this.tokens    = createDefaultTokenMap(options.tokens);
+    this.traits    = new Map();
     this.variables = new Map();
-    this.traits = new Map();
-    this.tokens = createDefaultTokenMap(options.tokens);
-    this.config = {};
+    this.webfonts  = new Set();
   }
 
-  evaluate(ast) {
+  evaluate (ast) {
     if (!Array.isArray(ast)) return ast;
     this.variables.clear();
     this.traits.clear();
     this.tokens = createDefaultTokenMap(this.options.tokens);
     this.config = {};
+    this.webfonts.clear();
 
     this.collectDefinitions(ast);
     const configAtRules = this.generateConfigAtRules();
