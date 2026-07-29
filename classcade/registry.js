@@ -8,7 +8,7 @@ class Registry {
   variants = new Map;
 
   // to add
-  addMacro   (obj) { this.macro   .set(obj.id, obj); return this; }
+  addMacro   (obj) { this.macros  .set(obj.id, obj); return this; }
   addMethod  (obj) { this.methods .set(obj.id, obj); return this; }
   addRule    (obj) { this.rules   .set(obj.id, obj); return this; }
   addVariant (obj) { this.variants.set(obj.id, obj); return this; }
