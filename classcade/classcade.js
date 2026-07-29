@@ -1,6 +1,8 @@
 // classcade.js
 
-export default class Classcade {
+import Registry from 'registry.js';
+
+class Classcade {
 
   constructor (options={}) {
     this.options   = options;
@@ -19,3 +21,5 @@ export default class Classcade {
   stop  () { this.runtime.stop();  }
 
 }
+
+export default Classcade;
