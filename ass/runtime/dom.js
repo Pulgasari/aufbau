@@ -32,17 +32,29 @@ export function attachAssToDOM (options = {}) {
   } );
 }
 
+
+
+export function normalizeUnit (unit) {
+  if (typeof unit === 'function') return unit;
+  if (typeof unit === 'string')   return CSS[unit];
+  return null;
+}
+
 const ass = {};
 get = function (key, withUnit = true) {
 
 };
 set = function (key, value, unit) {
   if (!key || value === undefined) return;
-  key  = normalizeProp(key);
-  unit = normalizeUnit(unit);
+
+  if (unit) {
+    key  = normalizeProp(key);
+    unit = normalizeUnit(unit);
+    this.attributeStyleMap.set(key, CSS[unit](value);
+  }
 
   if (!unit)
-  this.attributeStyleMap.set(key, CSS[unit](value);
+  
 }
 
 
