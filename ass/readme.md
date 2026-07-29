@@ -59,7 +59,7 @@ If the key is none of that it becomes an alias.
 ## @fn
 
 ```css
-@fn (arg1, arg2) {
+@fn doSth (arg1, arg2) {
 
 }
 ```
