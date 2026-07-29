@@ -1,4 +1,4 @@
-//index.js
+// index.js
 
 export { Classcade } from "./classcade.js";
 
