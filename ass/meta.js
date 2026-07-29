@@ -1,5 +1,7 @@
 // meta.js
 
+
+
 const variantsOfPropByPrefixWithSameStruct = {
   gap    : ['column', 'row'],
   height : ['max', 'min'],
@@ -12,10 +14,11 @@ const variantsOfPropBySuffixWithSameStruct = {
 };
 
 const subPropsmap = {
-  outline      : ['color', 'offset', 'style, 'width'],
-  overflow     : ['anchor', 'block', 'clip-margin', 'inline', 'wrap', 'x', 'y'],      
-  overlay      : null,
-  textEmphasis : ['color', 'position', 'style'],
+  outline        : ['color', 'offset', 'style, 'width'],
+  overflow       : ['anchor', 'block', 'clip-margin', 'inline', 'wrap', 'x', 'y'],      
+  overlay        : null,
+  textEmphasis   : ['color', 'position', 'style'],
+  textDecoration : ['color', 'inset', 'line', 'skip', 'skip-ink', 'style', 'thickness'],     
 };
 
 const propsMap = {
@@ -24,27 +27,29 @@ const propsMap = {
   pattern : null,
   shader  : null,
   webfont : null,
+  
   // CSS
-  border   : null,
-  bottom   : { unit: 'px' },
-  flex     : null,
-  fontSize : { unit: 'px' },
-  gap      : { unit: 'px' },
-  height   : { unit: 'px' },
-  left     : { unit: 'px' },
-  margin   : { unit: 'px' },
-  opacity  : { unit: null },
-  overlay  : null,
-  outline  : null,
-  padding  : { unit: 'px' },
-  rx       : null,
-  ry       : null,
-  scale    : null,
-  right    : { unit: 'px' },
-  textEmphasis : null,
-  top      : { unit: 'px' },
-  width    : { unit: 'px' },
-  zIndex   : { unit: false },
+  border         : null,
+  bottom         : { unit: 'px' },
+  flex           : null,
+  fontSize       : { unit: 'px' },
+  gap            : { unit: 'px' },
+  height         : { unit: 'px' },
+  left           : { unit: 'px' },
+  margin         : { unit: 'px' },
+  opacity        : { unit: null },
+  overlay        : null,
+  outline        : null,
+  padding        : { unit: 'px' },
+  rx             : null,
+  ry             : null,
+  scale          : null,
+  right          : { unit: 'px' },
+  textDecoration : null,
+  textEmphasis   : null,
+  top            : { unit: 'px' },
+  width          : { unit: 'px' },
+  zIndex         : { unit: false },
 };
 
 for (let sth of variantsOfPropBySuffixWithSameStruct['margin']) {
