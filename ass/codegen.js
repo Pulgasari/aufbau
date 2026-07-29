@@ -18,11 +18,17 @@ const methods = {
       indent( concat( hardline, bodyDocs.reduce( ( acc, curr ) => concat( acc, curr, hardline ), text( '' ) ) ) ),
       text( '}' )
     );
-  }
+  },
 
   genDeclaration : ( g, node ) => {
     const val = Array.isArray( node.value ) ? node.value.map( ( v ) => v.value ).join( ' ' ) : g.genNode( node.value );
     return concat( text( node.name.value ), text( ': ' ), text( val ), text( ';' ) );
+  },
+
+  genFuncCall: (g, node) => {
+    const name = node.name?.value || '';
+    const args = Array.isArray(node.args) ? node.args.map(a => g.genNode(a)).join(' ') : '';
+    return concat(text(name), text('('), text(args), text(')'));
   },
 
   genMapDeclaration : ( g, node ) => {
