@@ -7,49 +7,22 @@ export class Observer {
     this.observer = null;
   }
 
-  start() {
+  start () {
+    if (this.observer) return;
 
-    if (this.observer)
-      return;
-
-    this.observer = new MutationObserver(mutations => {
-
+    this.observer = new MutationObserver (mutations => {
       for (const mutation of mutations) {
-
-        mutation.addedNodes.forEach(node => {
-
-          if (node.nodeType === 1)
-            this.runtime.process(node);
-
-        });
-
-        if (
-          mutation.type === "attributes"
-        ) {
-
-          this.runtime.process(mutation.target);
-
-        }
-
+        mutation.addedNodes.forEach (node => (node.nodeType === 1) && this.runtime.process(node));
+        if (mutation.type === 'attributes') this.runtime.process(mutation.target);
       }
-
     });
 
-    this.observer.observe(document.documentElement, {
-
-      childList: true,
-      subtree: true,
-      attributes: true
-
-    });
-
+    this.observer.observe (document.documentElement, { attributes: true, childList: true, subtree: true });     
   }
 
-  stop() {
-
+  stop () {
     this.observer?.disconnect();
     this.observer = null;
-
   }
 
 }
