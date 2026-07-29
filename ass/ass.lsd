@@ -37,7 +37,12 @@ NODE == { name, value }
 RULE == IDENTIFIER `:` Value `;` => name:1 value:3
 
 RULE :: Value      == ValueItem+
-RULE :: ValueItem  == IDENTIFIER | NUMBER | STRING | PUNCT
+RULE :: ValueItem  == FuncCall | IDENTIFIER | NUMBER | STRING | PUNCT
+
+#### FuncCall
+META :: FuncCall
+NODE == { name, args }
+RULE == IDENTIFIER `(` ValueItem* `)` => name:1 args:3
 
 # ------------ Rules & Selectors ---------------------------------------
 
