@@ -206,3 +206,67 @@ const outputCSS = renderToCSS( evaluated );
 - [ ] Dynamic `@theme` AST expansion & CSS variable emission
 - [ ] Property Shorthand / Trait Expansion
 - [ ] Runtime Cascade Engine (`ASSEngine`) expansion
+
+```javascript
+export function normalizeUnit (unit) {
+  if (typeof unit === 'function') return unit;
+  if (typeof unit === 'string')   return CSS[unit];
+  return null;
+}
+
+const ass = {};
+get = function (key, withUnit = true) {
+
+};
+set = function (key, value, unit) {
+  if (!key || value === undefined) return;
+
+  if (unit) {
+    key  = normalizeProp(key);
+    unit = normalizeUnit(unit);
+    this.attributeStyleMap.set(key, CSS[unit](value);
+  }
+
+  if (!unit)
+  
+}
+
+
+// Anstatt
+element.style.width = "100px";
+// schreibt man
+element.attributeStyleMap.set("width", CSS.px(100));
+
+
+// generell
+
+element.ass.fontSize
+element.ass.['fontSize']
+element.ass.['font-size']
+
+// setting values
+
+element.ass.fontSize =  20;
+element.ass.fontSize = '20';
+element.ass.fontSize = '20px';
+
+element.ass.fontSize.set( 20 );
+element.ass.fontSize.set('20');
+
+element.ass.fontSize.set( 20,  'px');
+element.ass.fontSize.set('20', 'px');
+
+element.ass.fontSize.set( 20,  CSS.px);
+element.ass.fontSize.set('20', CSS.px);
+
+// getting values
+
+element.ass.fontSize;
+element.ass.fontSize.get(); // 20px
+element.ass.fontSize.getTyped(); // { value: 20, unit: CSS.px }
+
+
+
+// wenn value mit '--' beginnt
+new CSSVariableReferenceValue("--var")
+```
