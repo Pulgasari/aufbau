@@ -14,7 +14,9 @@ const variantsOfPropBySuffixWithSameStruct = {
 const subPropsmap = {
   outline : ['color', 'offset', 'style, 'width'],
   overlay : null,
+  textEmphasis : ['color', 'position', 'style'],
 };
+
 overflow-anchor
 overflow-block
 overflow-clip-margin
@@ -23,6 +25,7 @@ overflow-wrap
 overflow-x
 overflow-y
 overflow (shorthand)
+
 const propsMap = {
   // ASS
   colors  : null,
@@ -42,11 +45,21 @@ const propsMap = {
   overlay  : null,
   outline  : null,
   padding  : { unit: 'px' },
+  rx       : null,
+  ry       : null,
+  scale    : null,
   right    : { unit: 'px' },
+  textEmphasis : null,
   top      : { unit: 'px' },
   width    : { unit: 'px' },
   zIndex   : { unit: false },
 };
+
+for (let sth of MARGIN) {
+  let key  = 'scroll' + '-' + 'sth';
+  let body = propsMap['scroll'];
+  Object.assign(propsMap, { [key]: body });
+}
 
 export const defaultUnits = {
   fontSize     : 'px',
@@ -79,3 +92,20 @@ export const defaultUnits = {
   zIndex       : '',
   flex         : ''
 };
+
+/*
+scroll-margin-block-end
+scroll-margin-block-start
+scroll-margin-block (shorthand)
+scroll-margin-bottom
+scroll-margin-inline-end
+scroll-margin-inline-start
+scroll-margin-inline (shorthand)
+scroll-margin-left
+scroll-margin-right
+scroll-margin-top
+scroll-margin (shorthand)
+
+= scroll + margin
+= scroll + padding
+*/
