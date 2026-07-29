@@ -34,6 +34,14 @@ While syntax-wise close to CSS (using `{ ... }`, `:`, `;`, and `@directives`), A
 
 ## @colors
 
+the naming of keys follow strict rules which may seem a bit counter-intuitive at first glance but actually result in powerful flexibility of notating stuff for DX.
+
+If the key is the name of an HTMLElement it applies to these kind of HTMLElments directly.
+
+If the key is a selector it applies for the selector directly.
+
+If the key is none of that it becomes an alias.
+
 ```css
 @colors {
   soviet : red yellow;
