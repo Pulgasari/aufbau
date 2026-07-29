@@ -2,7 +2,7 @@ export default cc => {
   
   cc.rule ({ 
     id: 'bg', 
-    css: color => ({ background-color: color })
+    css: color => ({ backgroundColor: color })
   });
   
   cc.rule ({ 
