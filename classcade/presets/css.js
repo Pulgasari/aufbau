@@ -1,3 +1,31 @@
+// presets/css.js
+
+const cc = {};
+
+const quickies = Object.entries({
+  bg  : color => ({ backgroundColor: color }),
+  fg  : color => ({ color: color }),
+  opa : value => ({ opacity: value }),
+
+  gap : value => ({ gap: value }),
+  mar : value => ({ margin: value }),
+  pad : value => ({ padding: value }),
+
+  // layout
+  block  : value => ({ display: 'block' }),
+  hidden : value => ({ display: 'none' }),
+  inline : value => ({ display: 'inline' }),
+
+  // typo
+  bold      : value => ({ fontWeight: 'bold' }),
+  uppercase : value => ({ textTransform: 'uppercase' }),
+});
+
+for (const [id, css] of quickies) {
+  Object.assign(cc, cc.rule({ id, css }));
+}
+
+/*
 export default cc => {
   
   cc.rule ({ 
@@ -31,3 +59,4 @@ export default cc => {
   });
 
 };
+*/
