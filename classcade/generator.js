@@ -8,10 +8,7 @@ class Generator {
 
   generate (nodes) {
     if (!Array.isArray(nodes)) nodes = [nodes];
-    return nodes
-         . map(node => this.generateRule(node))
-         . filter(Boolean)
-         . join('\n\n');
+    return nodes.map(this.generateRule).filter(Boolean).join('\n\n');
   }
 
   generateRule (rule) {
