@@ -5,6 +5,7 @@ import { expandColors, expandPattern, expandShader } from './skills.js';
 export class ASSEngine {
   constructor(options = {}) {
     this.options = options;
+    this.variables = new Map();
     this.traits = new Map();
     this.tokens = createDefaultTokenMap(options.tokens);
     this.config = {};
@@ -12,6 +13,7 @@ export class ASSEngine {
 
   evaluate(ast) {
     if (!Array.isArray(ast)) return ast;
+    this.variables.clear();
     this.traits.clear();
     this.tokens = createDefaultTokenMap(this.options.tokens);
     this.config = {};
@@ -26,7 +28,10 @@ export class ASSEngine {
   collectDefinitions(statements) {
     for (const node of statements) {
       if (!node) continue;
-      if (node.type === 'AtRule') {
+      if (node.type === 'VarDecl') {
+        const name = node.name?.value;
+        if (name) this.variables.set(name, this.resolveValue(node.value));
+      } else if (node.type === 'AtRule') {
         if (node.name?.value === '@trait') this.registerTrait(node);
         if (node.name?.value === '@tokens') this.registerTokens(node);
         if (node.name?.value === '@config' || node.name?.value === '@aufbau-config') this.processConfig(node);
@@ -35,11 +40,30 @@ export class ASSEngine {
     }
   }
 
+  registerTrait(node) {
+    const name = node.params ? node.params.map(p => p.value).join('') : '';
+    if (!name) return;
+    this.traits.set(name, node.body || []);
+    if (name.startsWith('.')) this.traits.set(name.slice(1), node.body || []);
+  }
+
+  registerTokens(node) {
+    const targetProps = (node.params || []).map(p => p.value).join('').split(',').map(s => s.trim()).filter(Boolean);
+    for (const prop of targetProps) {
+      if (!this.tokens.has(prop)) this.tokens.set(prop, new Map());
+      const tokenMap = this.tokens.get(prop);
+      for (const item of (node.body || [])) {
+        if (item.type === 'Declaration' && item.name?.value) {
+          tokenMap.set(item.name.value, extractString(item.value));
+        }
+      }
+    }
+  }
+
   processConfig(node) {
     for (const item of (node.body || [])) {
       if (!item.name?.value) continue;
       const key = item.name.value;
-
       if (item.type === 'MapDeclaration') {
         const map = {};
         for (const entry of (item.entries || [])) {
@@ -75,32 +99,10 @@ export class ASSEngine {
     return rules;
   }
 
-  registerTrait(node) {
-    const name = node.params ? node.params.map(p => p.value).join('') : '';
-    if (!name) return;
-    this.traits.set(name, node.body || []);
-    if (name.startsWith('.')) this.traits.set(name.slice(1), node.body || []);
-  }
-
-  registerTokens(node) {
-    const targetProps = (node.params || []).map(p => p.value).join('').split(',').map(s => s.trim()).filter(Boolean);
-
-    for (const prop of targetProps) {
-      if (!this.tokens.has(prop)) this.tokens.set(prop, new Map());
-      const tokenMap = this.tokens.get(prop);
-
-      for (const item of (node.body || [])) {
-        if (item.type === 'Declaration' && item.name?.value) {
-          tokenMap.set(item.name.value, extractString(item.value));
-        }
-      }
-    }
-  }
-
   flattenStatements(statements, parentSelector = '') {
     const result = [];
     for (const node of statements) {
-      if (!node) continue;
+      if (!node || node.type === 'VarDecl') continue;
       if (node.type === 'AtRule' && (node.name?.value === '@trait' || node.name?.value === '@tokens' || node.name?.value === '@config' || node.name?.value === '@aufbau-config')) {
         if (node.name?.value === '@trait' && node.params) {
           const name = node.params.map(p => p.value).join('');
@@ -125,14 +127,12 @@ export class ASSEngine {
   processRule(node, parentSelector = '') {
     const rawSel = Array.isArray(node.selector) ? node.selector.map(s => s.value).join('') : (node.selector?.value || '');
     const fullSel = combineSelectors(parentSelector, rawSel);
-
     const decls = [];
     const nestedNodes = [];
 
     for (const child of (node.body || [])) {
       if (child.type === 'Declaration' || child.type === 'MapDeclaration') {
         const propName = child.name?.value;
-
         if (propName === 'use') {
           this.applyTraits(child, decls, nestedNodes);
         } else if (propName === 'colors') {
@@ -142,7 +142,7 @@ export class ASSEngine {
         } else if (propName === 'shader') {
           decls.push(...expandShader(child));
         } else {
-          decls.push(this.resolveTokens(child));
+          decls.push(this.resolveDeclaration(child));
         }
       } else {
         nestedNodes.push(child);
@@ -151,11 +151,9 @@ export class ASSEngine {
 
     const currentRule = { ...node, selector: fullSel, body: decls };
     const flattened = [currentRule];
-
     if (nestedNodes.length > 0) {
       flattened.push(...this.flattenStatements(nestedNodes, fullSel));
     }
-
     return flattened;
   }
 
@@ -165,32 +163,75 @@ export class ASSEngine {
       if (!traitName || traitName === ';') continue;
       const traitBody = this.traits.get(traitName);
       if (!traitBody) continue;
-
       for (const item of traitBody) {
-        if (item.type === 'Declaration') decls.push(this.resolveTokens(item));
+        if (item.type === 'Declaration') decls.push(this.resolveDeclaration(item));
         else nestedNodes.push(item);
       }
     }
   }
 
-  resolveTokens(decl) {
+  resolveDeclaration(decl) {
     const propName = decl.name?.value;
     if (!propName || decl.type === 'MapDeclaration') return decl;
 
     const category = getPropertyCategory(propName);
     const tokenMap = this.tokens.get(category);
-    if (!tokenMap) return decl;
 
-    if (Array.isArray(decl.value)) {
-      const resolvedValue = decl.value.map(item => {
-        if (item.type === 'IDENTIFIER' && tokenMap.has(item.value)) {
-          return { ...item, value: tokenMap.get(item.value) };
-        }
-        return item;
-      });
-      return { ...decl, value: resolvedValue };
+    let valueItems = Array.isArray(decl.value) ? decl.value : [decl.value];
+    let resolvedItems = [];
+
+    for (const item of valueItems) {
+      if (!item) continue;
+      if (item.type === 'BinaryExpr') {
+        resolvedItems.push({ type: 'IDENTIFIER', value: this.evaluateBinaryExpr(item) });
+      } else if (item.type === 'VARIABLE') {
+        const resolvedVar = this.variables.get(item.value) || item.value;
+        resolvedItems.push({ type: 'IDENTIFIER', value: resolvedVar });
+      } else if (item.type === 'CUSTOM_PROP') {
+        resolvedItems.push({ type: 'IDENTIFIER', value: `var(${item.value})` });
+      } else if (item.type === 'IDENTIFIER' && tokenMap && tokenMap.has(item.value)) {
+        resolvedItems.push({ type: 'IDENTIFIER', value: tokenMap.get(item.value) });
+      } else {
+        resolvedItems.push(item);
+      }
     }
-    return decl;
+    return { ...decl, value: resolvedItems };
+  }
+
+  evaluateBinaryExpr(expr) {
+    const leftVal = this.resolveValue(expr.left);
+    const rightVal = this.resolveValue(expr.right);
+    const op = expr.operator?.value || '+';
+
+    const matchL = String(leftVal).match(/^(-?\d+(?:\.\d+)?)([a-zA-Z%]*)$/);
+    const matchR = String(rightVal).match(/^(-?\d+(?:\.\d+)?)([a-zA-Z%]*)$/);
+
+    if (matchL && matchR) {
+      const numL = parseFloat(matchL[1]);
+      const unitL = matchL[2];
+      const numR = parseFloat(matchR[1]);
+      const unitR = matchR[2];
+
+      if (unitL === unitR || !unitR || !unitL) {
+        const unit = unitL || unitR;
+        let res = 0;
+        if (op === '+') res = numL + numR;
+        if (op === '-') res = numL - numR;
+        if (op === '*') res = numL * numR;
+        if (op === '/') res = numL / numR;
+        return `${res}${unit}`;
+      }
+    }
+    return `calc(${leftVal} ${op} ${rightVal})`;
+  }
+
+  resolveValue(node) {
+    if (!node) return '';
+    if (node.type === 'VARIABLE') return this.variables.get(node.value) || node.value;
+    if (node.type === 'CUSTOM_PROP') return `var(${node.value})`;
+    if (node.type === 'BinaryExpr') return this.evaluateBinaryExpr(node);
+    if (Array.isArray(node)) return node.map(n => this.resolveValue(n)).join(' ');
+    return node.value || '';
   }
 
   processAtRule(node, parentSelector = '') {
@@ -218,9 +259,9 @@ function extractList(val) {
 }
 
 function getPropertyCategory(prop) {
-  if (prop === 'margin' || prop.startsWith('margin-')) return 'margin';
+  if (prop === 'margin'  || prop.startsWith('margin-'))  return 'margin';
   if (prop === 'padding' || prop.startsWith('padding-')) return 'padding';
-  if (prop === 'gap' || prop.endsWith('-gap')) return 'gap';
+  if (prop === 'gap'     || prop.  endsWith('-gap'))     return 'gap';
   return prop;
 }
 
