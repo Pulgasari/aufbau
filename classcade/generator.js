@@ -3,11 +3,7 @@
 class Generator {
 
   constructor (options = {}) {
-    this.options = {
-      pretty: true,
-      indent: "  ",
-      ...options
-    };
+    this.options = options;
   }
 
   generate (nodes) {
@@ -15,28 +11,23 @@ class Generator {
     return nodes
          . map(node => this.generateRule(node))
          . filter(Boolean)
-         . join(this.options.pretty ? "\n\n" : "");
+         . join('\n\n');
   }
 
   generateRule (rule) {
     if (!rule?.selector) return '';
+    const decl = Object.entries(rule.declarations ?? {};
+    const code = [];
+    
+    code.push(`${rule.selector} {`);
+    for (const [property, value] of decl)) code.push(`${property}: ${value};`);
+    code.push('}');
 
-    const css = [];
-    css.push(`${rule.selector}{`);
-    for (const [property, value] of Object.entries(rule.declarations ?? {})) {
-      css.push(
-        this.options.pretty
-          ? `${this.options.indent}${property}:${value};`
-          : `${property}:${value};`
-      );
-    }
-    css.push("}");
-
-    let output = css.join(this.options.pretty ? "\n" : "");
-    if (rule.media)    output = `@media `    + rule.media    + `{ ${output} }`;
-    if (rule.supports) output = `@supports ` + rule.supports + `{ ${output} }`;
-    if (rule.layer)    output = `@layer `    + rule.layer}   + `{ ${output} }`;    
-    return output;
+    code = code.join('\n');
+    if (rule.media)    code = `@media `    + rule.media    + `{ ${code} }`;
+    if (rule.supports) code = `@supports ` + rule.supports + `{ ${code} }`;
+    if (rule.layer)    code = `@layer `    + rule.layer}   + `{ ${code} }`;    
+    return code;
   }
 
 }
