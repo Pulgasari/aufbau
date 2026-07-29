@@ -1,56 +1,33 @@
 class Injector {
 
-  constructor(id = "classcade") {
-
-    this.id = id;
-
+  constructor (id = 'classcade') {
+    this.id    = id;
     this.cache = new Set();
-
-    this.style =
-      document.querySelector(`style[data-classcade="${id}"]`)
-      ?? this.createStyle();
-
+    this.style = document.querySelector(`style[data-classcade="${id}"]`) ?? this.createStyleElement();    
   }
 
-  createStyle() {
-
-    const style = document.createElement("style");
-
-    style.dataset.classcade = this.id;
-
-    document.head.appendChild(style);
-
+  createStyleElement () {
+    const element = document.createElement('style');
+    element.dataset.classcade = this.id;
+    document.head.appendChild(element);
     return style;
-
   }
 
-  inject(css) {
-
-    if (!css || this.cache.has(css))
-      return false;
-
-    this.cache.add(css);
-
-    this.style.append(document.createTextNode(css + "\n"));
-
+  inject (code) {
+    if (!code || this.cache.has(code)) return false;
+    this.cache.add(code);
+    this.style.append(document.createTextNode(code + '\n'));
     return true;
-
   }
 
-  clear() {
-
+  clear () {
     this.cache.clear();
-
-    this.style.textContent = "";
-
+    this.style.textContent = '';
   }
 
-  destroy() {
-
+  destroy () {
     this.clear();
-
     this.style.remove();
-
   }
 
 }
