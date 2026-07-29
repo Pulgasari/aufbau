@@ -84,6 +84,9 @@ export class ASSEngine {
       const charset = Array.isArray(this.config.charset) ? this.config.charset[0] : this.config.charset;
       rules.push({ type: 'AtRule', name: { value: '@charset' }, params: [{ value: `"${charset}"` }] });
     }
+    for (const fontUrl of this.webfonts) {
+      rules.push({ type: 'AtRule', name: { value: '@import' }, params: [{ value: `"${fontUrl}"` }] });
+    }
     if (Array.isArray(this.config.import)) {
       for (const name of this.config.import) {
         if (!name) continue;
