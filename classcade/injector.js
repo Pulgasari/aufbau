@@ -1,3 +1,5 @@
+// injector.js
+
 class Injector {
 
   constructor (id = 'classcade') {
