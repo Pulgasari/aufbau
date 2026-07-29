@@ -24,6 +24,11 @@ class Classcade {
   start () { this.runtime.start(); }
   stop  () { this.runtime.stop();  }
 
+  use (preset){
+    preset(this);
+    return this;
+  }
+
 }
 
 export default Classcade;
