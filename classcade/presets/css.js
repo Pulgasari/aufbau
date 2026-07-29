@@ -3,83 +3,58 @@
 const cc = {};
 
 const quickies = Object.entries({
-  bg  : color => ({ backgroundColor: color }),
-  fg  : color => ({ color: color }),
-  opa : value => ({ opacity: value }),
+  bg  : 'background-color',
+  fg  : 'color',
+  opa : 'opacity',
 
-  gap : value => ({ gap: value }),
-  mar : value => ({ margin: value }),
-  pad : value => ({ padding: value }),
+  gap : 'gap',
+  mar : 'margin',
+  pad : 'padding',
+
+  ff  : 'font-family',
+  tt  : 'text-transform',
 
   // layout
-  block  : value => ({ display: 'block' }),
-  flex   : value => ({ display: 'flex' }),
-  grid   : value => ({ display: 'grid' }),
-  hidden : value => ({ display: 'none' }),
-  inline : value => ({ display: 'inline' }),
+  block  : { display: 'block' },
+  flex   : { display: 'flex' },
+  grid   : { display: 'grid' },
+  hidden : { display: 'none' },
+  inline : { display: 'inline' },
 
   //
-  h : value => ({ height: value }),
-  w : value => ({ width: value }),
+  h : 'height',
+  w : 'width',
 
   // typo
-  bold      : value => ({ fontWeight: 'bold' }),
-  uppercase : value => ({ textTransform: 'uppercase' }),
+  bold      : { fontWeight: 'bold' },
+  uppercase : { textTransform: 'uppercase' },
 });
 
-for (const [id, css] of quickies) {
-  Object.assign(cc, cc.rule({ id, css }));
+// if 'body' is string   -> cc.rule({ id, css: v => ({ <string>: v }) })
+// if 'body' is function -> cc.rule({ id, css: <function> })
+// if 'body' is object   -> cc.rule({ id, css: v => (<object>) })
+for (const [id, body] of quickies) {
+  let obj = (switch (typeof body) {
+    case 'string'   : return { id, css: v => ({ body: v }) };        
+    case 'function' : return { id, css: body };
+    case 'object'   : return { id, ...body };
+  });
+  Object.assign(cc, cc.rule(obj));
 }
-
-export default cc => {
-    cc.method({
-        id:"var",
-        resolve(name){
-            return `var(${name})`;
-        }
-    });
-
-    cc.method({
-        id:"calc",
-        resolve(expression){
-            return `calc(${expression})`;
-        }
-    });
-
-};
 
 /*
 export default cc => {
-  
+  cc.method({
+    id: "var",
+    css: function (name){ return `var(${name})`; }
+  });
+
   cc.rule ({ 
     id: 'bg', 
     css: color => ({ backgroundColor: color })
   });
-  
-  cc.rule ({ 
-    id: 'color', 
-    css: color => ({ color: color }) 
-  });
-
-  cc.rule ({ 
-    id: 'opacity', 
-    css: value => ({ opacity: value }) 
-  });
-
-  cc.rule ({ 
-    id: 'block', 
-    css: value => ({ display: 'block' }) 
-  });
-
-  cc.rule ({ 
-    id: 'hidden', 
-    css: value => ({ display: 'none' }) 
-  });
-
-  cc.rule ({ 
-    id: 'inline', 
-    css: value => ({ display: 'inline' }) 
-  });
-
 };
 */
+
+
+
