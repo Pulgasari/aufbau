@@ -1,11 +1,13 @@
 // registry.js
 
 class Registry {
-  macros   : new Map;
-  methods  : new Map;
-  rules    : new Map;
-  themes   : new Map;
-  variants : new Map;
+  constructor() {
+    this.macros   = new Map;
+    this.methods  = new Map;
+    this.rules    = new Map;
+    this.themes   = new Map;
+    this.variants = new Map;
+  }
 
   // to register
   method  (obj) { this.methods .set(obj.id, obj); }
