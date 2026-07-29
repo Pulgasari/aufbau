@@ -138,16 +138,13 @@ export class ASSEngine {
     for (const child of (node.body || [])) {
       if (child.type === 'Declaration' || child.type === 'MapDeclaration') {
         const propName = child.name?.value;
-        if (propName === 'use') {
-          this.applyTraits(child, decls, nestedNodes);
-        } else if (propName === 'colors') {
-          decls.push(...expandColors(child, this.tokens));
-        } else if (propName === 'pattern') {
-          decls.push(...expandPattern(child, this.tokens));
-        } else if (propName === 'shader') {
-          decls.push(...expandShader(child));
-        } else {
-          decls.push(this.resolveDeclaration(child));
+        switch (propName) {
+          case 'use'     : this.applyTraits(child, decls, nestedNodes); break;
+          case 'webfont' : decls.push(...expandWebfont(child, this.webfonts)); break;
+          case 'colors'  : decls.push(...expandColors(child, this.tokens)); break;
+          case 'pattern' : decls.push(...expandPattern(child, this.tokens)); break;
+          case 'shader'  : decls.push(...expandShader(child)); break;
+          default        : decls.push(this.resolveDeclaration(child));
         }
       } else {
         nestedNodes.push(child);
