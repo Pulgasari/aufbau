@@ -30,6 +30,38 @@ While syntax-wise close to CSS (using `{ ... }`, `:`, `;`, and `@directives`), A
 
 ---
 
+## Syntax
+
+**ASS** follows a very CSS-like syntax but there are some differents.
+
+identifiers starting with `--` are custom props
+
+```css
+// ASS
+html {
+  --color : #FF0000;
+  --size  : 20px;
+}
+
+div {
+  color : --color;
+  width : --size;
+}
+
+// CSS
+html {
+  --color : #FF0000;
+  --size  : 20px;
+}
+
+div {
+  color : var(--color);
+  width : var(--size);
+}
+```
+
+---
+
 # at-rules
 
 ## @colors
