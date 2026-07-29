@@ -1,5 +1,51 @@
 // ass custom properties processing via ast nodes
 
+const sth = items;
+if (sth.length === 1 && colorsTokens[sth[0]]) {
+    const pair = colorsTokens[sth[0]];
+    bg = resolveColorShade(pair.bg, colorTokens);
+    fg = resolveColorShade(pair.fg, colorTokens);
+  } else if (sth.length >= 2) {
+    bg = resolveColorShade(sth[0], colorTokens);
+    fg = resolveColorShade(sth[1], colorTokens);
+  } else if (sth.length === 1) {
+    bg = resolveColorShade(sth[0], colorTokens);
+    fg = 'currentColor';
+}
+return { bg, fg };
+
+const sth = fnArgs;
+if (sth.length === 1 && colorsTokens[sth[0]]) {
+  const pair = colorsTokens[sth[0]];
+  bg = resolveColorShade(pair.bg, colorTokens);
+  fg = resolveColorShade(pair.fg, colorTokens);
+} else if (sth.length >= 2) {
+  bg = resolveColorShade(sth[0], colorTokens);
+  fg = resolveColorShade(sth[1], colorTokens);
+} else if (sth.length === 1) {
+  fg = resolveColorShade(sth[0], colorTokens);
+}
+return { bg, fg };
+
+function resolveColorsAlias (sth, colorTokens) {
+  let bg, fg;
+  
+  if (sth.length === 1 && colorsTokens[sth[0]]) {
+    const pair = colorsTokens[sth[0]];
+    bg = resolveColorShade(pair.bg, colorTokens);
+    fg = resolveColorShade(pair.fg, colorTokens);
+  } else if (sth.length >= 2) {
+    bg = resolveColorShade(sth[0], colorTokens);
+    fg = resolveColorShade(sth[1], colorTokens);
+  } else if (sth.length === 1) {
+    fg = resolveColorShade(sth[0], colorTokens);
+  }
+  
+  return { bg, fg };
+}
+
+
+
 export function resolveColorShade(val, colorTokens = {}) {
   if (!val) return val;
   if (colorTokens[val]) return colorTokens[val];
@@ -20,7 +66,7 @@ export function resolveColorShade(val, colorTokens = {}) {
 }
 
 export function expandColors(decl, tokenMap) {
-  const  colorTokens = tokenMap?.get('color') ? Object.fromEntries(tokenMap.get('color')) : {};
+  const  colorTokens = tokenMap?.get('color')  ? Object.fromEntries(tokenMap.get('color'))  : {};
   const colorsTokens = tokenMap?.get('colors') ? Object.fromEntries(tokenMap.get('colors')) : {};
 
   const items = (decl.value || []).filter(item => item.type !== 'PUNCT').map(item => item.value);
@@ -41,18 +87,18 @@ export function expandColors(decl, tokenMap) {
 
   return [
     { type: 'Declaration', name: { value: 'background-color' }, value: [{ type: 'IDENTIFIER', value: bg }] },
-    { type: 'Declaration', name: { value: 'color' }, value: [{ type: 'IDENTIFIER', value: fg }] }
+    { type: 'Declaration', name: { value:            'color' }, value: [{ type: 'IDENTIFIER', value: fg }] }
   ];
 }
 
-export function expandPattern(decl, tokenMap) {
+export function expandPattern (decl, tokenMap) {
   let rotate = 0;
   let bg = 'transparent';
   let fg = 'currentColor';
   let animRule    = '';
   let patternName = 'grid';
 
-  const colorTokens = tokenMap?.get('color') ? Object.fromEntries(tokenMap.get('color')) : {};
+  const c olorTokens = tokenMap?.get('color')  ? Object.fromEntries(tokenMap.get('color'))  : {};
   const colorsTokens = tokenMap?.get('colors') ? Object.fromEntries(tokenMap.get('colors')) : {};
 
   for (const item of (decl.value || [])) {
@@ -131,7 +177,7 @@ export function expandWebfont(decl, webfontSet) {
   if (webfontSet) webfontSet.add(fontUrl);
 
   const fontLower = fontName.toLowerCase();
-  const fallback = fontLower.includes('mono') ? 'monospace' : fontLower.includes('serif') ? 'serif' : 'sans-serif';
+  const fallback  = fontLower.includes('mono') ? 'monospace' : fontLower.includes('serif') ? 'serif' : 'sans-serif';
 
   return [{
     type: 'Declaration',
