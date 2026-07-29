@@ -1,8 +1,8 @@
 // meta.js
 
 const subPropsmap = {
-  margin  : ['bottom', 'left', 'right', 'top'],
-  padding : ['bottom', 'left', 'right', 'top'],
+  margin  : ['bottom', 'left', 'right', 'top', 'block', 'inline'],
+  padding : ['bottom', 'left', 'right', 'top', 'block', 'inline'],
 
   height : ['max', 'min'],
   width  : ['max', 'min'],
