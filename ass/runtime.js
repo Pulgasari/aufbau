@@ -6,6 +6,9 @@ import { defaultTokens } from 'meta.js';
 
 // ::: Checks
 
+const isClient = () => window !== 'undefined';
+
+const isFn            = value => typeof value === 'function';
 const isNumber        = value => typeof value === 'number';
 const isNumericString = value => typeof value === 'string' && /^-?\d+(?:\.\d+)?$/.test(value.trim());   
 const isNumeric       = value => isNumber(value) || isNumericString(value);
@@ -20,10 +23,10 @@ export function normalizeProp (prop) {
 
 export function getCategory (prop) {
   const norm = normalizeProp(prop);
-  if (norm.startsWith('margin')) return 'margin';
-  if (norm.startsWith('padding')) return 'padding';
+  if (norm.startsWith('margin'))              return 'margin';
+  if (norm.startsWith('padding'))             return 'padding';
   if (norm.endsWith('Gap') || norm === 'gap') return 'gap';
-  return norm;
+                                              return norm;
 }
 
 export function resolveValue (prop, val, explicitUnit, customTokens) {
@@ -40,11 +43,8 @@ export function resolveValue (prop, val, explicitUnit, customTokens) {
   // handle explicit unit function (e.g. CSS.px)
   if (typeof explicitUnit === 'function') {
     const num = parseFloat(val);
-    try {
-      return explicitUnit(num);
-    } catch {
-      // fallback if not a typed om factory
-    }
+    try   { return explicitUnit(num); }
+    catch {} // fallback if not a typed om factory
   }
 
   // handle explicit unit string (e.g. 'px')
@@ -63,7 +63,7 @@ export function resolveValue (prop, val, explicitUnit, customTokens) {
 
   // handle token lookup
   if (typeof val === 'string') {
-    const tokens = customTokens || defaultTokens;
+    const tokens   = customTokens || defaultTokens;
     const category = getCategory(prop);
     if (tokens[category] && tokens[category][val]) {
       return tokens[category][val];
@@ -106,7 +106,7 @@ export class ASSValue extends String {
   constructor (val, element, prop, options = {}) {
     super(val);
     this.element = element;
-    this.prop = prop;
+    this.prop    = prop;
     this.options = options;
   }
 
@@ -138,16 +138,12 @@ export function getAssProperty (element, prop) {
 }
 
 export function setAssProperty (element, prop, val, explicitUnit, options = {}) {
-  const norm = normalizeProp(prop);
+  const norm     = normalizeProp(prop);
   const resolved = resolveValue(norm, val, explicitUnit, options.tokens);
 
   if (element.attributeStyleMap && typeof resolved === 'object') {
-    try {
-      element.attributeStyleMap.set(norm, resolved);
-      return;
-    } catch {
-      // fallback to style string assignment
-    }
+    try   { element.attributeStyleMap.set(norm, resolved); return; }
+    catch {} // fallback to style string assignment
   }
 
   element.style[norm] = String(resolved);
@@ -157,9 +153,9 @@ export function createAssProxy (element, options = {}) {
   return new Proxy(element, {
     get (target, prop) {
       if (typeof prop !== 'string' || prop === 'then') return Reflect.get(target, prop);
-      const norm = normalizeProp(prop);
-      const val = getAssProperty(target, norm);
-      return new ASSValue(val, target, norm, options);
+      const norm  = normalizeProp(prop);
+      const value = getAssProperty(target, norm);
+      return new ASSValue(value, target, norm, options);
     },
     set (target, prop, val) {
       if (typeof prop !== 'string') return Reflect.set(target, prop, val);
