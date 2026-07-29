@@ -12,19 +12,11 @@ const variantsOfPropBySuffixWithSameStruct = {
 };
 
 const subPropsmap = {
-  outline : ['color', 'offset', 'style, 'width'],
-  overlay : null,
+  outline      : ['color', 'offset', 'style, 'width'],
+  overflow     : ['anchor', 'block', 'clip-margin', 'inline', 'wrap', 'x', 'y'],      
+  overlay      : null,
   textEmphasis : ['color', 'position', 'style'],
 };
-
-overflow-anchor
-overflow-block
-overflow-clip-margin
-overflow-inline
-overflow-wrap
-overflow-x
-overflow-y
-overflow (shorthand)
 
 const propsMap = {
   // ASS
@@ -55,9 +47,17 @@ const propsMap = {
   zIndex   : { unit: false },
 };
 
-for (let sth of MARGIN) {
-  let key  = 'scroll' + '-' + 'sth';
-  let body = propsMap['scroll'];
+for (let sth of variantsOfPropBySuffixWithSameStruct['margin']) {
+  let prop = 'scroll';
+  let body = propsMap[prop];
+  let key  = prop + '-' + sth;
+  Object.assign(propsMap, { [key]: body });
+}
+
+for (let sth of variantsOfPropBySuffixWithSameStruct['padding']) {
+  let prop = 'scroll';
+  let body = propsMap[prop];
+  let key  = prop + '-' + sth;
   Object.assign(propsMap, { [key]: body });
 }
 
