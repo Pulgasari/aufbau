@@ -37,6 +37,11 @@ get = function (key, withUnit = true) {
 
 };
 set = function (key, value, unit) {
+  if (!key || value === undefined) return;
+  key  = normalizeProp(key);
+  unit = normalizeUnit(unit);
+
+  if (!unit)
   this.attributeStyleMap.set(key, CSS[unit](value);
 }
 
