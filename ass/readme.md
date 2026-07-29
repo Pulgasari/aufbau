@@ -61,7 +61,7 @@ If the key is none of that it becomes an alias.
 the name of the functions defines its lifetime:
 - `--name` a real css-spec fn
 - `$name` a temp fn
-- 'name' a "real" fn, still available at runtime
+- `name` a "real" fn, still available at runtime
 
 ```css
 @fn doSth ($arg1, $arg2) {
