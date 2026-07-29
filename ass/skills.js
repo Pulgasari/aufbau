@@ -1,34 +1,8 @@
 // ass custom properties processing via ast nodes
 
-const sth = items;
-if (sth.length === 1 && colorsTokens[sth[0]]) {
-    const pair = colorsTokens[sth[0]];
-    bg = resolveColorShade(pair.bg, colorTokens);
-    fg = resolveColorShade(pair.fg, colorTokens);
-  } else if (sth.length >= 2) {
-    bg = resolveColorShade(sth[0], colorTokens);
-    fg = resolveColorShade(sth[1], colorTokens);
-  } else if (sth.length === 1) {
-    bg = resolveColorShade(sth[0], colorTokens);
-    fg = 'currentColor';
-}
-return { bg, fg };
-
-const sth = fnArgs;
-if (sth.length === 1 && colorsTokens[sth[0]]) {
-  const pair = colorsTokens[sth[0]];
-  bg = resolveColorShade(pair.bg, colorTokens);
-  fg = resolveColorShade(pair.fg, colorTokens);
-} else if (sth.length >= 2) {
-  bg = resolveColorShade(sth[0], colorTokens);
-  fg = resolveColorShade(sth[1], colorTokens);
-} else if (sth.length === 1) {
-  fg = resolveColorShade(sth[0], colorTokens);
-}
-return { bg, fg };
-
-function resolveColorsAlias (sth, colorTokens) {
-  let bg, fg;
+function resolveColorsAlias (sth, colorTokens, colorsTokens) {
+  let bg = 'transparent';
+  let fg = 'currentColor';
   
   if (sth.length === 1 && colorsTokens[sth[0]]) {
     const pair = colorsTokens[sth[0]];
@@ -65,25 +39,12 @@ export function resolveColorShade(val, colorTokens = {}) {
   return val;
 }
 
-export function expandColors(decl, tokenMap) {
+export function expandColors (decl, tokenMap) {
   const  colorTokens = tokenMap?.get('color')  ? Object.fromEntries(tokenMap.get('color'))  : {};
   const colorsTokens = tokenMap?.get('colors') ? Object.fromEntries(tokenMap.get('colors')) : {};
 
   const items = (decl.value || []).filter(item => item.type !== 'PUNCT').map(item => item.value);
-  let bg = '';
-  let fg = '';
-
-  if (items.length === 1 && colorsTokens[items[0]]) {
-    const pair = colorsTokens[items[0]];
-    bg = resolveColorShade(pair.bg, colorTokens);
-    fg = resolveColorShade(pair.fg, colorTokens);
-  } else if (items.length >= 2) {
-    bg = resolveColorShade(items[0], colorTokens);
-    fg = resolveColorShade(items[1], colorTokens);
-  } else if (items.length === 1) {
-    bg = resolveColorShade(items[0], colorTokens);
-    fg = 'currentColor';
-  }
+  const { bg, fg } = resolveColorsAlias(items, colorTokens, colorsTokens);
 
   return [
     { type: 'Declaration', name: { value: 'background-color' }, value: [{ type: 'IDENTIFIER', value: bg }] },
@@ -92,13 +53,12 @@ export function expandColors(decl, tokenMap) {
 }
 
 export function expandPattern (decl, tokenMap) {
-  let rotate = 0;
-  let bg = 'transparent';
-  let fg = 'currentColor';
+  let bg, fg;
+  let rotate      = 0;
   let animRule    = '';
   let patternName = 'grid';
 
-  const c olorTokens = tokenMap?.get('color')  ? Object.fromEntries(tokenMap.get('color'))  : {};
+  const  colorTokens = tokenMap?.get('color')  ? Object.fromEntries(tokenMap.get('color'))  : {};
   const colorsTokens = tokenMap?.get('colors') ? Object.fromEntries(tokenMap.get('colors')) : {};
 
   for (const item of (decl.value || [])) {
@@ -109,15 +69,9 @@ export function expandPattern (decl, tokenMap) {
       if (fnName === 'rotate' && fnArgs[0]) {
         rotate = parseInt(fnArgs[0], 10) || 0;
       } else if (fnName === 'colors') {
-        if (fnArgs.length === 1 && colorsTokens[fnArgs[0]]) {
-          bg = resolveColorShade(colorsTokens[fnArgs[0]].bg, colorTokens);
-          fg = resolveColorShade(colorsTokens[fnArgs[0]].fg, colorTokens);
-        } else if (fnArgs.length >= 2) {
-          bg = resolveColorShade(fnArgs[0], colorTokens);
-          fg = resolveColorShade(fnArgs[1], colorTokens);
-        } else if (fnArgs.length === 1) {
-          fg = resolveColorShade(fnArgs[0], colorTokens);
-        }
+        const colorz = resolveColorsAlias (fnArgs, colorTokens, colorsTokens);
+        bg = colorz.bg;
+        fg = colorz.fg;
       } else if (fnName === 'animate' && fnArgs[0]) {
         const aName = fnArgs[0].startsWith('aufbau-') ? fnArgs[0] : `aufbau-pattern-${fnArgs[0]}`;
         const aRest = fnArgs.slice(1).join(' ') || '3s linear infinite';
@@ -166,7 +120,7 @@ export function expandShader(decl) {
   return [{ type: 'Declaration', name: { value: 'filter' }, value: [{ type: 'STRING', value: `url('${dataUri}#${filterId}')` }] }];
 }
 
-export function expandWebfont(decl, webfontSet) {
+export function expandWebfont (decl, webfontSet) {
   const rawItems = (decl.value || []).filter(item => item.type !== 'PUNCT').map(item => item.value.replace(/['"]/g, ''));
   if (rawItems.length === 0) return [decl];
 
