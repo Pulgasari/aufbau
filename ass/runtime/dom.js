@@ -93,7 +93,8 @@ element.ass.fontSize.getTyped(); // { value: 20, unit: CSS.px }
 
 
 
-
+// wenn value mit '--' beginnt
+new CSSVariableReferenceValue("--var")
 
 
 */
