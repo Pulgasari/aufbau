@@ -4,7 +4,7 @@ import { renderToCSS } from './codegen.js';
 import { ASSEngine }   from './engine.js';
 import { parseASS }    from './parser.js';
 
-import { attachAssToDOM } from './runtime/dom.js';
+import { attachAssToDOM } from './runtime.js';
 import { defaultTokens, createDefaultTokenMap } from './tokens.js';
 
 
