@@ -1,15 +1,28 @@
 // meta.js
 
-const subPropsmap = {
-  margin  : ['bottom', 'left', 'right', 'top', 'block', 'inline'],
-  padding : ['bottom', 'left', 'right', 'top', 'block', 'inline'],
-
+const variantsOfPropByPrefixWithSameStruct = {
+  gap    : ['column', 'row'],
   height : ['max', 'min'],
   width  : ['max', 'min'],
-
-  gap : ['column', 'row'],
 };
 
+const variantsOfPropBySuffixWithSameStruct = {
+  margin  : ['bottom', 'left', 'right', 'top', 'block', 'inline'],
+  padding : ['bottom', 'left', 'right', 'top', 'block', 'inline'],
+};
+
+const subPropsmap = {
+  outline : ['color', 'offset', 'style, 'width'],
+  overlay : null,
+};
+overflow-anchor
+overflow-block
+overflow-clip-margin
+overflow-inline
+overflow-wrap
+overflow-x
+overflow-y
+overflow (shorthand)
 const propsMap = {
   // ASS
   colors  : null,
@@ -26,6 +39,7 @@ const propsMap = {
   left     : { unit: 'px' },
   margin   : { unit: 'px' },
   opacity  : { unit: null },
+  overlay  : null,
   outline  : null,
   padding  : { unit: 'px' },
   right    : { unit: 'px' },
