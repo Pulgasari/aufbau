@@ -10,14 +10,16 @@ class Registry {
   }
 
   // to register
-  method  (obj) { this.methods .set(obj.id, obj); }
-  rule    (obj) { this.rules   .set(obj.id, obj); }
-  variant (obj) { this.variants.set(obj.id, obj); }
+  addMacro   (obj) { this.macro   .set(obj.id, obj); }
+  addMethod  (obj) { this.methods .set(obj.id, obj); }
+  addRule    (obj) { this.rules   .set(obj.id, obj); }
+  addVariant (obj) { this.variants.set(obj.id, obj); }
 
   // getters
-  //method  (id) { return this.methods .get(id); }
-  //rule    (id) { return this.rules   .get(id); }
-  //variant (id) { return this.variants.get(id); }
+  getMacro   (id) { return this.macros  .get(id); }
+  getMethod  (id) { return this.methods .get(id); }
+  getRule    (id) { return this.rules   .get(id); }
+  getVariant (id) { return this.variants.get(id); }
 };
 
 export default Registry;
