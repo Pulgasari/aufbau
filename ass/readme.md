@@ -28,6 +28,25 @@ While syntax-wise close to CSS (using `{ ... }`, `:`, `;`, and `@directives`), A
 [shader]()
 [use]()
 
+---
+
+# at-rules
+
+## @colors
+
+```css
+@colors {
+  soviet : red yellow;
+  zombie : grey white;
+}
+```
+
+```css
+@colors {
+  soviet : light-dark(lightred, darkred) yellow;
+  zombie : light-dark(lightgrey, darkgrey) white;
+}
+```
 
 ---
 
