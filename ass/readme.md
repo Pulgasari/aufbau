@@ -30,13 +30,15 @@ While syntax-wise close to CSS (using `{ ... }`, `:`, `;`, and `@directives`), A
 
 ---
 
-## Syntax
+# Syntax
 
 **ASS** follows a very CSS-like syntax but there are some differents.
 
+## custom properties
+
 identifiers starting with `--` are custom props
 
-```css
+```ass
 // ASS
 html {
   --color : #FF0000;
@@ -47,7 +49,9 @@ div {
   color : --color;
   width : --size;
 }
+```
 
+```css
 // CSS
 html {
   --color : #FF0000;
