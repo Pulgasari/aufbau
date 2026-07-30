@@ -4,7 +4,7 @@
 import hljs from 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm';
 import aufbau, { html, Fragment, useSignalEffect } from '@aufbau/kit';
 
-aufbau.ini
+aufbau.init();
 // Service Worker Registration
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
