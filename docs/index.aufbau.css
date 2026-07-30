@@ -106,7 +106,7 @@ body { aufbau-use: .vert; }
 
 #app-header {
   display         : flex;
-  fley-flow       : row;
+  flex-flow       : row;
   align-items     : center;
   justify-content : space-between;
   gap             : 1rem;
