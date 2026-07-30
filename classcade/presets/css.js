@@ -31,6 +31,7 @@ const quickies = Object.entries({
 });
 
 for (const [a,b] of quickies) cc.add(a,b);
+//quickies.forEach(([a,b]) => cc.add(a,b));
 
 /*
 export default cc => {
