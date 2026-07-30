@@ -1,7 +1,7 @@
 // aufbau/docs/sw.js
 
-//import { interceptFetch } from '@aufbau/kit';
-import { interceptFetch } from 'https://pulgasari.github.io/aufbau/kit';
+import { interceptFetch } from '@aufbau/kit';
+//import { interceptFetch } from 'https://pulgasari.github.io/aufbau/kit';
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
