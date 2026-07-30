@@ -3,7 +3,7 @@
 export class Observer {
 
   constructor (runtime) {
-    this.runtime  = runtime;
+    this.compiler = runtime;
     this.observer = null;
   }
 
@@ -12,8 +12,8 @@ export class Observer {
 
     this.observer = new MutationObserver (mutations => {
       for (const mutation of mutations) {
-        mutation.addedNodes.forEach (node => (node.nodeType === 1) && this.runtime.process(node));
-        if (mutation.type === 'attributes') this.runtime.process(mutation.target);
+        mutation.addedNodes.forEach (node => (node.nodeType === 1) && this.compiler.process(node));
+        if (mutation.type === 'attributes') this.compiler.process(mutation.target);
       }
     });
 
