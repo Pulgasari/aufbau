@@ -6,6 +6,7 @@ function escapeSelector (raw) {
 }
 
 class Resolver {
+  
   constructor (registry) {
     this.registry = registry;
   }
@@ -20,32 +21,37 @@ class Resolver {
     throw new Error(`[classcade] Unknown node type "${node.type}"`);
   }
 
-  resolveDecl (node) {
-    let declarations;
 
-    if (node.value === null) {
-      // kein [value] -> muss ein registrierter shorthand sein (Schritt 3)
-      const def = this.registry.get(node.prop);
-      if (!def || def.type !== 'shorthand') {
-        throw new Error(`[classcade] "${node.prop}" hat keinen Wert und ist kein registrierter Shorthand.`);
-      }
-      declarations = { ...def.declarations };
-    } else {
-      declarations = { [node.prop]: node.value }; // Schritt 1: reines Passthrough
+
+resolveDecl (node) {
+  let declarations;
+
+  if (node.value === null) {
+    const def = this.registry.get(node.prop);
+    if (!def || def.type !== 'shorthand') {
+      throw new Error(`[classcade] "${node.prop}" hat keinen Wert und ist kein registrierter Shorthand.`);
     }
+    declarations = { ...def.declarations };
+  } else {
+    const alias   = this.registry.get(node.prop);
+    const cssProp = (alias?.type === 'alias-prop') ? alias.ref : node.prop;
+    declarations  = { [cssProp]: this.resolveValue(node.value) };
+  }
 
-    if (node.important) {
-      declarations = Object.fromEntries(
-        Object.entries(declarations).map(([k, v]) => [k, `${v} !important`])
-      );
-    }
+  if (node.important) {
+    declarations = Object.fromEntries(Object.entries(declarations).map(([k, v]) => [k, `${v} !important`]));
+  }
 
-    return {
-      id       : node.raw,
-      selector : `.${escapeSelector(node.raw)}`,
-      declarations,
-      layer: null, media: null, supports: null,
-    };
+  return { id: node.raw, selector: `.${escapeSelector(node.raw)}`, declarations, layer: null, media: null, supports: null };
+}
+
+// ersetzt registrierte Funktions-Aliase INNERHALB eines rohen Werts,
+// z.B. "ld(white black)" -> "light-dark(white black)"
+resolveValue (raw) {
+  return raw.replace(/([a-zA-Z_-][a-zA-Z0-9_-]*)\(/g, (match, name) => {
+    const def = this.registry.get(name);
+    return (def?.type === 'alias-fn') ? `${def.ref}(` : match;
+  });
   }
 
   resolveVariant (node) {
