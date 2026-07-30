@@ -1,4 +1,4 @@
-// observer.js
+// @classcade/compiler/observer.js
 
 export class Observer {
 
