@@ -39,7 +39,7 @@ for (const [id, body] of quickies) {
     case 'function' : return { id, css: body };
     case 'object'   : return { id, ...body };
   });
-  Object.assign(cc, cc.rule(obj));
+  Object.assign(cc, cc.addRule(obj));
 }
 
 /*
