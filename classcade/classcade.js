@@ -17,9 +17,9 @@ class Classcade {
     this.runtime   = new Runtime  (this);
   }
   
-  method  (id) { this.registry.method  (id); return this; }
-  rule    (id) { this.registry.rule    (id); return this; }
-  variant (id) { this.registry.variant (id); return this; }
+  addMethod  (obj) { this.registry.addMethod  (obj); return this; }
+  addRule    (obj) { this.registry.addRule    (obj); return this; }
+  addVariant (obj) { this.registry.addVariant (obj); return this; }
 
   start () { this.runtime.start(); }
   stop  () { this.runtime.stop();  }
