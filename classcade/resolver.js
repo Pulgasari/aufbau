@@ -2,6 +2,11 @@
 
 import { arrayfied, isString } from './utils';
 
+function escapeSelector (raw) {
+  // eckige/runde Klammern, Doppelpunkte, Kommas etc. müssen für CSS-Selektoren escaped werden
+  return raw.replace(/[\[\]():,.!#%]/g, ch => `\\${ch}`);
+}
+
 class Resolver {
   
   resolve (ast) {
