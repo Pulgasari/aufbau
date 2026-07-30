@@ -83,8 +83,11 @@ body       { height: 100dvh; }
 @aufbaut-trait .vert { 
   display   : flex; 
   flex-flow : column;
-
-  > * { flex: 1 0 auto; }
+  min-height: 0;
+  > * { 
+    flex: 1 0 auto;
+    min-height: 0;
+  }
 }
 
 a { color: currentcolor; }
@@ -92,7 +95,7 @@ a { color: currentcolor; }
 
 body { aufbau-use: .vert; }
   
-#app { aufbau-use: .vert; min-height: 0; }
+#app { aufbau-use: .vert;  }
 #app > #app-header { flex: 0 0 auto; }
 #app > #app-footer { flex: 0 0 auto; }
 #app > #app-body   { flex: 1; min-height: 0; overflow-y: auto; }
@@ -172,20 +175,6 @@ body { aufbau-use: .vert; }
 .code-overlay    { pointer-events: none; overflow: hidden; z-index: 0; }
 #code-output pre { overflow: auto; }
 
-/*
-
-body { display:flex; flex-flow: column; }
-body > #app { flex: 1; }
-
-#app { display:flex; flex-flow: column; }
-#app > #app-header { flex: 0 0 auto; }
-#app > #app-footer { flex: 0 0 auto; }
-#app > #app-body   { flex: 1; min-height: 0; overflow-y: auto; }
-
-#app-body     { display: flex; flex-direction: column; }
-#app-body > * { flex: 1 0 auto; }
-
-*/
 
 /*
 
