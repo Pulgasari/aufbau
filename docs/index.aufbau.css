@@ -18,7 +18,7 @@ body {
 }
 
 body {
-  aufbau-colors  : current;
+  aufbau-colors  : aufbau;
   aufbau-webfont : 'Hubot Sans';
   /*
   aufbau-pattern : stripes rotate(45deg) colors(soviet) animate(slide 4s infinite);    
