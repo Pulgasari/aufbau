@@ -50,14 +50,14 @@ function parseHash() {
  * Parse HTML string, ensure all headings have slug IDs, and extract TOC items.
  */
 function processHtmlAndBuildToc(htmlContent) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlContent, 'text/html');
+  const parser   = new DOMParser();
+  const doc      = parser.parseFromString(htmlContent, 'text/html');
   const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  const toc = [];
+  const toc      = [];
 
   headings.forEach((h, index) => {
     const level = parseInt(h.tagName.substring(1), 10);
-    const text = h.textContent || '';
+    const text  = h.textContent || '';
     
     // Assign slug ID to heading if not present
     let id = h.id;
@@ -88,7 +88,7 @@ if (typeof window !== 'undefined') {
 // :::::: REACTION & DATA FETCHING
 
 // Fetch markdown and re-build TOC whenever route path changes
-useSignalEffect(() => {
+aufbau.useSignalEffect(() => {
   const { path, anchor } = currentRoute.value;
 
   async function loadDocument() {
@@ -101,7 +101,7 @@ useSignalEffect(() => {
       const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
 
       mdContent.value = processedHtml;
-      tocList.value = toc;
+      tocList.value   = toc;
       isLoading.value = false;
 
       // Handle smooth scrolling after DOM render
