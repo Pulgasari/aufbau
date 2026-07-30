@@ -1,4 +1,4 @@
-![Logo](logo.svg)
+![Logo](./../logo.svg)
 
 achtung !!! repo und docs sind im aufbau (hehe) und die hier genannten infos sind höchstwahrscheinlich ungenau oder falsch.
 
