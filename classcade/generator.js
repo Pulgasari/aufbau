@@ -1,14 +1,13 @@
 // generator.js
 
+import { arrayfied } from './utils.js';
+
 class Generator {
 
-  constructor (options = {}) {
-    this.options = options;
-  }
+  constructor () {}
 
   generate (nodes) {
-    if (!Array.isArray(nodes)) nodes = [nodes];
-    return nodes.map(this.generateRule).filter(Boolean).join('\n\n');
+    return arrayfied(nodes).map(this.generateRule).filter(Boolean).join('\n\n');
   }
 
   generateRule (rule) {
