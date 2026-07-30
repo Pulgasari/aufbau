@@ -30,8 +30,8 @@ const quickies = Object.entries({
   uppercase : { textTransform: 'uppercase' },
 });
 
+// these need also "type: 'rule'"
 for (const [a,b] of quickies) cc.add(a,b);
-//quickies.forEach(([a,b]) => cc.add(a,b));
 
 /*
 export default cc => {
