@@ -20,9 +20,9 @@ class Classcade {
   get (id)  { return this.registry.get(id); }
   add (a,b) {
     if (typeof a === 'string' && b) switch (typeof b) {        
-      case 'function' : this.add({ a, css: b }); break;
-      case 'object'   : this.add({ a,   ...b }); break;
-      case 'string'   : this.add({ a, css: v => ({ [b]: v }) });
+      case 'function' : this.registry.set(a, { id: a, css: b }); break;
+      case 'object'   : this.registry.set(a, { id: a,   ...b }); break;
+      case 'string'   : this.registry.set(a, { id: a, css: v => ({ [b]: v }) });
     };
     else this.registry.set(a.id, a);
   }
