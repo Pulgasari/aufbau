@@ -6,6 +6,8 @@ const base = 'https://pulgasari.github.io/aufbau/docs/';
 
 // :::::: IMPORTS
 
+import hljs from 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm';
+
 // ::: aufbau
 import aufbau, { html, useRef, useSignal, useSignalEffect, Fragment } from '@aufbau/kit';
 window.html = html; aufbau.init();
@@ -17,8 +19,6 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     .catch (err => console.error(error));
 }
 
-// ::: misc
-import hljs from 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm';
 
 // ::: components
 //import Footer from './components/Footer.js';
