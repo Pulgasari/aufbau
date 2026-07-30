@@ -1,1 +1,159 @@
+/* add to reset.css maybe
+div { min-height: 0; }
+body {
+  background : var(--aufbau-bg);
+  color      : var(--aufbau-fg);
+}
+*/
 
+@aufbau-config {
+  import : reset, default, keyframes;
+  themes : zombie;
+}
+
+@aufbau colors {
+  dark   : black white;
+  lite   : white black;
+  soviet : red yellow;
+  kobold : orange yellow;
+  none   : transparent transparent;
+}
+
+body {
+  aufbau-colors  : kobold;
+  aufbau-webfont : 'Hubot Sans';
+  aufbau-pattern : stripes rotate(45deg) colors(soviet) animate(slide 4s infinite);    
+}
+
+/*
+#app-body       { background: #f002; }
+#app-body   > * { background: #0803; }
+#playground > * { background: #ff03; }
+#code-input     { background: #0804; }
+#code-output    { background: #0804; }
+*/
+
+html, body { height: 100%; overflow: hidden; }
+body       { height: 100dvh; }
+
+@aufbaut-trait .vert { 
+  display   : flex; 
+  flex-flow : column;
+
+  > * { flex: 1 0 auto; }
+}
+
+a { color: currentcolor; }
+
+
+body { aufbau-use: .vert; }
+  
+#app { aufbau-use: .vert; }
+#app > #app-header { flex: 0 0 auto; }
+#app > #app-footer { flex: 0 0 auto; }
+#app > #app-body   { flex: 1; min-height: 0; overflow-y: auto; }
+
+#app-body   { aufbau-use: .vert; padding: 1rem; }
+#playground { aufbau-use: .vert; gap: 1rem; }
+
+
+
+
+
+#app-header {
+  display         : flex;
+  fley-flow       : row;
+  align-items     : center;
+  justify-content : space-between;
+  gap             : 1rem;
+  padding         : 1rem;
+}
+#app-footer {
+  display         : flex;
+  fley-flow       : row;
+  align-items     : center;
+  justify-content : center;
+  gap             : 1rem;
+  padding         : 1rem;
+}
+#app-header nav {
+  display     : flex;
+  fley-flow   : row nowrap;
+  align-items : center;
+  gap         : 0.5rem;
+}
+
+#code-input,
+#code-output {
+  display: flex;
+  flex-direction: column;
+
+  > *:nth-child(1) { flex: 0 0 auto; }
+  > *:nth-child(2) { flex: 1 0 auto; }
+}
+
+/* Styling for the editor overlay */
+.editor-wrapper { position: relative; width: 100%; }
+#code-input { position relative; }
+
+#code-input-area, .code-overlay,
+#code-output pre {
+  border-radius : 4px;
+  font-family   : monospace, monospace;
+  font-size     : 14px;
+  line-height   : 1.5;
+  padding       : 12px;
+}
+
+#code-input-area,
+.code-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 1px solid #444;
+}
+
+#code-input-area {
+  aufbau-colors: none;
+  caret-color: #fff;
+  z-index: 1;
+  resize: none;
+  outline: none;
+}
+
+.code-overlay    { pointer-events: none; overflow: hidden; z-index: 0; }
+#code-output pre { overflow: auto; }
+
+/*
+
+body { display:flex; flex-flow: column; }
+body > #app { flex: 1; }
+
+#app { display:flex; flex-flow: column; }
+#app > #app-header { flex: 0 0 auto; }
+#app > #app-footer { flex: 0 0 auto; }
+#app > #app-body   { flex: 1; min-height: 0; overflow-y: auto; }
+
+#app-body     { display: flex; flex-direction: column; }
+#app-body > * { flex: 1 0 auto; }
+
+*/
+
+/*
+
+#app {
+  auffbau-flex: column;
+}
+
+@auffbau-layout {
+  body       : flex column;
+  #app       : flex column;
+  #app-body  : flex column;
+  playground : flex column;
+}
+
+*/
