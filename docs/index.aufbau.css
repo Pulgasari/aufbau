@@ -92,7 +92,7 @@ a { color: currentcolor; }
 
 body { aufbau-use: .vert; }
   
-#app { aufbau-use: .vert; }
+#app { aufbau-use: .vert; min-height: 0; }
 #app > #app-header { flex: 0 0 auto; }
 #app > #app-footer { flex: 0 0 auto; }
 #app > #app-body   { flex: 1; min-height: 0; overflow-y: auto; }
