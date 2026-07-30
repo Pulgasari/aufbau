@@ -1,4 +1,4 @@
-// classcade/parser.js
+// @classcade/compiler/parser.js
 
 import { Lexer, buildTokenTypes, resolveRules }         from '@cosmonaut/lexer';
 import { ParserState, many, map, optional, seq, token } from '@cosmonaut/parser';
