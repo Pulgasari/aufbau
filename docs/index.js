@@ -16,7 +16,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
     .register(new URL('./sw.js', import.meta.url), { type: 'module' })
     .then  (reg => console.log(reg.scope))
-    .catch (err => console.error(error));
+    .catch (err => console.error(err));
 }
 
 
