@@ -1,6 +1,6 @@
 // resolver.js
 
-import { arrayfied, isString } from './utils';
+import { arrayfied, isString } from './utils.js';
 
 function escapeSelector (raw) {
   // eckige/runde Klammern, Doppelpunkte, Kommas etc. müssen für CSS-Selektoren escaped werden
