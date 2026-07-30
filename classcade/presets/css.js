@@ -30,23 +30,17 @@ const quickies = Object.entries({
   uppercase : { textTransform: 'uppercase' },
 });
 
-// if 'body' is string   -> cc.rule({ id, css: v => ({ <string>: v }) })
-// if 'body' is function -> cc.rule({ id, css: <function> })
-// if 'body' is object   -> cc.rule({ id, css: v => (<object>) })
-for (const [id, body] of quickies) {
-  let obj = (switch (typeof body) {
-    case 'string'   : return { id, css: v => ({ body: v }) };        
-    case 'function' : return { id, css: body };
-    case 'object'   : return { id, ...body };
-  });
-  Object.assign(cc, cc.addRule(obj));
-}
+for (const [id, body] of quickies) switch (typeof body) {        
+  case 'function' : cc.addRule({ id, css: body }); break;
+  case 'object'   : cc.addRule({ id,   ...body }); break;
+  case 'string'   : cc.addRule({ id, css: v => ({ body: v }) });
+}:
 
 /*
 export default cc => {
   cc.method({
     id: "var",
-    css: function (name){ return `var(${name})`; }
+    css: function (name){ return `var(${name})`; } 
   });
 
   cc.rule ({ 
