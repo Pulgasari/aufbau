@@ -2,6 +2,10 @@
 
 achtung !!! repo und docs sind im aufbau (hehe) und die hier genannten infos sind höchstwahrscheinlich ungenau oder falsch.
 
+[https://pulgasari.github.io/aufbau/docs/](https://pulgasari.github.io/aufbau/docs/)
+
+---
+
 **aufbau** is a browser-focused JS toolkit, library and framework. It's made for being used without any offline build-steps.
 
 ***Note:** It's also working with deno, node, vite etc. but working 100% client-side is the main focus.*
