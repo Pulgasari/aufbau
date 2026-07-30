@@ -7,6 +7,10 @@ import Parser    from './parser.js';
 import Resolver  from './resolver.js';
 import Scanner   from './scanner.js';
 
+const config = {
+  attributes: ['cc', 'class', 'classcade', 'className', 'data-classcade'],
+}
+
 export class Compiler {
 
   constructor () {
@@ -14,38 +18,42 @@ export class Compiler {
     this.injector  = new Injector;
     this.observer  = new Observer (this);
     this.parser    = new Parser;
-    this.scanner   = new Scanner ({ attributes: ['cc', 'class', 'classcade', 'className', 'data-classcade'] });    
+    this.scanner   = new Scanner ({ attributes: config.attributes });    
     this.registry  = new Map;
     this.resolver  = new Resolver (this.registry);
   }
 
-  // registry
+  // register
   add (obj) { this.registry.set(obj.id, obj); return this; }
   get (id)  { return this.registry.get(id); }
 
-  // runtime
-  observe (target) { this.process(target); this.observer.start(); }
-  stop () { this.observer.stop(); }
-  process (root) {
-    const entries = this.scanner.scan(root);
+  // observe
+  startObserver () { this.observer.start (); }
+  stopObserver  () { this.observer.stop  (); }
+  
+
+  // process
+  inject   (id, code) { return this.injector.inject (id, code); }
+  generate (input)    { return this.generator.generate (input); }
+  parse    (input)    { return this.parser.parse       (input); }
+  resolve  (input)    { return this.resolver.resolve   (input); }
+  scan     (input)    { return this.scanner.scan       (input); }
+  process (inout) {
+    const entries = this.scan(input);
     
-    for (const entry of entries) {
-      const ast   = this.classcade.parse(entry.value);
-      const rules = this.classcade.resolve(ast);
+    for (const { value } of entries) {
+      const ast   = this.parse(value);
+      const rules = this.resolve(ast);
 
       for (const rule of rules) {
-        if (this.classcade.injector.has(rule.id)) continue;
+        if (this.injector.has(rule.id)) continue;
 
-        const css = this.classcade.generate(rule);
-        this.classcade.injector.inject(rule.id, css);
+        const css = this.generate(rule);
+        this.inject(rule.id, css);
       }
     }
   }
-
-  // process
-  generate (input) { return this.generator.generate (input); }
-  parse    (input) { return this.parser.parse       (input); }
-  resolve  (input) { return this.resolver.resolve   (input); }
+  
 
   use (preset) {
     preset(this);
