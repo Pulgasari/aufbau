@@ -1,4 +1,4 @@
-// classcade.js
+// compiler.js
 
 import Generator from './generator.js';
 import Injector  from './injector.js';
@@ -17,13 +17,18 @@ class Classcade {
     this.runtime   = new Runtime  (this);
   }
 
+  // registry
   add (obj) { this.registry.set(obj.id, obj); return this; }
   get (id)  { return this.registry.get(id); }
- 
+
+  // runtime
   start () { this.runtime.start(); }
   stop  () { this.runtime.stop();  }
 
-  parse (source) { return this.parser.parse(source); }
+  // process
+  generate (input) { return this.generator.generate (input); }
+  parse    (input) { return this.parser.parse       (input); }
+  resolve  (input) { return this.resolver.resolve   (input); }
 
   use (preset) {
     preset(this);
