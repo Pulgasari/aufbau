@@ -6,7 +6,7 @@ import Parser    from './parser.js';
 import Resolver  from './resolver.js';
 import Runtime   from './runtime.js';
 
-class Classcade {
+class Compiler {
 
   constructor () {
     this.generator = new Generator;
@@ -37,4 +37,4 @@ class Classcade {
 
 }
 
-export default Classcade;
+export default Compiler;
