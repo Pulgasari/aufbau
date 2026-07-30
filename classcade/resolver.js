@@ -7,7 +7,7 @@ class Resolver {
     return ast.map(node => this.resolveNode(node));
   }
 
-  resolveNode () {
+  resolveNode (node) {
     switch (node.type) {
       case 'method'  : return this.resolveMethod  (node);
       case 'rule'    : return this.resolveRule    (node);
@@ -17,10 +17,9 @@ class Resolver {
 
   resolveMethod (node) {
     const method = this.registry.getMethod(node.id);
-    const args   = node.args.map (arg => {
-      if (typeof arg === 'object') return this.resolveNode(arg);
-      return arg;
-    });
+    const args   = node.args.map (
+      arg => (typeof arg === 'object') ? this.resolveNode(arg) : arg;
+    );
     return method.run(...args);
   }
 
@@ -44,3 +43,8 @@ class Resolver {
 }
 
 export default Resolver;
+
+
+
+
+
