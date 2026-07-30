@@ -52,6 +52,7 @@ const item = map(
 const classList = many(item);
 
 export default class Parser {
+  #tokenTypes = buildTokenTypes();
   constructor () {}
 
   tokenize (source) {
@@ -61,10 +62,10 @@ export default class Parser {
         baseRules.doubleQuoteString,
         baseRules.singleQuoteString,
         baseRules.number,
-        { id: 'identifier', type: tokenTypes.IDENTIFIER, regex: /[a-zA-Z_][a-zA-Z0-9_-]*/ },
+        { id: 'identifier', type: this.#tokenTypes.IDENTIFIER, regex: /[a-zA-Z_][a-zA-Z0-9_-]*/ },
       ]),
       skipWhitespace : true,
-      tokenTypes     : buildTokenTypes(), 
+      tokenTypes     : this.#tokenTypes, 
     });
     return lexer.tokenize();
   }
