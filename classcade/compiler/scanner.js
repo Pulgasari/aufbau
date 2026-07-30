@@ -1,4 +1,4 @@
-// scanner.js
+// @classcade/compiler/scanner.js
 
 function getRuntimeContext = () => 'browser';
 
