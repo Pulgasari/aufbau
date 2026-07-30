@@ -1,6 +1,6 @@
 // resolver.js
 
-import { arrayfied, isStr } from './utils';
+import { arrayfied, isString } from './utils';
 
 class Resolver {
   
@@ -10,7 +10,7 @@ class Resolver {
 
   resolveNode (node) {
     const def  = this.registry.get(node.id);
-    const args = node.args.map (arg => isStr(arg) ? arg : this.resolveNode(arg));    
+    const args = node.args.map (arg => isString(arg) ? arg : this.resolveNode(arg));    
     let done = def.css(...args);
     
     if (node.type === 'method') {}
