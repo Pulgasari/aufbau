@@ -50,8 +50,8 @@ function Footer () {
 
 
     // 2. @aufbau/import Test Suite
-    const jsonState = signal(null);
-    const   mdState = signal('Lade Markdown...');
+    const jsonState = aufbau.signal(null);
+    const   mdState = aufbau.signal('Lade Markdown...');
 
     async function runImportTests() {
       try {
