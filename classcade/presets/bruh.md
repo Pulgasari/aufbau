@@ -29,7 +29,7 @@ Und das bleibt auch so. (So bringt's halt -noch- nix...)
 Nun können wir Aliase für Properties als eine schnöde Map definieren und in die Registry bringen:
 
 ```js
-const PropertyAliases= {
+const PropertyAliases = {
   bg  : 'background-color',
   fg  : 'color',
   mar : 'margin',
@@ -44,7 +44,7 @@ for (const [id, ref] of Object.entries(PropertyAliases)) {
 Dasselbe für Aliase von CSS-Funktionen:
 
 ```js
-const FunctionAliases= {
+const FunctionAliases = {
   ld  : 'light-dark',
 };
 
@@ -68,6 +68,30 @@ div {
 ```
 
 Und jetzt bietet **classcade** schon einen Vorteil...
+
+## Schritt 3
+
+Nun könnte man so Shorthands definieren:
+
+```js
+const Shorthands = {
+  block     : { prop: 'display' , value: 'block' },
+  stickyTop : [{ prop: 'position', value: 'sticky' }, { prop: 'top', value: 0 }],
+  // und so weiter
+};
+
+for (const [id, ref] of Object.entries(Shorthands)) {
+  // ...
+}
+```
+
+Anmerkungen:
+
+1. Die genaue Syntax, wie man das intern handlet, ist dann zu schauen.
+
+2. Grundsätzlich sollte halt alles normalisiert werden und in der echten RegistryMap als `id` + `object` landen.
+- Und das Object enthält halt jeweils auch ne `type/kind`-Angabe (`alias-prop`, `alias-fn` usw.).
+- Und für sowas sollten wir vllt noch einen/mehrere SpecResolver/Normalizer oder sowas bauen, der in der Lage ist, so ziemlich jede halbwegs naheliegendes Definitionsformat zu kapieren (`{ prop: 'display' , value: 'block' }` oder `'display: block'` oder `'position: sticky; top: 0;'` odrr gar `bg[transparent]` würde er verstehen sobald es die alias gibt usw),
 
 
 
