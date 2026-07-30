@@ -1,19 +1,18 @@
-// classcade/grammar.js
-import { choice, many, map, optional, sepBy, seq, token } from '@cosmonaut/parser';
-import { ParserState } from '@cosmonaut/parser';
-import { createClasscadeLexer } from './lexer.js';
+// classcade/parser.js
 
-const identifier = token('IDENTIFIER');
+import { Lexer, buildTokenTypes, resolveRules }                        from '@cosmonaut/lexer';
+import { ParserState, choice, many, map, optional, sepBy, seq, token } from '@cosmonaut/parser';
+import { baseRules }                                                   from '@cosmonaut/presets';
 
 // a value inside [...] or (...) - can itself be a nested method call,
 // e.g. bg[var(--brand)] or shadow(var(--x), 2px)
 const value = choice(
-  map(seq(identifier, token('('), () => argList, token(')')), ([idTok, , args]) => ({
+  map(seq(token('IDENTIFIER'), token('('), () => argList, token(')')), ([idTok, , args]) => ({
     type: 'method', id: idTok.value, args, raw: `${idTok.value}(${args.map(a=>a.raw??a).join(',')})`,
   })),
   map(token('STRING'), t => t.value.slice(1, -1)),
   map(token('NUMBER'), t => t.value),
-  map(identifier, t => t.value),
+  map(token('IDENTIFIER'), t => t.value),
 );
 
 const argList = sepBy(value, token(','));
@@ -23,7 +22,7 @@ const argList = sepBy(value, token(','));
 // block / sticky-top -> flag,  no args at all
 const utility = map(
   seq(
-    identifier,
+    token('IDENTIFIER'),
     optional(choice(
       map(seq(token('['), argList, token(']')), ([, args]) => ({ kind: 'rule',   args })),
       map(seq(token('('), argList, token(')')), ([, args]) => ({ kind: 'method', args })),
@@ -51,8 +50,19 @@ const item = map(
 
 const classList = many(item);
 
-export function parseClasscade (source) {
-  const tokens = createClasscadeLexer(source).tokenize();
+export function parse (source) {
+  const lexer = new Lexer(source, {
+    puncts : ':()[],!/.'.split(''),
+    rules  : resolveRules([
+      baseRules.doubleQuoteString,
+      baseRules.singleQuoteString,
+      baseRules.number,
+      { id: 'identifier', type: tokenTypes.IDENTIFIER, regex: /[a-zA-Z_][a-zA-Z0-9_-]*/ },
+    ]),
+    skipWhitespace : true 
+    tokenTypes     : buildTokenTypes(), 
+  });
+  const tokens = lexer.tokenize();
   const state  = new ParserState(tokens);
   const result = classList(state);
 
