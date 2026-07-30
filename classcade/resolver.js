@@ -4,7 +4,7 @@ import { arrayfied, isString } from './utils.js';
 
 function escapeSelector (raw) {
   // eckige/runde Klammern, Doppelpunkte, Kommas etc. müssen für CSS-Selektoren escaped werden
-  return raw.replace(/[\[\]():,.!#%]/g, ch => `\\${ch}`);
+  return raw.replace(/[\[\]()\/:,.!#%]/g, ch => `\\${ch}`);
 }
 
 class Resolver {
