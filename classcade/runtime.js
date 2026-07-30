@@ -74,13 +74,13 @@ export class Runtime {
     const entries = this.scanner.scan(root);
     
     for (const entry of entries) {
-      const ast   = this.classcade.options.parser.parse(entry.value);
-      const rules = this.classcade.resolver.resolve(ast);
+      const ast   = this.classcade.parse(entry.value);
+      const rules = this.classcade.resolve(ast);
 
       for (const rule of rules) {
         if (this.classcade.injector.has(rule.id)) continue;
 
-        const css = this.classcade.generator.generate(rule);
+        const css = this.classcade.generate(rule);
         this.classcade.injector.inject(rule.id, css);
       }
     }
