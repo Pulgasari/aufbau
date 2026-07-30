@@ -1,5 +1,5 @@
 // compiler.js — Ergänzungen
-import { normalizeSpec } from './spec-resolver.js';
+import { normalizeSpec }         from './resolver.js';
 import Normalizer, { normalize } from './normalizer.js';
 
 class Registry {
