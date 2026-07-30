@@ -5,7 +5,6 @@ import Injector  from './injector.js';
 import Parser    from './parser.js';
 import Resolver  from './resolver.js';
 import Runtime   from './runtime.js';
-import { parseClasscade } from './parser/index.js';
 
 class Classcade {
 
@@ -23,6 +22,8 @@ class Classcade {
  
   start () { this.runtime.start(); }
   stop  () { this.runtime.stop();  }
+
+  parse (source) { return this.parser.parse(source); }
 
   use (preset) {
     preset(this);
