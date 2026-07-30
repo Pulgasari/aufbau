@@ -93,5 +93,18 @@ Anmerkungen:
 - Und das Object enthält halt jeweils auch ne `type/kind`-Angabe (`alias-prop`, `alias-fn` usw.).
 - Und für sowas sollten wir vllt noch einen/mehrere SpecResolver/Normalizer oder sowas bauen, der in der Lage ist, so ziemlich jede halbwegs naheliegendes Definitionsformat zu kapieren (`{ prop: 'display' , value: 'block' }` oder `'display: block'` oder `'position: sticky; top: 0;'` odrr gar `bg[transparent]` würde er verstehen sobald es die alias gibt usw),
 
+## Ausblick und weitere Schritte
+
+Da werden noch viele weitere Schritte kommen, durch die **classcade** sehr mächtig werden könnte usw.
+
+Aber wir machen jetzt erstmal:
+1. Die genannten Schritte, indem wir sie technisch ermöglichen umseten.
+2. Und dann dieses ganze  Zeug definieren.
+
+
+
+
+
+
 
 
