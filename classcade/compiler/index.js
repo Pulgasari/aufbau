@@ -1,4 +1,5 @@
-// compiler.js — Ergänzungen
+// @classcade/compiler/index.js — Ergänzungen
+
 import { normalizeSpec }         from './resolver.js';
 import Normalizer, { normalize } from './normalizer.js';
 
