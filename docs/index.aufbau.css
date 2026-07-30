@@ -12,11 +12,8 @@ body {
 }
 
 @aufbau colors {
-  current : var(--aufbau-bg) var(--aufbau-fg);
-  dark   : black white;
-  lite   : white black;
-  soviet : red yellow;
-  kobold : orange yellow;
+  /* should become defaults */
+  aufbau : var(--aufbau-bg) var(--aufbau-fg);
   none   : transparent transparent;
 }
 
