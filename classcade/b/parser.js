@@ -1,43 +1,47 @@
 // classcade/parser.js
+
 import { Lexer, buildTokenTypes, resolveRules }        from '@cosmonaut/lexer';
 import { ParserState, many, map, optional, seq, token } from '@cosmonaut/parser';
 
-const tokenTypes = buildTokenTypes();
-
-// -----------------------------------------------------------------------
-// Custom lexer rule: liest [ ... ] inklusive verschachtelter eckiger
-// Klammern (z.B. grid-template-columns[[full] 1fr [full]]), OHNE den
-// Inhalt zu interpretieren. Der Inhalt bleibt roher String - das ist
-// Absicht, keine Lücke: classcade prüft in Schritt 1 nichts.
-//
-// ANNAHME: eine Lexer-Rule darf statt `regex` auch `match(input, pos)`
-// haben, das die Trefferlänge ab `pos` zurückgibt (oder null). Falls euer
-// @cosmonaut/lexer nur `regex` unterstützt, sag Bescheid - dann bauen wir
-// stattdessen einen Pre-Scan-Pass vor dem eigentlichen Tokenizing, der
-// [...]-Abschnitte vorab durch Platzhalter-Tokens ersetzt. Funktional
-// identisch, nur anders verdrahtet.
-const bracketValue = {
-  id   : 'bracket-value',
-  type : 'BRACKET_VALUE',
+// classcade/parser.js — ersetzt identifier + bracketValue
+const identOrDecl = {
+  id   : 'ident-or-decl',
+  type : tokenTypes.IDENTIFIER,
   match (input, pos) {
-    if (input[pos] !== '[') return null;
-    let depth = 0;
-    for (let i = pos; i < input.length; i++) {
-      if      (input[i] === '[') depth++;
-      else if (input[i] === ']') { depth--; if (depth === 0) return i - pos + 1; }
+    if (!/[a-zA-Z_]/.test(input[pos])) return null;
+
+    let i = pos;
+    while (i < input.length && /[a-zA-Z0-9_-]/.test(input[i])) i++;
+
+    // Nur wenn DIREKT (kein Leerzeichen, kein sonstiges Zeichen) ein "["
+    // folgt, gehört der Klammerinhalt zum selben Token dazu.
+    if (input[i] === '[') {
+      let depth = 0;
+      for (; i < input.length; i++) {
+        if      (input[i] === '[') depth++;
+        else if (input[i] === ']') { depth--; if (depth === 0) { i++; break; } }
+      }
+      if (depth !== 0) throw new SyntaxError(`[classcade] Unclosed bracket at position ${pos}.`);
     }
-    throw new SyntaxError(`[classcade] Unclosed bracket starting at position ${pos}.`);
+
+    return i - pos;
   },
 };
 
-// Bezeichner dürfen Bindestriche enthalten (padding-top, sticky-top, ...)
-const identifier = {
-  id    : 'identifier',
-  type  : tokenTypes.IDENTIFIER,
-  regex : /[a-zA-Z_][a-zA-Z0-9_-]*/,
-};
 
-const rules  = resolveRules([bracketValue, identifier]);
+
+function splitDecl (raw) {
+  const open = raw.indexOf('[');
+  return open === -1
+    ? { prop: raw, value: null }
+    : { prop: raw.slice(0, open), value: raw.slice(open + 1, -1) };
+}
+
+
+
+const tokenTypes = buildTokenTypes();
+
+const rules = resolveRules([identOrDecl]);
 const puncts = ['!', ':'];
 
 function tokenize (source) {
@@ -53,18 +57,23 @@ function tokenize (source) {
 //                              Shorthand registriert - das prüft der
 //                              Resolver, nicht der Parser)
 
-const declTail = map(
-  seq(token('IDENTIFIER'), optional(token('BRACKET_VALUE'))),
-  ([idTok, valTok]) => ({
-    prop  : idTok.value,
-    value : valTok ? valTok.value.slice(1, -1) : null, // roh, ungeparst, ungeprüft
-  }),
+const declTail   = map(
+  token('IDENTIFIER'),
+  tok => splitDecl(tok.value)
 );
-
-const variantSeg = map(seq(token('IDENTIFIER'), token(':')), ([idTok]) => idTok.value);
+const variantSeg = map(
+  seq(
+    token('IDENTIFIER'),
+    token(':')
+  ), 
+  ([idTok]) => idTok.value);
 
 const item = map(
-  seq(optional(token('!')), many(variantSeg), declTail),
+  seq(
+    optional(token('!')), 
+    many(variantSeg), 
+    declTail
+  ),
   ([bang, variants, decl]) => {
     const raw = `${bang ? '!' : ''}${variants.map(v => `${v}:`).join('')}${decl.prop}${decl.value !== null ? `[${decl.value}]` : ''}`;
     const node = { type: 'decl', prop: decl.prop, value: decl.value, important: !!bang, raw };
@@ -74,7 +83,7 @@ const item = map(
 
 const classList = many(item);
 
-export default class Parser {
+export class Parser {
   parse (source) {
     const tokens = tokenize(source);
     const state  = new ParserState(tokens);
@@ -86,3 +95,7 @@ export default class Parser {
     return result;
   }
 }
+
+export default Parser;
+
+
