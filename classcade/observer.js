@@ -26,3 +26,5 @@ export class Observer {
   }
 
 }
+
+export default Observer;
