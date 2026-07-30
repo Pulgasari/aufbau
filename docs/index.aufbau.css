@@ -61,7 +61,7 @@ p { line-height: 1.25; }
 
 
 body {
-  font-family    : 'Noto Serif';
+  aufbau-webfont : 'Noto Serif';
   aufbau-colors  : aufbau;
   /*
   aufbau-webfont : 'Hubot Sans';
