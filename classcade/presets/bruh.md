@@ -24,7 +24,7 @@ div {
 
 ## Schritt 2:
 
-Nun kann man Aliase als eine schnöde Map definieren:
+Nun kann man Aliase als eine schnöde Map definieren und in die Registry bringen:
 
 ```js
 const PropertyAliases= {
@@ -35,20 +35,22 @@ const PropertyAliases= {
 };
 
 for (const [id, ref] of Object.entries(PropertyAliases)) {
-  compiler.add ({ type: 'alias', id, ref });
+  compiler.add ({ type: 'alias-prop', id, ref });
 }
 ```
 
-Da loopen wir dann durch und registrieren dies als `rule`
 
-```
-
+Dasselbe für CSS-Funktionen:
 
 
 ```js
 const FunctionAliases= {
   ld  : 'light-dark',
 };
+
+for (const [id, ref] of Object.entries(PropertyAliases)) {
+  compiler.add ({ type: 'alias-fn', id, ref });
+}
 ```
 
 
