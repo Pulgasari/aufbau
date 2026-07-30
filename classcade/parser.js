@@ -50,24 +50,34 @@ const item = map(
 
 const classList = many(item);
 
-export function parse (source) {
-  const lexer = new Lexer(source, {
-    puncts : ':()[],!/.'.split(''),
-    rules  : resolveRules([
-      baseRules.doubleQuoteString,
-      baseRules.singleQuoteString,
-      baseRules.number,
-      { id: 'identifier', type: tokenTypes.IDENTIFIER, regex: /[a-zA-Z_][a-zA-Z0-9_-]*/ },
-    ]),
-    skipWhitespace : true 
-    tokenTypes     : buildTokenTypes(), 
-  });
-  const tokens = lexer.tokenize();
-  const state  = new ParserState(tokens);
-  const result = classList(state);
+export default class Parser {
+  constructor () {}
 
-  if (result === undefined || !state.isEOF()) {
-    throw new SyntaxError(`[classcade] Failed to parse "${source}" at token ${state.index}.`);
+  tokenize (source) {
+    const lexer = new Lexer(source, {
+      puncts : ':()[],!/.'.split(''),
+      rules  : resolveRules([
+        baseRules.doubleQuoteString,
+        baseRules.singleQuoteString,
+        baseRules.number,
+        { id: 'identifier', type: tokenTypes.IDENTIFIER, regex: /[a-zA-Z_][a-zA-Z0-9_-]*/ },
+      ]),
+      skipWhitespace : true,
+      tokenTypes     : buildTokenTypes(), 
+    });
+    return lexer.tokenize();
   }
-  return result;
+
+  parse (source) {
+    const tokens = this.tokenize(source);
+    const state  = new ParserState(tokens);
+    const result = classList(state);
+  
+    if (result === undefined || !state.isEOF()) {
+      throw new SyntaxError(`[classcade] Failed to parse "${source}" at token ${state.index}.`);
+    }
+    return result;
+  }
 }
+
+
