@@ -30,11 +30,7 @@ const quickies = Object.entries({
   uppercase : { textTransform: 'uppercase' },
 });
 
-for (const [id, body] of quickies) switch (typeof body) {        
-  case 'function' : cc.add({ id, css: body }); break;
-  case 'object'   : cc.add({ id,   ...body }); break;
-  case 'string'   : cc.add({ id, css: v => ({ body: v }) });
-}:
+for (const [a,b] of quickies) cc.add(a,b);
 
 /*
 export default cc => {
