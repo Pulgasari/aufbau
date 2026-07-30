@@ -1,10 +1,10 @@
 // classcade.js
 
-import Generator from 'generator.js';
-import Injector  from 'injector.js';
-import Registry  from 'registry.js';
-import Resolver  from 'resolver.js';
-import Runtime   from 'runtime.js';
+import Generator from './generator.js';
+import Injector  from './injector.js';
+import Registry  from './registry.js';
+import Resolver  from './resolver.js';
+import Runtime   from './runtime.js';
 
 class Classcade {
 
