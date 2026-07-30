@@ -38,7 +38,7 @@ export class Compiler {
   parse    (input)    { return this.parser.parse       (input); }
   resolve  (input)    { return this.resolver.resolve   (input); }
   scan     (input)    { return this.scanner.scan       (input); }
-  process (inout) {
+  process  (input) {
     const entries = this.scan(input);
     
     for (const { value } of entries) {
