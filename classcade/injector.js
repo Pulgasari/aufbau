@@ -3,33 +3,33 @@
 class Injector {
 
   constructor (id = 'classcade') {
-    this.id    = id;
-    this.cache = new Set;
-    this.style = document.querySelector(`style[data-classcade="${id}"]`) ?? this.createStyleElement();    
+    this.id      = id;
+    this.cache   = new Set;
+    this.element = document.querySelector(`style[data-classcade="${id}"]`) ?? this.createStyleElement();    
   }
 
   createStyleElement () {
     const element = document.createElement('style');
     element.dataset.classcade = this.id;
     document.head.appendChild(element);
-    return style;
+    return element;
   }
 
   inject (id, code) {
     if (this.cache.has(id)) return false;
     this.cache.add(id);
-    this.style.append(document.createTextNode(code + '\n'));
+    this.element.append(document.createTextNode(code + '\n'));
     return true;
   }
 
   clear () {
     this.cache.clear();
-    this.style.textContent = '';
+    this.element.textContent = '';
   }
 
   destroy () {
     this.clear();
-    this.style.remove();
+    this.element.remove();
   }
 
   has (id) {
