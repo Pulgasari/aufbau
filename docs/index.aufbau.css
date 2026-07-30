@@ -12,6 +12,7 @@ body {
 }
 
 @aufbau colors {
+  current : var(--aufbau-bg) var(--aufbau-fg);
   dark   : black white;
   lite   : white black;
   soviet : red yellow;
@@ -20,7 +21,7 @@ body {
 }
 
 body {
-  aufbau-colors  : kobold;
+  aufbau-colors  : current;
   aufbau-webfont : 'Hubot Sans';
   /*
   aufbau-pattern : stripes rotate(45deg) colors(soviet) animate(slide 4s infinite);    
