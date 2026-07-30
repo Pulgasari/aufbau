@@ -37,17 +37,17 @@ import aufbau, { html } from '@aufbau/kit';
     async function runImportTests() {
       try {
         // A) Test test.jsonc
-        const jsonData = await aufbau.import('./test/test.jsonc');
+        const jsonData = await aufbau.import('./index.jsonc');
         jsonState.value = jsonData;
 
         // B) Test test.md
-        const mdHtml = await aufbau.import('./test/test.md');
+        const mdHtml = await aufbau.import('./readme.md');
         mdState.value = mdHtml;
 
         // C) Test test.ts
-        const tsModule = await aufbau.import('./test/test.ts');
-        const service  = new tsModule.TestService('Aufbau Kit');
-        tsState.value = service.getGreeting(tsModule.defaultUser);
+        //const tsModule = await aufbau.import('./test/test.ts');
+        //const service  = new tsModule.TestService('Aufbau Kit');
+        //tsState.value = service.getGreeting(tsModule.defaultUser);
       } catch (err) {
         console.error('[Import Test Error]:', err);
       }
