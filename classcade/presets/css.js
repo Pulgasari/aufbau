@@ -31,9 +31,9 @@ const quickies = Object.entries({
 });
 
 for (const [id, body] of quickies) switch (typeof body) {        
-  case 'function' : cc.addRule({ id, css: body }); break;
-  case 'object'   : cc.addRule({ id,   ...body }); break;
-  case 'string'   : cc.addRule({ id, css: v => ({ body: v }) });
+  case 'function' : cc.add({ id, css: body }); break;
+  case 'object'   : cc.add({ id,   ...body }); break;
+  case 'string'   : cc.add({ id, css: v => ({ body: v }) });
 }:
 
 /*
