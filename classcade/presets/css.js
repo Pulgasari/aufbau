@@ -20,7 +20,7 @@ CSS.Type = {
 
 
 CC.Fn = {
-  ld   : { fn: 'light-dark' },
+  ld  : { fn: 'light-dark' },
 };
 
 CC.Prop  = {
@@ -32,6 +32,9 @@ CC.Prop  = {
   gap : { prop: 'gap'     , unit: CSS.Type.Length },
   mar : { prop: 'margin'  , unit: CSS.Type.Length },
   pad : { prop: 'padding' , unit: CSS.Type.Length },
+
+  ff  : { prop: 'font-family'    },
+  tt  : { prop: 'text-transform' },
 };
 
 
