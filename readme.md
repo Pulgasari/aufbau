@@ -143,3 +143,23 @@ body > * { padding: small; }
 
 handpicked collection of free webfonts looking great in webdev projects.
 
+das waren bisher die besten
+
+```
+abschrift, anschein,
+durchblick,
+einband, erleuchtung,
+geleitwort,
+handbuch,
+leitbild, leitfaden,
+nachweis,
+quelltext,
+regelwerk,
+schimmer, sinnbild, struktur,
+überblick, urbild, ursprung,
+wegweiser,
+zugriff
+```
+
+
+
