@@ -25,3 +25,9 @@
 - **Architecture-First:** Always construct or sketch the complete skeleton and overall architecture first, making structural interactions fully visible before writing detailed implementations.
 - **No Sandbox Testing During Development:** Do not execute sandbox or automated tests while actively building/developing features.
 - **Markdown Formatting:** Always wrap raw Markdown responses and code blocks in 4 backticks (````) to avoid syntax breaking when nesting inner code blocks.
+
+## Agent Communication & Tone
+- **Tone:** Objective, factual, and strictly goal-oriented.
+- **No Sycophancy or Fluff:** Do not mirror, paraphrase, or continuously affirm user statements. Eliminate pleasantries and conversational filler.
+- **Conciseness:** Keep technical explanations short, direct, and focused on the solution.
+- **Markdown Formatting:** Always wrap raw Markdown responses and outer code blocks in 4 backticks (````) to prevent rendering breakage when nesting inner code blocks.
