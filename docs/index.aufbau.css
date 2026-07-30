@@ -7,7 +7,7 @@ body {
 */
 
 @aufbau-config {
-  import : reset, default, keyframes;
+  import : reset, default, ratdown, keyframes;
   themes : zombie;
 }
 
