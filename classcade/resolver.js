@@ -1,43 +1,29 @@
 // resolver.js
 
+import { arrayfied, isStr } from './utils';
+
 class Resolver {
   
   resolve (ast) {
-    if (!Array.isArray(ast)) ast = [ast];
-    return ast.map(node => this.resolveNode(node));
+    return arrayfied(ast).map(node => this.resolveNode(node));
   }
 
   resolveNode (node) {
-    switch (node.type) {
-      case 'method'  : return this.resolveMethod  (node);
-      case 'rule'    : return this.resolveRule    (node);
-      case 'variant' : return this.resolveVariant (node);
-    }
-  }
-
-  resolveMethod (node) {
-    const method = this.registry.getMethod(node.id);
-    const args   = node.args.map (
-      arg => (typeof arg === 'object') ? this.resolveNode(arg) : arg;
-    );
-    return method.run(...args);
-  }
-
-  resolveRule (node) {
-    const rule = this.registry.getRule(node.id);
-    const args = node.args.map (
-      arg => (typeof arg === 'object') ? this.resolveNode(arg) : arg;
-    );
-    const declarations = rule.css(...args);
-
-    return {
+    const def  = this.registry.get(node.id);
+    const args = node.args.map (arg => isStr(arg) ? arg : this.resolveNode(arg));    
+    let done = def.css(...args);
+    
+    if (node.type === 'method') {}
+    if (node.type === 'rule') return {
+      declarations: done,
       id       : node.raw,
       selector : node.selector,
-      declarations,
+      layer    : null,
       media    : null,
       supports : null,
-      layer    : null,
     };
+
+    return done;
   }
   
 }
