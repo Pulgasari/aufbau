@@ -2,6 +2,8 @@
 
 ## Tech Stack & Language
 - **Language:** Plain JavaScript. Do **not** use TypeScript, with the sole exception of `index.d.ts` declaration files for packages.
+- **Target Environment:** Browser-first and ESM-native. Maintain cross-runtime/bundler compatibility (Node.js, Deno, Bun, Vite) while prioritizing native browser execution.
+
 
 ## Code Structure & File Organization
 - **Modularization:** Split package logic into separate files where sensible, but avoid over-modularizing (do not create a file for every tiny utility).
@@ -9,6 +11,7 @@
 
 ## Coding Standards & Formatting
 - **Core Focus:** Prioritize performance and readability above all else.
+- **Performance Auditing:** Explicitly flag and explain any identified critical performance bottlenecks or anti-patterns, detailing the underlying technical causes.
 - **Indentation:** 2 spaces (tabsize: 2).
 - **Function Declarations:** Include a space before and after parentheses, but none inside:
   ```js
