@@ -20,22 +20,10 @@ const declarations = normalizeSpec(spec, str => this.resolveDeclOnly(str));
 this.add({ id, kind: 'shorthand', declarations });
 
 class Compiler {
+  
   addAlias (kind, alias, reference) {
-    kind = normalizeKind(kind)
-    if (kind == null) return;
-
-    this.add({ kind, id: alias, ref: reference });
-    return this;
-  }
-
-  addVariant (kind, id, xxx) {
-    kind = normalizeKind(kind)
-    if (kind == null) return;
-
-    if (kind === 'variant-media')  this.add({ kind, id, query: xxx });
-    if (kind === 'variant-prefix') this.add({ kind, id, selector: xxx });
-    if (kind === 'variant-suffix') this.add({ kind, id, selector: xxx });
-    
+    kind = normalize({ kind });
+    if (kind) this.add({ kind, id: alias, ref: reference });
     return this;
   }
 
@@ -44,16 +32,17 @@ class Compiler {
     this.add({ id, kind: 'shorthand', declarations });
     return this;
   }
-  
-  
-  
 
-  defineShorthand (id, spec) {
-    const declarations = normalizeSpec(spec, str => this.resolveDeclOnly(str));
-    this.add({ id, kind: 'shorthand', declarations });
-    return this;
+  addVariant (kind, id, xxx) {
+    switch (normalize({ kind })) {
+      case 'variant-media'  : this.add({ kind, id, query:    xxx }); return this;
+      case 'variant-prefix' : this.add({ kind, id, selector: xxx }); return this;
+      case 'variant-suffix' : this.add({ kind, id, selector: xxx }); return this;
+      default: return null;
+    }
   }
 
+  
   // wandelt einen classcade-String in ein flaches { prop: value }-Objekt,
   // ohne Selector/Media-Wrapping - genutzt vom Normalizer für rekursive
   // Shorthand-Referenzen wie defineShorthand('ghost', 'bg[transparent]')
