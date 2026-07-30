@@ -16,8 +16,18 @@ class Classcade {
     this.runtime   = new Runtime  (this);
   }
 
-  add (obj) { this.registry.set(obj.id, obj); return this; }
+  //add (obj) { this.registry.set(obj.id, obj); return this; }
   get (id)  { return this.registry.get(id); }
+
+  add (obj, sth) {
+    if (typeof obj === 'string' && sth) switch (typeof sth) {        
+      case 'function' : this.add({ id, css: sth }); break;
+      case 'object'   : this.add({ id,   ...sth }); break;
+      case 'string'   : this.add({ id, css: v => ({ [sth]: v }) });
+    };
+    else this.registry.set(obj.id, obj);
+    return this;
+  }
  
   start () { this.runtime.start(); }
   stop  () { this.runtime.stop();  }
