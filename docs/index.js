@@ -4,8 +4,7 @@
 import hljs from 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm';
 import aufbau, { html, Fragment, useSignalEffect } from '@aufbau/kit';
 
-aufbau.init();
-
+aufbau.ini
 // Service Worker Registration
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
@@ -88,7 +87,7 @@ if (typeof window !== 'undefined') {
 // :::::: REACTION & DATA FETCHING
 
 // Fetch markdown and re-build TOC whenever route path changes
-aufbau.useSignalEffect(() => {
+aufbau.effect(() => {
   const { path, anchor } = currentRoute.value;
 
   async function loadDocument() {
