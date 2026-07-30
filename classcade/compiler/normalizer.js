@@ -1,4 +1,4 @@
-// normalizer.js
+// @classcade/compiler/normalizer.js
 
 export class Normalizer {
   
