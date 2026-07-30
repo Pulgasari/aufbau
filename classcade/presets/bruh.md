@@ -39,9 +39,7 @@ for (const [id, ref] of Object.entries(PropertyAliases)) {
 }
 ```
 
-
 Dasselbe für CSS-Funktionen:
-
 
 ```js
 const FunctionAliases= {
@@ -53,6 +51,19 @@ for (const [id, ref] of Object.entries(PropertyAliases)) {
 }
 ```
 
+Und schon ist dies möglich:
+
+```html
+<div classcade='bg[ld(white black)]'>...<div>
+```
+
+daraus wird:
+
+```css
+div { 
+  background: light-dark(white black);
+}
+```
 
 
 
