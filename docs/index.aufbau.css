@@ -57,6 +57,8 @@ h6 { /* Mobile: 15px (0.938rem) -> Desktop: 17px (1.063rem) */
   letter-spacing: 0.05em;
 }
 
+p { line-height: 1.25; }
+
 
 body {
   aufbau-colors  : aufbau;
