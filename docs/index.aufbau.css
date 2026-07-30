@@ -69,6 +69,10 @@ body {
   */
 }
 
+pre, code {
+  aufbau-webfont: 'JetBrains Mono';
+}
+
 /*
 #app-body       { background: #f002; }
 #app-body   > * { background: #0803; }
