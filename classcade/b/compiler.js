@@ -29,3 +29,18 @@ class Compiler {
     return rules.reduce((acc, r) => Object.assign(acc, r.declarations), {});
   }
 }
+
+/*
+geht:
+
+cc.definePropAlias('bg', 'background-color');
+cc.definePropAlias('fg', 'color');
+cc.defineFnAlias('ld', 'light-dark');
+
+cc.defineShorthand('block',      { prop: 'display', value: 'block' });
+cc.defineShorthand('sticky-top', [{ prop: 'position', value: 'sticky' }, { prop: 'top', value: '0' }]);
+cc.defineShorthand('centered',   'display: flex; align-items: center; justify-content: center;');
+cc.defineShorthand('ghost',      'bg[transparent]'); // rekursiv, nutzt den Property-Alias
+
+*/
+
