@@ -8,6 +8,10 @@ function escapeSelector (raw) {
 }
 
 class Resolver {
+
+  constructor (registry) {
+    this.registry = registry;
+  }
   
   resolve (ast) {
     return arrayfied(ast).map(node => this.resolveNode(node));
