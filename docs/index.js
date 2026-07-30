@@ -112,8 +112,7 @@ aufbau.useSignalEffect(() => {
         });
 
         if (anchor) {
-          const targetEl = document.getElementById(anchor);
-          if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+         document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth' });
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
