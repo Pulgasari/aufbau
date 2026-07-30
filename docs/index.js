@@ -1,3 +1,19 @@
+// aufbau/docs/index.js
+
+// :::::: IMPORTS
+
+// ::: aufbau
+import aufbau, { html, useRef, useSignal, useSignalEffect, Fragment } from '@aufbau/kit';
+window.html = html; aufbau.init();
+// Register local Service Worker for network stylesheets
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register(new URL('./sw.js', import.meta.url), { type: 'module' })
+    .then  (reg => console.log(reg.scope))
+    .catch (err => console.error(error));
+}
+
+
 import aufbau, { html } from '@aufbau/kit';
     //import { importFile } from '@aufbau/import';
 
