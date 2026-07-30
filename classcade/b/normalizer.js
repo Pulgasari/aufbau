@@ -30,3 +30,8 @@ export class Normalizer {
 }
 
 export default Normalizer;
+
+export normalize (obj) {
+  if (obj.kind) return Normalizer.kind(obj.kind);
+  return obj;
+}
