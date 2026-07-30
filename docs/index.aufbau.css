@@ -61,9 +61,10 @@ p { line-height: 1.25; }
 
 
 body {
+  font-family    : 'Noto Serif';
   aufbau-colors  : aufbau;
-  aufbau-webfont : 'Hubot Sans';
   /*
+  aufbau-webfont : 'Hubot Sans';
   aufbau-pattern : stripes rotate(45deg) colors(soviet) animate(slide 4s infinite);    
   */
 }
