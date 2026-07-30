@@ -8,7 +8,7 @@ Nochmal neu:
 
 Von Haus aus soll ALLES bereits gehen, weil im ERSTEN SCHRITT ist die Syntax von **classcade** `prop[value]` gleichbedeutend mit **css** `prop: value;` – ohne das irgendwas geprüft werden muss etc.
 
-```
+```html
 <div classcade='background[black] padding-top[calc(5px + 2px)] fill[10deg]'>...<div>
 
 // css
