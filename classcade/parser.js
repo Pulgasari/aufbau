@@ -1,7 +1,7 @@
 // classcade/parser.js
 
 import { Lexer, buildTokenTypes, resolveRules }                        from '@cosmonaut/lexer';
-import { ParserState, choice, many, map, optional, sepBy, seq, token } from '@cosmonaut/parser';
+import { ParserState, choice, lazy, many, map, optional, sepBy, seq, token } from '@cosmonaut/parser';
 import { baseRules }                                                   from '@cosmonaut/presets';
 
 // a value inside [...] or (...) - can itself be a nested method call,
@@ -24,8 +24,9 @@ const utility = map(
   seq(
     token('IDENTIFIER'),
     optional(choice(
-      map(seq(token('['), argList, token(']')), ([, args]) => ({ kind: 'rule',   args })),
-      map(seq(token('('), argList, token(')')), ([, args]) => ({ kind: 'method', args })),
+      map(seq(token('['), lazy(() => argList), token(']')), ([, args]) => ({ kind: 'rule',   args })),
+      map(seq(token('('), lazy(() => argList), token(')')), ([, args]) => ({ kind: 'method', args })),
+      
     )),
   ),
   ([idTok, tail]) => {
@@ -38,7 +39,7 @@ const utility = map(
   },
 );
 
-const variant = map(seq(identifier, token(':')), ([idTok]) => idTok.value);
+const variant = map(seq(tokenTypes.IDENTIFIER, token(':')), ([idTok]) => idTok.value);
 
 const item = map(
   seq(optional(token('!')), many(variant), utility),
