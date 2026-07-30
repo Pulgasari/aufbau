@@ -1,5 +1,6 @@
-// resolver.js
-import { arrayfied } from './utils.js';
+// @classcade/compiler/resolver.js
+
+import { arrayfied } from './../utils.js';
 
 function escapeSelector (raw) {
   return raw.replace(/[\[\]():,.!#%\/\s+*:]/g, ch => `\\${ch}`);
