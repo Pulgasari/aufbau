@@ -33,19 +33,3 @@ const quickies = Object.entries({
 // these need also "type: 'rule'"
 for (const [a,b] of quickies) cc.add(a,b);
 
-/*
-export default cc => {
-  cc.method({
-    id: "var",
-    css: function (name){ return `var(${name})`; } 
-  });
-
-  cc.rule ({ 
-    id: 'bg', 
-    css: color => ({ backgroundColor: color })
-  });
-};
-*/
-
-
-
