@@ -22,9 +22,11 @@ div {
 }
 ```
 
+Und das bleibt auch so. (So bringt's halt -noch- nix...)
+
 ## Schritt 2:
 
-Nun kann man Aliase als eine schnöde Map definieren und in die Registry bringen:
+Nun können wir Aliase für Properties als eine schnöde Map definieren und in die Registry bringen:
 
 ```js
 const PropertyAliases= {
@@ -39,7 +41,7 @@ for (const [id, ref] of Object.entries(PropertyAliases)) {
 }
 ```
 
-Dasselbe für CSS-Funktionen:
+Dasselbe für Aliase von CSS-Funktionen:
 
 ```js
 const FunctionAliases= {
@@ -64,6 +66,8 @@ div {
   background: light-dark(white black);
 }
 ```
+
+Und jetzt bietet **classcade** schon einen Vorteil...
 
 
 
