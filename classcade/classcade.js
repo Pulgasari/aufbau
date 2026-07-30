@@ -18,15 +18,13 @@ class Classcade {
 
   //add (obj) { this.registry.set(obj.id, obj); return this; }
   get (id)  { return this.registry.get(id); }
-
-  add (obj, sth) {
-    if (typeof obj === 'string' && sth) switch (typeof sth) {        
-      case 'function' : this.add({ id, css: sth }); break;
-      case 'object'   : this.add({ id,   ...sth }); break;
-      case 'string'   : this.add({ id, css: v => ({ [sth]: v }) });
+  add (a,b) {
+    if (typeof a === 'string' && b) switch (typeof b) {        
+      case 'function' : this.add({ a, css: b }); break;
+      case 'object'   : this.add({ a,   ...b }); break;
+      case 'string'   : this.add({ a, css: v => ({ [b]: v }) });
     };
-    else this.registry.set(obj.id, obj);
-    return this;
+    else this.registry.set(a.id, a);
   }
  
   start () { this.runtime.start(); }
