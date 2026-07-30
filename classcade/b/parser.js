@@ -1,9 +1,8 @@
 // classcade/parser.js
 
-import { Lexer, buildTokenTypes, resolveRules }        from '@cosmonaut/lexer';
+import { Lexer, buildTokenTypes, resolveRules }         from '@cosmonaut/lexer';
 import { ParserState, many, map, optional, seq, token } from '@cosmonaut/parser';
 
-// classcade/parser.js — ersetzt identifier + bracketValue
 const identOrDecl = {
   id   : 'ident-or-decl',
   type : tokenTypes.IDENTIFIER,
@@ -41,7 +40,7 @@ function splitDecl (raw) {
 
 const tokenTypes = buildTokenTypes();
 
-const rules = resolveRules([identOrDecl]);
+const rules  = resolveRules([identOrDecl]);
 const puncts = ['!', ':'];
 
 function tokenize (source) {
