@@ -259,11 +259,8 @@ export async function importFile(path, options = {}) {
   */
   
   if (useCache && isCacheable(result)) {
-    try {
-      await cache.set(cacheKey, result);
-    } catch (e) {
-      console.warn(`[@aufbau/import] Could not cache "${path}":`, e);
-    }
+    try       { await cache.set(cacheKey, result);} 
+    catch (e) { console.warn(`[@aufbau/import] Could not cache "${path}":`, e); }
   }
 
   return result;
