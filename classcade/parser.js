@@ -1,14 +1,11 @@
 // classcade/parser.js
-
-import { Lexer, buildTokenTypes, resolveRules }                        from '@cosmonaut/lexer';
+import { Lexer, buildTokenTypes, resolveRules }                              from '@cosmonaut/lexer';
 import { ParserState, choice, lazy, many, map, optional, sepBy, seq, token } from '@cosmonaut/parser';
-import { baseRules }                                                   from '@cosmonaut/presets';
+import { baseRules }                                                         from '@cosmonaut/presets';
 
-// a value inside [...] or (...) - can itself be a nested method call,
-// e.g. bg[var(--brand)] or shadow(var(--x), 2px)
 const value = choice(
-  map(seq(token('IDENTIFIER'), token('('), () => argList, token(')')), ([idTok, , args]) => ({
-    type: 'method', id: idTok.value, args, raw: `${idTok.value}(${args.map(a=>a.raw??a).join(',')})`,
+  map(seq(token('IDENTIFIER'), token('('), lazy(() => argList), token(')')), ([idTok, , args]) => ({
+    type: 'method', id: idTok.value, args, raw: `${idTok.value}(${args.map(a => a.raw ?? a).join(',')})`,
   })),
   map(token('STRING'), t => t.value.slice(1, -1)),
   map(token('NUMBER'), t => t.value),
@@ -17,20 +14,16 @@ const value = choice(
 
 const argList = sepBy(value, token(','));
 
-// bg[red]           -> rule,   args from [ ]
-// shadow(var(--x))  -> method, args from ( )
-// block / sticky-top -> flag,  no args at all
 const utility = map(
   seq(
     token('IDENTIFIER'),
     optional(choice(
-      map(seq(token('['), lazy(() => argList), token(']')), ([, args]) => ({ kind: 'rule',   args })),
-      map(seq(token('('), lazy(() => argList), token(')')), ([, args]) => ({ kind: 'method', args })),
-      
+      map(seq(token('['), argList, token(']')), ([, args]) => ({ kind: 'rule',   args })),
+      map(seq(token('('), argList, token(')')), ([, args]) => ({ kind: 'method', args })),
     )),
   ),
   ([idTok, tail]) => {
-    const kind = tail?.kind ?? 'rule';         // no brackets/parens at all -> plain flag rule
+    const kind = tail?.kind ?? 'rule';
     const args = tail?.args ?? [];
     const raw  = kind === 'rule'
       ? (tail ? `${idTok.value}[${args.join(',')}]` : idTok.value)
@@ -39,13 +32,15 @@ const utility = map(
   },
 );
 
-const variant = map(seq(tokenTypes.IDENTIFIER, token(':')), ([idTok]) => idTok.value);
+const variant = map(seq(token('IDENTIFIER'), token(':')), ([idTok]) => idTok.value);
 
 const item = map(
   seq(optional(token('!')), many(variant), utility),
   ([important, variants, node]) => {
     const flagged = important ? { ...node, important: true } : node;
-    return variants.length ? { type: 'variant', variants, node: flagged, raw: `${variants.join(':')}:${flagged.raw}` } : flagged;
+    return variants.length
+      ? { type: 'variant', variants, node: flagged, raw: `${variants.join(':')}:${flagged.raw}` }
+      : flagged;
   },
 );
 
@@ -53,7 +48,6 @@ const classList = many(item);
 
 export default class Parser {
   #tokenTypes = buildTokenTypes();
-  constructor () {}
 
   tokenize (source) {
     const lexer = new Lexer(source, {
@@ -65,7 +59,7 @@ export default class Parser {
         { id: 'identifier', type: this.#tokenTypes.IDENTIFIER, regex: /[a-zA-Z_][a-zA-Z0-9_-]*/ },
       ]),
       skipWhitespace : true,
-      tokenTypes     : this.#tokenTypes, 
+      tokenTypes     : this.#tokenTypes,
     });
     return lexer.tokenize();
   }
@@ -74,12 +68,10 @@ export default class Parser {
     const tokens = this.tokenize(source);
     const state  = new ParserState(tokens);
     const result = classList(state);
-  
+
     if (result === undefined || !state.isEOF()) {
       throw new SyntaxError(`[classcade] Failed to parse "${source}" at token ${state.index}.`);
     }
     return result;
   }
 }
-
-
