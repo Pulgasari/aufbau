@@ -1,4 +1,4 @@
-# @aufbau/webcomponents
+# @aufbau/elements
 
 [usage](#usage)
 [config](#config)
@@ -8,11 +8,11 @@
 
 ### autoloader
 
-the components load automatically as soon as they appear in the DOM. fits best for usage directly in the browser.
+the elements load automatically as soon as they appear in the DOM. fits best for usage directly in the browser.
 
 ```html
 <script type="module">
-  import { autoloader } from '@aufbau/components';
+  import { autoloader } from '@aufbau/elements';
   autoloader();
 </script>
 
@@ -21,21 +21,21 @@ the components load automatically as soon as they appear in the DOM. fits best f
 <aufbau-slider value="50"></aufbau-slider>
 ```
 
-### register all components at once
+### register all elements at once
 
-registers all components at once. is good for prototyping.
+registers all elements at once. is good for prototyping.
 
 ```javascript
-import '@aufbau/components';
+import '@aufbau/elements';
 ```
 
-### register components one by one
+### register elements one by one
 
-only register the components you need.
+only register the elements you need.
 
 ```javascript
-import '@aufbau/components/button';
-import '@aufbau/components/flag';
+import '@aufbau/elements/button';
+import '@aufbau/elements/flag';
 ```
 
 or do it explictily in case you wanna rename the components or whatever.
