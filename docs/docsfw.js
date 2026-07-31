@@ -175,7 +175,7 @@ export function createDocsFW(config = {}) {
   function ExtensionSlot ({ slotData }) {
     switch (slotData?.type) {
       case 'component' : return html`<${slotData.value} />`;
-      case 'html'      ; return html`<div class="docs-extension" dangerouslySetInnerHTML=${{ __html: slotData.value }} />`;     
+      case 'html'      : return html`<div class="docs-extension" dangerouslySetInnerHTML=${{ __html: slotData.value }} />`;     
       default          : return null;
     }
   }
