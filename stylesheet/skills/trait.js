@@ -65,7 +65,7 @@ export function transformTraits (code) {
     const classBody = cleanCode.slice(classMatch.index + classMatch[0].length, i - 1).trim();
 
     if (!classMap.has(className)) {
-      classMap.set(className, classBody);
+      classMap.set(className,          classBody);
       classMap.set(className.slice(1), classBody);
     }
   }
