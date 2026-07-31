@@ -25,6 +25,8 @@
 <aufbau-paginate>
 <aufbau-popup>
 <aufbau-progress>
+<aufbau-scroller>
+<aufbau-skeleton>
 <aufbau-slider>
 <aufbau-svg>
 <aufbau-toast>
