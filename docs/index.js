@@ -23,8 +23,14 @@ createDocsFW({
   index  : 'readme.md',
   target : '#app',
   title  : 'aufbau :: docs',
+  
+  vars: {
+    repo  : '../',
+    comps : '$repo/webcomponents'
+  },
+  
   sidebar: {
-    components : 'webcomponents/readme.md',
+    components : '$repo/webcomponents/readme.md',
     kits       : 'docs/kits.md',
     packages   : 'packages.md',
     resources  : 'docs/resources.md',
