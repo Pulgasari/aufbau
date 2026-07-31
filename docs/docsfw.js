@@ -283,27 +283,34 @@ export function createDocsFW(config = {}) {
   }
 
   // UI Components
-  function Header() {
+  function Header () {
     const activePath = currentRoute.value.path;
+    const { title: brandTitle, img: brandImg, svgContent: brandSvg } = brandState.value;
+  
     return html`
       <header id="app-header">
         <a href="#/${index}" class="brand-link">
-          <div class="brand">${title}</div>
+          <div class="brand">
+            ${brandSvg ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: brandSvg }} />` : null}
+            ${brandImg ? html`<img class="brand-img" src=${brandImg} alt=${brandTitle} />` : null}
+            ${brandTitle ? html`<span class="brand-title">${brandTitle}</span>` : null}
+          </div>
         </a>
         <nav class="docs-nav">
-          ${normalizedSidebar.map(item => html`
-            <a 
-              key=${item.path} 
-              href="#/${item.path}" 
-              class=${activePath === item.path ? 'active' : ''}
-            >
-              ${item.title}
-            </a>
-          `)}
-        </nav>
+            ${normalizedSidebar.map(item => html`
+              <a 
+                key=${item.path} 
+                href="#/${item.path}" 
+                class=${activePath === item.path ? 'active' : ''}
+              >
+                ${item.title}
+              </a>
+            `)}
+          </nav>
       </header>
     `;
   }
+
 
   function TableOfContents() {
     const items = tocList.value;
