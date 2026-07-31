@@ -14,7 +14,6 @@
 <aufbau-combobox>
 <aufbau-epub>
 <aufbau-fake> (um so fake elemente zu generieren für testing und prototyping)
-<aufbau-filetree>
 <aufbau-flyout>
 <aufbau-graph>
 <aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
@@ -30,6 +29,8 @@
 <aufbau-slider>
 <aufbau-svg>
 <aufbau-toast>
+<aufbau-tree>
+<aufbau-tree-item>
 
 <aufbau-action-menu>
 <aufbau-context-menu>
