@@ -5,6 +5,47 @@ import aufbau, { html, Fragment, effect } from '@aufbau/kit';
 import { slugify } from '@aufbau/utils';
 
 /**
+ * Resolve brand configuration (supports string, image path, or inline SVG).
+ */
+async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
+  let title = titleOption || 'Documentation';
+  let img = null;
+  let svgPath = null;
+  let svgContent = null;
+
+  if (typeof brandOption === 'string') {
+    title = brandOption;
+  } else if (brandOption && typeof brandOption === 'object') {
+    if (brandOption.title) title = brandOption.title;
+    if (brandOption.img) img = resolvePath(brandOption.img, vars);
+    if (brandOption.svg) svgPath = brandOption.svg;
+  }
+
+  // Fetch raw SVG content if path/string is provided
+  if (svgPath) {
+    const trimmed = svgPath.trim();
+    if (trimmed.startsWith('<svg')) {
+      svgContent = trimmed;
+    } else {
+      const resolved = resolvePath(trimmed, vars);
+      const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http'))
+        ? resolved
+        : `./${resolved}`;
+
+      try {
+        const imported = await aufbau.import(importPath);
+        svgContent = typeof imported === 'string' ? imported : null;
+      } catch (err) {
+        console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, err);
+      }
+    }
+  }
+
+  return { title, img, svgContent };
+}
+
+
+/**
  * Resolves variables/aliases inside a path string.
  * Supports nested variables (e.g. $comps using $repo).
  * 
@@ -140,6 +181,7 @@ export function processHtmlAndBuildToc(htmlContent) {
  */
 export function createDocsFW(config = {}) {
   const {
+    brand      = null,
     title      = 'Documentation',
     index      = 'readme.md',
     sidebar    = [],
@@ -161,6 +203,12 @@ export function createDocsFW(config = {}) {
 
   const beforeSlot   = aufbau.signal(null);
   const afterSlot    = aufbau.signal(null);
+
+  const brandState = aufbau.signal({ 
+    title: typeof brand === 'string' ? brand : (brand?.title || title), 
+    img: null, 
+    svgContent: null 
+  });
 
   // Hash router event listener
   if (typeof window !== 'undefined') {
@@ -184,12 +232,15 @@ export function createDocsFW(config = {}) {
           ? resolvedPath
           : `./${resolvedPath}`;
 
-        // Fetch document and extensions in parallel
-        const [rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
+        // Fetch brand config parallel with document & extensions
+        const [resolvedBrand, rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
+          resolveBrandConfig(brand, title, vars),
           aufbau.import(importPath),
           resolveExtension(before, vars),
           resolveExtension(after, vars)
         ]);
+  
+        brandState.value = resolvedBrand;
 
         const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
 
