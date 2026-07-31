@@ -21,7 +21,7 @@ const isCacheable = (val) => {
 };
 
 
-function transformCSSResult(cssCode, asOption) {
+function transformCSSResult (cssCode, asOption) {
   if (asOption === 'css') return cssCode;
   if (asOption === 'style') {
     const element = document.createElement('style');
