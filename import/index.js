@@ -197,7 +197,7 @@ export async function importTOML (path, options = {}) {
   return parse(text);
 }
 
-export async function importTS(path, options = {}) {
+export async function importTS (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -216,7 +216,7 @@ export async function importTS(path, options = {}) {
 }
 export const importTSX = importTS;
 
-export async function importWASM(path, options = {}) {
+export async function importWASM (path, options = {}) {
   const response = await fetch(path); // Requires binary data
   if (!response.ok) throw new Error(`[@aufbau/import] Error loading WASM "${path}": ${response.status}`);
 
@@ -228,7 +228,7 @@ export async function importWASM(path, options = {}) {
   return instance.exports;
 }
 
-export async function importXML(path, options = {}) {
+export async function importXML (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -246,7 +246,7 @@ export async function importXML(path, options = {}) {
   return jsObj; // Default: JS Object
 }
 
-export async function importYAML(path, options = {}) {
+export async function importYAML (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
