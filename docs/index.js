@@ -14,7 +14,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
 function VersionBanner() {
   return html`
     <div class="version-banner">
-      <span>🚀 Version 2026.1 Active</span>
+      <span>Version 2026.1 Active</span>
     </div>
   `;
 }
@@ -29,12 +29,11 @@ createDocsFW({
   
   vars: {
     repo  : '../',
-    comps : '$repo/webcomponents'
   },
   
   sidebar: {
     docs       : 'readme.md',
-    elements   : '$repo/webcomponents/readme.md',
+    elements   : '$repo/elements/readme.md',
     kits       : 'kits.md',
     packages   : 'packages.md',
     resources  : 'resources.md',
