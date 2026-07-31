@@ -1,15 +1,25 @@
-// Class for the container index element
+// <aufbau-index> | <aufbau-item>
+
 class AufbauIndex extends HTMLElement {
   static get observedAttributes() {
-    return ['item-size', 'item-shape', 'gap'];
+    return ['item-size', 'item-shape', 'item-look', 'gap'];
   }
 
-  attributeChangedCallback () { this.updateProperties(); }
-  connectedCallback        () { this.updateProperties(); }
-  
-  updateProperties () {
-    const size  = this.getAttribute('item-size');
-    const shape = this.getAttribute('item-shape');
+  connectedCallback() {
+    this.updateProperties();
+  }
+
+  attributeChangedCallback() {
+    this.updateProperties();
+  }
+
+  updateProperties() {
+    // 1. Parse shorthand attribute
+    const look = parseLook(this.getAttribute('item-look'));
+
+    // 2. Explicit attributes override shorthand values
+    const size  = this.getAttribute('item-size')  || look.size;
+    const shape = this.getAttribute('item-shape') || look.shape;
     const gap   = this.getAttribute('gap');
 
     if (size)  this.style.setProperty('--aufbau-item-size', size);
@@ -17,7 +27,7 @@ class AufbauIndex extends HTMLElement {
     if (gap)   this.style.setProperty('--aufbau-gap', gap);
   }
 
-  resolveShape (shape) {
+  resolveShape(shape) {
     const shapes = {
       circle: '50%',
       square: '0px',
@@ -28,22 +38,23 @@ class AufbauIndex extends HTMLElement {
   }
 }
 
-// Class for child item overrides
 class AufbauItem extends HTMLElement {
   static get observedAttributes() {
-    return ['shape'];
+    return ['shape', 'look'];
   }
 
   connectedCallback() {
-    this.updateShape();
+    this.updateProperties();
   }
 
   attributeChangedCallback() {
-    this.updateShape();
+    this.updateProperties();
   }
 
-  updateShape() {
-    const shape = this.getAttribute('shape');
+  updateProperties() {
+    const look = parseLook(this.getAttribute('look'));
+    const shape = this.getAttribute('shape') || look.shape;
+
     if (shape) {
       const shapes = {
         circle: '50%',
@@ -55,12 +66,4 @@ class AufbauItem extends HTMLElement {
     }
   }
 }
-
-// Register custom elements
-if (typeof window !== 'undefined') {
-  if (!customElements.get('aufbau-index')) customElements.define('aufbau-index', AufbauIndex);    
-  if (!customElements.get('aufbau-item'))  customElements.define('aufbau-item', AufbauItem);
-}
-
-
 
