@@ -1,9 +1,11 @@
 import hljs from 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm';
 import aufbau, { html, Fragment, effect } from '@aufbau/kit';
+import { parseHash, resolvePath } from './router.js';
 
 /**
  * Extract path and anchor ID from location hash.
  */
+/*
 export function parseHash(defaultPath = 'readme.md') {
   const hash = window.location.hash.replace(/^#\/?/, '');
   if (!hash) return { path: defaultPath, anchor: null };
@@ -14,6 +16,7 @@ export function parseHash(defaultPath = 'readme.md') {
     anchor : anchor || null
   };
 }
+*/
 
 /**
  * Normalize sidebar configuration from either Array or Object format.
@@ -30,29 +33,32 @@ function normalizeSidebar(sidebar) {
  * Resolve content extensions (before / after content injections).
  * Supports: File paths (.html, .md), raw HTML strings, or Preact Component functions.
  */
-async function resolveExtension(ext) {
+async function resolveExtension(ext, vars = {}) {
   if (!ext) return null;
 
-  // Case A: Preact Component function
   if (typeof ext === 'function') {
     return { type: 'component', value: ext };
   }
 
-  // Case B: String (File path or raw HTML)
   if (typeof ext === 'string') {
     const trimmed = ext.trim();
     
-    // Inline HTML check (starts with '<' or contains line breaks)
+    // Inline HTML check
     if (trimmed.startsWith('<') || trimmed.includes('\n')) {
       return { type: 'html', value: trimmed };
     }
 
-    // Treat as file path to import via @aufbau/import
+    // Resolve path variables and import
+    const resolved = resolvePath(trimmed, vars);
+    const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http')) 
+      ? resolved 
+      : `./${resolved}`;
+
     try {
-      const imported = await aufbau.import(trimmed);
+      const imported = await aufbau.import(importPath);
       return { type: 'html', value: typeof imported === 'string' ? imported : '' };
     } catch (err) {
-      console.warn(`[DocsFW] Failed to load extension content from "${trimmed}":`, err);
+      console.warn(`[DocsFW] Failed to load extension content from "${importPath}":`, err);
       return null;
     }
   }
@@ -99,6 +105,7 @@ export function createDocsFW(config = {}) {
     title      = 'Documentation',
     index      = 'readme.md',
     sidebar    = [],
+    vars       = {},
     target     = '#app',
     footerText = 'Powered by @aufbau/docsfw',
     before     = null,
@@ -133,11 +140,17 @@ export function createDocsFW(config = {}) {
       errorMessage.value = null;
 
       try {
+        // Resolve variables in doc path (e.g. $comps/readme.md -> ../webcomponents/readme.md)
+        const resolvedPath = resolvePath(path, vars);
+        const importPath = (resolvedPath.startsWith('.') || resolvedPath.startsWith('/') || resolvedPath.startsWith('http'))
+          ? resolvedPath
+          : `./${resolvedPath}`;
+
         // Fetch document and extensions in parallel
         const [rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
-          aufbau.import(`./${path}`),
-          resolveExtension(before),
-          resolveExtension(after)
+          aufbau.import(importPath),
+          resolveExtension(before, vars),
+          resolveExtension(after, vars)
         ]);
 
         const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
@@ -279,3 +292,5 @@ export function createDocsFW(config = {}) {
     aufbau.render(html`<${App} />`, $target);
   }
 }
+
+
