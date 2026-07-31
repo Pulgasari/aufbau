@@ -79,6 +79,25 @@ console.log(greet('aufbau'));
 <aufbau-combobox src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-combobox>
 ```
 
+## aufbau-config
+
+```html
+<!-- 1. Central Global Configuration -->
+<aufbau-config 
+  flag-variant="square" 
+  toast-duration="5000" 
+  number-unit="px"
+  theme="zombie"
+></aufbau-config>
+
+<!-- Uses global default ("square") set via <aufbau-config> -->
+<aufbau-flag code="de"></aufbau-flag>
+<aufbau-flag code="us"></aufbau-flag>
+
+<!-- Local attribute overrides the global default for this specific element -->
+<aufbau-flag code="fr" variant="circle"></aufbau-flag>
+```
+
 ## aufbau-datalist
 
 ```html
