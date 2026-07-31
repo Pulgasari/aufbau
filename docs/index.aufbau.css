@@ -79,17 +79,9 @@ pre, code {
 }
 
 .markdown-body {
-  aufbau-use: .vert;
+  aufbau-use: .flow-y;
   gap: 1rem;
 }
-
-/*
-#app-body       { background: #f002; }
-#app-body   > * { background: #0803; }
-#playground > * { background: #ff03; }
-#code-input     { background: #0804; }
-#code-output    { background: #0804; }
-*/
 
 html, body { height: 100%; overflow: hidden; }
 body       { height: 100dvh; }
@@ -139,23 +131,11 @@ body { aufbau-use: .vert; }
 
 
 #app-header {
-  /*
-  display         : flex;
-  flex-flow       : row;
-  align-items     : center;
-  */
-  
   justify-content : space-between;
   gap             : 1rem;
   padding         : 1rem;
 }
 #app-footer {
-  /*
-  display         : flex;
-  fley-flow       : row;
-  align-items     : center;
-  */
-  
   justify-content : center;
   gap             : 1rem;
   padding         : 1rem;
