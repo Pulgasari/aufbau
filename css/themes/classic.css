@@ -1,0 +1,11 @@
+/* @aufbau/css/themes/classic.css */
+
+:root, [data-theme="classic"] {
+   --aufbau-bg     : white;
+   --aufbau-fg     : black;
+   --aufbau-blue   : blue;
+   --aufbau-green  : green;
+   --aufbau-red    : red;
+   --aufbau-purple : purple;
+   --aufbau-yellow : yellow;
+}
