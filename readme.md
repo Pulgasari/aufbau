@@ -13,6 +13,7 @@
 [@aufbau/import](#aufbau-import)
 [@aufbau/shaders](#aufbau-shaders)
 [@aufbau/stylesheet](#aufbau-stylesheet)
+[@aufbau/webcomponents](#aufbau-webcomponents)
 
 @aufbau/cache
 @aufbau/hyperfetch
@@ -24,9 +25,9 @@
 
 #### pure resources
 
-@aufbau/css
-@aufbau/svg
-@aufbau/webfonts
+[@aufbau/css](#aufbau-css)
+[@aufbau/svg](#aufbau-svg)
+[@aufbau/webfonts](#aufbau-webfonts)
 
 ---
 
