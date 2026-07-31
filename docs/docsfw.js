@@ -179,7 +179,7 @@ export function processHtmlAndBuildToc(htmlContent) {
 /**
  * Initializes and mounts the Docs Framework.
  */
-export function createDocsFW(config = {}) {
+export function createDocsFW (config = {}) {
   const {
     brand      = null,
     title      = 'Documentation',
@@ -291,9 +291,10 @@ export function createDocsFW(config = {}) {
       <header id="app-header">
         <a href="#/${index}" class="brand-link">
           <div class="brand">
-            ${brandSvg ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: brandSvg }} />` : null}
-            ${brandImg ? html`<img class="brand-img" src=${brandImg} alt=${brandTitle} />` : null}
-            ${brandTitle ? html`<span class="brand-title">${brandTitle}</span>` : null}
+            ${brandSvg   ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: brandSvg }} />`
+            : brandImg   ? html`<img class="brand-img" src=${brandImg} alt=${brandTitle} />`
+            : brandTitle ? html`<span class="brand-title">${brandTitle}</span>` 
+            : null}
           </div>
         </a>
         <nav class="docs-nav">
