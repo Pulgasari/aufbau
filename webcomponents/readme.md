@@ -6,16 +6,20 @@
 <aufbau-table> (hab gar kein bock table von hand zu bauen, also kann das teil nur objekte und vllt arrays entgegennehmen, und natürlich @aufbau/import wie datalist)
 <aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
 
+<aufbau-checkbox>
+<aufbau-combobox>
+<aufbau-number>
+<aufbau-slider> (optional mit inc/dec buttons und/oder numberdisplay das auch input kann und optionalem unit display)
+
 <aufbau-audio> (optional mit image, diverse layouts)
 <aufbau-avatar>
 <aufbau-breadcrumb>
-<aufbau-checkbox>
 <aufbau-colorpicker>
-<aufbau-combobox>
 <aufbau-epub>
 <aufbau-fake> (um so fake elemente zu generieren für testing und prototyping)
 <aufbau-flyout>
 <aufbau-graph>
+<aufbau-gui>
 <aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
 <aufbau-include>
 <aufbau-keyboard>
@@ -26,7 +30,7 @@
 <aufbau-progress>
 <aufbau-scroller>
 <aufbau-skeleton>
-<aufbau-slider>
+
 <aufbau-svg>
 <aufbau-toast>
 <aufbau-tree>
