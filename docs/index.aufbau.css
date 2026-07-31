@@ -92,7 +92,8 @@ body { aufbau-use: .flow-y; }
 #app-footer     { gap: 1rem; padding: 1rem; justify-content: center; }
 #app-header nav { gap: 0.5rem; }
 
-
+#app-header svg { height: 1.5rem; }
+  
 /*
 
 #app {
