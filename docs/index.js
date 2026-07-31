@@ -22,7 +22,7 @@ function VersionBanner() {
 createDocsFW({
   index  : 'readme.md',
   target : '#app',
-  title  : 'aufbau :: docs',
+  title  : 'aufbau',
   
   vars: {
     repo  : '../',
@@ -30,7 +30,8 @@ createDocsFW({
   },
   
   sidebar: {
-    components : '$repo/webcomponents/readme.md',
+    docs       : 'readme.md',
+    elememta   : '$repo/webcomponents/readme.md',
     kits       : 'kits.md',
     packages   : 'packages.md',
     resources  : 'resources.md',
