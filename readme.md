@@ -130,7 +130,7 @@ body > * { padding: small; }
 
 ## @aufbau/webcomponents
 
-read more [here](webcomponents).
+read more [here](webcomponents/readme.md).
 
 ## @aufbau/workers
 
