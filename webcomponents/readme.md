@@ -7,7 +7,11 @@
 <aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
 
 <aufbau-audio> (optional mit image, diverse layouts)
+<aufbau-avatar>
 <aufbau-breadcrumb>
+<aufbau-checkbox>
+<aufbau-colorpicker>
+<aufbau-combobox>
 <aufbau-epub>
 <aufbau-filetree>
 <aufbau-flyout>
