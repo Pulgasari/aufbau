@@ -9,7 +9,10 @@ export function parseHash() {
   if (!hash) return { path: 'readme.md', anchor: null };
 
   const [path, anchor] = hash.split('#');
-  return { path: path || 'readme.md', anchor: anchor || null };
+  return {
+    path   : path   || 'readme.md', 
+    anchor : anchor || null
+  };
 }
 
 /**
