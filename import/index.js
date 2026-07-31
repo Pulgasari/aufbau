@@ -173,12 +173,14 @@ export async function importSCSS (path, options = {}) {
 }
 
 export async function importSVG (path, options = {}) {
-  const text = await fetchText(path);
+  let text = await fetchText(path);
+  // strip XML declaration and DOCTYPE headers for clean HTML5 inlining
+  text = text.replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();    
   if (options.as === 'raw') return text;
 
   if (options.as === 'element') {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'image/svg+xml');
+    const doc    = parser.parseFromString(text, 'image/svg+xml');
     return doc.querySelector('svg') || doc.documentElement;
   }
 
