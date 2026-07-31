@@ -4,17 +4,19 @@
 [config](#config)
 [components](#components)
 
-## Usage
+## usage
 
 ### autoloader
 
+the components load automatically as soon as they appear in the DOM.
+
 ```html
 <script type="module">
-  import { enableAutoComponents } from '@aufbau/components/auto';
-  enableAutoComponents();
+  import { autoloader } from '@aufbau/components';
+  autoloader();
 </script>
 
-<!-- Magic happens: Components load automatically as soon as they appear in the DOM -->
+<!-- Magic happens:  -->
 <aufbau-flag code="de"></aufbau-flag>
 <aufbau-slider value="50"></aufbau-slider>
 ```
