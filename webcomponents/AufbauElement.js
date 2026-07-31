@@ -3,6 +3,8 @@
 
 import aufbau from '@aufbau/kit'; // sollte nicht das kit sein
 
+import { AufbauConfigStore } from './aufbau-config.js';
+
 export class AufbauElement extends HTMLElement {
   constructor() {
     super();
@@ -11,46 +13,65 @@ export class AufbauElement extends HTMLElement {
 
   connectedCallback() {
     this._mounted = true;
+
+    // Listen for global config updates
+    this._onConfigChange = () => {
+      if (this._mounted) this.update();
+    };
+    window.addEventListener('aufbau-config-changed', this._onConfigChange);
+
     this.onMount();
     this.update();
   }
 
   disconnectedCallback() {
     this._mounted = false;
+
+    if (this._onConfigChange) {
+      window.removeEventListener('aufbau-config-changed', this._onConfigChange);
+    }
+
     this.onUnmount();
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback (name, oldValue, newValue) {
     if (oldValue !== newValue && this._mounted) {
       this.onAttributeChange(name, oldValue, newValue);
       this.update();
     }
   }
 
-  // ::::: Lifecycle Hooks (in Subklassen überschreibbar)
-  onMount   () {}
-  onUnmount () {}
-  onAttributeChange(name, oldValue, newValue) {}
-  
   /**
-   * Wird bei Initialisierung und Attributänderungen aufgerufen.
-   * Hier bauen Subklassen ihr HTML auf oder aktualisieren Styles.
+   * Resolves attribute value based on Priority:
+   * 1. Direct Element Attribute
+   * 2. <aufbau-config> Attribute
+   * 3. Fallback Default
    */
+  getConfig (attrName, configKey, defaultValue) {
+    if (this.hasAttribute(attrName)) {
+      return this.getAttribute(attrName);
+    }
+    
+    const globalKey = (configKey || attrName).toLowerCase();
+    if (AufbauConfigStore.has(globalKey)) {
+      return AufbauConfigStore.get(globalKey);
+    }
+
+    return defaultValue;
+  }
+
+  // ::::: Lifecycle Hooks
+  onMount() {}
+  onUnmount() {}
+  onAttributeChange(name, oldValue, newValue) {}
   update() {}
 
-  // ::::: Event Emitter Helper
   emit(eventName, detail = {}, options = {}) {
     this.dispatchEvent(new CustomEvent(eventName, {
       detail,
       bubbles: true,
-      composed: true, // Durchbricht Shadow-DOM-Grenzen, falls später benötigt
+      composed: true,
       ...options
     }));
-  }
-
-  // ::::: Theming Helper
-  get currentTheme() {
-    // Kann später auf aufbau.theme.value hören oder CSS-Variablen auslesen
-    return this.getAttribute('theme') || document.documentElement.dataset.theme || 'default';
   }
 }
