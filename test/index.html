@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>aufbau - Import Test</title>
-  <link rel="stylesheet" href="./index.css" />
+  <link rel="stylesheet" href="./../index.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
@@ -46,7 +46,7 @@
   </footer>
 
   <script type="module">
-    import aufbau, { html } from './kit/index.js';
+    import aufbau, { html } from './../kit/index.js';
     //import { importFile } from '@aufbau/import';
 
     // 1. Footer Component & Theme Swapper (Bestehende Logik)
@@ -85,15 +85,15 @@
     async function runImportTests() {
       try {
         // A) Test test.jsonc
-        const jsonData = await aufbau.import('./test/test.jsonc');
+        const jsonData = await aufbau.import('./test.jsonc');
         jsonState.value = jsonData;
 
         // B) Test test.md
-        const mdHtml = await aufbau.import('./test/test.md');
+        const mdHtml = await aufbau.import('./test.md');
         mdState.value = mdHtml;
 
         // C) Test test.ts
-        const tsModule = await aufbau.import('./test/test.ts');
+        const tsModule = await aufbau.import('./test.ts');
         const service  = new tsModule.TestService('Aufbau Kit');
         tsState.value = service.getGreeting(tsModule.defaultUser);
       } catch (err) {
