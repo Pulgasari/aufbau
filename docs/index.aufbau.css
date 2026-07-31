@@ -69,7 +69,7 @@ body {
   */
 }
 
-#app-header { aufbau-colors: inverted; }
+#app-header { aufbau-colors: aufbau inverted; }
 #app-footer { aufbau-colors: aufbau inverted; }
 
 pre, code {
