@@ -1,8 +1,14 @@
 # @aufbau/elements
 
+official **aufbau** *webcomponents\** libraray.
+
+\* we don't like that begriff and prefer *"(custom) elements"*.
+
+---
+
 [usage](#usage)
 [config](#config)
-[components](#components)
+[elements](#elements)
 
 ## usage
 
@@ -41,7 +47,7 @@ import '@aufbau/elements/flag';
 or do it explictily in case you wanna rename the components or whatever.
 
 ```javascript
-import { AufbauFlag } from '@aufbau/components/flag';
+import { AufbauFlag } from '@aufbau/elements/flag';
 
 customElements.define('aufbau-flag', AufbauFlag);
 ```
@@ -76,7 +82,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 <aufbau-menu-item>
 ```
 
-# Components
+# elements
 
 [`<aufbau-audio>`](#aufbau-audio) ·
 [`<aufbau-button>`](#aufbau-button) ·
