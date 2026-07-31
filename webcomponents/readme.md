@@ -191,4 +191,36 @@ console.log(greet('aufbau'));
 <!-- 4. Slider mit +/- Buttons & editierbarem Textfeld -->
 <aufbau-slider value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
 
+<!-- 1. Toast Triggern via JS -->
+<button onclick="AufbauToast.notify({ type: 'success', title: 'Gespeichert!', message: 'Daten wurden aktualisiert.' })">
+  Toast anzeigen
+</button>
+
+<!-- 2. Audio Player mit Cover -->
+<aufbau-audio 
+  src="/media/track.mp3" 
+  title="Cyberpunk Theme" 
+  artist="Synthwave Studio" 
+  cover="/media/cover.jpg"
+  layout="card">
+</aufbau-audio>
+
+<!-- 3. Interaktive Waveform -->
+<aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
+
+<!-- 4. Tree Explorer (Verschachtelt) -->
+<aufbau-tree>
+  <aufbau-tree-item label="src" expanded>
+    <aufbau-tree-item label="components" expanded>
+      <aufbau-tree-item label="AufbauElement.js" icon="lucide:file-code"></aufbau-tree-item>
+      <aufbau-tree-item label="AufbauTree.js" icon="lucide:file-code"></aufbau-tree-item>
+    </aufbau-tree-item>
+    <aufbau-tree-item label="index.js" icon="lucide:file-code"></aufbau-tree-item>
+  </aufbau-tree-item>
+  <aufbau-tree-item label="package.json" icon="lucide:file-json"></aufbau-tree-item>
+</aufbau-tree>
+
+<!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
+<aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
+
 ```
