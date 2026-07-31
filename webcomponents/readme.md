@@ -126,4 +126,28 @@
   <aufbau-item>Samsung Galaxy S24</aufbau-item>
   <aufbau-item>Google Pixel 8</aufbau-item>
 </aufbau-index>
+
+<!-- Flagge -->
+<aufbau-flag code="de" variant="circle"></aufbau-flag>
+<aufbau-flag code="us"></aufbau-flag>
+
+<!-- Video / YouTube -->
+<aufbau-video youtube-id="dQw4w9WgXcQ"></aufbau-video>
+
+<!-- Toggle -->
+<aufbau-toggle label="Darkmode aktivieren" checked></aufbau-toggle>
+
+<!-- Dropdown -->
+<aufbau-dropdown label="Optionen">
+  <a href="#edit">Bearbeiten</a>
+  <a href="#delete">Löschen</a>
+</aufbau-dropdown>
+
+<!-- Switch / Segmented Control -->
+<aufbau-switch value="month" mode="buttons">
+  <option value="day">Tag</option>
+  <option value="month">Monat</option>
+  <option value="year">Jahr</option>
+</aufbau-switch>
+
 ```
