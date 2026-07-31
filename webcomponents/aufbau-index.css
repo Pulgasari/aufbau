@@ -1,0 +1,62 @@
+/* Global host default layout styles for aufbau-index */
+aufbau-index {
+  display: grid;
+  gap: var(--aufbau-gap, 1rem);
+  width: 100%;
+}
+
+/* Viewmodes */
+[viewmode="grid"] {
+  grid-template-columns: repeat(auto-fill, minmax(var(--aufbau-item-size, 200px), 1fr));
+}
+
+[viewmode="list"] {
+  display: flex;
+  flex-direction: column;
+}
+
+[viewmode="gallery"] {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+}
+
+[viewmode="gallery"] > aufbau-item {
+  flex: 0 0 var(--aufbau-item-size, 200px);
+  scroll-snap-align: start;
+}
+
+[viewmode="masonry"] {
+  display: block;
+  column-width: var(--aufbau-item-size, 200px);
+  column-gap: var(--aufbau-gap, 1rem);
+}
+
+[viewmode="masonry"] > aufbau-item {
+  break-inside: avoid;
+  margin-bottom: var(--aufbau-gap, 1rem);
+}
+
+/* Base styling for elements inside aufbau-item */
+aufbau-item {
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Inheritance with fallback */
+  border-radius: var(--aufbau-current-shape, var(--aufbau-item-shape, 0px));
+}
+
+/* Shape mapping logic */
+aufbau-index, 
+aufbau-item {
+  &[item-shape="circle"]   , &[shape="circle"]   { --aufbau-current-shape: 50%; aspect-ratio: 1 / 1; }
+  &[item-shape="square"]   , &[shape="square"]   { --aufbau-current-shape: 0px; aspect-ratio: 1 / 1; }     
+  &[item-shape="rounded"]  , &[shape="rounded"]  { --aufbau-current-shape: 12px; }
+  &[item-shape="squircle"] , &[shape="squircle"] { --aufbau-current-shape: 24% / 50%; }
+}
+
+
+
+
+
