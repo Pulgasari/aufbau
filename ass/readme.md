@@ -270,3 +270,42 @@ element.ass.fontSize.getTyped(); // { value: 20, unit: CSS.px }
 // wenn value mit '--' beginnt
 new CSSVariableReferenceValue("--var")
 ```
+
+## the triangle
+
+actually when writing sth. like this is a 3-way relationship
+
+```css
+body { line-height : 1.00; }
+h6   { line-height : 1.50; }
+p    { line-height : 1.25; }
+
+// scheme
+<selector> { <property> : <value> ; }
+```
+
+so why not switching the order?
+
+```css
+line-height { body : 1.00; }
+line-height { h6   : 1.50; }
+line-height { p    : 1.25; }
+
+// scheme
+<property> { <selector> : <value> ; }
+```
+
+and then group it like that?
+
+```css
+line-height {
+  body : 1.00;
+  h6   : 1.50;
+  p    : 1.25;
+}
+```
+
+
+
+
+
