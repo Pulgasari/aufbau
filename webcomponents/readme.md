@@ -139,6 +139,35 @@ console.log(greet('aufbau'));
 <aufbau-input type="text" datalist="city-list" placeholder="Select City..."></aufbau-input>
 ```
 
+## aufbau-loop
+
+```html
+<!-- 3. Auto-Schaltendes Video-/Image-Carousel (alle 4 Sekunden) -->
+<aufbau-loop mode="carousel" interval="4000" pause-on-hover>
+  <aufbau-video youtube-id="dQw4w9WgXcQ"></aufbau-video>
+  <img src="/assets/slide1.jpg" alt="Slide 1" />
+  <img src="/assets/slide2.jpg" alt="Slide 2" />
+</aufbau-loop>
+
+<!-- 4. Endloser Marquee-Ticker für Logos -->
+<aufbau-loop mode="marquee" speed="15s" pause-on-hover>
+  <aufbau-icon icon="logos:preact"></aufbau-icon>
+  <aufbau-icon icon="logos:javascript"></aufbau-icon>
+  <aufbau-icon icon="logos:css-3"></aufbau-icon>
+  <aufbau-icon icon="logos:html-5"></aufbau-icon>
+</aufbau-loop>
+```
+
+## aufbau-progress
+
+```html
+<!-- 1. Scroll-Fortschrittsbalken oben an der Seite -->
+<aufbau-progress type="scroll" target="body"></aufbau-progress>
+
+<!-- 2. Standard Progress-Bar mit Prozentanzeige -->
+<aufbau-progress value="75" max="100" show-text unit="%"></aufbau-progress>
+```
+
 ## aufbau-slider
 
 ```html
