@@ -17,10 +17,10 @@ function buildFontUrl (fontFamily, wght = 'wght@400;500;700') {
   return `${GOOGLE_FONTS_BASE}${formattedFamily}:${wght}&display=swap`;
 }
 
-export function transformWebfonts (code) {
+export default function (code) {
   const imports = new Set();
 
-  const transformedCode = code.replace(WEBFONT_REGEX, (_, fontName) => {
+  code = code.replace(WEBFONT_REGEX, (_, fontName) => {
     const rawName    = fontName.trim();
     const matchedKey = Object.keys(WEBFONT_MAP).find( key => key.toLowerCase() === rawName.toLowerCase() );
 
@@ -35,7 +35,5 @@ export function transformWebfonts (code) {
     return `font-family: "${rawName}", sans-serif;`;
   });
 
-  return { code: transformedCode, imports: Array.from(imports) };
+  return { code, imports: Array.from(imports) };
 }
-
-export default transformWebfonts;
