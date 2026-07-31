@@ -13,6 +13,7 @@
 <aufbau-colorpicker>
 <aufbau-combobox>
 <aufbau-epub>
+<aufbau-fake> (um so fake elemente zu generieren für testing und prototyping)
 <aufbau-filetree>
 <aufbau-flyout>
 <aufbau-graph>
