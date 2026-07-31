@@ -1,6 +1,6 @@
 # kits
 
-a **kit** is a bundle of aufbau-packages combined with other frameworks/libraries ready to use with easy.
+a **kit** is a bundle of all aufbau-packages combined with other frameworks/libraries ready to use in the browser with ease.
 
 ## @aufbau/kit/preact-htm
 
