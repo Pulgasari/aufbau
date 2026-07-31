@@ -26,7 +26,7 @@ createDocsFW({
   sidebar: {
     components : 'webcomponents/readme.md',
     kits       : 'docs/kits.md',
-    packages   : 'docs/packages.md',
+    packages   : 'packages.md',
     resources  : 'docs/resources.md',
   },
 
