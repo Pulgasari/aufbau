@@ -1,5 +1,20 @@
 # @aufbau/webcomponents
 
+## Usage
+
+### Register all components at once
+
+```javascript
+import '@aufbau/components';
+```
+
+### one by one
+
+```javascript
+import '@aufbau/components/button';
+import '@aufbau/components/flag';
+```
+
 ```md
 <aufbau-avatar>
 <aufbau-breadcrumb>
