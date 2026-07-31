@@ -9,8 +9,12 @@
 <aufbau-combobox>
 <aufbau-number>
 <aufbau-slider> (optional mit inc/dec buttons und/oder numberdisplay das auch input kann und optionalem unit display)
-
+<aufbau-toast>
 <aufbau-audio> (optional mit image, diverse layouts)
+<aufbau-waveform>
+<aufbau-tree>
+<aufbau-tree-item>
+
 <aufbau-avatar>
 <aufbau-breadcrumb>
 <aufbau-colorpicker>
@@ -35,11 +39,7 @@
 <aufbau-skeleton>
 <aufbau-svg>
 <aufbau-terminal>
-<aufbau-toast>
 <aufbau-toolbar>
-<aufbau-tree>
-<aufbau-tree-item>
-<aufbau-waveform>
 
 <aufbau-action-menu>
 <aufbau-context-menu>
