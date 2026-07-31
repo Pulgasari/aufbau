@@ -8,7 +8,7 @@ body {
 
 @aufbau-config {
   import : reset, default, docs, keyframes;
-  themes : zombie;
+  themes : classic;
 }
 
 @aufbau colors {
