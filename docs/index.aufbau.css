@@ -78,7 +78,7 @@ body { aufbau-use: .flow-y; }
 #app > #app-body   { flex: 1; overflow-y: auto; }
 
 #app-body   { padding: 1rem; }
-#app-header { text-transform: uppercase; }
+#app-header { font-size: 0.9rem; text-transform: uppercase; }
 
 #app-body       { aufbau-use : flow-y; }
 #app-header     { aufbau-use : flow-x; }
