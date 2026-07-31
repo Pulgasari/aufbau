@@ -13,15 +13,15 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     .catch(err => console.error('[SW Error]:', err));
 }
 
-// Mount DocsFW with project specific configuration
 createDocsFW({
-  title: 'aufbau / docs',
-  target: '#app',
-  footerText: 'aufbau | 2026',
+  title      : 'aufbau :: docs',
+  target     : '#app',
+  footerText : 'aufbau | 2026',
   sidebar: [
-    { title: 'Overview'   , path: 'readme.md' },
-    { title: 'Kit'        , path: 'kit/readme.md' },
-    { title: 'Stylesheet' , path: 'stylesheet/readme.md' },
-    { title: 'Shaders'    , path: 'shaders/readme.md' },
+    { title: 'Overview'      , path: 'docs/readme.md' },
+    { title: 'kits'          , path: 'docs/kits.md' },
+    { title: 'packages'      , path: 'docs/packages.md' },
+    { title: 'resources'     , path: 'docs/resources.md' },
+    { title: 'webcomponents' , path: 'webcomponents/readme.md' },
   ]
 });
