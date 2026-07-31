@@ -1,5 +1,9 @@
 # @aufbau/webcomponents
 
+[usage](#usage)
+[config](#config)
+[components](#components)
+
 ## Usage
 
 ### autoloader
@@ -65,6 +69,14 @@ customElements.define('aufbau-flag', AufbauFlag);
 <aufbau-context-menu>
 <aufbau-menu-item>
 ```
+
+# Components
+
+[aufbau-audio](#aufbau-audio)
+[aufbau-button](#aufbau-button)
+[aufbau-checkbox](#aufbau-checkbox)
+[aufbau-code](#aufbau-code)
+[aufbau-](#aufbau-)
 
 ## aufbau-audio
 
