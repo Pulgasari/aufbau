@@ -14,6 +14,8 @@
 <aufbau-avatar>
 <aufbau-breadcrumb>
 <aufbau-colorpicker>
+<aufbau-dash>
+<aufbau-dash-panel>
 <aufbau-epub>
 <aufbau-fake> (um so fake elemente zu generieren für testing und prototyping)
 <aufbau-flyout>
