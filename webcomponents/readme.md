@@ -46,6 +46,31 @@
 <aufbau-menu-item>
 ```
 
+## aufbau-checkbox
+
+```html
+<aufbau-checkbox label="AGB akzeptieren" checked></aufbau-checkbox>
+```
+
+## aufbau-code
+
+```html
+<!-- 1. Code-Block mit Inline-Text -->
+<aufbau-code lang="javascript">
+const greet = (name) => `Hello, ${name}!`;
+console.log(greet('aufbau'));
+</aufbau-code>
+
+<!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
+<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+```
+
+## aufbau-combobox
+
+```html
+<aufbau-combobox src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-combobox>
+```
+
 ## aufbau-datalist
 
 ```html
@@ -66,6 +91,22 @@
 <!-- Und deine inputs nutzen das einfach nativ -->
 <aufbau-input type="text" list="cities" placeholder="Select City..."></aufbau-input>
 <aufbau-input type="text" list="countries" placeholder="Select Country..."></aufbau-input>
+```
+
+## aufbau-dropdown
+
+```html
+<aufbau-dropdown label="Optionen">
+  <a href="#edit">Bearbeiten</a>
+  <a href="#delete">Löschen</a>
+</aufbau-dropdown>
+```
+
+## aufbau-flag
+
+```html
+<aufbau-flag code="de" variant="circle"></aufbau-flag>
+<aufbau-flag code="us"></aufbau-flag>
 ```
 
 ## aufbau-index
@@ -91,7 +132,37 @@
 ```html
 <!-- Input with preset icon & datalist linkage -->
 <aufbau-input type="email" placeholder="Enter your email"></aufbau-input>
-<aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
+```
+
+... with [<aufbau-datalist>](#aufbau-datalist)]
+```html
+<aufbau-input type="text" datalist="city-list" placeholder="Select City..."></aufbau-input>
+```
+
+## aufbau-slider
+
+```html
+<aufbau-slider value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
+```
+
+## aufbau-switch
+
+```html
+<aufbau-switch value="month" mode="buttons">
+  <option value="day">Tag</option>
+  <option value="month">Monat</option>
+  <option value="year">Jahr</option>
+</aufbau-switch>
+```
+
+## aufbau-table
+
+```html
+<!-- 3. Tabelle direkt aus einer CSV-Datei -->
+<aufbau-table src="/data/users.csv"></aufbau-table>
+
+<!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
+<aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
 ```
 
 ## aufbau-toc
@@ -108,6 +179,24 @@
 </div>
 ```
 
+## aufbau-toggle
+
+```html
+<aufbau-toggle label="Darkmode aktivieren" checked></aufbau-toggle>
+```
+
+## aufbau-video
+
+```html
+<aufbau-video youtube-id="dQw4w9WgXcQ"></aufbau-video>
+```
+
+## aufbau-waveform
+
+```html
+<aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
+```
+
 ---
 
 ```html
@@ -115,8 +204,7 @@
 <datalist is="aufbau-datalist" id="city-list" src="/api/cities.json" key="name"></datalist>
 
 <!-- Input with preset icon & datalist linkage -->
-<aufbau-input type="email" placeholder="Enter your email"></aufbau-input>
-<aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
+
 
 <!-- Filter search bar connected directly to an aufbau-index layout -->
 <aufbau-filter target="aufbau-index aufbau-item" placeholder="Search items..."></aufbau-filter>
@@ -128,27 +216,19 @@
 </aufbau-index>
 
 <!-- Flagge -->
-<aufbau-flag code="de" variant="circle"></aufbau-flag>
-<aufbau-flag code="us"></aufbau-flag>
+
 
 <!-- Video / YouTube -->
-<aufbau-video youtube-id="dQw4w9WgXcQ"></aufbau-video>
+
 
 <!-- Toggle -->
-<aufbau-toggle label="Darkmode aktivieren" checked></aufbau-toggle>
+
 
 <!-- Dropdown -->
-<aufbau-dropdown label="Optionen">
-  <a href="#edit">Bearbeiten</a>
-  <a href="#delete">Löschen</a>
-</aufbau-dropdown>
+
 
 <!-- Switch / Segmented Control -->
-<aufbau-switch value="month" mode="buttons">
-  <option value="day">Tag</option>
-  <option value="month">Monat</option>
-  <option value="year">Jahr</option>
-</aufbau-switch>
+
 
 <!-- 1. Button mit Icon + Attribut-Text -->
 <aufbau-button icon="lucide:save" label="Speichern" variant="primary"></aufbau-button>
@@ -158,20 +238,8 @@
   <strong>Löschen</strong> <small>(irreversibel)</small>
 </aufbau-button>
 
-<!-- 3. Tabelle direkt aus einer CSV-Datei -->
-<aufbau-table src="/data/users.csv"></aufbau-table>
 
-<!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
-<aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
 
-<!-- 1. Code-Block mit Inline-Text -->
-<aufbau-code lang="javascript">
-const greet = (name) => `Hello, ${name}!`;
-console.log(greet('aufbau'));
-</aufbau-code>
-
-<!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
-<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
 
 <!-- 3. Text-Element, das direkt eine Markdown-Datei lädt -->
 <aufbau-text src="/docs/getting-started.md"></aufbau-text>
@@ -180,16 +248,16 @@ console.log(greet('aufbau'));
 <aufbau-text raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-text>
 
 <!-- 1. Checkbox -->
-<aufbau-checkbox label="AGB akzeptieren" checked></aufbau-checkbox>
+
 
 <!-- 2. Combobox (aus Remote YAML oder inline options) -->
-<aufbau-combobox src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-combobox>
+
 
 <!-- 3. Number Input mit Einheit -->
 <aufbau-number value="16" min="8" max="64" step="2" unit="px"></aufbau-number>
 
 <!-- 4. Slider mit +/- Buttons & editierbarem Textfeld -->
-<aufbau-slider value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
+
 
 <!-- 1. Toast Triggern via JS -->
 <button onclick="AufbauToast.notify({ type: 'success', title: 'Gespeichert!', message: 'Daten wurden aktualisiert.' })">
@@ -206,7 +274,6 @@ console.log(greet('aufbau'));
 </aufbau-audio>
 
 <!-- 3. Interaktive Waveform -->
-<aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
 
 <!-- 4. Tree Explorer (Verschachtelt) -->
 <aufbau-tree>
