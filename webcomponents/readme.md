@@ -15,6 +15,14 @@ import '@aufbau/components/button';
 import '@aufbau/components/flag';
 ```
 
+Or do it explictily in case you wanna rename the components or whatever.
+
+```javascript
+import { AufbauFlag } from '@aufbau/components/flag';
+
+customElements.define('aufbau-flag', AufbauFlag);
+```
+
 ```md
 <aufbau-avatar>
 <aufbau-breadcrumb>
