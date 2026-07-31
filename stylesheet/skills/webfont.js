@@ -11,6 +11,9 @@ const WEBFONT_MAP = {
   'Roboto'         : { wght: 'wght@400;700'     , fallback: 'sans-serif' },
 };
 
+//const WEBFONT_MAP = new Map;
+//WEBFONT_MAP.set('Hubot Sans' , { wght: 'ital,wght@0,200..900;1,200..900', fallback: 'monospace' });
+
 
 function buildFontUrl (fontFamily, wght = 'wght@400;500;700') {
   const formattedFamily = encodeURIComponent(fontFamily).replace(/%20/g, '+');
@@ -18,7 +21,7 @@ function buildFontUrl (fontFamily, wght = 'wght@400;500;700') {
 }
 
 export default function (code) {
-  const imports = new Set();
+  const imports = new Set;
 
   code = code.replace(WEBFONT_REGEX, (_, fontName) => {
     const rawName    = fontName.trim();
