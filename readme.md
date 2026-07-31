@@ -10,20 +10,20 @@
 
 #### packages
 
+[@aufbau/cache](#aufbau-cache)
 [@aufbau/elements](#aufbau-elements)
 [@aufbau/import](#aufbau-import)
+[@aufbau/patterns](#aufbau-patterns)
 [@aufbau/shaders](#aufbau-shaders)
 [@aufbau/stylesheet](#aufbau-stylesheet)
 
-@aufbau/cache
 @aufbau/hyperfetch
-@aufbau/patterns
 @aufbau/shapeshift
 @aufbau/templates
 @aufbau/themes
 @aufbau/workers
 
-#### pure resources
+#### resources
 
 [@aufbau/css](#aufbau-css)
 [@aufbau/svg](#aufbau-svg)
