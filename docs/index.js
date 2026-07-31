@@ -16,7 +16,6 @@ createDocsFW({
   target     : '#app',
   footerText : 'aufbau | 2026',
   sidebar: [
-    { title: 'Overview'      , path: 'docs/readme.md' },
     { title: 'kits'          , path: 'docs/kits.md' },
     { title: 'packages'      , path: 'docs/packages.md' },
     { title: 'resources'     , path: 'docs/resources.md' },
