@@ -4,22 +4,67 @@ import aufbau, { html, Fragment, effect } from '@aufbau/kit';
 /**
  * Extract path and anchor ID from location hash.
  */
-export function parseHash() {
+export function parseHash(defaultPath = 'readme.md') {
   const hash = window.location.hash.replace(/^#\/?/, '');
-  if (!hash) return { path: 'readme.md', anchor: null };
+  if (!hash) return { path: defaultPath, anchor: null };
 
   const [path, anchor] = hash.split('#');
   return {
-    path   : path   || 'readme.md', 
+    path   : path   || defaultPath, 
     anchor : anchor || null
   };
 }
 
 /**
+ * Normalize sidebar configuration from either Array or Object format.
+ */
+function normalizeSidebar(sidebar) {
+  if (Array.isArray(sidebar)) return sidebar;
+  if (sidebar && typeof sidebar === 'object') {
+    return Object.entries(sidebar).map(([title, path]) => ({ title, path }));
+  }
+  return [];
+}
+
+/**
+ * Resolve content extensions (before / after content injections).
+ * Supports: File paths (.html, .md), raw HTML strings, or Preact Component functions.
+ */
+async function resolveExtension(ext) {
+  if (!ext) return null;
+
+  // Case A: Preact Component function
+  if (typeof ext === 'function') {
+    return { type: 'component', value: ext };
+  }
+
+  // Case B: String (File path or raw HTML)
+  if (typeof ext === 'string') {
+    const trimmed = ext.trim();
+    
+    // Inline HTML check (starts with '<' or contains line breaks)
+    if (trimmed.startsWith('<') || trimmed.includes('\n')) {
+      return { type: 'html', value: trimmed };
+    }
+
+    // Treat as file path to import via @aufbau/import
+    try {
+      const imported = await aufbau.import(trimmed);
+      return { type: 'html', value: typeof imported === 'string' ? imported : '' };
+    } catch (err) {
+      console.warn(`[DocsFW] Failed to load extension content from "${trimmed}":`, err);
+      return null;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Inject slug IDs into HTML headings and generate Table of Contents items.
  */
-export function processHtmlAndBuildToc (htmlContent) {
-  const parser   = new DOMParser;
+export function processHtmlAndBuildToc(htmlContent) {
+  const parser   = new DOMParser();
   const doc      = parser.parseFromString(htmlContent, 'text/html');
   const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
   const toc      = [];
@@ -52,22 +97,30 @@ export function processHtmlAndBuildToc (htmlContent) {
 export function createDocsFW(config = {}) {
   const {
     title      = 'Documentation',
+    index      = 'readme.md',
     sidebar    = [],
     target     = '#app',
-    footerText = 'Powered by @aufbau/docsfw'
+    footerText = 'Powered by @aufbau/docsfw',
+    before     = null,
+    after      = null
   } = config;
 
+  const normalizedSidebar = normalizeSidebar(sidebar);
+
   // Signals
-  const currentRoute = aufbau.signal(parseHash());
+  const currentRoute = aufbau.signal(parseHash(index));
   const mdContent    = aufbau.signal('');
   const tocList      = aufbau.signal([]);
   const isLoading    = aufbau.signal(true);
   const errorMessage = aufbau.signal(null);
 
+  const beforeSlot   = aufbau.signal(null);
+  const afterSlot    = aufbau.signal(null);
+
   // Hash router event listener
   if (typeof window !== 'undefined') {
     window.addEventListener('hashchange', () => {
-      currentRoute.value = parseHash();
+      currentRoute.value = parseHash(index);
     });
   }
 
@@ -76,17 +129,24 @@ export function createDocsFW(config = {}) {
     const { path, anchor } = currentRoute.value;
 
     async function loadDocument() {
-         isLoading.value = true;
+      isLoading.value = true;
       errorMessage.value = null;
 
       try {
-        // Fetch and parse markdown via @aufbau/import
-        const rawHtml = await aufbau.import(`./${path}`);
+        // Fetch document and extensions in parallel
+        const [rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
+          aufbau.import(`./${path}`),
+          resolveExtension(before),
+          resolveExtension(after)
+        ]);
+
         const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
 
-        mdContent.value = processedHtml;
-          tocList.value = toc;
-        isLoading.value = false;
+        mdContent.value  = processedHtml;
+        tocList.value    = toc;
+        beforeSlot.value = resolvedBefore;
+        afterSlot.value  = resolvedAfter;
+        isLoading.value  = false;
 
         // Post-render DOM manipulation
         requestAnimationFrame(() => {
@@ -104,21 +164,32 @@ export function createDocsFW(config = {}) {
       } catch (err) {
         console.error('[DocsFW Error]:', err);
         errorMessage.value = `Failed to load document: ${path}`;
-           isLoading.value = false;
+        isLoading.value    = false;
       }
     }
 
     loadDocument();
   });
 
+  // Helper component to render dynamic extensions
+  function ExtensionSlot ({ slotData }) {
+    switch (slotData?.type) {
+      case 'component' : return html`<${slotData.value} />`;
+      case 'html'      ; return html`<div class="docs-extension" dangerouslySetInnerHTML=${{ __html: slotData.value }} />`;     
+      default          : return null;
+    }
+  }
+
   // UI Components
   function Header() {
     const activePath = currentRoute.value.path;
     return html`
       <header id="app-header">
-        <div class="brand">${title}</div>
+        <a href="#/${index}" class="brand-link">
+          <div class="brand">${title}</div>
+        </a>
         <nav class="docs-nav">
-          ${sidebar.map(item => html`
+          ${normalizedSidebar.map(item => html`
             <a 
               key=${item.path} 
               href="#/${item.path}" 
@@ -129,16 +200,6 @@ export function createDocsFW(config = {}) {
           `)}
         </nav>
       </header>
-    `;
-  }
-
-  function SidebarNav() {
-    
-
-    return html`
-      <aside class="docs-sidebar">
-        
-      </aside>
     `;
   }
 
@@ -177,10 +238,14 @@ export function createDocsFW(config = {}) {
 
     return html`
       <div class="docs-body-wrapper">
-        <article 
-          class="markdown-body" 
-          dangerouslySetInnerHTML=${{ __html: mdContent.value }} 
-        />
+        <div class="docs-content-container">
+          <${ExtensionSlot} slotData=${beforeSlot.value} />
+          <article 
+            class="markdown-body" 
+            dangerouslySetInnerHTML=${{ __html: mdContent.value }} 
+          />
+          <${ExtensionSlot} slotData=${afterSlot.value} />
+        </div>
         <${TableOfContents} />
       </div>
     `;
