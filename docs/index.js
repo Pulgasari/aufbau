@@ -24,10 +24,10 @@ createDocsFW({
   target : '#app',
   title  : 'aufbau :: docs',
   sidebar: {
+    components : 'webcomponents/readme.md',
     kits       : 'docs/kits.md',
     packages   : 'docs/packages.md',
     resources  : 'docs/resources.md',
-    components : 'webcomponents/readme.md',
   },
 
   // Content Injections (Component, File Path, or Raw HTML String)
