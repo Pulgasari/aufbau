@@ -39,6 +39,7 @@
 <aufbau-toolbar>
 <aufbau-tree>
 <aufbau-tree-item>
+<aufbau-waveform>
 
 <aufbau-action-menu>
 <aufbau-context-menu>
