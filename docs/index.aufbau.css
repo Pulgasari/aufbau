@@ -125,6 +125,7 @@ body { aufbau-use: .flow-y; }
 #app-header nav { aufbau-use : flow-x; }
 #app-footer     { aufbau-use : flow-x; }
 .markdown-body  { aufbau-use : flow-y; }
+.docs-toc nav   { aufbau-use : flow-y; }
 
 .markdown-body  { gap: 1rem; }
 #app-header     { gap: 1rem; padding: 1rem; justify-content: space-between; }
