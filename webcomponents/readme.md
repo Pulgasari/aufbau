@@ -21,6 +21,7 @@
 <aufbau-keyboard>
 <aufbau-media> (allrounder?)
 <aufbau-modal>
+<aufbau-paginate>
 <aufbau-popup>
 <aufbau-progress>
 <aufbau-slider>
