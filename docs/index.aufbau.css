@@ -70,7 +70,13 @@ body {
 }
 
 pre, code {
-  aufbau-webfont: 'JetBrains Mono';
+  aufbau-webfont : 'JetBrains Mono';
+  line-height    : 1.25;
+}
+
+.markdown-body {
+  aufbau-use: .vert;
+  gap: 1rem;
 }
 
 /*
