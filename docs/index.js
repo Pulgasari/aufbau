@@ -11,18 +11,6 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     .catch(err => console.error('[SW Error]:', err));
 }
 
-createDocsFW({
-  title      : 'aufbau :: docs',
-  target     : '#app',
-  footerText : 'aufbau | 2026',
-  sidebar: [
-    { title: 'kits'          , path: 'docs/kits.md' },
-    { title: 'packages'      , path: 'docs/packages.md' },
-    { title: 'resources'     , path: 'docs/resources.md' },
-    { title: 'webcomponents' , path: 'webcomponents/readme.md' },
-  ]
-});
-
 function VersionBanner() {
   return html`
     <div class="version-banner">
@@ -32,12 +20,9 @@ function VersionBanner() {
 }
 
 createDocsFW({
-  title      : 'aufbau :: docs',
-  index      : 'readme.md', // Start Markdown file
-  target     : '#app',
-  footerText : 'aufbau | 2026',
-
-  // Flexible Object-Notation for sidebar
+  index  : 'readme.md', // Start Markdown file
+  target : '#app',
+  title  : 'aufbau :: docs',
   sidebar: {
     kits       : 'docs/kits.md',
     packages   : 'docs/packages.md',
@@ -46,6 +31,7 @@ createDocsFW({
   },
 
   // Content Injections (Component, File Path, or Raw HTML String)
-  before : VersionBanner,
-  after  : '<p class="content-feedback">Found an issue? Edit this page on GitHub.</p>'       
+  footerText : 'aufbau | 2026',
+  before     : VersionBanner,
+  after      : '<p class="content-feedback">Found an issue? Edit this page on GitHub.</p>'       
 });
