@@ -1,5 +1,27 @@
 # @aufbau/webcomponents
 
+## aufbau-datalist
+
+```html
+<!-- 1. JSONC mit Kommentaren -->
+<datalist is="aufbau-datalist" id="cities" src="/data/cities.jsonc" key="name"></datalist>
+
+<!-- 2. Lesbares YAML -->
+<datalist is="aufbau-datalist" id="tags" src="/config/tags.yaml"></datalist>
+
+<!-- 3. Riesen CSV/TSV Tabellen (geparst via PapaParse) -->
+<datalist is="aufbau-datalist" id="countries" src="/data/countries.csv" key="CountryName"></datalist>
+
+<!-- 4. TOML Config -->
+<datalist is="aufbau-datalist" id="presets" src="/settings/presets.toml" key="title"></datalist>
+```
+
+```html
+<!-- Und deine inputs nutzen das einfach nativ -->
+<aufbau-input type="text" list="cities" placeholder="Select City..."></aufbau-input>
+<aufbau-input type="text" list="countries" placeholder="Select Country..."></aufbau-input>
+```
+
 ## aufbau-index
 
 ```html
