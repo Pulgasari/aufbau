@@ -48,17 +48,17 @@ export function processHtmlAndBuildToc(htmlContent) {
  */
 export function createDocsFW(config = {}) {
   const {
-    title = 'Documentation',
-    sidebar = [],
-    target = '#app',
+    title      = 'Documentation',
+    sidebar    = [],
+    target     = '#app',
     footerText = 'Powered by @aufbau/docsfw'
   } = config;
 
   // Signals
   const currentRoute = aufbau.signal(parseHash());
-  const mdContent = aufbau.signal('');
-  const tocList = aufbau.signal([]);
-  const isLoading = aufbau.signal(true);
+  const mdContent    = aufbau.signal('');
+  const tocList      = aufbau.signal([]);
+  const isLoading    = aufbau.signal(true);
   const errorMessage = aufbau.signal(null);
 
   // Hash router event listener
@@ -73,7 +73,7 @@ export function createDocsFW(config = {}) {
     const { path, anchor } = currentRoute.value;
 
     async function loadDocument() {
-      isLoading.value = true;
+         isLoading.value = true;
       errorMessage.value = null;
 
       try {
@@ -82,7 +82,7 @@ export function createDocsFW(config = {}) {
         const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
 
         mdContent.value = processedHtml;
-        tocList.value = toc;
+          tocList.value = toc;
         isLoading.value = false;
 
         // Post-render DOM manipulation
@@ -101,7 +101,7 @@ export function createDocsFW(config = {}) {
       } catch (err) {
         console.error('[DocsFW Error]:', err);
         errorMessage.value = `Failed to load document: ${path}`;
-        isLoading.value = false;
+           isLoading.value = false;
       }
     }
 
