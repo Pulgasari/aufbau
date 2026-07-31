@@ -14,6 +14,7 @@
 [@aufbau/elements](#aufbau-elements)
 [@aufbau/import](#aufbau-import)
 [@aufbau/patterns](#aufbau-patterns)
+[@aufbau/plugins](#aufbau-plugins)
 [@aufbau/shaders](#aufbau-shaders)
 [@aufbau/stylesheet](#aufbau-stylesheet)
 
