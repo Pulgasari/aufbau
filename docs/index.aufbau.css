@@ -71,6 +71,7 @@ body {
 
 pre, code {
   aufbau-webfont : 'JetBrains Mono';
+  font-size      : 0.8rem;
   line-height    : 1.25;
 }
 
