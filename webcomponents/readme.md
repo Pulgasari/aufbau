@@ -1,5 +1,13 @@
 # @aufbau/webcomponents
 
+```md
+<aufbau-table>
+<aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
+<aufbau-breadcrumb>
+<aufbau-progess>
+<aufbau-toast>
+```
+
 ## aufbau-datalist
 
 ```html
