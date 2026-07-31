@@ -12,7 +12,7 @@ async function fetchText(path) {
   return response.text();
 }
 
-// Helper: Prüft, ob ein Objekt serialisierbar für IndexedDB ist
+// helper: checks whether a value can be serialized for IndexedDB storage
 const isCacheable = (val) => {
   if (!val || typeof val !== 'object') return typeof val !== 'function';
   if (val instanceof Node || val instanceof CSSStyleSheet) return false;
