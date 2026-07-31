@@ -30,8 +30,8 @@
 <aufbau-progress>
 <aufbau-scroller>
 <aufbau-skeleton>
-
 <aufbau-svg>
+<aufbau-terminal>
 <aufbau-toast>
 <aufbau-tree>
 <aufbau-tree-item>
