@@ -14,6 +14,7 @@
 <aufbau-avatar>
 <aufbau-breadcrumb>
 <aufbau-colorpicker>
+<aufbau-copy>
 <aufbau-dash>
 <aufbau-dash-panel>
 <aufbau-epub>
@@ -35,6 +36,7 @@
 <aufbau-svg>
 <aufbau-terminal>
 <aufbau-toast>
+<aufbau-toolbar>
 <aufbau-tree>
 <aufbau-tree-item>
 
