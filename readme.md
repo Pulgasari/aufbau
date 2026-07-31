@@ -4,7 +4,7 @@
 
 ***Note:** It's also working with deno, node, vite etc. but working 100% client-side is the main focus.*
 
-#### the kit
+#### kits
 
 [@aufbau/kit](#aufbau-kit)
 
@@ -127,6 +127,10 @@ body > * { padding: small; }
 ## @aufbau/templates
 
 ## @aufbau/themes
+
+## @aufbau/webcomponents
+
+read more [here](#webcomponents).
 
 ## @aufbau/workers
 
