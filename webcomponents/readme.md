@@ -164,4 +164,19 @@
 <!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
 <aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
 
+<!-- 1. Code-Block mit Inline-Text -->
+<aufbau-code lang="javascript">
+const greet = (name) => `Hello, ${name}!`;
+console.log(greet('aufbau'));
+</aufbau-code>
+
+<!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
+<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+
+<!-- 3. Text-Element, das direkt eine Markdown-Datei lädt -->
+<aufbau-text src="/docs/getting-started.md"></aufbau-text>
+
+<!-- 4. Text-Element mit inline Markdown -->
+<aufbau-text raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-text>
+
 ```
