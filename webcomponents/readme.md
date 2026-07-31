@@ -5,7 +5,6 @@
 <aufbau-code>
 <aufbau-table> (hab gar kein bock table von hand zu bauen, also kann das teil nur objekte und vllt arrays entgegennehmen, und natürlich @aufbau/import wie datalist)
 <aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
-
 <aufbau-checkbox>
 <aufbau-combobox>
 <aufbau-number>
@@ -23,6 +22,7 @@
 <aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
 <aufbau-include>
 <aufbau-keyboard>
+<aufbau-loop>
 <aufbau-media> (allrounder?)
 <aufbau-modal>
 <aufbau-paginate>
