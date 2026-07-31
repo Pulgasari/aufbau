@@ -22,6 +22,7 @@
 <aufbau-modal>
 <aufbau-popup>
 <aufbau-progress>
+<aufbau-slider>
 <aufbau-svg>
 <aufbau-toast>
 
