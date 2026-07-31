@@ -1,11 +1,14 @@
 # @aufbau/webcomponents
 
 ```md
-<aufbau-table>
+<aufbau-button> (optinal icon und label/text attribut, aber auch childrnr möglich>
+<aufbau-table> (hab gar kein bock table von hand zu bauen, also kann das teil nur objekte und vllt arrays entgegennehmen, und natürlich @aufbau/import wie datalist)
 
 <aufbau-audio> (optional mit image, diverse layouts)
 <aufbau-breadcrumb>
-<aufbau-progess>
+<aufbau-filetree>
+<aufbau-keyboard>
+<aufbau-progress>
 <aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
 <aufbau-toast>
 ```
