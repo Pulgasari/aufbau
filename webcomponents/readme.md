@@ -2,9 +2,11 @@
 
 ```md
 <aufbau-table>
-<aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
+
+<aufbau-audio> (optional mit image, diverse layouts)
 <aufbau-breadcrumb>
 <aufbau-progess>
+<aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
 <aufbau-toast>
 ```
 
