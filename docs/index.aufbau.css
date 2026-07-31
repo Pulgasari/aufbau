@@ -124,13 +124,14 @@ body { aufbau-use: .vert; }
 #app { aufbau-use: .vert;  flex-shrink: 1; }
 #app > #app-header { flex: 0 0 auto; }
 #app > #app-footer { flex: 0 0 auto; }
-#app > #app-body   { flex: 1; min-height: 0; overflow-y: auto; }
+#app > #app-body   { flex: 1; overflow-y: auto; }
 
-#app-body   { aufbau-use: .vert; padding: 1rem; }
-#playground { aufbau-use: .vert; gap: 1rem; }
+#app-body   { padding: 1rem; }
 
-
-
+#app-body       { aufbau-use : flow-y; }
+#app-header     { aufbau-use : flow-x; }
+#app-header nav { aufbau-use : flow-x; }
+#app-footer     { aufbau-use : flow-x; }
 
 
 #app-header {
@@ -139,8 +140,6 @@ body { aufbau-use: .vert; }
   flex-flow       : row;
   align-items     : center;
   */
-
-  aufbau-use : flow-x;
   
   justify-content : space-between;
   gap             : 1rem;
@@ -152,16 +151,13 @@ body { aufbau-use: .vert; }
   fley-flow       : row;
   align-items     : center;
   */
-
-  aufbau-use : flow-x;
   
   justify-content : center;
   gap             : 1rem;
   padding         : 1rem;
 }
 #app-header nav {
-  aufbau-use : flow-x;
-  gap        : 0.5rem;
+  gap: 0.5rem;
 }
 
 #code-input,
