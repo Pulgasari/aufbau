@@ -31,9 +31,9 @@ createDocsFW({
   
   sidebar: {
     components : '$repo/webcomponents/readme.md',
-    kits       : 'docs/kits.md',
+    kits       : 'kits.md',
     packages   : 'packages.md',
-    resources  : 'docs/resources.md',
+    resources  : 'resources.md',
   },
 
   // Content Injections (Component, File Path, or Raw HTML String)
