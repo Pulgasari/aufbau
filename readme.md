@@ -10,10 +10,10 @@
 
 #### packages
 
+[@aufbau/elements](#aufbau-elements)
 [@aufbau/import](#aufbau-import)
 [@aufbau/shaders](#aufbau-shaders)
 [@aufbau/stylesheet](#aufbau-stylesheet)
-[@aufbau/webcomponents](#aufbau-webcomponents)
 
 @aufbau/cache
 @aufbau/hyperfetch
@@ -46,6 +46,10 @@ import aufbau, { html } from '@aufbau/kit';
 # packages
 
 ## @aufbau/cache
+
+## @aufbau/elements
+
+read more [here](elements/readme.md).
 
 ## @aufbau/hyperfetch
 
@@ -127,10 +131,6 @@ body > * { padding: small; }
 ## @aufbau/templates
 
 ## @aufbau/themes
-
-## @aufbau/webcomponents
-
-read more [here](webcomponents/readme.md).
 
 ## @aufbau/workers
 
