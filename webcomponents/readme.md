@@ -8,7 +8,7 @@
 
 ### autoloader
 
-the components load automatically as soon as they appear in the DOM.
+the components load automatically as soon as they appear in the DOM. fits best for usage directly in the browser.
 
 ```html
 <script type="module">
@@ -21,20 +21,24 @@ the components load automatically as soon as they appear in the DOM.
 <aufbau-slider value="50"></aufbau-slider>
 ```
 
-### Register all components at once
+### register all components at once
+
+registers all components at once. is good for prototyping.
 
 ```javascript
 import '@aufbau/components';
 ```
 
-### one by one
+### register components one by one
+
+only register the components you need.
 
 ```javascript
 import '@aufbau/components/button';
 import '@aufbau/components/flag';
 ```
 
-Or do it explictily in case you wanna rename the components or whatever.
+or do it explictily in case you wanna rename the components or whatever.
 
 ```javascript
 import { AufbauFlag } from '@aufbau/components/flag';
