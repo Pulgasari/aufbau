@@ -9,9 +9,9 @@ import { slugify } from '@aufbau/utils';
  */
 async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
   let title = titleOption || 'Documentation';
-  let img = null;
-  let svgPath = null;
+  let img        = null;
   let svgContent = null;
+  let svgPath    = null;
 
   if (typeof brandOption === 'string') {
     title = brandOption;
