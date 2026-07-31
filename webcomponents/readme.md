@@ -40,6 +40,14 @@
 </aufbau-index>
 ```
 
+## aufbau-input
+
+```html
+<!-- Input with preset icon & datalist linkage -->
+<aufbau-input type="email" placeholder="Enter your email"></aufbau-input>
+<aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
+```
+
 ## aufbau-toc
 
 ```html
