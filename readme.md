@@ -4,6 +4,10 @@
 
 ***Note:** It's also working with deno, node, vite etc. but working 100% client-side is the main focus.*
 
+#### docs
+
+*read the fucking [docs](https://pulgasari.github.io/aufbau/docs/)! >.<*
+
 #### kits
 
 [@aufbau/kit](#aufbau-kit)
