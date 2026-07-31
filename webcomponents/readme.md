@@ -12,6 +12,7 @@
 <aufbau-filetree>
 <aufbau-flyout>
 <aufbau-graph>
+<aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
 <aufbau-keyboard>
 <aufbau-media> (allrounder?)
 <aufbau-modal>
