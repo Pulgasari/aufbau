@@ -72,11 +72,31 @@ customElements.define('aufbau-flag', AufbauFlag);
 
 # Components
 
-[`<aufbau-audio>`](#aufbau-audio)
-[`<aufbau-button>`](#aufbau-button)
-[`<aufbau-checkbox>`](#aufbau-checkbox)
-[`<aufbau-code>`](#aufbau-code)
-[`<aufbau->`](#aufbau-)
+[`<aufbau-audio>`](#aufbau-audio) ·
+[`<aufbau-button>`](#aufbau-button) ·
+[`<aufbau-checkbox>`](#aufbau-checkbox) ·
+[`<aufbau-code>`](#aufbau-code) ·
+[`<aufbau-combobox>`](#aufbau-combobox) ·
+[`<aufbau-config>`](#aufbau-config) ·
+[`<aufbau-datalist>`](#aufbau-datalist) ·
+[`<aufbau-dropdown>`](#aufbau-dropdown) ·
+[`<aufbau-flag>`](#aufbau-flag) ·
+[`<aufbau-index>`](#aufbau-index) ·
+[`<aufbau-input>`](#aufbau-input) ·
+[`<aufbau-loop>`](#aufbau-loop) ·
+[`<aufbau-number>`](#aufbau-number) ·
+[`<aufbau-progress>`](#aufbau-progress) ·
+[`<aufbau-slider>`](#aufbau-slider) ·
+[`<aufbau-switch>`](#aufbau-switch) ·
+[`<aufbau-table>`](#aufbau-table) ·
+[`<aufbau-text>`](#aufbau-text) ·
+[`<aufbau-toc>`](#aufbau-toc) ·
+[`<aufbau-toggle>`](#aufbau-toggle) ·
+[`<aufbau-tree>`](#aufbau-tree) ·
+[`<aufbau-tree-item>`](#aufbau-tree-item) ·
+[`<aufbau-video>`](#aufbau-video) ·
+[`<aufbau-waveform>`](#aufbau-waveform) ·
+[`<aufbau->`](#aufbau-) ·
 
 ## aufbau-audio
 
