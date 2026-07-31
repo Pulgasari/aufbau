@@ -1,6 +1,6 @@
 # @aufbau/elements
 
-official **aufbau** *webcomponents\** libraray.
+official **aufbau** *webcomponents\** library.
 
 \* we don't like that begriff and prefer *"(custom) elements"*.
 
