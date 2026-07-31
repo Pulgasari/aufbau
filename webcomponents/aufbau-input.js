@@ -6,6 +6,8 @@ const VARIANT_ICONS = {
   email    : 'lucide:mail',
   password : 'lucide:lock',
   search   : 'bx:search',
+  tel      : 'lucide:phone',
+  url      : 'lucide:link',
 };
 
 export class AufbauInput extends AufbauElement {
