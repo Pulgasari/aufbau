@@ -2,6 +2,19 @@
 
 ## Usage
 
+### autoloader
+
+```html
+<script type="module">
+  import { enableAutoComponents } from '@aufbau/components/auto';
+  enableAutoComponents();
+</script>
+
+<!-- Magic happens: Components load automatically as soon as they appear in the DOM -->
+<aufbau-flag code="de"></aufbau-flag>
+<aufbau-slider value="50"></aufbau-slider>
+```
+
 ### Register all components at once
 
 ```javascript
