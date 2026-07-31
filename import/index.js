@@ -16,7 +16,7 @@ async function fetchText(path) {
 const isCacheable = (val) => {
   if (!val || typeof val !== 'object') return typeof val !== 'function';
   if (val instanceof Node || val instanceof CSSStyleSheet) return false;
-  // Module oder Objekte mit Funktionen ausschließen
+  // exclude modules or objects containing function members
   return !Object.values(val).some(v => typeof v === 'function');
 };
 
@@ -36,7 +36,12 @@ function transformCSSResult(cssCode, asOption) {
 
 // :::::: FORMAT HANDLERS
 
-export async function importCSV(path, options = {}) {
+export async function importCSS (path, options = {}) {
+  const text = await fetchText(path);
+  return transformCSSResult(text, options.as);
+}
+
+export async function importCSV (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -54,7 +59,36 @@ export async function importCSV(path, options = {}) {
   return result.data;
 }
 
-export async function importJSON5(path, options = {}) {
+export async function importHTML (path, options = {}) {
+  const text = await fetchText(path);
+  if (options.as === 'raw') return text;
+
+  if (options.as === 'document') {
+    const parser = new DOMParser();
+    return parser.parseFromString(text, 'text/html');
+  }
+
+  if (options.as === 'element') {
+    const div = document.createElement('div');
+    div.innerHTML = text;
+    return div;
+  }
+
+  return text; // Default: HTML String
+}
+
+export async function importJS (path, options = {}) {
+  if (options.as === 'raw') return fetchText(path);
+  return import(path);
+}
+
+export async function importJSON (path, options = {}) {
+  const text = await fetchText(path);
+  if (options.as === 'raw') return text;
+  return JSON.parse(text);
+}
+
+export async function importJSON5 (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -62,7 +96,7 @@ export async function importJSON5(path, options = {}) {
   return JSON5.parse(text);
 }
 
-export async function importJSONC(path, options = {}) {
+export async function importJSONC (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -70,7 +104,7 @@ export async function importJSONC(path, options = {}) {
   return JSON.parse(json);
 }
 
-export async function importJSX(path, options = {}) {
+export async function importJSX (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -86,7 +120,7 @@ export async function importJSX(path, options = {}) {
   return module;
 }
 
-export async function importLESS(path, options = {}) {
+export async function importLESS (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -96,7 +130,7 @@ export async function importLESS(path, options = {}) {
   return transformCSSResult(output.css, options.as);
 }
 
-export async function importMD(path, options = {}) {
+export async function importMD (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -118,7 +152,7 @@ export async function importMD(path, options = {}) {
   return html; // Default: 'html' (String)
 }
 
-export async function importSASS(path, options = {}) {
+export async function importSASS (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -128,7 +162,7 @@ export async function importSASS(path, options = {}) {
   return transformCSSResult(css, options.as);
 }
 
-export async function importSCSS(path, options = {}) {
+export async function importSCSS (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -138,7 +172,24 @@ export async function importSCSS(path, options = {}) {
   return transformCSSResult(css, options.as);
 }
 
-export async function importTOML(path, options = {}) {
+export async function importSVG (path, options = {}) {
+  const text = await fetchText(path);
+  if (options.as === 'raw') return text;
+
+  if (options.as === 'element') {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'image/svg+xml');
+    return doc.querySelector('svg') || doc.documentElement;
+  }
+
+  return text; // Default: SVG string
+}
+
+export async function importText (path, options = {}) {
+  return fetchText(path);
+}
+
+export async function importTOML (path, options = {}) {
   const text = await fetchText(path);
   if (options.as === 'raw') return text;
 
@@ -206,18 +257,28 @@ export async function importYAML(path, options = {}) {
 // :::::: EXTENSION MAP & MAIN ENTRY
 
 const extensionMap = {
+  cjs   : importJS,
+  css   : importCSS,
   csv   : importCSV,
+  htm   : importHTML,
+  html  : importHTML,
+  js    : importJS,
+  json  : importJSON,
   json5 : importJSON5,
   jsonc : importJSONC,
   jsx   : importJSX,
   less  : importLESS,
   md    : importMD,
+  mjs   : importJS,
   sass  : importSASS,
   scss  : importSCSS,
+  svg   : importSVG,
+  text  : importText,
   toml  : importTOML,
   ts    : importTS,
   tsx   : importTSX,
   tsv   : importCSV,
+  txt   : importText,
   wasm  : importWASM,
   xml   : importXML,
   yaml  : importYAML,
@@ -247,19 +308,8 @@ export async function importFile(path, options = {}) {
   const result = await handler(path, options);
 
   // 2. Cache result if serializable (skip DOM nodes, CSSStyleSheets or functions)
-  /*
-  if (
-    useCache &&
-    !(result instanceof Node) &&
-    !(result instanceof CSSStyleSheet) &&
-    typeof result !== 'function'
-  ) {
-    await cache.set(cacheKey, result);
-  }
-  */
-  
   if (useCache && isCacheable(result)) {
-    try       { await cache.set(cacheKey, result);} 
+    try       { await cache.set(cacheKey, result); } 
     catch (e) { console.warn(`[@aufbau/import] Could not cache "${path}":`, e); }
   }
 
