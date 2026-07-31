@@ -1,20 +1,6 @@
 # @aufbau/webcomponents
 
 ```md
-<aufbau-button> (optinal icon und label/text attribut, aber auch childrnr möglich>
-<aufbau-code>
-<aufbau-table> (hab gar kein bock table von hand zu bauen, also kann das teil nur objekte und vllt arrays entgegennehmen, und natürlich @aufbau/import wie datalist)
-<aufbau-text> (md-fähig via @aufbau-import, würde ich später mit spezielle text-features erweitern)
-<aufbau-checkbox>
-<aufbau-combobox>
-<aufbau-number>
-<aufbau-slider> (optional mit inc/dec buttons und/oder numberdisplay das auch input kann und optionalem unit display)
-<aufbau-toast>
-<aufbau-audio> (optional mit image, diverse layouts)
-<aufbau-waveform>
-<aufbau-tree>
-<aufbau-tree-item>
-
 <aufbau-avatar>
 <aufbau-breadcrumb>
 <aufbau-colorpicker>
@@ -29,12 +15,10 @@
 <aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
 <aufbau-include>
 <aufbau-keyboard>
-<aufbau-loop>
 <aufbau-media> (allrounder?)
 <aufbau-modal>
 <aufbau-paginate>
 <aufbau-popup>
-<aufbau-progress>
 <aufbau-scroller>
 <aufbau-skeleton>
 <aufbau-svg>
@@ -44,6 +28,30 @@
 <aufbau-action-menu>
 <aufbau-context-menu>
 <aufbau-menu-item>
+```
+
+## aufbau-audio
+
+```html
+<aufbau-audio 
+  src="/media/track.mp3" 
+  title="Cyberpunk Theme" 
+  artist="Synthwave Studio" 
+  cover="/media/cover.jpg"
+  layout="card">
+</aufbau-audio>
+```
+
+## aufbau-button
+
+```html
+<!-- 1. Button mit Icon + Attribut-Text -->
+<aufbau-button icon="lucide:save" label="Speichern" variant="primary"></aufbau-button>
+
+<!-- 2. Button mit Icon + Custom Children HTML -->
+<aufbau-button icon="lucide:trash-2" variant="danger">
+  <strong>Löschen</strong> <small>(irreversibel)</small>
+</aufbau-button>
 ```
 
 ## aufbau-checkbox
@@ -158,6 +166,12 @@ console.log(greet('aufbau'));
 </aufbau-loop>
 ```
 
+## aufbau-number
+
+```html
+<aufbau-number value="16" min="8" max="64" step="2" unit="px"></aufbau-number>
+```
+
 ## aufbau-progress
 
 ```html
@@ -194,6 +208,16 @@ console.log(greet('aufbau'));
 <aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
 ```
 
+## aufbau-text
+
+```html
+<!-- 3. Text-Element, das direkt eine Markdown-Datei lädt -->
+<aufbau-text src="/docs/getting-started.md"></aufbau-text>
+
+<!-- 4. Text-Element mit inline Markdown -->
+<aufbau-text raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-text>
+```
+
 ## aufbau-toc
 
 ```html
@@ -212,6 +236,25 @@ console.log(greet('aufbau'));
 
 ```html
 <aufbau-toggle label="Darkmode aktivieren" checked></aufbau-toggle>
+```
+
+## aufbau-tree
+
+```html
+<!-- 4. Tree Explorer (Verschachtelt) -->
+<aufbau-tree>
+  <aufbau-tree-item label="src" expanded>
+    <aufbau-tree-item label="components" expanded>
+      <aufbau-tree-item label="AufbauElement.js" icon="lucide:file-code"></aufbau-tree-item>
+      <aufbau-tree-item label="AufbauTree.js" icon="lucide:file-code"></aufbau-tree-item>
+    </aufbau-tree-item>
+    <aufbau-tree-item label="index.js" icon="lucide:file-code"></aufbau-tree-item>
+  </aufbau-tree-item>
+  <aufbau-tree-item label="package.json" icon="lucide:file-json"></aufbau-tree-item>
+</aufbau-tree>
+
+<!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
+<aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
 ```
 
 ## aufbau-video
@@ -244,79 +287,8 @@ console.log(greet('aufbau'));
   <aufbau-item>Google Pixel 8</aufbau-item>
 </aufbau-index>
 
-<!-- Flagge -->
-
-
-<!-- Video / YouTube -->
-
-
-<!-- Toggle -->
-
-
-<!-- Dropdown -->
-
-
-<!-- Switch / Segmented Control -->
-
-
-<!-- 1. Button mit Icon + Attribut-Text -->
-<aufbau-button icon="lucide:save" label="Speichern" variant="primary"></aufbau-button>
-
-<!-- 2. Button mit Icon + Custom Children HTML -->
-<aufbau-button icon="lucide:trash-2" variant="danger">
-  <strong>Löschen</strong> <small>(irreversibel)</small>
-</aufbau-button>
-
-
-
-
-<!-- 3. Text-Element, das direkt eine Markdown-Datei lädt -->
-<aufbau-text src="/docs/getting-started.md"></aufbau-text>
-
-<!-- 4. Text-Element mit inline Markdown -->
-<aufbau-text raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-text>
-
-<!-- 1. Checkbox -->
-
-
-<!-- 2. Combobox (aus Remote YAML oder inline options) -->
-
-
-<!-- 3. Number Input mit Einheit -->
-<aufbau-number value="16" min="8" max="64" step="2" unit="px"></aufbau-number>
-
-<!-- 4. Slider mit +/- Buttons & editierbarem Textfeld -->
-
-
 <!-- 1. Toast Triggern via JS -->
 <button onclick="AufbauToast.notify({ type: 'success', title: 'Gespeichert!', message: 'Daten wurden aktualisiert.' })">
   Toast anzeigen
 </button>
-
-<!-- 2. Audio Player mit Cover -->
-<aufbau-audio 
-  src="/media/track.mp3" 
-  title="Cyberpunk Theme" 
-  artist="Synthwave Studio" 
-  cover="/media/cover.jpg"
-  layout="card">
-</aufbau-audio>
-
-<!-- 3. Interaktive Waveform -->
-
-<!-- 4. Tree Explorer (Verschachtelt) -->
-<aufbau-tree>
-  <aufbau-tree-item label="src" expanded>
-    <aufbau-tree-item label="components" expanded>
-      <aufbau-tree-item label="AufbauElement.js" icon="lucide:file-code"></aufbau-tree-item>
-      <aufbau-tree-item label="AufbauTree.js" icon="lucide:file-code"></aufbau-tree-item>
-    </aufbau-tree-item>
-    <aufbau-tree-item label="index.js" icon="lucide:file-code"></aufbau-tree-item>
-  </aufbau-tree-item>
-  <aufbau-tree-item label="package.json" icon="lucide:file-json"></aufbau-tree-item>
-</aufbau-tree>
-
-<!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
-<aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
-
 ```
