@@ -53,3 +53,23 @@
   <aufbau-toc target="#markdown-container" selector="h2, h3"></aufbau-toc>
 </div>
 ```
+
+---
+
+```html
+<!-- Remote data fetch for datalist autocomplete -->
+<datalist is="aufbau-datalist" id="city-list" src="/api/cities.json" key="name"></datalist>
+
+<!-- Input with preset icon & datalist linkage -->
+<aufbau-input type="email" placeholder="Enter your email"></aufbau-input>
+<aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
+
+<!-- Filter search bar connected directly to an aufbau-index layout -->
+<aufbau-filter target="aufbau-index aufbau-item" placeholder="Search items..."></aufbau-filter>
+
+<aufbau-index viewmode="grid" item-look="200px squircle">
+  <aufbau-item>Apple iPhone 15</aufbau-item>
+  <aufbau-item>Samsung Galaxy S24</aufbau-item>
+  <aufbau-item>Google Pixel 8</aufbau-item>
+</aufbau-index>
+```
