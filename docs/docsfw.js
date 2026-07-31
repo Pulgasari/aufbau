@@ -15,15 +15,15 @@ export function parseHash() {
 /**
  * Inject slug IDs into HTML headings and generate Table of Contents items.
  */
-export function processHtmlAndBuildToc(htmlContent) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlContent, 'text/html');
+export function processHtmlAndBuildToc (htmlContent) {
+  const parser   = new DOMParser;
+  const doc      = parser.parseFromString(htmlContent, 'text/html');
   const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  const toc = [];
+  const toc      = [];
 
   headings.forEach((heading, index) => {
     const level = parseInt(heading.tagName.substring(1), 10);
-    const text = heading.textContent || '';
+    const text  = heading.textContent || '';
     
     let id = heading.id;
     if (!id) {
@@ -110,18 +110,10 @@ export function createDocsFW(config = {}) {
 
   // UI Components
   function Header() {
+    const activePath = currentRoute.value.path;
     return html`
       <header id="app-header">
         <div class="brand">${title}</div>
-      </header>
-    `;
-  }
-
-  function SidebarNav() {
-    const activePath = currentRoute.value.path;
-
-    return html`
-      <aside class="docs-sidebar">
         <nav class="docs-nav">
           ${sidebar.map(item => html`
             <a 
@@ -133,6 +125,16 @@ export function createDocsFW(config = {}) {
             </a>
           `)}
         </nav>
+      </header>
+    `;
+  }
+
+  function SidebarNav() {
+    
+
+    return html`
+      <aside class="docs-sidebar">
+        
       </aside>
     `;
   }
@@ -194,7 +196,6 @@ export function createDocsFW(config = {}) {
       <${Fragment}>
         <${Header} />
         <div id="app-body">
-          <${SidebarNav} />
           <main class="docs-main-content">
             <${MainContent} />
           </main>
