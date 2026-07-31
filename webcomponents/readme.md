@@ -150,4 +150,18 @@
   <option value="year">Jahr</option>
 </aufbau-switch>
 
+<!-- 1. Button mit Icon + Attribut-Text -->
+<aufbau-button icon="lucide:save" label="Speichern" variant="primary"></aufbau-button>
+
+<!-- 2. Button mit Icon + Custom Children HTML -->
+<aufbau-button icon="lucide:trash-2" variant="danger">
+  <strong>Löschen</strong> <small>(irreversibel)</small>
+</aufbau-button>
+
+<!-- 3. Tabelle direkt aus einer CSV-Datei -->
+<aufbau-table src="/data/users.csv"></aufbau-table>
+
+<!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
+<aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
+
 ```
