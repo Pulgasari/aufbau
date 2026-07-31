@@ -80,7 +80,9 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-config>`](#aufbau-config) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
+[`<aufbau-filter>`](#aufbau-filter) ·
 [`<aufbau-flag>`](#aufbau-flag) ·
+[`<aufbau-icon>`](#aufbau-icon) ·
 [`<aufbau-index>`](#aufbau-index) ·
 [`<aufbau-input>`](#aufbau-input) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
