@@ -179,4 +179,16 @@ console.log(greet('aufbau'));
 <!-- 4. Text-Element mit inline Markdown -->
 <aufbau-text raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-text>
 
+<!-- 1. Checkbox -->
+<aufbau-checkbox label="AGB akzeptieren" checked></aufbau-checkbox>
+
+<!-- 2. Combobox (aus Remote YAML oder inline options) -->
+<aufbau-combobox src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-combobox>
+
+<!-- 3. Number Input mit Einheit -->
+<aufbau-number value="16" min="8" max="64" step="2" unit="px"></aufbau-number>
+
+<!-- 4. Slider mit +/- Buttons & editierbarem Textfeld -->
+<aufbau-slider value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
+
 ```
