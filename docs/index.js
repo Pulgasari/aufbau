@@ -20,7 +20,7 @@ function VersionBanner() {
 }
 
 createDocsFW({
-  index  : 'readme.md', // Start Markdown file
+  index  : 'readme.md',
   target : '#app',
   title  : 'aufbau :: docs',
   sidebar: {
