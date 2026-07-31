@@ -78,10 +78,6 @@ pre, code {
   line-height    : 1.25;
 }
 
-.markdown-body {
-  aufbau-use: .flow-y;
-  gap: 1rem;
-}
 
 html, body { height: 100%; overflow: hidden; }
 body       { height: 100dvh; }
@@ -115,9 +111,9 @@ body       { height: 100dvh; }
 a { color: currentcolor; }
 
 
-body { aufbau-use: .vert; }
+body { aufbau-use: .flow-y; }
   
-#app { aufbau-use: .vert;  flex-shrink: 1; }
+#app { aufbau-use: .flow-y;  flex-shrink: 1; }
 #app > #app-header { flex: 0 0 auto; }
 #app > #app-footer { flex: 0 0 auto; }
 #app > #app-body   { flex: 1; overflow-y: auto; }
@@ -128,66 +124,12 @@ body { aufbau-use: .vert; }
 #app-header     { aufbau-use : flow-x; }
 #app-header nav { aufbau-use : flow-x; }
 #app-footer     { aufbau-use : flow-x; }
+.markdown-body  { aufbau-use : flow-y; }
 
-
-#app-header {
-  justify-content : space-between;
-  gap             : 1rem;
-  padding         : 1rem;
-}
-#app-footer {
-  justify-content : center;
-  gap             : 1rem;
-  padding         : 1rem;
-}
-#app-header nav {
-  gap: 0.5rem;
-}
-
-#code-input,
-#code-output {
-  display: flex;
-  flex-direction: column;
-
-  > *:nth-child(1) { flex: 0 0 auto; }
-  > *:nth-child(2) { flex: 1 0 auto; }
-}
-
-/* Styling for the editor overlay */
-.editor-wrapper { position: relative; width: 100%; }
-#code-input { position relative; }
-
-#code-input-area, .code-overlay,
-#code-output pre {
-  border-radius : 4px;
-  font-family   : monospace, monospace;
-  font-size     : 14px;
-  line-height   : 1.5;
-  padding       : 12px;
-}
-
-#code-input-area,
-.code-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  white-space: pre-wrap;
-  word-break: break-all;
-  border: 1px solid #444;
-}
-
-#code-input-area {
-  aufbau-colors: none;
-  caret-color: #fff;
-  z-index: 1;
-  resize: none;
-  outline: none;
-}
-
-.code-overlay    { pointer-events: none; overflow: hidden; z-index: 0; }
-#code-output pre { overflow: auto; }
+.markdown-body  { gap: 1rem; }
+#app-header     { gap: 1rem; padding: 1rem; justify-content: space-between; }
+#app-footer     { gap: 1rem; padding: 1rem; justify-content: center; }
+#app-header nav { gap: 0.5rem; }
 
 
 /*
