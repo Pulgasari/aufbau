@@ -70,6 +70,18 @@ export class AufbauElement extends HTMLElement {
   }
 
   // ::: shorthands
+  get attrs () { return new Proxy (this, {get (target, prop) {
+    if (typeof prop !== 'string') return undefined;
+    const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+    return target.hasAttribute(kebab) ? target.getAttribute(kebab) : undefined;     
+  }});}
+  get numAttrs () { return new Proxy (this, {get (target, prop) {
+    if (typeof prop !== 'string') return undefined;
+    const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+    if (!target.hasAttribute(kebab)) return undefined;
+    const parsed = parseFloat(target.getAttribute(kebab));
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }});}
   attr (name, fallback = '') {
     return this.getAttribute(name) ?? fallback;
   }
