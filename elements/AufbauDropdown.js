@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-dropdown>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauDropdown extends AufbauElement {
   static get observedAttributes() {
@@ -6,7 +8,7 @@ export class AufbauDropdown extends AufbauElement {
   }
 
   update() {
-    const label = this.getAttribute('label') || 'Menu';
+    const label  = this.getAttribute('label') || 'Menu';
     const isOpen = this.hasAttribute('open');
 
     this.innerHTML = `
@@ -24,3 +26,4 @@ export class AufbauDropdown extends AufbauElement {
 }
 
 customElements.define('aufbau-dropdown', AufbauDropdown);
+export default AufbauDropdown;
