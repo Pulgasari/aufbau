@@ -12,9 +12,6 @@ export function slugify (text) {
     .replace(/\s+/g, '-');
 }
 
-
-
-
 export const 
   
 // timing
