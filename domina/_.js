@@ -21,21 +21,7 @@ export let
 // Low-level: get
 // ---------------------------------------------------------------------------
 export let
-  getElementById        = selector            => document.getElementById(selector),
-  getElement            = (selector, context) => _doc(context).querySelector(_slct(selector)),
-  getElements           = (selector, context) => [..._doc(context).querySelectorAll(_slct(selector))],
-  getElementsByDataAttr = (key, parent)       => getElements(`[data-${key}]`, parent),
-  getElementsByDataKey  = (key, parent)       => getElements(`[data-key="${key}"]`, parent),
-
-// ---------------------------------------------------------------------------
-// Low-level: create (strict signature)
-// ---------------------------------------------------------------------------
-  createElement = (tag = 'div', props = {}, ...children) => {
-    const el = document.createElement(tag);
-    updateElement(el, props, ...children);
-    return el;
-  },
-
+  
   createFragment   = ()  => document.createDocumentFragment(),
   createFragment2  = sth => document.createRange().createContextualFragment(sth),
   createTextNode   = text => document.createTextNode(String(text)),
