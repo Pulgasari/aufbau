@@ -1,8 +1,8 @@
 class AufbauIcon extends HTMLElement {
-  static get observedAttributes() {
-    return ['icon'];
-  }
-
+  static att r= {
+    icon : String,
+  };
+  
   connectedCallback() {
     this.update();
   }
@@ -12,11 +12,9 @@ class AufbauIcon extends HTMLElement {
   }
 
   update() {
-    const icon = this.getAttribute('icon');
-    if (!icon) return;
-
+    const { icon }   = this.getAttr(); if (!icon) return;
     const normalized = icon.replace('/', ':');
-    const url = `https://api.iconify.design/${normalized}.svg`;
+    const url        = `https://api.iconify.design/${normalized}.svg`;
 
     // Apply the SVG as a CSS mask
     this.style.setProperty('--icon-url', `url("${url}")`);
@@ -42,6 +40,4 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-if (typeof window !== 'undefined' && !customElements.get('aufbau-icon')) {
-  customElements.define('aufbau-icon', AufbauIcon);
-}
+AufbauIcon.init();
