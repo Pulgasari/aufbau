@@ -121,6 +121,47 @@ export class AufbauElement extends HTMLElement {
 
   // ::: attributes
 
+    /**
+   * Unified attribute getter for single values or Proxy-based destructuring.
+   * 
+   * Usage single: this.getAttr('name', type, fallback)
+   * Usage proxy:  const { foo, bar } = this.getAttr(type)
+   * 
+   * @param {string|Function} [nameOrType=String] - Attribute name (string) OR type constructor when destructuring.
+   * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String] - Type constructor (when 1st arg is a string).
+   * @param {*} [fallback] - Fallback value (when 1st arg is a string).
+   */
+  getAttr (nameOrType = String, type = String, fallback) {
+    // Proxy mode: triggered when the first argument is not a string (e.g. Boolean, Number, or empty)
+    if (typeof nameOrType !== 'string') {
+      const targetType = typeof nameOrType === 'function' ? nameOrType : String;
+      return new Proxy(this, {
+        get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, targetType) : undefined)
+      });
+    }
+
+    // Single attribute mode
+    const kebab = toKebabCase(nameOrType);
+
+    if (type === Boolean) return this.hasAttribute(kebab);
+    if (!this.hasAttribute(kebab)) return fallback;
+
+    const val = this.getAttribute(kebab);
+
+    if (type === Number) {
+      const parsed = parseFloat(val);
+      return Number.isNaN(parsed) ? fallback : parsed;
+    }
+
+    if (typeof type === 'function' && type !== String) {
+      try   { return type(val); }
+      catch { return fallback; }
+    }
+
+    return val;
+  }
+
+
   /**
    * @param {string} name
    * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String]
