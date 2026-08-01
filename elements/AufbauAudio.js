@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-audio>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauAudio extends AufbauElement {
   static get observedAttributes() {
@@ -124,3 +126,4 @@ export class AufbauAudio extends AufbauElement {
 }
 
 customElements.define('aufbau-audio', AufbauAudio);
+export default AufbauAudio;
