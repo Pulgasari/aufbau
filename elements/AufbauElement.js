@@ -145,65 +145,6 @@ export class AufbauElement extends HTMLElement {
   // ::: attributes
 
   /**
-   * Unified attribute getter. Resolves types & fallbacks via static attr schema when available.
-   * 
-   * Single usage:  this.getAttr('max')
-   * Override:      this.getAttr('max', Number, 100)
-   * Proxy usage:   const { min, max } = this.getAttr()
-   * 
-   * @param {string|Function} [nameOrType] - Attribute name (string) OR override type constructor when destructuring.
-   * @param {Function} [type] - Optional override type constructor.
-   * @param {*} [fallback] - Optional override fallback value.
-   */
-  getAttr (nameOrType, type, fallback) {
-    // Proxy mode: triggered when first arg is not a string (or called as this.getAttr())
-    if (typeof nameOrType !== 'string') {
-      const overrideType = typeof nameOrType === 'function' ? nameOrType : null;
-      return new Proxy(this, {
-        get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, overrideType, undefined) : undefined)
-      });
-    }
-
-    // Single attribute mode
-    const key = nameOrType;
-    const classAttr = this.constructor.attr;
-    const schema = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
-
-    // Look up key or kebab-cased variant in static attr schema
-    const schemaEntry  = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
-    const parsedSchema = schemaEntry !== undefined ? parseSchemaEntry(schemaEntry) : null;
-
-    // Explicit function parameters take precedence over schema definition
-    const finalType = (type && typeof type === 'function')
-      ? type
-      : (parsedSchema ? parsedSchema.type : String);
-
-    const finalFallback = fallback !== undefined
-      ? fallback
-      : (parsedSchema ? parsedSchema.fallback : undefined);
-
-    const kebab = toKebabCase(key);
-
-    if (finalType === Boolean)     return this.hasAttribute(kebab);
-    if (!this.hasAttribute(kebab)) return finalFallback;
-
-    const val = this.getAttribute(kebab);
-
-    if (finalType === Number) {
-      const parsed = parseFloat(val);
-      return Number.isNaN(parsed) ? finalFallback : parsed;
-    }
-
-    if (typeof finalType === 'function' && finalType !== String) {
-      try   { return finalType(val); }
-      catch { return finalFallback; }
-    }
-
-    return val;
-  }
-
-
-  /**
    * @param {string} name
    * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String]
    * @param {*} [fallback]
@@ -229,18 +170,79 @@ export class AufbauElement extends HTMLElement {
     return val;
   }
 
-  /**
-   * Proxy for destructuring multiple attributes at once, e.g.
-   * const { checked, disabled } = this.getAttributes(Boolean);
-   * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String]
+    /**
+   * Unified attribute getter with support for Minimal, Basic, and Full schema definitions.
+   * 
+   * @param {string|Function} [nameOrType] - Attribute name (string) OR override type constructor.
+   * @param {Function} [type] - Optional override type constructor.
+   * @param {*} [fallback] - Optional override fallback value.
    */
-  getAttributes (type = String) {
-    return new Proxy(this, {
-      get: (target, prop) => (typeof prop === 'string' ? this.attr(prop, type) : undefined)
-    });
+  getAttr (nameOrType, type, fallback) {
+    // Proxy mode: triggered when first arg is not a string (or called as this.getAttr())
+    if (typeof nameOrType !== 'string') {
+      const overrideType = typeof nameOrType === 'function' ? nameOrType : null;
+      return new Proxy(this, {
+        get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, overrideType, undefined) : undefined)
+      });
+    }
+
+    // Single attribute mode
+    const key = nameOrType;
+    const classAttr = this.constructor.attr;
+    const schema = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
+
+    // Look up schema entry
+    const schemaEntry = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
+    const parsedSchema = schemaEntry !== undefined ? parseSchemaEntry(schemaEntry) : null;
+
+    // Resolve final type constructor and fallback
+    const finalType = (type && typeof type === 'function')
+      ? type
+      : (parsedSchema ? parsedSchema.type : String);
+
+    const finalFallback = fallback !== undefined
+      ? fallback
+      : (parsedSchema ? parsedSchema.fallback : undefined);
+
+    const kebab = toKebabCase(key);
+
+    // 1. Handle Boolean flags
+    if (finalType === Boolean) {
+      const has = this.hasAttribute(kebab);
+      return has ? true : (finalFallback ?? false);
+    }
+
+    // 2. Handle missing attributes
+    if (!this.hasAttribute(kebab)) {
+      return finalFallback;
+    }
+
+    let val = this.getAttribute(kebab);
+
+    // 3. Handle Type Casting
+    if (finalType === Number) {
+      const parsed = parseFloat(val);
+      val = Number.isNaN(parsed) ? finalFallback : parsed;
+    } else if (typeof finalType === 'function' && finalType !== String) {
+      try   { val = finalType(val); }
+      catch { val = finalFallback; }
+    }
+
+    // 4. Validate against allowed values (Enum check)
+    if (parsedSchema?.values && !parsedSchema.values.includes(val)) {
+      val = finalFallback;
+    }
+
+    // 5. Apply custom transformation function (fn)
+    if (parsedSchema?.fn) {
+      try   { val = parsedSchema.fn.call(this, val, key); }
+      catch { val = finalFallback; }
+    }
+
+    return val;
   }
 
-  setAttributes (map) {
+  setAttr (map) {
     for (const [key, value] of Object.entries(map)) {
       const kebab = toKebabCase(key);
            if (value === false || value == null) this.removeAttribute(kebab);
