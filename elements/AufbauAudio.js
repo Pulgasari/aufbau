@@ -9,7 +9,7 @@ const formatTime = (seconds) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-export class AufbauAudio extends AufbauElement {
+export default class AufbauAudio extends AufbauElement {
   
   static attr = {
     src      : String,
