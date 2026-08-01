@@ -12,13 +12,19 @@ const VARIANT_ICONS = {
 
 export default class AufbauInput extends AufbauElement {
   static attr = ['type', 'icon', 'placeholder', 'value', 'list'];
+  static attr = {
+    icon  : String,
+    list  : String,
+    placeholder : String,
+    type  : 'text',
+    value : String,
 
   get value () {
     return this.$('input')?.value || '';
   }
 
   update () {
-    const { type = 'text', icon, placeholder = '', value = '', list = '' } = this.getAttr();
+    const { icon, list, placeholder, type, value } = this.getAttr();
     const iconName = icon === 'false' ? null : (icon || VARIANT_ICONS[type] || null);
 
     this.innerHTML = `
