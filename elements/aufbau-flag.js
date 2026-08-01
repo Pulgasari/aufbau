@@ -1,6 +1,6 @@
 // <aufbau-flag>
 
-import { AufbauElement } from './AufbauElement.js';
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauFlag extends AufbauElement {
   static get observedAttributes() {
@@ -18,3 +18,4 @@ export class AufbauFlag extends AufbauElement {
 }
 
 customElements.define('aufbau-flag', AufbauFlag);
+export default AufbauFlag;
