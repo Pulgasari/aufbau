@@ -53,8 +53,8 @@ const { artist, cover, layout = 'card', src, title = 'Unknown Title' } = this.ge
 
 ```javascript
 // vorher
-const isChecked = this.hasAttribute('checked');
-const isDisabled = this.hasAttribute('disabled');
+const isChecked       = this.hasAttribute('checked');
+const isDisabled      = this.hasAttribute('disabled');
 const isIndeterminate = this.hasAttribute('indeterminate');
 
 // nachher
@@ -63,6 +63,17 @@ const { checked, disabled, indeterminate } = this.getAttributes(Boolean);
 
 ```javascript
 // vorher
+const step    = parseFloat(this.getAttribute('step')  || '1');
+const current = parseFloat(this.getAttribute('value') || '0');
+this.setValue(current + direction * step);
+
+// nachher
+const { step = 1, value = 0 } = his.getAttributes(Number);
+
+```
+
+```javascript
+// vorher
 
 // nachher
 
@@ -74,6 +85,14 @@ const { checked, disabled, indeterminate } = this.getAttributes(Boolean);
 // nachher
 
 ```
+
+```javascript
+// vorher
+
+// nachher
+
+```
+
 
 
 
