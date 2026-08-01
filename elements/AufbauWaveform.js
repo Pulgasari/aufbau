@@ -1,3 +1,5 @@
+// <aufbau-waveform>
+
 import { AufbauElement } from './AufbauElement.js';
 
 let sharedAudioCtx = null;
@@ -9,28 +11,29 @@ function getAudioContext() {
   return sharedAudioCtx;
 }
 
-export class AufbauWaveform extends AufbauElement {
-  static get observedAttributes() {
-    return ['src', 'bars', 'progress', 'interactive'];
-  }
+export default class AufbauWaveform extends AufbauElement {
+  static attr = {
+    src         : String,
+    bars        : 40,
+    progress    : 0,
+    interactive : Boolean
+  };
 
-  onMount() {
-    this.addEventListener('click', (e) => {
-      if (!this.hasAttribute('interactive')) return;
+  onMount () {
+    this.on('click', (e) => {
+      if (!this.getAttr('interactive')) return;
 
       const rect = this.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const progressPercent = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
 
-      this.setAttribute('progress', progressPercent.toString());
+      this.setAttributes({ progress: progressPercent });
       this.emit('aufbau-waveform-seek', { progress: progressPercent });
     });
   }
 
-  async update() {
-    const src = this.getAttribute('src');
-    const barCount = parseInt(this.getAttribute('bars') || '40', 10);
-    const progress = parseFloat(this.getAttribute('progress') || '0');
+  async update () {
+    const { src, bars: barCount, progress } = this.getAttr();
 
     if (src && src !== this._loadedSrc) {
       this._loadedSrc = src;
@@ -56,7 +59,7 @@ export class AufbauWaveform extends AufbauElement {
     `;
   }
 
-  async fetchAndDecodePeaks(url, samples) {
+  async fetchAndDecodePeaks (url, samples) {
     try {
       const response    = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
@@ -85,4 +88,4 @@ export class AufbauWaveform extends AufbauElement {
   }
 }
 
-customElements.define('aufbau-waveform', AufbauWaveform);
+AufbauWaveform.init();
