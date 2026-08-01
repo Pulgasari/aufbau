@@ -5,8 +5,50 @@ import { parseSchemaEntry }  from './parseSchemaEntry.js';
 import { AufbauConfigStore } from './AufbauConfig.js';
 
 // Internal decorator helpers...
-const decorateElement = (el) => { /* ... */ return el; };
-const decorateArray   = (arr) => { /* ... */ return arr; };
+const decorateElement = (el) => {
+  if (!el || el._aufbauDecorated) return el;
+
+  Object.defineProperties(el, {
+    _aufbauDecorated: { value: true, configurable: true },
+    on: {
+      value (...args) {
+        this.addEventListener(...args);
+        return () => this.removeEventListener(...args);
+      },
+      writable: true, configurable: true
+    },
+    off: {
+      value (...args) {
+        this.removeEventListener(...args);
+        return this;
+      },
+      writable: true, configurable: true
+    }
+  });
+
+  return el;
+};
+
+const decorateArray = (arr) => {
+  Object.defineProperties(arr, {
+    on: {
+      value (...args) {
+        const unsubs = this.map(el => el.on?.(...args) ?? (() => {}));
+        return () => unsubs.forEach(unsub => unsub());
+      },
+      writable: true, configurable: true
+    },
+    off: {
+      value (...args) {
+        this.forEach(el => el.off?.(...args));
+        return this;
+      },
+      writable: true, configurable: true
+    }
+  });
+
+  return arr;
+};
 
 /**
  * Mixin that injects all Aufbau framework powers into any HTML base class.
