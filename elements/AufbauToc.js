@@ -1,32 +1,77 @@
-// @aufbau/webcomponents/toc.js
 // <aufbau-toc>
 
-class AufbauToc extends HTMLElement {
-  static get observedAttributes() {
-    return ['target', 'selector'];
+import AufbauElement from './AufbauElement.js';
+
+export default class AufbauToc extends AufbauElement {
+  static attr = {
+    target   : String,
+    selector : 'h1, h2, h3, h4, h5, h6'
+  };
+
+  constructor () {
+    super();
+    this._observer = null;
   }
 
-  connectedCallback() {
+  onMount () {
     this.initToc();
+    this.setupObserver();
   }
 
-  attributeChangedCallback() {
+  onUnmount () {
+    this.cleanupObserver();
+  }
+
+  onAttributeChange () {
     this.initToc();
+    this.setupObserver();
   }
 
-  initToc() {
-    const targetQuery = this.getAttribute('target');
-    const selector = this.getAttribute('selector') || 'h1, h2, h3, h4, h5, h6';
+  cleanupObserver () {
+    if (this._observer) {
+      this._observer.disconnect();
+      this._observer = null;
+    }
+  }
 
+  setupObserver () {
+    this.cleanupObserver();
+
+    const { target: targetQuery } = this.getAttr();
     const targetEl = targetQuery ? document.querySelector(targetQuery) : null;
     if (!targetEl) return;
+
+    this._observer = new MutationObserver(() => {
+      this._observer.disconnect();
+      this.initToc();
+
+      this._observer.observe(targetEl, {
+        childList: true,
+        subtree: true
+      });
+    });
+
+    this._observer.observe(targetEl, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  initToc () {
+    const { target: targetQuery, selector } = this.getAttr();
+
+    const targetEl = targetQuery ? document.querySelector(targetQuery) : null;
+    if (!targetEl) {
+      this.innerHTML = '';
+      return;
+    }
 
     const headings = targetEl.querySelectorAll(selector);
     const items = [];
 
     headings.forEach((el, index) => {
       const text = el.textContent?.trim() || '';
-      
+
       let level = 1;
       const match = el.tagName.match(/^H([1-6])$/i);
       if (match) {
@@ -35,7 +80,6 @@ class AufbauToc extends HTMLElement {
         level = parseInt(el.dataset.level, 10);
       }
 
-      // Inject ID into target element if missing
       if (!el.id) {
         el.id = text
           .toLowerCase()
@@ -49,7 +93,7 @@ class AufbauToc extends HTMLElement {
     this.render(items);
   }
 
-  render(items) {
+  render (items) {
     if (!items.length) {
       this.innerHTML = '';
       return;
@@ -70,7 +114,4 @@ class AufbauToc extends HTMLElement {
   }
 }
 
-// Register Web Component
-if (typeof window !== 'undefined' && !customElements.get('aufbau-toc')) {
-  customElements.define('aufbau-toc', AufbauToc);
-}
+AufbauToc.init();
