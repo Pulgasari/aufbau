@@ -1,20 +1,14 @@
 // <aufbau-table>
 
 import AufbauElement from './AufbauElement.js';
-import importFile     from '@aufbau/import';
+import importFile    from '@aufbau/import';
 
-export class AufbauTable extends AufbauElement {
-  static get observedAttributes () { return ['src', 'columns']; }
+export default class AufbauTable extends AufbauElement {
+  static attr = ['src', 'columns'];
 
   // allow setting data directly: table.data = [{ id: 1, name: 'Alpha' }]
-  set data (value) {
-    this._data = value;
-    this.update();
-  }
-
-  get data () {
-    return this._data;
-  }
+  set data (value) { this._data = value; this.update(); }
+  get data ()      { return this._data; }
 
   async update () {
     const src = this.getAttr('src');
@@ -76,5 +70,4 @@ export class AufbauTable extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-table')) customElements.define('aufbau-table', AufbauTable);
-export default AufbauTable;
+AufbauTable.init():
