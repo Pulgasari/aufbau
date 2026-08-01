@@ -1,5 +1,5 @@
 // <aufbau-config>
-// Central store for configuration values
+// central store for configuration values
 
 export const AufbauConfigStore = new Map;
 
@@ -39,3 +39,5 @@ export class AufbauConfig extends HTMLElement {
 if (typeof window !== 'undefined' && !customElements.get('aufbau-config')) {
   customElements.define('aufbau-config', AufbauConfig);
 }
+
+export default AufbauConfig;
