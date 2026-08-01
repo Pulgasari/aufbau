@@ -1,4 +1,4 @@
-// @aufbau/elements/core/AufbauMixin.js
+// @aufbau/elements/core/AufbauCore.js
 
 import { toKebabCase }       from './utils.js';
 import { parseSchemaEntry }  from './parseSchemaEntry.js';
@@ -11,7 +11,7 @@ const decorateArray   = (arr) => { /* ... */ return arr; };
 /**
  * Mixin that injects all Aufbau framework powers into any HTML base class.
  */
-export const AufbauMixin = (BaseClass = HTMLElement) => {
+export const AufbauCore = (BaseClass = HTMLElement) => {
   return class extends BaseClass {
     constructor () {
       super();
