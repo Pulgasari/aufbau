@@ -68,7 +68,8 @@ const current = parseFloat(this.getAttribute('value') || '0');
 this.setValue(current + direction * step);
 
 // nachher
-const { step = 1, value = 0 } = his.getAttributes(Number);
+const { step = 1, value = 0 } = this.getAttributes(Number);
+this.setValue(value + direction * step);
 
 ```
 
