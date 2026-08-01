@@ -63,7 +63,7 @@ const parseSchemaEntry = (entry) => {
   if (typeof entry === 'number')  return { type: Number, fallback: entry };
   if (typeof entry === 'boolean') return { type: Boolean, fallback: entry };
   if (typeof entry === 'string')  return { type: String, fallback: entry };
-
+  //
   return { type: String, fallback: undefined };
 };
 
@@ -158,41 +158,59 @@ export class AufbauElement extends HTMLElement {
 
   // ::: attributes
 
-    /**
-   * Unified attribute getter for single values or Proxy-based destructuring.
+  /**
+   * Unified attribute getter. Resolves types & fallbacks via static attr schema when available.
    * 
-   * Usage single: this.getAttr('name', type, fallback)
-   * Usage proxy:  const { foo, bar } = this.getAttr(type)
+   * Single usage:  this.getAttr('max')
+   * Override:      this.getAttr('max', Number, 100)
+   * Proxy usage:   const { min, max } = this.getAttr()
    * 
-   * @param {string|Function} [nameOrType=String] - Attribute name (string) OR type constructor when destructuring.
-   * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String] - Type constructor (when 1st arg is a string).
-   * @param {*} [fallback] - Fallback value (when 1st arg is a string).
+   * @param {string|Function} [nameOrType] - Attribute name (string) OR override type constructor when destructuring.
+   * @param {Function} [type] - Optional override type constructor.
+   * @param {*} [fallback] - Optional override fallback value.
    */
-  getAttr (nameOrType = String, type = String, fallback) {
-    // Proxy mode: triggered when the first argument is not a string (e.g. Boolean, Number, or empty)
+  getAttr (nameOrType, type, fallback) {
+    // Proxy mode: triggered when first arg is not a string (or called as this.getAttr())
     if (typeof nameOrType !== 'string') {
-      const targetType = typeof nameOrType === 'function' ? nameOrType : String;
+      const overrideType = typeof nameOrType === 'function' ? nameOrType : null;
       return new Proxy(this, {
-        get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, targetType) : undefined)
+        get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, overrideType, undefined) : undefined)
       });
     }
 
     // Single attribute mode
-    const kebab = toKebabCase(nameOrType);
+    const key = nameOrType;
+    const classAttr = this.constructor.attr;
+    const schema = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
 
-    if (type === Boolean) return this.hasAttribute(kebab);
-    if (!this.hasAttribute(kebab)) return fallback;
+    // Look up key or kebab-cased variant in static attr schema
+    const schemaEntry  = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
+    const parsedSchema = schemaEntry !== undefined ? parseSchemaEntry(schemaEntry) : null;
+
+    // Explicit function parameters take precedence over schema definition
+    const finalType = (type && typeof type === 'function')
+      ? type
+      : (parsedSchema ? parsedSchema.type : String);
+
+    const finalFallback = fallback !== undefined
+      ? fallback
+      : (parsedSchema ? parsedSchema.fallback : undefined);
+
+    const kebab = toKebabCase(key);
+
+    if (finalType === Boolean)     return this.hasAttribute(kebab);
+    if (!this.hasAttribute(kebab)) return finalFallback;
 
     const val = this.getAttribute(kebab);
 
-    if (type === Number) {
+    if (finalType === Number) {
       const parsed = parseFloat(val);
-      return Number.isNaN(parsed) ? fallback : parsed;
+      return Number.isNaN(parsed) ? finalFallback : parsed;
     }
 
-    if (typeof type === 'function' && type !== String) {
-      try   { return type(val); }
-      catch { return fallback; }
+    if (typeof finalType === 'function' && finalType !== String) {
+      try   { return finalType(val); }
+      catch { return finalFallback; }
     }
 
     return val;
