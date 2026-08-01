@@ -10,7 +10,7 @@ const VARIANT_ICONS = {
   url      : 'lucide:link',
 };
 
-export class AufbauInput extends AufbauElement {
+export default class AufbauInput extends AufbauElement {
   static attr = ['type', 'icon', 'placeholder', 'value', 'list'];
 
   get value () {
