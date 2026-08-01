@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-loop>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauLoop extends AufbauElement {
   static get observedAttributes() {
@@ -109,3 +111,4 @@ export class AufbauLoop extends AufbauElement {
 }
 
 customElements.define('aufbau-loop', AufbauLoop);
+export default AufbauLoop;
