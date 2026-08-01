@@ -1,35 +1,28 @@
+// @aufbau/elements/AufbauConfig.js
 // <aufbau-config>
-// central store for configuration values
+// central store for global configuration values, read via AufbauElement#getConfig()
 
-export const AufbauConfigStore = new Map;
+export const AufbauConfigStore = new Map();
 
 export class AufbauConfig extends HTMLElement {
-  connectedCallback() {
-    // Hide the element completely in the DOM
-    this.style.display = 'none';
-    this.syncConfig();
-    this.observeAttributes();
-  }
-
-  disconnectedCallback() {
-    if (this._observer) this._observer.disconnect();
-  }
-
-  observeAttributes() {
-    // Observe dynamic changes to <aufbau-config> attributes
-    this._observer = new MutationObserver(() => this.syncConfig());
+  connectedCallback () {
+    this.style.display = 'none'; // never rendered
+    this._observer = new MutationObserver(() => this.sync());
     this._observer.observe(this, { attributes: true });
+    this.sync();
   }
 
-  syncConfig() {
-    // Clear and re-populate config store
+  disconnectedCallback () {
+    this._observer?.disconnect();
+  }
+
+  sync () {
     AufbauConfigStore.clear();
 
-    Array.from(this.attributes).forEach(attr => {
-      AufbauConfigStore.set(attr.name.toLowerCase(), attr.value);
-    });
+    for (const { name, value } of this.attributes) {
+      AufbauConfigStore.set(name.toLowerCase(), value);
+    }
 
-    // Notify all components on the page about config updates
     window.dispatchEvent(new CustomEvent('aufbau-config-changed', {
       detail: Object.fromEntries(AufbauConfigStore)
     }));
