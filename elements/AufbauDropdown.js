@@ -2,12 +2,14 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauDropdown extends AufbauElement {
-  static attr = ['label', 'open'];
+export default class AufbauDropdown extends AufbauElement {
+  static attr = {
+    label : 'Menu',
+    open  : Boolean,
+  };
 
   update () {
-    const label    = this.getAttr('label', String, 'Menu');
-    const { open } = this.getAttr(Boolean);
+    const { label, open } = this.getAttr();
 
     this.innerHTML = `
       <details class="aufbau-dropdown-wrapper" ${open ? 'open' : ''}>
