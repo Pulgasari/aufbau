@@ -10,7 +10,16 @@ const formatTime = (seconds) => {
 };
 
 export class AufbauAudio extends AufbauElement {
-  static attr = ['src', 'title', 'artist', 'cover', 'layout', 'autoplay', 'loop'];
+  
+  static attr = {
+    src      : String,
+    title    : 'Unknown Title',
+    artist   : String,
+    cover    : String, 
+    layout   : 'card', 
+    autoplay : false, 
+    loop     : false,
+  ];
 
   onMount () {
     this._isPlaying = false;
@@ -66,7 +75,7 @@ export class AufbauAudio extends AufbauElement {
   }
 
   update () {
-    const { artist, cover, layout = 'card', src = '', title = 'Unknown Title' } = this.getAttr();
+    const { artist, cover, layout, src, title } = this.getAttr();
 
     if (this._audio && src !== this._audio.src) this._audio.src = src;
 
