@@ -1,39 +1,35 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-toggle>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauToggle extends AufbauElement {
-  static get observedAttributes() {
+  static get observedAttributes () {
     return ['checked', 'disabled', 'label'];
   }
 
-  onMount() {
-    this.addEventListener('click', this.toggle.bind(this));
+  onMount () {
+    this.on('click', () => this.toggle());
   }
 
-  toggle() {
+  toggle () {
     if (this.hasAttribute('disabled')) return;
-    const isChecked = this.hasAttribute('checked');
-    
-    if (isChecked) {
-      this.removeAttribute('checked');
-    } else {
-      this.setAttribute('checked', '');
-    }
 
-    // Emit custom event
-    this.emit('aufbau-toggle', { checked: !isChecked });
+    const checked = !this.hasAttribute('checked');
+    this.setAttributes({ checked });
+    this.emit('aufbau-toggle', { checked });
   }
 
-  update() {
-    const isChecked = this.hasAttribute('checked');
-    const label = this.getAttribute('label') || '';
+  update () {
+    const label = this.attr('label', String, '');
+    const { checked, disabled } = this.getAttributes(Boolean);
 
     this.innerHTML = `
-      <button 
-        type="button" 
-        role="switch" 
-        aria-checked="${isChecked}" 
-        class="aufbau-toggle-btn ${isChecked ? 'is-active' : ''}"
-        ${this.hasAttribute('disabled') ? 'disabled' : ''}
+      <button
+        type="button"
+        role="switch"
+        aria-checked="${checked}"
+        class="aufbau-toggle-btn ${checked ? 'is-active' : ''}"
+        ${disabled ? 'disabled' : ''}
       >
         <span class="thumb"></span>
       </button>
@@ -42,4 +38,5 @@ export class AufbauToggle extends AufbauElement {
   }
 }
 
-customElements.define('aufbau-toggle', AufbauToggle);
+if (!customElements.get('aufbau-toggle')) customElements.define('aufbau-toggle', AufbauToggle);
+export default AufbauToggle;
