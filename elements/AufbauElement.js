@@ -75,3 +75,5 @@ export class AufbauElement extends HTMLElement {
     }));
   }
 }
+
+export default AufbauElement;
