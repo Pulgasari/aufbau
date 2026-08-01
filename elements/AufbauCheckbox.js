@@ -3,9 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export default class AufbauCheckbox extends AufbauElement {
-  static get observedAttributes () {
-    return ['checked', 'disabled', 'label', 'value', 'indeterminate'];
-  }
+  static attr = ['checked', 'disabled', 'label', 'value', 'indeterminate'];
 
   onMount () {
     this.on('click', () => this.toggle());
