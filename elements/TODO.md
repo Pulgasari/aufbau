@@ -1,0 +1,36 @@
+# info:
+- die "webcomponents" heissen hier bewusst "elements"
+- die files folgen namens-schema `AufbauElementName`
+- pro file ein element 
+- elemente werden exportiert als default
+
+# todo
+
+wenn dir was unklar ist, frag nach.
+
+## schritt 1:
+
+- wir säubern die `AufbauElement.js`
+- clevere helfer für eventzeug: `on`, `off`, `emit`
+- clevere helfer für children-refs: `$`, `$$`
+- clevere helfer für attribute: `getAttributes`, `setAttributes`, `attr`
+
+## schritt 2: 
+
+- `AufbauConfig.js` das kann jetzt noch nix, aber vorbereitet
+
+## schritt 3:
+
+- wir räumen alle element-files auf und bauen sie nun konsequent mit den helfern
+- es wird nie `@aufbau/kit` importiert sondern das jeweilige unter-packe (zb `@aufbau/import`)
+
+## schritt 4:
+
+die `index.js`:
+- exportiert alle elemente
+- exportiert ne methode für register all
+- exportiert methode für autoloader
+
+## schritt 5:
+
+- wir erstellen saubere `jsr.json` und `package.json`
