@@ -1,29 +1,35 @@
+// <aufbau-switch>
+
 import { AufbauElement } from './AufbauElement.js';
 
-export class AufbauSwitch extends AufbauElement {
-  static get observedAttributes() {
-    return ['value', 'mode'];
-  }
+export default class AufbauSwitch extends AufbauElement {
+  static attr = {
+    value : String,
+    mode  : 'buttons' // 'buttons' | 'dropdown'
+  };
 
-  onMount() {
-    // Handle click events on segmented buttons
-    this.addEventListener('click', (e) => {
+  onMount () {
+    this.on('click', (e) => {
       const btn = e.target.closest('[data-value]');
       if (btn) {
-        const val = btn.dataset.value;
-        this.setAttribute('value', val);
-        this.emit('aufbau-switch', { value: val });
+        const value = btn.dataset.value;
+        this.setAttr({ value });
+        this.emit('aufbau-switch', { value });
+      }
+    });
+
+    this.on('change', (e) => {
+      if (e.target.matches('.aufbau-switch-select')) {
+        const value = e.target.value;
+        this.setAttributes({ value });
+        this.emit('aufbau-switch', { value });
       }
     });
   }
 
-  update() {
-    const currentValue = this.getAttribute('value');
-    const mode = this.getAttribute('mode') || 'buttons'; // 'buttons' | 'dropdown'
-
-    // Extract options from child <option> tags
-    const optionElements = Array.from(this.querySelectorAll('option, [data-value]'));
-    const options = optionElements.map(opt => ({
+  update () {
+    const { value: currentValue, mode } = this.getAttr();
+    const options = this.$$('option, [data-value]').map(opt => ({
       value: opt.getAttribute('value') || opt.dataset.value || opt.textContent.trim(),
       label: opt.textContent.trim()
     }));
@@ -38,13 +44,7 @@ export class AufbauSwitch extends AufbauElement {
           `).join('')}
         </select>
       `;
-
-      this.querySelector('select')?.addEventListener('change', (e) => {
-        this.setAttribute('value', e.target.value);
-        this.emit('aufbau-switch', { value: e.target.value });
-      });
     } else {
-      // Default: Segmented control buttons
       this.innerHTML = `
         <div class="aufbau-switch-group" role="radiogroup">
           ${options.map(opt => `
@@ -62,4 +62,4 @@ export class AufbauSwitch extends AufbauElement {
   }
 }
 
-customElements.define('aufbau-switch', AufbauSwitch);
+AufbauSwitch.init();
