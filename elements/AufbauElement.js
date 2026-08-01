@@ -3,32 +3,75 @@
 
 import { AufbauConfigStore } from './AufbauConfig.js';
 
+// ::::: internal helpers
+
+const decorateElement = (el) => {
+  if (!el || el._aufbauDecorated) return el;
+
+  Object.defineProperties(el, {
+    _aufbauDecorated: { value: true, configurable: true },
+    on: {
+      value: function (...args) {
+        this.addEventListener(...args);
+        return () => this.removeEventListener(...args);
+      },
+      writable: true,
+      configurable: true
+    },
+    off: {
+      value: function (...args) {
+        this.removeEventListener(...args);
+        return this;
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return el;
+};
+
+const decorateArray = (arr) => {
+  Object.defineProperties(arr, {
+    on: {
+      value: function (...args) {
+        const unsubs = this.map(el => el.on?.(...args) || (() => {}));
+        return () => unsubs.forEach(unsub => unsub());
+      },
+      writable: true,
+      configurable: true
+    },
+    off: {
+      value: function (...args) {
+        this.forEach(el => el.off?.(...args));
+        return this;
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return arr;
+};
+
+// :::::: main class
+
 export class AufbauElement extends HTMLElement {
-  constructor() {
+  constructor () {
     super();
     this._mounted = false;
   }
 
-  connectedCallback() {
+  connectedCallback () {
     this._mounted = true;
-
-    // Listen for global config updates
-    this._onConfigChange = () => {
-      if (this._mounted) this.update();
-    };
+    this._onConfigChange = () => { if (this._mounted) this.update(); };
     window.addEventListener('aufbau-config-changed', this._onConfigChange);
-
-    this.onMount();
-    this.update();
+    this.onMount(); this.update();
   }
 
   disconnectedCallback () {
     this._mounted = false;
-
-    if (this._onConfigChange) {
-      window.removeEventListener('aufbau-config-changed', this._onConfigChange);
-    }
-
+    if (this._onConfigChange) window.removeEventListener('aufbau-config-changed', this._onConfigChange);
     this.onUnmount();
   }
 
@@ -39,21 +82,11 @@ export class AufbauElement extends HTMLElement {
     }
   }
 
-  /**
-   * Resolves attribute value based on Priority:
-   * 1. Direct Element Attribute
-   * 2. <aufbau-config> Attribute
-   * 3. Fallback Default
-   */
   getConfig (attrName, configKey, defaultValue) {
-    if (this.hasAttribute(attrName)) {
-      return this.getAttribute(attrName);
-    }
+    if (this.hasAttribute(attrName)) return this.getAttribute(attrName);
     
     const globalKey = (configKey || attrName).toLowerCase();
-    if (AufbauConfigStore.has(globalKey)) {
-      return AufbauConfigStore.get(globalKey);
-    }
+    if (AufbauConfigStore.has(globalKey)) return AufbauConfigStore.get(globalKey);
 
     return defaultValue;
   }
@@ -70,27 +103,6 @@ export class AufbauElement extends HTMLElement {
   }
 
   // ::: shorthands
-  //$  (selector) { return (this.shadowRoot || this).querySelector(selector); }
-  $$ (selector) { return Array.from((this.shadowRoot || this).querySelectorAll(selector)); }    
-  get $ () {
-    const root    = this.shadowRoot || this;
-    const queryFn = (selector) => root.querySelector(selector);
-
-    return new Proxy (queryFn, {
-      // Handles function call: this.$('.some-class')
-      apply (target, thisArg, argArray) { return queryFn(...argArray); },
-      // Handles property access: const { audioProgress } = this.$;
-      get (target, prop) {
-        if (typeof prop !== 'string') return undefined;
-        const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-        return root.getElementById(kebab)
-            || root.getElementById(prop)
-            || root.querySelector(`.${kebab}`)
-            || root.querySelector(`[data-ref="${prop}"]`)
-            || null;
-      }
-    });
-  }
 
   setAttributes (map) {
     for (const [key, value] of Object.entries(map)) {
@@ -124,6 +136,7 @@ export class AufbauElement extends HTMLElement {
     const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
     return target.hasAttribute(kebab) ? target.getAttribute(kebab) : undefined;     
   }});}
+  
   attr (name, fallback = '') {
     return this.getAttribute(name) ?? fallback;
   }
@@ -134,6 +147,7 @@ export class AufbauElement extends HTMLElement {
     const val = parseFloat(this.getAttribute(name));
     return Number.isNaN(val) ? fallback : val;
   }
+  
   on (...args) { 
     this.addEventListener(...args); 
     return () => this.off(...args);
@@ -141,6 +155,52 @@ export class AufbauElement extends HTMLElement {
   off (...args) {
     this.removeEventListener(...args);
     return this;
+  }
+
+  //
+
+  get $() {
+    const root = this.shadowRoot || this;
+
+    const findOne = (target) => {
+      if (typeof target !== 'string') return target ? decorateElement(target) : null;
+
+      const kebab = target.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+      const el = root.querySelector(target)
+              || root.getElementById(kebab)
+              || root.getElementById(target)
+              || root.querySelector(`.${kebab}`)
+              || root.querySelector(`[data-ref="${target}"]`);
+
+      return decorateElement(el);
+    };
+
+    const queryFn = (selector) => findOne(selector);
+    queryFn.on  = (target, ...args) => findOne(target)?. on(...args) || (() => {});
+    queryFn.off = (target, ...args) => findOne(target)?.off(...args);
+
+    return new Proxy (queryFn, {
+      apply.(target, thisArg, argArray) {
+        return queryFn(...argArray);
+      },
+      get (target, prop) {
+        return (prop in target)           ? target[prop]
+             : (typeof prop !== 'string') ? undefined;
+             : findOne(prop);
+      }
+    });
+  }
+  
+  get $$ () {
+    const root = this.shadowRoot || this;
+    const _fn = (selector) => {
+      const nodes = Array.from(root.querySelectorAll(selector));
+      nodes.forEach(decorateElement);
+      return decorateArray(nodes);
+    };
+    _fn.on  = (selector, ...args) => _fn(selector). on(...args);
+    _fn.off = (selector, ...args) => _fn(selector).off(...args);
+    return _fn;
   }
 
 }
