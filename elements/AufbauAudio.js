@@ -9,7 +9,7 @@ export class AufbauAudio extends AufbauElement {
 
   onMount() {
     this._isPlaying = false;
-    this._audio = new Audio();
+    this._audio = new Audio;
 
     // Bind native audio events to custom UI
     this._audio.addEventListener('timeupdate', () => this.syncProgress());
