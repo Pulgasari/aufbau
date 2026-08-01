@@ -3,27 +3,27 @@
 import AufbauElement from './AufbauElement.js';
 import importFile    from '@aufbau/import';
 
-export class AufbauText extends AufbauElement {
-  static get observedAttributes () {
-    return ['src', 'raw'];
-  }
+export default class AufbauText extends AufbauElement {
+  static attr = {
+    src : String,
+    raw : String
+  };
 
   onMount () {
-    // preserve initial light-DOM HTML if neither src nor raw is set
-    if (!this.hasAttribute('src') && !this.hasAttribute('raw') && !this._originalContent) {
+    const { src, raw } = this.getAttr();
+    if (!src && !raw && !this._originalContent) {
       this._originalContent = this.innerHTML.trim();
     }
   }
 
   async update () {
-    const src = this.attr('src');
-    const raw = this.attr('raw') || this._originalContent;
+    const { src } = this.getAttr();
+    const raw = this.getAttr('raw') || this._originalContent;
 
     let html = '';
 
     if (src) {
       try {
-        // @aufbau/import handles .md natively and returns rendered HTML
         html = await importFile(src);
       } catch (err) {
         console.warn(`[aufbau-text] Error loading markdown file from "${src}":`, err);
@@ -34,7 +34,7 @@ export class AufbauText extends AufbauElement {
         const { marked } = await import('https://esm.sh/marked@11.1.1');
         html = await marked.parse(raw);
       } catch {
-        html = raw; // fallback to raw text if parser fails
+        html = raw;
       }
     }
 
@@ -43,5 +43,4 @@ export class AufbauText extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-text')) customElements.define('aufbau-text', AufbauText);
-export default AufbauText;
+AufbauText.init();
