@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-number>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauNumber extends AufbauElement {
   static get observedAttributes() {
@@ -70,3 +72,4 @@ export class AufbauNumber extends AufbauElement {
 }
 
 customElements.define('aufbau-number', AufbauNumber);
+export default AufbauNumber;
