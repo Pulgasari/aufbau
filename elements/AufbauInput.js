@@ -11,44 +11,34 @@ const VARIANT_ICONS = {
 };
 
 export class AufbauInput extends AufbauElement {
-  static get observedAttributes() {
+  static get observedAttributes () {
     return ['type', 'icon', 'placeholder', 'value', 'list'];
   }
 
-  update() {
-    const type         = this.getAttribute('type') || 'text';
-    const explicitIcon = this.getAttribute('icon');
-    const placeholder  = this.getAttribute('placeholder') || '';
-    const value        = this.getAttribute('value') || '';
-    const list         = this.getAttribute('list') || '';
+  get value () {
+    return this.$('input')?.value || '';
+  }
 
-    let iconName = null;
-    if (explicitIcon !== 'false') {
-      iconName = explicitIcon || VARIANT_ICONS[type] || null;
-    }
+  update () {
+    const { type = 'text', icon, placeholder = '', value = '', list = '' } = this.getAttributes();
+
+    const iconName = icon === 'false' ? null : (icon || VARIANT_ICONS[type] || null);
 
     this.innerHTML = `
       <div class="aufbau-input-wrapper">
         ${iconName ? `<aufbau-icon icon="${iconName}"></aufbau-icon>` : ''}
         <input 
-          type="${type}" 
-          placeholder="${placeholder}" 
-          value="${value}" 
+          type="${type}"
+          placeholder="${placeholder}"
+          value="${value}"
           ${list ? `list="${list}"` : ''}
         />
       </div>
     `;
 
-    // Internal listener setup
-    this.querySelector('input')?.addEventListener('input', (e) => {
-      this.emit('aufbau-input', { value: e.target.value });
-    });
-  }
-
-  get value() {
-    return this.querySelector('input')?.value || '';
+    this.$('input')?.on('input', (e) => this.emit('aufbau-input', { value: e.target.value }));
   }
 }
 
-customElements.define('aufbau-input', AufbauInput);
-export default AufbauItem;
+if (!customElements.get('aufbau-input')) customElements.define('aufbau-input', AufbauInput);
+export default AufbauInput;
