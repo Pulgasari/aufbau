@@ -2,29 +2,18 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauLoop extends AufbauElement {
-  static get observedAttributes() {
-    return ['mode', 'interval', 'speed', 'pause-on-hover', 'direction'];
-  }
+export default class AufbauLoop extends AufbauElement {
+  static attr = ['mode', 'interval', 'speed', 'pause-on-hover', 'direction'];
 
   onMount() {
     this._currentIndex = 0;
-    
     // Preserve original child elements before component mutations
-    if (!this._originalItems) {
-      this._originalItems = Array.from(this.children).map(child => child.cloneNode(true));
-    }
-
+    if (!this._originalItems) this._originalItems = Array.from(this.children).map(child => child.cloneNode(true));
     this.setupLoop();
   }
 
-  onUnmount() {
-    this.stopLoop();
-  }
-
-  onAttributeChange() {
-    this.setupLoop();
-  }
+  onUnmount         () { this.stopLoop(); }
+  onAttributeChange () { this.setupLoop(); }
 
   stopLoop() {
     if (this._timer) {
@@ -36,8 +25,8 @@ export class AufbauLoop extends AufbauElement {
   setupLoop() {
     this.stopLoop();
 
-    const mode = this.getAttribute('mode') || 'carousel';
-    const interval = parseInt(this.getAttribute('interval') || '3000', 10);
+    const { mode = 'carousel' } = this.getAttr();
+    const interval     = parseInt(this.getAttr('interval') || '3000', 10);
     const pauseOnHover = this.hasAttribute('pause-on-hover');
 
     if (mode === 'carousel' && this._originalItems?.length > 1) {
@@ -45,8 +34,8 @@ export class AufbauLoop extends AufbauElement {
     }
 
     if (pauseOnHover) {
-      this.addEventListener('mouseenter', () => this.stopLoop());
-      this.addEventListener('mouseleave', () => this.setupLoop());
+      this.on('mouseenter', () => this.stopLoop());
+      this.on('mouseleave', () => this.setupLoop());
     }
   }
 
@@ -57,8 +46,7 @@ export class AufbauLoop extends AufbauElement {
   }
 
   renderCarousel() {
-    const track = this.querySelector('.loop-track');
-    if (!track) return;
+    const track = this.$('.loop-track'); if (!track) return;
 
     const items = track.children;
     for (let i = 0; i < items.length; i++) {
@@ -68,10 +56,7 @@ export class AufbauLoop extends AufbauElement {
   }
 
   update() {
-    const mode = this.getAttribute('mode') || 'carousel'; // 'carousel' | 'marquee'
-    const direction = this.getAttribute('direction') || 'left';
-    const speed = this.getAttribute('speed') || '20s';
-
+    const { direction = 'left', mode = 'carousel', speed ='20s' } = this.getAttr() || ''; // 'carousel' | 'marquee'    
     if (!this._originalItems || !this._originalItems.length) {
       this._originalItems = Array.from(this.children).map(child => child.cloneNode(true));
     }
@@ -87,8 +72,7 @@ export class AufbauLoop extends AufbauElement {
         </div>
       `;
 
-      const contents = this.querySelectorAll('.marquee-content');
-      contents.forEach(container => {
+      this.$$('.marquee-content').forEach(container => {
         this._originalItems.forEach(item => container.appendChild(item.cloneNode(true)));
       });
     } else {
@@ -99,16 +83,15 @@ export class AufbauLoop extends AufbauElement {
         </div>
       `;
 
-      const track = this.querySelector('.loop-track');
+      const track = this.$('.loop-track');
       this._originalItems.forEach((item, index) => {
         const wrapper = document.createElement('div');
         wrapper.className = `loop-item ${index === this._currentIndex ? 'is-active' : ''}`;
-        wrapper.appendChild(item.cloneNode(true));
+        wrapper.appendChild(item.cloneNode(true);
         track.appendChild(wrapper);
       });
     }
   }
 }
 
-customElements.define('aufbau-loop', AufbauLoop);
-export default AufbauLoop;
+AufbauLoop.init();
