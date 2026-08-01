@@ -34,3 +34,28 @@ die `index.js`:
 ## schritt 5:
 
 - wir erstellen saubere `jsr.json` und `package.json`
+
+---
+
+# code beispiele
+
+vorher:
+```javascript
+const src    = this.getAttribute('src') || '';
+const title  = this.getAttribute('title') || 'Unknown Title';
+const artist = this.getAttribute('artist') || '';
+const cover  = this.getAttribute('cover') || '';
+const layout = this.getAttribute('layout') || 'card';
+```
+
+nachher:
+```javascript
+const { artist, cover, layout = 'card', src, title = 'Unknown Title' } = this.getAttributes();
+```
+
+
+
+
+
+
+
