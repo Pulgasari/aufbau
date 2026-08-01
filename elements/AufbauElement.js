@@ -1,7 +1,5 @@
-// @aufbau/webcomponents/AufbauElement.js
+// @aufbau/elements/AufbauElement.js
 // base class for all aufbau-webcomponents
-
-import aufbau from '@aufbau/kit'; // sollte nicht das kit sein
 
 import { AufbauConfigStore } from './AufbauConfig.js';
 
@@ -24,7 +22,7 @@ export class AufbauElement extends HTMLElement {
     this.update();
   }
 
-  disconnectedCallback() {
+  disconnectedCallback () {
     this._mounted = false;
 
     if (this._onConfigChange) {
@@ -60,18 +58,26 @@ export class AufbauElement extends HTMLElement {
     return defaultValue;
   }
 
-  // ::::: Lifecycle Hooks
-  onMount() {}
-  onUnmount() {}
-  onAttributeChange(name, oldValue, newValue) {}
-  update() {}
+  // ::: lifecycle hooks
+  onAttributeChange (name, oldValue, newValue) {}
+  onMount   () {}
+  onUnmount () {}
+  update    () {}
 
-  emit(eventName, detail = {}, options = {}) {
+  // ::: shorthands
+  on (...args) { 
+    this.addEventListener(...args); 
+    return () => this.off(...args);
+  }
+  off (...args) {
+    this.removeEventListener(...args);
+    return this;
+  }
+
+
+  emit (eventName, detail = {}, options = {}) {
     this.dispatchEvent(new CustomEvent(eventName, {
-      detail,
-      bubbles: true,
-      composed: true,
-      ...options
+      bubbles: true, composed: true, detail, ...options
     }));
   }
 }
