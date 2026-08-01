@@ -49,11 +49,11 @@ export class AufbauCombobox extends AufbauElement {
       }
     }
 
-    const inlineOptions = Array.from(this.querySelectorAll('option')).map(opt => ({
+    const inlineOptions = this.$$('option').map(opt => ({
       value: opt.getAttribute('value') || opt.textContent.trim(),
       label: opt.textContent.trim()
     }));
-
+                                                          
     const options = this._optionsData || inlineOptions;
 
     this.innerHTML = `
