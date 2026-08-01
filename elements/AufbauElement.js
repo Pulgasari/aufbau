@@ -63,8 +63,23 @@ export class AufbauElement extends HTMLElement {
   onMount   () {}
   onUnmount () {}
   update    () {}
+  emit (eventName, detail = {}, options = {}) {
+    this.dispatchEvent(new CustomEvent(eventName, {
+      bubbles: true, composed: true, detail, ...options
+    }));
+  }
 
   // ::: shorthands
+  attr (name, fallback = '') {
+    return this.getAttribute(name) ?? fallback;
+  }
+  boolAttr (name) {
+    return this.hasAttribute(name);
+  }
+  numAttr(name, fallback = 0) {
+    const val = parseFloat(this.getAttribute(name));
+    return Number.isNaN(val) ? fallback : val;
+  }
   on (...args) { 
     this.addEventListener(...args); 
     return () => this.off(...args);
@@ -74,12 +89,6 @@ export class AufbauElement extends HTMLElement {
     return this;
   }
 
-
-  emit (eventName, detail = {}, options = {}) {
-    this.dispatchEvent(new CustomEvent(eventName, {
-      bubbles: true, composed: true, detail, ...options
-    }));
-  }
 }
 
 export default AufbauElement;
