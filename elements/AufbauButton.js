@@ -3,9 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export default class AufbauButton extends AufbauElement {
-  static get observedAttributes () {
-    return ['icon', 'label', 'text', 'disabled', 'type', 'variant'];
-  }
+  static attr = ['icon', 'label', 'text', 'disabled', 'type', 'variant'];
 
   onMount () {
     // preserve initial light-DOM children if no explicit label was given
