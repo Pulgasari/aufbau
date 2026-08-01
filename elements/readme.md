@@ -396,3 +396,65 @@ console.log(greet('aufbau'));
   Toast anzeigen
 </button>
 ```
+
+---
+
+```javascript
+// @aufbau/elements/AufbauAudio.js
+import { AufbauElement } from './AufbauElement.js';
+
+export default class AufbauAudio extends AufbauElement {
+  // Schema definition: Supports type constructors OR default values
+  static attr = {
+    src: String,          // Type: String, fallback: undefined
+    title: 'Untitled',    // Inferred Type: String, fallback: 'Untitled'
+    volume: 50,           // Inferred Type: Number, fallback: 50
+    autoplay: Boolean,    // Type: Boolean, fallback: false
+    loop: false,          // Inferred Type: Boolean, fallback: false
+  };
+
+  update () {
+    // 1. Destructure everything at once with automatic casting & schema fallbacks!
+    const { src, title, volume, autoplay, loop } = this.getAttr();
+
+    console.log({ src, title, volume, autoplay, loop });
+  }
+}
+
+// Auto-registers as 'aufbau-audio' and extracts observedAttributes from static attr
+AufbauAudio.init();
+```
+
+```javascript
+// Inside any method of your component:
+
+// A) Single attribute using the static schema
+const vol = this.getAttr('volume');       // Returns parsed number (e.g. 80) or default 50
+const isAutoplay = this.getAttr('autoplay'); // Returns boolean (true/false)
+
+// B) Overriding schema type on demand
+const rawVolumeString = this.getAttr('volume', String); // Forces returning '80' as String
+
+// C) Overriding schema fallback on demand
+const customMin = this.getAttr('min', Number, 0); // Forces type Number with fallback 0
+```
+
+```javascript
+// @aufbau/elements/AufbauDropdown.js
+import { AufbauElement } from './AufbauElement.js';
+
+export default class AufbauDropdown extends AufbauElement {
+  // Classic array syntax still fully supported
+  static attr = ['label', 'open'];
+
+  update () {
+    // Destructuring with explicit type override
+    const { open } = this.getAttr(Boolean);
+    
+    // Destructuring default (String)
+    const { label } = this.getAttr();
+  }
+}
+
+AufbauDropdown.init();
+```
