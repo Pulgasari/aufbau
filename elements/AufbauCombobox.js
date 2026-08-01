@@ -1,7 +1,7 @@
 // <aufbau-combobox>
 
-import { AufbauElement } from './AufbauElement.js';
-import aufbauImport from '@aufbau/import';
+import AufbauElement from './AufbauElement.js';
+import aufbauImport  from '@aufbau/import';
 
 export class AufbauCombobox extends AufbauElement {
   static get observedAttributes() {
