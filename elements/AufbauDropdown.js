@@ -3,6 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export default class AufbauDropdown extends AufbauElement {
+  
   static attr = {
     label : 'Menu',
     open  : Boolean,
