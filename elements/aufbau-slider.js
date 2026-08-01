@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-slider>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauSlider extends AufbauElement {
   static get observedAttributes() {
@@ -23,7 +25,7 @@ export class AufbauSlider extends AufbauElement {
   }
 
   stepBy(direction) {
-    const step    = parseFloat(this.getAttribute('step') || '1');
+    const step    = parseFloat(this.getAttribute('step')  || '1');
     const current = parseFloat(this.getAttribute('value') || '0');
     this.setValue(current + direction * step);
   }
@@ -38,14 +40,16 @@ export class AufbauSlider extends AufbauElement {
   }
 
   update() {
-    const value = this.getAttribute('value') || '0';
-    const min = this.getAttribute('min') || '0';
-    const max = this.getAttribute('max') || '100';
-    const step = this.getAttribute('step') || '1';
-    const unit = this.getAttribute('unit') || '';
+    const value       = this.getAttribute('value') || '0';
+    const min         = this.getAttribute('min')   || '0';
+    const max         = this.getAttribute('max')   || '100';
+    const step        = this.getAttribute('step')  || '1';
+    const unit        = this.getAttribute('unit')  || '';
     const hasControls = this.hasAttribute('controls');
-    const isEditable = this.hasAttribute('editable');
-    const isDisabled = this.hasAttribute('disabled');
+    const isEditable  = this.hasAttribute('editable');
+    const isDisabled  = this.hasAttribute('disabled');
+
+    const { max, min, step, unit, value } = this.attributes;
 
     this.innerHTML = `
       <div class="aufbau-slider-wrapper ${isDisabled ? 'is-disabled' : ''}">
