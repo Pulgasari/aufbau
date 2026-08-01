@@ -3,7 +3,13 @@
 import AufbauElement from './AufbauElement.js';
 
 export default class AufbauCheckbox extends AufbauElement {
-  static attr = ['checked', 'disabled', 'label', 'value', 'indeterminate'];
+  static attr = {
+    checked       : Boolean,
+    disabled      : Boolean,
+    indeterminate : Boolean,
+    label         : String, 
+    value         : String,
+  ];
 
   onMount () {
     this.on('click', () => this.toggle());
@@ -18,8 +24,7 @@ export default class AufbauCheckbox extends AufbauElement {
   }
 
   update () {
-    const label = this.getAttr('label', String, '');
-    const { checked, disabled, indeterminate } = this.getAttr(Boolean);
+    const { checked, disabled, indeterminate, label } = this.getAttr();
     const state = indeterminate ? 'mixed' : String(checked);
 
     this.innerHTML = `
