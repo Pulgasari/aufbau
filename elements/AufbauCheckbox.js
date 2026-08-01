@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-checkbox>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauCheckbox extends AufbauElement {
   static get observedAttributes() {
@@ -52,3 +54,4 @@ export class AufbauCheckbox extends AufbauElement {
 }
 
 customElements.define('aufbau-checkbox', AufbauCheckbox);
+export default AufbauCheckbox;
