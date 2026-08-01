@@ -8,7 +8,7 @@ export default class AufbauCheckbox extends AufbauElement {
     disabled      : Boolean,
     indeterminate : Boolean,
     label         : String, 
-    value         : String,
+    value         : 'on',
   ];
 
   onMount () {
@@ -16,11 +16,11 @@ export default class AufbauCheckbox extends AufbauElement {
   }
 
   toggle () {
-    if (this.hasAttribute('disabled')) return;
-
-    const checked = !this.hasAttribute('checked');
-    this.setAttr({ checked });
-    this.emit('aufbau-checkbox', { checked, value: this.getAttr('value', String, 'on') });
+    const { disabled, checked, value } = this.getAttr();
+    if (disabled) return;
+    const nextChecked = !checked;
+    this.setAttributes({ checked: nextChecked });
+    this.emit('aufbau-checkbox', { checked: nextChecked, value });
   }
 
   update () {
@@ -45,3 +45,25 @@ export default class AufbauCheckbox extends AufbauElement {
 }
 
 AufbauCheckbox.init();
+
+/*
+// In AufbauCheckbox.js
+export default class AufbauCheckbox extends AufbauElement {
+  static formAssociated = true; // Enables native form integration
+
+  constructor () {
+    super();
+    this.internals = this.attachInternals();
+  }
+
+  update () {
+    const { checked, value } = this.getAttr();
+    
+    // Checked -> submits 'on' (or custom value)
+    // Unchecked -> null (submits NOTHING in <form>, native behavior)
+    this.internals.setFormValue(checked ? value : null);
+
+    // ... rest of rendering logic
+  }
+}
+*/
