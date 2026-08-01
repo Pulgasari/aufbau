@@ -1,13 +1,15 @@
 // <aufbau-tree>
 
 import AufbauElement from './AufbauElement.js';
-import importFile     from '@aufbau/import';
+import importFile    from '@aufbau/import';
 
-export class AufbauTree extends AufbauElement {
-  static get observedAttributes () { return ['src']; }
+export default class AufbauTree extends AufbauElement {
+  static attr = {
+    src : String
+  };
 
   async update () {
-    const src = this.getAttr('src');
+    const { src } = this.getAttr();
     if (!src || this._renderedFromSrc) return;
 
     try {
@@ -34,5 +36,4 @@ export class AufbauTree extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-tree')) customElements.define('aufbau-tree', AufbauTree);
-export default AufbauTree;
+AufbauTree.init();
