@@ -2,24 +2,28 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauToggle extends AufbauElement {
-  static attr = ['checked', 'disabled', 'label'];
+export default class AufbauToggle extends AufbauElement {
+  static attr = {
+    checked  : Boolean,
+    disabled : Boolean,
+    label    : String
+  };
 
   onMount () {
     this.on('click', () => this.toggle());
   }
 
   toggle () {
-    if (this.hasAttribute('disabled')) return;
+    const { disabled, checked } = this.getAttr();
+    if (disabled) return;
 
-    const checked = !this.hasAttribute('checked');
-    this.setAttr({ checked });
-    this.emit('aufbau-toggle', { checked });
+    const nextChecked = !checked;
+    this.setAttr({ checked: nextChecked });
+    this.emit('aufbau-toggle', { checked: nextChecked });
   }
 
   update () {
-    const label = this.getAttr('label', String, '');
-    const { checked, disabled } = this.getAttr(Boolean);
+    const { checked, disabled, label } = this.getAttr();
 
     this.innerHTML = `
       <button
