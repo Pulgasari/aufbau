@@ -39,19 +39,42 @@ die `index.js`:
 
 # code beispiele
 
-vorher:
 ```javascript
+// vorher
 const src    = this.getAttribute('src') || '';
 const title  = this.getAttribute('title') || 'Unknown Title';
 const artist = this.getAttribute('artist') || '';
 const cover  = this.getAttribute('cover') || '';
 const layout = this.getAttribute('layout') || 'card';
-```
 
-nachher:
-```javascript
+// nachher
 const { artist, cover, layout = 'card', src, title = 'Unknown Title' } = this.getAttributes();
 ```
+
+```javascript
+// vorher
+const isChecked = this.hasAttribute('checked');
+const isDisabled = this.hasAttribute('disabled');
+const isIndeterminate = this.hasAttribute('indeterminate');
+
+// nachher
+const { checked, disabled, indeterminate } = this.getAttributes(Boolean);
+```
+
+```javascript
+// vorher
+
+// nachher
+
+```
+
+```javascript
+// vorher
+
+// nachher
+
+```
+
 
 
 
