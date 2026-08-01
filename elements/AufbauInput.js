@@ -11,17 +11,14 @@ const VARIANT_ICONS = {
 };
 
 export class AufbauInput extends AufbauElement {
-  static get observedAttributes () {
-    return ['type', 'icon', 'placeholder', 'value', 'list'];
-  }
+  static attr = ['type', 'icon', 'placeholder', 'value', 'list'];
 
   get value () {
     return this.$('input')?.value || '';
   }
 
   update () {
-    const { type = 'text', icon, placeholder = '', value = '', list = '' } = this.getAttributes();
-
+    const { type = 'text', icon, placeholder = '', value = '', list = '' } = this.getAttr();
     const iconName = icon === 'false' ? null : (icon || VARIANT_ICONS[type] || null);
 
     this.innerHTML = `
@@ -35,5 +32,4 @@ export class AufbauInput extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-input')) customElements.define('aufbau-input', AufbauInput);
-export default AufbauInput;
+AufbauInput.init();
