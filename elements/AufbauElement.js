@@ -5,7 +5,7 @@ import { AufbauConfigStore } from './AufbauConfig.js';
 
 // ::::: internal helpers
 
-const toKebabCase = (str) => str.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
 const decorateElement = (el) => {
   if (!el || el._aufbauDecorated) return el;
@@ -81,6 +81,18 @@ export class AufbauElement extends HTMLElement {
       this.onAttributeChange(name, oldValue, newValue);
       this.update();
     }
+  }
+  
+  /**
+   * Registers the custom element safely.
+   * Auto-derives tag name from class name if omitted (e.g., AufbauTreeItem -> aufbau-tree-item).
+   * 
+   * @param {string} [tagName] - Optional explicit tag name
+   */
+  static init (tagName) {
+    const name = tagName || toKebabCase(this.name);
+    if (!name || !name.includes('-')) { console.warn(`[Aufbau] Invalid tag name "${name}". Custom elements require a hyphen.`); return; }     
+    if (!customElements.get(name)) customElements.define(name, this);
   }
 
   // ::: lifecycle hooks (override in subclasses)
