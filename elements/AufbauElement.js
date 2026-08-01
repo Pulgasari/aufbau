@@ -52,6 +52,21 @@ const decorateArray = (arr) => {
   return arr;
 };
 
+/**
+ * Parses a schema entry into a normalized type constructor and fallback value.
+ * @param {*} entry - e.g. Number, 50, Boolean, false, String, 'default'
+ */
+const parseSchemaEntry = (entry) => {
+  // Case 1: Direct constructor function (e.g. Number, Boolean, String)
+  if (typeof entry === 'function') return { type: entry, fallback: undefined };
+  // Case 2: Literal fallback values (infer type constructor from primitive value)
+  if (typeof entry === 'number')  return { type: Number, fallback: entry };
+  if (typeof entry === 'boolean') return { type: Boolean, fallback: entry };
+  if (typeof entry === 'string')  return { type: String, fallback: entry };
+
+  return { type: String, fallback: undefined };
+};
+
 // :::::: main class
 
 export class AufbauElement extends HTMLElement {
@@ -84,18 +99,26 @@ export class AufbauElement extends HTMLElement {
   }
   
   /**
-   * Registers the custom element safely.
-   * Auto-derives tag name from class name if omitted (e.g., AufbauTreeItem -> aufbau-tree-item).
-   * 
+   * Registers the custom element safely and maps static attr schema to observedAttributes.
    * @param {string} [tagName] - Optional explicit tag name
    */
   static init (tagName) {
+    // build tagName if none is provided
     const name = tagName || toKebabCase(this.name);
-    if (!name || !name.includes('-')) { console.warn(`[Aufbau] Invalid tag name "${name}". Custom elements require a hyphen.`); return; }
-    // Map 'static attr' to native 'observedAttributes' getter
-    if (this.attr && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) { Object.defineProperty(this, 'observedAttributes', { get: () => this.attr, configurable: true });
+    // check tagName for containing hyphen (-)
+    if (!name || !name.includes('-')) {
+      console.warn(`[Aufbau] Invalid tag name "${name}". Custom elements require a hyphen.`);
+      return;
+    }
+    // Map 'static attr' (Array OR Object schema) to native 'observedAttributes'
+    if (this.attr && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
+      const observed = Array.isArray(this.attr) ? this.attr.map(toKebabCase) : Object.keys(this.attr).map(toKebabCase);
+      Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
+    }
+    // register AufbauElement
     if (!customElements.get(name)) customElements.define(name, this);
   }
+
 
   // ::: lifecycle hooks (override in subclasses)
 
