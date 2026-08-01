@@ -27,12 +27,7 @@ export class AufbauInput extends AufbauElement {
     this.innerHTML = `
       <div class="aufbau-input-wrapper">
         ${iconName ? `<aufbau-icon icon="${iconName}"></aufbau-icon>` : ''}
-        <input 
-          type="${type}"
-          placeholder="${placeholder}"
-          value="${value}"
-          ${list ? `list="${list}"` : ''}
-        />
+        <input type="${type}" placeholder="${placeholder}" value="${value}" ${list ? `list="${list}"` : ''} />   
       </div>
     `;
 
