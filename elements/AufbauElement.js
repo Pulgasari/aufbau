@@ -91,7 +91,9 @@ export class AufbauElement extends HTMLElement {
    */
   static init (tagName) {
     const name = tagName || toKebabCase(this.name);
-    if (!name || !name.includes('-')) { console.warn(`[Aufbau] Invalid tag name "${name}". Custom elements require a hyphen.`); return; }     
+    if (!name || !name.includes('-')) { console.warn(`[Aufbau] Invalid tag name "${name}". Custom elements require a hyphen.`); return; }
+    // Map 'static attr' to native 'observedAttributes' getter
+    if (this.attr && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) { Object.defineProperty(this, 'observedAttributes', { get: () => this.attr, configurable: true });
     if (!customElements.get(name)) customElements.define(name, this);
   }
 
