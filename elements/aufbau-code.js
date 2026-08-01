@@ -1,11 +1,11 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-code>
+
+import AufbauElement from './AufbauElement.js';
 
 // Lazy loader singleton for highlight.js
 let hljsPromise = null;
 function getHljs() {
-  if (!hljsPromise) {
-    hljsPromise = import('https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm').then(m => m.default);
-  }
+  if (!hljsPromise) hljsPromise = import('https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm').then(m => m.default);   
   return hljsPromise;
 }
 
@@ -51,12 +51,9 @@ export class AufbauCode extends AufbauElement {
     try {
       const hljs   = await getHljs();
       const codeEl = this.querySelector('code');
-      if (codeEl) {
-        hljs.highlightElement(codeEl);
-      }
-    } catch (err) {
-      console.warn('[aufbau-code] Failed to lazy load highlight.js:', err);
-    }
+      if (codeEl) hljs.highlightElement(codeEl);
+    } 
+    catch (e) { console.warn('[aufbau-code] Failed to lazy load highlight.js:', e); }
   }
 
   async copyToClipboard(text, btn) {
@@ -72,9 +69,8 @@ export class AufbauCode extends AufbauElement {
       setTimeout(() => {
         if (icon) icon.setAttribute('icon', 'lucide:copy');
       }, 2000);
-    } catch (err) {
-      console.error('[aufbau-code] Clipboard copy failed:', err);
-    }
+    } 
+    catch (e) { console.error('[aufbau-code] Clipboard copy failed:', e); }
   }
 
   escapeHtml(str) {
@@ -88,3 +84,4 @@ export class AufbauCode extends AufbauElement {
 }
 
 customElements.define('aufbau-code', AufbauCode);
+export default AufbauCode;
