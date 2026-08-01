@@ -9,6 +9,7 @@ import * as aufbauPluginsClient from '@aufbau/plugins/client';
 import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
 import * as aufbauShaders       from '@aufbau/shaders';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
+import * as aufbauUtils         from '@aufbau/utils';
 
 // ::: HTM
 import htm from 'htm'; 
@@ -26,7 +27,7 @@ const preact = {
   ...preactCore,
   ...preactHooks,
   ...preactSignals,
-};
+};c
 
 const aufbau = {
   // AUFBAU
@@ -41,6 +42,7 @@ const aufbau = {
   import     : aufbauImport,
   shaders    : aufbauShaders,
   stylesheet : aufbauStylesheet,
+  utils      : aufbauUtils,
 
   // aufbau adapters
   plugins = {
