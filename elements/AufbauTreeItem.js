@@ -3,9 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export class AufbauTreeItem extends AufbauElement {
-  static get observedAttributes () {
-    return ['label', 'icon', 'expanded', 'selected'];
-  }
+  static get observedAttributes () { return ['expanded', 'icon', 'label', 'selected']; }
 
   onMount () {
     this.on('click', (e) => {
@@ -17,11 +15,11 @@ export class AufbauTreeItem extends AufbauElement {
   }
 
   hasChildren () {
-    return this.querySelector('aufbau-tree-item') !== null;
+    return this.$('aufbau-tree-item') !== null;
   }
 
   toggleExpand () {
-    this.setAttributes({ expanded: !this.hasAttribute('expanded') });
+    this.setAttr({ expanded: !this.hasAttribute('expanded') });
   }
 
   select () {
@@ -29,14 +27,14 @@ export class AufbauTreeItem extends AufbauElement {
       ?.querySelectorAll('aufbau-tree-item')
       .forEach(item => item.removeAttribute('selected'));
 
-    this.setAttributes({ selected: true });
-    this.emit('aufbau-tree-select', { label: this.attr('label'), element: this });
+    this.setAttr({ selected: true });
+    this.emit('aufbau-tree-select', { label: this.getAttr('label'), element: this });
   }
 
   update () {
-    const label = this.attr('label', String, 'Item');
-    const icon  = this.attr('icon');
-    const { expanded: isExpanded, selected: isSelected } = this.getAttributes(Boolean);
+    const label = this.getAttr('label', String, 'Item');
+    const icon  = this.getAttr('icon');
+    const { expanded: isExpanded, selected: isSelected } = this.getAttr(Boolean);
     const hasChildren = this.hasChildren();
 
     const defaultIcon = hasChildren
