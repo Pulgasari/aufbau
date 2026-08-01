@@ -4,7 +4,13 @@ import AufbauElement from './AufbauElement.js';
 import importFile     from '@aufbau/import';
 
 export default class AufbauCombobox extends AufbauElement {
-  static = ['placeholder', 'value', 'src', 'disabled'];
+  
+  static attr = {
+    placeholder : 'select or type...',
+    value       : '', 
+    src         : '', 
+    disabled    : false
+  };
 
   onMount () {
     this.on('input', (e) => {
@@ -34,9 +40,8 @@ export default class AufbauCombobox extends AufbauElement {
   }
 
   async update () {
-    const { src, placeholder = 'Select or type...', value = '' } = this.getAttr();
-    const isDisabled = this.hasAttr('disabled');
-
+    const { disabled, src, placeholder, value } = this.getAttr();
+    
     if (src && !this._optionsData) {
       try {
         this._optionsData = await importFile(src);
@@ -61,7 +66,7 @@ export default class AufbauCombobox extends AufbauElement {
             class="combobox-input"
             placeholder="${placeholder}"
             value="${value}"
-            ${isDisabled ? 'disabled' : ''}
+            ${disabled ? 'disabled' : ''}
           />
           <aufbau-icon icon="lucide:chevron-down" class="dropdown-icon"></aufbau-icon>
         </div>
