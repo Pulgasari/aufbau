@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-button>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauButton extends AufbauElement {
   static get observedAttributes() {
@@ -33,3 +35,4 @@ export class AufbauButton extends AufbauElement {
 }
 
 customElements.define('aufbau-button', AufbauButton);
+export default AufbauButton;
