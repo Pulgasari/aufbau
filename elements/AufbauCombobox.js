@@ -1,54 +1,54 @@
 // <aufbau-combobox>
 
 import AufbauElement from './AufbauElement.js';
-import aufbauImport  from '@aufbau/import';
+import importFile     from '@aufbau/import';
 
 export class AufbauCombobox extends AufbauElement {
-  static get observedAttributes() {
+  static get observedAttributes () {
     return ['placeholder', 'value', 'src', 'disabled'];
   }
 
-  onMount() {
-    // Listen for input filtering and selection
-    this.addEventListener('input', (e) => {
-      if (e.target.matches('.combobox-input')) {
-        this.filterOptions(e.target.value);
-        this.emit('aufbau-combobox', { value: e.target.value });
-      }
+  onMount () {
+    this.on('input', (e) => {
+      if (!e.target.matches('.combobox-input')) return;
+      this.filterOptions(e.target.value);
+      this.emit('aufbau-combobox', { value: e.target.value });
     });
 
-    this.addEventListener('click', (e) => {
+    this.on('click', (e) => {
       const item = e.target.closest('.combobox-option');
-      if (item) {
-        const val = item.dataset.value;
-        this.setAttribute('value', val);
-        this.closeDropdown();
-        this.emit('aufbau-combobox', { value: val });
-      }
+      if (!item) return;
+
+      const value = item.dataset.value;
+      this.setAttributes({ value });
+      this.closeDropdown();
+      this.emit('aufbau-combobox', { value });
     });
 
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (!this.contains(e.target)) this.closeDropdown();
-    });
+    // close dropdown on outside click — unsubscribed again in onUnmount
+    const handleOutsideClick = (e) => { if (!this.contains(e.target)) this.closeDropdown(); };
+    document.addEventListener('click', handleOutsideClick);
+    this._offOutsideClick = () => document.removeEventListener('click', handleOutsideClick);
   }
 
-  async update() {
-    const placeholder = this.getAttribute('placeholder') || 'Select or type...';
-    const value       = this.getAttribute('value')       || '';
-    const src         = this.getAttribute('src');
+  onUnmount () {
+    this._offOutsideClick?.();
+  }
 
-    // Load remote items via @aufbau/import if src attribute is present
+  async update () {
+    const { placeholder = 'Select or type...', value = '' } = this.getAttributes();
+    const src = this.attr('src');
+    const isDisabled = this.hasAttribute('disabled');
+
     if (src && !this._optionsData) {
       try {
-        this._optionsData = await aufbauImport(src);
+        this._optionsData = await importFile(src);
       } catch (err) {
         console.warn(`[aufbau-combobox] Failed to load options from "${src}":`, err);
         this._optionsData = [];
       }
     }
 
-    // Extract options from inline <option> elements or _optionsData
     const inlineOptions = Array.from(this.querySelectorAll('option')).map(opt => ({
       value: opt.getAttribute('value') || opt.textContent.trim(),
       label: opt.textContent.trim()
@@ -59,49 +59,46 @@ export class AufbauCombobox extends AufbauElement {
     this.innerHTML = `
       <div class="aufbau-combobox-wrapper">
         <div class="input-container">
-          <input 
-            type="text" 
-            class="combobox-input" 
-            placeholder="${placeholder}" 
+          <input
+            type="text"
+            class="combobox-input"
+            placeholder="${placeholder}"
             value="${value}"
-            ${this.hasAttribute('disabled') ? 'disabled' : ''}
+            ${isDisabled ? 'disabled' : ''}
           />
           <aufbau-icon icon="lucide:chevron-down" class="dropdown-icon"></aufbau-icon>
         </div>
         <div class="combobox-list" hidden>
           ${options.map(opt => {
-            const val = typeof opt === 'object' ? opt.value || opt.name : opt;
-            const label = typeof opt === 'object' ? opt.label || opt.name || val : opt;
+            const val   = typeof opt === 'object' ? (opt.value || opt.name) : opt;
+            const label = typeof opt === 'object' ? (opt.label || opt.name || val) : opt;
             return `<div class="combobox-option" data-value="${val}">${label}</div>`;
           }).join('')}
         </div>
       </div>
     `;
 
-    const inputEl = this.querySelector('.combobox-input');
-    inputEl?.addEventListener('focus', () => this.openDropdown());
+    this.$('.combobox-input')?.on('focus', () => this.openDropdown());
   }
 
-  openDropdown() {
-    const list = this.querySelector('.combobox-list');
+  openDropdown () {
+    const list = this.$('.combobox-list');
     if (list) list.hidden = false;
   }
 
-  closeDropdown() {
-    const list = this.querySelector('.combobox-list');
+  closeDropdown () {
+    const list = this.$('.combobox-list');
     if (list) list.hidden = true;
   }
 
-  filterOptions(query) {
-    const options = this.querySelectorAll('.combobox-option');
+  filterOptions (query) {
     const q = query.toLowerCase().trim();
-    options.forEach(opt => {
-      const match = opt.textContent.toLowerCase().includes(q);
-      opt.hidden = !match;
+    this.$$('.combobox-option').forEach(opt => {
+      opt.hidden = !opt.textContent.toLowerCase().includes(q);
     });
     this.openDropdown();
   }
 }
 
-customElements.define('aufbau-combobox', AufbauCombobox);
+if (!customElements.get('aufbau-combobox')) customElements.define('aufbau-combobox', AufbauCombobox);
 export default AufbauCombobox;
