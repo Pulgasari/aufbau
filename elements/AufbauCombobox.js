@@ -3,10 +3,8 @@
 import AufbauElement from './AufbauElement.js';
 import importFile     from '@aufbau/import';
 
-export class AufbauCombobox extends AufbauElement {
-  static get observedAttributes () {
-    return ['placeholder', 'value', 'src', 'disabled'];
-  }
+export default class AufbauCombobox extends AufbauElement {
+  static = ['placeholder', 'value', 'src', 'disabled'];
 
   onMount () {
     this.on('input', (e) => {
@@ -20,7 +18,7 @@ export class AufbauCombobox extends AufbauElement {
       if (!item) return;
 
       const value = item.dataset.value;
-      this.setAttributes({ value });
+      this.setAttr({ value });
       this.closeDropdown();
       this.emit('aufbau-combobox', { value });
     });
@@ -36,9 +34,8 @@ export class AufbauCombobox extends AufbauElement {
   }
 
   async update () {
-    const { placeholder = 'Select or type...', value = '' } = this.getAttributes();
-    const src = this.attr('src');
-    const isDisabled = this.hasAttribute('disabled');
+    const { src, placeholder = 'Select or type...', value = '' } = this.getAttr();
+    const isDisabled = this.hasAttr('disabled');
 
     if (src && !this._optionsData) {
       try {
@@ -50,7 +47,7 @@ export class AufbauCombobox extends AufbauElement {
     }
 
     const inlineOptions = this.$$('option').map(opt => ({
-      value: opt.getAttribute('value') || opt.textContent.trim(),
+      value: opt.getAttr('value') || opt.textContent.trim(),
       label: opt.textContent.trim()
     }));
                                                           
@@ -81,15 +78,8 @@ export class AufbauCombobox extends AufbauElement {
     this.$('.combobox-input')?.on('focus', () => this.openDropdown());
   }
 
-  openDropdown () {
-    const list = this.$('.combobox-list');
-    if (list) list.hidden = false;
-  }
-
-  closeDropdown () {
-    const list = this.$('.combobox-list');
-    if (list) list.hidden = true;
-  }
+  openDropdown  () { this.$('.combobox-list')?.hidden = false; }
+  closeDropdown () { this.$('.combobox-list')?.hidden = true;  }
 
   filterOptions (query) {
     const q = query.toLowerCase().trim();
@@ -100,5 +90,4 @@ export class AufbauCombobox extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-combobox')) customElements.define('aufbau-combobox', AufbauCombobox);
-export default AufbauCombobox;
+AufbauCombobox.init();
