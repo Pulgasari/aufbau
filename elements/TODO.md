@@ -41,14 +41,23 @@ die `index.js`:
 
 ```javascript
 // vorher
-const src    = this.getAttribute('src') || '';
-const title  = this.getAttribute('title') || 'Unknown Title';
+const src    = this.getAttribute('src')    || '';
+const title  = this.getAttribute('title')  || 'Unknown Title';
 const artist = this.getAttribute('artist') || '';
-const cover  = this.getAttribute('cover') || '';
+const cover  = this.getAttribute('cover')  || '';
 const layout = this.getAttribute('layout') || 'card';
 
+const step    = parseFloat(this.getAttribute('step')  || '1');
+const current = parseFloat(this.getAttribute('value') || '0');
+
 // nachher
-const { artist, cover, layout = 'card', src, title = 'Unknown Title' } = this.getAttributes();
+const {
+  artist, cover, src,
+  step   = 1,
+  value  = 0,
+  layout = 'card',
+  title  = 'Unknown Title'
+} = this.getAttr();
 ```
 
 ```javascript
