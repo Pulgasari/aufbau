@@ -1,5 +1,7 @@
+// <aufbau-combobox>
+
 import { AufbauElement } from './AufbauElement.js';
-import aufbau from '@aufbau/kit';
+import aufbauImport from '@aufbau/import';
 
 export class AufbauCombobox extends AufbauElement {
   static get observedAttributes() {
@@ -27,21 +29,19 @@ export class AufbauCombobox extends AufbauElement {
 
     // Close dropdown on outside click
     document.addEventListener('click', (e) => {
-      if (!this.contains(e.target)) {
-        this.closeDropdown();
-      }
+      if (!this.contains(e.target)) this.closeDropdown();
     });
   }
 
   async update() {
     const placeholder = this.getAttribute('placeholder') || 'Select or type...';
-    const value = this.getAttribute('value') || '';
-    const src = this.getAttribute('src');
+    const value       = this.getAttribute('value')       || '';
+    const src         = this.getAttribute('src');
 
     // Load remote items via @aufbau/import if src attribute is present
     if (src && !this._optionsData) {
       try {
-        this._optionsData = await aufbau.import(src);
+        this._optionsData = await aufbauImport(src);
       } catch (err) {
         console.warn(`[aufbau-combobox] Failed to load options from "${src}":`, err);
         this._optionsData = [];
@@ -104,3 +104,4 @@ export class AufbauCombobox extends AufbauElement {
 }
 
 customElements.define('aufbau-combobox', AufbauCombobox);
+export default AufbauCombobox;
