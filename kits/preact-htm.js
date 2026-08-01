@@ -52,8 +52,6 @@ const aufbau = {
   html, preact,
 };
 
-aufbau.
-
 export function init () {
   if (typeof window !== 'undefined') {
     aufbauPluginsClient.observeStylesheets();
