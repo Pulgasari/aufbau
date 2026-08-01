@@ -75,6 +75,26 @@ this.setValue(value + direction * step);
 
 ```javascript
 // vorher
+const progressInput   = this.$('.audio-progress');
+const timeDisplay     = this.$('.time-current');
+const durationDisplay = this.$('.time-duration');
+
+// nachher
+// (würden auch schon id statt class bekommen, dann:)
+const { audioProgress, timeCurrent, timeDuration } = this.$;
+// und haben nun auch on/off an sich dran
+
+```
+
+```javascript
+// vorher
+
+// nachher
+
+```
+
+```javascript
+// vorher
 onMount() {
   this._isPlaying = false;
   this._audio = new Audio;
@@ -92,19 +112,6 @@ this._audio.addEventListener('ended', () => {
 
 ```
 
-```javascript
-// vorher
-
-// nachher
-
-```
-
-```javascript
-// vorher
-
-// nachher
-
-```
 
 
 
