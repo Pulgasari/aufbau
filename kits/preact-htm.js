@@ -19,15 +19,27 @@ import * as preactSignals from '@preact/signals';
 import htm from 'htm'; 
 export const html = htm.bind(h);
 
+// :::::: BUILD :::::::::::::::::::::::::::::::::::::::::::::::::
+
 const preact = { 
   ...preactCore,
   ...preactHooks,
   ...preactSignals,
 };
 
-export {
+const aufbau = {
+  // AUFBAU
+  config, configs, 
+  init, interceptFetch, interceptFetchStylesheet,
+  cache, import: importFile,
+  createApp, injectImportMap,
+  shaders, stylesheet,
+  define, update, updateDataset, updateProperty,
+
+  // Preact + HTM
   preact,
-}
+};
+
 
 export function init () {
   if (typeof window !== 'undefined') {
@@ -41,15 +53,11 @@ export function init () {
 
 
 
-export * from '@aufbau/plugins/worker';
 
-/**
- * Combined master fetch handler for Service Workers.
- * Checks all registered Aufbau plugins in sequence.
- * 
- * @param {FetchEvent} event
- * @returns {Promise<Response>|null}
- */
+
+
+// Combined master fetch handler for Service Workers.
+// Checks all registered Aufbau plugins in sequence.
 export async function interceptFetch (event) {
   // 1. Check stylesheet plugin
   const stylesheetResponse = await interceptFetchStylesheet(event);
@@ -57,22 +65,18 @@ export async function interceptFetch (event) {
   return null;
 }
 
-/**
- * Central Aufbau Singleton Instance
- */
-export const aufbau = {
-  // AUFBAU
-  config, configs, 
-  init, interceptFetch, interceptFetchStylesheet,
-  cache, import: importFile,
-  createApp, injectImportMap,
-  shaders, stylesheet,
-  define, update, updateDataset, updateProperty,
+// :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  // Preact + HTM
-  preact,
-};
+export * from '@aufbau/plugins/worker';
+
+
+export aufbau;
+export preact;
 
 export default aufbau;
 
+/* :::::: USAGE ::::::::::::::::::::::::::::::::::::::::::::::::: 
 
+import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+
+*/
