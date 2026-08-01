@@ -1,9 +1,11 @@
 // @aufbau/elements/AufbauElement.js
-// base class for all aufbau-webcomponents
+// base class for all aufbau elements (webcomponents)
 
 import { AufbauConfigStore } from './AufbauConfig.js';
 
 // ::::: internal helpers
+
+const toKebabCase = (str) => str.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
 
 const decorateElement = (el) => {
   if (!el || el._aufbauDecorated) return el;
@@ -11,20 +13,18 @@ const decorateElement = (el) => {
   Object.defineProperties(el, {
     _aufbauDecorated: { value: true, configurable: true },
     on: {
-      value: function (...args) {
+      value (...args) {
         this.addEventListener(...args);
         return () => this.removeEventListener(...args);
       },
-      writable: true,
-      configurable: true
+      writable: true, configurable: true
     },
     off: {
-      value: function (...args) {
+      value (...args) {
         this.removeEventListener(...args);
         return this;
       },
-      writable: true,
-      configurable: true
+      writable: true, configurable: true
     }
   });
 
@@ -34,20 +34,18 @@ const decorateElement = (el) => {
 const decorateArray = (arr) => {
   Object.defineProperties(arr, {
     on: {
-      value: function (...args) {
-        const unsubs = this.map(el => el.on?.(...args) || (() => {}));
+      value (...args) {
+        const unsubs = this.map(el => el.on?.(...args) ?? (() => {}));
         return () => unsubs.forEach(unsub => unsub());
       },
-      writable: true,
-      configurable: true
+      writable: true, configurable: true
     },
     off: {
-      value: function (...args) {
+      value (...args) {
         this.forEach(el => el.off?.(...args));
         return this;
       },
-      writable: true,
-      configurable: true
+      writable: true, configurable: true
     }
   });
 
@@ -62,11 +60,14 @@ export class AufbauElement extends HTMLElement {
     this._mounted = false;
   }
 
+  // ::: lifecycle
+
   connectedCallback () {
     this._mounted = true;
     this._onConfigChange = () => { if (this._mounted) this.update(); };
     window.addEventListener('aufbau-config-changed', this._onConfigChange);
-    this.onMount(); this.update();
+    this.onMount();
+    this.update();
   }
 
   disconnectedCallback () {
@@ -82,127 +83,121 @@ export class AufbauElement extends HTMLElement {
     }
   }
 
+  // ::: lifecycle hooks (override in subclasses)
+
+  onAttributeChange (name, oldValue, newValue) {}
+  onMount   () {}
+  onUnmount () {}
+  update    () {}
+
+  // ::: config
+
   getConfig (attrName, configKey, defaultValue) {
     if (this.hasAttribute(attrName)) return this.getAttribute(attrName);
-    
+
     const globalKey = (configKey || attrName).toLowerCase();
     if (AufbauConfigStore.has(globalKey)) return AufbauConfigStore.get(globalKey);
 
     return defaultValue;
   }
 
-  // ::: lifecycle hooks
-  onAttributeChange (name, oldValue, newValue) {}
-  onMount   () {}
-  onUnmount () {}
-  update    () {}
-  emit (eventName, detail = {}, options = {}) {
-    this.dispatchEvent(new CustomEvent(eventName, {
-      bubbles: true, composed: true, detail, ...options
-    }));
-  }
+  // ::: events
 
-  // ::: shorthands
-
-  setAttributes (map) {
-    for (const [key, value] of Object.entries(map)) {
-      const kebab = key.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-           if (value === false || value == null ) this.removeAttribute(kebab);
-      else if (value === true) this.setAttribute(kebab, '');
-      else                     this.setAttribute(kebab, String(value));
-    }
-  }
-  getAttributes (type = String) { return new Proxy(this, { get (target, prop) {
-    if (typeof prop !== 'string') return undefined;
-    const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-    if (type === Boolean) return target.hasAttribute(kebab);
-    if (!target.hasAttribute(kebab)) return undefined;
-    const val = target.getAttribute(kebab);
-
-    if (type === Number) {
-      const parsed = parseFloat(val);
-      return Number.isNaN(parsed) ? undefined : parsed;
-    }
-
-    if (typeof type === 'function' && type !== String) {
-      try   { return type(val); } 
-      catch { return undefined; }
-    }
-
-    return val;
-  }});}
-  get getAttributes () { return new Proxy (this, {get (target, prop) {
-    if (typeof prop !== 'string') return undefined;
-    const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-    return target.hasAttribute(kebab) ? target.getAttribute(kebab) : undefined;     
-  }});}
-  
-  attr (name, fallback = '') {
-    return this.getAttribute(name) ?? fallback;
-  }
-  boolAttr (name) {
-    return this.hasAttribute(name);
-  }
-  numAttr(name, fallback = 0) {
-    const val = parseFloat(this.getAttribute(name));
-    return Number.isNaN(val) ? fallback : val;
-  }
-  
-  on (...args) { 
-    this.addEventListener(...args); 
+  on (...args) {
+    this.addEventListener(...args);
     return () => this.off(...args);
   }
+
   off (...args) {
     this.removeEventListener(...args);
     return this;
   }
 
-  //
+  emit (eventName, detail = {}, options = {}) {
+    return this.dispatchEvent(new CustomEvent(eventName, {
+      bubbles: true, composed: true, detail, ...options
+    }));
+  }
 
-  get $() {
+  // ::: attributes
+
+  /**
+   * @param {string} name
+   * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String]
+   * @param {*} [fallback]
+   */
+  attr (name, type = String, fallback) {
+    const kebab = toKebabCase(name);
+
+    if (type === Boolean) return this.hasAttribute(kebab);
+    if (!this.hasAttribute(kebab)) return fallback;
+
+    const val = this.getAttribute(kebab);
+
+    if (type === Number) {
+      const parsed = parseFloat(val);
+      return Number.isNaN(parsed) ? fallback : parsed;
+    }
+
+    if (typeof type === 'function' && type !== String) {
+      try   { return type(val); }
+      catch { return fallback; }
+    }
+
+    return val;
+  }
+
+  /**
+   * Proxy for destructuring multiple attributes at once, e.g.
+   * const { checked, disabled } = this.getAttributes(Boolean);
+   * @param {StringConstructor|NumberConstructor|BooleanConstructor|Function} [type=String]
+   */
+  getAttributes (type = String) {
+    return new Proxy(this, {
+      get: (target, prop) => (typeof prop === 'string' ? this.attr(prop, type) : undefined)
+    });
+  }
+
+  setAttributes (map) {
+    for (const [key, value] of Object.entries(map)) {
+      const kebab = toKebabCase(key);
+           if (value === false || value == null) this.removeAttribute(kebab);
+      else if (value === true)                   this.setAttribute(kebab, '');
+      else                                        this.setAttribute(kebab, String(value));
+    }
+    return this;
+  }
+
+  // ::: children refs
+
+  /**
+   * this.$('selector')       -> querySelector, on/off-decorated
+   * this.$.someId            -> getElementById('some-id'), on/off-decorated
+   */
+  get $ () {
     const root = this.shadowRoot || this;
+    const findOne = (selector) => decorateElement(root.querySelector(selector));
 
-    const findOne = (target) => {
-      if (typeof target !== 'string') return target ? decorateElement(target) : null;
-
-      const kebab = target.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-      const el = root.querySelector(target)
-              || root.getElementById(kebab)
-              || root.getElementById(target)
-              || root.querySelector(`.${kebab}`)
-              || root.querySelector(`[data-ref="${target}"]`);
-
-      return decorateElement(el);
-    };
-
-    const queryFn = (selector) => findOne(selector);
-    queryFn.on  = (target, ...args) => findOne(target)?. on(...args) || (() => {});
-    queryFn.off = (target, ...args) => findOne(target)?.off(...args);
-
-    return new Proxy (queryFn, {
-      apply.(target, thisArg, argArray) {
-        return queryFn(...argArray);
-      },
+    return new Proxy(findOne, {
+      apply: (target, thisArg, args) => findOne(...args),
       get (target, prop) {
-        return (prop in target)           ? target[prop]
-             : (typeof prop !== 'string') ? undefined;
-             : findOne(prop);
+        if (prop in target) return target[prop];
+        if (typeof prop !== 'string') return undefined;
+        const kebab = toKebabCase(prop);
+        return decorateElement(root.getElementById(kebab) || root.getElementById(prop));
       }
     });
   }
-  
+
+  /**
+   * this.$$('selector') -> querySelectorAll, elements + array both on/off-decorated
+   */
   get $$ () {
     const root = this.shadowRoot || this;
-    const _fn = (selector) => {
-      const nodes = Array.from(root.querySelectorAll(selector));
-      nodes.forEach(decorateElement);
-      return decorateArray(nodes);
-    };
-    _fn.on  = (selector, ...args) => _fn(selector). on(...args);
-    _fn.off = (selector, ...args) => _fn(selector).off(...args);
-    return _fn;
+    return (selector) => decorateArray(
+      Array.from(root.querySelectorAll(selector)).map(decorateElement)
+    );
   }
-
 }
 
 export default AufbauElement;
