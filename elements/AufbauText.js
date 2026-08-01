@@ -1,7 +1,7 @@
 // <aufbau-text>
 
 import AufbauElement from './AufbauElement.js';
-import importFile     from '@aufbau/import';
+import importFile    from '@aufbau/import';
 
 export class AufbauText extends AufbauElement {
   static get observedAttributes () {
