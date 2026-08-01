@@ -2,8 +2,13 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauTreeItem extends AufbauElement {
-  static get observedAttributes () { return ['expanded', 'icon', 'label', 'selected']; }
+export default class AufbauTreeItem extends AufbauElement {
+  static attr = {
+    expanded : Boolean,
+    icon     : String,
+    label    : 'Item',
+    selected : Boolean
+  };
 
   onMount () {
     this.on('click', (e) => {
@@ -19,7 +24,8 @@ export class AufbauTreeItem extends AufbauElement {
   }
 
   toggleExpand () {
-    this.setAttr({ expanded: !this.hasAttribute('expanded') });
+    const { expanded } = this.getAttr();
+    this.setAttributes({ expanded: !expanded });
   }
 
   select () {
@@ -27,14 +33,12 @@ export class AufbauTreeItem extends AufbauElement {
       ?.querySelectorAll('aufbau-tree-item')
       .forEach(item => item.removeAttribute('selected'));
 
-    this.setAttr({ selected: true });
+    this.setAttributes({ selected: true });
     this.emit('aufbau-tree-select', { label: this.getAttr('label'), element: this });
   }
 
   update () {
-    const label = this.getAttr('label', String, 'Item');
-    const icon  = this.getAttr('icon');
-    const { expanded: isExpanded, selected: isSelected } = this.getAttr(Boolean);
+    const { expanded: isExpanded, icon, label, selected: isSelected } = this.getAttr();
     const hasChildren = this.hasChildren();
 
     const defaultIcon = hasChildren
@@ -59,11 +63,9 @@ export class AufbauTreeItem extends AufbauElement {
       ${childrenHtml}
     `;
 
-    // re-attach nested items into the freshly rendered container
     const container = this.$('.tree-children');
     childNodes.forEach(child => container?.appendChild(child));
   }
 }
 
-if (!customElements.get('aufbau-tree-item')) customElements.define('aufbau-tree-item', AufbauTreeItem);
-export default AufbauTreeItem;
+AufbauTreeItem.init();
