@@ -19,12 +19,12 @@ export class AufbauAudio extends AufbauElement {
       this.updatePlayState();
     });
 
-    this.addEventListener('click', (e) => {
+    this.on('click', (e) => {
       const btnPlay = e.target.closest('.btn-play');
       if (btnPlay) this.togglePlay();
     });
 
-    this.addEventListener('input', (e) => {
+    this.on('input', (e) => {
       if (e.target.matches('.audio-progress')) {
         const time = (parseFloat(e.target.value) / 100) * this._audio.duration;
         if (!isNaN(time)) this._audio.currentTime = time;
@@ -62,9 +62,9 @@ export class AufbauAudio extends AufbauElement {
   }
 
   syncProgress() {
-    const progressInput   = this.querySelector('.audio-progress');
-    const timeDisplay     = this.querySelector('.time-current');
-    const durationDisplay = this.querySelector('.time-duration');
+    const progressInput   = this.$('.audio-progress');
+    const timeDisplay     = this.$('.time-current');
+    const durationDisplay = this.$('.time-duration');
 
     if (this._audio && this._audio.duration) {
       const percent = (this._audio.currentTime / this._audio.duration) * 100;
