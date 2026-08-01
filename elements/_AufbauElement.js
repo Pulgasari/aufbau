@@ -3,7 +3,7 @@
 
 import aufbau from '@aufbau/kit'; // sollte nicht das kit sein
 
-import { AufbauConfigStore } from './aufbau-config.js';
+import { AufbauConfigStore } from './AufbauConfig.js';
 
 export class AufbauElement extends HTMLElement {
   constructor() {
