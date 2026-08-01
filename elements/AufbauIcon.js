@@ -3,7 +3,9 @@
 import AufbauElement from './AufbauElement.js';
 
 export default class AufbauIcon extends AufbauElement {
-  static attr = ['icon'];
+  static attr = {
+    icon : String,
+  };
 
   update () {
     const icon = this.getAttr('icon'); if (!icon) return;
