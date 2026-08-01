@@ -38,6 +38,18 @@ export class AufbauSlider extends AufbauElement {
     const { current = 0, step = 1 } = this.numAttrs;
     this.setValue(current + direction * step);
   }
+  stepBy (direction) {
+    const { current = 0, step = 1 } = this.attrsAsNum;
+    this.setValue(current + direction * step);
+  }
+  stepBy (direction) {
+    const { current = 0, step = 1 } = this.attrs('num');
+    this.setValue(current + direction * step);
+  }
+  stepBy (direction) {
+    const { current = 0, step = 1 } = this.attrs(Number);
+    this.setValue(current + direction * step);
+  }
 
   setValue(val) {
     const min = this.hasAttribute('min') ? parseFloat(this.getAttribute('min')) : 0;
