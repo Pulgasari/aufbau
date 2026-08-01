@@ -3,7 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export class AufbauDropdown extends AufbauElement {
-  static get observedAttributes () { return ['label', 'open']; }
+  static attr = ['label', 'open'];
 
   update () {
     const label    = this.getAttr('label', String, 'Menu');
