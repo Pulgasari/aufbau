@@ -1,42 +1,6 @@
 // domina/index.js
 
 // ---------------------------------------------------------------------------
-// Internal type checks
-// ---------------------------------------------------------------------------
-const isArray      = Array.isArray;
-const isString     = v => typeof v === 'string';
-const isFn         = v => typeof v === 'function';
-const isNullish    = v => v == null;
-const isObject     = v => v !== null && typeof v === 'object';
-const isFragment   = v => v instanceof DocumentFragment;
-const isElementish = v =>
-  v instanceof Element ||
-  v instanceof DocumentFragment ||
-  v instanceof Document;
-
-// ---------------------------------------------------------------------------
-// Main Elements References
-// ---------------------------------------------------------------------------
-export let
-  $app  = document.getElementById('app'),
-  $body = document.body,
-  $head = document.head,
-  $root = document.documentElement;
-
-// ---------------------------------------------------------------------------
-// Domain-specific checks
-// ---------------------------------------------------------------------------
-let
-  isDate   = v => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(v) || (!isNaN(Date.parse(v)) && isNaN(Number(v))),
-  isEDO    = v => isObject(v) && (v.tag || v.tagName),
-  isEmpty  = v => v === '' || v === null || v === undefined,
-  isHTML   = v => isString(v) && v.trim().startsWith('<'),
-  isIdLike = v => v.charCodeAt(0) === 35 && v.indexOf(' ') === -1 && v.indexOf('.') === -1,
-  isDings  = el => el.type === 'checkbox' || el.type === 'radio',
-  isMulti  = el => el.tagName === 'SELECT' && el.multiple,
-  isURL    = v => isString(v) && v.includes('://');
-
-// ---------------------------------------------------------------------------
 // Magic Helpers
 // ---------------------------------------------------------------------------
 export let
