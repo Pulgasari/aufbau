@@ -3,12 +3,21 @@
 import AufbauElement from './AufbauElement.js';
 
 export default class AufbauNumber extends AufbauElement {
-  static attr = ['value', 'min', 'max', 'step', 'disabled', 'unit'];
+  
+  static attr = {
+    value    : 0,
+    min      : Number,
+    max      : Number,
+    step     : 1,
+    disabled : Boolean,
+    unit     : String,
+  };
 
   onMount () {
     this.on('click', (e) => {
       const btn = e.target.closest('[data-step]');
-      if (!btn || this.hasAttribute('disabled')) return;
+      // Check disabled state via schema-based Boolean
+      if (!btn || this.getAttr('disabled')) return;
       this.stepBy(parseInt(btn.dataset.step, 10));
     });
 
@@ -18,22 +27,25 @@ export default class AufbauNumber extends AufbauElement {
   }
 
   stepBy (direction) {
-    const { step = 1, value = 0 } = this.getAttr(Number);
+    const { step, value } = this.getAttr();
     this.setValue(value + direction * step);
   }
 
   setValue (val) {
-    const { min = -Infinity, max = Infinity } = this.getAttr(Number);
+    const { min, max } = this.getAttr();
+    const parsedVal = parseFloat(val) || 0;
+    const minBound = min ?? -Infinity;
+    const maxBound = max ??  Infinity;
 
-    const value = Math.max(min, Math.min(max, parseFloat(val) || 0));
-    this.setAttr({ value });
+    const value = Math.max(minBound, Math.min(maxBound, parsedVal));
+    
+    this.setAttributes({ value });
     this.emit('aufbau-number', { value });
   }
 
   update () {
-    const { max, min, step = 1, value = 0 } = this.getAttributes(Number);
-    const { unit }     = this.getAttr(String);
-    const { disabled } = this.getAttr(Boolean);
+    // One single call extracts ALL attributes with accurate types & fallbacks
+    const { value, min, max, step, disabled, unit } = this.getAttr();
 
     this.innerHTML = `
       <div class="aufbau-number-wrapper ${disabled ? 'is-disabled' : ''}">
