@@ -70,17 +70,29 @@ export class AufbauElement extends HTMLElement {
   }
 
   // ::: shorthands
+  attrs (type = String) { return new Proxy(this, { get (target, prop) {
+    if (typeof prop !== 'string') return undefined;
+    const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+    if (type === Boolean) return target.hasAttribute(kebab);
+    if (!target.hasAttribute(kebab)) return undefined;
+    const val = target.getAttribute(kebab);
+
+    if (type === Number) {
+      const parsed = parseFloat(val);
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }
+
+    if (typeof type === 'function' && type !== String) {
+      try   { return type(val); } 
+      catch { return undefined; }
+    }
+
+    return val;
+  }});}
   get attrs () { return new Proxy (this, {get (target, prop) {
     if (typeof prop !== 'string') return undefined;
     const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
     return target.hasAttribute(kebab) ? target.getAttribute(kebab) : undefined;     
-  }});}
-  get numAttrs () { return new Proxy (this, {get (target, prop) {
-    if (typeof prop !== 'string') return undefined;
-    const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-    if (!target.hasAttribute(kebab)) return undefined;
-    const parsed = parseFloat(target.getAttribute(kebab));
-    return Number.isNaN(parsed) ? undefined : parsed;
   }});}
   attr (name, fallback = '') {
     return this.getAttribute(name) ?? fallback;
