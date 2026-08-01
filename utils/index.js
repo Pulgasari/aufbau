@@ -11,7 +11,9 @@ export function slugify (text) {
 
 
 
-export const // timing
+export const 
+  
+// timing
 debounce  = ( fn, delay=100 ) => {
   let timeout;
   return (...args) => {
@@ -21,5 +23,18 @@ debounce  = ( fn, delay=100 ) => {
 },
 sleep = (duration=1000) => new Promise( resolve => setTimeout(resolve, duration) ),     
 
-  // array
+// array
 arrayfied = value => isArray(value) ? value : [value],
+
+// ::: object
+
+/ object
+deepMerge = ( target, source ) => {
+  if (!isPlainObject(source)) return source;
+  Object.keys(source).forEach( key => {
+    isEvery(isPlainObject, target[key], source[key]) //fixme
+    ? deepMerge( target[key], source[key] )
+    : target[key] = source[key];
+  });
+  return target;
+},
