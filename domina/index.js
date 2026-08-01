@@ -2,6 +2,9 @@
 
 import * from './utils.js';
 
+import sortElements  from './sortElements.js';
+import updateElement from './updateElement.js';
+
 /*
 import createElement from './createElement.js';
 import getElements   from './getElements.js';
@@ -39,6 +42,8 @@ export default {
   getElement,
   getElements,
   insertElement,
+  sortElements,
+  updateElement,
   
   element  : getElement,
   elements : getElements,
