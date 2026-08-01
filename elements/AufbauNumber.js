@@ -3,9 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export class AufbauNumber extends AufbauElement {
-  static get observedAttributes () {
-    return ['value', 'min', 'max', 'step', 'disabled', 'unit'];
-  }
+  static attr = ['value', 'min', 'max', 'step', 'disabled', 'unit'];
 
   onMount () {
     this.on('click', (e) => {
@@ -20,21 +18,21 @@ export class AufbauNumber extends AufbauElement {
   }
 
   stepBy (direction) {
-    const { step = 1, value = 0 } = this.getAttributes(Number);
+    const { step = 1, value = 0 } = this.getAttr(Number);
     this.setValue(value + direction * step);
   }
 
   setValue (val) {
-    const { min = -Infinity, max = Infinity } = this.getAttributes(Number);
+    const { min = -Infinity, max = Infinity } = this.getAttr(Number);
 
     const value = Math.max(min, Math.min(max, parseFloat(val) || 0));
-    this.setAttributes({ value });
+    this.setAttr({ value });
     this.emit('aufbau-number', { value });
   }
 
   update () {
-    const { max, min, step = 1, unit = '', value = 0 } = this.getAttributes(Number);
-    const { disabled } = this.getAttributes(Boolean);
+    const { max, min, step = 1, unit = '', value = 0 } = this.getAttr(Number);
+    const { disabled } = this.getAttr(Boolean);
 
     this.innerHTML = `
       <div class="aufbau-number-wrapper ${disabled ? 'is-disabled' : ''}">
@@ -61,5 +59,4 @@ export class AufbauNumber extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-number')) customElements.define('aufbau-number', AufbauNumber);
-export default AufbauNumber;
+AufbauNumber.init();
