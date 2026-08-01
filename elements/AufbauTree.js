@@ -4,12 +4,10 @@ import AufbauElement from './AufbauElement.js';
 import importFile     from '@aufbau/import';
 
 export class AufbauTree extends AufbauElement {
-  static get observedAttributes () {
-    return ['src'];
-  }
+  static get observedAttributes () { return ['src']; }
 
   async update () {
-    const src = this.attr('src');
+    const src = this.getAttr('src');
     if (!src || this._renderedFromSrc) return;
 
     try {
