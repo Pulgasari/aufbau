@@ -10,7 +10,6 @@ import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
 import * as aufbauShaders       from '@aufbau/shaders';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 
-
 // ::: HTM
 import htm from 'htm'; 
 
@@ -32,7 +31,7 @@ const preact = {
 const aufbau = {
   // AUFBAU
   config, configs, 
-  init, interceptFetch, interceptFetchStylesheet,
+  init, interceptFetch,
 
   // aufbau-dirty (needs to be moved)
   define, update, updateDataset, updateProperty,
@@ -43,15 +42,17 @@ const aufbau = {
   shaders    : aufbauShaders,
   stylesheet : aufbauStylesheet,
 
+  // aufbau adapters
+  plugins = {
+    client : aufbauPluginsClient,
+    worker : aufbauPluginsWorker
+  },
+
   // Preact + HTM
   html, preact,
 };
 
-aufbau.plugins = {
-  client : aufbauPluginsClient,
-  worker : aufbauPluginsWorker
-};
-
+aufbau.
 
 export function init () {
   if (typeof window !== 'undefined') {
@@ -70,9 +71,6 @@ export async function interceptFetch (event) {
 }
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
-
-export * from '@aufbau/plugins/worker';
-
 
 export aufbau;
 export html;
