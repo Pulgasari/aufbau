@@ -1,7 +1,6 @@
-// @aufbau/webcomponents
 // <aufbau-icon>
 
-import { AufbauElement } from './AufbauElement.js';
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauIcon extends AufbauElement {
   static get observedAttributes() {
@@ -9,9 +8,7 @@ export class AufbauIcon extends AufbauElement {
   }
 
   update() {
-    const icon = this.getAttribute('icon');
-    if (!icon) return;
-
+    const icon = this.getAttribute('icon'); if (!icon) return;
     const normalized = icon.replace('/', ':');
     const url = `https://api.iconify.design/${normalized}.svg`;
 
@@ -20,3 +17,4 @@ export class AufbauIcon extends AufbauElement {
 }
 
 customElements.define('aufbau-icon', AufbauIcon);
+export default AufbauIcon;
