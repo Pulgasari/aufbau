@@ -66,38 +66,7 @@ export let
 // ---------------------------------------------------------------------------
 // Low-level: update / remove
 // ---------------------------------------------------------------------------
-  updateElement = (el, props = {}, ...children) => {
-    el = _el(el);
-    if (!el) return false;
-
-    // Apply props
-    for (const [key, value] of Object.entries(props)) {
-      if (key === 'style') {
-        Object.assign(el.style, value);
-      } else if (key === 'dataset' || key === 'data') {
-        Object.assign(el.dataset, value);
-      } else if (key.startsWith('on') && isFn(value)) {
-        el.addEventListener(key.slice(2).toLowerCase(), value);
-      } else if (key in el) {
-        el[key] = value;
-      } else {
-        el.setAttribute(key, value);
-      }
-    }
-
-    // Append children – use DocumentFragment when there are multiple nodes
-    if (children.length === 1) {
-      el.append(children[0]);
-    } else if (children.length > 1) {
-      const frag = document.createDocumentFragment();
-      for (const child of children) {
-        if (isArray(child)) child.forEach(c => frag.append(c));
-        else frag.append(child);
-      }
-      el.append(frag);
-    }
-  },
-
+  
   updateTitle   = str => (document.title = str),
   clearElement  = sth => _el(sth) && (_el(sth).innerHTML = ''),
   removeElement = sth => _el(sth)?.remove();
