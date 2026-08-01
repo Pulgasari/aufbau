@@ -1,0 +1,32 @@
+{
+  "name": "@aufbau/elements",
+  "version": "1.0.0",
+  "description": "Reactive, zero-dependency Web Components for the @aufbau framework ecosystem",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "sideEffects": [
+    "./Aufbau*.js"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*.js"
+  },
+  "files": [
+    "index.js",
+    "Aufbau*.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@aufbau/import": "^1.0.0"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "aufbau",
+    "ui-kit",
+    "esm"
+  ],
+  "license": "MIT"
+}
