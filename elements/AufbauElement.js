@@ -1,11 +1,12 @@
 // @aufbau/elements/AufbauElement.js
 // base class for all aufbau elements (webcomponents)
 
+import { toKebabCase }       from './core/utils.js';
+import { parseSchemaEntry }  from './core/parseSchemaEntry.js';
 import { AufbauConfigStore } from './AufbauConfig.js';
 
 // ::::: internal helpers
 
-const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
 const decorateElement = (el) => {
   if (!el || el._aufbauDecorated) return el;
@@ -50,21 +51,6 @@ const decorateArray = (arr) => {
   });
 
   return arr;
-};
-
-/**
- * Parses a schema entry into a normalized type constructor and fallback value.
- * @param {*} entry - e.g. Number, 50, Boolean, false, String, 'default'
- */
-const parseSchemaEntry = (entry) => {
-  // Case 1: Direct constructor function (e.g. Number, Boolean, String)
-  if (typeof entry === 'function') return { type: entry, fallback: undefined };
-  // Case 2: Literal fallback values (infer type constructor from primitive value)
-  if (typeof entry === 'number')  return { type: Number, fallback: entry };
-  if (typeof entry === 'boolean') return { type: Boolean, fallback: entry };
-  if (typeof entry === 'string')  return { type: String, fallback: entry };
-  //
-  return { type: String, fallback: undefined };
 };
 
 // :::::: main class
