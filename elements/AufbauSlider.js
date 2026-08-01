@@ -2,10 +2,8 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauSlider extends AufbauElement {
-  static get observedAttributes () {
-    return ['value', 'min', 'max', 'step', 'unit', 'controls', 'editable', 'disabled'];
-  }
+export default class AufbauSlider extends AufbauElement {
+  static attr = ['value', 'min', 'max', 'step', 'unit', 'controls', 'editable', 'disabled'];
 
   onMount () {
     this.on('input', (e) => {
@@ -14,28 +12,27 @@ export class AufbauSlider extends AufbauElement {
 
     this.on('click', (e) => {
       const btn = e.target.closest('[data-step]');
-      if (!btn || this.hasAttribute('disabled')) return;
+      if (!btn || this.hasAttr('disabled')) return;
       this.stepBy(parseInt(btn.dataset.step, 10));
     });
   }
 
   stepBy (direction) {
-    const { step = 1, value = 0 } = this.getAttributes(Number);
+    const { step = 1, value = 0 } = this.getAttr(Number);
     this.setValue(value + direction * step);
   }
 
   setValue (val) {
-    const { min = 0, max = 100 } = this.getAttributes(Number);
-
+    const { min = 0, max = 100 } = this.getAttr(Number);
     const value = Math.max(min, Math.min(max, parseFloat(val) || 0));
-    this.setAttributes({ value });
+    this.setAttr({ value });
     this.emit('aufbau-slider', { value });
   }
 
   update () {
-    const { max = 100, min = 0, step = 1, value = 0 } = this.getAttributes(Number);
-    const unit = this.attr('unit', String, '');
-    const { controls, editable, disabled } = this.getAttributes(Boolean);
+    const { max = 100, min = 0, step = 1, value = 0 } = this.getAttr(Number);
+    const unit = this.getAttr('unit', String, '');
+    const { controls, editable, disabled } = this.getAttr(Boolean);
 
     this.innerHTML = `
       <div class="aufbau-slider-wrapper ${disabled ? 'is-disabled' : ''}">
@@ -82,5 +79,4 @@ export class AufbauSlider extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-slider')) customElements.define('aufbau-slider', AufbauSlider);
-export default AufbauSlider;
+AufbauSlider.init();
