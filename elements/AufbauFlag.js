@@ -2,14 +2,12 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauFlag extends AufbauElement {
-  static get observedAttributes() {
-    return ['code', 'variant'];
-  }
+export default class AufbauFlag extends AufbauElement {
+  static attr = ['code', 'variant'];
 
   update() {
-    const code    = (this.getAttribute('code')   || 'de').toLowerCase();
-    //const variant = this.getAttribute('variant') || 'circle'; // 'circle' | 'square' | '4x3'
+    const code    = (this.getAttr('code')   || 'de').toLowerCase();
+    //const variant = this.getAttr('variant') || 'circle'; // 'circle' | 'square' | '4x3'
     const variant = this.getConfig('variant', 'flag-variant', 'circle');
     
     const iconSet = variant === 'circle' ? 'circle-flags' : 'flagpack';
@@ -17,5 +15,4 @@ export class AufbauFlag extends AufbauElement {
   }
 }
 
-customElements.define('aufbau-flag', AufbauFlag);
-export default AufbauFlag;
+AufbauFlag.init();
