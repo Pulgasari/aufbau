@@ -3,16 +3,14 @@
 import AufbauElement from './AufbauElement.js';
 
 export class AufbauDropdown extends AufbauElement {
-  static get observedAttributes() {
-    return ['label', 'open'];
-  }
+  static get observedAttributes () { return ['label', 'open']; }
 
-  update() {
-    const label  = this.getAttribute('label') || 'Menu';
-    const isOpen = this.hasAttribute('open');
+  update () {
+    const label    = this.getAttr('label', String, 'Menu');
+    const { open } = this.getAttr(Boolean);
 
     this.innerHTML = `
-      <details class="aufbau-dropdown-wrapper" ${isOpen ? 'open' : ''}>
+      <details class="aufbau-dropdown-wrapper" ${open ? 'open' : ''}>
         <summary class="aufbau-dropdown-trigger">
           <span>${label}</span>
           <aufbau-icon icon="lucide:chevron-down"></aufbau-icon>
@@ -25,5 +23,4 @@ export class AufbauDropdown extends AufbauElement {
   }
 }
 
-customElements.define('aufbau-dropdown', AufbauDropdown);
-export default AufbauDropdown;
+AufbauDropdown.init();
