@@ -14,7 +14,12 @@ const escapeHtml = (str) => str
   .replace(/'/g, '&#039;');
 
 export default class AufbauCode extends AufbauElement {
-  static attr = ['lang', 'language', 'code', 'no-copy'];
+  static attr = {
+    lang     : String,
+    language : String,
+    code     : String,
+    no-copy  : Boolean,
+  ];
 
   onMount () {
     // save original inner text if no code attribute is set
@@ -24,9 +29,7 @@ export default class AufbauCode extends AufbauElement {
   }
 
   async update () {
-    const { lang, language, code } = this.getAttr();
-    const { noCopy } = this.getAttr(Boolean);
-
+    const { code, lang, language, noCopy } = this.getAttr();
     const usedLang = lang || language || 'plaintext';
     const rawCode  = code || this._originalCode || '';
     const showCopy = !noCopy;
