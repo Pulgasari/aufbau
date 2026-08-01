@@ -75,6 +75,18 @@ this.setValue(value + direction * step);
 
 ```javascript
 // vorher
+onMount() {
+  this._isPlaying = false;
+  this._audio = new Audio;
+
+this._audio.addEventListener('timeupdate', () => this.syncProgress());
+this._audio.addEventListener('loadedmetadata', () => this.syncProgress());
+this._audio.addEventListener('ended', () => {
+  this._isPlaying = false;
+  this.updatePlayState();
+});
+  ...
+}
 
 // nachher
 
