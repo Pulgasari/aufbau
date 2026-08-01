@@ -1,4 +1,4 @@
-// @aufbau/webcomponents/datalist.js
+// <aufbau-datalist>
 
 import importeur from '@aufbau/import';
 
