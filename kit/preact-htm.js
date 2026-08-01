@@ -1,5 +1,7 @@
 // @aufbau/kits/preact-htm
 
+// :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
+
 // ::: AUFBAU
 import aufbauCache                  from '@aufbau/cache';
 import aufbauImport                 from '@aufbau/import';
@@ -17,7 +19,7 @@ import * as preactSignals from '@preact/signals';
 import htm from 'htm'; 
 export const html = htm.bind(h);
 
-const preact = {
+const preact = { 
   ...preactCore,
   ...preactHooks,
   ...preactSignals,
@@ -72,3 +74,6 @@ export const aufbau = {
 };
 
 export default aufbau;
+
+
+
