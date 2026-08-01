@@ -1,6 +1,6 @@
 // <aufbau-input>
 
-import { AufbauElement } from './AufbauElement.js';
+import AufbauElement from './AufbauElement.js';
 
 const VARIANT_ICONS = {
   email    : 'lucide:mail',
@@ -51,3 +51,4 @@ export class AufbauInput extends AufbauElement {
 }
 
 customElements.define('aufbau-input', AufbauInput);
+export default AufbauItem;
