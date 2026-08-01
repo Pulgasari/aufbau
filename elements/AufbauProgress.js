@@ -2,33 +2,37 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauProgress extends AufbauElement {
-  static get observedAttributes() {
-    return ['value', 'max', 'type', 'target', 'show-text', 'unit'];
-  }
+export default class AufbauProgress extends AufbauElement {
+  static attr = {
+    value    : Number,
+    max      : 100,
+    type     : 'standard',
+    target   : String,
+    showText : Boolean,
+    unit     : '%'
+  };
 
-  onMount() {
+  onMount () {
     this._onScroll = this._onScroll.bind(this);
     this.setupScrollListener();
   }
 
-  onUnmount() {
+  onUnmount () {
     this.removeScrollListener();
   }
 
-  onAttributeChange(name) {
+  onAttributeChange (name) {
     if (name === 'target' || name === 'type') {
       this.setupScrollListener();
     }
   }
 
-  setupScrollListener() {
+  setupScrollListener () {
     this.removeScrollListener();
 
-    const type = this.getAttribute('type');
+    const { type, target: targetQuery } = this.getAttr();
     if (type !== 'scroll') return;
 
-    const targetQuery = this.getAttribute('target');
     this._scrollTarget = targetQuery
       ? (targetQuery === 'body' ? window : document.querySelector(targetQuery))
       : window;
@@ -39,15 +43,15 @@ export class AufbauProgress extends AufbauElement {
     }
   }
 
-  removeScrollListener() {
+  removeScrollListener () {
     if (this._scrollTarget) {
       this._scrollTarget.removeEventListener('scroll', this._onScroll);
       this._scrollTarget = null;
     }
   }
 
-  _onScroll() {
-    const type = this.getAttribute('type');
+  _onScroll () {
+    const { type } = this.getAttr();
     if (type !== 'scroll') return;
 
     let percentage = 0;
@@ -62,18 +66,15 @@ export class AufbauProgress extends AufbauElement {
       percentage = totalScroll > 0 ? (el.scrollTop / totalScroll) * 100 : 0;
     }
 
-    this.setAttribute('value', Math.min(100, Math.max(0, percentage)).toFixed(1));
+    const val = Math.min(100, Math.max(0, percentage)).toFixed(1);
+    this.setAttributes({ value: val });
   }
 
-  update() {
-    const type      = this.getAttribute('type') || 'standard';
-    const valueAttr = this.getAttribute('value');
-    const max       = parseFloat(this.getAttribute('max') || '100');
-    const unit      = this.getAttribute('unit') || '%';
-    const showText  = this.hasAttribute('show-text');
+  update () {
+    const { value, max, type, showText, unit } = this.getAttr();
 
-    const isIndeterminate = valueAttr === null && type !== 'scroll';
-    const val = parseFloat(valueAttr || '0');
+    const isIndeterminate = (value === undefined) && type !== 'scroll';
+    const val = value ?? 0;
     const percentage = isIndeterminate ? 0 : Math.min(100, Math.max(0, (val / max) * 100));
 
     this.innerHTML = `
@@ -87,5 +88,4 @@ export class AufbauProgress extends AufbauElement {
   }
 }
 
-customElements.define('aufbau-progress', AufbauProgress);
-export default AufbauProgress;
+AufbauProgress.init();
