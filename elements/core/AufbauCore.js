@@ -125,6 +125,50 @@ export const AufbauCore = (BaseClass = HTMLElement) => {return class extends Bas
 
   // ::: events
 
+  /**
+   * Universal event listener with automatic unsubscribe cleanup.
+   * 
+   * Self:    this.on('click', handler)
+   * External: this.on(this._audio, 'timeupdate', handler)
+   * Window:   this.on(window, 'resize', handler)
+   * Selector: this.on('.btn-play', 'click', handler)
+   */
+  on (...args) {
+    // 1. Standard usage on self: this.on('click', listener, options)
+    if (typeof args[0] === 'string') {
+      const [type, listener, options] = args;
+      this.addEventListener(type, listener, options);
+      return () => this.removeEventListener(type, listener, options);
+    }
+
+    // 2. External usage: this.on(target, type, listener, options)
+    const [rawTarget, type, listener, options] = args;
+    if (!rawTarget) return () => {};
+
+    // Resolve target (Selector string, NodeList/Array, or EventTarget/Audio/window)
+    let targets = [];
+    if (typeof rawTarget === 'string') {
+      const root = this.shadowRoot || this;
+      targets = Array.from(root.querySelectorAll(rawTarget));
+    } else if (Array.isArray(rawTarget) || rawTarget instanceof NodeList) {
+      targets = Array.from(rawTarget);
+    } else {
+      targets = [rawTarget];
+    }
+
+    // Attach listeners and collect cleanup functions
+    const unsubs = targets.filter(Boolean).map(target => {
+      // Use existing decorated .on() if present, otherwise fallback to addEventListener
+      if (typeof target.on === 'function' && target !== this) {
+        return target.on(type, listener, options);
+      }
+      target.addEventListener(type, listener, options);
+      return () => target.removeEventListener(type, listener, options);
+    });
+
+    return () => unsubs.forEach(unsub => unsub());
+  }
+
   on (...args) {
     this.addEventListener(...args);
     return () => this.off(...args);
