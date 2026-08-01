@@ -6,6 +6,11 @@ body {
 }
 */
 
+svg {
+  width: auto;
+  max-width: 100%;
+}
+
 @aufbau-config {
   import : reset, default, docs, keyframes;
   themes : classic;
