@@ -1,4 +1,6 @@
-import { AufbauElement } from './AufbauElement.js';
+// <aufbau-progress>
+
+import AufbauElement from './AufbauElement.js';
 
 export class AufbauProgress extends AufbauElement {
   static get observedAttributes() {
@@ -51,11 +53,11 @@ export class AufbauProgress extends AufbauElement {
     let percentage = 0;
 
     if (this._scrollTarget === window || this._scrollTarget === document.body) {
-      const docEl = document.documentElement;
+      const docEl       = document.documentElement;
       const totalScroll = docEl.scrollHeight - docEl.clientHeight;
       percentage = totalScroll > 0 ? (window.scrollY / totalScroll) * 100 : 0;
     } else if (this._scrollTarget instanceof HTMLElement) {
-      const el = this._scrollTarget;
+      const el          = this._scrollTarget;
       const totalScroll = el.scrollHeight - el.clientHeight;
       percentage = totalScroll > 0 ? (el.scrollTop / totalScroll) * 100 : 0;
     }
@@ -64,11 +66,11 @@ export class AufbauProgress extends AufbauElement {
   }
 
   update() {
-    const type = this.getAttribute('type') || 'standard';
+    const type      = this.getAttribute('type') || 'standard';
     const valueAttr = this.getAttribute('value');
-    const max = parseFloat(this.getAttribute('max') || '100');
-    const unit = this.getAttribute('unit') || '%';
-    const showText = this.hasAttribute('show-text');
+    const max       = parseFloat(this.getAttribute('max') || '100');
+    const unit      = this.getAttribute('unit') || '%';
+    const showText  = this.hasAttribute('show-text');
 
     const isIndeterminate = valueAttr === null && type !== 'scroll';
     const val = parseFloat(valueAttr || '0');
@@ -86,3 +88,4 @@ export class AufbauProgress extends AufbauElement {
 }
 
 customElements.define('aufbau-progress', AufbauProgress);
+export default AufbauProgress;
