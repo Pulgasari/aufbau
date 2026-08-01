@@ -3,23 +3,25 @@
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: AUFBAU
-import aufbauCache                  from '@aufbau/cache';
-import aufbauImport                 from '@aufbau/import';
-import * as aufbauShaders           from '@aufbau/shaders';
-import * as aufbauStylesheet        from '@aufbau/stylesheet';
-import { observeStylesheets }       from '@aufbau/plugins/client';
-import { interceptFetchStylesheet } from '@aufbau/plugins/worker';
+import      aufbauCache         from '@aufbau/cache';
+import      aufbauImport        from '@aufbau/import';
+import * as aufbauPluginsClient from '@aufbau/plugins/client';
+import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
+import * as aufbauShaders       from '@aufbau/shaders';
+import * as aufbauStylesheet    from '@aufbau/stylesheet';
+
+
+// ::: HTM
+import htm from 'htm'; 
 
 // ::: PREACT
 import * as preactCore    from 'preact';
 import * as preactHooks   from 'preact/hooks';
 import * as preactSignals from '@preact/signals';
 
-// ::: HTM
-import htm from 'htm'; 
-export const html = htm.bind(h);
-
 // :::::: BUILD :::::::::::::::::::::::::::::::::::::::::::::::::
+
+const html = htm.bind(h);
 
 const preact = { 
   ...preactCore,
@@ -31,36 +33,38 @@ const aufbau = {
   // AUFBAU
   config, configs, 
   init, interceptFetch, interceptFetchStylesheet,
-  cache, import: importFile,
-  createApp, injectImportMap,
-  shaders, stylesheet,
+
+  // aufbau-dirty (needs to be moved)
   define, update, updateDataset, updateProperty,
 
+  // aufbau-packages
+  cache      : aufbauCache,
+  import     : aufbauImport,
+  shaders    : aufbauShaders,
+  stylesheet : aufbauStylesheet,
+
   // Preact + HTM
-  preact,
+  html, preact,
+};
+
+aufbau.plugins = {
+  client : aufbauPluginsClient,
+  worker : aufbauPluginsWorker
 };
 
 
 export function init () {
   if (typeof window !== 'undefined') {
-    observeStylesheets();
+    aufbauPluginsClient.observeStylesheets();
   }
 }
-
-// ::: AUFBAU
-
-
-
-
-
-
 
 
 // Combined master fetch handler for Service Workers.
 // Checks all registered Aufbau plugins in sequence.
 export async function interceptFetch (event) {
   // 1. Check stylesheet plugin
-  const stylesheetResponse = await interceptFetchStylesheet(event);
+  const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
   if (stylesheetResponse) return stylesheetResponse;
   return null;
 }
@@ -71,6 +75,7 @@ export * from '@aufbau/plugins/worker';
 
 
 export aufbau;
+export html;
 export preact;
 
 export default aufbau;
