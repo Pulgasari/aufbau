@@ -1,5 +1,9 @@
 // @aufbau/utils
 
+import { isArray, isEvery, isFn, isNullish, isObject, isPlainObject } from './is.js';
+import { _el } from './dom.js';
+
+
 
 export function slugify (text) {
   return text
