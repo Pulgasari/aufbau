@@ -2,7 +2,7 @@
 
 import AufbauElement from './AufbauElement.js';
 
-export class AufbauNumber extends AufbauElement {
+export default class AufbauNumber extends AufbauElement {
   static attr = ['value', 'min', 'max', 'step', 'disabled', 'unit'];
 
   onMount () {
@@ -31,7 +31,8 @@ export class AufbauNumber extends AufbauElement {
   }
 
   update () {
-    const { max, min, step = 1, unit = '', value = 0 } = this.getAttr(Number);
+    const { max, min, step = 1, value = 0 } = this.getAttributes(Number);
+    const { unit }     = this.getAttr(String);
     const { disabled } = this.getAttr(Boolean);
 
     this.innerHTML = `
