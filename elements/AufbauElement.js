@@ -70,7 +70,17 @@ export class AufbauElement extends HTMLElement {
   }
 
   // ::: shorthands
-  attrs (type = String) { return new Proxy(this, { get (target, prop) {
+  $  (selector) { return (this.shadowRoot || this).querySelector(selector); }
+  $$ (selector) { return Array.from((this.shadowRoot || this).querySelectorAll(selector)); }
+  setAttributes (map) {
+    for (const [key, value] of Object.entries(map)) {
+      const kebab = key.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+           if (value === false || value == null ) this.removeAttribute(kebab);
+      else if (value === true) this.setAttribute(kebab, '');
+      else                     this.setAttribute(kebab, String(value));
+    }
+  }
+  getAttributes (type = String) { return new Proxy(this, { get (target, prop) {
     if (typeof prop !== 'string') return undefined;
     const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
     if (type === Boolean) return target.hasAttribute(kebab);
@@ -89,7 +99,7 @@ export class AufbauElement extends HTMLElement {
 
     return val;
   }});}
-  get attrs () { return new Proxy (this, {get (target, prop) {
+  get getAttributes () { return new Proxy (this, {get (target, prop) {
     if (typeof prop !== 'string') return undefined;
     const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
     return target.hasAttribute(kebab) ? target.getAttribute(kebab) : undefined;     
