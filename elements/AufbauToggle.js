@@ -3,9 +3,7 @@
 import AufbauElement from './AufbauElement.js';
 
 export class AufbauToggle extends AufbauElement {
-  static get observedAttributes () {
-    return ['checked', 'disabled', 'label'];
-  }
+  static attr = ['checked', 'disabled', 'label'];
 
   onMount () {
     this.on('click', () => this.toggle());
@@ -15,13 +13,13 @@ export class AufbauToggle extends AufbauElement {
     if (this.hasAttribute('disabled')) return;
 
     const checked = !this.hasAttribute('checked');
-    this.setAttributes({ checked });
+    this.setAttr({ checked });
     this.emit('aufbau-toggle', { checked });
   }
 
   update () {
-    const label = this.attr('label', String, '');
-    const { checked, disabled } = this.getAttributes(Boolean);
+    const label = this.getAttr('label', String, '');
+    const { checked, disabled } = this.getAttr(Boolean);
 
     this.innerHTML = `
       <button
@@ -38,5 +36,4 @@ export class AufbauToggle extends AufbauElement {
   }
 }
 
-if (!customElements.get('aufbau-toggle')) customElements.define('aufbau-toggle', AufbauToggle);
-export default AufbauToggle;
+AufbauToggle.init();
