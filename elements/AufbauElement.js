@@ -70,8 +70,28 @@ export class AufbauElement extends HTMLElement {
   }
 
   // ::: shorthands
-  $  (selector) { return (this.shadowRoot || this).querySelector(selector); }
-  $$ (selector) { return Array.from((this.shadowRoot || this).querySelectorAll(selector)); }
+  //$  (selector) { return (this.shadowRoot || this).querySelector(selector); }
+  $$ (selector) { return Array.from((this.shadowRoot || this).querySelectorAll(selector)); }    
+  get $ () {
+    const root    = this.shadowRoot || this;
+    const queryFn = (selector) => root.querySelector(selector);
+
+    return new Proxy (queryFn, {
+      // Handles function call: this.$('.some-class')
+      apply (target, thisArg, argArray) { return queryFn(...argArray); },
+      // Handles property access: const { audioProgress } = this.$;
+      get (target, prop) {
+        if (typeof prop !== 'string') return undefined;
+        const kebab = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
+        return root.getElementById(kebab)
+            || root.getElementById(prop)
+            || root.querySelector(`.${kebab}`)
+            || root.querySelector(`[data-ref="${prop}"]`)
+            || null;
+      }
+    });
+  }
+
   setAttributes (map) {
     for (const [key, value] of Object.entries(map)) {
       const kebab = key.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
