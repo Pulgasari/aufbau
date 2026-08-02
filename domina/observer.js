@@ -3,6 +3,12 @@
 
 // dieser part kommt eigtl aus den domina/utils
 const
+isElementish    = v => v instanceof Element || v instanceof DocumentFragment,
+isObject        = v => v && typeof v === 'object' && !isArray(v) && v !== null,
+ isPlainObject  = v => v !== null && typeof v === 'object' && v.constructor === Object, // !!sth ???
+ isRealObject   = v => v?.constructor === Object,
+ isStrictObject = v => Object.prototype.toString.call(v) === '[object Object]',
+ 
 _doc  = sth => sth ? _el(sth) : document,
 _el   = sth => isElementish(sth) ? sth : getElement(_slct(sth)),
 _root = sth => sth ? _el(sth) : $root,
