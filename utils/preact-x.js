@@ -14,6 +14,7 @@
 - BunkerSignal
 - MapSignal
 - SetSignal
+- QuerySignal
 
 
 */
