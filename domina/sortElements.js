@@ -1,6 +1,6 @@
 // @domina/sortElements.js
 
-import { getElement, getElements }   from './core.js';
+import { getElement, getElements }         from './core.js';
 import { isArray, isDate, isFn, isString } from './utils.js';
 
 const sortModes = {
