@@ -23,3 +23,38 @@ toSlug = str => {
     .replace(/[^\w-]+/g, '') // remove all non-word chars
     .replace(/--+/g, '-'); // replace multiple - with single -
 };
+
+
+
+// The Chain
+class VanillaXStrChain {
+  constructor (s) { this._str = s; }
+  toString    ()  { return String(this._str); }
+  valueOf     ()  { return this._str; }
+  
+  [Symbol.toPrimitive] (hint) {
+    return (hint === 'number') 
+      ? Number(this._str)
+      : String(this._str);
+  }
+}
+// add all methods to chain
+for (let [name, fn] of Object.entries({
+  toCamelCase, 
+  toConstantCase, 
+  toKebabCase, 
+  toPascalCase, 
+  toSnakeCase,
+  replace, 
+  replaceAll
+})) {
+  Object.defineProperty( StrChain.prototype, name, {
+    value: function( ...args ){
+      this._str = fn( this._str, ...args );
+      return this;
+    },
+    configurable: true,
+    writable: true
+  });
+}
+export let str = s => new VanillaXStrChain(s);
