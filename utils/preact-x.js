@@ -36,12 +36,19 @@ let ui    = deepSignal({ sidebar: true }, { key: 'ui', store: session });
 
 
 
-let theme = betterSignal ({ value: 'dark', key: 'theme', store: local });
-let ui    = deepSignal   ({ value: { sidebar: true }, key: 'ui', store: session });
-let tags  = signalSet    ({ value: new Map, store: bunker('tags', { db: 'app', table: 'meta' }) });
+let theme = betterSignal ({ type: String , value: 'dark', key: 'theme', store: local });
+let ui    = betterSignal ({ type: '...'  , value: { sidebar: true }, key: 'ui', store: session });
+let tags  = betterSignal ({ type: Map    , value: [], store: bunker('tags', { db: 'app', table: 'meta' }) });
 let icons = querySignal  (fetchIcons, { infinite: true, prefetch: true, limit: 60 });
 
-
+/*
+--- betterSignal options: ---
+key    :
+store  :
+type   :
+value  :
+values :
+*/
 
 
 import { useEffect, useRef } from 'preact/hooks';
