@@ -23,6 +23,19 @@ und dann optional: persistierend zu store x under key y?
 
 */
 
+let theme = storedSignal('dark', { store: local('theme') });
+let ui    = deepSignal({ sidebar: true }, { store: session('ui') });
+let tags  = signalSet([], { store: bunker('tags', { db: 'app', table: 'meta' }) });
+let icons = signalQuery(fetchIcons, { infinite: true, prefetch: true, limit: 60 });
+
+
+
+let theme = storedSignal('dark', { key: 'theme', store: local });
+let theme = storedSignal('dark', { key: 'theme', store: [cookie, local] }); // 2 stores manchmal nötig
+let ui    = deepSignal({ sidebar: true }, { key: 'ui', store: session });
+
+
+
 import { useEffect, useRef } from 'preact/hooks';
 import { computed, effect, signal, useSignal, useSignalEffect } from '@preact/signals';
 import BunkerDB from './bunker.js';
