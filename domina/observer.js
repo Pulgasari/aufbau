@@ -57,7 +57,7 @@ _slct = sth => {
 const $body = document.body;
 const $root = document.documentElement;
 const arrayfied   = value => isArray(value) ? value : [value];
-const getElements = (selector, ctx) => [...ctx.querySelectorAll(selector)];
+const getElements = (spec, ctx) => [..._doc(ctx).querySelectorAll(_slct(spec))];
 
 // real observer.js
 
