@@ -1,7 +1,7 @@
 // @aufbau/utils
 
-import { isArray, isEvery, isFn, isNullish, isObject, isPlainObject } from './is.js';
-import { _el } from './dom.js';
+//import { isArray, isEvery, isFn, isNullish, isObject, isPlainObject } from './is.js';
+//import { _el } from './dom.js';
 
 
 
@@ -12,6 +12,7 @@ export function slugify (text) {
     .replace(/\s+/g, '-');
 }
 
+/*
 export const 
   
 // timing
@@ -97,7 +98,7 @@ customEvent = ( target, name, value ) => {
 onGlobalEvent = ( selector, type, callback, options, parent=document ) => {
   let listener = e => e.target.matches(selector) && callback(e);
   parent.addEventListener( type, listener, options );
-},
+};
 
 
 
@@ -114,4 +115,4 @@ function _event ( targets, types, listener, options, mode=1 ) {
   );
   if (mode === 1) return () => offEvent( targets, types, listener);
 };
-
+*/
