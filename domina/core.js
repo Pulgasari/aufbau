@@ -2,6 +2,9 @@
 
 import { isElementish, isObject } from './utils.js';
 
+export const // =========== CLONE ===========
+clone = (spec, deep = true) => _el(spec)?.cloneNode(deep) ?? null;
+
 export const // ============ GET ============
 getElementById        = (id,   ctx) =>     _doc(ctx).getElementById(id),
 getElement            = (spec, ctx) =>     _doc(ctx).querySelector   (_slct(spec)),
@@ -9,8 +12,7 @@ getElements           = (spec, ctx) => [..._doc(ctx).querySelectorAll(_slct(spec
 getElementsByDataAttr = (key,  ctx) => getElements(`[data-${key}]`,       ctx),
 getElementsByDataKey  = (key,  ctx) => getElements(`[data-key="${key}"]`, ctx);
 
-
-export const
+export const // ============ MAGIC HELPERS ============
 _doc  = sth => sth ? _el(sth) : document,
 _root = sth => sth ? _el(sth) : $root,
 _el   = sth => isElementish(sth) ? sth : getElement(_slct(sth)),
