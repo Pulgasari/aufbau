@@ -1,549 +1,165 @@
 // preact-x.js
 
-/* === refactoring
-
-(1) signalWithQuery, signalWithInfiniteQuery, signalWithOptimisticInfiniteQuery teilen sich viel logik 
-- bzw könnten vermutlich eigtl aufeinander aufbauen?
-- oder besser wäre vllt "infinite"und "optmisitc" wären options/variantenvon `signalWithQuery`?
-
-(2) grundsätzlich wäre vermutlich besser es modularer zu machen mit kombi aus haupttyp + konfigurationen
-
-- storedSignal
-- signalWithQuery
-
-- Signal
-- BunkerSignal
-- DeepSignal
-- MapSignal
-- SetSignal
-- QuerySignal
-
-und dann optional: persistierend zu store x under key y?
-
-
-*/
-
-let theme = storedSignal('dark', { store: local('theme') });
-let ui    = deepSignal({ sidebar: true }, { store: session('ui') });
-let tags  = signalSet([], { store: bunker('tags', { db: 'app', table: 'meta' }) });
-let icons = signalQuery(fetchIcons, { infinite: true, prefetch: true, limit: 60 });
-
-
-
-let theme = storedSignal('dark', { key: 'theme', store: local });
-let theme = storedSignal('dark', { key: 'theme', store: [cookie, local] }); // 2 stores manchmal nötig
-let ui    = deepSignal({ sidebar: true }, { key: 'ui', store: session });
-
-
-
-let theme = betterSignal ({ type: String , value: 'dark', key: 'theme', store: local });
-let ui    = betterSignal ({ type: '...'  , value: { sidebar: true }, key: 'ui', store: session });
-let tags  = betterSignal ({ type: Map    , value: [], store: bunker('tags', { db: 'app', table: 'meta' }) });
-let icons = querySignal  (fetchIcons, { infinite: true, prefetch: true, limit: 60 });
-
-/*
---- betterSignal options: ---
-key    :
-store  :
-type   :
-value  :
-values :
-*/
-
-
 import { useEffect, useRef } from 'preact/hooks';
-import { computed, effect, signal, useSignal, useSignalEffect } from '@preact/signals';
-import BunkerDB from './bunker.js';
+import { computed, effect, signal, Signal, useSignal } from '@preact/signals';
 
-// Internal Helpers
-let isNullish   = v => v === undefined || v === null;
-let isPlainObj  = v => v !== null && typeof v === 'object' && !Array.isArray(v);
-let serialize   = value => typeof value === 'string' ? value : JSON.stringify(value);
-let deserialize = value => { try { return JSON.parse(value); } catch { return value; }};
-let deepClone   = v => JSON.parse(JSON.stringify(v));
-let tryParse    = (v, fallback) => { try { return JSON.parse(v); } catch { return fallback; }};
-let getCookie = name => {
-  let value = `; ${document.cookie}`;
-  let parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return deserialize(decodeURIComponent(parts.pop().split(";").shift()));
-  return null;
-};
-let setCookie = (name, val, options={}) => {
-  let { days = 7, path = '/' } = options;
-  let d = new Date();
-  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${encodeURIComponent(serialize(val))};expires=${d.toUTCString()};path=${path}`;
-};
+// TODO: should `values` also apply to leaves inside a deep object?
+//       e.g. deep: { size: ['s','m','l'] } — structure carrying both. undecided.
+// TODO: bunker store — the interface already allows an async get(), so it can be
+//       added without touching anything else here.
 
-// ====== Signal ====================================================
 
-// API: with Persistence
-let createPersistentSignal = (storage, key, init, options = {}) => {
-  let { syncTabs = true } = options;
-  //
-  let saved = storage.getItem(key);
-  if (saved !== null) init = deserialize(saved);
-  //
-  let sig = signal(init);
-  //
-  effect(() => storage.setItem( key, serialize(sig.value) ));
-  // Sync across tabs (only for localStorage)
-  if (syncTabs && storage === window.localStorage) {
-    window.addEventListener('storage', event => {
-      if (event.key === key && event.newValue !== null) {
-        let newVal = deserialize(event.newValue);
-        if (serialize(sig.peek()) !== serialize(newVal)) sig.value = newVal;
+// ====== helpers ===================================================
+
+let isPlainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+let isPromise     = value => value !== null && typeof value?.then === 'function';
+let isAbort       = error => error?.name === 'AbortError';
+
+let encode = value => JSON.stringify(value);
+let decode = raw   => { try { return JSON.parse(raw); } catch { return undefined; }};
+
+
+// ====== stores ====================================================
+// every store is `(options?) => { get, set, subscribe? }`
+// get() may return a value or a promise — hydration handles both
+
+let webStore = (storage, { sync = true } = {}) => ({
+  get (key) {
+    let raw = storage.getItem(key);
+    return raw === null ? undefined : decode(raw);
+  },
+  set (key, value) { storage.setItem(key, encode(value)); },
+  subscribe: sync && storage === globalThis.localStorage
+    ? (key, callback) => {
+        let handler = event => { if (event.key === key && event.newValue !== null) callback(decode(event.newValue)); };
+        addEventListener('storage', handler);
+        return () => removeEventListener('storage', handler);
       }
-    });
+    : undefined
+});
+
+export let cookie = ({ days = 365, path = '/' } = {}) => ({
+  get (key) {
+    let match = `; ${document.cookie}`.split(`; ${key}=`);
+    if (match.length !== 2) return undefined;
+    return decode(decodeURIComponent(match.pop().split(';').shift()));
+  },
+  set (key, value) {
+    let expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${key}=${encodeURIComponent(encode(value))};expires=${expires};path=${path}`;
   }
-  // Done
-  return sig;
+});
+export let local   = (options) => webStore(globalThis.localStorage,   options);
+export let none    = ()        => ({ get: () => undefined, set: () => {} });
+export let session = (options) => webStore(globalThis.sessionStorage, options);
+
+// accepts both `store: local` and `store: cookie({ days: 7 })`
+let resolveStore = store => typeof store === 'function' ? store() : (store ?? none());
+
+
+// ====== deep signals ==============================================
+// each leaf property is an independent signal — mutations stay scoped
+
+let _leaves = new WeakSet;
+let _meta   = new WeakMap;
+
+let isLeaf = value => _leaves.has(value);
+let isNode = value => value !== null && typeof value === 'object' && _meta.has(value);
+
+// deep spec: true = unlimited, number = remaining levels, object = explicit shape
+let descend = (spec, key) =>
+    spec === true             ? true
+  : typeof spec === 'number'  ? spec - 1
+  : isPlainObject(spec)       ? (spec[key] ?? false)
+  : false;
+
+let _makeLeaf = value => {
+  let leaf = signal(value);
+  _leaves.add(leaf);
+  return leaf;
 };
-export let signalWithStorage = (init, key, options) => createPersistentSignal( window.localStorage,   key, init, options);
-export let signalWithSession = (init, key, options) => createPersistentSignal( window.sessionStorage, key, init, options);
-export let signalWithCookie  = (init, key, options = {}) => {
-  let { expires = 365, path = '/' } = options;
-  let saved = getCookie(key);
-  let sig   = signal(saved !== null ? saved : init);
+let _spawn = (value, spec) => spec && isPlainObject(value) ? _makeNode(value, spec) : _makeLeaf(value);
 
-  effect(() => setCookie(key, sig.value));
-  return sig;
-};
-
-// Helper to wrap an existing signal with storage logic if needed.
-export let persistSignal = (sig, storage, key) => {
-  effect(() => storage.setItem( key, serialize(sig.value) ));
-  return sig;
-};
-
-// API: with Query
-export let signalWithQuery = fetcher => {
-  let state = signal({ data: null, isPending: true, isError: false });
-
-  effect(() => {
-    let currentData = state.peek().data;
-    state.value = { data: currentData, isPending: true, isError: false };
-    
-    fetcher()
-    .then(data => state.value = { data, isPending: false, isError: false })
-    .catch(error => state.value = { data: state.peek().data, isPending: false, isError: true });
-  });
-
-  return state;
-};
-export let signalWithInfiniteQuery = (fetcher, { limit = 100 }={}) => {
-  let state = signal({ 
-    pages: [], 
-    isPending: true, 
-    isFetchingNextPage: false, 
-    isError: false, 
-    hasNextPage: true 
-  });
-  let currentPage = 1;
-
-  effect(() => {
-    currentPage = 1;
-    state.value = { 
-      pages: [], 
-      isPending: true, 
-      isFetchingNextPage: false, 
-      isError: false, 
-      hasNextPage: true 
-    };
-    executeFetch(true);
-  });
-
-  async function executeFetch (isReset) {
-    try {
-      let data      = await fetcher(currentPage);
-      let hasNext   = data.length === limit; 
-      
-      // Nutze .peek(), um die aktuellen Pages zu holen, ohne das Signal zu abonnieren!
-      let currentPages = state.peek().pages;
-      let nextPages    = isReset ? [data] : [...currentPages, data]; 
-      
-      state.value = {
-        pages: nextPages,
-        isPending: false,
-        isFetchingNextPage: false,
-        isError: false,
-        hasNextPage: hasNext
-      };
-      
-      if (hasNext) currentPage++;
-    } catch (e) {
-      console.error(e);
-      // Auch im Fehlerfall .peek() nutzen, um den restlichen State zu behalten
-      let currentState = state.peek();
-      state.value = { 
-        ...currentState, 
-        isPending: false, 
-        isFetchingNextPage: false, 
-        isError: true 
-      };
-    }
-  }
-
-  function fetchNextPage() {
-    let currentState = state.peek();
-    if (!currentState.hasNextPage || currentState.isFetchingNextPage) return;
-    // Status auf "Lade nÃ¤chste Seite" setzen
-    state.value = { ...currentState, isFetchingNextPage: true };
-    executeFetch(false); 
-  }
-
-  return { state, fetchNextPage };
-};
-export let signalWithOptimisticInfiniteQuery = (fetcher, { limit = 60 }={}) => {
-  let state = signal({ 
-    pages: [], 
-    isPending: true, 
-    isFetchingNextPage: false, 
-    isError: false, 
-    hasNextPage: true 
-  });
-  
-  let currentPage     = 1;
-  let cachedNextPage  = null; // Holds the pre-fetched data
-  let prefetchPromise = null; // Tracks ongoing background fetches
-  let realHasNext     = true; // The actual truth from the API
-  let runToken        = 0;    // Protects against race conditions (e.g., language change during fetch)
-
-  // Hidden background worker
-  async function prefetchNext(token) {
-    if (prefetchPromise || !realHasNext) return;
-    
-    prefetchPromise = fetcher(currentPage + 1)
-      .then(data => {
-        if (token !== runToken) return; // Discard if search/language changed
-        cachedNextPage = data;
-        realHasNext = data.length === limit;
-      })
-      .catch(e => {
-        if (token !== runToken) return;
-        cachedNextPage = null; // Let the standard fetch retry later
-      })
-      .finally(() => {
-        if (token === runToken) prefetchPromise = null;
-      });
-  }
-
-  effect(() => {
-    // Reset state when dependencies change
-    runToken++;
-    let token = runToken;
-    
-    currentPage     = 1;
-    cachedNextPage  = null;
-    prefetchPromise = null;
-    realHasNext     = true;
-    
-    state.value = { 
-      pages: [], 
-      isPending: true, 
-      isFetchingNextPage: false, 
-      isError: false, 
-      hasNextPage: true 
-    };
-    
-    executeInitialFetch(token);
-  });
-
-  async function executeInitialFetch (token) {
-    try {
-      let data = await fetcher(1);
-      if (token !== runToken) return;
-
-      realHasNext = data.length === limit;
-      
-      state.value = {
-        pages: [data],
-        isPending: false,
-        isFetchingNextPage: false,
-        isError: false,
-        hasNextPage: realHasNext
-      };
-      
-      // Initial load complete. Silently start fetching page 2!
-      if (realHasNext) prefetchNext(token);
-      
-    } catch (e) {
-      if (token !== runToken) return;
-      state.value = { ...state.peek(), isPending: false, isError: true };
-    }
-  }
-  async function fetchNextPage() {
-    let currentState = state.peek();
-    if (!currentState.hasNextPage || currentState.isFetchingNextPage) return;
-    
-    let token = runToken;
-
-    // SCENARIO 1: The user scrolled so fast, the background fetch is still running!
-    if (prefetchPromise) {
-      state.value = { ...currentState, isFetchingNextPage: true };
-      await prefetchPromise; 
-      if (token !== runToken) return;
-    }
-
-    // SCENARIO 2: CACHE HIT! The background fetch finished successfully.
-    if (cachedNextPage !== null) {
-      let data = cachedNextPage;
-      cachedNextPage = null; // Consume the cache
-      currentPage++;
-      
-      state.value = {
-        ...state.peek(),
-        pages: [...state.peek().pages, data],
-        isFetchingNextPage: false,
-        hasNextPage: realHasNext // Update UI based on what the prefetch discovered
-      };
-      
-      // Kick off the NEXT prefetch in the background
-      if (realHasNext) prefetchNext(token);
-      return;
-    }
-
-    // SCENARIO 3: CACHE MISS (e.g. background fetch failed). Fallback to standard fetch.
-    state.value = { ...state.peek(), isFetchingNextPage: true };
-    try {
-      let data = await fetcher(currentPage + 1);
-      if (token !== runToken) return;
-      
-      currentPage++;
-      realHasNext = data.length === limit;
-      
-      state.value = {
-        ...state.peek(),
-        pages: [...state.peek().pages, data],
-        isFetchingNextPage: false,
-        hasNextPage: realHasNext
-      };
-      
-      if (realHasNext) prefetchNext(token);
-    } catch (e) {
-      if (token !== runToken) return;
-      state.value = { ...state.peek(), isFetchingNextPage: false, isError: true };
-    }
-  }
-
-  return { state, fetchNextPage };
-};
-
-// API: Map with Reactivity + Persistence
-let createPersistentSignalMap = (storage, key, init) => {
-  let saved = tryParse(storage.getItem(key), null);
-  let sm    = signalMap(saved ?? init);
-  effect(() => storage.setItem(key, JSON.stringify(sm.toObject())));
-  return sm;
-};
-export let signalMap = (init = []) => {
-  let entries = Array.isArray(init) ? init : Object.entries(init);
-  let sig     = signal(new Map(entries));
-  let mutate  = fn => { let m = new Map(sig.peek()); fn(m); sig.value = m; };
-
-  return {
-    get $signal () { return sig; },
-    get size    () { return sig.value.size; },
-    has      : k     => sig.value.has(k),
-    get      : k     => sig.value.get(k),
-    set      : (k,v) => mutate(m => m.set(k, v)),
-    delete   : k     => mutate(m => m.delete(k)),
-    clear    : ()    => sig.value = new Map(),
-    forEach  : cb    => sig.value.forEach(cb),
-    keys     : ()    => sig.value.keys(),
-    values   : ()    => sig.value.values(),
-    entries  : ()    => sig.value.entries(),
-    toArray  : ()    => [...sig.value.entries()],
-    toObject : ()    => Object.fromEntries(sig.value),
-    [Symbol.iterator]() { return sig.value[Symbol.iterator](); },
-  };
-};
-export let signalMapWithStorage = (key, init = []) => createPersistentSignalMap(  localStorage, key, init);
-export let signalMapWithSession = (key, init = []) => createPersistentSignalMap(sessionStorage, key, init);
-
-// API: Set with Reactivity + Persistence
-let createPersistentSignalSet = (storage, key, init) => {
-  let saved = tryParse(storage.getItem(key), null);
-  let ss    = signalSet(Array.isArray(saved) ? saved : (init ?? []));
-  effect(() => storage.setItem(key, JSON.stringify(ss.toArray())));
-  return ss;
-};
-export let signalSet = (init = []) => {
-  let sig    = signal(new Set(init));
-  let mutate = fn => { let s = new Set(sig.peek()); fn(s); sig.value = s; };
-
-  return {
-    get $signal () { return sig; },
-    get size    () { return sig.value.size; },
-    has     : v  => sig.value.has(v),
-    add     : v  => mutate(s => s.add(v)),
-    delete  : v  => mutate(s => s.delete(v)),
-    toggle  : v  => mutate(s => s.has(v) ? s.delete(v) : s.add(v)),
-    clear   : () => sig.value = new Set(),
-    forEach : cb => sig.value.forEach(cb),
-    values  : () => sig.value.values(),
-    toArray : () => [...sig.value],
-    [Symbol.iterator]() { return sig.value[Symbol.iterator](); },
-  };
-};
-export let signalSetWithStorage = (key, init = []) => createPersistentSignalSet(  localStorage, key, init);
-export let signalSetWithSession = (key, init = []) => createPersistentSignalSet(sessionStorage, key, init);
-
-
-/*
-let createPersistentCollection = (storage, key, init, factory, serialize) => {
-  let saved = tryParse(storage.getItem(key), null);
-  let col   = factory(saved ?? init);
-  effect(() => storage.setItem(key, JSON.stringify(serialize(col))));
-  return col;
-};
-
-let createPersistentSignalMap = (storage, key, init) => createPersistentCollection(storage, key, init, signalMap, c => c.toObject());
-let createPersistentSignalSet = (storage, key, init) => createPersistentCollection(storage, key, init, signalSet, c => c.toArray());
-*/
-
-
-
-// ====== useSignal =================================================
-
-// API: Hooks with Persistence (component-scoped, auto-disposed)
-let useCreatePersistentSignal = (storage, key, init, options = {}) => {
-  let { syncTabs = true } = options;
-  let saved = storage.getItem(key);
-  if (saved !== null) init = deserialize(saved);
-
-  let sig = useSignal(init);
-
-  // Persist on every change
-  useSignalEffect(() => storage.setItem(key, serialize(sig.value)));
-
-  // Tab sync â€” only localStorage, cleans up on unmount
-  if (syncTabs && storage === window.localStorage) {
-    useEffect(() => {
-      let handler = e => {
-        if (e.key === key && e.newValue !== null) {
-          let newVal = deserialize(e.newValue);
-          if (serialize(sig.peek()) !== serialize(newVal)) sig.value = newVal;
-        }
-      };
-      window.addEventListener('storage', handler);
-      return () => window.removeEventListener('storage', handler);
-    }, [key]);
-  }
-
-  return sig;
-};
-export let useSignalWithStorage = (init, key, options) => useCreatePersistentSignal( window.localStorage,   key, init, options );
-export let useSignalWithSession = (init, key, options) => useCreatePersistentSignal( window.sessionStorage, key, init, options );
-export let useSignalWithCookie  = (init, key, options = {}) => {
-  let { expires = 365, path = '/' } = options;
-  let saved = getCookie(key);
-  let sig   = useSignal(saved !== null ? saved : init);
-
-  useSignalEffect(() => setCookie(key, sig.value));
-  return sig;
-};
-
-
-
-// Fine-grained deep reactive objects for @preact/signals.
-// Each leaf property is an independent signal â€” mutations are perfectly scoped.
-
-// Internal Registry
-let _leaves = new WeakSet();
-let _meta   = new WeakMap();
-
-let isLeaf = v => _leaves.has(v);
-let isNode = v => v !== null && typeof v === 'object' && _meta.has(v);
-
-let _makeLeaf = val => {
-  let s = signal(val);
-  _leaves.add(s);
-  return s;
-};
-
-let _spawn = val => isPlainObj(val) ? _makeNode(val) : _makeLeaf(val);
-// Snapshot Helpers
-// reactive=true  â†’ tracks every descendant signal (for effect/computed)
-// reactive=false â†’ peek only, no subscriptions created
+// reactive=true  -> tracks every descendant signal (for effect/computed)
+// reactive=false -> peek only, no subscriptions created
 let _raw = ({ children, keysSignal }, reactive) => {
   if (reactive) void keysSignal.value;
   let out = {};
-  for (let [k, child] of children)
-    out[k] = isLeaf(child)
+  for (let [key, child] of children)
+    out[key] = isLeaf(child)
       ? (reactive ? child.value : child.peek())
       : _raw(_meta.get(child), reactive);
   return out;
 };
-// Node Factory
-let _makeNode = obj => {
-  let children   = new Map();
-  let keysSignal = signal(Object.keys(obj));
-  let meta       = { children, keysSignal, sig: null }; // closure ref â€” no WeakMap lookup in hot paths
+
+let _makeNode = (object, spec = true) => {
+  let children   = new Map;
+  let keysSignal = signal(Object.keys(object));
+  let meta       = { children, keysSignal, ready: null, sig: null, spec };
 
   for (let key of keysSignal.peek())
-    children.set(key, _spawn(obj[key]));
+    children.set(key, _spawn(object[key], descend(spec, key)));
 
   let proxy = new Proxy({}, {
-    get(_, key) {
+    get (_, key) {
       if (typeof key === 'symbol') return undefined;
-      
+
       switch (key) {
-        case '$raw'  : return _raw(meta, true);
-        case '$peek' : return () => _raw(meta, false);
-        case '$keys' : return keysSignal.value;
+        case '$keys'  : return keysSignal.value;
+        case '$peek'  : return () => _raw(meta, false);
+        case '$raw'   : return _raw(meta, true);
+        case '$ready' : return meta.ready;
         case '$signal': {
-          if (!meta.sig) meta.sig = computed(() => _raw(meta, true)); // lazy â€” only pay when needed
+          if (!meta.sig) meta.sig = computed(() => _raw(meta, true)); // lazy — only pay when needed
           return meta.sig;
         }
         case '$update': return patch => {
-          for (let [k,v] of Object.entries(patch))
-          isPlainObj(v) ? proxy[k].$update(v) : proxy[k] = v;
+          for (let [k, v] of Object.entries(patch))
+            isPlainObject(v) && isNode(children.get(k)) ? proxy[k].$update(v) : proxy[k] = v;
         };
         case '$toggle': return dotKey => {
           let parts  = dotKey.split('.');
-          let last   = parts.pop(); // mutates parts â†’ prefix path, last â†’ leaf key
-          let target = parts.reduce((p,k) => p[k], proxy);
-          let v = target[last];
-          target[last] = typeof v === 'boolean' ? !v
-                       : v === 'on'             ? 'off'
-                       : v === 'off'            ? 'on' : v;
+          let last   = parts.pop(); // mutates parts -> prefix path, last -> leaf key
+          let target = parts.reduce((node, k) => node[k], proxy);
+          let value  = target[last];
+          target[last] = typeof value === 'boolean' ? !value
+                       : value === 'on'             ? 'off'
+                       : value === 'off'            ? 'on' : value;
         };
       }
-      
+
       let child = children.get(key);
       if (child === undefined) return undefined;
       return isLeaf(child) ? child.value : child;
     },
-    
+
     set (_, key, value) {
       if (typeof key === 'symbol') return true;
-      
+
       let child = children.get(key);
-      
+
       if (child !== undefined) {
-        if (isLeaf(child) && !isPlainObj(value)) { child.value = value; return true; } // scalarâ†’scalar: minimal blast radius
-        if (isNode(child) &&  isPlainObj(value)) { _merge(child, value); return true; } // objectâ†’object: deep merge, preserves signals
-        // type changed (scalarâ†”object): replace â€” old consumers stop updating, correct by design
+        if (isLeaf(child) && !isPlainObject(value)) { child.value = value; return true; } // scalar->scalar: minimal blast radius
+        if (isNode(child) &&  isPlainObject(value)) { _merge(child, value); return true; } // object->object: deep merge, preserves signals
+        // type changed (scalar<->object): replace — old consumers stop updating, correct by design
       }
-      
-      // new key or type change: spawn + conditionally announce structural change
-      children.set(key, _spawn(value));
+
+      children.set(key, _spawn(value, descend(spec, key)));
       if (child === undefined) keysSignal.value = [...keysSignal.peek(), key];
       return true;
     },
-    
-    deleteProperty(_, key) {
+
+    deleteProperty (_, key) {
       if (children.has(key)) {
         children.delete(key);
         keysSignal.value = keysSignal.peek().filter(k => k !== key);
       }
       return true;
     },
-    
-    has (_, key) { return children.has(key); },
-    ownKeys (_)  { void keysSignal.value; return [...children.keys()]; },
-    getOwnPropertyDescriptor(_, key) {
+
+    has     (_, key) { return children.has(key); },
+    ownKeys (_)      { void keysSignal.value; return [...children.keys()]; },
+    getOwnPropertyDescriptor (_, key) {
       return children.has(key)
         ? { configurable: true, enumerable: true, writable: true }
         : undefined;
@@ -553,98 +169,293 @@ let _makeNode = obj => {
   _meta.set(proxy, meta);
   return proxy;
 };
-let _merge = (proxy, obj) => {
+
+let _merge = (proxy, object) => {
   let { children } = _meta.get(proxy);
-  let keys = new Set(Object.keys(obj));
-  for (let key of keys)            proxy[key] = obj[key];
+  let keys = new Set(Object.keys(object));
+  for (let key of keys)            proxy[key] = object[key];
   for (let key of children.keys()) if (!keys.has(key)) delete proxy[key];
 };
-// â”€â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-export let deepSignal = init => _makeNode(init);
-let createPersistentDeepSignal = (key, init, storage) => {
-  let saved = tryParse( storage.getItem(key), null );
-  let sig   = deepSignal(saved ?? init);
-  effect(() => storage.setItem(key, JSON.stringify(sig.$signal.value)));
-  return sig;
+
+
+// ====== map / set collections =====================================
+
+let makeMap = (init = []) => {
+  let sig    = signal(new Map(Array.isArray(init) ? init : Object.entries(init)));
+  let mutate = fn => { let next = new Map(sig.peek()); fn(next); sig.value = next; };
+
+  return {
+    get $ready () { return null; },
+    get $signal () { return sig; },
+    get size    () { return sig.value.size; },
+    clear    : ()      => sig.value = new Map,
+    delete   : key     => mutate(map => map.delete(key)),
+    entries  : ()      => sig.value.entries(),
+    forEach  : callback => sig.value.forEach(callback),
+    get      : key     => sig.value.get(key),
+    has      : key     => sig.value.has(key),
+    keys     : ()      => sig.value.keys(),
+    replace  : source  => sig.value = new Map(Array.isArray(source) ? source : Object.entries(source)),
+    set      : (key, value) => mutate(map => map.set(key, value)),
+    toArray  : ()      => [...sig.value.entries()],
+    toObject : ()      => Object.fromEntries(sig.value),
+    values   : ()      => sig.value.values(),
+    [Symbol.iterator] () { return sig.value[Symbol.iterator](); },
+  };
 };
-export let deepSignalWithStorage = ({ key, value }) => createPersistentDeepSignal(key, value,   localStorage);
-export let deepSignalWithSession = ({ key, value }) => createPersistentDeepSignal(key, value, sessionStorage);
+
+let makeSet = (init = []) => {
+  let sig    = signal(new Set(init));
+  let mutate = fn => { let next = new Set(sig.peek()); fn(next); sig.value = next; };
+
+  return {
+    get $ready () { return null; },
+    get $signal () { return sig; },
+    get size    () { return sig.value.size; },
+    add      : value    => mutate(set => set.add(value)),
+    clear    : ()       => sig.value = new Set,
+    delete   : value    => mutate(set => set.delete(value)),
+    forEach  : callback => sig.value.forEach(callback),
+    has      : value    => sig.value.has(value),
+    replace  : source   => sig.value = new Set(source),
+    toArray  : ()       => [...sig.value],
+    toggle   : value    => mutate(set => set.has(value) ? set.delete(value) : set.add(value)),
+    values   : ()       => sig.value.values(),
+    [Symbol.iterator] () { return sig.value[Symbol.iterator](); },
+  };
+};
 
 
+// ====== scalar signal with allowed values =========================
 
-//
-let createUsePersistentDeepSignal = (storage, key, init) => {
-  let ref = useRef(null);
-  if (ref.current === null) {
-    let saved = tryParse(storage.getItem(key), null);
-    ref.current = deepSignal(saved ?? init);
+class XSignal extends Signal {
+  constructor (value, values) {
+    super(value);
+    this.$ready  = null;
+    this.$values = values ?? null;
   }
-  useSignalEffect(() => storage.setItem(key, JSON.stringify(ref.current.$signal.value)));
-  return ref.current;
+  get value () { return super.value; }
+  set value (next) {
+    if (this.$values && !this.$values.includes(next))
+      return void console.warn(`[x] ignored "${next}" — not in [${this.$values}]`);
+    super.value = next;
+  }
+  // steps to the next allowed value and wraps around — a two-value list is a toggle
+  cycle () {
+    if (!this.$values) return this.peek();
+    let index = this.$values.indexOf(this.peek());
+    super.value = this.$values[(index + 1) % this.$values.length];
+    return this.peek();
+  }
+}
+
+
+// ====== betterSignal ==============================================
+// a plain object argument is ALWAYS config — wrap real object values in { value }
+
+export let betterSignal = input => {
+  let config = isPlainObject(input) ? input : { value: input };
+  let { deep = false, key, type, value, values } = config;
+  let store  = resolveStore(config.store);
+
+  // pick the carrier and expose a uniform read/write pair for persistence
+  let target =
+      type === Map ? (target => ({ target, read: () => target.toObject(), write: saved => target.replace(saved) }))(makeMap(value))
+    : type === Set ? (target => ({ target, read: () => target.toArray(),  write: saved => target.replace(saved) }))(makeSet(value))
+    : deep         ? (target => ({ target, read: () => target.$signal.value, write: saved => _merge(target, saved) }))(_makeNode(value ?? {}, deep))
+    :                (target => ({ target, read: () => target.value, write: saved => { target.$values = null; target.value = saved; target.$values = values ?? null; } }))(new XSignal(value, values));
+
+  if (!key) return target.target;
+
+  // hydrate first, persist afterwards — never write the initial value back over stored data
+  let live  = false;
+  let saved = store.get(key);
+  let apply = loaded => { if (loaded !== undefined) target.write(loaded); };
+
+  let ready = isPromise(saved)
+    ? saved.then(loaded => { apply(loaded); live = true; })
+    : (apply(saved), live = true, Promise.resolve());
+
+  effect(() => { let snapshot = target.read(); if (live) store.set(key, snapshot); });
+  store.subscribe?.(key, loaded => apply(loaded));
+
+  if (target.target instanceof XSignal) target.target.$ready = ready;
+  else if (_meta.has(target.target))    _meta.get(target.target).ready = ready;
+  else                                  Object.defineProperty(target.target, '$ready', { get: () => ready });
+
+  return target.target;
 };
-export let useDeepSignal = init => {
-  let ref = useRef(null);
-  if (ref.current === null) ref.current = deepSignal(init);
-  return ref.current;
-};
-export let useDeepSignalWithStorage = ({ key, value }) => createUsePersistentDeepSignal(  localStorage, key, value);
-export let useDeepSignalWithSession = ({ key, value }) => createUsePersistentDeepSignal(sessionStorage, key, value);
 
 
+// ====== querySignal ===============================================
 
-// ============ WITH BUNKER ============ //
+let emptyState = (pending, fetching) => ({
+  data               : null,
+  error              : null,
+  hasNextPage        : true,
+  isFetching         : fetching,
+  isFetchingNextPage : false,
+  isPending          : pending,
+  pages              : [],
+});
 
-/*
-let withBunker = async (db, table, key, init, factory, serialize) => {
-  let saved = await db.get(table, key);
-  let col   = factory(saved ?? init);
-  effect(() => db.set(table, key, serialize(col)));
-  return col;
-};
+export let querySignal = (fetcher, options = {}) => {
+  let { deps, enabled = true, infinite = false, limit = 100, prefetch = false } = options;
 
-export let signalMapWithBunker  = (db, table, key, init = []) => withBunker(db, table, key, init, signalMap, c => c.toObject());
-export let signalSetWithBunker  = (db, table, key, init = []) => withBunker(db, table, key, init, signalSet, c => c.toArray());
-export let deepSignalWithBunker = (db, table, key, init)      => withBunker(db, table, key, init, deepSignal, v => v);
-// Note: `_persist` can stay or be folded into withBunker
-*/
+  let state = signal(emptyState(true, true));
 
-export let signalWithBunker  = async (database, table, key, init) => {
-  let db    = new BunkerDB(database);
-  let saved = await db.get(table, key);
-  let sig   = signal( !isNullish(saved) ? saved : init );
-  effect(() => db.set(table, key, sig.value));
-  return sig;
-};
-export let signalMapWithBunker  = async (db, table, key, init = []) => {
-  let saved = await db.get(table, key);
-  let rm    = signalMap(saved ?? init);
-  effect(() => db.set(table, key, rm.toObject()));
-  return rm;
-};
-export let signalSetWithBunker  = async (db, table, key, init = []) => {
-  let saved = await db.get(table, key);
-  let rs    = signalSet(Array.isArray(saved) ? saved : init);
-  effect(() => db.set(table, key, rs.toArray()));
-  return rs;
-};
-export let useSignalWithBunker  = (database, table, key, init) => {
-  let sig = useSignal(init);
+  let cached      = null; // pre-fetched page, waiting to be consumed
+  let controller  = null;
+  let hasMore     = true; // the actual truth from the last response
+  let page        = 1;
+  let prefetching = null;
+  let token       = 0;    // guards against out-of-order responses
 
-  useEffect(() => {
-    let db = new BunkerDB(database);
-    db.get(table, key).then( saved => { if (!isNullish(saved)) sig.value = saved; });
-  }, [database, table, key]);
+  let abort   = () => { controller?.abort(); controller = new AbortController; return controller.signal; };
+  let flatten = pages => pages.flat();
 
-  useSignalEffect(() => {
-    let db = new BunkerDB(database);
-    db.set(table, key, sig.value);
+  // arrays fall back to the limit heuristic, objects can be explicit
+  let normalize = result => {
+    if (Array.isArray(result)) return { items: result, hasMore: result.length === limit };
+    let items = result?.items ?? [];
+    return { items, hasMore: result?.hasMore ?? items.length === limit };
+  };
+
+  async function prefetchNext (runToken) {
+    if (prefetching || !hasMore) return;
+    prefetching = fetcher({ page: page + 1, signal: controller.signal })
+      .then(result => {
+        if (runToken !== token) return;
+        let next = normalize(result);
+        cached  = next.items;
+        hasMore = next.hasMore;
+      })
+      .catch(() => { cached = null; }) // let the regular path retry later
+      .finally(() => { if (runToken === token) prefetching = null; });
+  }
+
+  async function load (runToken) {
+    let abortSignal = abort();
+    try {
+      let result = await fetcher({ page: 1, signal: abortSignal });
+      if (runToken !== token) return;
+
+      if (!infinite) {
+        state.value = { ...emptyState(false, false), data: result };
+        return;
+      }
+      let { items, hasMore: more } = normalize(result);
+      hasMore = more;
+      state.value = { ...emptyState(false, false), data: flatten([items]), hasNextPage: more, pages: [items] };
+      if (prefetch && more) prefetchNext(runToken);
+    } catch (error) {
+      if (runToken !== token || isAbort(error)) return;
+      state.value = { ...state.peek(), error, isFetching: false, isFetchingNextPage: false, isPending: false };
+    }
+  }
+
+  async function fetchNextPage () {
+    let current = state.peek();
+    if (!infinite || !current.hasNextPage || current.isFetchingNextPage) return;
+
+    let runToken = token;
+
+    // the user scrolled faster than the background fetch — wait for it
+    if (prefetching) {
+      state.value = { ...current, isFetching: true, isFetchingNextPage: true };
+      await prefetching;
+      if (runToken !== token) return;
+    }
+
+    if (cached !== null) {
+      let items = cached;
+      cached = null;
+      page++;
+      let previous = state.peek();
+      let pages    = [...previous.pages, items];
+      state.value  = { ...previous, data: flatten(pages), hasNextPage: hasMore, isFetching: false, isFetchingNextPage: false, pages };
+      if (prefetch && hasMore) prefetchNext(runToken);
+      return;
+    }
+
+    state.value = { ...state.peek(), isFetching: true, isFetchingNextPage: true };
+    try {
+      let result = await fetcher({ page: page + 1, signal: controller.signal });
+      if (runToken !== token) return;
+
+      let { items, hasMore: more } = normalize(result);
+      page++;
+      hasMore = more;
+      let previous = state.peek();
+      let pages    = [...previous.pages, items];
+      state.value  = { ...previous, data: flatten(pages), hasNextPage: more, isFetching: false, isFetchingNextPage: false, pages };
+      if (prefetch && more) prefetchNext(runToken);
+    } catch (error) {
+      if (runToken !== token || isAbort(error)) return;
+      state.value = { ...state.peek(), error, isFetching: false, isFetchingNextPage: false };
+    }
+  }
+
+  function start () {
+    token++;
+    cached      = null;
+    hasMore     = true;
+    page        = 1;
+    prefetching = null;
+    return token;
+  }
+
+  effect(() => {
+    deps?.(); // read explicitly — anything after an await in the fetcher is NOT tracked
+    let on = typeof enabled === 'function' ? enabled() : enabled;
+
+    let runToken = start();
+    state.value  = emptyState(true, on);
+    if (on) load(runToken);
+    else controller?.abort();
   });
 
-  return sig;
+  state.fetchNextPage = fetchNextPage;
+  state.refetch       = () => { let runToken = start(); state.value = emptyState(true, true); return load(runToken); };
+
+  return state;
 };
-export let deepSignalWithBunker = async (db, table, key, init) => {
-  let saved = await db.get(table, key);
-  let sig   = deepSignal(saved ?? init);
-  effect(() => db.set(table, key, sig.$signal.value));
-  return sig;
+
+
+// ====== fake data =================================================
+
+export let fakeFetcher = ({ delay = 300, fail = 0, limit = 20, total = 200 } = {}) =>
+  ({ page = 1 } = {}) => new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() < fail) return reject(new Error('fakeFetcher: simulated failure'));
+      let start = (page - 1) * limit;
+      let count = Math.max(0, Math.min(limit, total - start));
+      let items = Array.from({ length: count }, (_, i) => ({ id: start + i + 1, title: `item ${start + i + 1}` }));
+      resolve({ items, hasMore: start + count < total });
+    }, delay);
+  });
+
+export let dummyFetcher = (resource = 'products', { delay = 0, limit = 20 } = {}) =>
+  async ({ page = 1, signal: abortSignal } = {}) => {
+    let skip     = (page - 1) * limit;
+    let response = await fetch(`https://dummyjson.com/${resource}?limit=${limit}&skip=${skip}&delay=${delay}`, { signal: abortSignal });
+    let data     = await response.json();
+    let items    = data[resource] ?? [];
+    return { items, hasMore: skip + items.length < data.total };
+  };
+
+
+// ====== hooks =====================================================
+// component-scoped equivalents — created once, kept across renders
+
+export let useBetterSignal = input => {
+  let ref = useRef(null);
+  if (ref.current === null) ref.current = betterSignal(input);
+  return ref.current;
+};
+
+export let useQuerySignal = (fetcher, options) => {
+  let ref = useRef(null);
+  if (ref.current === null) ref.current = querySignal(fetcher, options);
+  return ref.current;
 };
