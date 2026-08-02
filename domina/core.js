@@ -22,36 +22,36 @@ _el   = sth => isElementish(sth) ? sth : getElement(_slct(sth)),
 _slct = sth => {
     if (!isObject(sth)) return sth;
 
-    let sel = '';
+    let selector = '';
 
     // tag
     if (sth.tag || sth.tagName) {
-      sel += (sth.tag || sth.tagName).toLowerCase();
+      selector += (sth.tag || sth.tagName).toLowerCase();
     }
 
     // id
-    if (sth.id) sel += '#' + sth.id;
+    if (sth.id) selector += '#' + sth.id;
 
     // class / className
-    const cls = sth.class || sth.className;
-    if (cls) {
-      sel += '.' + String(cls).trim().split(/\s+/).join('.');
+    const className = sth.class || sth.className;
+    if (className) {
+      selector += '.' + String(className).trim().split(/\s+/).join('.');
     }
 
     // dataset / data
     const data = sth.dataset || sth.data;
     if (data && isObject(data)) {
-      for (const [k, v] of Object.entries(data)) {
-        sel += `[data-${k}="${v}"]`;
+      for (const [k,v] of Object.entries(data)) {
+        selector += `[data-${k}="${v}"]`;
       }
     }
 
     // remaining attributes
-    for (const [k, v] of Object.entries(sth)) {
+    for (const [k,v] of Object.entries(sth)) {
       if (['tag', 'tagName', 'id', 'class', 'className', 'dataset', 'data'].includes(k)) continue;
       if (v == null) continue;
-      sel += `[${k}="${v}"]`;
+      selector += `[${k}="${v}"]`;
     }
 
-    return sel || '*';
+    return selector || '*';
 };
