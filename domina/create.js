@@ -1,33 +1,30 @@
 // create.js
 
+import { isString } from './utils.js';
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-
-
-
 export const
-  createElement = (tag = 'div', props = {}, ...children) =>
-    updateElement(document.createElement(tag), props, ...children),
+  
+createElement = (tag = 'div', props = {}, ...children) =>
+  updateElement(document.createElement(tag), props, ...children),
 
-  createSVG = (tag = 'svg', props = {}, ...children) =>
-    updateElement(document.createElementNS(SVG_NS, tag), props, ...children),
+createSVG = (tag = 'svg', props = {}, ...children) =>
+  updateElement(document.createElementNS(SVG_NS, tag), props, ...children),
 
-  createFragment = (...nodes) => {
-    const frag = document.createDocumentFragment();
-    const kids = normalize(nodes);
-    if (kids.length) frag.append(...kids);
-    return frag;
-  },
+createFragment = (...nodes) => {
+  const fragment = document.createDocumentFragment();
+  const children = normalize(nodes);
+  if (children.length) fragment.append(...children);
+  return fragment;
+},
 
-  createHTML = html => {
-    const t = document.createElement('template');
-    t.innerHTML = String(html).trim();
-    return t.content;
-  },
+createHTML = html => {
+  const template = document.createElement('template');
+  template.innerHTML = String(html).trim();
+  return template.content;
+},
 
-  createTextNode = text => document.createTextNode(String(text)),
+createStylesheet = sth  => createElement('style', isString(sth) ? { textContent: sth } : sth),    
 
-  clone = (spec, deep = true) => {
-    const el = _el(spec);
-    return el ? el.cloneNode(deep) : null;
-  };
+createTextNode   = text => document.createTextNode(String(text));
