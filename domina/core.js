@@ -9,8 +9,8 @@ export const // ============ GET ============
 getElementById        = (id,   ctx) =>     _doc(ctx).getElementById(id),
 getElement            = (spec, ctx) =>     _doc(ctx).querySelector   (_slct(spec)),
 getElements           = (spec, ctx) => [..._doc(ctx).querySelectorAll(_slct(spec))],     
-getElementsByDataAttr = (key,  ctx) => getElements(`[data-${key}]`,       ctx),
-getElementsByDataKey  = (key,  ctx) => getElements(`[data-key="${key}"]`, ctx);
+getElementsByDataAttr = (key,  ctx) => getElements(`[data-${key}]`,       _doc(ctx)),
+getElementsByDataKey  = (key,  ctx) => getElements(`[data-key="${key}"]`, _doc(ctx));
 
 export const // ============ MAGIC HELPERS ============
 _doc  = sth => sth ? _el(sth) : document,
