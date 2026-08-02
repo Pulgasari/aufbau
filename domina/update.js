@@ -10,14 +10,16 @@ export const
 
 updateElement = (spec, props = {}, ...children) => {
   const element = _el(spec); if (!element) return null;
-
-  // SVG-Elemente haben read-only Props (className, href) -> immer setAttribute
-  const isSVG = element instanceof SVGElement;
+  const isSVG   = element instanceof SVGElement; // SVG-Elemente haben read-only Props (className, href) -> immer setAttribute
+  let mountFn, mountTo;
 
   for (const [key, value] of Object.entries(props)) {
     if (value == null) continue;
 
-    if (key === 'style') {
+    else if (key === 'appendTo')  { mountTo = value; mountFn = 'append';  }
+    else if (key === 'prependTo') { mountTo = value; mountFn = 'prepend'; }
+
+    else if (key === 'style') {
       if (isString(value)) element.setAttribute('style', value);
       else for (const [p, v] of Object.entries(value))
         p.includes('-') ? element.style.setProperty(p, v) : (element.style[p] = v);
@@ -50,6 +52,7 @@ updateElement = (spec, props = {}, ...children) => {
 
   const kids = normalize(children);
   if (kids.length) element.append(...kids);
+  if (mountTo) _el(mountTo)?.[mountFn](element);
 
   return element;
 };
