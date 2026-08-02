@@ -1,7 +1,9 @@
 // @domina/observer.js
 
-import { $body, $root, getElements } from './dom.js';
-import { arrayfied } from './util.js';
+const $body = document.body;
+const $root = document.documentElement;
+const arrayfied   = value => isArray(value) ? value : [value];
+const getElements = (selector, ctx) => [...ctx.querySelectorAll(selector)];
 
 //----- INTERNAL SHORTHANDS
 let
