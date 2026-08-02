@@ -171,7 +171,8 @@ wegweiser,
 zugriff
 ```
 
-https://www.skypack.dev/
+https://skypack.dev
+https://svgjs.dev
 
 
 
