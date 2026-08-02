@@ -13,15 +13,6 @@ import resolveEDO    from './resolveEDO.js';
 */
 
 export const 
-
-// ============ GET ============
-
-getElementById        = id          => document.getElementById(selector),
-getElement            = (spec, ctx) => _doc(context).querySelector(_slct(selector)),
-getElements           = (spec, ctx) => [..._doc(context).querySelectorAll(_slct(selector))],     
-getElementsByDataAttr = (key,  ctx) => getElements(`[data-${key}]`, parent),
-getElementsByDataKey  = (key,  ctx) => getElements(`[data-key="${key}"]`, parent),
-
 // ============ CREATE ============
 
 create = (edo = {}, ...children) => {
