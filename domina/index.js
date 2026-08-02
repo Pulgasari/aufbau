@@ -2,6 +2,14 @@
 
 import * from './utils.js';
 
+// ::: get
+import getElement            from './core.js';
+import getElementById        from './core.js';
+import getElements           from './core.js';
+import getElementsByDataAttr from './core.js';
+import getElementsByDataKey  from './core.js';
+
+// ::: misc
 import sortElements  from './sortElements.js';
 import updateElement from './updateElement.js';
 
@@ -11,6 +19,7 @@ import getElements   from './getElements.js';
 import insertElement from './insertElement.js';
 import resolveEDO    from './resolveEDO.js';
 */
+
 
 export const 
 // ============ CREATE ============
