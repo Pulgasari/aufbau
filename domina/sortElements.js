@@ -1,6 +1,7 @@
 // @domina/sortElements.js
 
-import * from './utils.js';
+import { getElement, getElements }   from './core.js';
+import { isArray, isDate, isFn, isString } from './utils.js';
 
 const sortModes = {
   regular: (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }),
@@ -27,7 +28,7 @@ export function sortElements ({ container, item, indicators }) {
 
   // Normalize indicator specs
   const specs = [].concat(indicators).map(spec => {
-    if (isString(spec)) return { selector: spec, order: defaultOrder };
+    if (isString(spec)) return { selector: spec,    order:            defaultOrder };
     if (isArray(spec))  return { selector: spec[0], order: spec[1] || defaultOrder };
     return { order: defaultOrder, ...spec };
   });
