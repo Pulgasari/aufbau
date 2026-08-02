@@ -1,5 +1,23 @@
 // preact-x.js
 
+/* === refactoring
+
+(1) signalWithQuery, signalWithInfiniteQuery, signalWithOptimisticInfiniteQuery teilen sich viel logik 
+- bzw könnten vermutlich eigtl aufeinander aufbauen?
+- oder besser wäre vllt "infinite"und "optmisitc" wären options/variantenvon `signalWithQuery`?
+
+(2) grundsätzlich wäre vermutlich besser es modularer zu machen mit kombi aus haupttyp + konfigurationen
+
+- storedSignal
+- signalWithQuery
+
+- BunkerSignal
+- MapSignal
+- SetSignal
+
+
+*/
+
 import { useEffect, useRef } from 'preact/hooks';
 import { computed, effect, signal, useSignal, useSignalEffect } from '@preact/signals';
 import BunkerDB from './bunker.js';
