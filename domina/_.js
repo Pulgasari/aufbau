@@ -24,9 +24,7 @@ export let
   
   createFragment   = ()  => document.createDocumentFragment(),
   createFragment2  = sth => document.createRange().createContextualFragment(sth),
-  createTextNode   = text => document.createTextNode(String(text)),
-  createStylesheet = sth => createElement('style', isString(sth) ? { textContent: sth } : sth),
-
+  
 // ---------------------------------------------------------------------------
 // Low-level: insert
 // ---------------------------------------------------------------------------
