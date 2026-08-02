@@ -11,10 +11,14 @@
 - storedSignal
 - signalWithQuery
 
+- Signal
 - BunkerSignal
+- DeepSignal
 - MapSignal
 - SetSignal
 - QuerySignal
+
+und dann optional: persistierend zu store x under key y?
 
 
 */
