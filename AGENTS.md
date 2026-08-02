@@ -33,3 +33,21 @@
 - **No Sycophancy or Fluff:** Do not mirror, paraphrase, or continuously affirm user statements. Eliminate pleasantries and conversational filler.
 - **Conciseness:** Keep technical explanations short, direct, and focused on the solution.
 - **Markdown Formatting:** Always wrap raw Markdown responses and outer code blocks in 4 backticks (````) to prevent rendering breakage when nesting inner code blocks.
+
+
+---
+
+
+- kommentare im code immer englisch und klein ausser hevorhebungen
+- keine docs-kommentare im code (machen wir hinterher als extra file jsdocs oder index.d.ts oder sowas)
+- kein abkürzen von variablen-namen ausser die sind echt lang
+- da wo platz is, sind einzeiler voll okay
+- insb. So `if (bla) blubb;` gehört auf eine zeile nich 3
+- bei funktion deklaration `identifier (arg, arg2) {` einhalten
+- wenn in zeilen ähnliches/gleiches untereinander steht, mag ich alignment sehr: 
+```
+const abc   = null;
+const heino = new Date;
+```
+- bei `new Classname` ohne args klammern weglassen
+- wo möglich/sinnvoll/machbar: alphabetisch sortieren und ggf logisch kategorisieren
