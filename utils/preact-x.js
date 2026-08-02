@@ -36,6 +36,14 @@ let ui    = deepSignal({ sidebar: true }, { key: 'ui', store: session });
 
 
 
+let theme = betterSignal ({ value: 'dark', key: 'theme', store: local });
+let ui    = deepSignal   ({ value: { sidebar: true }, key: 'ui', store: session });
+let tags  = signalSet    ({ value: new Map, store: bunker('tags', { db: 'app', table: 'meta' }) });
+let icons = querySignal  (fetchIcons, { infinite: true, prefetch: true, limit: 60 });
+
+
+
+
 import { useEffect, useRef } from 'preact/hooks';
 import { computed, effect, signal, useSignal, useSignalEffect } from '@preact/signals';
 import BunkerDB from './bunker.js';
