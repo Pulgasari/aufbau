@@ -25,14 +25,13 @@ _slct = sth => {
     let selector = '';
 
     // tag
-    if (sth.tag || sth.tagName) {
-      selector += (sth.tag || sth.tagName).toLowerCase();
-    }
+    selector += (sth.tag || sth.tagName || '').toLowerCase();
 
     // id
     if (sth.id) selector += '#' + sth.id;
 
     // class / className
+    //selector += toDot(sth.class || sth.className) ?? '';
     const className = sth.class || sth.className;
     if (className) selector += '.' + String(className).trim().split(/\s+/).join('.');
 
@@ -53,3 +52,35 @@ _slct = sth => {
 
     return selector || '*';
 };
+
+
+
+/*
+export function cls (input) {
+  // Normalizes any input (String, Array, Object) into a clean string array
+  toArray(input) {
+    if (!input) return [];
+    if (Array.isArray(input)) return input.flatMap(cls.toArray);
+    if (typeof input === 'object') {
+      return Object.entries(input)
+        .filter(([, value]) => Boolean(value))
+        .flatMap(([key]) => cls.toArray(key));
+    }
+    return String(input)
+      .split(/[\s.]+/)
+      .filter(Boolean);
+  },
+
+  // Converts to CSS selector format: ".a.b.c"
+  toDot(input) {
+    const list = cls.toArray(input);
+    return list.length ? `.${list.join('.')}` : '';
+  },
+
+  // Converts to HTML class attribute format: "a b c"
+  toSpace(input) {
+    return cls.toArray(input).join(' ');
+  }
+};
+*/
+
