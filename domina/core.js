@@ -34,9 +34,7 @@ _slct = sth => {
 
     // class / className
     const className = sth.class || sth.className;
-    if (className) {
-      selector += '.' + String(className).trim().split(/\s+/).join('.');
-    }
+    if (className) selector += '.' + String(className).trim().split(/\s+/).join('.');
 
     // dataset / data
     const data = sth.dataset || sth.data;
