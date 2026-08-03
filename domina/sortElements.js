@@ -1,66 +1,77 @@
-// @domina/sortElements.js
+// sortElements.js
 
 import { getElement, getElements }         from './core.js';
-import { isArray, isDate, isFn, isString } from './utils.js';
+
+import { _el, getElement, getElements }    from './core.js';
+import { isArray, isFn, isString }         from './utils.js';
+import { parseDate, shuffle, toNum }       from './utils.js';
+import { getValue }                        from './values.js';
+
+// unparsebare Werte landen immer am Ende (auch bei desc – gewollt)
+const nullsLast = (a, b) => (a === null && b === null) ? 0 : a === null ? 1 : b === null ? -1 : null;
 
 const sortModes = {
   regular: (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }),
-  num:     (a, b) => parseFloat(a) - parseFloat(b),
-  date:    (a, b) => {
-    const parseDate = (v) => {
-      const m = String(v).match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-      return m ? new Date(+m[3], +m[2] - 1, +m[1]) : new Date(v);
-    };
-    return parseDate(a) - parseDate(b);
+
+  num: (a, b) => {
+    const x = toNum(a), y = toNum(b);
+    return nullsLast(x, y) ?? x - y;
   },
-  auto: (a, b) => (isDate(a) && isDate(b)) ? sortModes.date(a, b) : sortModes.regular(a, b),
+
+  date: (a, b) => {
+    const x = parseDate(a), y = parseDate(b);
+    return nullsLast(x, y) ?? x - y;
+  },
+
+  auto: (a, b) => (parseDate(a) && parseDate(b)) ? sortModes.date(a, b) : sortModes.regular(a, b),
 };
 
-export function sortElements ({ container, item, indicators }) {
-  const $container = getElement(container);
+export function sortElements({ container, item, indicators }) {
+  const $container = _el(container);
   if (!$container) {
-    console.warn(`Container "${container}" not found.`);
-    return;
+    console.warn('sortElements: container not found.', container);
+    return [];
   }
 
   const items = getElements(item, $container);
   const defaultOrder = 'auto-asc';
 
-  // Normalize indicator specs
-  const specs = [].concat(indicators).map(spec => {
-    if (isString(spec)) return { selector: spec,    order:            defaultOrder };
-    if (isArray(spec))  return { selector: spec[0], order: spec[1] || defaultOrder };
+  const specs = [].concat(indicators ?? []).map(spec => {
+    if (isString(spec) || isFn(spec)) return {
+      order    : isFn(spec) ? spec : defaultOrder,
+      selector : isFn(spec) ? null : spec 
+    };
+    if (isArray(spec)) return {
+      order    : spec[1] || defaultOrder,
+      selector : spec[0],
+    };
     return { order: defaultOrder, ...spec };
   });
 
-  items.sort((a, b) => {
-    for (const { selector, order } of specs) {
-      const valA = a.querySelector(selector)?.textContent.trim() || '';
-      const valB = b.querySelector(selector)?.textContent.trim() || '';
+  if (specs.some(s => s.order === 'random')) {
+    shuffle(items);
+  } else {
+    items.sort((a, b) => {
+      for (const { selector, order } of specs) {
+        const valA = getValue(selector ? getElement(selector, a) : a) ?? '';
+        const valB = getValue(selector ? getElement(selector, b) : b) ?? '';
 
-      let result = 0;
+        let result;
 
-      if (order === 'random') {
-        result = Math.random() - 0.5;
-      } else if (isFn(order)) {
-        result = order(valA, valB);
-      } else {
-        const [mode, direction] = order.includes('-')
-          ? order.split('-')
-          : ['auto', order];
+        if (isFn(order)) {
+          result = order(valA, valB, a, b);
+        } else {
+          const [mode, direction] = order.includes('-') ? order.split('-') : ['auto', order];
+          result = (sortModes[mode] || sortModes.auto)(valA, valB);
+          if (direction === 'desc') result *= -1;
+        }
 
-        const strategy = sortModes[mode] || sortModes.auto;
-        result = strategy(valA, valB);
-        if (direction === 'desc') result *= -1;
+        if (result) return result;
       }
+      return 0;
+    });
+  }
 
-      if (result !== 0) return result;
-    }
-    return 0;
-  });
-
-  // Re-append in new order via DocumentFragment
-  const frag = document.createDocumentFragment();
-  items.forEach(el => frag.append(el));
-  $container.append(frag);
+  $container.append(...items);   // reine Bewegung, kein Fragment nötig
+  return items;
 }
