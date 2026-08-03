@@ -1,3 +1,5 @@
 /* @aufbau/css/themes.css */
+@import url('./themes/classic.css');
 @import url('./themes/oled.css');
+@import url('./themes/rainbow.css');
 @import url('./themes/zombie.css');
