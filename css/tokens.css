@@ -1,6 +1,11 @@
 /* Global Design Tokens and fallback variables */
 @layer tokens {
   :root {
+    --aufbau-error   : red;
+    --aufbau-success : green;
+    --aufbau-warn    : yellow;
+
+    
     /* Typography */
     --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-family-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
