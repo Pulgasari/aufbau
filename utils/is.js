@@ -1,5 +1,14 @@
 // @aufbau/utils/is.js
 
+// ???
+//isEDO    = v => isObject(v) && (v.tag || v.tagName),
+//isEmpty  = v => v === '' || v === null || v === undefined,
+//isHTML   = v => isString(v) && v.trim().startsWith('<'),
+//isIdLike = v => v.charCodeAt(0) === 35 && v.indexOf(' ') === -1 && v.indexOf('.') === -1,
+//isDings  = el => el.type === 'checkbox' || el.type === 'radio',
+//isMulti  = el => el.tagName === 'SELECT' && el.multiple,
+//isURL    = v => isString(v) && v.includes('://');
+
 export let // checks
 isAlphaNumeric  = v => typeof v === 'string' && /^[a-z0-9]+$/i.test(v),
 isArray         = v => Array.isArray(v),
@@ -11,10 +20,11 @@ isBoolean       = v => typeof v === 'boolean',
 isBuffer        = v => typeof Buffer !== 'undefined' && Buffer.isBuffer(v),
 isCanvas        = v => v instanceof HTMLCanvasElement,
 isDate          = v => v instanceof Date && !isNaN(v.getTime()),
+isDate2         = v => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(v) || (!isNaN(Date.parse(v)) && isNaN(Number(v))),
 isDefined       = v => v !== undefined,
 isDomNode       = v => typeof Node !== 'undefined' && v instanceof Node,
 isElement       = v => typeof Element !== 'undefined' && v instanceof Element,
-isElementish    = v => v instanceof Element || v instanceof DocumentFragment,
+isElementish    = v => v instanceof Element || v instanceof DocumentFragment || v instanceof Document,
 isEmail         = v => typeof v === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
 isEmpty         = v => v === '' || v.length === 0,
 isEmptyArray    = v => Array.isArray(v) && v.length === 0,
@@ -41,7 +51,7 @@ isNaN           = v => Number.isNaN(v),
 isNegative      = v => typeof v === 'number' && v < 0,
 isNode          = v => v instanceof Node,
 isNull          = v => v === null,
-isNullish       = v => v === undefined || v === null, // sth == null
+isNullish       = v => v == null,
 isNumber        = v => typeof v === 'number' && !isNaN(v),
 isNumeric       = v => (typeof v === 'number' && !Number.isNaN(v)) || (typeof v === 'string' && v.trim() !== '' && !isNaN(Number(v))),
 isNumericString = v => typeof v === 'string' && v.trim() !== '' && !isNaN(Number(v)),
