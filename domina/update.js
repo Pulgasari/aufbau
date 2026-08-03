@@ -1,6 +1,6 @@
 // update.js
 
-import { _el } from './utils.js';
+import { _el } from './core.js';
 import { isArray, isFn, isString } from './utils.js';
 
 // null / undefined / false raus, Arrays platt – für Children überall gleich
