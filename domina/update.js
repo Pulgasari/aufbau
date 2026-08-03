@@ -2,6 +2,9 @@
 
 import { _el } from './core.js';
 import { isArray, isFn, isString } from './utils.js';
+import { onAdded, onAttr, onConnected, onDisconnected, onRemoved, onResize, onVisible } from './observer.js';
+
+const observerEvents = { onAdded, onAttr, onConnected, onDisconnected, onRemoved, onResize, onVisible };
 
 // null / undefined / false raus, Arrays platt – für Children überall gleich
 const normalize = nodes => nodes.flat(Infinity).filter(n => n != null && n !== false);
@@ -16,38 +19,33 @@ updateElement = (spec, props = {}, ...children) => {
   for (const [key, value] of Object.entries(props)) {
     if (value == null) continue;
 
-    else if (key === 'appendTo')  { mountTo = value; mountFn = 'append';  }
+    // appendTo + prependTo
+    else if (key ===  'appendTo') { mountTo = value; mountFn = 'append';  }
     else if (key === 'prependTo') { mountTo = value; mountFn = 'prepend'; }
 
+    // style
     else if (key === 'style') {
       if (isString(value)) element.setAttribute('style', value);
-      else for (const [p, v] of Object.entries(value))
+      else for (const [p,v] of Object.entries(value))
         p.includes('-') ? element.style.setProperty(p, v) : (element.style[p] = v);
     }
-      
-    else if (key === 'dataset' || key === 'data') {
-      Object.assign(element.dataset, value);
-    }
-      
-    else if (key === 'class' || key === 'className') {
-      element.setAttribute('class', 
-        isArray(value)
-        ? value.flat(Infinity).filter(Boolean).join(' ')
-        : value
-      );
-    }
-      
-    else if (key.startsWith('on') && isFn(value)) {
-      element.addEventListener(key.slice(2).toLowerCase(), value);
-    }
-      
-    else if (!isSVG && key in element) {
-      element[key] = value;
-    }
-      
-    else {
-      element.setAttribute(key, value);
-    }
+
+    // dataset
+    else if (key === 'dataset' || key === 'data')
+    Object.assign(element.dataset, value);
+
+    // class
+    else if (key === 'class' || key === 'className')
+    element.setAttribute('class', isArray(value) ? value.flat(Infinity).filter(Boolean).join(' ') : value);
+
+    // event
+    else if (key.startsWith('on') && isFn(value))
+    observerEvents[key] ?? element.addEventListener(key.slice(2).toLowerCase(), value);
+
+    // prop + attribute
+    else if (!isSVG && key in element) element[key] = value;
+    else element.setAttribute(key, value);
+    
   }
 
   const kids = normalize(children);
@@ -73,7 +71,7 @@ export const updateElement2 = (spec, props = {}, ...children) => {
     ? Object.assign(el.dataset, value)
         
     : (key.startsWith('on') && isFn(value))
-    ? el.addEventListener(key.slice(2).toLowerCase(), value)
+    ? observerEvents[key] ?? el.addEventListener(key.slice(2).toLowerCase(), value)
         
     : (key in el)
     ? el[key] = value
