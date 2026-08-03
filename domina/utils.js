@@ -1,7 +1,6 @@
 // utils.js
 
-export { isArray, isElementish, isFn, isFragment, isNullish, isObject, isString }
-from 'https://pulgasari.github.io/aufbau/utils/is.js';
+export { arrayfied, isArray, isElementish, isFn, isFragment, isNullish, isObject, isString } from 'https://pulgasari.github.io/aufbau/utils/is.js';
 
 export const
 isDate   = v => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(v) || (!isNaN(Date.parse(v)) && isNaN(Number(v))),
