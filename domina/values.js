@@ -1,10 +1,13 @@
 // values.js
 
+import { _el }     from './core.js';
 import { isArray } from './utils.js';
 
+const isDings = el => el.type === 'checkbox' || el.type === 'radio';
+const isMulti = el => el.tagName === 'SELECT' && el.multiple;
+
 export const getValue = (node, mode = null) => {
-    const el = _el(node);
-    if (!el) return null;
+    const el = _el(node); if (!el) return null;
 
     let value = isDings(el)   ? el.checked
               : isMulti(el)   ? Array.from(el.selectedOptions).map(o => o.value)
@@ -20,8 +23,7 @@ export const getValue = (node, mode = null) => {
 };
 
 export const setValue = (node, value) => {
-    const el = _el(node);
-    if (!el) return null;
+    const el = _el(node); if (!el) return null;
 
     // Checkboxes & Radios
     if (isDings(el)) {
