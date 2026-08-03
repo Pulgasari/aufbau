@@ -21,8 +21,11 @@ import resolveEDO    from './resolveEDO.js';
 */
 
 export default {
-  getElement, getElementById,
-  getElements, getElementsByDataAttr, getElementsByDataKey,
+  getElement,
+  getElementById,
+  getElements,
+  getElementsByDataAttr,
+  getElementsByDataKey,
   
   insertElement,
   sortElements,
