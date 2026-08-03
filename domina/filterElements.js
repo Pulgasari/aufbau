@@ -1,5 +1,4 @@
 // filterElements.js
-// getValue
 
 import { getElement, getElements } from './core.js';
 import { isArray, isEmpty, isFn }  from './utils.js';
