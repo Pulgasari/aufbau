@@ -8,9 +8,9 @@ import { arrayfied, isArray, isObject, isElementish } from './utils.js';
 //========================================================================
 
 const
-MO = callback => new  MutationObserver(callback),
+MO = callback            => new     MutationObserver(callback),
 IO = (callback, options) => new IntersectionObserver(callback, options),
-RO = callback => new     ResizeObserver(callback),
+RO = callback            => new       ResizeObserver(callback),
 
 $root = document.documentElement,
 
