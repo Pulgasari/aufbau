@@ -1,20 +1,20 @@
 /* @aufbau/css/keyframes.css */
 
-keyframes slide-in-leftwards {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0);    }
+@keyframes slide-in-leftwards {
+  from { translate: 100%; }
+  to   { translate:    0; }
 }
 @keyframes slide-out-leftwards {
-  from { transform: translateX(0);     }
-  to   { transform: translateX(-100%); }
+  from { translate:     0;     }
+  to   { translate: -100%; }
 }
 @keyframes slide-in-rightwards {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0);     }
+  from { translate: -100%; }
+  to   { translate:     0;     }
 }
 @keyframes slide-out-rightwards {
-  from { transform: translateX(0);    }
-  to   { transform: translateX(100%); }
+  from { translate:    0;    }
+  to   { translate: 100%; }
 }
 
 /* @patterns */
