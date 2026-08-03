@@ -1,18 +1,9 @@
 // utils.js
 
+export { isArray, isElementish, isFn, isFragment, isNullish, isObject, isString }
+from 'https://pulgasari.github.io/aufbau/utils/is.js';
+
 export const
-
-isArray      = Array.isArray;
-isString     = v => typeof v === 'string';
-isFn         = v => typeof v === 'function';
-isNullish    = v => v == null;
-isObject     = v => v !== null && typeof v === 'object';
-isFragment   = v => v instanceof DocumentFragment;
-isElementish = v =>
-  v instanceof Element ||
-  v instanceof DocumentFragment ||
-  v instanceof Document,
-
 isDate   = v => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(v) || (!isNaN(Date.parse(v)) && isNaN(Number(v))),
 isEDO    = v => isObject(v) && (v.tag || v.tagName),
 isEmpty  = v => v === '' || v === null || v === undefined,
