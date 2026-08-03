@@ -24,10 +24,8 @@ _el   = sth => isElementish(sth) ? sth : getElement(_slct(sth)),
 _slct = sth => {
     if (!isObject(sth)) return sth;
 
-    let selector = '';
-
     // tag
-    selector += (sth.tag || sth.tagName || '').toLowerCase();
+    const selector = (sth.tag || sth.tagName || '').toLowerCase();
 
     // id
     if (sth.id) selector += '#' + sth.id;
@@ -46,9 +44,9 @@ _slct = sth => {
     }
 
     // remaining attributes
+    const attrsToSkip = ['tag', 'tagName', 'id', 'class', 'className', 'dataset', 'data'];    
     for (const [k,v] of Object.entries(sth)) {
-      if (['tag', 'tagName', 'id', 'class', 'className', 'dataset', 'data'].includes(k)) continue;
-      if (v == null) continue;
+      if (attrsToSkip.includes(k) || null) continue;
       selector += `[${k}="${v}"]`;
     }
 
