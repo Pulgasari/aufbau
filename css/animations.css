@@ -5,10 +5,10 @@
   --atf: linear;
   animation-direction:       var(--direction, normal);
   animation-duration:        var(--duration, 1000ms);
-  animation-iteration-count: var(--iterations, infinite);
   animation-fill-mode:       both;
-  transform-origin:          var(--origin, center);
+  animation-iteration-count: var(--iterations, infinite);
   animation-timing-function: var(--atf);
+  transform-origin:          var(--origin, center);
 }
 /* Richtung */
 .normal   { --direction: normal; }
