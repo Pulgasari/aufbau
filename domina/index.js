@@ -1,6 +1,8 @@
 // @domina
 
-import * from './utils.js';
+// ::: create
+import * as createMethods from './create.js';
+//import * as    getMethods from './get.js';
 
 // ::: get
 import getElement            from './core.js';
@@ -14,31 +16,11 @@ import sortElements  from './sortElements.js';
 import updateElement from './updateElement.js';
 
 /*
-import createElement from './createElement.js';
-import getElements   from './getElements.js';
 import insertElement from './insertElement.js';
 import resolveEDO    from './resolveEDO.js';
 */
 
-
-export const 
-// ============ CREATE ============
-
-create = (edo = {}, ...children) => {
-  const { tag, tagName, ...props } = edo;
-  const what = tag || tagName || 'div';
-  return createElement (what, props, ...children);
-},
-  
-createElement = (tag = 'div', props = {}, ...children) => {
-  const el = document.createElement(tag);
-  updateElement(el, props, ...children);
-  return el;
-};
-
-
 export default {
-  createElement,
   getElement,
   getElements,
   insertElement,
@@ -47,6 +29,8 @@ export default {
   
   element  : getElement,
   elements : getElements,
+
+  ...createMethods,
 }
 
 
