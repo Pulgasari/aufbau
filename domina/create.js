@@ -28,3 +28,20 @@ createHTML = html => {
 createStylesheet = sth  => createElement('style', isString(sth) ? { textContent: sth } : sth),    
 
 createTextNode   = text => document.createTextNode(String(text));
+
+
+
+/* ============ CREATE ============
+export const 
+create = (edo = {}, ...children) => {
+  const { tag, tagName, ...props } = edo;
+  const what = tag || tagName || 'div';
+  return createElement (what, props, ...children);
+},
+  
+createElement = (tag = 'div', props = {}, ...children) => {
+  const el = document.createElement(tag);
+  updateElement(el, props, ...children);
+  return el;
+};
+*/
