@@ -3,6 +3,7 @@
 
 import { getElement, getElements } from './core.js';
 import { isArray, isEmpty, isFn }  from './utils.js';
+import { getValue, setValue }      from './values.js';
 
 
 const parseVal = (v) => {
