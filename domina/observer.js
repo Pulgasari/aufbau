@@ -320,10 +320,10 @@ export const observe = (target, handlers) => {
 //========================================================================
 
 export const
-onConnected    = (node, callback) => observe(node, { onMatch  : callback }),
-onDisconnected = (node, callback) => observe(node, { onRemoved: callback }),
+onConnected    = (node,   callback) => observe(node,   { onMatch  : callback }),
+onDisconnected = (node,   callback) => observe(node,   { onRemoved: callback }),
 onAdded        = (target, callback) => observe(target, { onAdded  : callback }),
 onRemoved      = (target, callback) => observe(target, { onRemoved: callback }),
 onAttr         = (target, spec)     => observe(target, { onAttr   : spec     }),
-onVisible      = (target, callback, options) => observe(target, { onVisible: options ? { ...options, handler: callback } : callback }),
-onResize       = (target, callback) => observe(target, { onResize : callback });
+onResize       = (target, callback) => observe(target, { onResize : callback }),
+onVisible      = (target, callback, options) => observe(target, { onVisible: options ? { ...options, handler: callback } : callback });     
