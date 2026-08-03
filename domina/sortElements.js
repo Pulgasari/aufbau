@@ -1,7 +1,5 @@
 // sortElements.js
 
-import { getElement, getElements }         from './core.js';
-
 import { _el, getElement, getElements }    from './core.js';
 import { isArray, isFn, isString }         from './utils.js';
 import { parseDate, shuffle, toNum }       from './utils.js';
