@@ -1,0 +1,16 @@
+
+@layer shapes {
+  .shape-flat {
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --border-width: 2px;
+    --shadow-elevation: 4px 4px 0px 0px var(--color-border);
+  }
+
+  .shape-flat button,
+  .shape-flat input,
+  .shape-flat select {
+    border-radius: 0px;
+  }
+}
