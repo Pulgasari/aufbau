@@ -1,9 +1,7 @@
 // @domina/observer.js
 
-import {
-  isArray, isObject, isElementish,
-  _doc, _el, _slct, getElements, arrayfied
-} from './utils.js';
+import { _doc, _el, _slct, getElements }              from './core.js';
+import { arrayfied, isArray, isObject, isElementish } from './utils.js';
 
 //========================================================================
 // INTERNAL SHORTHANDS
