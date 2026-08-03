@@ -12,6 +12,7 @@ import getElementsByDataAttr from './core.js';
 import getElementsByDataKey  from './core.js';
 
 // ::: misc
+import filterElements from './filterElements.js';
 import sortElements  from './sortElements.js';
 import updateElement from './updateElement.js';
 
@@ -26,8 +27,8 @@ export default {
   getElements,
   getElementsByDataAttr,
   getElementsByDataKey,
-  
-  insertElement,
+
+  filterElements,
   sortElements,
   updateElement,
   
