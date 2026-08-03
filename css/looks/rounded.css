@@ -1,0 +1,16 @@
+
+@layer shapes {
+  .shape-rounded {
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --border-width: 1px;
+    --shadow-elevation: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  }
+
+  .shape-rounded button,
+  .shape-rounded input,
+  .shape-rounded select {
+    border-radius: var(--radius-sm);
+  }
+}
