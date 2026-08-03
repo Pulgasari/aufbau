@@ -1,0 +1,14 @@
+/* Mobile First Single Column Layout Strategy */
+@layer layout {
+  .layout-mobile-basic {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: var(--space-md);
+    gap: var(--space-lg);
+  }
+
+  .layout-mobile-basic > main {
+    flex: 1;
+  }
+}
