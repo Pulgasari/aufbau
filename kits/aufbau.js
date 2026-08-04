@@ -31,7 +31,7 @@ const aufbau = {
   utils      : aufbauUtils,
 
   // aufbau adapters
-  plugins = {
+  plugins : {
     client : aufbauPluginsClient,
     worker : aufbauPluginsWorker
   },
