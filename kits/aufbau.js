@@ -60,9 +60,11 @@ export default aufbau;
 
 /* :::::: USAGE ::::::::::::::::::::::::::::::::::::::::::::::::: 
 
+/*
 @aufbau/kits/preact-htm
 @aufbau/kits/preact-jsx
 @aufbau/kits/react-jsx
 @aufbau/kits/svelte
+*/
 
 */
