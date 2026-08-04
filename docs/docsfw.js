@@ -149,34 +149,17 @@ async function resolveExtension(ext, vars = {}) {
 }
 
 /**
- * Inject slug IDs into HTML headings and generate Table of Contents items.
+ * injects slug ids into headings, so deep links and <aufbau-toc> share stable targets.
+ * runs before render, the toc element only reads what is already there.
  */
-export function processHtmlAndBuildToc(htmlContent) {
-  const parser   = new DOMParser();
-  const doc      = parser.parseFromString(htmlContent, 'text/html');
-  const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  const toc      = [];
+export function injectHeadingIds (htmlContent) {
+  const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
 
-  headings.forEach((heading, index) => {
-    const level = parseInt(heading.tagName.substring(1), 10);
-    const text  = heading.textContent || '';
-    
-    let id = heading.id;
-    if (!id) {
-      id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-') || `heading-${index}`;
-      heading.id = id;
-    }
-
-    toc.push({ id, text, level });
+  doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading, index) => {
+    if (!heading.id) heading.id = slugify(heading.textContent || '') || `heading-${index}`;
   });
 
-  return {
-    processedHtml: doc.body.innerHTML,
-    toc
-  };
+  return doc.body.innerHTML;
 }
 
 /**
@@ -245,11 +228,7 @@ export function createDocsFW (config = {}) {
         ]);
   
         brandState.value = resolvedBrand;
-
-        const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
-
-        mdContent.value  = processedHtml;
-        tocList.value    = toc;
+        mdContent.value = injectHeadingIds(rawHtml);
         beforeSlot.value = resolvedBefore;
         afterSlot.value  = resolvedAfter;
         isLoading.value  = false;
@@ -277,7 +256,35 @@ export function createDocsFW (config = {}) {
     loadDocument();
   });
 
-// Helper component to render dynamic extensions
+  // external protocol or protocol-relative url
+  const isExternal = (href) => /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
+  
+  // translates github-compatible hrefs into router hashes at click time,
+  // so the markdown source stays readable on github itself
+  function onContentClick (event) {
+    const link = event.target.closest?.('a[href]');
+    if (!link || event.defaultPrevented) return;
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+  
+    const href = link.getAttribute('href');
+    if (!href || isExternal(href) || link.target === '_blank') return;
+  
+    event.preventDefault();
+    const { path } = currentRoute.value;
+  
+    // plain anchor: stay in the current document
+    if (href.startsWith('#')) {
+      window.location.hash = `#/${path}#${href.slice(1)}`;
+      return;
+    }
+  
+    // relative document link, resolved against the current doc's directory
+    const [to, anchor] = href.split('#');
+    const next = new URL(to, new URL(path, 'file:///')).pathname.replace(/^\//, '');
+    window.location.hash = `#/${next}${anchor ? `#${anchor}` : ''}`;
+  }
+
+  // Helper component to render dynamic extensions
   function ExtensionSlot ({ slotData }) {
     switch (slotData?.type) {
       case 'component' : return html`<${slotData.value} />`;
@@ -384,7 +391,7 @@ export function createDocsFW (config = {}) {
     return html`
       <${Fragment}>
         <${Header} />
-        <div id="app-body">
+        <div id="app-body" onClick=${onContentClick}>
           <main class="docs-main-content">
             <${MainContent} />
           </main>
