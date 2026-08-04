@@ -1,6 +1,6 @@
 // <aufbau-flag>
 
-import { AufbauElement } from './core/AufbauCore.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauFlag extends AufbauElement {
   static attr = {
