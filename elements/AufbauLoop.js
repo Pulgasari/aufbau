@@ -1,6 +1,6 @@
 // <aufbau-loop>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauLoop extends AufbauElement {
   static attr = ['mode', 'interval', 'speed', 'pause-on-hover', 'direction'];
