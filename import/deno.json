@@ -1,0 +1,12 @@
+{
+  "name": "@aufbau/import",
+  "version": "1.0.0",
+  "license": "MIT",
+  "exports": "./index.js",
+  "imports": {
+    "@aufbau/cache": "jsr:@aufbau/cache@^1.0.0"
+  },
+  "publish": {
+    "include": ["index.js", "index.d.ts", "readme.md", "LICENSE"]
+  }
+}
