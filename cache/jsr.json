@@ -1,5 +1,14 @@
 {
   "name": "@aufbau/cache",
   "version": "1.0.0",
-  "exports": "./index.js"
+  "license": "MIT",
+  "exports": "./index.js",
+  "publish": {
+    "include": [
+      "index.js",
+      "index.d.ts",
+      "readme.md",
+      "LICENSE"
+    ]
+  }
 }
