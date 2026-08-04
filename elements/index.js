@@ -13,17 +13,20 @@ import AufbauElement from './core/AufbauElement.js';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
-const PREFIX = 'aufbau-';
+// list to exclude that already-imported stuff at registerAll-method
+const EXCLUDED = new Set([
+  './core/AufbauConfig.js',
+  './core/AufbauCore.js',
+  './core/AufbauElement.js',
+]);
+
+let   baseURL   = import.meta.url; // resolve module urls relative to this file unless a base is configured
+let   manifest  = null; // module-level cache, the manifest is fetched at most once
+const PREFIX    = 'aufbau-';
+const requested = new Set(); // tags already requested, prevents duplicate network calls
 
 // 'aufbau-tree-item' -> 'AufbauTreeItem'
-const toPascalCase = (str) => str.split(/[-_\s]+/).filter(Boolean)
-  .map(word => word[0].toUpperCase() + word.slice(1)).join('');
-
-// resolve module urls relative to this file unless a base is configured
-let baseURL = import.meta.url;
-
-// tags already requested, prevents duplicate network calls
-const requested = new Set();
+const toPascalCase = (str) => str.split(/[-_\s]+/).filter(Boolean).map(word => word[0].toUpperCase() + word.slice(1)).join('');    
 
 /**
  * reads the aufbau tag of an element, including customized built-ins.
@@ -54,12 +57,23 @@ export function load (tag) {
   });
 }
 
+
+
+// not an element, just the base class
+
 /**
- * imports every element at once. good for prototyping and ssr-less bundles.
- * @returns {Promise<any>}
+ * imports every element at once. good for prototyping.
+ * the element list is read from jsr.json, which is the single source of truth.
+ * @returns {Promise<any[]>}
  */
-export function registerAll () {
-  return import (new URL('./all.js', baseURL).href);
+export async function registerAll () {
+  manifest ??= (await import(new URL('./jsr.json', baseURL).href, { with: { type: 'json' } })).default;    
+
+  const paths = Object.entries(manifest.exports ?? {})
+    .filter(([key, path]) => key.startsWith('./Aufbau') && !EXCLUDED.has(path))
+    .map(([, path]) => path);
+
+  return Promise.all(paths.map(path => import(new URL(path, baseURL).href)));
 }
 
 // :::::: AUTOLOADER ::::::::::::::::::::::::::::::::::::::::::::
