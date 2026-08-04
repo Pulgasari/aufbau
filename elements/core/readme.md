@@ -4,6 +4,14 @@ Lightweight, zero-dependency abstraction layer for Web Components. Provides a un
 
 ---
 
+## todo
+
+### config
+
+- hljs connection um eigenes syntax highlighting einspeisen zu können
+
+---
+
 ## Architecture
 
 Components are built on top of the `AufbauCore` mixin. It can wrap `HTMLElement` or any native HTML class for customized built-in elements.
