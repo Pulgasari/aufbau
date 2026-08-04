@@ -1,8 +1,8 @@
 // docsfw.js
 
-import hljs from 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm';
+import hljs                               from 'hljs';
 import aufbau, { html, Fragment, effect } from '@aufbau/kit';
-import { slugify } from '@aufbau/utils';
+import { slugify }                        from '@aufbau/utils';
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
