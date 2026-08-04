@@ -3,7 +3,7 @@
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: AUFBAU
-import aufbau  from '@aufbau/kits/aufbau.js';
+import aufbau  from './aufbau.js';
 
 // ::: HTM
 import htm from 'htm'; 
