@@ -1,6 +1,6 @@
 // <aufbau-filter>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/AufbauCore.js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {
