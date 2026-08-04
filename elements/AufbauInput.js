@@ -18,6 +18,7 @@ export default class AufbauInput extends AufbauElement {
     placeholder : String,
     type  : 'text',
     value : String,
+  }
 
   get value () {
     return this.$('input')?.value || '';
