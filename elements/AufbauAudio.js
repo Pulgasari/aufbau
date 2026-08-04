@@ -1,6 +1,6 @@
 // <aufbau-audio>
 
-import { AufbauElement } from './core/AufbauCore.js';
+import { AufbauElement } from './core/index.js';
 
 const formatTime = (seconds) => {
   if (Number.isNaN(seconds)) return '0:00';
