@@ -1,0 +1,43 @@
+{
+  "name"        : "@aufbau/kits",
+  "version"     : "1.0.0",
+  "description" : "Ready-to-use bundles of all Aufbau packages combined with a frontend framework of choice.",
+  "type"        : "module",
+  "exports": {
+    "."            : "./aufbau.js",
+    "./aufbau"     : "./aufbau.js",
+    "./dom"        : "./dom.js",
+    "./preact-htm" : "./preact-htm.js"
+  },
+  "dependencies": {
+    "@aufbau/cache"      : "workspace:*",
+    "@aufbau/elements"   : "workspace:*",
+    "@aufbau/import"     : "workspace:*",
+    "@aufbau/plugins"    : "workspace:*",
+    "@aufbau/shaders"    : "workspace:*",
+    "@aufbau/stylesheet" : "workspace:*",
+    "@aufbau/utils"      : "workspace:*"
+  },
+  "peerDependencies": {
+    "@preact/signals": "^1.3.0",
+    "htm": "^3.1.1",
+    "preact": "^10.22.0"
+  },
+  "peerDependenciesMeta": {
+    "@preact/signals": { "optional": true },
+    "htm": { "optional": true },
+    "preact": { "optional": true }
+  },
+  "files": [
+    "aufbau.js",
+    "dom.js",
+    "preact-htm.js",
+    "readme.md"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "kits"
+  }
+}
