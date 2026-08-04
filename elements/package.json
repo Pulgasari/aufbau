@@ -2,18 +2,19 @@
   "name": "@aufbau/elements",
   "version": "1.0.0",
   "description": "Reactive, zero-dependency Web Components for the @aufbau framework ecosystem",
-  "type": "module",
-  "main": "./index.js",
-  "module": "./index.js",
+  "type"   : "module",
+  "main"   : "./index.js",
+  "module" : "./index.js",
   "sideEffects": [
     "./Aufbau*.js"
   ],
   "exports": {
-    ".": "./index.js",
-    "./*": "./*.js"
+    "."   : "./index.js",
+    "./*" : "./*.js"
   },
   "files": [
     "index.js",
+    "jsr.json",
     "Aufbau*.js",
     "README.md",
     "LICENSE"
