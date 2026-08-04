@@ -1,0 +1,10 @@
+{
+  "name"    : "@aufbau/kits",
+  "version" : "1.0.0",
+  "exports": {
+    "."            : "./aufbau.js",
+    "./aufbau"     : "./aufbau.js",
+    "./dom"        : "./dom.js",
+    "./preact-htm" : "./preact-htm.js"
+  }
+}
