@@ -4,7 +4,7 @@
   "exports": {
     "."                : "./index.js",
     "./AufbauAudio"    : "./AufbauAudio.js",
-    "./AufbauButton".  : "./AufbauButton.js",
+    "./AufbauButton"   : "./AufbauButton.js",
     "./AufbauCheckbox" : "./AufbauCheckbox.js",
     "./AufbauCode"     : "./AufbauCode.js",
     "./AufbauCombobox" : "./AufbauCombobox.js",
