@@ -1,7 +1,7 @@
 // <aufbau-text>
 
-import AufbauElement from './AufbauElement.js';
-import importFile    from '@aufbau/import';
+import { AufbauElement } from './core/index.js';
+import { importFile }    from '@aufbau/import';
 
 export default class AufbauText extends AufbauElement {
   static attr = {
