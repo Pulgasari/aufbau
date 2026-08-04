@@ -1,8 +1,8 @@
 // aufbau/docs/index.js
 
-import aufbau, { html } from '@aufbau/kit';
+//import aufbau, { html } from '@aufbau/kit';
 import { createDocsFW } from './docsfw.js';
-aufbau.init(); // initialize @aufbau7kit
+//aufbau.init(); // initialize @aufbau7kit
 
 // Service Worker registration for local assets
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
