@@ -15,29 +15,37 @@ import * as preactSignals from '@preact/signals';
 
 // :::::: BUNDLE ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const html = htm.bind(h);
-
 const preact = { 
   ...preactCore,
   ...preactHooks,
   ...preactSignals,
 };
 
-aufbau.htm    = htm;
-aufbau.html   = html;
-aufbau.preact = preact;
+const html = htm.bind(preact.h);
+
+Object.assign(
+  aufbau, 
+  preact, // flattened into aufbauObj
+  { htm, html, preact }
+);
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export aufbau;
-export htm;
-export html;
-export preact;
+export * from 'preact';
+export * from 'preact/hooks';
+export * from '@preact/signals';
+
+export { aufbau, htm, html, preact };
 
 export default aufbau;
 
-/* :::::: USAGE ::::::::::::::::::::::::::::::::::::::::::::::::: 
+/* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
-import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+import aufbau, { html, signal, render } from '@aufbau/kits/preact-htm';
+
+await aufbau.init();
+
+const count = signal(0);
+render(html`<button onClick=${() => count.value++}>${count}</button>`, document.body);
 
 */
