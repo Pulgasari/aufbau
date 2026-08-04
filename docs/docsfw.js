@@ -191,6 +191,7 @@ export function createDocsFW (config = {}) {
     vars       = {},
     target     = '#app',
     footerText = 'Powered by @aufbau/docsfw',
+    toc        = 'h2, h3',
     before     = null,
     after      = null
   } = config;
