@@ -99,13 +99,6 @@ const aufbau = {
   },
 };
 
-export function init () {
-  if (typeof window !== 'undefined') {
-    aufbauPluginsClient.observeStylesheets();
-  }
-}
-
-
 // Combined master fetch handler for Service Workers.
 // Checks all registered Aufbau plugins in sequence.
 export async function interceptFetch (event) {
