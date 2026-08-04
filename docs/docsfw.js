@@ -1,8 +1,10 @@
 // docsfw.js
 
-import hljs                               from 'hljs';
-import aufbau, { html, Fragment, effect } from '@aufbau/kit';
-import { slugify }                        from '@aufbau/utils';
+import hljs                     from 'hljs';
+import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+import { slugify }              from '@aufbau/utils';
+
+const { Fragment } from preact; //TODO: use htm/preact to enable <> syntax
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -218,7 +220,7 @@ export function createDocsFW (config = {}) {
   }
 
   // Reactive data loader effect
-  effect(() => {
+  preact.effect(() => {
     const { path, anchor } = currentRoute.value;
 
     async function loadDocument() {
@@ -273,7 +275,7 @@ export function createDocsFW (config = {}) {
     loadDocument();
   });
 
-  // Helper component to render dynamic extensions
+// Helper component to render dynamic extensions
   function ExtensionSlot ({ slotData }) {
     switch (slotData?.type) {
       case 'component' : return html`<${slotData.value} />`;
@@ -368,7 +370,7 @@ export function createDocsFW (config = {}) {
       </footer>
     `;
   }
-
+  
   function App() {
     return html`
       <${Fragment}>
