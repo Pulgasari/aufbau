@@ -5,7 +5,7 @@ import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { slugify }              from '@aufbau/utils';
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
-
+aufbau.init();
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
  */
