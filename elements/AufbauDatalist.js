@@ -1,11 +1,10 @@
 // <aufbau-datalist>
 
-import importeur from '@aufbau/import';
+import { AufbauDatalistElement } from './core/AufbauCore.js';
+import { importFile }            from '@aufbau/import';
 
-class AufbauDatalist extends HTMLDataListElement {
-  static get observedAttributes() {
-    return ['src', 'key', 'label-key'];
-  }
+class AufbauDatalist extends AufbauDataListElement {
+  static attr = ['src', 'key', 'label-key'];
 
   connectedCallback() {
     this.loadData();
