@@ -1,0 +1,401 @@
+// docsfw.js
+
+import hljs                     from 'hljs';
+import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+import { slugify }              from '@aufbau/utils';
+
+const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
+aufbau.init();
+//window.html = html;
+/**
+ * Resolve brand configuration (supports string, image path, or inline SVG).
+ */
+async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
+  let title = titleOption || 'Documentation';
+  let img        = null;
+  let svgContent = null;
+  let svgPath    = null;
+
+  if (typeof brandOption === 'string') {
+    title = brandOption;
+  } else if (brandOption && typeof brandOption === 'object') {
+    if (brandOption.title) title = brandOption.title;
+    if (brandOption.img) img = resolvePath(brandOption.img, vars);
+    if (brandOption.svg) svgPath = brandOption.svg;
+  }
+
+  // Fetch raw SVG content if path/string is provided
+  if (svgPath) {
+    const trimmed = svgPath.trim();
+    if (trimmed.startsWith('<svg')) {
+      svgContent = trimmed;
+    } else {
+      const resolved = resolvePath(trimmed, vars);
+      const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http'))
+        ? resolved
+        : `./${resolved}`;
+
+      try {
+        const imported = await aufbau.import(importPath);
+        svgContent = typeof imported === 'string' ? imported : null;
+      } catch (err) {
+        console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, err);
+      }
+    }
+  }
+
+  return { title, img, svgContent };
+}
+
+
+/**
+ * Resolves variables/aliases inside a path string.
+ * Supports nested variables (e.g. $comps using $repo).
+ * 
+ * @param {string} pathStr - Raw path string (e.g. "$comps/readme.md")
+ * @param {Object} vars - Variable dictionary (e.g. { repo: '../', comps: '$repo/webcomponents' })
+ * @returns {string} Fully resolved file path
+ */
+export function resolvePath(pathStr, vars = {}) {
+  if (!pathStr || typeof pathStr !== 'string') return pathStr;
+
+  let resolved = pathStr;
+  let maxPasses = 10; // Prevent infinite loops on circular variables
+
+  while (maxPasses-- > 0) {
+    let replaced = false;
+    resolved = resolved.replace(/\$(\{([a-zA-Z0-9_]+)\}|([a-zA-Z0-9_]+))/g, (match, _, braced, unbraced) => {
+      const varName = braced || unbraced;
+      if (Object.prototype.hasOwnProperty.call(vars, varName)) {
+        replaced = true;
+        return vars[varName];
+      }
+      return match;
+    });
+
+    if (!replaced) break;
+  }
+
+  // Clean up duplicate slashes (preserving protocols like http://)
+  return resolved.replace(/(?<!:)\/{2,}/g, '/');
+}
+
+/**
+ * Extract path and heading anchor ID from location hash.
+ * Example: "#/$comps/readme.md#installation" -> { path: "$comps/readme.md", anchor: "installation" }
+ * 
+ * @param {string} [defaultPath='readme.md']
+ * @returns {{ path: string, anchor: string|null }}
+ */
+export function parseHash(defaultPath = 'readme.md') {
+  const rawHash = window.location.hash.replace(/^#\/?/, '');
+  if (!rawHash) return { path: defaultPath, anchor: null };
+
+  const [path, anchor] = rawHash.split('#');
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+
+  return {
+    path   : cleanPath || defaultPath,
+    anchor : anchor    || null
+  };
+}
+
+/**
+ * Normalize sidebar configuration from either Array or Object format.
+ */
+function normalizeSidebar(sidebar) {
+  if (Array.isArray(sidebar)) return sidebar;
+  if (sidebar && typeof sidebar === 'object') {
+    return Object.entries(sidebar).map(([title, path]) => ({ title, path }));
+  }
+  return [];
+}
+
+/**
+ * Resolve content extensions (before / after content injections).
+ * Supports: File paths (.html, .md), raw HTML strings, or Preact Component functions.
+ */
+async function resolveExtension(ext, vars = {}) {
+  if (!ext) return null;
+
+  if (typeof ext === 'function') {
+    return { type: 'component', value: ext };
+  }
+
+  if (typeof ext === 'string') {
+    const trimmed = ext.trim();
+    
+    // Inline HTML check
+    if (trimmed.startsWith('<') || trimmed.includes('\n')) {
+      return { type: 'html', value: trimmed };
+    }
+
+    // Resolve path variables and import
+    const resolved = resolvePath(trimmed, vars);
+    const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http')) 
+      ? resolved 
+      : `./${resolved}`;
+
+    try {
+      const imported = await aufbau.import(importPath);
+      return { type: 'html', value: typeof imported === 'string' ? imported : '' };
+    } catch (err) {
+      console.warn(`[DocsFW] Failed to load extension content from "${importPath}":`, err);
+      return null;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Inject slug IDs into HTML headings and generate Table of Contents items.
+ */
+export function processHtmlAndBuildToc(htmlContent) {
+  const parser   = new DOMParser();
+  const doc      = parser.parseFromString(htmlContent, 'text/html');
+  const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  const toc      = [];
+
+  headings.forEach((heading, index) => {
+    const level = parseInt(heading.tagName.substring(1), 10);
+    const text  = heading.textContent || '';
+    
+    let id = heading.id;
+    if (!id) {
+      id = text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-') || `heading-${index}`;
+      heading.id = id;
+    }
+
+    toc.push({ id, text, level });
+  });
+
+  return {
+    processedHtml: doc.body.innerHTML,
+    toc
+  };
+}
+
+/**
+ * Initializes and mounts the Docs Framework.
+ */
+export function createDocsFW (config = {}) {
+  const {
+    brand      = null,
+    title      = 'Documentation',
+    index      = 'readme.md',
+    sidebar    = [],
+    vars       = {},
+    target     = '#app',
+    footerText = 'Powered by @aufbau/docsfw',
+    before     = null,
+    after      = null
+  } = config;
+
+  const normalizedSidebar = normalizeSidebar(sidebar);
+
+  // Signals
+  const currentRoute = aufbau.signal(parseHash(index));
+  const mdContent    = aufbau.signal('');
+  const tocList      = aufbau.signal([]);
+  const isLoading    = aufbau.signal(true);
+  const errorMessage = aufbau.signal(null);
+
+  const beforeSlot   = aufbau.signal(null);
+  const afterSlot    = aufbau.signal(null);
+
+  const brandState = aufbau.signal({ 
+    title: typeof brand === 'string' ? brand : (brand?.title || title), 
+    img: null, 
+    svgContent: null 
+  });
+
+  // Hash router event listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('hashchange', () => {
+      currentRoute.value = parseHash(index);
+    });
+  }
+
+  // Reactive data loader effect
+  preact.effect(() => {
+    const { path, anchor } = currentRoute.value;
+
+    async function loadDocument() {
+      isLoading.value = true;
+      errorMessage.value = null;
+
+      try {
+        // Resolve variables in doc path (e.g. $comps/readme.md -> ../webcomponents/readme.md)
+        const resolvedPath = resolvePath(path, vars);
+        const importPath = (resolvedPath.startsWith('.') || resolvedPath.startsWith('/') || resolvedPath.startsWith('http'))
+          ? resolvedPath
+          : `./${resolvedPath}`;
+
+        // Fetch brand config parallel with document & extensions
+        const [resolvedBrand, rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
+          resolveBrandConfig(brand, title, vars),
+          aufbau.import(importPath),
+          resolveExtension(before, vars),
+          resolveExtension(after, vars)
+        ]);
+  
+        brandState.value = resolvedBrand;
+
+        const { processedHtml, toc } = processHtmlAndBuildToc(rawHtml);
+
+        mdContent.value  = processedHtml;
+        tocList.value    = toc;
+        beforeSlot.value = resolvedBefore;
+        afterSlot.value  = resolvedAfter;
+        isLoading.value  = false;
+
+        // Post-render DOM manipulation
+        requestAnimationFrame(() => {
+          document.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+          });
+
+          if (anchor) {
+            const targetEl = document.getElementById(anchor);
+            if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      } catch (err) {
+        console.error('[DocsFW Error]:', err);
+        errorMessage.value = `Failed to load document: ${path}`;
+        isLoading.value    = false;
+      }
+    }
+
+    loadDocument();
+  });
+
+// Helper component to render dynamic extensions
+  function ExtensionSlot ({ slotData }) {
+    switch (slotData?.type) {
+      case 'component' : return html`<${slotData.value} />`;
+      case 'html'      : return html`<div class="docs-extension" dangerouslySetInnerHTML=${{ __html: slotData.value }} />`;     
+      default          : return null;
+    }
+  }
+
+  // internal link that owns the hash-routing convention
+  function RouterLink ({ to, anchor, class: className, children }) {
+    const href  = `#/${to}${anchor ? `#${anchor}` : ''}`;
+    const active = currentRoute.value.path === to;
+  
+    return html`
+      <a href=${href} class=${[className, active && 'active'].filter(Boolean).join(' ')}>
+        ${children}
+      </a>
+    `;
+  }
+
+  // UI Components
+  function Header () {
+    const activePath = currentRoute.value.path;
+    const { title: brandTitle, img: brandImg, svgContent: brandSvg } = brandState.value;
+
+    return html`
+      <header id="app-header">
+        <${RouterLink} to=${index} class="brand-link">
+          <div class="brand">
+            ${brandSvg   ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: brandSvg }} />`
+            : brandImg   ? html`<img class="brand-img" src=${brandImg} alt=${brandTitle} />`
+            : brandTitle ? html`<span class="brand-title">${brandTitle}</span>` 
+            : null}
+          </div>
+        </${RouterLink}>
+        <nav class="docs-nav">
+          ${normalizedSidebar.map(item => html`
+            <${RouterLink} key=${item.path} to=${item.path}>${item.title}</${RouterLink}>
+          `)}
+          </nav>
+      </header>
+    `;
+  }
+
+
+  function TableOfContents() {
+    const items = tocList.value;
+    const currentPath = currentRoute.value.path;
+
+    if (!items.length) return null;
+
+    return html`
+      <aside class="docs-toc">
+        <h4>On This Page</h4>
+        <nav>
+          ${items.map(item => html`
+            <a 
+              key=${item.id} 
+              href="#/${currentPath}#${item.id}"
+              class=${`toc-item level-${item.level}`}
+            >
+              ${item.text}
+            </a>
+          `)}
+        </nav>
+      </aside>
+    `;
+  }
+
+  function MainContent() {
+    if (isLoading.value) {
+      return html`<div class="docs-status">Loading documentation...</div>`;
+    }
+
+    if (errorMessage.value) {
+      return html`<div class="docs-status error">${errorMessage.value}</div>`;
+    }
+
+    return html`
+      <div class="docs-body-wrapper">
+        <div class="docs-content-container">
+          <${ExtensionSlot} slotData=${beforeSlot.value} />
+          <article 
+            class="markdown-body" 
+            dangerouslySetInnerHTML=${{ __html: mdContent.value }} 
+          />
+          <${ExtensionSlot} slotData=${afterSlot.value} />
+        </div>
+        <${TableOfContents} />
+      </div>
+    `;
+  }
+
+  function Footer() {
+    return html`
+      <footer id="app-footer">
+        <span>${footerText}</span>
+      </footer>
+    `;
+  }
+  
+  function App() {
+    return html`
+      <${Fragment}>
+        <${Header} />
+        <div id="app-body">
+          <main class="docs-main-content">
+            <${MainContent} />
+          </main>
+        </div>
+        <${Footer} />
+      </${Fragment}>
+    `;
+  }
+
+  // Mount framework to target node
+  const $target = typeof target === 'string' ? document.querySelector(target) : target;
+  if ($target) preact.render(html`<${App} />`, $target);
+  
+}
+
+export { html };
