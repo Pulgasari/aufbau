@@ -1,6 +1,6 @@
 // <aufbau-slider>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauSlider extends AufbauElement {
   static attr = {
