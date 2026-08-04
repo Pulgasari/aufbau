@@ -1,6 +1,6 @@
 // <aufbau-number>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauNumber extends AufbauElement {
   
