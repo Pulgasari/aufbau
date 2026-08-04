@@ -8,7 +8,6 @@
     "./AufbauCheckbox" : "./AufbauCheckbox.js",
     "./AufbauCode"     : "./AufbauCode.js",
     "./AufbauCombobox" : "./AufbauCombobox.js",
-    "./AufbauConfig"   : "./AufbauConfig.js",
     "./AufbauDropdown" : "./AufbauDropdown.js",
     "./AufbauFilter"   : "./AufbauFilter.js",
     "./AufbauFlag"     : "./AufbauFlag.js",
