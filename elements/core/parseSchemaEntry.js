@@ -4,7 +4,7 @@
  * Parses a schema entry (Minimal, Basic, or Full) into a normalized schema object.
  * @param {*} entry - e.g. Number, 50, or { type: Number, default: 0, values: [...], fn: ... }
  */
-const parseSchemaEntry = (entry) => {
+export const parseSchemaEntry = (entry) => {
   // CASE 1: direct constructor function (e.g. Number, Boolean, String)
   if (typeof entry === 'function') {
     return { type: entry, fallback: undefined, values: null, fn: null };
@@ -38,3 +38,5 @@ const parseSchemaEntry = (entry) => {
 
   return { type: String, fallback: undefined, values: null, fn: null };
 };
+
+export default parseSchemaEntry;
