@@ -1,6 +1,6 @@
 // <aufbau-waveform>
 
-import { AufbauElement } from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 let sharedAudioCtx = null;
 function getAudioContext() {
