@@ -387,9 +387,8 @@ export function createDocsFW (config = {}) {
 
   // Mount framework to target node
   const $target = typeof target === 'string' ? document.querySelector(target) : target;
-  if ($target) {
-    aufbau.render(html`<${App} />`, $target);
-  }
+  if ($target) preact.render(html`<${App} />`, $target);
+  
 }
 
 
