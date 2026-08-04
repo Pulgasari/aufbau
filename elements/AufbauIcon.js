@@ -1,6 +1,6 @@
 // <aufbau-icon>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/AufbauCore.js';
 
 export default class AufbauIcon extends AufbauElement {
   static attr = {
