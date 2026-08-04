@@ -1,6 +1,6 @@
 // <aufbau-dropdown>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/AufbauCore.js';
 
 export default class AufbauDropdown extends AufbauElement {
   
