@@ -1,6 +1,6 @@
 // <aufbau-video>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauVideo extends AufbauElement {
   static attr = {
