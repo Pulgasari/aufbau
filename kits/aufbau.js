@@ -1,12 +1,10 @@
 /* @aufbau/kits/aufbau.js
 
-framework-agnostic core kit. 
-bundles all aufbau packages into one namespace.
+framework-agnostic core-kit. 
+bundles all aufbau-packages into one namespace.
 every framework-kit builds on top of this file.
 
-*/
-
-// :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
+*// :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: AUFBAU
 import      aufbauCache         from '@aufbau/cache';
@@ -18,76 +16,12 @@ import * as aufbauShaders       from '@aufbau/shaders';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/utils';
 
-// :::::: BUILD :::::::::::::::::::::::::::::::::::::::::::::::::
-
-const aufbau = {
-  // aufbau: config
-  config, configs, 
-  init, interceptFetch,
-
-  // aufbau-dirty (needs to be moved)
-  define, update, updateDataset, updateProperty,
-
-  // aufbau-packages
-  cache      : aufbauCache,
-  elements   : aufbauElements,
-  import     : aufbauImport,
-  shaders    : aufbauShaders,
-  stylesheet : aufbauStylesheet,
-  utils      : aufbauUtils,
-
-  // aufbau adapters
-  plugins : {
-    client : aufbauPluginsClient,
-    worker : aufbauPluginsWorker
-  },
-};
-
-export function init () {
-  if (typeof window !== 'undefined') {
-    aufbauPluginsClient.observeStylesheets();
-  }
-}
-
-
-// Combined master fetch handler for Service Workers.
-// Checks all registered Aufbau plugins in sequence.
-export async function interceptFetch (event) {
-  // 1. Check stylesheet plugin
-  const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
-  if (stylesheetResponse) return stylesheetResponse;
-  return null;
-}
-
-// :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
-
-export { aufbau };
-export default aufbau;
-
-/* :::::: USAGE ::::::::::::::::::::::::::::::::::::::::::::::::: 
-
-/*
-@aufbau/kits/preact-htm
-@aufbau/kits/preact-jsx
-@aufbau/kits/react-jsx
-@aufbau/kits/svelte
-*/
-
-*/
-
-
-
-// :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
-
-// ::: AUFBAU
-
-
 // ::: LOCAL
 import { define, update, updateDataset, updateProperty } from './dom.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const defaults = {
+const configs = {
   // 'auto'  : lazy autoloader, elements are fetched when they appear in the dom
   // 'all'   : eagerly register every element up front
   // false   : do not touch @aufbau/elements at all
@@ -95,8 +29,6 @@ const defaults = {
   // observe <link>/<style> and transform aufbau stylesheets client-side
   stylesheet : true,
 };
-
-const configs = { ...defaults };
 
 /**
  * merges options into the runtime config. returns the current config.
@@ -142,10 +74,10 @@ export async function interceptFetch (event) {
   return null;
 }
 
-// :::::: BUNDLE ::::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
 const aufbau = {
-  // runtime
+  // config + runtime
   config, configs,
   init, interceptFetch,
 
@@ -163,13 +95,29 @@ const aufbau = {
   // adapters
   plugins : {
     client : aufbauPluginsClient,
-    worker : aufbauPluginsWorker,
+    worker : aufbauPluginsWorker
   },
 };
 
+export function init () {
+  if (typeof window !== 'undefined') {
+    aufbauPluginsClient.observeStylesheets();
+  }
+}
+
+
+// Combined master fetch handler for Service Workers.
+// Checks all registered Aufbau plugins in sequence.
+export async function interceptFetch (event) {
+  // 1. Check stylesheet plugin
+  const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
+  if (stylesheetResponse) return stylesheetResponse;
+  return null;
+}
+
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { aufbau, define, update, updateDataset, updateProperty };
+export { aufbau };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
@@ -182,4 +130,3 @@ await aufbau.init();
 import aufbau, { html } from '@aufbau/kits/preact-htm';
 
 */
-
