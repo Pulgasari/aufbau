@@ -1,6 +1,6 @@
 // <aufbau-datalist>
 
-import { AufbauDatalistElement } from './core/AufbauCore.js';
+import { AufbauDatalistElement } from './core/index.js';
 import { importFile }            from '@aufbau/import';
 
 export default lass AufbauDatalist extends AufbauDataListElement {
