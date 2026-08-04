@@ -9,7 +9,7 @@ or registerAll() to get everything at once.
 
 import AufbauConfig  from './core/AufbauConfig.js';
 import AufbauCore    from './core/AufbauCore.js';
-import AufbauElement from './core/AufbauElement.js';
+//import AufbauElement from './core/AufbauElement.js';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -17,7 +17,7 @@ import AufbauElement from './core/AufbauElement.js';
 const EXCLUDED = new Set([
   './core/AufbauConfig.js',
   './core/AufbauCore.js',
-  './core/AufbauElement.js',
+  //'./core/AufbauElement.js',
 ]);
 
 let   baseURL   = import.meta.url; // resolve module urls relative to this file unless a base is configured
@@ -121,13 +121,13 @@ export function autoloader ({ base, root = document } = {}) {
 export {
   AufbauCore,
   AufbauConfig,
-  AufbauElement
+//  AufbauElement
 };
 
 export default {
   AufbauCore,
   AufbauConfig,
-  AufbauElement, 
+//  AufbauElement, 
   autoloader, 
   load, 
   registerAll
