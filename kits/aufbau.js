@@ -99,15 +99,6 @@ const aufbau = {
   },
 };
 
-// Combined master fetch handler for Service Workers.
-// Checks all registered Aufbau plugins in sequence.
-export async function interceptFetch (event) {
-  // 1. Check stylesheet plugin
-  const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
-  if (stylesheetResponse) return stylesheetResponse;
-  return null;
-}
-
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 export { aufbau };
