@@ -16,6 +16,8 @@ const cssOptionsMap = {
   
   sheet         : 'stylesheet',
   CSSStyleSheet : 'stylesheet',
+
+  return Object.assign(document.createElement('style'),{textContent:cssCode});
 };
 */
 
