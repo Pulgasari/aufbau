@@ -284,31 +284,37 @@ export function createDocsFW (config = {}) {
     }
   }
 
+  // internal link that owns the hash-routing convention
+  function RouterLink ({ to, anchor, class: className, children }) {
+    const href  = `#/${to}${anchor ? `#${anchor}` : ''}`;
+    const active = currentRoute.value.path === to;
+  
+    return html`
+      <a href=${href} class=${[className, active && 'active'].filter(Boolean).join(' ')}>
+        ${children}
+      </a>
+    `;
+  }
+
   // UI Components
   function Header () {
     const activePath = currentRoute.value.path;
     const { title: brandTitle, img: brandImg, svgContent: brandSvg } = brandState.value;
-  
+
     return html`
       <header id="app-header">
-        <a href="#/${index}" class="brand-link">
+        <${RouterLink} to=${index} class="brand-link">
           <div class="brand">
             ${brandSvg   ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: brandSvg }} />`
             : brandImg   ? html`<img class="brand-img" src=${brandImg} alt=${brandTitle} />`
             : brandTitle ? html`<span class="brand-title">${brandTitle}</span>` 
             : null}
           </div>
-        </a>
+        </${RouterLink}>
         <nav class="docs-nav">
-            ${normalizedSidebar.map(item => html`
-              <a 
-                key=${item.path} 
-                href="#/${item.path}" 
-                class=${activePath === item.path ? 'active' : ''}
-              >
-                ${item.title}
-              </a>
-            `)}
+          ${normalizedSidebar.map(item => html`
+            <${RouterLink} key=${item.path} to=${item.path}>${item.title}</${RouterLink}>
+          `)}
           </nav>
       </header>
     `;
