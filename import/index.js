@@ -2,9 +2,26 @@
 
 import cache from '@aufbau/cache';
 
+/*TODO:
+transformCSSResult sollte bei 'asOption' DX-freundlicher entscheiden:
+const cssOptionsMap = {
+  raw, styleElement, stylesheet,
+  
+  css    : 'raw',
+  code   : 'raw',
+  string : 'raw',
+  text   : 'raw',
+  
+  style  : 'styleElement',
+  
+  sheet         : 'stylesheet',
+  CSSStyleSheet : 'stylesheet',
+};
+*/
+
 // :::::: HELPERS
 
-async function fetchText(path) {
+async function fetchText (path) {
   const response = await fetch(path);
   if (!response.ok) {
     throw new Error(`[@aufbau/import] Error loading "${path}": ${response.status} ${response.statusText}`);
