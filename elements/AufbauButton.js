@@ -1,6 +1,6 @@
 // <aufbau-button>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/AufbauCore.js';
 
 export default class AufbauButton extends AufbauElement {
   static attr = {
