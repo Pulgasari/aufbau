@@ -1,7 +1,7 @@
 // <aufbau-table>
 
-import AufbauElement from './AufbauElement.js';
-import importFile    from '@aufbau/import';
+import { AufbauElement } from './core/index.js';
+import { importFile }    from '@aufbau/import';
 
 export default class AufbauTable extends AufbauElement {
   static attr = ['src', 'columns'];
