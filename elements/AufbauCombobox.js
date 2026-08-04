@@ -1,7 +1,7 @@
 // <aufbau-combobox>
 
 import { AufbauElement } from './core/AufbauCore.js';
-import importFile        from '@aufbau/import';
+import { importFile }    from '@aufbau/import';
 
 export default class AufbauCombobox extends AufbauElement {
   
