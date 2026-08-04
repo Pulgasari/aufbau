@@ -1,0 +1,86 @@
+# ======================================================================
+# ASS :: LANGUAGE SPECIFICATION DATA :: ass.lsd
+# ======================================================================
+
+# //////////// META ////////////////////////////////////////////////////
+
+META LIST :: keywords == @aufbau @aufbau-config @aufbau-tokens @aufbau-trait @scope @theme @layer @keyframes @media     
+META LIST :: puncts   == { } : ; , ( ) . # & > + ~ * [ ] =
+
+# //////////// TOKENIZER ///////////////////////////////////////////////
+
+TKN :: COMMENT     == /\/\*[\s\S]*?\*\/|\/\/.*/y
+TKN :: WHITESPACE  == /[ \t\n\r]+/y
+
+TKN :: AT_KEYWORD  == /@[a-zA-Z0-9_-]+/y
+TKN :: PROP_AUFBAU == /aufbau[a-zA-Z0-9_-]+/y
+TKN :: PROP_CUSTOM == /--[a-zA-Z0-9_-]+/y
+TKN :: PROP_NORMAL ==
+TKN :: VARIABLE    == /\$[a-zA-Z0-9_-]+/y
+
+TKN :: OPERATOR    == /\+|\-|\*|\//y
+TKN :: PUNCT       == @puncts
+TKN :: NUMBER      == /-?\d+(?:\.\d+)?(?:[a-zA-Z%]+)?/y
+TKN :: STRING      == /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/y
+
+TKN :: IDENTIFIER  == /[a-zA-Z_][a-zA-Z0-9_-]*/y
+
+# //////////// RULES ///////////////////////////////////////////////////
+
+RULE :: Sheet      == Statement*
+RULE :: Statement  == VarDecl | AtRule | Rule | Declaration
+RULE :: Block      == `{` Statement* `}` => 2
+
+RULE :: Primary    == FuncCall | VARIABLE | Property | NUMBER | STRING
+RULE :: Property   == PROP_AUFBAU | PROP_CUSTOM | PROP_NORMAL
+RULE :: Value      == ValueItem+
+RULE :: ValueItem  == BinaryExpr | FuncCall | VARIABLE | Property | NUMBER | STRING | OPERATOR | PUNCT    
+
+# ------------ Declarations & Variables --------------------------------
+
+#### VarDecl
+META :: VarDecl
+NODE == { name, value }
+RULE == VARIABLE `:` Value `;` => name:1 value:3
+
+#### MapDeclaration
+META :: MapDeclaration
+NODE == { name, entries }
+RULE == IDENTIFIER `:` `{` Declaration* `}` `;` => name:1 entries:4
+
+#### Declaration
+META :: Declaration
+NODE == { name, value }
+RULE == ( IDENTIFIER | CUSTOM_PROP ) `:` Value `;` => name:1 value:3
+
+#### BinaryExpr
+META :: BinaryExpr
+NODE == { left, operator, right }
+RULE == Primary OPERATOR Primary => left:1 operator:2 right:3
+
+#### FuncCall
+META :: FuncCall
+NODE == { name, args }
+RULE == IDENTIFIER `(` ValueItem* `)` => name:1 args:3
+
+# ------------ Rules & Selectors ---------------------------------------
+
+#### Rule
+META :: Rule
+NODE == { selector, body }
+RULE == Selector Block => selector:1 body:2
+
+RULE :: Selector     == SelectorPart+
+RULE :: SelectorPart == IDENTIFIER | NUMBER | STRING | PUNCT
+
+# ------------ AtRules -------------------------------------------------
+
+#### AtRule
+META :: AtRule
+NODE == { name, params, body }
+RULE == AT_KEYWORD AtParams? Block => name:1 params:2 body:3
+RULE == AT_KEYWORD AtParams? `;`   => name:1 params:2
+
+RULE :: AtParams    == AtParamItem+
+RULE :: AtParamItem == IDENTIFIER | NUMBER | STRING | PUNCT
+
