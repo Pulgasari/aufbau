@@ -1,6 +1,6 @@
 // <aufbau-progress>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauProgress extends AufbauElement {
   static attr = {
