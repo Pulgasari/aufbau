@@ -1,6 +1,6 @@
 // <aufbau-checkbox>
 
-import { AufbauElement } from './core/AufbauCore.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauCheckbox extends AufbauElement {
   static attr = {
