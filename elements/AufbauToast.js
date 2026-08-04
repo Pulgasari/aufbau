@@ -1,6 +1,6 @@
 // <aufbau-toast>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 const TOAST_ICONS = {
   info    : 'lucide:info',
