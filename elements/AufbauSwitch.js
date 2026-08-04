@@ -1,6 +1,6 @@
 // <aufbau-switch>
 
-import { AufbauElement } from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauSwitch extends AufbauElement {
   static attr = {
