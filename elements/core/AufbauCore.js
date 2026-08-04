@@ -1,6 +1,6 @@
 // @aufbau/elements/core/AufbauCore.js
 
-import { toKebabCase }       from './utils.js';
+import { decorateArray, decorateElement, toKebabCase } from './utils.js';
 import { parseSchemaEntry }  from './parseSchemaEntry.js';
 import { AufbauConfigStore } from './AufbauConfig.js';
 
