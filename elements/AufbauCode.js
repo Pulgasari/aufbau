@@ -18,8 +18,8 @@ export default class AufbauCode extends AufbauElement {
     lang     : String,
     language : String,
     code     : String,
-    no-copy  : Boolean,
-  ];
+    noCopy   : Boolean,
+  };
 
   onMount () {
     // save original inner text if no code attribute is set
