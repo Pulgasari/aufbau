@@ -55,7 +55,7 @@ export async function init (options = {}) {
 
   if (configs.stylesheet) aufbauPluginsClient.observeStylesheets();
 
-  if (configs.elements === 'auto')     aufbauElements.autoloader();
+       if (configs.elements === 'auto')      aufbauElements.autoloader();
   else if (configs.elements === 'all') await aufbauElements.registerAll();
 
   return aufbau;
