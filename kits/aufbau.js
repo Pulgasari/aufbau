@@ -55,7 +55,7 @@ export async function interceptFetch (event) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export aufbau;
+export { aufbau };
 export default aufbau;
 
 /* :::::: USAGE ::::::::::::::::::::::::::::::::::::::::::::::::: 
