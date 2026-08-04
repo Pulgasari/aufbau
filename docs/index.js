@@ -34,7 +34,7 @@ createDocsFW({
   sidebar: {
     docs       : 'readme.md',
     elements   : '$repo/elements/readme.md',
-    kits       : 'kits.md',
+    kits       : '$repo/kits/readme.md',
     packages   : 'packages.md',
     resources  : 'resources.md',
   },
