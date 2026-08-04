@@ -3,7 +3,7 @@
 import { AufbauDatalistElement } from './core/AufbauCore.js';
 import { importFile }            from '@aufbau/import';
 
-class AufbauDatalist extends AufbauDataListElement {
+export class AufbauDatalist extends AufbauDataListElement {
   static attr = ['src', 'key', 'label-key'];
 
   connectedCallback() {
@@ -51,6 +51,5 @@ class AufbauDatalist extends AufbauDataListElement {
   }
 }
 
-if (typeof window !== 'undefined' && !customElements.get('aufbau-datalist')) {
-  customElements.define('aufbau-datalist', AufbauDatalist, { extends: 'datalist' });
-}
+AufbauDatalist.init();
+export default AufbauDatalist;
