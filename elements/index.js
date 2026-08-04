@@ -57,10 +57,6 @@ export function load (tag) {
   });
 }
 
-
-
-// not an element, just the base class
-
 /**
  * imports every element at once. good for prototyping.
  * the element list is read from jsr.json, which is the single source of truth.
@@ -122,9 +118,20 @@ export function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { AufbauElement };
+export {
+  AufbauCore,
+  AufbauConfig,
+  AufbauElement
+};
 
-export default { AufbauElement, autoloader, load, registerAll };
+export default {
+  AufbauCore,
+  AufbauConfig,
+  AufbauElement, 
+  autoloader, 
+  load, 
+  registerAll
+};
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
