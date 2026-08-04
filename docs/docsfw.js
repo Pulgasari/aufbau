@@ -1,12 +1,12 @@
 // docsfw.js
 
-import hljs                     from 'hljs';
+//import hljs                     from 'hljs';
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { slugify }              from '@aufbau/utils';
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
-aufbau.init();
-//window.html = html;
+aufbau.init(); //window.html = html;
+
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
  */
@@ -103,7 +103,7 @@ export function parseHash(defaultPath = 'readme.md') {
 /**
  * Normalize sidebar configuration from either Array or Object format.
  */
-function normalizeSidebar(sidebar) {
+function normalizeSidebar (sidebar) {
   if (Array.isArray(sidebar)) return sidebar;
   if (sidebar && typeof sidebar === 'object') {
     return Object.entries(sidebar).map(([title, path]) => ({ title, path }));
@@ -115,7 +115,7 @@ function normalizeSidebar(sidebar) {
  * Resolve content extensions (before / after content injections).
  * Supports: File paths (.html, .md), raw HTML strings, or Preact Component functions.
  */
-async function resolveExtension(ext, vars = {}) {
+async function resolveExtension (ext, vars = {}) {
   if (!ext) return null;
 
   if (typeof ext === 'function') {
@@ -148,16 +148,28 @@ async function resolveExtension(ext, vars = {}) {
   return null;
 }
 
-/**
- * injects slug ids into headings, so deep links and <aufbau-toc> share stable targets.
- * runs before render, the toc element only reads what is already there.
- */
-export function injectHeadingIds (htmlContent) {
+// rewrite fenced code blocks into <aufbau-code>, so highlighting and copy-to-clipboard
+// come from the element instead of a docsfw-level hljs pass
+function upgradeCodeBlocks (doc) {
+  doc.querySelectorAll('pre > code').forEach(codeEl => {
+    const lang = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
+
+    const element = doc.createElement('aufbau-code');
+    element.setAttribute('lang', lang);
+    element.textContent = codeEl.textContent; // the element escapes on its own
+
+    codeEl.parentElement.replaceWith(element);
+  });
+}
+
+export function processContent (htmlContent) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
 
   doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading, index) => {
     if (!heading.id) heading.id = slugify(heading.textContent || '') || `heading-${index}`;
   });
+
+  upgradeCodeBlocks(doc);
 
   return doc.body.innerHTML;
 }
@@ -228,7 +240,7 @@ export function createDocsFW (config = {}) {
         ]);
   
         brandState.value = resolvedBrand;
-        mdContent.value = injectHeadingIds(rawHtml);
+        mdContent.value  = processContent(rawHtml);
         beforeSlot.value = resolvedBefore;
         afterSlot.value  = resolvedAfter;
         isLoading.value  = false;
