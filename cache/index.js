@@ -1,4 +1,5 @@
 // @aufbau/cache
+// @ts-self-types="./index.d.ts"
 
 // highest code unit, used as the upper bound of a prefix range scan
 const RANGE_END = '\uffff';
