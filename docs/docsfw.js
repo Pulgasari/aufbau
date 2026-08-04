@@ -4,7 +4,7 @@ import hljs                     from 'hljs';
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { slugify }              from '@aufbau/utils';
 
-const { Fragment } from preact; //TODO: use htm/preact to enable <> syntax
+const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
