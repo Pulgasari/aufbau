@@ -1,6 +1,6 @@
 // <aufbau-input>
 
-import { AufbauElement } from './core/AufbauCore.js';
+import { AufbauElement } from './core/index.js';
 
 const VARIANT_ICONS = {
   email    : 'lucide:mail',
