@@ -1,6 +1,6 @@
 // <aufbau-code>
 
-import { AufbauElement } from './core/AufbauCore.js';
+import { AufbauElement } from './core/index.js';
 
 // lazy loader singleton for highlight.js
 let hljsPromise = null;
