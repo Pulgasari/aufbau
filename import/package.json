@@ -1,17 +1,32 @@
 {
   "name": "@aufbau/import",
   "version": "1.0.0",
-  "description": "Dynamic multi-format asset loader for the browser (CSV, JSON5, JSX, Less, MD, Sass, TOML, TS, WASM, XML, YAML).",
+  "description": "Dynamic multi-format asset loader for the browser (CSV, ENV, GLSL, INI, JSON5, JSONL, JSX, Less, MD, Sass, TOML, TS, WASM, XML, YAML).",
   "type": "module",
   "main": "./index.js",
-  "dependencies": {
-    "@aufbau/cache": "workspace:*"
-  },
+  "module": "./index.js",
+  "types": "./index.d.ts",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "dependencies": {
+    "@aufbau/cache": "^1.0.0"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts",
+    "readme.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "aufbau",
+    "browser",
+    "esm",
+    "loader",
+    "dynamic-import"
   ],
   "license": "MIT",
   "repository": {
