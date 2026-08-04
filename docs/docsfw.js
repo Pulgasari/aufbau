@@ -359,13 +359,14 @@ export function createDocsFW (config = {}) {
       <div class="docs-body-wrapper">
         <div class="docs-content-container">
           <${ExtensionSlot} slotData=${beforeSlot.value} />
-          <article 
-            class="markdown-body" 
-            dangerouslySetInnerHTML=${{ __html: mdContent.value }} 
+          <article
+            id="docs-content"
+            class="markdown-body"
+            dangerouslySetInnerHTML=${{ __html: mdContent.value }}
           />
           <${ExtensionSlot} slotData=${afterSlot.value} />
         </div>
-        <${TableOfContents} />
+        ${toc ? html`<aufbau-toc class="docs-toc" target="#docs-content" selector=${toc} />` : null}
       </div>
     `;
   }
