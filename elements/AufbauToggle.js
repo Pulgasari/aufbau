@@ -1,6 +1,6 @@
 // <aufbau-toggle>
 
-import AufbauElement from './AufbauElement.js';
+import { AufbauElement } from './core/index.js';
 
 export default class AufbauToggle extends AufbauElement {
   static attr = {
