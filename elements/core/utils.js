@@ -2,47 +2,44 @@
 
 export const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();     
 
-export const decorateElement = (el) => {
-  if (!el || el._aufbauDecorated) return el;
+// elements/core/events.js
 
-  Object.defineProperties(el, {
-    _aufbauDecorated: { value: true, configurable: true },
-    on: {
-      value (...args) {
-        this.addEventListener(...args);
-        return () => this.removeEventListener(...args);
-      },
-      writable: true, configurable: true
-    },
-    off: {
-      value (...args) {
-        this.removeEventListener(...args);
-        return this;
-      },
-      writable: true, configurable: true
-    }
-  });
-
-  return el;
+// the one primitive: bind a listener, return its unsubscribe
+export const bind = (target, type, listener, options) => {
+  target.addEventListener(type, listener, options);
+  return () => target.removeEventListener(type, listener, options);
 };
 
-export const decorateArray = (arr) => {
-  Object.defineProperties(arr, {
-    on: {
-      value (...args) {
-        const unsubs = this.map(el => el.on?.(...args) ?? (() => {}));
-        return () => unsubs.forEach(unsub => unsub());
-      },
-      writable: true, configurable: true
-    },
-    off: {
-      value (...args) {
-        this.forEach(el => el.off?.(...args));
-        return this;
-      },
-      writable: true, configurable: true
-    }
+// attaches on/off to any event target, idempotent and non-enumerable
+export function decorate (target) {
+  if (!target || target._aufbauDecorated) return target;
+
+  Object.defineProperties(target, {
+    _aufbauDecorated : { value: true, configurable: true },
+    on  : { configurable: true, writable: true, value (...args) { return bind(this, ...args); } },      
+    off : { configurable: true, writable: true, value (type, listener, options) {
+      this.removeEventListener(type, listener, options);
+      return this;
+    } }
   });
 
-  return arr;
-};
+  return target;
+}
+
+// same api on a list, fans out to the already decorated members
+export function decorateAll (list) {
+  const items = list.map(decorate);
+
+  Object.defineProperties(items, {
+    on  : { configurable: true, writable: true, value (...args) {
+      const unsubs = items.map(item => item.on(...args));
+      return () => unsubs.forEach(unsub => unsub());
+    } },
+    off : { configurable: true, writable: true, value (...args) {
+      items.forEach(item => item.off(...args));
+      return items;
+    } }
+  });
+
+  return items;
+}
