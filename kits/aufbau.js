@@ -4,7 +4,7 @@ framework-agnostic core-kit.
 bundles all aufbau-packages into one namespace.
 every framework-kit builds on top of this file.
 
-*// :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
+*/// ::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: AUFBAU
 import      aufbauCache         from '@aufbau/cache';
