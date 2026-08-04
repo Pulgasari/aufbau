@@ -398,4 +398,4 @@ export function createDocsFW (config = {}) {
   
 }
 
-
+export { html };
