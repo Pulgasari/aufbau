@@ -11,7 +11,7 @@ const VARIANT_ICONS = {
 };
 
 export default class AufbauInput extends AufbauElement {
-  static attr = ['type', 'icon', 'placeholder', 'value', 'list'];
+  
   static attr = {
     icon  : String,
     list  : String,
