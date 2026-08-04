@@ -97,6 +97,7 @@ function scan (node) {
 export function autoloader ({ base, root = document } = {}) {
   if (typeof window === 'undefined') return () => {};
   if (base) baseURL = base;
+  console.log('[@aufbau/elements] autoloader initialized.');
 
   // 1. initial pass over what is already there
   scan(root.documentElement ?? root);
