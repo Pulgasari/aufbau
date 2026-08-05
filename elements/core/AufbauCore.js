@@ -13,7 +13,7 @@ const isFn     = sth => typeof sth === 'function';
 const isString = sth => typeof sth === 'string';
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
-  return class extends BaseClass {
+return class extends BaseClass {
 
     constructor () {
       super();
@@ -190,17 +190,20 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
         ? fallback
         : (parsedSchema ? parsedSchema.fallback : undefined);
 
-      const kebab = toKebabCase(key);
+      const kebab      = toKebabCase(key);
+const fromConfig = () => (parsedSchema?.config ? resolveConfig(this.tag, kebab, parsedSchema.config) : undefined);
 
-      if (finalType === Boolean) {
-        const has = this.hasAttribute(kebab);
-        return has ? true : (finalFallback ?? false);
-      }
+// 1. booleans: attribute presence first, then config, then fallback
+if (finalType === Boolean) {
+  if (this.hasAttribute(kebab)) return true;
+  const raw = fromConfig();
+  if (raw !== undefined) return raw === '' || raw === true || String(raw).toLowerCase() === 'true';
+  return finalFallback ?? false;
+}
 
-      if (!this.hasAttribute(kebab)) {
-        return finalFallback;
-      }
-
+// 2. attribute -> config -> fallback
+let val = this.hasAttribute(kebab) ? this.getAttribute(kebab) : fromConfig();
+if (val === undefined) return finalFallback;
       let val = this.getAttribute(kebab);
 
       if (finalType === Number) {
@@ -237,26 +240,26 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
 
     
-    get $ () {
-      const root = this.shadowRoot || this;
-      const findOne = (selector) => decorate(root.querySelector(selector));
+get $ () {
+  const root = this.shadowRoot || this;
+  const findOne = (selector) => decorate(root.querySelector(selector));
 
-      return new Proxy(findOne, {
-        apply: (target, thisArg, args) => findOne(...args),
-        get (target, prop) {
-          if (prop in target) return target[prop];
-          if (typeof prop !== 'string') return undefined;
-          const kebab = toKebabCase(prop);
-          return decorate(root.getElementById(kebab) || root.getElementById(prop));
-        }
-      });
+  return new Proxy(findOne, {
+    apply: (target, thisArg, args) => findOne(...args),
+    get (target, prop) {
+      if (prop in target) return target[prop];
+      if (typeof prop !== 'string') return undefined;
+      const kebab = toKebabCase(prop);
+      return decorate(root.getElementById(kebab) || root.getElementById(prop));
     }
+  });
+}
 
-    get $$ () {
-      const root = this.shadowRoot || this;
-      return (selector) => decorateAll(Array.from(root.querySelectorAll(selector)));
-    }
-  };
-};
+get $$ () {
+  const root = this.shadowRoot || this;
+  return (selector) => decorateAll(Array.from(root.querySelectorAll(selector)));
+}
+
+};};
 
 export default AufbauCore;
