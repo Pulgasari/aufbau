@@ -36,22 +36,8 @@ body {
 #app-header { aufbau-colors: aufbau inverted; }
 #app-footer { aufbau-colors: aufbau inverted; }
 
-#app-header { z-index: 3; box-shadow: 0  0.50rem 1.00rem -5px var(--aufbau-bg); }
-#app-footer { z-index: 3; box-shadow: 0 -0.50rem 1.00rem -5px var(--aufbau-bg); }
-
-#app-header {
-  box-shadow: 
-    0  4px  6px -1px color-mix(in srgb, var(--aufbau-fg)  25%, transparent),
-    0 10px 15px -3px color-mix(in srgb, var(--aufbau-fg)  50%, transparent),
-    0 20px 25px -5px color-mix(in srgb, var(--aufbau-fg) 100%, transparent);
-}
-
-#app-footer {
-  box-shadow: 
-    0  -4px  6px -1px color-mix(in srgb, var(--aufbau-fg)  25%, transparent),
-    0 -10px 15px -3px color-mix(in srgb, var(--aufbau-fg)  50%, transparent),
-    0 -20px 25px -5px color-mix(in srgb, var(--aufbau-fg) 100%, transparent);
-}
+#app-header { z-index: 3; box-shadow: 0  0.50rem 1.00rem -5px var(--aufbau-fg); }
+#app-footer { z-index: 3; box-shadow: 0 -0.50rem 1.00rem -5px var(--aufbau-fg); }
 
 pre, code {
   aufbau-webfont : 'JetBrains Mono';
