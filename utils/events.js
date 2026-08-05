@@ -35,16 +35,16 @@ export const disposer = () => {
   };
 };
 
-export const emit = (target, type, detail = {}, options) =>
+export const emitEvent = (target, type, detail = {}, options) =>
   target.dispatchEvent(new CustomEvent(type, { bubbles: true, composed: true, detail, ...options }));
 
-export const off = (targets, types, listener, options) => {
+export const offEvent = (targets, types, listener, options) => {
   const list  = toTargets(targets);
   const names = toTypes(types);
   for (const target of list) for (const type of names) target.removeEventListener(type, listener, options);
 };
 
-export const on = (targets, types, listener, options) => {
+export const onEvent = (targets, types, listener, options) => {
   const list  = toTargets(targets);
   const names = toTypes(types);
   for (const target of list) for (const type of names) target.addEventListener(type, listener, options);
@@ -53,4 +53,4 @@ export const on = (targets, types, listener, options) => {
   };
 };
 
-export const once = (targets, types, listener, options) => on(targets, types, listener, withOnce(options));
+export const onceEvent = (targets, types, listener, options) => on(targets, types, listener, withOnce(options));
