@@ -30,6 +30,12 @@ export const off = (target, type, listener, options) => {
   return target;
 };
 
+export const emitEvent (target, eventName, detail = {}, options = {}) {
+  return target.dispatchEvent (new CustomEvent (eventName, {
+    bubbles: true, composed: true, detail, ...options
+  }));
+}
+
 // :::::: DECORATION ::::::::::::::::::::::::::::::::::::::::::::
 
 export function decorate (target) {
