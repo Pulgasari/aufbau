@@ -6,6 +6,7 @@ import { toKebabCase } from './../utils/strings.js';
 
 const AufbauConfigStore = new Map(); // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
+const DEFAULTS = Symbol('defaults');
 const RESERVED = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
 const RUNTIME  = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
 const sources  = new Map(); // one source map per <aufbau-config> element, merged in connect order
@@ -26,12 +27,15 @@ function mergeSources () {
   const next  = new Map();
   const apply = (entries) => {
     for (const [key, value] of entries) {
-      if (value === null) next.delete(key); // explicit null revokes a key set by an earlier source
+      if (value === null) next.delete(key);
       else next.set(key, value);
     }
   };
 
-  for (const [owner, entries] of sources) if (owner !== RUNTIME) apply(entries);
+  if (sources.has(DEFAULTS)) apply(sources.get(DEFAULTS));
+  for (const [owner, entries] of sources) {
+    if (owner !== DEFAULTS && owner !== RUNTIME) apply(entries); // markup, in connect order
+  }
   if (sources.has(RUNTIME)) apply(sources.get(RUNTIME));
 
   return next;
@@ -53,7 +57,7 @@ export function commitConfig () {
   AufbauConfigStore.clear();
   for (const [key, value] of next) AufbauConfigStore.set(key, value);
 
-  window.dispatchEvent(new CustomEvent(CONFIG_EVENT, {
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(CONFIG_EVENT, {
     detail: { changed, config: Object.fromEntries(next) }
   }));
 
@@ -65,6 +69,26 @@ export function commitConfig () {
 export function getConfig (key, fallback) {
   const found = AufbauConfigStore.get(normalize(key));
   return found === undefined ? fallback : found;
+}
+
+
+/**
+ * setConfig('code-theme', 'nord')
+ * setConfig({ code: { theme: 'nord' } }, { layer: 'defaults' })
+ */
+export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
+  const isKey   = typeof keyOrMap === 'string';
+  const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
+  const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
+
+  const entries = sources.get(owner) ?? new Map();
+  sources.set(owner, entries);
+
+  if (isKey) entries.set(normalize(keyOrMap), valueOrOptions == null ? null : String(valueOrOptions));
+  else for (const [key, val] of flatten(keyOrMap)) entries.set(key, val);
+
+  commitConfig();
+  return AufbauConfigStore;
 }
 
 /**
