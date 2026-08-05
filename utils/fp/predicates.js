@@ -1,10 +1,8 @@
-// @aufbau/utils/fp/predicates.js
+// @aufbau/utils/fp/predicates.js (8.97kb)
 
 import { and, not, or } from './core.js';
 
-// ============================================================================
-// 1. FACTORIES (internal)
-// ============================================================================
+//////////// 1. FACTORIES (internal) ////////////
 
 // the constructor lookup happens once at module evaluation, not on every check
 const instanceOf = (ctor) => ctor == null ? () => false : (value) => value instanceof ctor;
@@ -14,44 +12,40 @@ const typeOf     = (type)  => (value) => typeof value === type;
 // undefined outside the browser (node, deno, ssr)
 const origin = globalThis.location?.origin;
 
-// ============================================================================
-// 2. PRIMITIVES & TYPES
-// ============================================================================
+export const // :::::: EXPORTS ::::::::::::::::::::::::::::::::::::
+  
+//////////// 2. PRIMITIVES & TYPES ////////////
 
-export const bigInt     = typeOf('bigint');
-export const boolean    = typeOf('boolean');
-export const defined    = (value) => value !== undefined;
-export const func       = typeOf('function');
-export const null_      = (value) => value === null;
-export const nullish    = (value) => value == null;
-export const primitive  = (value) => value !== Object(value);
-export const string     = typeOf('string');
-export const symbol     = typeOf('symbol');
-export const undefined_ = (value) => value === undefined;
+bigInt     = typeOf('bigint'),
+boolean    = typeOf('boolean'),
+defined    = (value) => value !== undefined,
+func       = typeOf('function'),
+null_      = (value) => value === null,
+nullish    = (value) => value ==  null,
+primitive  = (value) => value !== Object(value),
+string     = typeOf('string'),
+symbol     = typeOf('symbol'),
+undefined_ = (value) => value === undefined;
 
-// ============================================================================
-// 3. NUMBERS
-// ============================================================================
+//////////// 3. NUMBERS ////////////
 
 // hot predicates are written out instead of composed, one callback per check adds up
-export const even     = (value) => Number.isInteger(value) && value % 2 === 0;
-export const finite   = Number.isFinite;
-export const float    = (value) => typeof value === 'number' && !Number.isNaN(value) && !Number.isInteger(value);
-export const integer  = Number.isInteger;
-export const nan      = Number.isNaN;
-export const negative = (value) => typeof value === 'number' && value < 0;
-export const number   = (value) => typeof value === 'number' && !Number.isNaN(value);
-export const odd      = (value) => Number.isInteger(value) && Math.abs(value % 2) === 1;
-export const positive = (value) => typeof value === 'number' && value > 0;
-export const zero     = (value) => value === 0;
+even     = (value) => Number.isInteger(value) && value % 2 === 0,
+finite   = Number.isFinite,
+float    = (value) => typeof value === 'number' && !Number.isNaN(value) && !Number.isInteger(value),
+integer  = Number.isInteger,
+nan      = Number.isNaN,
+negative = (value) => typeof value === 'number' && value < 0,
+number   = (value) => typeof value === 'number' && !Number.isNaN(value),
+odd      = (value) => Number.isInteger(value) && Math.abs(value % 2) === 1,
+positive = (value) => typeof value === 'number' && value > 0,
+zero     = (value) => value === 0,
 
-export const numericString = (value) => typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value));
-export const numeric       = (value) => number(value) || numericString(value);
-export const year          = (value) => numeric(value) && /^\d{4}$/.test(String(value)) && +value >= 0 && +value <= 9999;
+numericString = (value) => typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value)),
+numeric       = (value) => number(value) || numericString(value),
+year          = (value) => numeric(value) && /^\d{4}$/.test(String(value)) && +value >= 0 && +value <= 9999;
 
-// ============================================================================
-// 4. OBJECTS & DATA STRUCTURES
-// ============================================================================
+//////////// 4. OBJECTS & DATA STRUCTURES ////////////
 
 export const array        = Array.isArray;
 export const buffer       = (value) => typeof Buffer !== 'undefined' && Buffer.isBuffer(value);
@@ -69,9 +63,7 @@ export const strictObject = (value) => Object.prototype.toString.call(value) ===
 export const asyncIterable = (value) => value != null && typeof value[Symbol.asyncIterator] === 'function';
 export const iterable      = (value) => value != null && typeof value[Symbol.iterator] === 'function';
 
-// ============================================================================
-// 5. DOM & ENVIRONMENT (ssr-safe)
-// ============================================================================
+//////////// 5. DOM & ENVIRONMENT (ssr-safe) ////////////
 
 export const canvas       = instanceOf(globalThis.HTMLCanvasElement ?? null);
 export const element      = instanceOf(globalThis.Element ?? null);
@@ -94,9 +86,7 @@ export const externalUrl = (value) => string(value) && (
   origin === undefined ? /^[a-z][a-z0-9+.-]*:\/\//i.test(value) : !value.startsWith(origin)
 );
 
-// ============================================================================
-// 6. EMPTINESS
-// ============================================================================
+//////////// 6. EMPTINESS ////////////
 
 export const blank       = (value) => value === null || value === undefined || value === '';
 export const blankish    = (value) => !value && value !== 0 && value !== false;
@@ -111,9 +101,7 @@ export const empty = (value) =>
 
 export const filled = (value) => !blank(value) && !empty(value) && !emptyObject(value);
 
-// ============================================================================
-// 7. FORMATS & PARSING
-// ============================================================================
+//////////// 7. FORMATS & PARSING ////////////
 
 export const alphaNumeric = matches(/^[a-z0-9]+$/i);
 export const dateString   = (value) => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(value) || (!Number.isNaN(Date.parse(value)) && Number.isNaN(Number(value)));
@@ -139,9 +127,7 @@ export const url = (value) => {
   try { new URL(value); return true; } catch { return false; }
 };
 
-// ============================================================================
-// 8. STRING CASES
-// ============================================================================
+//////////// 8. STRING CASES ////////////
 
 export const constantCase = matches(/^[A-Z0-9]+(?:_[A-Z0-9]+)*$/);
 export const kebabCase    = matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
@@ -151,17 +137,13 @@ export const snakeCase    = matches(/^[a-z0-9]+(?:_[a-z0-9]+)*$/);
 export const upperCase    = (value) => typeof value === 'string' && value === value.toUpperCase();
 export const camelCase    = and(matches(/^[a-z][a-zA-Z0-9]*$/), not(upperCase));
 
-// ============================================================================
-// 9. LISTS
-// ============================================================================
+//////////// 9. LISTS ////////////
 
 export const entriesList = (value) => Array.isArray(value) && value.every((item) => Array.isArray(item) && item.length === 2);
 export const objectList  = (value) => Array.isArray(value) && value.every(object);
 export const stringList  = (value) => Array.isArray(value) && value.every(string);
 
-// ============================================================================
-// 10. DEPRECATED ALIASES (names from the first draft)
-// ============================================================================
+//////////// 10. DEPRECATED ALIASES (names from the first draft)
 
 export const date2 = dateString;
 export const falsy = blankish;
