@@ -1,5 +1,6 @@
 #
 
+```html
 <aufbau-data-list>
 <aufbau-data-map>
 
@@ -10,10 +11,19 @@
 <aufbau-toggle>
 
 <aufbau-input>
-<aufbau-input>
+<aufbau-input type='date'>
+<aufbau-input type='number'>
+<aufbau-input type='password'>
+<aufbau-input type='phone'>
+<aufbau-input type='range'>
+<aufbau-input type='text'>
+<aufbau-input type='time'>
+<aufbau-input type='url'>
+```
 
 ## HTML
 
+```html
 <input type='button'>
 <input type='checkbox'>
 <input type='color'>
@@ -50,4 +60,5 @@
 <progress>
 <select>
 <textarea>
+```
 
