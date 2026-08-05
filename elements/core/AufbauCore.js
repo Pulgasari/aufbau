@@ -4,10 +4,6 @@ import { decorate, decorateAll, off, on, toKebabCase } from './events.js';
 import { parseSchemaEntry }  from './parseSchemaEntry.js';
 import { AufbauConfigStore } from './AufbauConfig.js';
 
-/**
- * Core mixin providing lifecycle, attribute schema, and universal event handling.
- * @param {CustomElementConstructor} BaseClass
- */
 export const AufbauCore = (BaseClass = HTMLElement) => {
   return class extends BaseClass {
 
@@ -40,10 +36,6 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       }
     }
 
-    /**
-     * Registers the custom element safely and maps static attr schema to observedAttributes.
-     * @param {string|object} [options] - Optional tag name or config object { name, extends }
-     */
     static init (options) {
       const tagName = typeof options === 'string' ? options : options?.name;
       const extendsTag = typeof options === 'object' ? options?.extends : this.extendsTag;
@@ -87,32 +79,17 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     // ::: events
 
-    /**
-     * Collects an unsubscribe function for automatic release on disconnect.
-     * @param {Function} unsub
-     */
     track (unsub) {
       this._unsubs.push(unsub);
       return unsub;
     }
 
-    /**
-     * Runs and clears all tracked unsubscribes.
-     */
     release () {
       this._unsubs.forEach(unsub => unsub());
       this._unsubs = [];
       return this;
     }
 
-    /**
-     * Universal event listener with automatic unsubscribe cleanup.
-     *
-     * Self:     this.on('click', handler)
-     * Target:   this.on(this._audio, 'timeupdate', handler)
-     * Window:   this.on(window, 'resize', handler)
-     * Selector: this.on('.btn-play', 'click', handler)
-     */
     on (...args) {
       // 1. self: this.on(type, listener, options)
       if (typeof args[0] === 'string' && typeof args[1] === 'function') {
@@ -146,12 +123,6 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     // ::: attributes
 
-    /**
-     * Unified attribute getter with support for Minimal, Basic, and Full schema definitions.
-     * @param {string|Function} [nameOrType]
-     * @param {Function} [type]
-     * @param {*} [fallback]
-     */
     getAttr (nameOrType, type, fallback) {
       if (typeof nameOrType !== 'string') {
         const overrideType = typeof nameOrType === 'function' ? nameOrType : null;
@@ -220,10 +191,8 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     // ::: children refs
 
-    /**
-     * Query single element: this.$('selector') or ID lookup: this.$.myId
-     * results carry on/off, see ./events.js
-     */
+
+    
     get $ () {
       const root = this.shadowRoot || this;
       const findOne = (selector) => decorate(root.querySelector(selector));
@@ -239,10 +208,6 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       });
     }
 
-    /**
-     * Query all matching elements as a clean Array: this.$$('selector')
-     * the array and its members carry on/off
-     */
     get $$ () {
       const root = this.shadowRoot || this;
       return (selector) => decorateAll(Array.from(root.querySelectorAll(selector)));
