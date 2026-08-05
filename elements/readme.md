@@ -13,6 +13,20 @@ official **aufbau** *webcomponents\** library.
 
 ---
 
+```html
+<aufbau-data-list>
+<aufbau-data-map>
+
+<aufbau-option>
+<aufbau-option type='color'>
+<aufbau-option type='color'>
+
+<aufbau-toggle>
+
+<aufbau-input>
+<aufbau-input>
+```
+
 ## usage
 
 ### autoloader
