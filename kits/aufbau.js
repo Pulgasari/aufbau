@@ -21,12 +21,7 @@ import { define, update, updateDataset, updateProperty } from './dom.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const configs = {
-  // 'auto' | 'all' | false via elements.mode, every other key is element config:
-  // code: { theme: 'nord' }, flag: { variant: 'square' }
-  elements   : { mode: 'auto' },
-  stylesheet : true,
-};
+
 
 const RESERVED_ELEMENT_KEYS = new Set(['mode']);
 
@@ -59,7 +54,7 @@ const configs = {
   // 'auto'  : lazy autoloader, elements are fetched when they appear in the dom
   // 'all'   : eagerly register every element up front
   // false   : do not touch @aufbau/elements at all
-  elements   : 'auto',
+  elements   : { mode: 'auto' },
   // observe <link>/<style> and transform aufbau stylesheets client-side
   stylesheet : true,
 };
