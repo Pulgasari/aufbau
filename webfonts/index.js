@@ -3,12 +3,13 @@
 import aufbau, {
   html, render, signal, computed, useState, useEffect, useRef
 } from '@aufbau/kits/preact-htm';
+//import { importJSON5 } from '@aufbau/import';
 
 await aufbau.init();
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const MANIFEST = new URL('./fonts.json', import.meta.url);
+const MANIFEST = new URL('./fonts.json5', import.meta.url);
 
 // pangram exercises umlauts and eszett - relevant for the german/blackletter part of the collection
 const SPECIMEN_LINE  = 'Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.';
@@ -62,7 +63,8 @@ function loadFont (font) {
   if (registry.has(font.id)) return registry.get(font.id);
 
   const task = Promise.all(font.faces.map(async face => {
-    const url    = new URL(`./${face.file}`, MANIFEST).href;
+    //const url    = new URL(`./${face.file}`, MANIFEST).href;
+    const data = await aufbau.import(MANIFEST.href);
     const loaded = await new FontFace(font.name, `url("${url}") format("woff2")`, {
       weight  : String(face.weight),
       style   : face.style,
