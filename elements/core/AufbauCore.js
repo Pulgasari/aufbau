@@ -47,9 +47,7 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       }
 
       if (this.attr && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
-        const observed = Array.isArray(this.attr)
-          ? this.attr.map(toKebabCase)
-          : Object.keys(this.attr).map(toKebabCase);
+        const observed = Array.isArray(this.attr) ? this.attr.map(toKebabCase) : Object.keys(this.attr).map(toKebabCase);
         Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
       }
 
@@ -110,8 +108,8 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       return this.track(() => unsubs.forEach(unsub => unsub()));
     }
 
-    off (type, listener, options) {
-      off(this, type, listener, options);
+    off (...args) {
+      off(this, ...args);
       return this;
     }
 
@@ -131,11 +129,10 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
         });
       }
 
-      const key = nameOrType;
-      const classAttr = this.constructor.attr;
-      const schema = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
-
-      const schemaEntry = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
+      const key          = nameOrType;
+      const classAttr    = this.constructor.attr;
+      const schema       = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
+      const schemaEntry  = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
       const parsedSchema = schemaEntry !== undefined ? parseSchemaEntry(schemaEntry) : null;
 
       const finalType = (type && typeof type === 'function')
