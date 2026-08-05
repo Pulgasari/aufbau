@@ -98,9 +98,7 @@ function autoloader ({ base, root = document } = {}) {
 
   // 2. only walk what actually got added, no repeated full-document scans
   const observer = new MutationObserver(records => {
-    for (const record of records) {
-      record.addedNodes.forEach(scan);
-    }
+    for (const record of records) record.addedNodes.forEach(scan);
   });
 
   observer.observe (
