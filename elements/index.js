@@ -7,9 +7,9 @@ or registerAll() to get everything at once.
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
-import AufbauConfig  from './core/AufbauConfig.js';
-import AufbauCore    from './core/AufbauCore.js';
-//import AufbauElement from './core/AufbauElement.js';
+import * as AufbauConfig  from './core/AufbauConfig.js';
+import * as AufbauCore    from './core/AufbauCore.js';
+import { toPascalCase }   from '@aufbau/utils';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -17,16 +17,12 @@ import AufbauCore    from './core/AufbauCore.js';
 const EXCLUDED = new Set([
   './core/AufbauConfig.js',
   './core/AufbauCore.js',
-  //'./core/AufbauElement.js',
 ]);
 
 let   baseURL   = import.meta.url; // resolve module urls relative to this file unless a base is configured
 let   manifest  = null; // module-level cache, the manifest is fetched at most once
 const PREFIX    = 'aufbau-';
 const requested = new Set(); // tags already requested, prevents duplicate network calls
-
-// 'aufbau-tree-item' -> 'AufbauTreeItem'
-const toPascalCase = (str) => str.split(/[-_\s]+/).filter(Boolean).map(word => word[0].toUpperCase() + word.slice(1)).join('');    
 
 /**
  * reads the aufbau tag of an element, including customized built-ins.
@@ -119,27 +115,17 @@ export function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export {
-  AufbauCore,
-  AufbauConfig,
-//  AufbauElement
-};
+const x = {
+  ...AufbauCore,
+  ...AufbauConfig,
 
-export default {
-  AufbauCore,
-  AufbauConfig,
-//  AufbauElement, 
   autoloader, 
   load, 
   registerAll
 };
 
-export {
-  AufbauConfigStore, 
-  getConfig, 
-  onConfigChange, 
-  setConfig
-} from './core/AufbauConfig.js';
+export default x;
+export { ...x };
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
