@@ -3,7 +3,7 @@
 import { AufbauDatalistElement } from './core/index.js';
 import { importFile }            from '@aufbau/import';
 
-export default lass AufbauDatalist extends AufbauDataListElement {
+export default class AufbauDatalist extends AufbauDataListElement {
   static attr = ['src', 'key', 'label-key'];
 
   connectedCallback() {
