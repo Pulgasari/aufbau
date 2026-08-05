@@ -2,7 +2,9 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
-import { isString } from '@aufbau/utils';
+import { createLogger, emit, isPlainObject, isString, on, toJson, toKebabCase } from '@aufbau/utils';
+
+const log = createLogger('aufbau-config');
 
 const AufbauConfigStore = new Map(); // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
@@ -11,14 +13,14 @@ const RESERVED = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // at
 const RUNTIME  = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
 const sources  = new Map(); // one source map per <aufbau-config> element, merged in connect order
 
-const normalize = (key) => toKebabCase(String(key)).toLowerCase();
+const toValue = (value) => value == null ? null : String(value);
 
 // { code: { theme: 'nord' } } -> 'code-theme'
 function flatten (input, prefix = '', out = new Map()) {
   for (const [key, value] of Object.entries(input ?? {})) {
-    const path = prefix ? `${prefix}-${normalize(key)}` : normalize(key);
-    if (value && typeof value === 'object' && !Array.isArray(value)) flatten(value, path, out);
-    else out.set(path, value == null ? null : String(value));
+    const path = prefix ? `${prefix}-${toKebabCase(key)}` : toKebabCase(key);
+    if (isPlainObject(value)) flatten(value, path, out);
+    else out.set(path, toValue(value));
   }
   return out;
 }
@@ -57,9 +59,9 @@ export function commitConfig () {
   AufbauConfigStore.clear();
   for (const [key, value] of next) AufbauConfigStore.set(key, value);
 
-  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(CONFIG_EVENT, {
-    detail: { changed, config: Object.fromEntries(next) }
-  }));
+  if (typeof window !== 'undefined') {
+    emit(window, CONFIG_EVENT, { changed, config: Object.fromEntries(next) });
+  }
 
   return changed;
 }
@@ -67,7 +69,7 @@ export function commitConfig () {
 // :::::: PUBLIC API :::::::::::::::::::::::::::::::::::::::::::
 
 export function getConfig (key, fallback) {
-  const found = AufbauConfigStore.get(normalize(key));
+  const found = AufbauConfigStore.get(toKebabCase(key));
   return found === undefined ? fallback : found;
 }
 
@@ -79,8 +81,8 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   const entries = sources.get(owner) ?? new Map();
   sources.set(owner, entries);
 
-  if (isKey) entries.set(normalize(keyOrMap), valueOrOptions == null ? null : String(valueOrOptions));
-  else for (const [key, val] of flatten(keyOrMap)) entries.set(key, val);
+  if (isKey) entries.set(toKebabCase(keyOrMap), toValue(valueOrOptions));
+  else for (const [key, value] of flatten(keyOrMap)) entries.set(key, value);
 
   commitConfig();
   return AufbauConfigStore;
@@ -91,10 +93,10 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
  * <aufbau-code theme> -> ['code-theme', 'aufbau-code-theme']
  */
 export function configKeys (tag, name) {
-  const attr = normalize(name);
+  const attr = toKebabCase(name);
   if (!tag) return [attr];
 
-  const full  = normalize(tag);
+  const full  = toKebabCase(tag);
   const short = full.replace(/^aufbau-/, '');
   return [`${short}-${attr}`, `${full}-${attr}`];
 }
@@ -103,16 +105,15 @@ export function configKeys (tag, name) {
 export function resolveConfig (tag, name, keys = true) {
   const candidates =
       keys === true       ? configKeys(tag, name)
-    : Array.isArray(keys) ? keys.map(normalize)
-    : [normalize(keys)];
+    : Array.isArray(keys) ? keys.map(toKebabCase)
+    : [toKebabCase(keys)];
 
   for (const key of candidates) if (AufbauConfigStore.has(key)) return AufbauConfigStore.get(key);
   return undefined;
 }
 
 export function onConfigChange (listener) {
-  window.addEventListener(CONFIG_EVENT, listener);
-  return () => window.removeEventListener(CONFIG_EVENT, listener);
+  return on(window, CONFIG_EVENT, listener);
 }
 
 // :::::: ELEMENT ::::::::::::::::::::::::::::::::::::::::::::::
@@ -138,15 +139,15 @@ export class AufbauConfig extends HTMLElement {
     if (this._remote) for (const [key, value] of this._remote) entries.set(key, value);
 
     // 2. inline json body: <aufbau-config>{"code":{"theme":"nord"}}</aufbau-config>
-    const body = this.textContent.trim();
-    if (body) {
-      try   { for (const [key, value] of flatten(JSON.parse(body))) entries.set(key, value); }
-      catch { console.warn('[aufbau-config] inline body is not valid json, ignored.'); }
-    }
+    const body   = this.textContent.trim();
+    const parsed = body ? toJson(body, null) : null;
+
+    if (body && !isPlainObject(parsed)) log.warn('inline body is not a valid json object, ignored.');
+    else if (parsed) for (const [key, value] of flatten(parsed)) entries.set(key, value);
 
     // 3. attributes win, most explicit form
     for (const { name, value } of this.attributes) {
-      const key = normalize(name);
+      const key = toKebabCase(name);
       if (RESERVED.has(key)) continue;
       entries.set(key, value);
     }
@@ -166,7 +167,7 @@ export class AufbauConfig extends HTMLElement {
       this._remote = flatten(await response.json());
       this.sync();
     } catch (error) {
-      console.warn(`[aufbau-config] could not load "${src}":`, error);
+      log.warn(`could not load "${src}":`, error);
     }
   }
 }
