@@ -36,12 +36,12 @@
 
 ---
 
-# @aufbau/kit
+# @aufbau/kis
 
 the **kit** bundles all the following packages with **Preact** and **HTM** to deliver a *batteries-included* JS-framework made in and for the browser.
 
 ```javascript
-import aufbau, { html } from '@aufbau/kit';
+import aufbau, { html } from '@aufbau/kits/preact-htm';
 ```
 
 ***note:** multiple other kits are planned as well.*
