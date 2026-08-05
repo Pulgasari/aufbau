@@ -1,230 +1,143 @@
-// ============================================================================
-// 1. FP COMBINATORS & CORE HELPERS
-// ============================================================================
+// @aufbau/utils/fp/is.js
 
-// Type and Instance Check Factories
-const typeOf     = type => v => typeof v === type;
-const instanceOf = ctor => v => typeof ctor !== 'undefined' && ctor !== null && v instanceof ctor;
-const matches    = re   => v => typeof v === 'string' && re.test(v);
-
-// Logic Combinators
-export const not = fn => (...args) => !fn(...args);
-export const and = (...fns) => v => fns.every(fn => (typeof fn === 'function' ? fn(v) : fn));
-export const or  = (...fns) => v => fns.some(fn => (typeof fn === 'function' ? fn(v) : fn));
+import * as predicates from './predicates.js';
 
 // ============================================================================
-// 2. BASE PREDICATES (Clean names without 'is')
+// 1. REGISTRY
 // ============================================================================
 
-// Primitives & Types
-export const string      = typeOf('string');
-export const bigInt      = typeOf('bigint');
-export const boolean     = typeOf('boolean');
-export const func        = typeOf('function');
-export const symbol      = typeOf('symbol');
-export const undefined_  = typeOf('undefined');
-export const null_       = v => v === null;
-export const nullish     = v => v == null;
-export const defined     = v => v !== undefined;
-export const primitive   = v => v !== Object(v);
-
-// Numbers
-export const nan         = Number.isNaN;
-export const number      = and(typeOf('number'), not(nan));
-export const integer     = Number.isInteger;
-export const finite      = Number.isFinite;
-export const float       = and(typeOf('number'), not(nan), not(integer));
-export const even        = and(integer, v => v % 2 === 0);
-export const odd         = and(integer, v => Math.abs(v % 2) === 1);
-export const positive    = and(number, v => v > 0);
-export const negative    = and(number, v => v < 0);
-export const zero        = v => v === 0;
-
-export const numericString = v => string(v) && v.trim() !== '' && !nan(Number(v));
-export const numeric       = or(number, numericString);
-export const year          = v => (number(v) || numericString(v)) && /^\d{4}$/.test(String(v)) && +v >= 0 && +v <= 9999;
-
-// Objects & Data Structures
-export const array        = Array.isArray;
-export const object       = v => Boolean(v) && typeof v === 'object' && !array(v);
-export const plainObject  = v => v !== null && typeof v === 'object' && v.constructor === Object;
-export const realObject   = v => v?.constructor === Object;
-export const strictObject = v => Object.prototype.toString.call(v) === '[object Object]';
-export const map          = instanceOf(typeof Map !== 'undefined' ? Map : null);
-export const set          = instanceOf(typeof Set !== 'undefined' ? Set : null);
-export const date         = v => instanceOf(Date)(v) && !nan(v.getTime());
-export const date2        = v => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(v) || (!nan(Date.parse(v)) && nan(Number(v)));
-export const regExp       = instanceOf(RegExp);
-export const promise      = instanceOf(Promise);
-export const error        = instanceOf(Error);
-export const buffer       = v => typeof Buffer !== 'undefined' && Buffer.isBuffer(v);
-
-export const iterable       = v => v != null && typeof v[Symbol.iterator] === 'function';
-export const asyncIterable  = v => v != null && typeof v[Symbol.asyncIterator] === 'function';
-
-// DOM & Environment (SSR-Safe)
-export const node         = instanceOf(typeof Node !== 'undefined' ? Node : null);
-export const domNode      = node;
-export const element      = instanceOf(typeof Element !== 'undefined' ? Element : null);
-export const fragment     = instanceOf(typeof DocumentFragment !== 'undefined' ? DocumentFragment : null);
-export const canvas       = instanceOf(typeof HTMLCanvasElement !== 'undefined' ? HTMLCanvasElement : null);
-export const elementish   = or(element, fragment, instanceOf(typeof Document !== 'undefined' ? Document : null));
-export const realNodeList = instanceOf(typeof NodeList !== 'undefined' ? NodeList : null);
-export const nodeList     = v => (realNodeList(v) || array(v)) && [...v].every(node);
-
-export const internalUrl  = v => string(v) && typeof window !== 'undefined' && v.startsWith(window.location.origin);
-export const externalUrl  = v => string(v) && typeof window !== 'undefined' && !v.startsWith(window.location.origin);
-
-// Emptiness & Logic
-export const blank        = v => v === null || v === undefined || v === '';
-export const emptyString   = v => !v || v.length === 0;
-export const emptyArray    = and(array, v => v.length === 0);
-export const emptyMap      = and(map, v => v.size === 0);
-export const emptySet      = and(set, v => v.size === 0);
-export const emptyObject   = and(plainObject, v => Object.keys(v).length === 0);
-export const empty         = or(v => v === '', v => v?.length === 0, emptyMap, emptySet, emptyObject);
-export const falsy         = v => !v && v !== 0 && v !== false;
-export const filled        = and(not(blank), not(empty), not(emptyObject));
-
-// Formats & Parsing
-export const alphaNumeric = matches(/^[a-z0-9]+$/i);
-export const base64       = matches(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
-export const email        = matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-export const hexColor     = matches(/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
-export const uuid         = matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-export const json         = v => { if (!string(v)) return false; try { JSON.parse(v); return true; } catch { return false; } };
-export const url          = v => { try { new URL(v); return true; } catch { return false; } };
-export const html         = v => string(v) && /^<([a-z]+)(\s[^>]*)?>.*<\/\1>$\vert{}^<([a-z]+)(\s[^>]*)?\/?>$/i.test(v.trim());
-
-// String Cases
-export const lowerCase    = and(string, v => v === v.toLowerCase());
-export const upperCase    = and(string, v => v === v.toUpperCase());
-export const camelCase    = and(matches(/^[a-z][a-zA-Z0-9]*$/), not(upperCase));
-export const constantCase = matches(/^[A-Z0-9]+(?:_[A-Z0-9]+)*$/);
-export const kebabCase    = matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
-export const pascalCase   = matches(/^[A-Z][a-zA-Z0-9]*$/);
-export const snakeCase    = matches(/^[a-z0-9]+(?:_[a-z0-9]+)*$/);
-
-// Lists
-export const entriesList  = v => array(v) && v.every(item => array(item) && item.length === 2);
-export const objectList   = v => array(v) && v.every(object);
-export const stringList   = v => array(v) && v.every(string);
+// null-prototype: inherited keys like 'constructor' or 'toString' cannot leak through
+// the proxy, and the lookup skips the prototype chain
+const registry = Object.assign(Object.create(null), predicates, {
+  function  : predicates.func,
+  null      : predicates.null_,
+  undefined : predicates.undefined_
+});
 
 // ============================================================================
-// 3. PREDICATE REGISTRY & DYNAMIC IS PROXY
+// 2. RULE EVALUATION
 // ============================================================================
 
-const predicates = {
-  alphaNumeric, array, asyncIterable, base64, bigInt, blank, boolean, buffer,
-  canvas, date, date2, defined, domNode, element, elementish, email, empty,
-  emptyArray, emptyMap, emptyObject, emptySet, emptyString, error, even,
-  externalUrl, falsy, filled, finite, float, fragment, function: func, hexColor,
-  integer, internalUrl, iterable, json, map, nan, negative, node, null: null_,
-  nullish, number, numeric, numericString, object, plainObject, realObject,
-  strictObject, odd, positive, primitive, promise, regExp, set, string, symbol,
-  undefined: undefined_, url, uuid, year, zero, html, camelCase, constantCase,
-  kebabCase, lowerCase, pascalCase, snakeCase, upperCase, entriesList, nodeList,
-  realNodeList, objectList, stringList
-};
-
-// Evaluator for single/multiple rules () and []
-const evalRule = (rule, val) => {
-  if (typeof rule === 'string') return predicates[rule]?.(val) ?? false;
-  if (typeof rule === 'function') return rule(val);
-  if (Array.isArray(rule)) return rule.every(r => evalRule(r, val)); // [] = ALL must match
+// the single evaluator behind `is` and `match`
+//   function -> called with the value
+//   string   -> looked up in the registry
+//   array    -> every entry must match (AND), nesting allowed
+//   boolean  -> used as-is, handy for feature flags in rule tables
+export const test = (rule, value) => {
+  if (typeof rule === 'function') return rule(value);
+  if (typeof rule === 'string') {
+    const check = registry[rule];
+    return check === undefined ? false : check(value);
+  }
+  if (Array.isArray(rule)) {
+    for (let index = 0; index < rule.length; index++) if (!test(rule[index], value)) return false;
+    return true;
+  }
+  if (typeof rule === 'boolean') return rule;
   return false;
 };
 
-// Curried syntax creator: is('string')(val) or is([number, even])(val)
-const createChecker = rule => val => evalRule(rule, val);
+const createChecker = (rule) => (value) => test(rule, value);
 
-// The `is` Proxy: supports is.string(v), is('string')(v), is([p1, p2])(v)
+// ============================================================================
+// 3. THE `is` PROXY
+// ============================================================================
+
+// three call styles:
+//   is.string(value)             direct predicate access
+//   is('string')(value)          rule by name, e.g. from an attribute or json config
+//   is([number, even])(value)    combined rules
+// unknown string keys resolve to undefined instead of falling through to Function.prototype:
+// is[nameFromUserData] must never hand out call/bind/constructor.
+// note: every property access runs the trap, so destructure once in hot code
 export const is = new Proxy(createChecker, {
-  get(target, prop) {
-    if (prop in predicates) return predicates[prop];
-    return target[prop];
+  get (target, key) {
+    if (typeof key === 'symbol') return Reflect.get(target, key);
+    return registry[key];
   }
 });
 
 // ============================================================================
-// 4. BACKWARD COMPATIBLE EXPORTS (isX Alias Exports)
+// 4. isX ALIASES
 // ============================================================================
 
-export const isAlphaNumeric  = alphaNumeric;
-export const isArray         = array;
-export const isAsyncIterable = asyncIterable;
-export const isBase64        = base64;
-export const isBigInt        = bigInt;
-export const isBlank         = blank;
-export const isBoolean       = boolean;
-export const isBuffer        = buffer;
-export const isCanvas        = canvas;
-export const isDate          = date;
-export const isDate2         = date2;
-export const isDefined       = defined;
-export const isDomNode       = domNode;
-export const isElement       = element;
-export const isElementish    = elementish;
-export const isEmail         = email;
-export const isEmpty         = empty;
-export const isEmptyArray    = emptyArray;
-export const isEmptyMap      = emptyMap;
-export const isEmptyObject   = emptyObject;
-export const isEmptySet      = emptySet;
-export const isEmptyString   = emptyString;
-export const isError         = error;
-export const isEven          = even;
-export const isExternalUrl   = externalUrl;
-export const isFalsy         = falsy;
-export const isFilled        = filled;
-export const isFinite        = finite;
-export const isFloat         = float;
-export const isFn            = func;
-export const isFragment      = fragment;
-export const isFunction      = func;
-export const isHexColor      = hexColor;
-export const isInteger       = integer;
-export const isInternalUrl   = internalUrl;
-export const isIterable      = iterable;
-export const isJSON          = json;
-export const isMap           = map;
-export const isNaN           = nan;
-export const isNegative      = negative;
-export const isNode          = node;
-export const isNull         = null_;
-export const isNullish       = nullish;
-export const isNumber        = number;
-export const isNumeric       = numeric;
-export const isNumericString = numericString;
-export const isObject        = object;
-export const isPlainObject   = plainObject;
-export const isRealObject    = realObject;
-export const isStrictObject  = strictObject;
-export const isOdd           = odd;
-export const isPositive      = positive;
-export const isPrimitive     = primitive;
-export const isPromise       = promise;
-export const isRegExp        = regExp;
-export const isSet           = set;
-export const isString        = string;
-export const isSymbol        = symbol;
-export const isUndefined     = undefined_;
-export const isUrl           = url;
-export const isUUID          = uuid;
-export const isYear          = year;
-export const isZero          = zero;
-export const isHTML          = html;
+export const isAlphaNumeric  = predicates.alphaNumeric;
+export const isArray         = predicates.array;
+export const isAsyncIterable = predicates.asyncIterable;
+export const isBase64        = predicates.base64;
+export const isBigInt        = predicates.bigInt;
+export const isBlank         = predicates.blank;
+export const isBlankish      = predicates.blankish;
+export const isBoolean       = predicates.boolean;
+export const isBuffer        = predicates.buffer;
+export const isCamelCase     = predicates.camelCase;
+export const isCanvas        = predicates.canvas;
+export const isConstantCase  = predicates.constantCase;
+export const isDate          = predicates.date;
+export const isDateString    = predicates.dateString;
+export const isDefined       = predicates.defined;
+export const isDomNode       = predicates.domNode;
+export const isElement       = predicates.element;
+export const isElementish    = predicates.elementish;
+export const isEmail         = predicates.email;
+export const isEmpty         = predicates.empty;
+export const isEmptyArray    = predicates.emptyArray;
+export const isEmptyMap      = predicates.emptyMap;
+export const isEmptyObject   = predicates.emptyObject;
+export const isEmptySet      = predicates.emptySet;
+export const isEmptyString   = predicates.emptyString;
+export const isEntriesList   = predicates.entriesList;
+export const isError         = predicates.error;
+export const isEven          = predicates.even;
+export const isExternalUrl   = predicates.externalUrl;
+export const isFilled        = predicates.filled;
+export const isFinite        = predicates.finite;
+export const isFloat         = predicates.float;
+export const isFn            = predicates.func;
+export const isFragment      = predicates.fragment;
+export const isFunction      = predicates.func;
+export const isHTML          = predicates.html;
+export const isHexColor      = predicates.hexColor;
+export const isInteger       = predicates.integer;
+export const isInternalUrl   = predicates.internalUrl;
+export const isIterable      = predicates.iterable;
+export const isJSON          = predicates.json;
+export const isKebabCase     = predicates.kebabCase;
+export const isLowerCase     = predicates.lowerCase;
+export const isMap           = predicates.map;
+export const isNaN           = predicates.nan;
+export const isNegative      = predicates.negative;
+export const isNode          = predicates.node;
+export const isNodeList      = predicates.nodeList;
+export const isNull          = predicates.null_;
+export const isNullish       = predicates.nullish;
+export const isNumber        = predicates.number;
+export const isNumeric       = predicates.numeric;
+export const isNumericString = predicates.numericString;
+export const isObject        = predicates.object;
+export const isObjectList    = predicates.objectList;
+export const isOdd           = predicates.odd;
+export const isPascalCase    = predicates.pascalCase;
+export const isPlainObject   = predicates.plainObject;
+export const isPositive      = predicates.positive;
+export const isPrimitive     = predicates.primitive;
+export const isPromise       = predicates.promise;
+export const isRealNodeList  = predicates.realNodeList;
+export const isRealObject    = predicates.realObject;
+export const isRegExp        = predicates.regExp;
+export const isSet           = predicates.set;
+export const isSnakeCase     = predicates.snakeCase;
+export const isStrictObject  = predicates.strictObject;
+export const isString        = predicates.string;
+export const isStringList    = predicates.stringList;
+export const isSymbol        = predicates.symbol;
+export const isUUID          = predicates.uuid;
+export const isUndefined     = predicates.undefined_;
+export const isUpperCase     = predicates.upperCase;
+export const isUrl           = predicates.url;
+export const isYear          = predicates.year;
+export const isZero          = predicates.zero;
 
-export const isCamelCase     = camelCase;
-export const isConstantCase  = constantCase;
-export const isKebabCase     = kebabCase;
-export const isLowerCase     = lowerCase;
-export const isPascalCase    = pascalCase;
-export const isSnakeCase     = snakeCase;
-export const isUpperCase     = upperCase;
-
-export const isEntriesList   = entriesList;
-export const isNodeList      = nodeList;
-export const isRealNodeList  = realNodeList;
-export const isObjectList    = objectList;
-export const isStringList    = stringList;
+// deprecated aliases, kept for compatibility with the first draft
+export const isDate2 = predicates.dateString;
+export const isFalsy = predicates.blankish;
