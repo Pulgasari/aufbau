@@ -4,42 +4,50 @@ export const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').t
 
 // elements/core/events.js
 
-// the one primitive: bind a listener, return its unsubscribe
-export const bind = (target, type, listener, options) => {
-  target.addEventListener(type, listener, options);
-  return () => target.removeEventListener(type, listener, options);
+// non-enumerable, non-writable-by-accident definition, keeps the descriptor in one place
+const define = (target, props) => {
+  for (const [key, value] of Object.entries(props)) {
+    Object.defineProperty(target, key, { value, configurable: true, writable: true });
+  }
+  return target;
 };
 
-// attaches on/off to any event target, idempotent and non-enumerable
-export function decorate (target) {
-  if (!target || target._aufbauDecorated) return target;
+const decorated = new WeakSet();
 
-  Object.defineProperties(target, {
-    _aufbauDecorated : { value: true, configurable: true },
-    on  : { configurable: true, writable: true, value (...args) { return bind(this, ...args); } },      
-    off : { configurable: true, writable: true, value (type, listener, options) {
-      this.removeEventListener(type, listener, options);
-      return this;
-    } }
-  });
+// the two primitives, everything else just resolves targets
+export const on = (target, ...tlo) => {
+  target.addEventListener(...tlo);
+  return () => target.removeEventListener(...tlo);
+};
 
+export const off = (target, ...tlo) => {
+  target.removeEventListener(...tlo);
   return target;
+};
+
+// attaches on/off to a single event target
+export function decorate (target) {
+  if (!target || decorated.has(target)) return target;
+  decorated.add(target);
+
+  return define(target, {
+    on  (...args) { return on  (this, ...args); },
+    off (...args) { return off (this, ...args); }
+  });
 }
 
-// same api on a list, fans out to the already decorated members
+// same api on a list, fans out to its members
 export function decorateAll (list) {
   const items = list.map(decorate);
 
-  Object.defineProperties(items, {
-    on  : { configurable: true, writable: true, value (...args) {
+  return define(items, {
+    on (...args) {
       const unsubs = items.map(item => item.on(...args));
       return () => unsubs.forEach(unsub => unsub());
-    } },
-    off : { configurable: true, writable: true, value (...args) {
+    },
+    off (...args) {
       items.forEach(item => item.off(...args));
       return items;
-    } }
+    }
   });
-
-  return items;
 }
