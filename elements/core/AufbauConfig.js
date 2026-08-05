@@ -2,7 +2,7 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
-import { CanonicalMap, createLogger, emit, isPlainObject, isString, on, toJson, toKebabCase } from '@aufbau/utils';
+import { CanonicalMap, createLogger, emit, isPlainObject, isString, onEvent, toJson, toKebabCase } from '@aufbau/utils';
 
 const log = createLogger('aufbau-config');
 
@@ -64,7 +64,7 @@ export function commitConfig () {
   AufbauConfigStore.merge(next);
 
   if (typeof window !== 'undefined') {
-    emit(window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
+    emitEvent (window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
   }
 
   return changed;
@@ -118,7 +118,7 @@ export function resolveConfig (tag, name, keys = true) {
 }
 
 export function onConfigChange (listener) {
-  return on(window, CONFIG_EVENT, listener);
+  return onEvent (window, CONFIG_EVENT, listener);
 }
 
 // :::::: ELEMENT ::::::::::::::::::::::::::::::::::::::::::::::
