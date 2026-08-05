@@ -7,7 +7,7 @@ usage: <script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
 const pkg = [
   'builders/docs',
   'cache',
-  'elements`,
+  'elements',
   'import',
   'kits',
   'kits/preact-htm',
