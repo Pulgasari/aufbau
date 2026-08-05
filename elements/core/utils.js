@@ -1,6 +1,6 @@
 // @aufbau/elements/core/utils.js
 
-import { emitEvent, offEvent, onEvent } from './../utils/events.js';
+import { emitEvent, offEvent, onEvent } from '@aufbau/utils';
 
 // non-enumerable definition, keeps the descriptor boilerplate in one place
 const define = (target, props) => {
