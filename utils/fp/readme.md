@@ -7,6 +7,38 @@
 ​pipe (Left-to-Right): Liest sich wie ein Fließband. Daten gehen rein \rightarrow Schritt 1 \rightarrow Schritt 2 \rightarrow Ergebnis raus. (In der Praxis zu 90% bevorzugt, weil es unserer Leseseite entspricht).
 ​compose (Right-to-Left): Entspricht der mathematischen Notation f(g(x)). Der letzte Parameter wird zuerst ausgeführt.
 
+## curry
+
+```javascript
+import { pipe } from './lib.js';
+
+// 1. Standard JS functions (Data-Last parameter order)
+const rawAdd      = (a, b) => a + b;
+const rawMultiply = (a, b) => a * b;
+const rawReplace  = (searchValue, replaceValue, str) => str.replace(searchValue, replaceValue);
+const rawSlice    = (start, end, arr) => arr.slice(start, end);
+
+// 2. Currying the functions
+export const add      = curry(rawAdd);
+export const multiply = curry(rawMultiply);
+export const replace  = curry(rawReplace);
+export const slice    = curry(rawSlice);
+
+// Usage outside pipelines (both syntaxes work seamlessly!)
+add(5, 10);    // 15 (Standard call)
+add(5)(10);    // 15 (Curried call)
+
+// 3. Building a pipeline with pre-configured functions
+const processPrices = pipe(
+  add(10),                 // Configured: adds 10 to whatever comes in
+  multiply(1.19),          // Configured: applies 19% VAT
+  val => val.toFixed(2)    // Final formatting
+);
+
+processPrices(100); 
+// Calculation: (100 + 10) * 1.19 => "130.85"
+```
+
 ## match
 
 vorher:
