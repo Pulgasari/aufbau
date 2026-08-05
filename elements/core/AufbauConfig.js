@@ -2,7 +2,7 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
-import { toKebabCase } from './utils.js';
+import { toKebabCase } from './../utils/strings.js';
 
 const AufbauConfigStore = new Map(); // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
