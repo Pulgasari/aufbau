@@ -37,7 +37,11 @@ body {
 #app-footer { aufbau-colors: aufbau inverted; }
 
 #app-header,
-#app-footer { box-shadow: 0 0 1rem var(--bg); }
+#app-footer { 
+  box-shadow: 0 0 1rem var(--bg);
+  z-index: 3;
+
+}
 
 pre, code {
   aufbau-webfont : 'JetBrains Mono';
