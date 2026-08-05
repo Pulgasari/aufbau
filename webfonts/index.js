@@ -194,7 +194,7 @@ function Toolbar () {
 
 function App () {
   if (status.value === 'loading') return html`<p class="state">Sammlung wird geladen…</p>`;
-  if (status.value === 'error')   return html`<p class="state">fonts.json ist nicht erreichbar.</p>`;
+  if (status.value === 'error')   return html`<p class="state">fonts.json5 ist nicht erreichbar.</p>`;
 
   return html`
     <header class="masthead">
