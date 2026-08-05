@@ -12,7 +12,7 @@ export * from './object.js';
 export * from './random.js';
 export * from './string.js';
 export * from './timing.js';
-export * from './url.js';
+//export * from './url.js';
 
 //import { isArray, isEvery, isFn, isNullish, isObject, isPlainObject } from './is.js';
 //import { _el } from './dom.js';
