@@ -115,7 +115,7 @@ export function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const x = {
+export {
   ...AufbauCore,
   ...AufbauConfig,
 
@@ -123,9 +123,6 @@ const x = {
   load, 
   registerAll
 };
-
-export default x;
-export { ...x };
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
