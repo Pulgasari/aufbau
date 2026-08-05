@@ -20,7 +20,7 @@ function VersionBanner() {
 }
 
 createDocsFW({
-  index  : 'readme.md',
+  index  : '$repo/readme.md',
   target : '#app',
   brand: {
     svg   : '$repo/logo.svg',
@@ -32,7 +32,7 @@ createDocsFW({
   },
   
   sidebar: {
-    docs       : 'readme.md',
+    docs       : '$repo/readme.md',
     elements   : '$repo/elements/readme.md',
     kits       : '$repo/kits/readme.md',
     packages   : 'packages.md',
