@@ -1,13 +1,6 @@
 // @aufbau/elements/core/utils.js
 
-//import { on, off } from '@aufbau/dom/events';
-//import { on, off } from '@domina/events';
-
 import { emitEvent, offEvent, onEvent } from './../utils/events.js';
-
-export const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();     
-
-// @aufbau/elements/core/events.js
 
 // non-enumerable definition, keeps the descriptor boilerplate in one place
 const define = (target, props) => {
@@ -20,24 +13,6 @@ const define = (target, props) => {
 // tracks decorated targets without writing a marker property onto them
 const decorated = new WeakSet();
 
-// :::::: PRIMITIVES ::::::::::::::::::::::::::::::::::::::::::::
-
-export const on = (target, type, listener, options) => {
-  target.addEventListener(type, listener, options);
-  return () => target.removeEventListener(type, listener, options);
-};
-
-export const off = (target, type, listener, options) => {
-  target.removeEventListener(type, listener, options);
-  return target;
-};
-
-export const emitEvent (target, eventName, detail = {}, options = {}) {
-  return target.dispatchEvent (new CustomEvent (eventName, {
-    bubbles: true, composed: true, detail, ...options
-  }));
-}
-
 // :::::: DECORATION ::::::::::::::::::::::::::::::::::::::::::::
 
 export function decorate (target) {
@@ -45,8 +20,8 @@ export function decorate (target) {
   decorated.add(target);
 
   return define(target, {
-    on  (...args) { return on  (this, ...args); },
-    off (...args) { return off (this, ...args); }
+    on  (...args) { return onEvent  (this, ...args); },
+    off (...args) { return offEvent (this, ...args); }
   });
 }
 
@@ -64,3 +39,6 @@ export function decorateAll (list) {
     }
   });
 }
+
+
+
