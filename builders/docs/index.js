@@ -1,4 +1,4 @@
-// docsfw.js
+// @aufbau/builders/docs/index.js
 
 //import hljs                     from 'hljs';
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
