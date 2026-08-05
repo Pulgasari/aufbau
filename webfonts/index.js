@@ -198,7 +198,7 @@ function App () {
 
   return html`
     <header class="masthead">
-      <h1>webfonts</h1>
+      <h1>@aufbau/webfonts</h1>
       <p>${filtered.value.length} von ${fonts.value.length} Schriften</p>
     </header>
 
