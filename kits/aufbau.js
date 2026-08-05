@@ -8,7 +8,7 @@ every framework-kit builds on top of this file.
 
 // ::: AUFBAU
 import      aufbauCache         from '@aufbau/cache';
-import      aufbauElements      from '@aufbau/elements';
+import * as aufbauElements      from '@aufbau/elements';
 import      aufbauImport        from '@aufbau/import';
 import * as aufbauPluginsClient from '@aufbau/plugins/client';
 import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
