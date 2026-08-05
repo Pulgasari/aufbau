@@ -61,7 +61,7 @@ isObject        = v => v && typeof v === 'object' && !isArray(v) && v !== null,
  isStrictObject = v => Object.prototype.toString.call(v) === '[object Object]',
 isOdd           = v => isInteger(v) && Math.abs(v % 2) === 1,
 isPositive      = v => typeof v === 'number' && v > 0,
-isPrimitive     = v => v !== Object(sth),
+isPrimitive     = v => v !== Object(v),
 isPromise       = v => v instanceof Promise,
 isRegExp        = v => v instanceof RegExp,
 isSet           = v => v instanceof Set,
@@ -85,7 +85,7 @@ isUpperCase     = v => typeof v === 'string' && v === v.toUpperCase(),
 
 // Lists
 // isList
-isEntriesList   = v => Array.isArray(v) && input.every( item => Array.isArray(item) && item.length === 2),
+isEntriesList   = v => Array.isArray(v) && v.every( item => Array.isArray(item) && item.length === 2),
 isNodeList      = v => (v instanceof NodeList || isArray(v)) && [...v].every(isNode),
 isRealNodeList  = v => typeof NodeList !== 'undefined' && v instanceof NodeList,
 isObjectList    = v => isArray(v) && v.every(isObject),
