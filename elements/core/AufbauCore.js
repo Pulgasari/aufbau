@@ -4,13 +4,11 @@ import { decorate, decorateAll } from './utils.js';
 import { parseSchemaEntry }      from './parseSchemaEntry.js';
 import { AufbauConfigStore, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-import { emitEvent, offEvent, onEvent } from './../utils/events.js';
-import { toKebabCase }                  from './../utils/strings.js';
-
-
-
-const isFn     = sth => typeof sth === 'function';
-const isString = sth => typeof sth === 'string';
+import { 
+  emitEvent, offEvent, onEvent,
+  isFn, isString,
+  toKebabCase,
+} from '@aufbau/utils';
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
