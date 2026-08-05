@@ -19,7 +19,7 @@ export default class AufbauAudio extends AufbauElement {
     layout   : 'card', 
     autoplay : false, 
     loop     : false,
-  ];
+  };
 
   onMount () {
     this._isPlaying = false;
