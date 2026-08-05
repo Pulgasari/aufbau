@@ -87,7 +87,7 @@ export async function init (options = {}) {
   if (configs.stylesheet) aufbauPluginsClient.observeStylesheets();
   
        if (configs.elements.mode === 'auto')      aufbauElements.autoloader();
- .else if (configs.elements.mode === 'all') await aufbauElements.registerAll();
+  else if (configs.elements.mode === 'all') await aufbauElements.registerAll();
   return aufbau;
 }
 
