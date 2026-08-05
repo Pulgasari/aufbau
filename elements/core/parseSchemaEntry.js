@@ -1,13 +1,10 @@
 // @aufbau/elements/core
 
-/**
- * Parses a schema entry (Minimal, Basic, or Full) into a normalized schema object.
- * @param {*} entry - e.g. Number, 50, or { type: Number, default: 0, values: [...], fn: ... }
- */
 export const parseSchemaEntry = (entry) => {
+  
   // CASE 1: direct constructor function (e.g. Number, Boolean, String)
   if (typeof entry === 'function') {
-    return { type: entry, fallback: undefined, values: null, fn: null };
+    return { type: entry, fallback: undefined, config: null, fn: null, values: null };
   }
 
   // CASE 2: full configuration object
@@ -24,17 +21,19 @@ export const parseSchemaEntry = (entry) => {
     );
 
     return {
-      type: inferredType,
-      fallback: fallback,
-      values: Array.isArray(entry.values) ? entry.values : null,
-      fn: typeof entry.fn === 'function' ? entry.fn : null
+      type     : inferredType,
+      fallback : fallback,
+      values   : Array.isArray(entry.values) ? entry.values : null,
+      fn       : typeof entry.fn === 'function' ? entry.fn : null,
+      // true -> auto namespaced key, string|string[] -> explicit keys
+      config   : entry.config === true ? true : (entry.config ? [].concat(entry.config) : null)
     };
   }
 
   // Case 3: Primitive default values (number, boolean, string)
-  if (typeof entry === 'number')  return { type: Number,  fallback: entry, values: null, fn: null };
-  if (typeof entry === 'boolean') return { type: Boolean, fallback: entry, values: null, fn: null };
-  if (typeof entry === 'string')  return { type: String,  fallback: entry, values: null, fn: null };
+  if (typeof entry === 'number')  return { type: Number,  fallback: entry, config: null, values: null, fn: null };
+  if (typeof entry === 'boolean') return { type: Boolean, fallback: entry, config: null, values: null, fn: null };
+  if (typeof entry === 'string')  return { type: String,  fallback: entry, config: null, values: null, fn: null };
 
   return { type: String, fallback: undefined, values: null, fn: null };
 };
