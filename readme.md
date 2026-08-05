@@ -10,7 +10,7 @@
 
 #### kits
 
-[@aufbau/kit](#aufbau-kit)
+[@aufbau/kits](#aufbau-kits)
 
 #### packages
 
@@ -36,7 +36,7 @@
 
 ---
 
-# @aufbau/kis
+# @aufbau/kits
 
 the **kit** bundles all the following packages with **Preact** and **HTM** to deliver a *batteries-included* JS-framework made in and for the browser.
 
