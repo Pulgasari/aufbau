@@ -134,6 +134,13 @@ export default {
   registerAll
 };
 
+export {
+  AufbauConfigStore, 
+  getConfig, 
+  onConfigChange, 
+  setConfig
+} from './core/AufbauConfig.js';
+
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
 // lazy, browser first
