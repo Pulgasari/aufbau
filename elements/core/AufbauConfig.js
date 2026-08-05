@@ -72,7 +72,7 @@ export function getConfig (key, fallback) {
 }
 
 export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
-  const isKey   = typeof keyOrMap === 'string';
+  const isKey   = isString(keyOrMap);
   const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
   const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
 
