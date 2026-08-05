@@ -22,6 +22,40 @@ import { define, update, updateDataset, updateProperty } from './dom.js';
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
 const configs = {
+  // 'auto' | 'all' | false via elements.mode, every other key is element config:
+  // code: { theme: 'nord' }, flag: { variant: 'square' }
+  elements   : { mode: 'auto' },
+  stylesheet : true,
+};
+
+const RESERVED_ELEMENT_KEYS = new Set(['mode']);
+
+const isPlainObject = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
+
+function deepMerge (target, source) {
+  for (const [key, value] of Object.entries(source)) {
+    if (isPlainObject(value) && isPlainObject(target[key])) deepMerge(target[key], value);
+    else target[key] = value;
+  }
+  return target;
+}
+
+// keeps the old shorthand working: elements: 'auto' -> elements: { mode: 'auto' }
+const normalizeElements = (value) =>
+  value === undefined ? null : (isPlainObject(value) ? value : { mode: value });
+
+/** pushes element config into the AufbauConfigStore as the lowest layer */
+function syncElementConfig () {
+  const entries = {};
+  for (const [key, value] of Object.entries(configs.elements)) {
+    if (!RESERVED_ELEMENT_KEYS.has(key)) entries[key] = value;
+  }
+  aufbauElements.setConfig(entries, { layer: 'defaults' });
+}
+
+
+
+const configs = {
   // 'auto'  : lazy autoloader, elements are fetched when they appear in the dom
   // 'all'   : eagerly register every element up front
   // false   : do not touch @aufbau/elements at all
@@ -30,12 +64,14 @@ const configs = {
   stylesheet : true,
 };
 
-/**
- * merges options into the runtime config. returns the current config.
- * @param {Partial<typeof defaults>} [options]
- */
 export function config (options = {}) {
-  Object.assign(configs, options);
+  const { elements, ...rest } = options;
+  deepMerge(configs, rest);
+
+  const normalized = normalizeElements(elements);
+  if (normalized) deepMerge(configs.elements, normalized);
+
+  syncElementConfig(); // also runs on calls after boot, so config() stays live
   return configs;
 }
 
@@ -54,10 +90,9 @@ export async function init (options = {}) {
   initialized = true;
 
   if (configs.stylesheet) aufbauPluginsClient.observeStylesheets();
-
-       if (configs.elements === 'auto')      aufbauElements.autoloader();
-  else if (configs.elements === 'all') await aufbauElements.registerAll();
-
+  
+       if (configs.elements.mode === 'auto')      aufbauElements.autoloader();
+ .else if (configs.elements.mode === 'all') await aufbauElements.registerAll();
   return aufbau;
 }
 
