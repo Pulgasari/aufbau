@@ -3,19 +3,21 @@
 //import { on, off } from '@aufbau/dom/events';
 //import { on, off } from '@domina/events';
 
-export const onEvent = (target, type, listener, options) => {
+export const 
+  
+onEvent = (target, type, listener, options) => {
   target.addEventListener(type, listener, options);
   return () => target.removeEventListener(type, listener, options);
-};
+},
 
-export const offEvent = (target, type, listener, options) => {
+offEvent = (target, type, listener, options) => {
   target.removeEventListener(type, listener, options);
   return target;
-};
+},
 
-export const emitEvent = (target, eventName, detail = {}, options = {}) {
+emitEvent = (target, eventName, detail = {}, options = {}) => {  
   return target.dispatchEvent (new CustomEvent (eventName, {
     bubbles: true, composed: true, detail, ...options
   }));
-}
+};
 
