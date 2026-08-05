@@ -6,12 +6,19 @@
 
 <aufbau-option>
 <aufbau-option type='color'>
-<aufbau-option type='color'>
+<aufbau-option type='string'>
+
+<aufbau-slider>
+<aufbau-slider type='range'>
 
 <aufbau-toggle>
+<aufbau-toggle type='checkbox'>
 
 <aufbau-input>
+<aufbau-input type='color'>
 <aufbau-input type='date'>
+<aufbau-input type='datetime'>
+<aufbau-input type='file'>
 <aufbau-input type='number'>
 <aufbau-input type='password'>
 <aufbau-input type='phone'>
@@ -19,6 +26,8 @@
 <aufbau-input type='text'>
 <aufbau-input type='time'>
 <aufbau-input type='url'>
+
+<aufbau-upload>
 ```
 
 ## HTML
