@@ -14,10 +14,9 @@ export const match = (rules, fallback = identity) => (value) => {
   return typeof fallback === 'function' ? fallback(value) : fallback;
 };
 
-// ============================================================================
-// CONDITIONAL TRANSFORMS
-// ============================================================================
+// :::::: CONDITIONAL TRANSFORMS
 
-export const ifElse = (rule, onTrue, onFalse) => (value) => test(rule, value) ? onTrue(value) : onFalse(value);
-export const unless = (rule, fn) => (value) => test(rule, value) ? value : fn(value);
-export const when   = (rule, fn) => (value) => test(rule, value) ? fn(value) : value;
+export const 
+ifElse = (rule, onTrue, onFalse) => value => test(rule, value) ? onTrue(value) : onFalse(value),   
+unless = (rule, fn)              => value => test(rule, value) ?        value  :      fn(value),
+when   = (rule, fn)              => value => test(rule, value) ?     fn(value) :         value;
