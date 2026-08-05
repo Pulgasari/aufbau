@@ -1,8 +1,12 @@
 // @aufbau/elements/core/AufbauCore.js
 
-import { decorate, decorateAll, off, on, toKebabCase } from './utils.js';
-import { parseSchemaEntry }  from './parseSchemaEntry.js';
-import { AufbauConfigStore } from './AufbauConfig.js';
+import { decorate, decorateAll } from './utils.js';
+import { parseSchemaEntry }      from './parseSchemaEntry.js';
+import { AufbauConfigStore }     from './AufbauConfig.js';
+
+import { emitEvent, offEvent, onEvent } from './../utils/events.js';
+import { toKebabCase }                  from './../utils/strings.js';
+
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
   return class extends BaseClass {
