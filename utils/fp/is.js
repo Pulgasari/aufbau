@@ -96,7 +96,7 @@ export const {
   float: isFloat,
   func: isFn,
   fragment: isFragment,
-  func: isFunction,          // zweimal derselbe Schlüssel (überschreibt isFn nicht, weil gleicher Wert)
+  func: isFunction,
   html: isHTML,
   hexColor: isHexColor,
   integer: isInteger,
