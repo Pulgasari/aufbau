@@ -44,7 +44,6 @@ body {
     0  4px  6px -1px color-mix(in srgb, var(--aufbau-bg) 30%, transparent),
     0 10px 15px -3px color-mix(in srgb, var(--aufbau-bg) 50%, transparent),
     0 20px 25px -5px color-mix(in srgb, var(--aufbau-bg) 70%, transparent);
-  }
 }
 
 #app-footer {
@@ -52,7 +51,6 @@ body {
     0  -4px  6px -1px color-mix(in srgb, var(--aufbau-fg) 30%, transparent),
     0 -10px 15px -3px color-mix(in srgb, var(--aufbau-fg) 50%, transparent),
     0 -20px 25px -5px color-mix(in srgb, var(--aufbau-fg) 70%, transparent);
-  }
 }
 
 pre, code {
