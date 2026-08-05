@@ -4,19 +4,11 @@
 
 import { toKebabCase } from './utils.js';
 
-export const CONFIG_EVENT = 'aufbau-config-changed';
-
-// merged, read-only view of all sources. never write directly, use setConfig()
-export const AufbauConfigStore = new Map();
-
-// one source map per <aufbau-config> element, merged in connect order
-const sources = new Map();
-
-// programmatic source, always merged last so setConfig() beats markup
-const RUNTIME = Symbol('runtime');
-
-// attributes that configure the element itself, not the store
-const RESERVED = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']);
+const AufbauConfigStore = new Map(); // merged, read-only view of all sources. never write directly, use setConfig()
+const CONFIG_EVENT = 'aufbau-config-changed';
+const RESERVED = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
+const RUNTIME  = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
+const sources  = new Map(); // one source map per <aufbau-config> element, merged in connect order
 
 const normalize = (key) => toKebabCase(String(key)).toLowerCase();
 
@@ -177,6 +169,11 @@ export class AufbauConfig extends HTMLElement {
 
 if (typeof window !== 'undefined' && !customElements.get('aufbau-config')) {
   customElements.define('aufbau-config', AufbauConfig);
+}
+
+export {
+  AufbauConfigStore,
+  CONFIG_EVENT,
 }
 
 export default AufbauConfig;
