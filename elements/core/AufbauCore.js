@@ -7,6 +7,8 @@ import { AufbauConfigStore }     from './AufbauConfig.js';
 import { emitEvent, offEvent, onEvent } from './../utils/events.js';
 import { toKebabCase }                  from './../utils/strings.js';
 
+const isFn     = sth => typeof sth === 'function';
+const isString = sth => typeof sth === 'string';
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
   return class extends BaseClass {
@@ -41,7 +43,7 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
     }
 
     static init (options) {
-      const tagName = typeof options === 'string' ? options : options?.name;
+      const tagName    = isString(options) ? options : options?.name;
       const extendsTag = typeof options === 'object' ? options?.extends : this.extendsTag;
 
       const name = tagName || toKebabCase(this.name);
@@ -94,7 +96,7 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     on (...args) {
       // 1. self: this.on(type, listener, options)
-      if (typeof args[0] === 'string' && typeof args[1] === 'function') {
+      if (typeof args[0] === 'string' && isFn(args[1])) {
         return this.track(on(this, ...args));
       }
 
@@ -104,11 +106,11 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
       const root = this.shadowRoot || this;
       const targets =
-        typeof rawTarget === 'string'                               ? Array.from(root.querySelectorAll(rawTarget))
+        isString(rawTarget)                              ? Array.from(root.querySelectorAll(rawTarget))
         : Array.isArray(rawTarget) || rawTarget instanceof NodeList ? Array.from(rawTarget)
         : [rawTarget];
 
-      const unsubs = targets.filter(Boolean).map(target => on(target, type, listener, options));
+      const unsubs = targets.filter(Boolean).map(target => onEvent(target, type, listener, options));
       return this.track(() => unsubs.forEach(unsub => unsub()));
     }
 
@@ -127,7 +129,7 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     getAttr (nameOrType, type, fallback) {
       if (typeof nameOrType !== 'string') {
-        const overrideType = typeof nameOrType === 'function' ? nameOrType : null;
+        const overrideType = isFn(nameOrType) ? nameOrType : null;
         return new Proxy(this, {
           get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, overrideType, undefined) : undefined)
         });
@@ -139,7 +141,7 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       const schemaEntry  = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
       const parsedSchema = schemaEntry !== undefined ? parseSchemaEntry(schemaEntry) : null;
 
-      const finalType = (type && typeof type === 'function')
+      const finalType = (type && isFn(type))
         ? type
         : (parsedSchema ? parsedSchema.type : String);
 
@@ -163,7 +165,7 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       if (finalType === Number) {
         const parsed = parseFloat(val);
         val = Number.isNaN(parsed) ? finalFallback : parsed;
-      } else if (typeof finalType === 'function' && finalType !== String) {
+      } else if (isFn(finalType) && finalType !== String) {
         try   { val = finalType(val); }
         catch { val = finalFallback; }
       }
