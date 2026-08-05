@@ -183,6 +183,19 @@ console.log(greet('aufbau'));
 <aufbau-flag code="fr" variant="circle"></aufbau-flag>
 ```
 
+```html
+<aufbau-config code-theme="tokyo-night-dark" flag-variant="square"></aufbau-config>
+
+<!-- oder als json body, verschachtelt -->
+<aufbau-config>{ "code": { "theme": "nord" }, "toast": { "duration": 5000 } }</aufbau-config>
+
+<!-- oder ausgelagert -->
+<aufbau-config src="/aufbau.config.json"></aufbau-config>
+
+<aufbau-code lang="js">const x = 1;</aufbau-code>            <!-- nutzt code-theme -->
+<aufbau-code lang="js" theme="github">…</aufbau-code>          <!-- lokaler override -->
+```
+
 ## aufbau-datalist
 
 ```html
