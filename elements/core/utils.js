@@ -2,9 +2,9 @@
 
 export const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();     
 
-// elements/core/events.js
+// @aufbau/elements/core/events.js
 
-// non-enumerable, non-writable-by-accident definition, keeps the descriptor in one place
+// non-enumerable definition, keeps the descriptor boilerplate in one place
 const define = (target, props) => {
   for (const [key, value] of Object.entries(props)) {
     Object.defineProperty(target, key, { value, configurable: true, writable: true });
@@ -12,20 +12,35 @@ const define = (target, props) => {
   return target;
 };
 
+// tracks decorated targets without writing a marker property onto them
 const decorated = new WeakSet();
 
-// the two primitives, everything else just resolves targets
-export const on = (target, ...tlo) => {
-  target.addEventListener(...tlo);
-  return () => target.removeEventListener(...tlo);
+// :::::: PRIMITIVES ::::::::::::::::::::::::::::::::::::::::::::
+
+/**
+ * attaches a listener and returns its unsubscribe function.
+ * this is the only place addEventListener is called.
+ */
+export const on = (target, type, listener, options) => {
+  target.addEventListener(type, listener, options);
+  return () => target.removeEventListener(type, listener, options);
 };
 
-export const off = (target, ...tlo) => {
-  target.removeEventListener(...tlo);
+/**
+ * removes a listener. needs the exact same reference and capture flag,
+ * the unsubscribe returned by on() is the reliable way.
+ */
+export const off = (target, type, listener, options) => {
+  target.removeEventListener(type, listener, options);
   return target;
 };
 
-// attaches on/off to a single event target
+// :::::: DECORATION ::::::::::::::::::::::::::::::::::::::::::::
+
+/**
+ * attaches on/off to a single event target. idempotent.
+ * @param {EventTarget} target
+ */
 export function decorate (target) {
   if (!target || decorated.has(target)) return target;
   decorated.add(target);
@@ -36,7 +51,11 @@ export function decorate (target) {
   });
 }
 
-// same api on a list, fans out to its members
+/**
+ * same api on a list, fans out to its members.
+ * no weakset needed, $$() returns a fresh array on every call.
+ * @param {Element[]} list
+ */
 export function decorateAll (list) {
   const items = list.map(decorate);
 
