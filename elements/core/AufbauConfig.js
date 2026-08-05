@@ -71,11 +71,6 @@ export function getConfig (key, fallback) {
   return found === undefined ? fallback : found;
 }
 
-
-/**
- * setConfig('code-theme', 'nord')
- * setConfig({ code: { theme: 'nord' } }, { layer: 'defaults' })
- */
 export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   const isKey   = typeof keyOrMap === 'string';
   const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
@@ -85,21 +80,6 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   sources.set(owner, entries);
 
   if (isKey) entries.set(normalize(keyOrMap), valueOrOptions == null ? null : String(valueOrOptions));
-  else for (const [key, val] of flatten(keyOrMap)) entries.set(key, val);
-
-  commitConfig();
-  return AufbauConfigStore;
-}
-
-/**
- * writes to the runtime source, null removes a key again.
- * setConfig('code-theme', 'nord') | setConfig({ code: { theme: 'nord' } })
- */
-export function setConfig (keyOrMap, value) {
-  const entries = sources.get(RUNTIME) ?? new Map();
-  sources.set(RUNTIME, entries);
-
-  if (typeof keyOrMap === 'string') entries.set(normalize(keyOrMap), value == null ? null : String(value));
   else for (const [key, val] of flatten(keyOrMap)) entries.set(key, val);
 
   commitConfig();
