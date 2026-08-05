@@ -1,0 +1,53 @@
+/* @aufbau/importmap.js
+classic script. must be loaded before any module script.
+usage: <script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
+*/
+(() => {
+
+const map = { imports: {
+      "htm"              : "https://esm.sh/htm@3.1.1",
+      "preact"           : "https://esm.sh/preact@10.20.1",
+      "preact/hooks"     : "https://esm.sh/preact@10.20.1/hooks",
+      "@preact/signals"  : "https://esm.sh/@preact/signals@1.2.2?external=preact",
+  
+    "@aufbau/builders/docs"   : "./builders/docs/index.js",
+    "@aufbau/builders/docs/"  : "./builders/docs/",
+    "@aufbau/cache"           : "./cache/index.js",
+    "@aufbau/elements"        : "./elements/index.js",
+    "@aufbau/elements/"       : "./elements/",
+    "@aufbau/import"          : "./import/index.js",
+    "@aufbau/kits"            : "./kits/aufbau.js",
+    "@aufbau/kits/preact-htm" : "./kits/preact-htm.js",
+    "@aufbau/kit"             : "./kit/index.js",
+    "@aufbau/patterns"        : "./patterns/index.js",
+    "@aufbau/plugins"         : "./plugins/index.js",
+    "@aufbau/plugins/client"  : "./plugins/client/index.js",
+    "@aufbau/plugins/vite"    : "./plugins/vite/index.js",
+    "@aufbau/plugins/worker"  : "./plugins/worker/index.js",
+    "@aufbau/shaders"         : "./shaders/index.js",
+    "@aufbau/stylesheet"      : ".stylesheet/index.js",
+    "@aufbau/stylesheet/"     : "./stylesheet/",
+    "@aufbau/utils"           : "./utils/index.js",
+
+    "hljs" : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm"
+    }
+  };
+
+  const mapURL = document.currentScript?.src;
+  if (!mapURL) throw new Error('[aufbau] importmap injector must be a classic script');
+
+  // rebase relative urls against this file, not the host page
+  const rebase = m => { for (const k in m) m[k] = new URL(m[k], mapURL).href; return m; };
+  rebase(map.imports);
+  for (const s in map.scopes ?? {}) rebase(map.scopes[s]);
+
+  document.currentScript.after(
+    Object.assign(
+      document.createElement('script'), {
+        type: 'importmap', 
+        textContent: JSON.stringify(map)
+      }
+    )
+  );
+
+})();
