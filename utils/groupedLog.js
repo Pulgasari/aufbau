@@ -1,8 +1,30 @@
-**
- * Logs a group of key-value pairs with customizable options.
- * @param {Array<[string, any]>} entries - Array of [label, value] pairs.
- * @param {Object} options - Configuration object.
- */
+const LEVELS = { debug: 10, info: 20, warn: 30, error: 40, silent: 100 };
+
+let threshold = LEVELS.info;
+
+export const setLogLevel = (level) => {
+  threshold = LEVELS[level] ?? threshold;
+  return threshold;
+};
+
+export const createLogger = (scope) => {
+  const label = `[${scope}]`;
+
+  const write = (level) => (...args) => {
+    if (LEVELS[level] < threshold) return;
+    console[level](label, ...args);
+  };
+
+  return {
+    scope,
+    child : (suffix) => createLogger(`${scope}/${suffix}`),
+    debug : write('debug'),
+    error : write('error'),
+    info  : write('info'),
+    warn  : write('warn')
+  };
+};
+
 const groupedLog1 = ( entries=[], options={} ) => {
   let { name = 'Log Group', color = '#00adb5', collapsed = false } = options;
   let groupMethod = collapsed ? 'groupCollapsed' : 'group';
@@ -16,11 +38,7 @@ const groupedLog1 = ( entries=[], options={} ) => {
   });
   console.groupEnd();
 };
-/**
- * Logs a group of key-value pairs with high flexibility for entry formats.
- * @param {Array} entries - Can be [[l,v]], [{label, value, color}], or [value].
- * @param {Object} options - Configuration object (name, color, collapsed).
- */
+
 function groupedLog( entries=[], options={} ){
   let { name = 'Log Group', color = '#00adb5', collapsed = false } = options;
   let groupMethod = collapsed ? 'groupCollapsed' : 'group';
