@@ -36,6 +36,14 @@
 
 ---
 
+# importmap
+
+```javascript
+<script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
+```
+
+---
+
 # @aufbau/kits
 
 the **kit** bundles all the following packages with **Preact** and **HTM** to deliver a *batteries-included* JS-framework made in and for the browser.
