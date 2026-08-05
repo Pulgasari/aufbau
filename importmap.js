@@ -4,6 +4,23 @@ usage: <script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
 */
 (() => {
 
+const pkg = [
+  'builders/docs',
+  'cache',
+  'elements`,
+  'import',
+  'kits',
+  'kits/preact-htm',
+  'patterns',
+  'plugins',
+  'plugins/client',
+  'plugins/vite',
+  'plugins/worker',
+  'shaders',
+  'stylesheet',
+  'utils',
+];
+
 const map = { imports: {
       "htm"              : "https://esm.sh/htm@3.1.1",
       "preact"           : "https://esm.sh/preact@10.20.1",
