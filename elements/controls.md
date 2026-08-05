@@ -11,6 +11,12 @@
 <aufbau-slider>
 <aufbau-slider type='range'>
 
+<aufbau-slider type='range' value-type='color'>
+<aufbau-slider type='range' value-type='date'>
+<aufbau-slider type='range' value-type='datetime'>
+<aufbau-slider type='range' value-type='number'>
+<aufbau-slider type='range' value-type='time'>
+
 <aufbau-toggle>
 <aufbau-toggle type='checkbox'>
 
