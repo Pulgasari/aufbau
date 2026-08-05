@@ -2,10 +2,12 @@
 
 import { decorate, decorateAll } from './utils.js';
 import { parseSchemaEntry }      from './parseSchemaEntry.js';
-import { AufbauConfigStore }     from './AufbauConfig.js';
+import { AufbauConfigStore, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import { emitEvent, offEvent, onEvent } from './../utils/events.js';
 import { toKebabCase }                  from './../utils/strings.js';
+
+
 
 const isFn     = sth => typeof sth === 'function';
 const isString = sth => typeof sth === 'string';
@@ -23,12 +25,13 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     connectedCallback () {
       this._mounted = true;
-      // tracked, so it is released in disconnectedCallback like any other listener
-      this.on(window, 'aufbau-config-changed', () => { if (this._mounted) this.update(); });
+      this.on(window, CONFIG_EVENT, (event) => {
+        if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
+      });
       this.onMount();
       this.update();
     }
-
+    
     disconnectedCallback () {
       this._mounted = false;
       this.release();
@@ -72,13 +75,51 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     // ::: config
 
-    getConfig (attrName, configKey, defaultValue) {
-      if (this.hasAttribute(attrName)) return this.getAttribute(attrName);
+    /** works for customized built-ins too: <datalist is="aufbau-datalist"> -> 'aufbau-datalist' */
+    get tag () {
+      return this.getAttribute('is') || this.localName;
+    }
+    
+    /** config keys this element depends on. null means: react to any change */
+    get configWatchlist () {
+      if (this._configWatchlist !== undefined) return this._configWatchlist;
+    
+      const explicit = this.constructor.observedConfig;
+      if (Array.isArray(explicit)) return (this._configWatchlist = new Set(explicit.map(toKebabCase)));
+    
+      const classAttr = this.constructor.attr;
+      const schema    = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
+      if (!schema) return (this._configWatchlist = null);
+    
+      const keys = new Set();
+      for (const [name, entry] of Object.entries(schema)) {
+        const { config } = parseSchemaEntry(entry);
+        if (!config) continue;
+        if (config === true) configKeys(this.tag, name).forEach(key => keys.add(key));
+        else config.forEach(key => keys.add(toKebabCase(key)));
+      }
+    
+      return (this._configWatchlist = keys.size ? keys : null);
+    }
 
-      const globalKey = (configKey || attrName).toLowerCase();
-      if (AufbauConfigStore.has(globalKey)) return AufbauConfigStore.get(globalKey);
-
-      return defaultValue;
+    observesConfig (changed) {
+      const watchlist = this.configWatchlist;
+      if (!watchlist || !Array.isArray(changed)) return true;
+      return changed.some(key => watchlist.has(key));
+    }
+    
+    /**
+     * precedence: local attribute -> <aufbau-config> -> fallback
+     * @param {string} name
+     * @param {*} [fallback]
+     * @param {true|string|string[]} [keys=true] - config key(s), true auto namespaces
+     */
+    getConfig (name, fallback, keys = true) {
+      const kebab = toKebabCase(name);
+      if (this.hasAttribute(kebab)) return this.getAttribute(kebab);
+    
+      const found = resolveConfig(this.tag, kebab, keys);
+      return found === undefined ? fallback : found;
     }
 
     // ::: events
