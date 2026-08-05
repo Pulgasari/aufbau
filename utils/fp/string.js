@@ -21,19 +21,15 @@ export {
   unquote
 } from '../string.js';
 
-// ============================================================================
-// 1. UNARY TRANSFORMS
-// ============================================================================
+// :::::: UNARY TRANSFORMS
 
-export const toLower   = (value) => value.toLowerCase();
-export const toUpper   = (value) => value.toUpperCase();
-export const trim      = (value) => value.trim();
-export const trimEnd   = (value) => value.trimEnd();
-export const trimStart = (value) => value.trimStart();
+export const toLower   = value => value.toLowerCase ();
+export const toUpper   = value => value.toUpperCase ();
+export const trim      = value => value.trim        ();
+export const trimEnd   = value => value.trimEnd     ();
+export const trimStart = value => value.trimStart   ();
 
-// ============================================================================
-// 2. CONFIGURED TRANSFORMS
-// ============================================================================
+// :::::: CONFIGURED TRANSFORMS
 
 export const padEnd     = (length, filler = ' ') => (value) => value.padEnd(length, filler);
 export const padStart   = (length, filler = ' ') => (value) => value.padStart(length, filler);
@@ -45,9 +41,7 @@ export const suffix     = (text) => (value) => ensureSuffix(value, text);
 export const template   = (values) => (value) => templateOf(value, values);
 export const truncate   = (length, ending) => (value) => truncateOf(value, length, ending);
 
-// ============================================================================
-// 3. QUERY
-// ============================================================================
+// :::::: QUERY
 
 export const endsWith   = (search) => (value) => value.endsWith(search);
 export const startsWith = (search) => (value) => value.startsWith(search);
