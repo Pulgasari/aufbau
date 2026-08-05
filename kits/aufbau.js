@@ -18,22 +18,13 @@ import * as aufbauUtils         from '@aufbau/utils';
 
 // ::: LOCAL
 import { define, update, updateDataset, updateProperty } from './dom.js';
+const { deepMerge, isPlainObject } = aufbauUtils;
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
 const RESERVED_ELEMENT_KEYS = new Set(['mode']);
-
-const isPlainObject = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
-
-function deepMerge (target, source) {
-  for (const [key, value] of Object.entries(source)) {
-    if (isPlainObject(value) && isPlainObject(target[key])) deepMerge(target[key], value);
-    else target[key] = value;
-  }
-  return target;
-}
 
 // keeps the old shorthand working: elements: 'auto' -> elements: { mode: 'auto' }
 const normalizeElements = (value) =>
