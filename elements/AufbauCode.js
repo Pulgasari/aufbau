@@ -1,6 +1,7 @@
 // <aufbau-code>
 
 import { AufbauElement } from './core/index.js';
+import { escapeHtml } from '@aufbau/utils';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
@@ -29,13 +30,6 @@ const FALLBACK_THEMES = [
   'shades-of-purple', 'srcery', 'stackoverflow-dark', 'stackoverflow-light', 'sunburst', 'tokyo-night-dark',
   'tokyo-night-light', 'tomorrow-night-blue', 'tomorrow-night-bright', 'vs', 'vs2015', 'xcode', 'xt256'
 ];
-
-const escapeHtml = (str) => str
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#039;');
 
 // prefixes every selector so several themes can coexist on one page
 function scopeRules (rules, scope) {
