@@ -1,6 +1,6 @@
 // @aufbau/elements/core/AufbauCore.js
 
-import { decorateArray, decorateElement, toKebabCase } from './utils.js';
+import { decorate, decorateAll, off, on, toKebabCase } from './events.js';
 import { parseSchemaEntry }  from './parseSchemaEntry.js';
 import { AufbauConfigStore } from './AufbauConfig.js';
 
@@ -14,21 +14,22 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
     constructor () {
       super();
       this._mounted = false;
+      this._unsubs  = [];
     }
 
     // ::: lifecycle
 
     connectedCallback () {
       this._mounted = true;
-      this._onConfigChange = () => { if (this._mounted) this.update(); };
-      window.addEventListener('aufbau-config-changed', this._onConfigChange);
+      // tracked, so it is released in disconnectedCallback like any other listener
+      this.on(window, 'aufbau-config-changed', () => { if (this._mounted) this.update(); });
       this.onMount();
       this.update();
     }
 
     disconnectedCallback () {
       this._mounted = false;
-      if (this._onConfigChange) window.removeEventListener('aufbau-config-changed', this._onConfigChange);
+      this.release();
       this.onUnmount();
     }
 
@@ -87,45 +88,53 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
     // ::: events
 
     /**
+     * Collects an unsubscribe function for automatic release on disconnect.
+     * @param {Function} unsub
+     */
+    track (unsub) {
+      this._unsubs.push(unsub);
+      return unsub;
+    }
+
+    /**
+     * Runs and clears all tracked unsubscribes.
+     */
+    release () {
+      this._unsubs.forEach(unsub => unsub());
+      this._unsubs = [];
+      return this;
+    }
+
+    /**
      * Universal event listener with automatic unsubscribe cleanup.
-     * 
+     *
      * Self:     this.on('click', handler)
      * Target:   this.on(this._audio, 'timeupdate', handler)
      * Window:   this.on(window, 'resize', handler)
      * Selector: this.on('.btn-play', 'click', handler)
      */
     on (...args) {
-      // 1. Standard usage on self: this.on('click', listener, options)
+      // 1. self: this.on(type, listener, options)
       if (typeof args[0] === 'string' && typeof args[1] === 'function') {
-        const [type, listener, options] = args;
-        this.addEventListener(type, listener, options);
-        return () => this.removeEventListener(type, listener, options);
+        return this.track(on(this, ...args));
       }
 
-      // 2. Target/Selector usage: this.on(target, type, listener, options)
+      // 2. target or selector: this.on(rawTarget, type, listener, options)
       const [rawTarget, type, listener, options] = args;
       if (!rawTarget) return () => {};
 
-      let targets = [];
-      if (typeof rawTarget === 'string') {
-        const root = this.shadowRoot || this;
-        targets = Array.from(root.querySelectorAll(rawTarget));
-      } else if (Array.isArray(rawTarget) || rawTarget instanceof NodeList) {
-        targets = Array.from(rawTarget);
-      } else {
-        targets = [rawTarget];
-      }
+      const root = this.shadowRoot || this;
+      const targets =
+        typeof rawTarget === 'string'                               ? Array.from(root.querySelectorAll(rawTarget))
+        : Array.isArray(rawTarget) || rawTarget instanceof NodeList ? Array.from(rawTarget)
+        : [rawTarget];
 
-      const unsubs = targets.filter(Boolean).map(target => {
-        target.addEventListener(type, listener, options);
-        return () => target.removeEventListener(type, listener, options);
-      });
-
-      return () => unsubs.forEach(unsub => unsub());
+      const unsubs = targets.filter(Boolean).map(target => on(target, type, listener, options));
+      return this.track(() => unsubs.forEach(unsub => unsub()));
     }
 
     off (type, listener, options) {
-      this.removeEventListener(type, listener, options);
+      off(this, type, listener, options);
       return this;
     }
 
@@ -213,10 +222,11 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
 
     /**
      * Query single element: this.$('selector') or ID lookup: this.$.myId
+     * results carry on/off, see ./events.js
      */
     get $ () {
       const root = this.shadowRoot || this;
-      const findOne = (selector) => root.querySelector(selector);
+      const findOne = (selector) => decorate(root.querySelector(selector));
 
       return new Proxy(findOne, {
         apply: (target, thisArg, args) => findOne(...args),
@@ -224,17 +234,18 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
           if (prop in target) return target[prop];
           if (typeof prop !== 'string') return undefined;
           const kebab = toKebabCase(prop);
-          return root.getElementById(kebab) || root.getElementById(prop);
+          return decorate(root.getElementById(kebab) || root.getElementById(prop));
         }
       });
     }
 
     /**
      * Query all matching elements as a clean Array: this.$$('selector')
+     * the array and its members carry on/off
      */
     get $$ () {
       const root = this.shadowRoot || this;
-      return (selector) => Array.from(root.querySelectorAll(selector));
+      return (selector) => decorateAll(Array.from(root.querySelectorAll(selector)));
     }
   };
 };
