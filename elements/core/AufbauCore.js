@@ -2,13 +2,16 @@
 
 import { decorate, decorateAll } from './utils.js';
 import { parseSchemaEntry }      from './parseSchemaEntry.js';
-import { AufbauConfigStore, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
+import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-import { 
+import {
+  coerce, createLogger, disposer,
   emitEvent, offEvent, onEvent,
-  isFn, isString,
-  toKebabCase,
+  isFn, isPlainObject, isString,
+  toBoolean, toKebabCase,
 } from '@aufbau/utils';
+
+const log = createLogger('aufbau-core');
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
@@ -16,7 +19,7 @@ return class extends BaseClass {
     constructor () {
       super();
       this._mounted = false;
-      this._unsubs  = [];
+      this._effects = disposer();
     }
 
     // ::: lifecycle
@@ -29,7 +32,7 @@ return class extends BaseClass {
       this.onMount();
       this.update();
     }
-    
+
     disconnectedCallback () {
       this._mounted = false;
       this.release();
@@ -45,23 +48,20 @@ return class extends BaseClass {
 
     static init (options) {
       const tagName    = isString(options) ? options : options?.name;
-      const extendsTag = typeof options === 'object' ? options?.extends : this.extendsTag;
+      const extendsTag = isPlainObject(options) ? options.extends : this.extendsTag;
 
       const name = tagName || toKebabCase(this.name);
       if (!name || !name.includes('-')) {
-        console.warn(`[Aufbau] Invalid tag name "${name}". Custom elements require a hyphen.`);
-        return;
+        return log.warn(`invalid tag name "${name}", custom elements require a hyphen.`);
       }
 
       if (this.attr && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
-        const observed = Array.isArray(this.attr) ? this.attr.map(toKebabCase) : Object.keys(this.attr).map(toKebabCase);
+        const observed = (Array.isArray(this.attr) ? this.attr : Object.keys(this.attr)).map(toKebabCase);
         Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
       }
 
-      if (!customElements.get(name)) {
-        const defineOptions = extendsTag ? { extends: extendsTag } : undefined;
-        customElements.define(name, this, defineOptions);
-      }
+      if (customElements.get(name)) return;
+      customElements.define(name, this, extendsTag ? { extends: extendsTag } : undefined);
     }
 
     // ::: lifecycle hooks (override in subclasses)
@@ -77,18 +77,23 @@ return class extends BaseClass {
     get tag () {
       return this.getAttribute('is') || this.localName;
     }
-    
+
+    /** static attr as a schema map, null when declared as a plain array */
+    get schema () {
+      const { attr } = this.constructor;
+      return isPlainObject(attr) ? attr : null;
+    }
+
     /** config keys this element depends on. null means: react to any change */
     get configWatchlist () {
       if (this._configWatchlist !== undefined) return this._configWatchlist;
-    
+
       const explicit = this.constructor.observedConfig;
       if (Array.isArray(explicit)) return (this._configWatchlist = new Set(explicit.map(toKebabCase)));
-    
-      const classAttr = this.constructor.attr;
-      const schema    = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
+
+      const schema = this.schema;
       if (!schema) return (this._configWatchlist = null);
-    
+
       const keys = new Set();
       for (const [name, entry] of Object.entries(schema)) {
         const { config } = parseSchemaEntry(entry);
@@ -96,7 +101,7 @@ return class extends BaseClass {
         if (config === true) configKeys(this.tag, name).forEach(key => keys.add(key));
         else config.forEach(key => keys.add(toKebabCase(key)));
       }
-    
+
       return (this._configWatchlist = keys.size ? keys : null);
     }
 
@@ -105,7 +110,7 @@ return class extends BaseClass {
       if (!watchlist || !Array.isArray(changed)) return true;
       return changed.some(key => watchlist.has(key));
     }
-    
+
     /**
      * precedence: local attribute -> <aufbau-config> -> fallback
      * @param {string} name
@@ -115,113 +120,85 @@ return class extends BaseClass {
     getConfig (name, fallback, keys = true) {
       const kebab = toKebabCase(name);
       if (this.hasAttribute(kebab)) return this.getAttribute(kebab);
-    
+
       const found = resolveConfig(this.tag, kebab, keys);
       return found === undefined ? fallback : found;
     }
 
     // ::: events
 
-    track (unsub) {
-      this._unsubs.push(unsub);
-      return unsub;
+    track (unsubscribe) {
+      return this._effects.add(unsubscribe);
     }
 
     release () {
-      this._unsubs.forEach(unsub => unsub());
-      this._unsubs = [];
+      this._effects.dispose();
       return this;
     }
 
+    /**
+     * this.on(type, listener, options)                  -> self
+     * this.on(target|selector|list, type, listener, ...) -> children or any target
+     */
     on (...args) {
-      // 1. self: this.on(type, listener, options)
-      if (typeof args[0] === 'string' && isFn(args[1])) {
-        return this.track(on(this, ...args));
-      }
+      if (isString(args[0]) && isFn(args[1])) return this.track(onEvent(this, ...args));
 
-      // 2. target or selector: this.on(rawTarget, type, listener, options)
       const [rawTarget, type, listener, options] = args;
       if (!rawTarget) return () => {};
 
-      const root = this.shadowRoot || this;
-      const targets =
-        isString(rawTarget)                              ? Array.from(root.querySelectorAll(rawTarget))
-        : Array.isArray(rawTarget) || rawTarget instanceof NodeList ? Array.from(rawTarget)
-        : [rawTarget];
-
-      const unsubs = targets.filter(Boolean).map(target => onEvent(target, type, listener, options));
-      return this.track(() => unsubs.forEach(unsub => unsub()));
+      const targets = isString(rawTarget) ? this.$$(rawTarget) : rawTarget;
+      return this.track(onEvent(targets, type, listener, options));
     }
 
     off (...args) {
-      off(this, ...args);
+      offEvent(this, ...args);
       return this;
     }
-    
-    emit (...args) {
-      return emitEvent (this, ...args);
+
+    emit (type, detail, options) {
+      return emitEvent(this, type, detail, options);
     }
-
-
 
     // ::: attributes
 
     getAttr (nameOrType, type, fallback) {
-      if (typeof nameOrType !== 'string') {
+      if (!isString(nameOrType)) {
         const overrideType = isFn(nameOrType) ? nameOrType : null;
         return new Proxy(this, {
-          get: (target, prop) => (typeof prop === 'string' ? this.getAttr(prop, overrideType, undefined) : undefined)
+          get: (target, prop) => (isString(prop) ? this.getAttr(prop, overrideType, undefined) : undefined)
         });
       }
 
-      const key          = nameOrType;
-      const classAttr    = this.constructor.attr;
-      const schema       = (classAttr && typeof classAttr === 'object' && !Array.isArray(classAttr)) ? classAttr : null;
-      const schemaEntry  = schema ? (schema[key] ?? schema[toKebabCase(key)]) : undefined;
-      const parsedSchema = schemaEntry !== undefined ? parseSchemaEntry(schemaEntry) : null;
+      const kebab  = toKebabCase(nameOrType);
+      const schema = this.schema;
+      const entry  = schema ? (schema[nameOrType] ?? schema[kebab]) : undefined;
+      const parsed = entry !== undefined ? parseSchemaEntry(entry) : null;
 
-      const finalType = (type && isFn(type))
-        ? type
-        : (parsedSchema ? parsedSchema.type : String);
+      const finalType     = isFn(type) ? type : (parsed?.type ?? String);
+      const finalFallback = fallback !== undefined ? fallback : parsed?.fallback;
+      const fromConfig    = () => (parsed?.config ? resolveConfig(this.tag, kebab, parsed.config) : undefined);
 
-      const finalFallback = fallback !== undefined
-        ? fallback
-        : (parsedSchema ? parsedSchema.fallback : undefined);
-
-      const kebab      = toKebabCase(key);
-const fromConfig = () => (parsedSchema?.config ? resolveConfig(this.tag, kebab, parsedSchema.config) : undefined);
-
-// 1. booleans: attribute presence first, then config, then fallback
-if (finalType === Boolean) {
-  if (this.hasAttribute(kebab)) return true;
-  const raw = fromConfig();
-  if (raw !== undefined) return raw === '' || raw === true || String(raw).toLowerCase() === 'true';
-  return finalFallback ?? false;
-}
-
-// 2. attribute -> config -> fallback
-let val = this.hasAttribute(kebab) ? this.getAttribute(kebab) : fromConfig();
-if (val === undefined) return finalFallback;
-      val = this.getAttribute(kebab);
-
-      if (finalType === Number) {
-        const parsed = parseFloat(val);
-        val = Number.isNaN(parsed) ? finalFallback : parsed;
-      } else if (isFn(finalType) && finalType !== String) {
-        try   { val = finalType(val); }
-        catch { val = finalFallback; }
+      // booleans: attribute presence first, then config, then fallback
+      if (finalType === Boolean) {
+        if (this.hasAttribute(kebab)) return true;
+        const configured = fromConfig();
+        return configured === undefined ? (finalFallback ?? false) : toBoolean(configured);
       }
 
-      if (parsedSchema?.values && !parsedSchema.values.includes(val)) {
-        val = finalFallback;
+      // attribute -> config -> fallback
+      const raw = this.hasAttribute(kebab) ? this.getAttribute(kebab) : fromConfig();
+      if (raw == null) return finalFallback;
+
+      let value = coerce(raw, finalType, finalFallback);
+
+      if (parsed?.values && !parsed.values.includes(value)) value = finalFallback;
+
+      if (parsed?.fn) {
+        try   { value = parsed.fn.call(this, value, nameOrType); }
+        catch { value = finalFallback; }
       }
 
-      if (parsedSchema?.fn) {
-        try   { val = parsedSchema.fn.call(this, val, key); }
-        catch { val = finalFallback; }
-      }
-
-      return val;
+      return value;
     }
 
     setAttr (map) {
@@ -229,34 +206,32 @@ if (val === undefined) return finalFallback;
         const kebab = toKebabCase(key);
              if (value === false || value == null) this.removeAttribute(kebab);
         else if (value === true)                   this.setAttribute(kebab, '');
-        else                                        this.setAttribute(kebab, String(value));
+        else                                       this.setAttribute(kebab, String(value));
       }
       return this;
     }
 
     // ::: children refs
 
+    get $ () {
+      const root    = this.shadowRoot || this;
+      const findOne = (selector) => decorate(root.querySelector(selector));
 
-    
-get $ () {
-  const root = this.shadowRoot || this;
-  const findOne = (selector) => decorate(root.querySelector(selector));
-
-  return new Proxy(findOne, {
-    apply: (target, thisArg, args) => findOne(...args),
-    get (target, prop) {
-      if (prop in target) return target[prop];
-      if (typeof prop !== 'string') return undefined;
-      const kebab = toKebabCase(prop);
-      return decorate(root.getElementById(kebab) || root.getElementById(prop));
+      return new Proxy(findOne, {
+        apply: (target, thisArg, args) => findOne(...args),
+        get (target, prop) {
+          if (prop in target) return target[prop];
+          if (!isString(prop)) return undefined;
+          const kebab = toKebabCase(prop);
+          return decorate(root.getElementById(kebab) || root.getElementById(prop));
+        }
+      });
     }
-  });
-}
 
-get $$ () {
-  const root = this.shadowRoot || this;
-  return (selector) => decorateAll(Array.from(root.querySelectorAll(selector)));
-}
+    get $$ () {
+      const root = this.shadowRoot || this;
+      return (selector) => decorateAll(Array.from(root.querySelectorAll(selector)));
+    }
 
 };};
 
