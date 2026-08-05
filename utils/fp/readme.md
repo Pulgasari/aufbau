@@ -88,3 +88,16 @@ const handleApiResponse = match([
   [res => res.status >= 500,  () => ShowError('Server Error')]
 ], () => ShowError('Unexpected status'));
 ```
+
+## pipe
+
+```javascript
+const slugify = pipe(
+  replace(/\s+/g, '-'),     // Replaces spaces with hyphens
+  replace(/[^a-z0-9-]/g, ''),// Removes invalid characters
+  slice(0, 15)              // Truncates to max 15 chars
+);
+
+slugify(" Functional Programming JS! "); 
+// Output: "functional-prog"
+```
