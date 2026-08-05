@@ -116,12 +116,12 @@ export const AufbauCore = (BaseClass = HTMLElement) => {
       off(this, ...args);
       return this;
     }
-
-    emit (eventName, detail = {}, options = {}) {
-      return this.dispatchEvent(new CustomEvent(eventName, {
-        bubbles: true, composed: true, detail, ...options
-      }));
+    
+    emit (...args) {
+      return emitEvent (this, ...args);
     }
+
+
 
     // ::: attributes
 
