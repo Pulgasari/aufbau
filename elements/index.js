@@ -56,7 +56,7 @@ export function load (tag) {
  * the element list is read from jsr.json, which is the single source of truth.
  * @returns {Promise<any[]>}
  */
-export async function registerAll () {
+async function registerAll () {
   manifest ??= (await import(new URL('./jsr.json', baseURL).href, { with: { type: 'json' } })).default;    
 
   const paths = Object.entries(manifest.exports ?? {})
@@ -88,7 +88,7 @@ function scan (node) {
  * @param {Element|Document} [options.root=document]
  * @returns {() => void} stop function, disconnects the observer
  */
-export function autoloader ({ base, root = document } = {}) {
+function autoloader ({ base, root = document } = {}) {
   if (typeof window === 'undefined') return () => {};
   if (base) baseURL = base;
   console.log('[@aufbau/elements] autoloader initialized.');
