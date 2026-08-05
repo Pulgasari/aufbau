@@ -39,7 +39,7 @@ body {
 #app-header { z-index: 3; box-shadow: 0  0.50rem 1.00rem -5px var(--aufbau-bg); }
 #app-footer { z-index: 3; box-shadow: 0 -0.50rem 1.00rem -5px var(--aufbau-bg); }
 
-#app-header
+#app-header {
   box-shadow: 
     0  4px  6px -1px color-mix(in srgb, var(--aufbau-bg) 30%, transparent),
     0 10px 15px -3px color-mix(in srgb, var(--aufbau-bg) 50%, transparent),
