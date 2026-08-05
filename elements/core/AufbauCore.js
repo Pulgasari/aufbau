@@ -202,7 +202,7 @@ if (finalType === Boolean) {
 // 2. attribute -> config -> fallback
 let val = this.hasAttribute(kebab) ? this.getAttribute(kebab) : fromConfig();
 if (val === undefined) return finalFallback;
-      let val = this.getAttribute(kebab);
+      val = this.getAttribute(kebab);
 
       if (finalType === Number) {
         const parsed = parseFloat(val);
