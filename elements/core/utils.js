@@ -1,5 +1,8 @@
 // @aufbau/elements/core/utils.js
 
+//import { on, off } from '@aufbau/dom/events';
+//import { on, off } from '@domina/events';
+
 export const toKebabCase = (str) => str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();     
 
 // @aufbau/elements/core/events.js
@@ -17,19 +20,11 @@ const decorated = new WeakSet();
 
 // :::::: PRIMITIVES ::::::::::::::::::::::::::::::::::::::::::::
 
-/**
- * attaches a listener and returns its unsubscribe function.
- * this is the only place addEventListener is called.
- */
 export const on = (target, type, listener, options) => {
   target.addEventListener(type, listener, options);
   return () => target.removeEventListener(type, listener, options);
 };
 
-/**
- * removes a listener. needs the exact same reference and capture flag,
- * the unsubscribe returned by on() is the reliable way.
- */
 export const off = (target, type, listener, options) => {
   target.removeEventListener(type, listener, options);
   return target;
@@ -37,10 +32,6 @@ export const off = (target, type, listener, options) => {
 
 // :::::: DECORATION ::::::::::::::::::::::::::::::::::::::::::::
 
-/**
- * attaches on/off to a single event target. idempotent.
- * @param {EventTarget} target
- */
 export function decorate (target) {
   if (!target || decorated.has(target)) return target;
   decorated.add(target);
@@ -51,11 +42,6 @@ export function decorate (target) {
   });
 }
 
-/**
- * same api on a list, fans out to its members.
- * no weakset needed, $$() returns a fresh array on every call.
- * @param {Element[]} list
- */
 export function decorateAll (list) {
   const items = list.map(decorate);
 
