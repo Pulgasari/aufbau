@@ -24,7 +24,7 @@ export default class AufbauDatalist extends AufbauDataListElement {
 
     try {
       // Use @aufbau/import under the hood (supports .jsonc, .json5, .yaml, .toml, .csv, .xml out-of-the-box!)
-      const data = await importeur(src);
+      const data = await importFile(src);
       
       // Normalize imported data into an array
       let items = [];
