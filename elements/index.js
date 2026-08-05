@@ -43,7 +43,7 @@ function tagOf (element) {
  * @param {string} tag - e.g. 'aufbau-slider'
  * @returns {Promise<any>}
  */
-export function load (tag) {
+function load (tag) {
   const url = new URL(`./${toPascalCase(tag)}.js`, baseURL).href;
   return import(url).catch(err => {
     console.warn(`[@aufbau/elements] could not load <${tag}> from "${url}":`, err);
