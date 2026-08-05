@@ -1,17 +1,31 @@
 // @aufbau/utils
 
+export * from './coerce.js';
+export * from './events.js';
+export * from './hash.js';
+export * from './html.js';
+export * from './is.js';
+export * from './log.js';
+export * from './memo.js';
+export * from './number.js';
+export * from './object.js';
+export * from './random.js';
+export * from './string.js';
+export * from './timing.js';
+export * from './url.js';
+
 //import { isArray, isEvery, isFn, isNullish, isObject, isPlainObject } from './is.js';
 //import { _el } from './dom.js';
 
 
-
+/*
 export function slugify (text) {
   return text
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-');
 }
-
+*/
 /*
 export const 
   
