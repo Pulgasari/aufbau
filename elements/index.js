@@ -111,8 +111,8 @@ function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export * as AufbauConfig  from './core/AufbauConfig.js';
-export * as AufbauCore    from './core/AufbauCore.js';
+export * from './core/AufbauConfig.js';
+export * from './core/AufbauCore.js';
 
 export {
   autoloader, 
