@@ -22,8 +22,6 @@ const { deepMerge, isPlainObject } = aufbauUtils;
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-
 const RESERVED_ELEMENT_KEYS = new Set(['mode']);
 
 // keeps the old shorthand working: elements: 'auto' -> elements: { mode: 'auto' }
@@ -51,12 +49,7 @@ const configs = {
 };
 
 export function config (options = {}) {
-  const { elements, ...rest } = options;
-  deepMerge(configs, rest);
-
-  const normalized = normalizeElements(elements);
-  if (normalized) deepMerge(configs.elements, normalized);
-
+  deepMerge(configs.elements, options);
   syncElementConfig(); // also runs on calls after boot, so config() stays live
   return configs;
 }
