@@ -223,7 +223,7 @@ function App () {
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 try {
-  const data = await (await fetch(MANIFEST)).json();
+  const data = await aufbau.import(MANIFEST.href);
   fonts.value  = data.fonts ?? [];
   status.value = 'ready';
 } catch (err) {
