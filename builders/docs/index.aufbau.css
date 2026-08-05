@@ -36,12 +36,8 @@ body {
 #app-header { aufbau-colors: aufbau inverted; }
 #app-footer { aufbau-colors: aufbau inverted; }
 
-#app-header,
-#app-footer { 
-  box-shadow: 0 0 1rem var(--bg);
-  z-index: 3;
-
-}
+#app-header { z-index: 3; box-shadow: 0  0.50rem 1.00rem -5px var(--aufbau-bg); }
+#app-footer { z-index: 3; box-shadow: 0 -0.50rem 1.00rem -5px var(--aufbau-bg); }
 
 pre, code {
   aufbau-webfont : 'JetBrains Mono';
