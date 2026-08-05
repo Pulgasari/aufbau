@@ -2,23 +2,27 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
-import { createLogger, emit, isPlainObject, isString, on, toJson, toKebabCase } from '@aufbau/utils';
+import { CanonicalMap, createLogger, emit, isPlainObject, isString, on, toJson, toKebabCase } from '@aufbau/utils';
 
 const log = createLogger('aufbau-config');
 
-const AufbauConfigStore = new Map(); // merged, read-only view of all sources. never write directly, use setConfig()
+const KEY_FORMS = ['kebab', 'camel']; // stored kebab, readable in both forms
+
+const AufbauConfigStore = new CanonicalMap(null, KEY_FORMS); // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
 const DEFAULTS = Symbol('defaults');
 const RESERVED = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
 const RUNTIME  = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
 const sources  = new Map(); // one source map per <aufbau-config> element, merged in connect order
 
+const newSource = () => new CanonicalMap(null, KEY_FORMS);
+
 const toValue = (value) => value == null ? null : String(value);
 
-// { code: { theme: 'nord' } } -> 'code-theme'
-function flatten (input, prefix = '', out = new Map()) {
+// { code: { theme: 'nord' } } -> 'code-theme'. the store normalizes each path itself
+function flatten (input, prefix = '', out = newSource()) {
   for (const [key, value] of Object.entries(input ?? {})) {
-    const path = prefix ? `${prefix}-${toKebabCase(key)}` : toKebabCase(key);
+    const path = prefix ? `${prefix}-${key}` : key;
     if (isPlainObject(value)) flatten(value, path, out);
     else out.set(path, toValue(value));
   }
@@ -26,7 +30,7 @@ function flatten (input, prefix = '', out = new Map()) {
 }
 
 function mergeSources () {
-  const next  = new Map();
+  const next  = new Map(); // keys arrive canonical from every source, no normalization needed
   const apply = (entries) => {
     for (const [key, value] of entries) {
       if (value === null) next.delete(key);
@@ -57,10 +61,10 @@ export function commitConfig () {
   if (!changed.length) return changed;
 
   AufbauConfigStore.clear();
-  for (const [key, value] of next) AufbauConfigStore.set(key, value);
+  AufbauConfigStore.merge(next);
 
   if (typeof window !== 'undefined') {
-    emit(window, CONFIG_EVENT, { changed, config: Object.fromEntries(next) });
+    emit(window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
   }
 
   return changed;
@@ -68,8 +72,9 @@ export function commitConfig () {
 
 // :::::: PUBLIC API :::::::::::::::::::::::::::::::::::::::::::
 
+/** key accepts any case form, 'codeTheme' and 'code-theme' resolve alike */
 export function getConfig (key, fallback) {
-  const found = AufbauConfigStore.get(toKebabCase(key));
+  const found = AufbauConfigStore.get(key);
   return found === undefined ? fallback : found;
 }
 
@@ -78,11 +83,11 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
   const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
 
-  const entries = sources.get(owner) ?? new Map();
+  const entries = sources.get(owner) ?? newSource();
   sources.set(owner, entries);
 
-  if (isKey) entries.set(toKebabCase(keyOrMap), toValue(valueOrOptions));
-  else for (const [key, value] of flatten(keyOrMap)) entries.set(key, value);
+  if (isKey) entries.set(keyOrMap, toValue(valueOrOptions));
+  else entries.merge(flatten(keyOrMap));
 
   commitConfig();
   return AufbauConfigStore;
@@ -105,8 +110,8 @@ export function configKeys (tag, name) {
 export function resolveConfig (tag, name, keys = true) {
   const candidates =
       keys === true       ? configKeys(tag, name)
-    : Array.isArray(keys) ? keys.map(toKebabCase)
-    : [toKebabCase(keys)];
+    : Array.isArray(keys) ? keys
+    : [keys];
 
   for (const key of candidates) if (AufbauConfigStore.has(key)) return AufbauConfigStore.get(key);
   return undefined;
@@ -133,23 +138,22 @@ export class AufbauConfig extends HTMLElement {
   }
 
   sync () {
-    const entries = new Map();
+    const entries = newSource();
 
     // 1. remote defaults, lowest precedence
-    if (this._remote) for (const [key, value] of this._remote) entries.set(key, value);
+    if (this._remote) entries.merge(this._remote);
 
     // 2. inline json body: <aufbau-config>{"code":{"theme":"nord"}}</aufbau-config>
     const body   = this.textContent.trim();
     const parsed = body ? toJson(body, null) : null;
 
     if (body && !isPlainObject(parsed)) log.warn('inline body is not a valid json object, ignored.');
-    else if (parsed) for (const [key, value] of flatten(parsed)) entries.set(key, value);
+    else if (parsed) entries.merge(flatten(parsed));
 
     // 3. attributes win, most explicit form
     for (const { name, value } of this.attributes) {
-      const key = toKebabCase(name);
-      if (RESERVED.has(key)) continue;
-      entries.set(key, value);
+      if (RESERVED.has(entries.key(name))) continue;
+      entries.set(name, value);
     }
 
     sources.set(this, entries);
