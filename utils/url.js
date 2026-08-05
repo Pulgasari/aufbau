@@ -56,8 +56,6 @@ class Url {
 export let url = input => new Url(input);
 
 
-Hier komplett:
-
 
 
 
