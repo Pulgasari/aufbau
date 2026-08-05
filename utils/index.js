@@ -1,5 +1,7 @@
 // @aufbau/utils
 
+export * from './CanonicalMap.js';
+
 export * from './coerce.js';
 export * from './events.js';
 export * from './hash.js';
