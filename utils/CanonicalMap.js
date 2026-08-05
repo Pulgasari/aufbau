@@ -1,4 +1,10 @@
-import { toCamelCase, toConstantCase, toKebabCase, toPascalCase, toSnakeCase } from './case.js';
+import {
+  toCamelCase, 
+  toConstantCase,
+  toKebabCase, 
+  toPascalCase, 
+  toSnakeCase
+} from './string.js';
 
 const FORMS = {
   camel    : toCamelCase,
