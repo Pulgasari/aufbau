@@ -12,23 +12,32 @@ export {
   capitalize,
   dedent,
   slugify,
-  toCamelCase,
-  toConstantCase,
-  toKebabCase,
-  toPascalCase,
-  toSnakeCase,
-  toTitleCase,
   unquote
 } from '../string.js';
+
+export const toWords = (value) => String(value)
+  .replace(/([a-z\d])([A-Z])/g, '$1 $2')
+  .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+  .replace(/[\s\-_.]+/g, ' ')
+  .trim()
+  .toLowerCase()
+  .split(' ')
+  .filter(Boolean);
 
 // :::::: UNARY TRANSFORMS
 
 export const 
-toLower   = value => value.toLowerCase (),
-toUpper   = value => value.toUpperCase (),
-trim      = value => value.trim        (),
-trimEnd   = value => value.trimEnd     (),
-trimStart = value => value.trimStart   ();
+toLowerCase    = value => value.toLowerCase (),
+toUpperCase    = value => value.toUpperCase (),
+toCamelCase    = value => toWords(value).map((word, index) => index ? upperFirst(word) : word).join(''),    
+toConstantCase = value => toWords(value).join('_').toUpperCase(),
+toKebabCase    = value => toWords(value).join('-'),
+toPascalCase   = value => toWords(value).map(upperFirst).join(''),
+toSnakeCase    = value => toWords(value).join('_'),
+toTitleCase    = value => toWords(value).map(upperFirst).join(' '),
+trim           = value => value.trim      (),
+trimEnd        = value => value.trimEnd   (),
+trimStart      = value => value.trimStart ();
 
 // :::::: CONFIGURED TRANSFORMS
 
