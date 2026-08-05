@@ -70,4 +70,4 @@ export default class AufbauTable extends AufbauElement {
   }
 }
 
-AufbauTable.init():
+AufbauTable.init();
