@@ -13,7 +13,7 @@ svg {
 
 @aufbau-config {
   import : reset, default, docs, keyframes;
-  themes : classic;
+  themes : zombie;
 }
 
 @aufbau colors {
