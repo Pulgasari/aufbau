@@ -23,11 +23,12 @@ export {
 
 // :::::: UNARY TRANSFORMS
 
-export const toLower   = value => value.toLowerCase ();
-export const toUpper   = value => value.toUpperCase ();
-export const trim      = value => value.trim        ();
-export const trimEnd   = value => value.trimEnd     ();
-export const trimStart = value => value.trimStart   ();
+export const 
+toLower   = value => value.toLowerCase (),
+toUpper   = value => value.toUpperCase (),
+trim      = value => value.trim        (),
+trimEnd   = value => value.trimEnd     (),
+trimStart = value => value.trimStart   ();
 
 // :::::: CONFIGURED TRANSFORMS
 
