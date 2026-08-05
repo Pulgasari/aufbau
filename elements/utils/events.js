@@ -13,7 +13,7 @@ export const offEvent = (target, type, listener, options) => {
   return target;
 };
 
-export const emitEvent (target, eventName, detail = {}, options = {}) {
+export const emitEvent = (target, eventName, detail = {}, options = {}) {
   return target.dispatchEvent (new CustomEvent (eventName, {
     bubbles: true, composed: true, detail, ...options
   }));
