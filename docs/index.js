@@ -1,7 +1,7 @@
 // aufbau/docs/index.js
 
 //import aufbau, { html } from '@aufbau/kits/preact-htm';
-import { createDocsFW, html } from './docsfw.js';
+import { createDocsFW, html } from '@aufbau/builders/docs';
 //aufbau.init(); // initialize @aufbau7kit
 
 // Service Worker registration for local assets
