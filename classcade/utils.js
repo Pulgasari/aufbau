@@ -2,7 +2,7 @@
 
 export const
   
-arrayfied = sth => Array.isArray(sth) ast : [ast],
+arrayfied = sth => Array.isArray(sth) ? sth : [sth],
 
 isClient = () => window !== 'undefined',
 
