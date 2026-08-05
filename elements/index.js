@@ -7,8 +7,6 @@ or registerAll() to get everything at once.
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
-import * as AufbauConfig  from './core/AufbauConfig.js';
-import * as AufbauCore    from './core/AufbauCore.js';
 import { toPascalCase }   from '@aufbau/utils';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
@@ -115,10 +113,10 @@ export function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export {
-  ...AufbauCore,
-  ...AufbauConfig,
+export * as AufbauConfig  from './core/AufbauConfig.js';
+export * as AufbauCore    from './core/AufbauCore.js';
 
+export {
   autoloader, 
   load, 
   registerAll
