@@ -44,5 +44,6 @@ export const truncate   = (length, ending) => (value) => truncateOf(value, lengt
 
 // :::::: QUERY
 
-export const endsWith   = (search) => (value) => value.endsWith(search);
-export const startsWith = (search) => (value) => value.startsWith(search);
+export const 
+endsWith   = search => value => value.endsWith   (search),
+startsWith = search => value => value.startsWith (search);
