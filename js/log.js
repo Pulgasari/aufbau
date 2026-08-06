@@ -1,3 +1,5 @@
+// @aufbau/js/log.js
+
 const LEVELS = { debug: 10, info: 20, warn: 30, error: 40, silent: 100 };
 
 let threshold = LEVELS.info;
