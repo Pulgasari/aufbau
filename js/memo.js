@@ -44,7 +44,7 @@ export const lru = (max = 100) => {
 };
 
 export const memoize = (callback, { key = (...args) => args[0], max = 0 } = {}) => {
-  const store = max > 0 ? lru(max) : new Map();
+  const store = max > 0 ? lru(max) : new Map;
 
   const memoized = (...args) => {
     const cacheKey = key(...args);
