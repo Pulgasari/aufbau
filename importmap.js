@@ -44,6 +44,7 @@ const map = { imports: {
     "@aufbau/shaders"         : "./shaders/index.js",
     "@aufbau/stylesheet"      : "./stylesheet/index.js",
     "@aufbau/stylesheet/"     : "./stylesheet/",
+    "@aufbau/utils"           : "./js/index.js",
     
     "hljs" : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm"
     }
