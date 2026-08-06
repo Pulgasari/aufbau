@@ -22,7 +22,7 @@ export * from './html.js';
 export * from './log.js';
 export * from './memo.js';
 export * from './number.js';
-//export * from './random.js';
+export * from './random.js';
 export * from './timing.js';
 //export * from './url.js';
 
