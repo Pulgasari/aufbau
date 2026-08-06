@@ -1,21 +1,21 @@
 // @aufbau/js/random.js
 
-export function randomInt({ min = 0, max = 100, step = 1 }){
+export function randomInt ({ min = 0, max = 100, step = 1 }) {
   let range = Math.floor((max - min) / step) + 1;
   return min + step * Math.floor(Math.random() * range);
 }
-export function randomFloat({ min = 0, max = 1, step = 0 }){
+export function randomFloat ({ min = 0, max = 1, step = 0 }) {
   let value = Math.random() * (max - min) + min;
   if (step > 0) value = Math.round(value / step) * step;
   return value;
 }
-export function randomValueFromArray( arr ){
+export function randomValueFromArray (arr) {
   if (!Array.isArray(arr) || arr.length === 0) return;
   let index = Math.floor(Math.random() * arr.length);
   return arr[index];
 }
 // Color: Hex
-export function randomColorHex({ min, max } = {} ){
+export function randomColorHex ({ min, max } = {}) {
   let toInt = (v, fallback) => {
     if (v == null) return fallback;
     if (typeof v === 'number' && Number.isFinite(v)) {
@@ -48,7 +48,7 @@ export function randomColorHex({ min, max } = {} ){
   return '#' + n.toString(16).padStart(6, '0');
 }
 // Color: HSL(A)
-export function randomColorHSL({
+export function randomColorHSL ({
   h = null, hMin = 0, hMax = 360,
   s = null, sMin = 0, sMax = 100,
   l = null, lMin = 0, lMax = 100,
@@ -59,7 +59,7 @@ export function randomColorHSL({
   l ??= randomInt({ min: lMin, max: lMax, step });
   return `hsl(${h} ${s}% ${l}%)`;
 }
-export function randomColorHSLA({
+export function randomColorHSLA ({
   h = null, hMin = 0, hMax = 360,
   s = null, sMin = 0, sMax = 100,
   l = null, lMin = 0, lMax = 100,
@@ -74,7 +74,7 @@ export function randomColorHSLA({
   return hsl.replace(/^hsl\((.+)\)$/, `hsla($1 / ${a})`);
 }
 // Color: RGB(A)
-function randomColorRGB({
+function randomColorRGB ({
   r = null, rMin = 0, rMax = 255,
   g = null, gMin = 0, gMax = 255,
   b = null, bMin = 0, bMax = 255,
@@ -85,7 +85,7 @@ function randomColorRGB({
   b ??= randomInt({ min: bMin, max: bMax, step });
   return `rgb(${r} ${g} ${b})`;
 }
-function randomColorRGBA({
+function randomColorRGBA ({
   r = null, rMin = 0, rMax = 255,
   g = null, gMin = 0, gMax = 255,
   b = null, bMin = 0, bMax = 255,
@@ -100,7 +100,7 @@ function randomColorRGBA({
   return rgb.replace(/^rgb\((.+)\)$/, `rgba($1 / ${alpha})`);
 }
 
-export default {
+export const random = {
   color : {
     hex  : randomColorHex,
     hsl  : randomColorHSL,
@@ -111,4 +111,6 @@ export default {
   float : randomFloat,
   int   : randomFloat,
   valueFromArray : randomValueFromArray,
-}
+};
+
+export default random;
