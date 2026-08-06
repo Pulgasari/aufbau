@@ -33,12 +33,12 @@ official **aufbau** *webcomponents\** library.
 
 the elements load automatically as soon as they appear in the DOM. fits best for usage directly in the browser.
 
-```html
-<script type="module">
-  import { autoloader } from '@aufbau/elements';
-  autoloader();
-</script>
+```javascript
+import { autoloader } from '@aufbau/elements';
+autoloader();
+```
 
+```html
 <!-- Magic happens:  -->
 <aufbau-flag code="de"></aufbau-flag>
 <aufbau-slider value="50"></aufbau-slider>
@@ -46,7 +46,7 @@ the elements load automatically as soon as they appear in the DOM. fits best for
 
 ### register all elements at once
 
-registers all elements at once. is good for prototyping.
+registers all elements at once. is good for prototyping but in most other cases kinda stupid.
 
 ```javascript
 import '@aufbau/elements';
