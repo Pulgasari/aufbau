@@ -36,23 +36,14 @@
 
 ---
 
-# importmap
-
-```javascript
-<script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
-```
-
----
-
 # [@aufbau/kits](kits/readme.md)
 
-the **kit** bundles all the following packages with **Preact** and **HTM** to deliver a *batteries-included* JS-framework made in and for the browser.
+a **kit** is a *batteries-included* bundle containing all **aufbau**-packages combined with other frameworks/libraries ready to use in the browser.
 
-```javascript
-import aufbau, { html } from '@aufbau/kits/preact-htm';
-```
-
-***note:** multiple other kits are planned as well.*
+- preact-htm
+- preact-jsx
+- react-jsx
+- svelte
 
 ---
 
