@@ -1,6 +1,8 @@
-export const clamp = (value, min, max) => Math.min(Math.max(value, min ?? -Infinity), max ?? Infinity);
+// @aufbau/js/number.js
 
-export const lerp = (from, to, amount) => from + (to - from) * amount;
+export const 
+clamp = (value, min, max)  => Math.min(Math.max(value, min ?? -Infinity), max ?? Infinity),
+lerp  = (from, to, amount) => from + (to - from) * amount;
 
 export const mapRange = (value, fromMin, fromMax, toMin, toMax) =>
   fromMax === fromMin ? toMin : toMin + ((value - fromMin) / (fromMax - fromMin)) * (toMax - toMin);
