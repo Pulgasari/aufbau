@@ -1,11 +1,10 @@
-// @aufbau/utils/fp/core.js
+// @aufbau/js/core.js
 
-// ============================================================================
-// 1. COMPOSITION
-// ============================================================================
+// :::::: COMPOSITION
 
-export const identity = (value) => value;
-export const constant = (value) => () => value;
+export const 
+identity = value => value,
+constant = value => () => value;
 
 // left-to-right: pipe(f, g, h)(x) => h(g(f(x)))
 // small arities are specialized to avoid a reducer closure per invocation
@@ -23,7 +22,7 @@ export const pipe = (...fns) => {
   };
 };
 
-// right-to-left: compose(f, g, h)(x) => f(g(h(x)))
+// right-to-left: compose (f,g,h) (x) => f(g(h(x)))
 export const compose = (...fns) => {
   const [first, second, third] = fns;
   switch (fns.length) {
@@ -38,9 +37,7 @@ export const compose = (...fns) => {
   };
 };
 
-// ============================================================================
-// 2. FUNCTION WRAPPERS
-// ============================================================================
+// :::::: FUNCTION WRAPPERS
 
 // step-by-step argument passing; pass arity explicitly when fn uses default or rest params,
 // because fn.length stops counting at the first of those
@@ -66,9 +63,7 @@ export const once = (fn) => {
   };
 };
 
-// ============================================================================
-// 3. LOGIC COMBINATORS
-// ============================================================================
+// :::::: LOGIC COMBINATORS
 
 export const not = (fn) => (...args) => !fn(...args);
 
