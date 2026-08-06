@@ -9,7 +9,7 @@ import {
   emitEvent, offEvent, onEvent,
   isFn, isPlainObject, isString,
   toBoolean, toKebabCase,
-} from '@aufbau/utils';
+} from '@aufbau/js';
 
 const log = createLogger('aufbau-core');
 
