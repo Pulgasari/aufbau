@@ -7,6 +7,10 @@ a **kit** is a bundle of all aufbau-packages combined with other frameworks/libr
 a kit containing aufbau + preact (core, hooks, signals) + htm.
 
 ```javascript
+https://esm.sh/jsr/@aufbau/kits/preact-htm
+```
+
+```javascript
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 
 aufbau.init();
