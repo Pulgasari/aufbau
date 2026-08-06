@@ -1,3 +1,5 @@
+// @aufbau/js/timing.js
+
 export const debounce = (callback, delay = 100) => {
   let timer = null;
 
