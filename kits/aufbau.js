@@ -14,7 +14,7 @@ import * as aufbauPluginsClient from '@aufbau/plugins/client';
 import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
 import * as aufbauShaders       from '@aufbau/shaders';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
-import * as aufbauUtils         from '@aufbau/utils';
+import * as aufbauUtils         from '@aufbau/js';
 
 // ::: LOCAL
 import { define, update, updateDataset, updateProperty } from './dom.js';
