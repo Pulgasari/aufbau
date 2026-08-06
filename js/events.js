@@ -1,4 +1,6 @@
-// @aufbau/utils/events.js
+// @aufbau/js/events.js
+
+// :::::: HELPERS
 
 const toTargets = (value) =>
     value == null                                   ? []
@@ -6,11 +8,10 @@ const toTargets = (value) =>
   : typeof value[Symbol.iterator] === 'function'    ? Array.from(value)
   : [];
 
-const toTypes = (value) =>
-  Array.isArray(value) ? value.filter(Boolean) : String(value).split(/[\s,]+/).filter(Boolean);
+const toTypes  = (value)   => Array.isArray(value) ? value.filter(Boolean) : String(value).split(/[\s,]+/).filter(Boolean);     
+const withOnce = (options) => typeof options === 'boolean' ? { capture: options, once: true } : { ...options, once: true };
 
-const withOnce = (options) =>
-  typeof options === 'boolean' ? { capture: options, once: true } : { ...options, once: true };
+// :::::: EXPORTS
 
 export const delegate = (root, selector, types, listener, options) => {
   const handler = (event) => {
