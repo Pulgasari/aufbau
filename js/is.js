@@ -140,6 +140,8 @@ export const {
   zero: isZero
 } = predicates;
 
+export const isBool = predicates.boolean;
+
 // deprecated aliases, kept for compatibility with the first draft
 export const isDate2 = predicates.dateString;
 export const isFalsy = predicates.blankish;
