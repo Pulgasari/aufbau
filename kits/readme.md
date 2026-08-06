@@ -26,6 +26,12 @@ const { useEffect, useRef, signal } = preact;
 because **aufbau** is not published yet this importmap needs to be defined.
 
 ```html
+<script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
+```
+
+or copypaste:
+
+```html
 <script type="importmap">{"imports":{
   "htm"                  : "https://esm.sh/htm@3.1.1",
   "preact"               : "https://esm.sh/preact@10.20.1",
