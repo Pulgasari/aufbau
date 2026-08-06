@@ -1,3 +1,5 @@
+// @aufbau/js/memo.js
+
 export const lazy = (factory) => {
   let called = false;
   let value;
@@ -15,14 +17,14 @@ export const lazy = (factory) => {
 };
 
 export const lru = (max = 100) => {
-  const store = new Map();
+  const store = new Map;
 
   return {
     get size () { return store.size; },
-    clear  : () => store.clear(),
-    delete : (key) => store.delete(key),
-    has    : (key) => store.has(key),
-    keys   : () => store.keys(),
+    clear  : ()  => store.clear  (),
+    delete : key => store.delete (key),
+    has    : key => store.has    (key),
+    keys   : ()  => store.keys   (),
 
     get (key) {
       if (!store.has(key)) return undefined;
