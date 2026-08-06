@@ -1,7 +1,7 @@
 // preact-gestures.js — thin wrapper around gestures.js
 
 import { useRef, useMemo } from 'preact/hooks';
-import { gestures }        from './gestures.js';
+import { gestures }        from './../dom/gestures.js';
 
 let IS_CALLBACK = /^on[A-Z]/;
 
@@ -36,4 +36,4 @@ export let useGesture = options => {
   }, []);
 };
 
-export { gestures } from './gestures.js';
+export { gestures } from './../dom/gestures.js';
