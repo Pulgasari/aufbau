@@ -4,6 +4,15 @@ a **kit** is a bundle of all aufbau-packages combined with other frameworks/libr
 
 ## @aufbau/kits/preact-htm
 
+a kit containing aufbau + preact (core, hooks, signals) + htm.
+
+```javascript
+import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+
+aufbau.init();
+const { useEffect, useRef, signal } = preact;
+```
+
 ## @aufbau/kits/preact-jsx
 
 ## @aufbau/kits/react-jsx
