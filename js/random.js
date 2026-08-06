@@ -1,4 +1,4 @@
-// random.js
+// @aufbau/js/random.js
 
 export function randomInt({ min = 0, max = 100, step = 1 }){
   let range = Math.floor((max - min) / step) + 1;
@@ -101,15 +101,14 @@ function randomColorRGBA({
 }
 
 export default {
+  color : {
+    hex  : randomColorHex,
+    hsl  : randomColorHSL,
+    hsla : randomColorHSLA,
+    rgb  : randomColorRGB,
+    rgba : randomColorRGBA,
+  },
   float : randomFloat,
   int   : randomFloat,
-  color : {
-    hex : randomColorHex,
-    hsl : randomColorHSL,
-   hsla : randomColorHSLA,
-    rgb : randomColorRGB,
-   rgba : randomColorRGBA,
-  },
-  valueFromArray : randomValueFromArray
-
+  valueFromArray : randomValueFromArray,
 }
