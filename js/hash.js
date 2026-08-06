@@ -1,3 +1,5 @@
+// @aufbau/js/hash.js
+
 export const stableStringify = (value) => {
     typeof value === 'string'                ? value
   : value === null || typeof value !== 'object' ? String(value)
