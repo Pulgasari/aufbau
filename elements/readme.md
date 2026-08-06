@@ -76,6 +76,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 <aufbau-copy>
 <aufbau-dash>
 <aufbau-dash-panel>
+<aufbau-editor>
 <aufbau-epub>
 <aufbau-fake> (um so fake elemente zu generieren für testing und prototyping)
 <aufbau-flyout>
@@ -85,12 +86,14 @@ customElements.define('aufbau-flag', AufbauFlag);
 <aufbau-include>
 <aufbau-keyboard>
 <aufbau-media> (allrounder?)
+<aufbau-menu>
 <aufbau-modal>
 <aufbau-paginate>
 <aufbau-popup>
 <aufbau-scroller>
 <aufbau-skeleton>
 <aufbau-svg>
+<aufbau-taplet>
 <aufbau-terminal>
 <aufbau-toolbar>
 
