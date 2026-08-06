@@ -16,6 +16,14 @@ export * from './string.js';
 export * from './timing.js';
 //export * from './url.js';
 
+
+// minimal escaping — keeps url() valid at roughly two thirds the length.
+// single quotes remain in the markup, so results must be wrapped as url("...")
+export function encodeSvg (svg) {
+  const compact = svg.replace(/\s+/g, ' ').replace(/"/g, "'").trim();
+  return `data:image/svg+xml,${compact.replace(/[<>#%{}|\\^`]/g, c => '%' + c.charCodeAt(0).toString(16))}`;
+}
+
 //import { isArray, isEvery, isFn, isNullish, isObject, isPlainObject } from './is.js';
 //import { _el } from './dom.js';
 
