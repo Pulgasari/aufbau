@@ -1,0 +1,8 @@
+// @aufbau/svg/index.json5
+
+{
+  patterns: [
+    { id: 'dots'    , name: 'Dots'    },
+    { id: 'striped' , name: 'Stripes' },
+  ],
+}
