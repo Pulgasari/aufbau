@@ -84,33 +84,33 @@ export const nodeList = (value) => {
 };
 
 // without a location (ssr) nothing can be same-origin, so only absolute urls count as external
-export const internalUrl = (value) => string(value) && origin !== undefined && value.startsWith(origin);
-export const externalUrl = (value) => string(value) && (
-  origin === undefined ? /^[a-z][a-z0-9+.-]*:\/\//i.test(value) : !value.startsWith(origin)
-);
+export const
+internalUrl = (value) => string(value) && origin !== undefined && value.startsWith(origin),
+externalUrl = (value) => string(value) && (origin === undefined ? /^[a-z][a-z0-9+.-]*:\/\//i.test(value) : !value.startsWith(origin));    
 
 //////////// 6. EMPTINESS ////////////
 
-export const blank       = (value) => value === null || value === undefined || value === '';
-export const blankish    = (value) => !value && value !== 0 && value !== false;
-export const emptyArray  = (value) => Array.isArray(value) && value.length === 0;
-export const emptyMap    = (value) => map(value) && value.size === 0;
-export const emptyObject = (value) => plainObject(value) && Object.keys(value).length === 0;
-export const emptySet    = (value) => set(value) && value.size === 0;
-export const emptyString = (value) => typeof value === 'string' && value.length === 0;
+export const
+blank       = (value) => value == null || value === '',
+blankish    = (value) => !value && value !== 0 && value !== false,
+emptyArray  = (value) => Array.isArray(value) && value.length === 0,
+emptyMap    = (value) => map(value) && value.size === 0,
+emptyObject = (value) => plainObject(value) && Object.keys(value).length === 0,
+emptySet    = (value) => set(value) && value.size === 0,
+emptyString = (value) => typeof value === 'string' && value.length === 0;
 
-export const empty = (value) =>
-  value === '' || (value != null && value.length === 0) || emptyMap(value) || emptySet(value) || emptyObject(value);
-
-export const filled = (value) => !blank(value) && !empty(value) && !emptyObject(value);
+export const
+empty  = (value) => value === '' || (value != null && value.length === 0) || emptyMap(value) || emptySet(value) || emptyObject(value),
+filled = (value) => !blank(value) && !empty(value) && !emptyObject(value);
 
 //////////// 7. FORMATS & PARSING ////////////
 
-export const alphaNumeric = matches(/^[a-z0-9]+$/i);
-export const dateString   = (value) => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(value) || (!Number.isNaN(Date.parse(value)) && Number.isNaN(Number(value)));
-export const email        = matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-export const hexColor     = matches(/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
-export const uuid         = matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+export const
+alphaNumeric = matches(/^[a-z0-9]+$/i),
+dateString   = (value) => /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(value) || (!Number.isNaN(Date.parse(value)) && Number.isNaN(Number(value))),    
+email        = matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
+hexColor     = matches(/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i),
+uuid         = matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
 // surrounding whitespace is tolerated, the alternation covers paired and self-closing tags
 export const html = (value) =>
@@ -126,27 +126,28 @@ export const json = (value) => {
   try { JSON.parse(value); return true; } catch { return false; }
 };
 
-export const url = (value) => {
-  try { new URL(value); return true; } catch { return false; }
-};
+export const url = (value) => {try { new URL(value); return true; } catch { return false; }};
 
 //////////// 8. STRING CASES ////////////
 
-export const constantCase = matches(/^[A-Z0-9]+(?:_[A-Z0-9]+)*$/);
-export const kebabCase    = matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
-export const lowerCase    = (value) => typeof value === 'string' && value === value.toLowerCase();
-export const pascalCase   = matches(/^[A-Z][a-zA-Z0-9]*$/);
-export const snakeCase    = matches(/^[a-z0-9]+(?:_[a-z0-9]+)*$/);
-export const upperCase    = (value) => typeof value === 'string' && value === value.toUpperCase();
-export const camelCase    = and(matches(/^[a-z][a-zA-Z0-9]*$/), not(upperCase));
+export const
+constantCase = matches(/^[A-Z0-9]+(?:_[A-Z0-9]+)*$/),
+kebabCase    = matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+lowerCase    = (value) => typeof value === 'string' && value === value.toLowerCase(),
+pascalCase   = matches(/^[A-Z][a-zA-Z0-9]*$/),
+snakeCase    = matches(/^[a-z0-9]+(?:_[a-z0-9]+)*$/),
+upperCase    = (value) => typeof value === 'string' && value === value.toUpperCase(),
+camelCase    = and(matches(/^[a-z][a-zA-Z0-9]*$/), not(upperCase));
 
 //////////// 9. LISTS ////////////
 
-export const entriesList = (value) => Array.isArray(value) && value.every((item) => Array.isArray(item) && item.length === 2);
-export const objectList  = (value) => Array.isArray(value) && value.every(object);
-export const stringList  = (value) => Array.isArray(value) && value.every(string);
+export const
+entriesList = (value) => Array.isArray(value) && value.every((item) => Array.isArray(item) && item.length === 2),
+objectList  = (value) => Array.isArray(value) && value.every(object),
+stringList  = (value) => Array.isArray(value) && value.every(string);
 
 //////////// 10. DEPRECATED ALIASES (names from the first draft)
 
-export const date2 = dateString;
-export const falsy = blankish;
+export const 
+date2 = dateString,
+falsy = blankish;
