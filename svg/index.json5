@@ -3,6 +3,7 @@
 {
   patterns: [
     { id: 'dots'    , name: 'Dots'    },
+    { id: 'grid'    , name: 'Grid'    },
     { id: 'stripes' , name: 'Stripes' },
   ],
 }
