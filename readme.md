@@ -1,4 +1,4 @@
-![Logo](logo.svg)
+![Logo](/logo.svg)
 
 **aufbau** is a browser-focused JS toolkit, library and framework. It's made for being used without any offline build-steps.
 
