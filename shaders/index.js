@@ -2,7 +2,8 @@
 
 import waveShader       from './presets/wave.js';
 import heavyCyberGlitch from './presets/heavy_cyber_glitch.js';
-import { glitchRgb, liveGlitch } from './presets/glitch.js';
+import { glitchRgb }    from './presets/glitch.js';
+import { liveGlitch }   from './presets/glitch.js';
 
 /**
  * Registry mapping shader names to their respective SVG generator functions.
