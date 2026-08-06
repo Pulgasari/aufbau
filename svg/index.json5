@@ -1,6 +1,10 @@
 // @aufbau/svg/index.json5
 
 {
+  filters: [
+    { id: 'glitch-live' , name: 'Live Glitch' },
+    { id: 'glitch-rgb'  , name: 'RGB Glitch'  },
+  ],
   patterns: [
     { id: 'dots'    , name: 'Dots'    },
     { id: 'grid'    , name: 'Grid'    },
