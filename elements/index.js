@@ -7,7 +7,7 @@ or registerAll() to get everything at once.
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
-import { toPascalCase }   from '@aufbau/utils';
+import { toPascalCase }   from '@aufbau/js';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
