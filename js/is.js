@@ -1,4 +1,4 @@
-// @aufbau/utils/fp/is.js
+// @aufbau/js/is.js
 
 import * as predicates from './predicates.js';
 
