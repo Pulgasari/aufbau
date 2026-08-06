@@ -41,11 +41,11 @@ export default function (code) {
     const options = {};
 
     // Extract parameters from functional syntax
-    val = val.replace(/scale\(([^)]+)\)/g, (_, v) => { options.scale = parseFloat(v); return ''; });
-    val = val.replace(/speed\(([^)]+)\)/g, (_, v) => { options.speed = v.trim(); return ''; });
-    val = val.replace(/frequency\(([^)]+)\)/g, (_, v) => { options.frequency = v.trim(); return ''; });
-    val = val.replace(/octaves\(([^)]+)\)/g, (_, v) => { options.octaves = parseInt(v, 10); return ''; });
-    val = val.replace(/offset\(([^)]+)\)/g, (_, v) => { options.offsetX = parseFloat(v); return ''; });
+    val = val.replace(/scale\(([^)]+)\)/g     , (_, v) => { options.scale     = parseFloat(v);   return ''; });
+    val = val.replace(/speed\(([^)]+)\)/g     , (_, v) => { options.speed     = v.trim();        return ''; });
+    val = val.replace(/frequency\(([^)]+)\)/g , (_, v) => { options.frequency = v.trim();        return ''; });
+    val = val.replace(/octaves\(([^)]+)\)/g   , (_, v) => { options.octaves   = parseInt(v, 10); return ''; });
+    val = val.replace(/offset\(([^)]+)\)/g    , (_, v) => { options.offsetX   = parseFloat(v);   return ''; });
 
     // Build a unique filter ID based on passed parameters
     const optionKeys = Object.keys(options).sort();
