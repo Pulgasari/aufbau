@@ -148,6 +148,9 @@ body > * { padding: small; }
 
 ## [@aufbau/svg](/svg)
 
+[filters](/svg/filters)
+[patterns](/svg/patterns)
+
 ## [@aufbau/webfonts](/webfonts)
 
 handpicked collection of free webfonts looking great in webdev projects.
