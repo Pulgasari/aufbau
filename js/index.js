@@ -33,4 +33,3 @@ export function encodeSvg (svg) {
   const compact = svg.replace(/\s+/g, ' ').replace(/"/g, "'").trim();
   return `data:image/svg+xml,${compact.replace(/[<>#%{}|\\^`]/g, c => '%' + c.charCodeAt(0).toString(16))}`;
 }
-
