@@ -60,7 +60,7 @@ import aufbau, { html } from '@aufbau/kits/preact-htm';
 
 ## @aufbau/cache
 
-## @aufbau/elements
+## [@aufbau/elements](elements/readme.md)
 
 read more [here](elements/readme.md).
 
