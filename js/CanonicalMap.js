@@ -1,3 +1,5 @@
+// @aufbau/js/CanonicalMap.js
+
 import {
   toCamelCase, 
   toConstantCase,
