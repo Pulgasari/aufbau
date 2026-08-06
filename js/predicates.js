@@ -25,7 +25,7 @@ nullish    = (value) => value ==  null,
 primitive  = (value) => value !== Object(value),
 string     = typeOf('string'),
 symbol     = typeOf('symbol'),
-undefined_ = (value) => value === undefined;
+undefined_ = (value) => value === undefined,
 
 //////////// 3. NUMBERS ////////////
 
@@ -47,31 +47,34 @@ year          = (value) => numeric(value) && /^\d{4}$/.test(String(value)) && +v
 
 //////////// 4. OBJECTS & DATA STRUCTURES ////////////
 
-export const array        = Array.isArray;
-export const buffer       = (value) => typeof Buffer !== 'undefined' && Buffer.isBuffer(value);
-export const date         = (value) => value instanceof Date && !Number.isNaN(value.getTime());
-export const error        = instanceOf(Error);
-export const map          = instanceOf(globalThis.Map ?? null);
-export const object       = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-export const plainObject  = (value) => value !== null && typeof value === 'object' && value.constructor === Object;
-export const promise      = instanceOf(Promise);
-export const realObject   = (value) => value?.constructor === Object;
-export const regExp       = instanceOf(RegExp);
-export const set          = instanceOf(globalThis.Set ?? null);
-export const strictObject = (value) => Object.prototype.toString.call(value) === '[object Object]';
+export const 
+array        = Array.isArray,
+buffer       = (value) => typeof Buffer !== 'undefined' && Buffer.isBuffer(value),
+date         = (value) => value instanceof Date && !Number.isNaN(value.getTime()),
+error        = instanceOf(Error),
+map          = instanceOf(globalThis.Map ?? null),
+object       = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value),
+plainObject  = (value) => value !== null && typeof value === 'object' && value.constructor === Object,
+promise      = instanceOf(Promise),
+realObject   = (value) => value?.constructor === Object,
+regExp       = instanceOf(RegExp),
+set          = instanceOf(globalThis.Set ?? null),
+strictObject = (value) => Object.prototype.toString.call(value) === '[object Object]';
 
-export const asyncIterable = (value) => value != null && typeof value[Symbol.asyncIterator] === 'function';
-export const iterable      = (value) => value != null && typeof value[Symbol.iterator] === 'function';
+export const 
+asyncIterable = (value) => value != null && typeof value[Symbol.asyncIterator] === 'function',
+iterable      = (value) => value != null && typeof value[Symbol.iterator]      === 'function';
 
 //////////// 5. DOM & ENVIRONMENT (ssr-safe) ////////////
 
-export const canvas       = instanceOf(globalThis.HTMLCanvasElement ?? null);
-export const element      = instanceOf(globalThis.Element ?? null);
-export const fragment     = instanceOf(globalThis.DocumentFragment ?? null);
-export const node         = instanceOf(globalThis.Node ?? null);
-export const domNode      = node;
-export const elementish   = or(element, fragment, instanceOf(globalThis.Document ?? null));
-export const realNodeList = instanceOf(globalThis.NodeList ?? null);
+export const 
+canvas       = instanceOf(globalThis.HTMLCanvasElement ?? null),
+element      = instanceOf(globalThis.Element           ?? null),
+fragment     = instanceOf(globalThis.DocumentFragment  ?? null),
+node         = instanceOf(globalThis.Node              ?? null),
+domNode      = node,
+elementish   = or(element, fragment, instanceOf(globalThis.Document ?? null)),
+realNodeList = instanceOf(globalThis.NodeList ?? null);
 
 // indexed loop instead of [...value].every(node), spreading copies the whole list just to read it
 export const nodeList = (value) => {
