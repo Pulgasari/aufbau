@@ -151,13 +151,13 @@ body > * { padding: small; }
 
 # pure resources
 
-## @aufbau/css
+## [@aufbau/css](/css)
 
 [themes](/css/themes)
 
-## @aufbau/svg
+## [@aufbau/svg](/svg)
 
-## @aufbau/webfonts
+## [@aufbau/webfonts](/webfonts)
 
 handpicked collection of free webfonts looking great in webdev projects.
 
