@@ -1,3 +1,5 @@
+// @aufbau/js/coerce.js
+
 const FALSY = new Set(['false', '0', 'no', 'off', 'null', 'undefined']);
 
 const parseNumber = (value, fallback) => {
