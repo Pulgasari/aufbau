@@ -1,7 +1,7 @@
 // <aufbau-code>
 
 import { AufbauElement } from './core/index.js';
-import { escapeHtml } from '@aufbau/utils';
+import { escapeHtml } from '@aufbau/js';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
