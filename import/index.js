@@ -15,6 +15,7 @@ const registry = {
   sass          : 'sass@1.70.0',
   smolToml      : 'smol-toml@1.1.4',
   sucrase       : 'sucrase@3.35.0',
+  svgjs         : '',
   yaml          : 'yaml@2.3.4'
 };
 
@@ -128,6 +129,7 @@ const outputs = {
   scss  : cssModes,
   svg   : { string   : ['markup', 'text'],
             element  : ['dom', 'node', 'svgelement'],
+            svgjs    : ['svgdotjs', 'wrapped'],
             raw      : ['original', 'source'] },
   text  : textModes,
   toml  : dataModes,
@@ -406,6 +408,11 @@ export async function importSVG (path, options = {}) {
   // strip xml declaration and doctype headers for clean html5 inlining
   const clean = text.replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
   if (mode !== 'element') return clean;
+
+  if (mode === 'svgjs') {
+    const { SVG } = await vendor('svgJs');
+    return SVG(el); // adopts the live node, no re-parse
+  }
 
   const doc = new DOMParser().parseFromString(clean, 'image/svg+xml');
   return doc.querySelector('svg') || doc.documentElement;
