@@ -15,12 +15,12 @@ export * from './string.js';
 
 export * from './CanonicalMap.js';
 
-//export * from './coerce.js';
+export * from './coerce.js';
 export * from './events.js';
 export * from './hash.js';
-//export * from './html.js';
-//export * from './log.js';
-//export * from './memo.js';
+export * from './html.js';
+export * from './log.js';
+export * from './memo.js';
 export * from './number.js';
 //export * from './random.js';
 export * from './timing.js';
