@@ -3,7 +3,7 @@
 /**
  * Encodes an SVG string into an optimized utf8 Data-URI.
  */
-function encodeSvg (svg) {
+function encodeSVG (svg) {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
@@ -21,7 +21,7 @@ export function stripes ({ bg = 'transparent', fg = 'currentColor', rotate = 0 }
   <rect width="100%" height="100%" fill="url(#p)"/>
 </svg>`;
 
-  return encodeSvg(svg);
+  return encodeSVG(svg);
 }
 
 /**
@@ -38,7 +38,7 @@ export function dots ({ bg = 'transparent', fg = 'currentColor', rotate = 0 } = 
   <rect width="100%" height="100%" fill="url(#p)"/>
 </svg>`;
 
-  return encodeSvg(svg);
+  return encodeSVG(svg);
 }
 
 /**
@@ -55,5 +55,5 @@ export function grid ({ bg = 'transparent', fg = 'currentColor', rotate = 0 } = 
   <rect width="100%" height="100%" fill="url(#p)"/>
 </svg>`;
 
-  return encodeSvg(svg);
+  return encodeSVG(svg);
 }
