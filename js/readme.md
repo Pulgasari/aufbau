@@ -55,9 +55,11 @@ Zweiter Grund für den Deep-Import: `is.js` referenziert über seine Registry
 
 ## pipe & compose
 
-Statt `h(g(f(x)))` eine lesbare Kette. `pipe` läuft links nach rechts (das ist in
-90 % der Fälle das, was du willst), `compose` rechts nach links wie die
-mathematische Notation.
+Statt `h(g(f(x)))` eine lesbare Kette. 
+
+`pipe` läuft links nach rechts (das ist in 90 % der Fälle das, was du willst).
+
+`compose` rechts nach links wie die mathematische Notation.
 
 ```javascript
 import { pipe }                    from '@aufbau/utils/fp';
