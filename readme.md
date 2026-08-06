@@ -44,7 +44,7 @@
 
 ---
 
-# @aufbau/kits
+# [@aufbau/kits](kits/readme.md)
 
 the **kit** bundles all the following packages with **Preact** and **HTM** to deliver a *batteries-included* JS-framework made in and for the browser.
 
@@ -66,7 +66,7 @@ read more [here](elements/readme.md).
 
 ## @aufbau/hyperfetch
 
-## @aufbau/import
+## [@aufbau/import](cache/readme.md)
 
 It can import the following file formats:
 
@@ -94,7 +94,7 @@ const config = await aufbau.import('config.jsonc');
 
 ## @aufbau/shapeshift
 
-## @aufbau/stylesheet
+## [@aufbau/stylesheet](stylesheee/readme.md)
 
 **Aufbau Stylesheets** (`.ass` or `.aufbau.css`)
 
