@@ -5,7 +5,7 @@ ensurePrefix = (value, prefix) => String(value).startsWith(prefix) ? String(valu
 ensureSuffix = (value, suffix) => String(value).  endsWith(suffix) ? String(value) : value + suffix;
 
 export const
-templateOf = (value, values = {})          => String(value).replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match);
+templateOf = (value, values = {})          => String(value).replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match),
 truncateOf = (value, length, suffix = '…') => String(value).length <= length ? String(value) : String(value).slice(0, Math.max(0, length - suffix.length)) + suffix;    
 
 // already unary in ../string.js and therefore pipe-ready as they are
