@@ -52,9 +52,8 @@ function locate (name) {
   try {
     const hit = import.meta.resolve(bare(specifier));
     if (hit) return hit;
-  } catch {
-    // not present in the importmap or resolver, fall through to cdn
   }
+  catch {} // not present in the importmap or resolver, fall through to cdn
 
   return cdn + specifier;
 }
@@ -217,8 +216,8 @@ function serializeOptions (options) {
     if (value === undefined || CONTROL_OPTIONS.has(key)) continue;
     if (typeof value === 'function') return null;
     if (typeof value === 'object' && value !== null) {
-      try       { out += `${key}=${JSON.stringify(value)};`; }
-      catch     { return null; }
+      try   { out += `${key}=${JSON.stringify(value)};`; }
+      catch { return null; }
     } else {
       out += `${key}=${value};`;
     }
