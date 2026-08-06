@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+  <defs>
+    <pattern 
+      id="aufbau-pattern-dots" 
+      width="20" height="20" 
+      patternUnits="userSpaceOnUse" 
+      patternTransform="rotate(var(--svg-rotate))"
+      >
+      <rect width="20" height="20" fill="var(--svg-bg)"/>
+      <circle cx="10" cy="10" r="3" fill="var(--svg-fg)"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#aufbau-pattern-dots)"/>
+</svg>
