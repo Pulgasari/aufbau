@@ -33,6 +33,7 @@ const map = { imports: {
     "@aufbau/elements"        : "./elements/index.js",
     "@aufbau/elements/"       : "./elements/",
     "@aufbau/import"          : "./import/index.js",
+    "@aufbau/js"              : "./js/index.js",
     "@aufbau/kits"            : "./kits/aufbau.js",
     "@aufbau/kits/preact-htm" : "./kits/preact-htm.js",
     "@aufbau/patterns"        : "./patterns/index.js",
