@@ -109,7 +109,7 @@ export const random = {
     rgba : randomColorRGBA,
   },
   float : randomFloat,
-  int   : randomFloat,
+  int   : randomInt,
   valueFromArray : randomValueFromArray,
 };
 
