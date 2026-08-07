@@ -1,6 +1,8 @@
 // <aufbau-slider>
 
 import { AufbauElement } from './core/index.js';
+import * as dom from '@domina/core';
+import { html } from '@aufbau/js';
 
 export default class AufbauSlider extends AufbauElement {
   static attr = {
@@ -15,13 +17,9 @@ export default class AufbauSlider extends AufbauElement {
   };
 
   onMount () {
-    this.on('input', (e) => {
-      if (e.target.matches('.slider-range, .slider-number-input')) this.setValue(e.target.value);
-    });
-
-    this.on('click', (e) => {
-      const btn = e.target.closest('[data-step]');
-      if (!btn || this.getAttr('disabled')) return;
+    this.on('input', '.slider-range, .slider-number-input', (e, input) => this.setValue(input.value));
+    this.on('click', '[data-step]', (e, btn) => {
+      if (this.getAttr('disabled')) return;
       this.stepBy(parseInt(btn.dataset.step, 10));
     });
   }
@@ -38,51 +36,52 @@ export default class AufbauSlider extends AufbauElement {
     this.emit('aufbau-slider', { value });
   }
 
-  update () {
-    const { value, min, max, step, unit, controls, editable, disabled } = this.getAttr();
+  /**
+   * structure only. value and disabled are deliberately absent, otherwise every
+   * keystroke would rebuild the markup and drop focus out of the number input.
+   */
+  render () {
+    const { min, max, step, unit, controls, editable } = this.getAttr();
 
-    this.innerHTML = `
-      <div class="aufbau-slider-wrapper ${disabled ? 'is-disabled' : ''}">
-        ${controls ? `
-          <button type="button" class="btn-step btn-dec" data-step="-1" ${disabled ? 'disabled' : ''}>
-            <aufbau-icon icon="lucide:minus"></aufbau-icon>
-          </button>
-        ` : ''}
+    const stepBtn = (dir, icon) => html`
+      <button type="button" class="btn-step btn-${dir > 0 ? 'inc' : 'dec'}" data-step="${dir}">
+        <aufbau-icon icon="${icon}"></aufbau-icon>
+      </button>
+    `;
 
-        <input
-          type="range"
-          class="slider-range"
-          value="${value}"
-          min="${min}"
-          max="${max}"
-          step="${step}"
-          ${disabled ? 'disabled' : ''}
-        />
+    return html`
+      <div class="aufbau-slider-wrapper">
+        ${controls && stepBtn(-1, 'lucide:minus')}
 
-        ${controls ? `
-          <button type="button" class="btn-step btn-inc" data-step="1" ${disabled ? 'disabled' : ''}>
-            <aufbau-icon icon="lucide:plus"></aufbau-icon>
-          </button>
-        ` : ''}
+        <input type="range" class="slider-range" min="${min}" max="${max}" step="${step}" />
+
+        ${controls && stepBtn(1, 'lucide:plus')}
 
         <div class="slider-display">
-          ${editable ? `
-            <input
-              type="number"
-              class="slider-number-input"
-              value="${value}"
-              min="${min}"
-              max="${max}"
-              step="${step}"
-              ${disabled ? 'disabled' : ''}
-            />
-          ` : `
-            <span class="slider-value-text">${value}</span>
-          `}
-          ${unit ? `<span class="slider-unit">${unit}</span>` : ''}
+          ${editable
+            ? html`<input type="number" class="slider-number-input" min="${min}" max="${max}" step="${step}" />`
+            : html`<span class="slider-value-text"></span>`}
+          ${unit && html`<span class="slider-unit">${unit}</span>`}
         </div>
       </div>
     `;
+  }
+
+  sync () {
+    const { value, disabled } = this.getAttr();
+
+    dom.element(this.$('.aufbau-slider-wrapper')).toggleClass('is-disabled', disabled);
+
+    for (const input of this.$$('.slider-range, .slider-number-input')) {
+      // never write back into the field the user is typing in
+      if (input !== document.activeElement) dom.setValue(input, value);
+      dom.setAttr(input, { disabled });
+    }
+
+    dom.setAttr(this.$$('[data-step]'), { disabled });
+
+    const text = this.$('.slider-value-text');
+    if (text) text.textContent = value;
   }
 }
 
