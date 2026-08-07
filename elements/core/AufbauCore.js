@@ -1,16 +1,61 @@
   // @aufbau/elements/core/AufbauCore.js
 
+// :::::: IMPORTS
+
 import { decorate, decorateAll } from './utils.js';
 import { BASE, schemaOf }        from './schema.js';
 import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
-  dom,
+  dom, //delegate, disposer, emitEvent, offEvent, onEvent
   coerce, createLogger, 
-  //delegate, disposer, emitEvent, offEvent, onEvent,
   isArray, isFn, isPlainObject, isString,
   toBoolean, toCamelCase, toKebabCase,
 } from '@aufbau/js';
+
+// :::::: DECORATION
+
+// non-enumerable definition, keeps the descriptor boilerplate in one place
+const define = (target, props) => {
+  for (const [key, value] of Object.entries(props)) {
+    Object.defineProperty(target, key, { value, configurable: true, writable: true });
+  }
+  return target;
+};
+
+const decorated = new WeakSet;
+
+function decorate (target) {
+  if (!target || decorated.has(target)) return target;
+  decorated.add(target);
+
+  return define(target, {
+    on  (...args) { return dom.onEvent  (this, ...args); },
+    off (...args) { return dom.offEvent (this, ...args); }
+  });
+}
+
+function decorateAll (list) {
+  const items = list.map(decorate);
+
+  return define(items, {
+    on (...args) {
+      const unsubs = items.map(item => item.on(...args));
+      return () => unsubs.forEach(unsub => unsub());
+    },
+    off (...args) {
+      items.forEach(item => item.off(...args));
+      return items;
+    }
+  });
+}
+
+
+
+
+
+
+
 
 const log = createLogger('aufbau-core');
 
