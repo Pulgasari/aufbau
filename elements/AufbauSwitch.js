@@ -21,7 +21,7 @@ export default class AufbauSwitch extends AufbauElement {
     this.on('change', (e) => {
       if (e.target.matches('.aufbau-switch-select')) {
         const value = e.target.value;
-        this.setAttributes({ value });
+        this.setAttr({ value });
         this.emit('aufbau-switch', { value });
       }
     });
