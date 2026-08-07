@@ -49,13 +49,6 @@ function decorateAll (list) {
   });
 }
 
-
-
-
-
-
-
-
 const log = createLogger('aufbau-core');
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
@@ -94,10 +87,6 @@ return class extends BaseClass {
     }
   }
 
-  /**
-   * registers the custom element. safe to call twice, hmr re-imports are a no-op.
-   * @param {string|{name?: string, extends?: string}} [options]
-   */
   static init (options) {
     const tagName    = isString(options)      ? options : options?.name;
     const extendsTag = isPlainObject(options) ? options.extends : this.extendsTag;
