@@ -11,9 +11,7 @@ export function transformPattern (rawVal, tokens = {}) {
   // 1. Extract rotate(...)
   let rotate = 0;
   const rotateMatch = rawVal.match(/rotate\s*\(\s*(-?\d+)(?:deg)?\s*\)/i);
-  if (rotateMatch) {
-    rotate = parseInt(rotateMatch[1], 10);
-  }
+  if (rotateMatch) rotate = parseInt(rotateMatch[1], 10);
 
   // 2. Extract colors(...)
   let bg = 'transparent';
@@ -59,11 +57,9 @@ export function transformPattern (rawVal, tokens = {}) {
     .trim();
 
   const patternName = cleanedName.split(/\s+/)[0];
-  const generator = patterns[patternName];
+  const generator   = patterns[patternName];
 
-  if (!generator) {
-    return `/* Unknown pattern: ${patternName} */`;
-  }
+  if (!generator) return `/* Unknown pattern: ${patternName} */`;
 
   const svgDataUri = generator({ bg, fg, rotate });
   return `background-image: url('${svgDataUri}'); background-repeat: repeat;${animationRule}`;
