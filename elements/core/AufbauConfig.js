@@ -2,7 +2,8 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
-import { CanonicalMap, createLogger, emitEvent, isPlainObject, isString, onEvent, toJson, toKebabCase } from '@aufbau/js';
+import { CanonicalMap, createLogger, isPlainObject, isString, toJson, toKebabCase } from '@aufbau/js';
+import * as dom from '@domina/core';
 
 const log = createLogger('aufbau-config');
 
@@ -65,7 +66,7 @@ export function commitConfig () {
   AufbauConfigStore.merge(next);
 
   if (typeof window !== 'undefined') {
-    emitEvent (window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
+    dom.emitEvent (window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
   }
 
   return changed;
@@ -109,8 +110,8 @@ export function configKeys (tag, name) {
 /** first hit wins. keys: true (auto namespace) | string | string[] */
 export function resolveConfig (tag, name, keys = true) {
   const candidates =
-      keys === true       ? configKeys(tag, name)
-    : Array.isArray(keys) ? keys
+      keys === true ? configKeys(tag, name)
+    : isArray(keys) ? keys
     : [keys];
 
   for (const key of candidates) if (AufbauConfigStore.has(key)) return AufbauConfigStore.get(key);
