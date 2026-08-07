@@ -10,15 +10,18 @@
 
 <aufbau-slider>
 <aufbau-slider type='range'>
-
 <aufbau-slider type='range' value-type='color'>
 <aufbau-slider type='range' value-type='date'>
 <aufbau-slider type='range' value-type='datetime'>
 <aufbau-slider type='range' value-type='number'>
 <aufbau-slider type='range' value-type='time'>
 
+<aufbau-picker look='combobox'>
+<aufbau-picker look='radio'>
+<aufbau-picker look='segments'>
+
 <aufbau-toggle>
-<aufbau-toggle type='checkbox'>
+<aufbau-toggle look='checkbox'>
 
 <aufbau-input>
 <aufbau-input type='color'>
@@ -34,6 +37,7 @@
 <aufbau-input type='url'>
 
 <aufbau-upload>
+<aufbau-upload mimetype=''>
 ```
 
 ## HTML
