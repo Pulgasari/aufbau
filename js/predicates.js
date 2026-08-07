@@ -1,4 +1,4 @@
-// @aufbau/utils/fp/predicates.js (8.97kb)
+// @aufbau/js/predicates.js (8.97kb)
 
 import { and, not, or } from './core.js';
 
