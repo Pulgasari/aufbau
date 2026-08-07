@@ -1,6 +1,6 @@
 // @aufbau/elements/core/utils.js
 
-import * as dom from '@domina/core';
+import { dom } from '@aufbau/js';
 //import { emitEvent, offEvent, onEvent } from '@aufbau/js';
 export { dom };
 
