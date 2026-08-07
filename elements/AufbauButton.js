@@ -4,10 +4,10 @@ import { AufbauElement } from './core/index.js';
 
 export default class AufbauButton extends AufbauElement {
   static attr = {
+    disabled : false, 
     icon     : String, 
     label    : String, 
     text     : String, 
-    disabled : false, 
     type     : 'button',
     variant  : 'default',
   ];
@@ -29,7 +29,7 @@ export default class AufbauButton extends AufbauElement {
         class="aufbau-btn variant-${variant}"
         ${disabled ? 'disabled' : ''}
       >
-        ${icon    ? `<aufbau-icon icon="${icon}"></aufbau-icon>`      : ''}
+        ${icon    ? `<aufbau-icon icon="${icon}"></aufbau-icon>`  : ''}
         ${content ? `<span class="btn-content">${content}</span>` : ''}
       </button>
     `;
