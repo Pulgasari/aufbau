@@ -24,14 +24,14 @@ const toEntries = (source) =>
   : Object.entries(source);
 
 export class CanonicalMap extends Map {
-  constructor (source, forms = ['camel', 'kebab']) {
+  constructor (source, forms = ['camel', 'kebab', 'snake']) {
     super();
 
     this.forms     = forms.map(toConverter).filter(Boolean);
     if (!this.forms.length) this.forms = [FORMS.camel];
     this.canonical = this.forms[0];
-    this.aliases   = new Map();
-    this.cache     = new Map();
+    this.aliases   = new Map;
+    this.cache     = new Map;
 
     for (const [key, value] of toEntries(source)) this.set(key, value);
   }
@@ -67,8 +67,8 @@ export class CanonicalMap extends Map {
     return super.set(key, value);
   }
 
-  get (rawKey)    { return super.get(this.key(rawKey)); }
-  has (rawKey)    { return super.has(this.key(rawKey)); }
+  get (rawKey) { return super.get(this.key(rawKey)); }
+  has (rawKey) { return super.has(this.key(rawKey)); }
 
   delete (rawKey) {
     const key = this.key(rawKey);
