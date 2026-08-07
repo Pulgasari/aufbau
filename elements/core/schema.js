@@ -1,53 +1,57 @@
 // @aufbau/elements/core/schema.js
 
-import { isArray, isFn, isPlainObject, mapValuesOf } from '@aufbau/js';
+import { isArray, isFn, isPlainObject, toArray, toKebabCase } from '@aufbau/js';
 
 const cache = new WeakMap;
 
+// every entry normalizes to this shape, so consumers never have to null-check a key
+export const BASE = Object.freeze({ type: String, fallback: undefined, values: null, fn: null, config: null });
+
+// infers the type constructor from a default value when `type` is omitted
+const TYPES  = { number: Number, boolean: Boolean, string: String };
+const typeOf = (value) => TYPES[typeof value] ?? String;
+
+export const parseSchemaEntry = (entry) => {
+
+  // shorthand, bare constructor: `src: String`
+  if (isFn(entry)) return { ...BASE, type: entry };
+
+  // full form: `{ type, default, values, fn, config }`
+  if (isPlainObject(entry)) return {
+    ...BASE,
+    type     : entry.type ?? typeOf(entry.default),
+    fallback : entry.default,
+    values   : isArray(entry.values) ? entry.values : null,
+    fn       : isFn(entry.fn) ? entry.fn : null,
+    // true -> auto namespaced key, string|string[] -> explicit keys
+    config   : entry.config === true ? true : (entry.config ? toArray(entry.config) : null),
+  };
+
+  // shorthand, bare default value: `volume: 50`
+  if (entry != null) return { ...BASE, type: typeOf(entry), fallback: entry };
+
+  return { ...BASE };
+};
+
+/**
+ * parsed schema for a class, keyed by kebab-case attribute name.
+ * parsing happens once per class, the weakmap keeps subclasses separate
+ * and dies with the class itself.
+ * @param {Function} Class
+ * @returns {Record<string, typeof BASE>}
+ */
 export const schemaOf = (Class) => {
-  if (cache.has(Class)) return cache.get(Class);
+  const hit = cache.get(Class); if (hit) return hit;
   const { attr } = Class;
-  const parsed = isPlainObject(attr) ? mapValuesOf(attr, parseSchemaEntry) : null;
+  const source = isArray(attr)       ? Object.fromEntries(attr.map(name => [name, String]))
+               : isPlainObject(attr) ? attr
+               : {};
+
+  const parsed = {};
+  for (const [name, entry] of Object.entries(source)) {
+    parsed[toKebabCase(name)] = parseSchemaEntry(entry);
+  }
+
   cache.set(Class, parsed);
   return parsed;
 };
-
-export const parseSchemaEntry = (entry) => {
-  
-  // CASE 1: direct constructor function (e.g. Number, Boolean, String)
-  if (typeof entry === 'function') {
-    return { type: entry, fallback: undefined, config: null, fn: null, values: null };
-  }
-
-  // CASE 2: full configuration object
-  if (isPlainObject(entry)) {
-    const explicitType = entry.type;
-    const fallback     = entry.default;
-    
-    // Infer type constructor from default value if type is omitted
-    const inferredType = explicitType || (
-        typeof fallback === 'number'  ? Number
-      : typeof fallback === 'boolean' ? Boolean
-      : typeof fallback === 'string'  ? String 
-      : String
-    );
-
-    return {
-      type     : inferredType,
-      fallback : fallback,
-      values   : isArray(entry.values) ? entry.values : null,
-      fn       : isFn(entry.fn) ? entry.fn : null,
-      // true -> auto namespaced key, string|string[] -> explicit keys
-      config   : entry.config === true ? true : (entry.config ? [].concat(entry.config) : null)
-    };
-  }
-
-  // Case 3: Primitive default values (number, boolean, string)
-  if (typeof entry === 'number')  return { type: Number,  fallback: entry, config: null, values: null, fn: null };
-  if (typeof entry === 'boolean') return { type: Boolean, fallback: entry, config: null, values: null, fn: null };
-  if (typeof entry === 'string')  return { type: String,  fallback: entry, config: null, values: null, fn: null };
-
-  return { type: String, fallback: undefined, values: null, fn: null };
-};
-
-export default parseSchemaEntry;
