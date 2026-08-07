@@ -1,0 +1,18 @@
+<filter id="aufbau-filter-wave">
+  
+  <feTurbulence 
+    type="fractalNoise" 
+    baseFrequency="var(--filter-frequency, 0.02)" 
+    numOctaves="var(--filter-octaves, 2)" 
+    result="noise"
+    />
+  
+  <feDisplacementMap 
+    in="SourceGraphic" 
+    in2="noise" 
+    scale="var(--filter-scale, 20)" 
+    xChannelSelector="R" 
+    yChannelSelector="G"
+    />
+  
+</filter>
