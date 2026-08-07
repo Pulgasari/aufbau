@@ -1,6 +1,8 @@
 // @aufbau/elements/core/utils.js
 
-import { emitEvent, offEvent, onEvent } from '@aufbau/js';
+import * as dom from '@domina/core';
+//import { emitEvent, offEvent, onEvent } from '@aufbau/js';
+export { dom };
 
 // non-enumerable definition, keeps the descriptor boilerplate in one place
 const define = (target, props) => {
@@ -20,8 +22,8 @@ export function decorate (target) {
   decorated.add(target);
 
   return define(target, {
-    on  (...args) { return onEvent  (this, ...args); },
-    off (...args) { return offEvent (this, ...args); }
+    on  (...args) { return dom.onEvent  (this, ...args); },
+    off (...args) { return dom.offEvent (this, ...args); }
   });
 }
 
