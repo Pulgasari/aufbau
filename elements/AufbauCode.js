@@ -1,7 +1,5 @@
 // <aufbau-code>
 
-// <aufbau-code>
-
 import { AufbauElement } from './core/index.js';
 import * as dom from '@domina/core';
 import { html } from '@aufbau/js';
