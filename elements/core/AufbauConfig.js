@@ -83,7 +83,6 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   const isKey   = isString(keyOrMap);
   const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
   const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
-
   const entries = sources.get(owner) ?? newSource();
   sources.set(owner, entries);
 
