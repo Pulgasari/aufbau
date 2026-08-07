@@ -7,42 +7,26 @@ or registerAll() to get everything at once.
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
-import { toPascalCase }   from '@aufbau/js';
+import { dom, toPascalCase } from '@aufbau/js';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
-// list to exclude that already-imported stuff at registerAll-method
 const EXCLUDED = new Set([
   './core/AufbauConfig.js',
   './core/AufbauCore.js',
 ]);
 
-let   baseURL   = import.meta.url; // resolve module urls relative to this file unless a base is configured
-let   manifest  = null; // module-level cache, the manifest is fetched at most once
+let   baseURL   = import.meta.url;
+let   manifest  = null; 
 const PREFIX    = 'aufbau-';
-const requested = new Set(); // tags already requested, prevents duplicate network calls
+const requested = new Set;
 
-/**
- * reads the aufbau tag of an element, including customized built-ins.
- * <aufbau-flag>            -> 'aufbau-flag'
- * <datalist is="aufbau-x"> -> 'aufbau-x'
- * @param {Element} el
- * @returns {string|null}
- */
 function tagOf (element) {
-  const is = element.getAttribute?.('is');
-  if (is?.startsWith(PREFIX)) return is;
   return element.localName?.startsWith(PREFIX) ? element.localName : null;
 }
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::
 
-/**
- * dynamically imports and thereby registers a single element by tag name.
- * element modules register themselves via their trailing X.init() call.
- * @param {string} tag - e.g. 'aufbau-slider'
- * @returns {Promise<any>}
- */
 function load (tag) {
   const url = new URL(`./${toPascalCase(tag)}.js`, baseURL).href;
   return import(url).catch(err => {
@@ -51,11 +35,6 @@ function load (tag) {
   });
 }
 
-/**
- * imports every element at once. good for prototyping.
- * the element list is read from jsr.json, which is the single source of truth.
- * @returns {Promise<any[]>}
- */
 async function registerAll () {
   manifest ??= (await import(new URL('./jsr.json', baseURL).href, { with: { type: 'json' } })).default;    
 
@@ -80,14 +59,6 @@ function scan (node) {
   node.querySelectorAll('*').forEach(el => request(tagOf(el)));
 }
 
-/**
- * watches the dom and loads elements on demand as soon as they appear.
- * covers markup injected later, e.g. html rendered through @aufbau/import.
- * @param {Object} [options]
- * @param {string} [options.base] - override the module base url
- * @param {Element|Document} [options.root=document]
- * @returns {() => void} stop function, disconnects the observer
- */
 function autoloader ({ base, root = document } = {}) {
   if (typeof window === 'undefined') return () => {};
   if (base) baseURL = base;
