@@ -4,6 +4,7 @@
   filters: [
     { id: 'glitch-live' , name: 'Live Glitch' },
     { id: 'glitch-rgb'  , name: 'RGB Glitch'  },
+    { id: 'wave'        , name: 'Wave'        },
   ],
   patterns: [
     { id: 'dots'    , name: 'Dots'    },
