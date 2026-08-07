@@ -3,6 +3,7 @@
 // :::::: IMPORTS
 
 import { BASE, schemaOf }        from './schema.js';
+import { adoptClassStyles, BASE_LAYER } from './styles.js';
 import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
@@ -67,13 +68,15 @@ return class extends BaseClass {
 
   connectedCallback () {
     this._mounted = true;
+    // lazy on purpose: an imported but unused element must not adopt anything
+    adoptClassStyles(this.constructor, this.root);
     this.on(window, CONFIG_EVENT, (event) => {
       if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
     });
     this.onMount();
     this.update();
   }
-
+  
   disconnectedCallback () {
     this._mounted = false;
     this.release();
