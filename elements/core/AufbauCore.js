@@ -2,7 +2,6 @@
 
 // :::::: IMPORTS
 
-import { decorate, decorateAll } from './utils.js';
 import { BASE, schemaOf }        from './schema.js';
 import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
