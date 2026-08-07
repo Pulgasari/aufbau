@@ -25,7 +25,7 @@ export default class AufbauTreeItem extends AufbauElement {
 
   toggleExpand () {
     const { expanded } = this.getAttr();
-    this.setAttributes({ expanded: !expanded });
+    this.setAttr({ expanded: !expanded });
   }
 
   select () {
@@ -33,7 +33,7 @@ export default class AufbauTreeItem extends AufbauElement {
       ?.querySelectorAll('aufbau-tree-item')
       .forEach(item => item.removeAttribute('selected'));
 
-    this.setAttributes({ selected: true });
+    this.setAttr({ selected: true });
     this.emit('aufbau-tree-select', { label: this.getAttr('label'), element: this });
   }
 
