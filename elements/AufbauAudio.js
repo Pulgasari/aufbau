@@ -23,14 +23,19 @@ export default class AufbauAudio extends AufbauElement {
 
   onMount () {
     this._isPlaying = false;
-    this._audio = new Audio();
+    this._audio = new Audio;
 
+    this.on( this._audio, ['loadedmetadata', 'timeupdate'], () => this.syncProgress() );
+    this.on( this._audio, 'ended', () => { this._isPlaying = false; this.updatePlayState(); });    
+
+    /*
     this._audio.addEventListener('timeupdate',     () => this.syncProgress());
     this._audio.addEventListener('loadedmetadata', () => this.syncProgress());
     this._audio.addEventListener('ended', () => {
       this._isPlaying = false;
       this.updatePlayState();
     });
+    */
 
     this.on('click', (e) => {
       if (e.target.closest('.btn-play')) this.togglePlay();
