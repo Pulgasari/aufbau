@@ -1,69 +1,76 @@
 // <aufbau-loop>
 
 import { AufbauElement } from './core/index.js';
+import * as dom from '@domina/core';
+import { html } from '@aufbau/js';
 
 export default class AufbauLoop extends AufbauElement {
-  static attr = ['mode', 'interval', 'speed', 'pause-on-hover', 'direction'];
+  static attr = {
+    mode         : { type: String, default: 'carousel', values: ['carousel', 'marquee'] },
+    interval     : 3000,
+    speed        : '20s',
+    direction    : { type: String, default: 'left', values: ['left', 'right'] },
+    pauseOnHover : Boolean,
+  };
 
-  onMount() {
-    this._currentIndex = 0;
-    // Preserve original child elements before component mutations
-    if (!this._originalItems) this._originalItems = Array.from(this.children).map(child => child.cloneNode(true));
-    this.setupLoop();
+  onMount () {
+    this._index = 0;
+    // the original children are the slides and get wiped by the first render
+    this._items ??= [...this.children].map(child => child.cloneNode(true));
+
+    // pointerenter/leave instead of mouseenter/leave: those do not bubble and
+    // cannot be delegated. registered once here, never inside setupLoop()
+    this.on('pointerenter', () => this._paused = true);
+    this.on('pointerleave', () => this._paused = false);
+
+    // a carousel in a background tab or off screen does not need to tick
+    this.track(dom.onVisible(this, (el, entry) => {
+      this._offscreen = !entry.isIntersecting;
+    }));
+
+    this.startLoop();
   }
 
-  onUnmount         () { this.stopLoop(); }
-  onAttributeChange () { this.setupLoop(); }
+  onUnmount () { this.stopLoop(); }
 
-  stopLoop() {
-    if (this._timer) {
-      clearInterval(this._timer);
-      this._timer = null;
-    }
+  onAttributeChange () { this.startLoop(); }
+
+  stopLoop () {
+    clearInterval(this._timer);
+    this._timer = null;
   }
 
-  setupLoop() {
+  startLoop () {
     this.stopLoop();
 
-    const { mode = 'carousel' } = this.getAttr();
-    const interval     = parseInt(this.getAttr('interval') || '3000', 10);
-    const pauseOnHover = this.hasAttribute('pause-on-hover');
+    const { mode, interval } = this.getAttr();
+    if (mode !== 'carousel' || (this._items?.length ?? 0) < 2) return;
 
-    if (mode === 'carousel' && this._originalItems?.length > 1) {
-      this._timer = setInterval(() => this.nextStep(), interval);
-    }
-
-    if (pauseOnHover) {
-      this.on('mouseenter', () => this.stopLoop());
-      this.on('mouseleave', () => this.setupLoop());
-    }
+    this._timer = setInterval(() => {
+      if (this._offscreen) return;
+      if (this._paused && this.getAttr('pauseOnHover')) return;
+      this.next();
+    }, interval);
   }
 
-  nextStep() {
-    if (!this._originalItems || !this._originalItems.length) return;
-    this._currentIndex = (this._currentIndex + 1) % this._originalItems.length;
-    this.renderCarousel();
+  next () {
+    this._index = (this._index + 1) % this._items.length;
+    this.sync();
+    this.emit('aufbau-loop-change', { index: this._index });
   }
 
-  renderCarousel() {
-    const track = this.$('.loop-track'); if (!track) return;
-
-    const items = track.children;
-    for (let i = 0; i < items.length; i++) {
-      items[i].classList.toggle('is-active', i === this._currentIndex);
-    }
-    this.emit('aufbau-loop-change', { index: this._currentIndex });
+  goTo (index) {
+    this._index = ((index % this._items.length) + this._items.length) % this._items.length;
+    this.sync();
   }
 
-  update() {
-    const { direction = 'left', mode = 'carousel', speed ='20s' } = this.getAttr() || ''; // 'carousel' | 'marquee'    
-    if (!this._originalItems || !this._originalItems.length) {
-      this._originalItems = Array.from(this.children).map(child => child.cloneNode(true));
-    }
+  render () {
+    const { mode, direction, speed } = this.getAttr();
+    const items = this._items ??= [...this.children].map(child => child.cloneNode(true));
 
+    // marquee duplicates the content for a seamless loop, the copy is aria-hidden
     if (mode === 'marquee') {
-      // Marquee mode duplicates content for seamless continuous animation
-      this.innerHTML = `
+      return html`
         <div class="aufbau-loop-wrapper mode-marquee dir-${direction}">
           <div class="marquee-track" style="animation-duration: ${speed};">
             <div class="marquee-content"></div>
@@ -71,26 +78,30 @@ export default class AufbauLoop extends AufbauElement {
           </div>
         </div>
       `;
-
-      this.$$('.marquee-content').forEach(container => {
-        this._originalItems.forEach(item => container.appendChild(item.cloneNode(true)));
-      });
-    } else {
-      // Step / Carousel mode
-      this.innerHTML = `
-        <div class="aufbau-loop-wrapper mode-carousel">
-          <div class="loop-track"></div>
-        </div>
-      `;
-
-      const track = this.$('.loop-track');
-      this._originalItems.forEach((item, index) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = `loop-item ${index === this._currentIndex ? 'is-active' : ''}`;
-        wrapper.appendChild(item.cloneNode(true);
-        track.appendChild(wrapper);
-      });
     }
+
+    return html`
+      <div class="aufbau-loop-wrapper mode-carousel">
+        <div class="loop-track">
+          ${items.map(() => html`<div class="loop-item"></div>`)}
+        </div>
+      </div>
+    `;
+  }
+
+  /** the slides are real nodes, so they are appended after a structural rebuild */
+  onRender () {
+    const items = this._items ?? [];
+
+    for (const container of this.$$('.marquee-content')) {
+      container.append(...items.map(item => item.cloneNode(true)));
+    }
+
+    this.$$('.loop-item').forEach((slot, i) => slot.append(items[i].cloneNode(true)));
+  }
+
+  sync () {
+    this.$$('.loop-item').forEach((item, i) => item.classList.toggle('is-active', i === this._index));
   }
 }
 
