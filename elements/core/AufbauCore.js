@@ -5,8 +5,9 @@ import { BASE, schemaOf }        from './schema.js';
 import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
-  coerce, createLogger, delegate, disposer,
-  emitEvent, offEvent, onEvent,
+  dom,
+  coerce, createLogger, 
+  //delegate, disposer, emitEvent, offEvent, onEvent,
   isArray, isFn, isPlainObject, isString,
   toBoolean, toCamelCase, toKebabCase,
 } from '@aufbau/js';
@@ -145,16 +146,16 @@ return class extends BaseClass {
 
     // the element itself
     if (isString(first) && isFn(second)) {
-      return this.track(onEvent(this, first, second, third));
+      return this.track(dom.onEvent(this, first, second, third));
     }
 
     // any external event target or iterable of targets
     if (!first) return () => {};
-    return this.track(onEvent(first, second, third, fourth));
+    return this.track(dom.onEvent(first, second, third, fourth));
   }
 
-  off  (...args) { offEvent(this, ...args); return this; }
-  emit (...args) { return emitEvent(this, ...args); }
+  off  (...args) { dom.offEvent(this, ...args); return this; }
+  emit (...args) { return dom.emitEvent(this, ...args); }
 
   release () { this._effects.dispose(); return this; }
   track   (unsubscribe) { return this._effects.add(unsubscribe); }
