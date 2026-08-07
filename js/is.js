@@ -30,6 +30,46 @@ export const test = (rule, value) => {
   
   return false;
 };
+// Evaluates rules against values
+export const test2 = (rule, value) => {
+  // direct primitive / literal equality (e.g. null, undefined, exact values)
+  if (rule === value) return true;
+
+  // native constructors & types
+  if (rule === Array)    return Array.isArray(value);
+  if (rule === Boolean)  return typeof value === 'boolean';
+  if (rule === Function) return typeof value === 'function';
+  if (rule === Number)   return typeof value === 'number' && !Number.isNaN(value);
+  if (rule === String)   return typeof value === 'string';
+  
+  /*
+  switch (rule) {
+    // direct primitive / literal equality (e.g. null, undefined, exact values)
+    case value    : return true;
+    // native constructors & types
+    case Array    : return Array.isArray(value);
+    case Boolean  : return typeof value === 'boolean';
+    case Function : return typeof value === 'function';
+    case Number   : return typeof value === 'number' && !Number.isNaN(value);
+    case String   : return typeof value === 'string';
+  }
+  */
+  
+  // custom class instances or predicate functions
+  if (typeof rule === 'function') return (value instanceof rule) || Boolean(rule(value));
+
+  // RegExp matching
+  if (rule instanceof RegExp) return typeof value === 'string' && rule.test(value);
+
+  // registry lookup by string name
+  if (typeof rule === 'string') return registry[rule]?.(value) ?? false;
+
+  // array = AND composition
+  if (Array.isArray(rule)) return rule.every(r => test(r, value));
+
+  return false;
+};
+
 
 const createChecker = rule => value => test(rule, value);
 
