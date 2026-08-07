@@ -1,63 +1,55 @@
-// html.js
+// @aufbau/js/html.js
 
-import { isBool, isFn } from './is.js';
+const RAW = Symbol.for('aufbau.raw');
 
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
-const toDashed = (key) => key.startsWith('--') ? key : key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+// quotes included, values are interpolated into attributes as often as into text
+export const escapeHtml = value =>
+  value == null ? '' : String(value).replace(/[&<>"']/g, char => ESCAPES[char]);
 
-class HtmlString {
+class Html {
   constructor (value) { this.value = value; }
+  get [RAW] () { return true; }
   toString () { return this.value; }
 }
 
-const resolve = (value) =>
-    value == null || isBool(value) ? ''
-  : value instanceof HtmlString    ? value.value
-  : Array.isArray(value)           ? value.map(resolve).join('')
+export const isRaw = value => value?.[RAW] === true;
+
+// nested html`` results and arrays of them pass through, everything else is escaped.
+// null, undefined and false render as nothing, which makes `${cond && html``}` work.
+const interpolate = value =>
+    value == null || value === false ? ''
+  : isRaw(value)                     ? value.toString()
+  : Array.isArray(value)             ? value.map(interpolate).join('')
   : escapeHtml(value);
 
-export const
+/**
+ * tagged template that escapes every interpolated value.
+ *
+ *   html`<td>${row.name}</td>`
+ *   html`<ul>${items.map(i => html`<li>${i}</li>`)}</ul>`
+ *   html`${label && html`<span>${label}</span>`}`
+ */
+export const html = (strings, ...values) =>
+  new Html(strings.reduce(
+    (out, part, i) => out + part + (i < values.length ? interpolate(values[i]) : ''),
+    ''
+  ));
 
-attr = (name, value) =>
-    value == null || value === false ? new HtmlString('')
-  : value === true                   ? new HtmlString(` ${name}`)
-  : new HtmlString(` ${name}="${escapeHtml(value)}"`),
+/** opt out of escaping. only for markup that is known to be trusted */
+export const raw = value => new Html(value == null ? '' : String(value));
 
-attrs = (map) => new HtmlString(Object.entries(map).map(([name, value]) => attr(name, value).value).join('')),
-
-classes = (...values) => {
-  const list = [];
-
-  const walk = (value) => {
-    if (!value) return;
-    if (typeof value === 'string') list.push(value);
-    else if (Array.isArray(value)) value.forEach(walk);
-    else if (typeof value === 'object') {
-      for (const [key, active] of Object.entries(value)) if (active) list.push(key);
-    }
-  };
-
-  values.forEach(walk);
-  return list.join(' ');
-},
-
-escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ESCAPES[char]),
-
-htmlx = (strings, ...values) => {
-  let result = strings[0];
-  for (let index = 0; index < values.length; index++) result += resolve(values[index]) + strings[index + 1];
-  return new HtmlString(result);
-},
-
-raw = (value) => new HtmlString(value == null ? '' : String(value)),
-
-styles = (map) => Object.entries(map)
-  .filter(([, value]) => value != null && value !== false && value !== '')
-  .map(([key, value]) => `${toDashed(key)}: ${value};`)
-  .join(' '),
-
-when = (condition, content, otherwise = '') => {
-  const value = condition ? content : otherwise;
-  return typeof value === 'function' ? value() : value;
-};
+/**
+ * attribute map -> raw attribute string, so attributes can be built conditionally
+ * without hand-escaping. false, null, undefined and '' omit the attribute,
+ * true renders it bare.
+ *
+ *   html`<a ${attrs({ href, target: external && '_blank', hidden: !visible })}>`
+ */
+export const attrs = map => raw(
+  Object.entries(map ?? {})
+    .filter(([, value]) => value !== false && value != null && value !== '')
+    .map(([key, value]) => value === true ? key : `${key}="${escapeHtml(value)}"`)
+    .join(' ')
+);
