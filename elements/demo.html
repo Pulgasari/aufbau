@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@aufbau/elements — controls</title>
+  <script src="../importmap.js"></script>
+
+  <style>
+    body        { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 2rem; max-width: 60rem; }
+    h1          { font-size: 1.4rem; }
+    h2          { font-size: 1rem; margin: 2.5rem 0 .75rem; padding-bottom: .35rem; border-bottom: 1px solid #ddd; }
+    section     { display: grid; gap: .75rem; }
+    .row        { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+    label       { font-size: .8rem; opacity: .7; min-width: 9rem; }
+    output      { display: block; white-space: pre-wrap; font: 12px/1.5 ui-monospace, monospace;
+                  background: #f5f5f5; padding: .75rem; border-radius: .4rem; }
+    .is-hidden  { display: none; }
+    [hidden]    { display: none !important; }
+  </style>
+</head>
+
+<body>
+
+<h1>@aufbau/elements — controls</h1>
+<p>alle controls in einem <code>&lt;form&gt;</code>. die ausgabe unten kommt aus
+<code>getFormValues()</code> und aktualisiert sich bei jeder änderung.</p>
+
+<form id="playground">
+
+  <h2>aufbau-picker</h2>
+  <section>
+    <div class="row">
+      <label>look="combobox" searchable</label>
+      <aufbau-picker name="framework" look="combobox" searchable placeholder="Framework wählen...">
+        <aufbau-option value="preact">Preact</aufbau-option>
+        <aufbau-option value="svelte">Svelte</aufbau-option>
+        <aufbau-option value="vanilla" selected>Vanilla</aufbau-option>
+      </aufbau-picker>
+    </div>
+    <div class="row">
+      <label>look="segments"</label>
+      <aufbau-picker name="view" look="segments" value="month">
+        <aufbau-option value="day">Tag</aufbau-option>
+        <aufbau-option value="month">Monat</aufbau-option>
+        <aufbau-option value="year">Jahr</aufbau-option>
+      </aufbau-picker>
+    </div>
+    <div class="row">
+      <label>look="radio"</label>
+      <aufbau-picker name="lang" look="radio">
+        <aufbau-option value="de">Deutsch</aufbau-option>
+        <aufbau-option value="en">English</aufbau-option>
+        <aufbau-option value="fr" disabled>Français (disabled)</aufbau-option>
+      </aufbau-picker>
+    </div>
+    <div class="row">
+      <label>multiple</label>
+      <aufbau-picker name="tags" look="radio" multiple>
+        <aufbau-option value="js">JavaScript</aufbau-option>
+        <aufbau-option value="css">CSS</aufbau-option>
+        <aufbau-option value="html">HTML</aufbau-option>
+      </aufbau-picker>
+    </div>
+    <div class="row">
+      <button type="button" id="add-option">option zur laufzeit anhängen</button>
+      <button type="button" id="drop-option">letzte entfernen</button>
+    </div>
+  </section>
+
+  <h2>aufbau-toggle</h2>
+  <section>
+    <div class="row">
+      <label>look="switch"</label>
+      <aufbau-toggle name="darkmode" label="Darkmode" checked></aufbau-toggle>
+    </div>
+    <div class="row">
+      <label>look="checkbox" required</label>
+      <aufbau-toggle name="agb" look="checkbox" label="AGB akzeptieren" required></aufbau-toggle>
+    </div>
+    <div class="row">
+      <label>look="button"</label>
+      <aufbau-toggle name="pin" look="button" label="Anheften"></aufbau-toggle>
+    </div>
+  </section>
+
+  <h2>aufbau-input</h2>
+  <section>
+    <div class="row"><label>type="text"</label>     <aufbau-input name="titel"  type="text" placeholder="Titel"></aufbau-input></div>
+    <div class="row"><label>type="email"</label>    <aufbau-input name="mail"   type="email" placeholder="mail@example.com"></aufbau-input></div>
+    <div class="row"><label>type="password"</label> <aufbau-input name="pass"   type="password"></aufbau-input></div>
+    <div class="row"><label>type="phone"</label>    <aufbau-input name="tel"    type="phone"></aufbau-input></div>
+    <div class="row"><label>type="url"</label>      <aufbau-input name="url"    type="url"></aufbau-input></div>
+    <div class="row"><label>type="date"</label>     <aufbau-input name="datum"  type="date"></aufbau-input></div>
+    <div class="row"><label>type="datetime"</label> <aufbau-input name="stamp"  type="datetime"></aufbau-input></div>
+    <div class="row"><label>type="time"</label>     <aufbau-input name="uhr"    type="time"></aufbau-input></div>
+    <div class="row"><label>type="color" swatch</label><aufbau-input name="brand" type="color" look="swatch" value="#3355ff"></aufbau-input></div>
+    <div class="row"><label>type="number" stepper</label><aufbau-input name="size" type="number" look="stepper" value="16" min="8" max="64" step="2"></aufbau-input></div>
+  </section>
+
+  <h2>aufbau-slider</h2>
+  <section>
+    <div class="row"><label>type="number"</label>
+      <aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider></div>
+    <div class="row"><label>type="number" range</label>
+      <aufbau-slider name="preis" type="number" range value="20,80" min="0" max="100" unit="€"></aufbau-slider></div>
+    <div class="row"><label>type="color"</label>
+      <aufbau-slider name="hue" type="color" value="#3355ff"></aufbau-slider></div>
+    <div class="row"><label>type="time"</label>
+      <aufbau-slider name="von" type="time" value="09:00"></aufbau-slider></div>
+    <div class="row"><label>type="date"</label>
+      <aufbau-slider name="tag" type="date" value="2026-06-01" min="2026-01-01" max="2026-12-31"></aufbau-slider></div>
+  </section>
+
+  <h2>aufbau-writer</h2>
+  <section>
+    <div class="row"><label>counter maxlength</label>
+      <aufbau-writer name="bio" placeholder="Kurz über dich..." counter maxlength="280"></aufbau-writer></div>
+    <div class="row"><label>autogrow 3–12</label>
+      <aufbau-writer name="notiz" autogrow min-rows="3" max-rows="12"></aufbau-writer></div>
+    <div class="row"><label>kindinhalt als startwert</label>
+      <aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer></div>
+  </section>
+
+  <h2>aufbau-upload</h2>
+  <section>
+    <div class="row"><label>accept="image/*"</label>
+      <aufbau-upload name="avatar" accept="image/*"></aufbau-upload></div>
+    <div class="row"><label>multiple max-size=5MB</label>
+      <aufbau-upload name="belege" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload></div>
+  </section>
+
+  <div class="row" style="margin-top:1.5rem">
+    <button type="submit">absenden (validity prüfen)</button>
+    <button type="reset">reset</button>
+  </div>
+
+</form>
+
+<h2>getFormValues()</h2>
+<output id="dump"></output>
+
+<h2>aufbau-reader</h2>
+<aufbau-reader raw="# Inline&#10;Kommt durch **denselben** markdown-compiler wie `src`."></aufbau-reader>
+
+<h2>aufbau-button</h2>
+<div class="row">
+  <aufbau-button label="Speichern" icon="lucide:save" variant="primary"></aufbau-button>
+  <aufbau-button variant="danger"><strong>Löschen</strong> <small>(irreversibel)</small></aufbau-button>
+  <aufbau-button label="Deaktiviert" disabled></aufbau-button>
+</div>
+
+<h2>aufbau-dropdown</h2>
+<aufbau-dropdown label="Optionen">
+  <a href="#edit">Bearbeiten</a>
+  <a href="#delete">Löschen</a>
+</aufbau-dropdown>
+
+<script type="module">
+  import { autoloader } from '@aufbau/elements';
+  import { getFormValues } from '@domina/core';
+
+  autoloader();
+
+  const form = document.getElementById('playground');
+  const dump = document.getElementById('dump');
+
+  const show = () => {
+    const values = getFormValues(form);
+    const data   = Object.fromEntries([...new FormData(form).entries()]
+      .map(([key, value]) => [key, value instanceof File ? `File(${value.name})` : value]));
+
+    dump.textContent = `getFormValues: ${JSON.stringify(values, null, 2)}\n\nFormData:     ${JSON.stringify(data, null, 2)}`;
+  };
+
+  form.addEventListener('input',  show);
+  form.addEventListener('change', show);
+  form.addEventListener('reset',  () => setTimeout(show));
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    console.log('valid:', form.checkValidity());
+    show();
+  });
+
+  // options must survive being added and removed at runtime
+  const picker = form.querySelector('[name="lang"]');
+  let counter = 0;
+
+  document.getElementById('add-option').addEventListener('click', () => {
+    const option = document.createElement('aufbau-option');
+    option.setAttribute('value', `neu-${++counter}`);
+    option.textContent = `Neu ${counter}`;
+    picker.append(option);
+  });
+
+  document.getElementById('drop-option').addEventListener('click', () => {
+    [...picker.querySelectorAll('aufbau-option')].pop()?.remove();
+  });
+
+  setTimeout(show, 300);
+</script>
+
+</body>
+</html>

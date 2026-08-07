@@ -34,6 +34,25 @@ export const parseSchemaEntry = (entry) => {
 };
 
 /**
+ * collects the classes in the prototype chain that declare their OWN `static
+ * attr`, base class first. a subclass therefore EXTENDS the base schema instead
+ * of shadowing it, which is what the shared control base relies on.
+ */
+const attrOwners = (Class) => {
+  const owners = [];
+  for (let c = Class; isFn(c); c = Object.getPrototypeOf(c)) {
+    if (Object.hasOwn(c, 'attr') && c.attr) owners.unshift(c);
+  }
+  return owners;
+};
+
+// both the array shorthand (`['src', 'alt']`) and the object form normalize to entries
+const entriesOf = (attr) =>
+    isArray(attr)       ? attr.map(name => [name, String])
+  : isPlainObject(attr) ? Object.entries(attr)
+  : [];
+
+/**
  * parsed schema for a class, keyed by kebab-case attribute name.
  * parsing happens once per class, the weakmap keeps subclasses separate
  * and dies with the class itself.
@@ -42,14 +61,13 @@ export const parseSchemaEntry = (entry) => {
  */
 export const schemaOf = (Class) => {
   const hit = cache.get(Class); if (hit) return hit;
-  const { attr } = Class;
-  const source = isArray(attr)       ? Object.fromEntries(attr.map(name => [name, String]))
-               : isPlainObject(attr) ? attr
-               : {};
 
+  // later owners win, so a subclass can redeclare a single inherited attribute
   const parsed = {};
-  for (const [name, entry] of Object.entries(source)) {
-    parsed[toKebabCase(name)] = parseSchemaEntry(entry);
+  for (const owner of attrOwners(Class)) {
+    for (const [name, entry] of entriesOf(owner.attr)) {
+      parsed[toKebabCase(name)] = parseSchemaEntry(entry);
+    }
   }
 
   cache.set(Class, parsed);

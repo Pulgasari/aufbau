@@ -1,54 +1,43 @@
-// <aufbau-datalist>
+// <datalist is="aufbau-datalist">
+// a data source for native list= autocompletion, fed by @aufbau/import.
 
-import { AufbauDatalistElement } from './core/index.js';
-import { importFile }            from '@aufbau/import';
+import { AufbauDatalistElement, normalizeOptions } from './core/index.js';
+import { importFile } from '@aufbau/import';
+import { attrs, html } from '@aufbau/js';
 
-export default class AufbauDatalist extends AufbauDataListElement {
-  static attr = ['src', 'key', 'label-key'];
+export default class AufbauDatalist extends AufbauDatalistElement {
+  static attr = {
+    key      : 'value',
+    labelKey : 'label',
+    src      : String,
+  };
 
-  connectedCallback() {
-    this.loadData();
-  }
+  // no connectedCallback/attributeChangedCallback override, the core lifecycle
+  // handles both and calls update()
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (oldValue !== newValue) {
-      this.loadData();
-    }
-  }
+  async update () {
+    const { key, labelKey, src } = this.getAttr();
+    if (!src) return this;
 
-  async loadData() {
-    const src = this.getAttribute('src');
-    const key = this.getAttribute('key') || 'value';
-    const labelKey = this.getAttribute('label-key') || 'label';
-    if (!src) return;
-
-    try {
-      // Use @aufbau/import under the hood (supports .jsonc, .json5, .yaml, .toml, .csv, .xml out-of-the-box!)
-      const data = await importFile(src);
-      
-      // Normalize imported data into an array
-      let items = [];
-      if (Array.isArray(data)) {
-        items = data;
-      } else if (data && typeof data === 'object') {
-        // Fallback for wrapped payloads like { items: [...] } or { data: [...] }
-        items = data.items || data.data || data.results || Object.values(data);
+    if (src !== this._loadedSrc) {
+      this._loadedSrc = src;
+      try {
+        // @aufbau/import covers json, jsonc, json5, yaml, toml, csv and xml
+        this._items = normalizeOptions(await importFile(src), { key, labelKey });
+      } catch (error) {
+        console.warn(`[aufbau-datalist] could not import data from "${src}":`, error);
+        this._items = [];
       }
-
-      // Render options
-      this.innerHTML = items.map(item => {
-        if (typeof item === 'object' && item !== null) {
-          const val = item[key] ?? item.value ?? Object.values(item)[0];
-          const label = item[labelKey] ? ` label="${item[labelKey]}"` : '';
-          return `<option value="${val}"${label}></option>`;
-        }
-        return `<option value="${item}"></option>`;
-      }).join('');
-
-    } catch (err) {
-      console.warn(`[aufbau-datalist] Could not import data from "${src}":`, err);
     }
+
+    return super.update();
+  }
+
+  render () {
+    return html`${(this._items ?? []).map(item =>
+      html`<option ${attrs({ label: item.label === item.value ? false : item.label, value: item.value })}></option>`
+    )}`;
   }
 }
 
-AufbauDatalist.init();
+AufbauDatalist.init({ extends: 'datalist' });

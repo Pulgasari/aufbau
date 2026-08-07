@@ -16,6 +16,7 @@
     "index.js",
     "jsr.json",
     "Aufbau*.js",
+    "core/*.js",
     "README.md",
     "LICENSE"
   ],

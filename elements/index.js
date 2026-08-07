@@ -11,18 +11,18 @@ import { dom, toPascalCase } from '@aufbau/js';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
-const EXCLUDED = new Set([
-  './core/AufbauConfig.js',
-  './core/AufbauCore.js',
-]);
-
 let   baseURL   = import.meta.url;
-let   manifest  = null; 
+let   manifest  = null;
 const PREFIX    = 'aufbau-';
 const requested = new Set;
 
+// covers both autonomous elements (<aufbau-flag>) and customized built-ins
+// (<datalist is="aufbau-datalist">), which carry the name on `is` instead
 function tagOf (element) {
-  return element.localName?.startsWith(PREFIX) ? element.localName : null;
+  if (element.localName?.startsWith(PREFIX)) return element.localName;
+
+  const is = element.getAttribute?.('is');
+  return is?.startsWith(PREFIX) ? is : null;
 }
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::
@@ -39,7 +39,7 @@ async function registerAll () {
   manifest ??= (await import(new URL('./jsr.json', baseURL).href, { with: { type: 'json' } })).default;    
 
   const paths = Object.entries(manifest.exports ?? {})
-    .filter(([key, path]) => key.startsWith('./Aufbau') && !EXCLUDED.has(path))
+    .filter(([key]) => key.startsWith('./Aufbau'))
     .map(([, path]) => path);
 
   return Promise.all(paths.map(path => import(new URL(path, baseURL).href)));
@@ -82,8 +82,8 @@ function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
+export * from './core/index.js';
 export * from './core/AufbauConfig.js';
-export * from './core/AufbauCore.js';
 
 export {
   autoloader, 
