@@ -31,7 +31,7 @@ function flatten (input, prefix = '', out = newSource()) {
 }
 
 function mergeSources () {
-  const next  = new Map(); // keys arrive canonical from every source, no normalization needed
+  const next  = new Map;
   const apply = (entries) => {
     for (const [key, value] of entries) {
       if (value === null) next.delete(key);
