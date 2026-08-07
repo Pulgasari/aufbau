@@ -27,6 +27,8 @@ export * from './timing.js';
 
 // dom
 export * from './dom/events.js';
+export * as dom from '@domina/core';
+
 
 
 // minimal escaping — keeps url() valid at roughly two thirds the length.
