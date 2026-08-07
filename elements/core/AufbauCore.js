@@ -1,7 +1,7 @@
 // @aufbau/elements/core/AufbauCore.js
 
 import { decorate, decorateAll } from './utils.js';
-import { parseSchemaEntry }      from './parseSchemaEntry.js';
+import { parseSchemaEntry }      from './schema.js';
 import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
