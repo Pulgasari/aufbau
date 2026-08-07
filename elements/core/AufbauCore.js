@@ -1,7 +1,7 @@
 // @aufbau/elements/core/AufbauCore.js
 
 import { decorate, decorateAll } from './utils.js';
-import { parseSchemaEntry }      from './schema.js';
+import { parseSchemaEntry, schemaOf }      from './schema.js';
 import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
@@ -16,13 +16,13 @@ const log = createLogger('aufbau-core');
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
 
-    constructor () {
-      super();
-      this._mounted = false;
-      this._effects = disposer();
-    }
+  constructor () {
+    super();
+    this._mounted = false;
+    this._effects = disposer();
+  }
 
-    // ::: lifecycle
+  // ::: lifecycle
 
     connectedCallback () {
       this._mounted = true;
@@ -33,11 +33,11 @@ return class extends BaseClass {
       this.update();
     }
 
-    disconnectedCallback () {
-      this._mounted = false;
-      this.release();
-      this.onUnmount();
-    }
+  disconnectedCallback () {
+    this._mounted = false;
+    this.release();
+    this.onUnmount();
+  }
 
     attributeChangedCallback (name, oldValue, newValue) {
       if (oldValue !== newValue && this._mounted) {
