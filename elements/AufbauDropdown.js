@@ -1,49 +1,57 @@
-// <aufbau-dropdown>
+// <datalist is="aufbau-datalist">
 
-import { AufbauElement } from './core/index.js';
-import * as dom from '@domina/core';
-import { html } from '@aufbau/js';
+import { AufbauDatalistElement } from './core/index.js';
+import { importFile }            from '@aufbau/import';
+import { attrs, html }           from '@aufbau/js';
 
-export default class AufbauDropdown extends AufbauElement {
+export default class AufbauDatalist extends AufbauDatalistElement {
   static attr = {
-    label : 'Menu',
-    open  : Boolean,
+    src      : String,
+    key      : 'value',
+    labelKey : 'label',
   };
 
-  onMount () {
-    // light dom has no slots, so the original children are moved into the
-    // rendered shell after every structural rebuild
-    this._content ??= [...this.childNodes];
+  // no connectedCallback/attributeChangedCallback override, the core lifecycle
+  // handles both and calls update()
 
-    this.on('toggle', '.aufbau-dropdown-wrapper', (e, details) => {
-      this.setAttr({ open: details.open });
-      this.emit('aufbau-dropdown', { open: details.open });
-    });
+  async update () {
+    const { src } = this.getAttr();
+    if (!src) return;
 
-    this.onOutside(() => this.setAttr({ open: false }));
+    if (src !== this._loadedSrc) {
+      this._loadedSrc = src;
+      try {
+        // @aufbau/import covers json, jsonc, json5, yaml, toml, csv and xml
+        this._items = this.normalize(await importFile(src));
+      } catch (err) {
+        console.warn(`[aufbau-datalist] could not import data from "${src}":`, err);
+        this._items = [];
+      }
+    }
+
+    super.update();
+  }
+
+  normalize (data) {
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      // handles wrapped payloads like { items: [...] } or { data: [...] }
+      return data.items || data.data || data.results || Object.values(data);
+    }
+    return [];
   }
 
   render () {
-    const { label } = this.getAttr();
+    const { key, labelKey } = this.getAttr();
 
-    return html`
-      <details class="aufbau-dropdown-wrapper">
-        <summary class="aufbau-dropdown-trigger">
-          <span>${label}</span>
-          <aufbau-icon icon="lucide:chevron-down"></aufbau-icon>
-        </summary>
-        <div class="aufbau-dropdown-content"></div>
-      </details>
-    `;
-  }
-
-  onRender () {
-    this.$('.aufbau-dropdown-content')?.append(...(this._content ?? []));
-  }
-
-  sync () {
-    dom.setAttr(this.$('.aufbau-dropdown-wrapper'), { open: this.getAttr('open') });
+    return html`${(this._items ?? []).map(item => {
+      if (typeof item !== 'object' || item === null) {
+        return html`<option ${attrs({ value: item })}></option>`;
+      }
+      const value = item[key] ?? item.value ?? Object.values(item)[0];
+      return html`<option ${attrs({ value, label: item[labelKey] })}></option>`;
+    })}`;
   }
 }
 
-AufbauDropdown.init();
+AufbauDatalist.init({ extends: 'datalist' });
