@@ -3,18 +3,14 @@
 import { AufbauElement } from './core/index.js';
 import { escapeHtml } from '@aufbau/js';
 
-const HLJS_VERSION = '11.9.0';
-const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
-const HLJS_STYLES  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/styles/`;
-const HLJS_INDEX   = `https://data.jsdelivr.com/v1/packages/npm/highlight.js@${HLJS_VERSION}?structure=flat`;
-
-// separate from [data-theme], which belongs to @aufbau/css themes
-const THEME_ATTR = 'data-hljs-theme';
-
-let hljsPromise   = null;
-let themesPromise = null;
-const themeSheets = new Map(); // theme -> Promise<CSSStyleSheet|null>
-
+const HLJS_VERSION  = '11.9.0';
+const HLJS_MODULE   = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
+const HLJS_STYLES   = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/styles/`;
+const HLJS_INDEX    = `https://data.jsdelivr.com/v1/packages/npm/highlight.js@${HLJS_VERSION}?structure=flat`;
+const THEME_ATTR    = 'data-hljs-theme'; // separate from [data-theme], which belongs to @aufbau/css themes
+const themeSheets   = new Map; // theme -> Promise<CSSStyleSheet|null>
+let   hljsPromise   = null;
+let   themesPromise = null;
 const getHljs = () => (hljsPromise ??= import(HLJS_MODULE).then(m => m.default));
 
 // used when the jsdelivr file index is unreachable
@@ -55,7 +51,7 @@ function loadTheme (theme) {
     const response = await fetch(`${HLJS_STYLES}${theme}.min.css`);
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
 
-    const sheet = new CSSStyleSheet();
+    const sheet = new CSSStyleSheet;
     sheet.replaceSync(await response.text());
     scopeRules(sheet.cssRules, `aufbau-code[${THEME_ATTR}="${theme}"]`);
 
