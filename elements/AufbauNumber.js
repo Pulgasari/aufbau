@@ -39,7 +39,7 @@ export default class AufbauNumber extends AufbauElement {
 
     const value = Math.max(minBound, Math.min(maxBound, parsedVal));
     
-    this.setAttributes({ value });
+    this.setAttr({ value });
     this.emit('aufbau-number', { value });
   }
 
