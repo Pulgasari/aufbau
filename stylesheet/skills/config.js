@@ -1,6 +1,8 @@
 // @aufbau/stylesheet/skills/config.js
 // [at-rule] @aufbau-config
 
+import { blockEnd, stripComments } from './parse.js';
+
 const BASE_CSS_URL   = 'https://pulgasari.github.io/aufbau/css/';
 const BASE_THEME_URL = BASE_CSS_URL + 'themes/';
 
@@ -23,7 +25,7 @@ function normalizeFontValue (val) {
   return `'${clean}'`;
 }
 
-function parseConfigBlock (body) {
+function parseConfigBlock (rawBody) {
   const config = {
     charset : null,
     font    : null,
@@ -31,6 +33,11 @@ function parseConfigBlock (body) {
     theme   : null,
     themes  : []
   };
+
+  // a comment would otherwise become part of the next key, and that declaration
+  // would be dropped without a word. stripping here also covers the nested
+  // font: { … } block further down
+  const body = stripComments(rawBody);
 
   let i = 0;
   const len = body.length;
@@ -118,14 +125,7 @@ export function transformConfig (code) {
 
   while ((match = configRegex.exec(code)) !== null) {
     const startIdx = match.index;
-    let depth = 1;
-    let i = match.index + match[0].length;
-
-    while (i < code.length && depth > 0) {
-      if (code[i] === '{') depth++;
-      else if (code[i] === '}') depth--;
-      i++;
-    }
+    const i = blockEnd(code, match.index + match[0].length);
 
     const fullBlock   = code.slice(startIdx, i);
     const bodyContent = code.slice(startIdx + match[0].length, i - 1);

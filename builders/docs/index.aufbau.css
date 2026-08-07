@@ -11,12 +11,10 @@ svg {
   max-width: 100%;
 }
 
-/* all four themes are loaded so the footer picker can switch between them at
-   runtime. the last one wins when no data-theme is set, so it is the default.
-   note: comments must stay OUTSIDE @aufbau-config, one inside silently drops
-   the whole block */
 @aufbau-config {
   import : reset, default, docs, keyframes;
+  /* all four are loaded so the footer picker can switch between them at runtime.
+     the last one wins when no data-theme is set, so it is the default */
   themes : classic, oled, rainbow, zombie;
 }
 
