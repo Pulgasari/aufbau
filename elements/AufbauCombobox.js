@@ -83,8 +83,8 @@ export default class AufbauCombobox extends AufbauElement {
     this.$('.combobox-input')?.on('focus', () => this.openDropdown());
   }
 
-  openDropdown  () { this.$('.combobox-list')?.hidden = false; }
-  closeDropdown () { this.$('.combobox-list')?.hidden = true;  }
+  openDropdown  () { this.$('.combobox-list').hidden = false; }
+  closeDropdown () { this.$('.combobox-list').hidden = true;  }
 
   filterOptions (query) {
     const q = query.toLowerCase().trim();
