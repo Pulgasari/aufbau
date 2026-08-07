@@ -1,38 +1,40 @@
 // <aufbau-button>
 
 import { AufbauElement } from './core/index.js';
+import { html, raw as rawHtml } from '@aufbau/js';
+import * as dom from '@domina/core';
 
 export default class AufbauButton extends AufbauElement {
   static attr = {
-    disabled : false, 
-    icon     : String, 
-    label    : String, 
-    text     : String, 
+    disabled : Boolean,
+    icon     : String,
+    label    : String,
+    text     : String,
     type     : 'button',
     variant  : 'default',
-  ];
+  };
 
   onMount () {
-    // preserve initial light-DOM children if no explicit label was given
-    if (!this.hasAttribute('label') && !this.hasAttribute('text') && !this._originalChildren) {
-      this._originalChildren = this.innerHTML;
-    }
+    // authored children are the label when no explicit one was given.
+    // captured before the first render replaces them
+    this._children ??= this.innerHTML.trim();
   }
 
-  update () {
-    const { disabled, icon, label, text, type, variant } = this.getAttr();
-    const content = label || text || this._originalChildren || '';
+  render () {
+    const { icon, label, text, type, variant } = this.getAttr();
+    const content = label || text || this._children || '';
 
-    this.innerHTML = `
-      <button
-        type="${type}"
-        class="aufbau-btn variant-${variant}"
-        ${disabled ? 'disabled' : ''}
-      >
-        ${icon    ? `<aufbau-icon icon="${icon}"></aufbau-icon>`  : ''}
-        ${content ? `<span class="btn-content">${content}</span>` : ''}
+    return html`
+      <button type="${type}" class="aufbau-btn variant-${variant}">
+        ${icon    && html`<aufbau-icon icon="${icon}"></aufbau-icon>`}
+        ${content && html`<span class="btn-content">${rawHtml(content)}</span>`}
       </button>
     `;
+  }
+
+  // kept out of render() so toggling disabled does not rebuild the markup
+  sync () {
+    dom.setAttr(this.$('.aufbau-btn'), { disabled: this.getAttr('disabled') });
   }
 }
 

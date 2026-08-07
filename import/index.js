@@ -376,18 +376,28 @@ export async function importLESS (path, options = {}) {
   return transformCSSResult(css, mode);
 }
 
-export async function importMD (path, options = {}) {
+/**
+ * markdown source string -> html. split out of importMD so callers that already
+ * hold the text go through the same configured compiler instead of pulling in a
+ * second markdown parser of their own.
+ */
+export async function renderMD (text, options = {}) {
   options = toOptions(options);
   const mode = resolveMode('md', options);
-  const text = await fetchText(path, options);
   if (mode === 'raw') return text;
 
   const html = options.compiler
-    ? await options.compiler(text, path)
+    ? await options.compiler(text, options.path)
     : await (await vendor('marked')).marked.parse(text);
 
   if (mode === 'element') return Object.assign(document.createElement('div'), { innerHTML: html });
   return html;
+}
+
+export async function importMD (path, options = {}) {
+  options = toOptions(options);
+  const text = await fetchText(path, options);
+  return renderMD(text, { ...options, path });
 }
 
 export async function importSASS (path, options = {}) {

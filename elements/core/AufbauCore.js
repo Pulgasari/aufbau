@@ -64,6 +64,31 @@ return class extends BaseClass {
   /** shadow root when present, the element itself otherwise */
   get root () { return this.shadowRoot ?? this; }
 
+  /**
+   * where render() output goes. defaults to the whole root, so a plain element
+   * simply owns its markup. containers that must keep their light dom children
+   * alive (picker, upload, reader …) override this with a dedicated shell.
+   */
+  get renderTarget () { return this.root; }
+
+  /**
+   * lazily creates a dedicated render shell inside the element, so authored
+   * light dom children are never wiped by a re-render. override renderTarget
+   * with `this.shell('aufbau-picker-ui')` to opt in.
+   */
+  shell (className, { prepend = false } = {}) {
+    if (this._shell?.isConnected) return this._shell;
+
+    this._shell = this.querySelector(`:scope > .${className}`);
+    if (!this._shell) {
+      this._shell = document.createElement('div');
+      this._shell.className = className;
+    }
+    if (!this._shell.isConnected) this[prepend ? 'prepend' : 'append'](this._shell);
+
+    return this._shell;
+  }
+
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   connectedCallback () {
@@ -114,7 +139,36 @@ return class extends BaseClass {
   onAttributeChange (name, oldValue, newValue) {}
   onMount   () {}
   onUnmount () {}
-  update    () {}
+
+  /** structure, without values. return null to opt out of markup entirely */
+  render () { return null; }
+
+  /** values and state, applied to the structure render() produced */
+  sync () {}
+
+  /**
+   * the render pipeline. structure is only rebuilt when render() actually
+   * produces different markup, otherwise every keystroke would drop focus and
+   * caret position out of the inner fields. sync() runs on every pass.
+   */
+  update () {
+    if (!this._mounted) return this;
+
+    const markup = this.render();
+    if (markup != null) {
+      const next = String(markup);
+      if (next !== this._markup) {
+        this._markup = next;
+        this.renderTarget.innerHTML = next;
+      }
+    }
+
+    this.sync();
+    return this;
+  }
+
+  /** forces the next update() to rebuild the markup even if it is unchanged */
+  invalidate () { this._markup = undefined; return this; }
 
   // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
   
@@ -157,9 +211,10 @@ return class extends BaseClass {
   on (...args) {
     const [first, second, third, fourth] = args;
 
-    // delegated: type first, selector second
+    // delegated: type first, selector second. dom.delegate takes
+    // (container, types, selector, fn), so the order carries straight through
     if (isString(first) && isString(second) && isFn(third)) {
-      return this.track(dom.delegate(this, second, first, third, fourth));
+      return this.track(dom.delegate(this, first, second, third, fourth));
     }
 
     // the element itself
@@ -174,6 +229,16 @@ return class extends BaseClass {
 
   off  (...args) { dom.offEvent(this, ...args); return this; }
   emit (...args) { return dom.emitEvent(this, ...args); }
+
+  /**
+   * fires when an interaction happens anywhere but inside this element.
+   * composedPath() is used on purpose, it sees through shadow roots.
+   */
+  onOutside (handler, { type = 'pointerdown' } = {}) {
+    return this.on(document, type, (event) => {
+      if (!event.composedPath().includes(this)) handler(event);
+    });
+  }
 
   release () { this._effects.dispose(); return this; }
   track   (unsubscribe) { return this._effects.add(unsubscribe); }

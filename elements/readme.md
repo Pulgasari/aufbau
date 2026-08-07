@@ -13,18 +13,30 @@ official **aufbau** *webcomponents\** library.
 
 ---
 
+die control-elemente folgen drei achsen: `type` (welcher wert), `look` (wie es
+aussieht) und `range`/`multiple` (wie viele). ausführlich in
+[controls.md](./controls.md).
+
 ```html
-<aufbau-data-list>
-<aufbau-data-map>
+<aufbau-option value='de' label='Deutsch'>
 
-<aufbau-option>
-<aufbau-option type='color'>
-<aufbau-option type='color'>
+<aufbau-picker look='combobox'>
+<aufbau-picker look='radio'>
+<aufbau-picker look='segments'>
 
-<aufbau-toggle>
+<aufbau-toggle look='switch'>
+<aufbau-toggle look='checkbox'>
 
-<aufbau-input>
-<aufbau-input>
+<aufbau-input type='text'>
+<aufbau-input type='number' look='stepper'>
+
+<aufbau-slider type='number' range>
+<aufbau-slider type='color'>
+
+<aufbau-upload accept='image/*'>
+
+<aufbau-writer counter maxlength='280'>
+<aufbau-reader src='/docs/intro.md'>
 ```
 
 ## usage
@@ -106,31 +118,29 @@ customElements.define('aufbau-flag', AufbauFlag);
 
 [`<aufbau-audio>`](#aufbau-audio) ·
 [`<aufbau-button>`](#aufbau-button) ·
-[`<aufbau-checkbox>`](#aufbau-checkbox) ·
 [`<aufbau-code>`](#aufbau-code) ·
-[`<aufbau-combobox>`](#aufbau-combobox) ·
 [`<aufbau-config>`](#aufbau-config) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-filter>`](#aufbau-filter) ·
 [`<aufbau-flag>`](#aufbau-flag) ·
 [`<aufbau-icon>`](#aufbau-icon) ·
-[`<aufbau-index>`](#aufbau-index) ·
 [`<aufbau-input>`](#aufbau-input) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
-[`<aufbau-number>`](#aufbau-number) ·
+[`<aufbau-option>`](#aufbau-option) ·
+[`<aufbau-picker>`](#aufbau-picker) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
+[`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-slider>`](#aufbau-slider) ·
-[`<aufbau-switch>`](#aufbau-switch) ·
 [`<aufbau-table>`](#aufbau-table) ·
-[`<aufbau-text>`](#aufbau-text) ·
 [`<aufbau-toc>`](#aufbau-toc) ·
 [`<aufbau-toggle>`](#aufbau-toggle) ·
 [`<aufbau-tree>`](#aufbau-tree) ·
 [`<aufbau-tree-item>`](#aufbau-tree-item) ·
+[`<aufbau-upload>`](#aufbau-upload) ·
 [`<aufbau-video>`](#aufbau-video) ·
 [`<aufbau-waveform>`](#aufbau-waveform) ·
-[`<aufbau->`](#aufbau-) ·
+[`<aufbau-writer>`](#aufbau-writer) ·
 
 ## aufbau-audio
 
@@ -156,12 +166,6 @@ customElements.define('aufbau-flag', AufbauFlag);
 </aufbau-button>
 ```
 
-## aufbau-checkbox
-
-```html
-<aufbau-checkbox label="AGB akzeptieren" checked></aufbau-checkbox>
-```
-
 ## aufbau-code
 
 ```html
@@ -173,12 +177,6 @@ console.log(greet('aufbau'));
 
 <!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
 <aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
-```
-
-## aufbau-combobox
-
-```html
-<aufbau-combobox src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-combobox>
 ```
 
 ## aufbau-config
@@ -271,14 +269,24 @@ console.log(greet('aufbau'));
 
 ## aufbau-input
 
+`type` ist ausschliesslich der wertetyp, `look` ausschliesslich die darstellung.
+für `type="range"` gibt es [`<aufbau-slider>`](#aufbau-slider), für `type="file"`
+[`<aufbau-upload>`](#aufbau-upload).
+
 ```html
-<!-- Input with preset icon & datalist linkage -->
-<aufbau-input type="email" placeholder="Enter your email"></aufbau-input>
+<!-- icon kommt automatisch aus dem typ -->
+<aufbau-input name="mail" type="email" placeholder="Enter your email"></aufbau-input>
+
+<!-- stepper statt nacktem zahlenfeld (löst <aufbau-number> ab) -->
+<aufbau-input name="size" type="number" look="stepper" min="8" max="64" step="2"></aufbau-input>
+
+<!-- farbfeld -->
+<aufbau-input name="brand" type="color" look="swatch" value="#3355ff"></aufbau-input>
 ```
 
-... with [<aufbau-datalist>](#aufbau-datalist)]
+... with [<aufbau-datalist>](#aufbau-datalist)
 ```html
-<aufbau-input type="text" datalist="city-list" placeholder="Select City..."></aufbau-input>
+<aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
 ```
 
 ## aufbau-loop
@@ -300,10 +308,41 @@ console.log(greet('aufbau'));
 </aufbau-loop>
 ```
 
-## aufbau-number
+## aufbau-option
+
+datenelement, kein control. es rendert sich nie selbst, sondern wird von seinem
+container gelesen — und bleibt dabei im dom, damit optionen zur laufzeit
+dazukommen und verschwinden können.
 
 ```html
-<aufbau-number value="16" min="8" max="64" step="2" unit="px"></aufbau-number>
+<aufbau-picker name="lang">
+  <aufbau-option value="de" icon="circle-flags:de">Deutsch</aufbau-option>
+  <aufbau-option value="en" icon="circle-flags:us" selected>English</aufbau-option>
+  <aufbau-option value="fr" disabled>Français</aufbau-option>
+</aufbau-picker>
+```
+
+## aufbau-picker
+
+one-of-n. `look` wechselt nur die darstellung — dasselbe markup funktioniert als
+combobox, radiogruppe oder segmented control.
+
+```html
+<aufbau-picker name="view" look="segments" value="month">
+  <aufbau-option value="day">Tag</aufbau-option>
+  <aufbau-option value="month">Monat</aufbau-option>
+  <aufbau-option value="year">Jahr</aufbau-option>
+</aufbau-picker>
+
+<!-- durchsuchbar, optionen aus einer datei -->
+<aufbau-picker name="framework" look="combobox" searchable
+               src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-picker>
+
+<!-- mehrfachauswahl, ein FormData-eintrag pro wert -->
+<aufbau-picker name="tags" look="radio" multiple>
+  <aufbau-option value="js">JavaScript</aufbau-option>
+  <aufbau-option value="css">CSS</aufbau-option>
+</aufbau-picker>
 ```
 
 ## aufbau-progress
@@ -316,20 +355,46 @@ console.log(greet('aufbau'));
 <aufbau-progress value="75" max="100" show-text unit="%"></aufbau-progress>
 ```
 
-## aufbau-slider
+## aufbau-reader
+
+lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
+über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
+selbst von einem cdn.
 
 ```html
-<aufbau-slider value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
+<!-- markdown-datei -->
+<aufbau-reader src="/docs/getting-started.md"></aufbau-reader>
+
+<!-- inline markdown -->
+<aufbau-reader raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-reader>
+
+<!-- oder direkt als kindinhalt -->
+<aufbau-reader>
+# Titel
+Text mit **markdown**.
+</aufbau-reader>
 ```
 
-## aufbau-switch
+der ladezustand steht als `data-state="loading|ready|error|idle"` am element und
+ist damit direkt per css ansprechbar.
+
+## aufbau-slider
+
+ein wert auf einer achse. jeder `type` wird intern auf dieselbe numerische
+achse projiziert, deshalb teilen sich zahl, farbe, datum und zeit eine
+implementierung.
 
 ```html
-<aufbau-switch value="month" mode="buttons">
-  <option value="day">Tag</option>
-  <option value="month">Monat</option>
-  <option value="year">Jahr</option>
-</aufbau-switch>
+<aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
+
+<!-- zwei griffe, value="from,to" -->
+<aufbau-slider name="preis" type="number" range value="20,80" min="0" max="100"></aufbau-slider>
+
+<!-- die achse ist der farbton -->
+<aufbau-slider name="hue" type="color" value="#3355ff"></aufbau-slider>
+
+<!-- die achse ist die zeit -->
+<aufbau-slider name="von" type="time" value="09:00" min="06:00" max="22:00"></aufbau-slider>
 ```
 
 ## aufbau-table
@@ -340,16 +405,6 @@ console.log(greet('aufbau'));
 
 <!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
 <aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
-```
-
-## aufbau-text
-
-```html
-<!-- 3. Text-Element, das direkt eine Markdown-Datei lädt -->
-<aufbau-text src="/docs/getting-started.md"></aufbau-text>
-
-<!-- 4. Text-Element mit inline Markdown -->
-<aufbau-text raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-text>
 ```
 
 ## aufbau-toc
@@ -368,8 +423,12 @@ console.log(greet('aufbau'));
 
 ## aufbau-toggle
 
+ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
+
 ```html
-<aufbau-toggle label="Darkmode aktivieren" checked></aufbau-toggle>
+<aufbau-toggle name="darkmode" label="Darkmode aktivieren" checked></aufbau-toggle>
+<aufbau-toggle name="agb" look="checkbox" label="AGB akzeptieren" required></aufbau-toggle>
+<aufbau-toggle name="pin" look="button" label="Anheften"></aufbau-toggle>
 ```
 
 ## aufbau-tree
@@ -391,6 +450,20 @@ console.log(greet('aufbau'));
 <aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
 ```
 
+## aufbau-upload
+
+`accept` statt `mimetype`, weil das native attribut mehr kann: mimetypes
+*und* endungen.
+
+```html
+<aufbau-upload name="avatar" accept="image/*"></aufbau-upload>
+<aufbau-upload name="belege" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload>
+<aufbau-upload name="logo" look="button" text="Datei wählen"></aufbau-upload>
+```
+
+abgelehnte dateien (falscher typ, zu gross) kommen als
+`aufbau-upload-rejected`-event und setzen die validity des elements.
+
 ## aufbau-video
 
 ```html
@@ -401,6 +474,20 @@ console.log(greet('aufbau'));
 
 ```html
 <aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
+```
+
+## aufbau-writer
+
+mehrzeiliger text, das gegenstück zu [`<aufbau-reader>`](#aufbau-reader).
+
+```html
+<aufbau-writer name="bio" placeholder="Kurz über dich..." counter maxlength="280"></aufbau-writer>
+
+<!-- wächst mit, zwischen 3 und 12 zeilen -->
+<aufbau-writer name="notiz" autogrow min-rows="3" max-rows="12"></aufbau-writer>
+
+<!-- kindinhalt ist der startwert -->
+<aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer>
 ```
 
 ---
