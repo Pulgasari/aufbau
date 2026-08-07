@@ -120,8 +120,8 @@ export default class AufbauPicker extends AufbauControl {
 
   // :::::: INTERACTION :::::::::::::::::::::::::::::::::::::::::
 
-  open   () { this.setOpen(true);  return this; }
-  close  () { this.setOpen(false); return this; }
+  open   () { this.setOpen(true);         return this; }
+  close  () { this.setOpen(false);        return this; }
   toggle () { this.setOpen(!this.isOpen); return this; }
 
   setOpen (open) {
