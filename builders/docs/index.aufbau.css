@@ -11,9 +11,13 @@ svg {
   max-width: 100%;
 }
 
+/* all four themes are loaded so the footer picker can switch between them at
+   runtime. the last one wins when no data-theme is set, so it is the default.
+   note: comments must stay OUTSIDE @aufbau-config, one inside silently drops
+   the whole block */
 @aufbau-config {
   import : reset, default, docs, keyframes;
-  themes : zombie;
+  themes : classic, oled, rainbow, zombie;
 }
 
 @aufbau colors {
@@ -101,6 +105,13 @@ body { aufbau-use: .flow-y; }
 #app-header nav { gap: 0.5rem; }
 
 #app-header svg { height: 1.5rem; }
+
+/* theme controls in the footer */
+
+.theme-controls       { aufbau-use: .flow-x; gap: 1rem; font-size: 0.8rem; }
+.theme-control        { aufbau-use: .flow-x; gap: 0.5rem; }
+.theme-control label  { text-transform: uppercase; opacity: 0.7; white-space: nowrap; }
+.theme-control aufbau-picker { min-width: 11rem; }
   
 /*
 

@@ -1,11 +1,38 @@
 // @aufbau/builders/docs/index.js
 
-//import hljs                     from 'hljs';
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { slugify }              from '@aufbau/utils';
+// imported for its static themes(), which also registers <aufbau-code>
+import AufbauCode               from '@aufbau/elements/AufbauCode.js';
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
 aufbau.init(); //window.html = html;
+
+// :::::: THEMING :::::::::::::::::::::::::::::::::::::::::::::::
+
+// the themes shipped in @aufbau/css/themes, all four loaded by index.aufbau.css
+const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
+const DEFAULT_CODE = 'github-dark';
+const STORAGE_KEY  = 'aufbau-docs-theme';
+
+// storage is wrapped, private mode and disabled cookies must not break the docs
+const readStored = () => {
+  try   { return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {}; }
+  catch { return {}; }
+};
+
+const writeStored = (value) => {
+  try   { localStorage.setItem(STORAGE_KEY, JSON.stringify(value)); }
+  catch { /* nothing to do, the choice just will not survive a reload */ }
+};
+
+const applyPageTheme = (theme) => {
+  if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme;
+};
+
+// <aufbau-code> reads `code-theme` from the config store on its own,
+// so every existing code block follows without being touched here
+const applyCodeTheme = (theme) => aufbau.elements.setConfig({ code: { theme } });
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -203,11 +230,30 @@ export function createDocsFW (config = {}) {
   const beforeSlot   = aufbau.signal(null);
   const afterSlot    = aufbau.signal(null);
 
-  const brandState = aufbau.signal({ 
-    title: typeof brand === 'string' ? brand : (brand?.title || title), 
-    img: null, 
-    svgContent: null 
+  const brandState = aufbau.signal({
+    title: typeof brand === 'string' ? brand : (brand?.title || title),
+    img: null,
+    svgContent: null
   });
+
+  // ::: theme state, restored and applied before the first render
+
+  const stored     = readStored();
+  const pageTheme  = aufbau.signal(stored.page ?? PAGE_THEMES.at(-1));
+  const codeTheme  = aufbau.signal(stored.code ?? DEFAULT_CODE);
+  // seeded with the active one so the picker is never momentarily empty
+  const codeThemes = aufbau.signal([codeTheme.value]);
+
+  applyPageTheme(pageTheme.value);
+  applyCodeTheme(codeTheme.value);
+
+  // the full list of every theme in the pinned highlight.js version. falls back
+  // to the short list inside <aufbau-code> only when the index is unreachable
+  AufbauCode.themes().then(list => {
+    codeThemes.value = list.includes(codeTheme.value) ? list : [codeTheme.value, ...list];
+  });
+
+  const persistThemes = () => writeStored({ code: codeTheme.value, page: pageTheme.value });
 
   // Hash router event listener
   if (typeof window !== 'undefined') {
@@ -245,12 +291,10 @@ export function createDocsFW (config = {}) {
         afterSlot.value  = resolvedAfter;
         isLoading.value  = false;
 
-        // Post-render DOM manipulation
+        // Post-render DOM manipulation.
+        // no highlighting pass here: upgradeCodeBlocks turned every fenced block
+        // into <aufbau-code>, which highlights itself
         requestAnimationFrame(() => {
-          document.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
-          });
-
           if (anchor) {
             const targetEl = document.getElementById(anchor);
             if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
@@ -283,14 +327,17 @@ export function createDocsFW (config = {}) {
   
     event.preventDefault();
     const { path } = currentRoute.value;
-  
+
     // plain anchor: stay in the current document
     if (href.startsWith('#')) {
       window.location.hash = `#/${path}#${href.slice(1)}`;
       return;
     }
-  
-    // relative document link, resolved against the current doc's directory
+
+    // relative document link, resolved against the current doc's directory.
+    // deliberately resolved in UNRESOLVED space, with '$repo' still in place:
+    // routes stay symbolic and only turn into real paths at load time. resolving
+    // first would collapse '../' against the url root and drop the variable.
     const [to, anchor] = href.split('#');
     const next = new URL(to, new URL(path, 'file:///')).pathname.replace(/^\//, '');
     window.location.hash = `#/${next}${anchor ? `#${anchor}` : ''}`;
@@ -391,10 +438,46 @@ export function createDocsFW (config = {}) {
     `;
   }
 
+  function ThemeControls () {
+    const choose = (signal, apply) => (event) => {
+      const value = event.target.value;
+      if (!value || value === signal.value) return;
+      signal.value = value;
+      apply(value);
+      persistThemes();
+    };
+
+    const picker = (id, label, options, signal, apply, extra = {}) => html`
+      <div class="theme-control">
+        <label for=${id}>${label}</label>
+        <aufbau-picker
+          id=${id}
+          look="combobox"
+          value=${signal.value}
+          onChange=${choose(signal, apply)}
+          ...${extra}
+        >
+          ${options.map(name => html`
+            <aufbau-option key=${name} value=${name}>${name}</aufbau-option>
+          `)}
+        </aufbau-picker>
+      </div>
+    `;
+
+    return html`
+      <div class="theme-controls">
+        ${picker('page-theme', 'theme',  PAGE_THEMES,       pageTheme, applyPageTheme)}
+        ${picker('code-theme', 'syntax', codeThemes.value,  codeTheme, applyCodeTheme, { searchable: true })}
+      </div>
+    `;
+  }
+
+  // footerText is still accepted as an option, it is just not rendered any more.
+  // the footer carries the theme controls now
   function Footer() {
     return html`
       <footer id="app-footer">
-        <span>${footerText}</span>
+        <${ThemeControls} />
       </footer>
     `;
   }
