@@ -13,7 +13,7 @@ const define = (target, props) => {
 };
 
 // tracks decorated targets without writing a marker property onto them
-const decorated = new WeakSet();
+const decorated = new WeakSet;
 
 // :::::: DECORATION ::::::::::::::::::::::::::::::::::::::::::::
 
