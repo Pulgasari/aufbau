@@ -34,7 +34,7 @@ export default class AufbauSlider extends AufbauElement {
   setValue (val) {
     const { min, max } = this.getAttr();
     const value = Math.max(min, Math.min(max, parseFloat(val) || 0));
-    this.setAttributes({ value });
+    this.setAttr({ value });
     this.emit('aufbau-slider', { value });
   }
 
