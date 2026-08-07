@@ -125,20 +125,9 @@ return class extends BaseClass {
   update    () {}
 
   // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
-
-  /** works for customized built-ins too: <datalist is="aufbau-datalist"> -> 'aufbau-datalist' */
-  get tag () {
-    return this.getAttribute('is') || this.localName;
-  }
-
-  /**
-   * parsed schema, keyed by kebab-case attribute name. parsing happens once per
-   * class inside schemaOf(), this getter is a weakmap hit.
-   * always an object, empty when the class declares no `static attr`.
-   */
-  get schema () {
-    return schemaOf(this.constructor);
-  }
+  
+  get schema () { return schemaOf(this.constructor); }
+  get tag    () { return this.getAttribute('is') || this.localName; }
 
   /** config keys this element depends on. null means: react to any change */
   get configWatchlist () {
