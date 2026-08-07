@@ -1,63 +1,69 @@
 // <aufbau-switch>
 
 import { AufbauElement } from './core/index.js';
+import * as dom from '@domina/core';
+import { html } from '@aufbau/js';
 
 export default class AufbauSwitch extends AufbauElement {
   static attr = {
     value : String,
-    mode  : 'buttons' // 'buttons' | 'dropdown'
+    mode  : { type: String, default: 'buttons', values: ['buttons', 'dropdown'] }
   };
 
   onMount () {
-    this.on('click', (e) => {
-      const btn = e.target.closest('[data-value]');
-      if (btn) {
-        const value = btn.dataset.value;
-        this.setAttr({ value });
-        this.emit('aufbau-switch', { value });
-      }
-    });
+    // the source options are children of this element and get wiped by the first
+    // render, so they have to be read before update() runs
+    this._options = this.readOptions();
 
-    this.on('change', (e) => {
-      if (e.target.matches('.aufbau-switch-select')) {
-        const value = e.target.value;
-        this.setAttr({ value });
-        this.emit('aufbau-switch', { value });
-      }
-    });
+    this.on('click', '[data-value]', (e, btn) => this.select(btn.dataset.value));
+    this.on('change', '.aufbau-switch-select', (e, select) => this.select(select.value));
   }
 
-  update () {
-    const { value: currentValue, mode } = this.getAttr();
-    const options = this.$$('option, [data-value]').map(opt => ({
-      value: opt.getAttribute('value') || opt.dataset.value || opt.textContent.trim(),
-      label: opt.textContent.trim()
+  readOptions () {
+    return this.$$('option, [data-value]').map(opt => ({
+      value : opt.getAttribute('value') || opt.dataset.value || opt.textContent.trim(),
+      label : opt.textContent.trim()
     }));
+  }
 
+  select (value) {
+    if (value === this.getAttr('value')) return;
+    this.setAttr({ value });
+    this.emit('aufbau-switch', { value });
+  }
+
+  render () {
+    const { mode } = this.getAttr();
+    const options  = this._options ??= this.readOptions();
+
+    // no selected/is-selected here, that state is applied in sync()
     if (mode === 'dropdown') {
-      this.innerHTML = `
+      return html`
         <select class="aufbau-switch-select">
-          ${options.map(opt => `
-            <option value="${opt.value}" ${opt.value === currentValue ? 'selected' : ''}>
-              ${opt.label}
-            </option>
-          `).join('')}
+          ${options.map(opt => html`<option value="${opt.value}">${opt.label}</option>`)}
         </select>
       `;
-    } else {
-      this.innerHTML = `
-        <div class="aufbau-switch-group" role="radiogroup">
-          ${options.map(opt => `
-            <button 
-              type="button" 
-              data-value="${opt.value}" 
-              class="switch-btn ${opt.value === currentValue ? 'is-selected' : ''}"
-            >
-              ${opt.label}
-            </button>
-          `).join('')}
-        </div>
-      `;
+    }
+
+    return html`
+      <div class="aufbau-switch-group" role="radiogroup">
+        ${options.map(opt => html`
+          <button type="button" data-value="${opt.value}" class="switch-btn">${opt.label}</button>
+        `)}
+      </div>
+    `;
+  }
+
+  sync () {
+    const { value } = this.getAttr();
+
+    const select = this.$('.aufbau-switch-select');
+    if (select) { dom.setValue(select, value); return; }
+
+    for (const btn of this.$$('.switch-btn')) {
+      const active = btn.dataset.value === value;
+      btn.classList.toggle('is-selected', active);
+      btn.setAttribute('aria-checked', String(active));
     }
   }
 }
