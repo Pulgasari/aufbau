@@ -9,11 +9,11 @@ import {
 } from './string.js';
 
 const FORMS = {
-  camel    : toCamelCase,
-  constant : toConstantCase,
-  kebab    : toKebabCase,
-  pascal   : toPascalCase,
-  snake    : toSnakeCase
+  camel    : toCamelCase,    // userProfileStatus
+  constant : toConstantCase, // USER_PROFILE_STATUS
+  kebab    : toKebabCase,    // user-profile-status
+  pascal   : toPascalCase,   // UserProfileStatus
+  snake    : toSnakeCase,    // user_profile_status
 };
 
 const toConverter = (form) => typeof form === 'function' ? form : FORMS[form];
