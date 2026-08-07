@@ -9,7 +9,7 @@ export default class AufbauCheckbox extends AufbauElement {
     indeterminate : Boolean,
     label         : String, 
     value         : 'on',
-  ];
+  };
 
   onMount () {
     this.on('click', () => this.toggle());
@@ -19,7 +19,7 @@ export default class AufbauCheckbox extends AufbauElement {
     const { disabled, checked, value } = this.getAttr();
     if (disabled) return;
     const nextChecked = !checked;
-    this.setAttributes({ checked: nextChecked });
+    this.setAttr({ checked: nextChecked });
     this.emit('aufbau-checkbox', { checked: nextChecked, value });
   }
 
