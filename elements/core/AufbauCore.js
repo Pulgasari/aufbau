@@ -211,16 +211,6 @@ return class extends BaseClass {
 
   hasAttr (name) { return this.hasAttribute(toKebabCase(name)); }
 
-  /**
-   * reads a single attribute, or returns a destructurable proxy when called
-   * without a name. resolution order is attribute -> config -> schema fallback.
-   *
-   *   getAttr('volume')            -> schema type and fallback
-   *   getAttr('volume', String)    -> type override
-   *   getAttr('min', Number, 0)    -> type and fallback override
-   *   getAttr()                    -> proxy, types come from the schema
-   *   getAttr(Number)              -> proxy, every read coerced to Number
-   */
   getAttr (nameOrType, type, fallback) {
     if (!isString(nameOrType)) return this._attrProxy(isFn(nameOrType) ? nameOrType : null);
 
@@ -253,11 +243,6 @@ return class extends BaseClass {
     return value;
   }
 
-  /**
-   * proxy over an empty target rather than over `this`, otherwise ownKeys and `in`
-   * would expose every htmlelement member. keys are reported in camelCase so
-   * spreading and Object.keys() match the way attributes are destructured.
-   */
   _attrProxy (overrideType) {
     const names = Object.keys(this.schema);
 
@@ -268,17 +253,7 @@ return class extends BaseClass {
       getOwnPropertyDescriptor: () => ({ configurable: true, enumerable: true }),
     });
   }
-
-  /** false and null remove, true sets an empty attribute, everything else stringifies */
-  setAttr (map) {
-    for (const [key, value] of Object.entries(map)) {
-      const kebab = toKebabCase(key);
-           if (value === false || value == null) this.removeAttribute(kebab);
-      else if (value === true)                   this.setAttribute(kebab, '');
-      else                                       this.setAttribute(kebab, String(value));
-    }
-    return this;
-  }
+  setAttr (map) { dom.setAttr(this, map); return this; }
 
   // :::::: CHILDREN REFS :::::::::::::::::::::::::::::::::::::::
 
