@@ -22,12 +22,6 @@
 [@aufbau/shaders](#aufbau-shaders)
 [@aufbau/stylesheet](#aufbau-stylesheet)
 
-@aufbau/hyperfetch
-@aufbau/shapeshift
-@aufbau/templates
-@aufbau/themes
-@aufbau/workers
-
 #### resources
 
 [@aufbau/css](#aufbau-css)
@@ -83,8 +77,6 @@ const config = await aufbau.import('config.jsonc');
 
 ## @aufbau/shaders
 
-## @aufbau/shapeshift
-
 ## [@aufbau/stylesheet](stylesheet/readme.md)
 
 **Aufbau Stylesheets** (`.ass` or `.aufbau.css`)
@@ -131,12 +123,6 @@ body > * { padding: small; }
   color            : brand-l10; /* +10% white */
 }
 ```
-
-## @aufbau/templates
-
-## @aufbau/themes
-
-## @aufbau/workers
 
 ---
 
