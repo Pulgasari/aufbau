@@ -1,4 +1,16 @@
-// @aufbau/elements/core
+// @aufbau/elements/core/schema.js
+
+import { isArray, isFn, isPlainObject, mapValuesOf } from '@aufbau/js';
+
+const cache = new WeakMap;
+
+export const schemaOf = (Class) => {
+  if (cache.has(Class)) return cache.get(Class);
+  const { attr } = Class;
+  const parsed = isPlainObject(attr) ? mapValuesOf(attr, parseSchemaEntry) : null;
+  cache.set(Class, parsed);
+  return parsed;
+};
 
 export const parseSchemaEntry = (entry) => {
   
@@ -8,9 +20,9 @@ export const parseSchemaEntry = (entry) => {
   }
 
   // CASE 2: full configuration object
-  if (typeof entry === 'object' && entry !== null && !Array.isArray(entry)) {
+  if (isPlainObject(entry)) {
     const explicitType = entry.type;
-    const fallback = entry.default;
+    const fallback     = entry.default;
     
     // Infer type constructor from default value if type is omitted
     const inferredType = explicitType || (
@@ -23,8 +35,8 @@ export const parseSchemaEntry = (entry) => {
     return {
       type     : inferredType,
       fallback : fallback,
-      values   : Array.isArray(entry.values) ? entry.values : null,
-      fn       : typeof entry.fn === 'function' ? entry.fn : null,
+      values   : isArray(entry.values) ? entry.values : null,
+      fn       : isFn(entry.fn) ? entry.fn : null,
       // true -> auto namespaced key, string|string[] -> explicit keys
       config   : entry.config === true ? true : (entry.config ? [].concat(entry.config) : null)
     };
