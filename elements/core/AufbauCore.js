@@ -173,16 +173,6 @@ return class extends BaseClass {
 
   // :::::: EVENTS ::::::::::::::::::::::::::::::::::::::::::::::
 
-  /**
-   * every binding is tracked and released on disconnect.
-   *
-   *   on('click', fn)                -> the element itself
-   *   on('click', '.btn', fn)        -> delegated, survives innerHTML re-renders
-   *   on(target, 'click', fn)        -> external target (window, document, Audio, node list …)
-   *
-   * delegated listeners receive (event, matchedElement) with `this` bound to the match.
-   * @returns {() => void} unsubscribe
-   */
   on (...args) {
     const [first, second, third, fourth] = args;
 
