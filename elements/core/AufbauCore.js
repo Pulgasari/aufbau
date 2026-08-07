@@ -177,7 +177,8 @@ return class extends BaseClass {
 
   // :::::: ATTRIBUTES ::::::::::::::::::::::::::::::::::::::::::
 
-  hasAttr (name) { return this.hasAttribute(toKebabCase(name)); }
+  hasAttr (name) { return dom.hasAttr(this, name); }
+  setAttr (map)  { dom.setAttr(this, map); return this; }
 
   getAttr (nameOrType, type, fallback) {
     if (!isString(nameOrType)) return this._attrProxy(isFn(nameOrType) ? nameOrType : null);
@@ -221,7 +222,7 @@ return class extends BaseClass {
       getOwnPropertyDescriptor: () => ({ configurable: true, enumerable: true }),
     });
   }
-  setAttr (map) { dom.setAttr(this, map); return this; }
+  
 
   // :::::: CHILDREN REFS :::::::::::::::::::::::::::::::::::::::
 
