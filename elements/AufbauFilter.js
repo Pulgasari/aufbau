@@ -1,50 +1,55 @@
 // <aufbau-filter>
 
 import { AufbauElement } from './core/index.js';
+import * as dom from '@domina/core';
+import { html } from '@aufbau/js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {
-    placeholder : 'Filter...',
-    target      : String,
-    debounce    : 100
+    placeholder   : 'Filter...',
+    target        : String,
+    container     : String,
+    mode          : { 
+      type: String, 
+      default: 'contains',
+      values: ['contains', 'startsWith', 'endsWith', 'exact']
+    },
+    mismatchClass : 'is-filtered-out',
+    debounce      : 100
   };
 
   onMount () {
     let timer = null;
 
     this.on('aufbau-input', (e) => {
-      const { debounce: delay } = this.getAttr();
       clearTimeout(timer);
-
-      timer = setTimeout(() => {
-        this.applyFilter(e.detail.value);
-      }, delay);
+      timer = setTimeout(() => this.applyFilter(e.detail.value), this.getAttr('debounce'));
     });
+
+    this.on('aufbau-filter-reset', () => this.applyFilter(''));
   }
+
+  onUnmount () { clearTimeout(this._timer); }
 
   applyFilter (query) {
-    const { target: targetQuery } = this.getAttr();
-    if (!targetQuery) return;
+    const { target, container, mode, mismatchClass } = this.getAttr();
+    if (!target) return;
 
-    const items = document.querySelectorAll(targetQuery);
-    const normalizedQuery = query.toLowerCase().trim();
-
-    items.forEach(item => {
-      const text = item.textContent || '';
-      const isMatch = text.toLowerCase().includes(normalizedQuery);
-      item.hidden = !isMatch;
+    // container defaults to the closest shared ancestor of the targets, document
+    // is the safe fallback when none is configured
+    const result = dom.filterElements({
+      container : container || document,
+      item      : target,
+      filters   : [['', query, mode]],
+      mismatchClass
     });
+
+    this.emit('aufbau-filter', { query, ...result });
   }
 
-  update () {
+  render () {
     const { placeholder } = this.getAttr();
-
-    this.innerHTML = `
-      <aufbau-input 
-        type="search" 
-        placeholder="${placeholder}"
-      ></aufbau-input>
-    `;
+    return html`<aufbau-input type="search" placeholder="${placeholder}"></aufbau-input>`;
   }
 }
 
