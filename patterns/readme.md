@@ -17,7 +17,31 @@ these are also built into @aufbau/stylesheet
 }
 ```
 
-##
+## usage with @aufbau/kits
+
+these are also built into any kit from @aufbau/kits
+
+```javascript
+import aufbau from '@aufbau/kits/preact-htm';
+
+aufbau.dom.element('#example');
+
+aufbau.setPattern('dots', {
+  bg: 'transparent',
+  fg: '#FF0000',
+  rotate: '90deg',
+});
+```
+
+or simply in the stylesheet:
+
+```css
+#example {
+  aufbau-pattern: dots bg(transparent) fg(#FF0000) rotate(90deg);
+}
+```
+
+## vanilla
 
 ```javascript
 import api from '@aufbau/patterns';
