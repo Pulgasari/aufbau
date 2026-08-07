@@ -16,6 +16,11 @@ import * as aufbauShaders       from '@aufbau/shaders';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
 
+// ::: OTHERS
+import * as domina from '@domina/core';
+//import      doc from '@domina/doc';
+
+
 // ::: LOCAL
 import { define, update, updateDataset, updateProperty } from './dom.js';
 const { deepMerge, isPlainObject } = aufbauUtils;
@@ -96,6 +101,7 @@ const aufbau = {
   init, interceptFetch,
 
   // dom bridge (see ./dom.js, candidate for @aufbau/utils)
+  dom: domina,
   define, update, updateDataset, updateProperty,
 
   // packages
