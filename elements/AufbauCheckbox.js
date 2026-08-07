@@ -1,16 +1,14 @@
-// <aufbau-checkbox>
+// <aufbau-toggle>
 
 import { AufbauElement } from './core/index.js';
 import * as dom from '@domina/core';
 import { html } from '@aufbau/js';
 
-export default class AufbauCheckbox extends AufbauElement {
+export default class AufbauToggle extends AufbauElement {
   static attr = {
-    checked       : Boolean,
-    disabled      : Boolean,
-    indeterminate : Boolean,
-    label         : String,
-    value         : 'on',
+    checked  : Boolean,
+    disabled : Boolean,
+    label    : String
   };
 
   onMount () {
@@ -23,40 +21,32 @@ export default class AufbauCheckbox extends AufbauElement {
   }
 
   toggle () {
-    const { disabled, checked, value } = this.getAttr();
+    const { disabled, checked } = this.getAttr();
     if (disabled) return;
 
     const nextChecked = !checked;
-    // a user interaction always resolves the mixed state
-    this.setAttr({ checked: nextChecked, indeterminate: false });
-    this.emit('aufbau-checkbox', { checked: nextChecked, value });
+    this.setAttr({ checked: nextChecked });
+    this.emit('aufbau-toggle', { checked: nextChecked });
   }
 
-  // structure only. checked/disabled/indeterminate are written in sync()
   render () {
     const { label } = this.getAttr();
 
     return html`
-      <label class="aufbau-checkbox-wrapper">
-        <button type="button" role="checkbox" class="checkbox-box">
-          <aufbau-icon></aufbau-icon>
-        </button>
-        ${label && html`<span class="checkbox-label">${label}</span>`}
-      </label>
+      <button type="button" role="switch" class="aufbau-toggle-btn">
+        <span class="thumb"></span>
+      </button>
+      ${label && html`<span class="toggle-label">${label}</span>`}
     `;
   }
 
   sync () {
-    const { checked, disabled, indeterminate } = this.getAttr();
+    const { checked, disabled } = this.getAttr();
 
-    dom.element(this.$('.aufbau-checkbox-wrapper')).toggleClass('is-disabled', disabled);
-
-    dom.element(this.$('.checkbox-box'))
-      .setAttr({ ariaChecked: indeterminate ? 'mixed' : String(checked), disabled })
-      .toggleClass({ 'is-checked': checked, 'is-indeterminate': indeterminate });
-
-    dom.setAttr(this.$('aufbau-icon'), { icon: indeterminate ? 'lucide:minus' : 'lucide:check' });
+    dom.element(this.$('.aufbau-toggle-btn'))
+      .setAttr({ ariaChecked: String(checked), disabled })
+      .toggleClass('is-active', checked);
   }
 }
 
-AufbauCheckbox.init();
+AufbauToggle.init();
