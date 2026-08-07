@@ -2,9 +2,7 @@
 
 import * as predicates from './predicates.js';
 
-// ============================================================================
-// 1. REGISTRY
-// ============================================================================
+// :::::: REGISTRY
 
 // null-prototype: inherited keys like 'constructor' or 'toString' cannot leak through
 // the proxy, and the lookup skips the prototype chain
@@ -14,9 +12,7 @@ const registry = Object.assign(Object.create(null), predicates, {
   undefined : predicates.undefined_
 });
 
-// ============================================================================
-// 2. RULE EVALUATION
-// ============================================================================
+// :::::: RULE EVALUATION
 
 // the single evaluator behind `is` and `match`
 //   function -> called with the value
@@ -25,23 +21,19 @@ const registry = Object.assign(Object.create(null), predicates, {
 //   boolean  -> used as-is, handy for feature flags in rule tables
 export const test = (rule, value) => {
   if (typeof rule === 'function') return rule(value);
-  if (typeof rule === 'string') {
-    const check = registry[rule];
-    return check === undefined ? false : check(value);
-  }
+  if (typeof rule === 'string')   return registry[rule]?.(value) ?? false;
+  if (typeof rule === 'boolean')  return rule;
   if (Array.isArray(rule)) {
     for (let index = 0; index < rule.length; index++) if (!test(rule[index], value)) return false;
     return true;
   }
-  if (typeof rule === 'boolean') return rule;
+  
   return false;
 };
 
-const createChecker = (rule) => (value) => test(rule, value);
+const createChecker = rule => value => test(rule, value);
 
-// ============================================================================
-// 3. THE `is` PROXY
-// ============================================================================
+// :::::: THE `is` PROXY
 
 // three call styles:
 //   is.string(value)             direct predicate access
@@ -50,16 +42,15 @@ const createChecker = (rule) => (value) => test(rule, value);
 // unknown string keys resolve to undefined instead of falling through to Function.prototype:
 // is[nameFromUserData] must never hand out call/bind/constructor.
 // note: every property access runs the trap, so destructure once in hot code
-export const is = new Proxy(createChecker, {
+export const is = new Proxy (createChecker, {
   get (target, key) {
-    if (typeof key === 'symbol') return Reflect.get(target, key);
-    return registry[key];
+    return (typeof key === 'symbol')
+      ? Reflect.get(target, key)
+      : registry[key];
   }
 });
 
-// ============================================================================
-// 4. isX ALIASES
-// ============================================================================
+// :::::: isX ALIASES
 
 export const {
   alphaNumeric: isAlphaNumeric,
