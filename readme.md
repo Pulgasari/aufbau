@@ -85,7 +85,7 @@ const config = await aufbau.import('config.jsonc');
 
 ## @aufbau/shapeshift
 
-## [@aufbau/stylesheet](stylesheee/readme.md)
+## [@aufbau/stylesheet](stylesheet/readme.md)
 
 **Aufbau Stylesheets** (`.ass` or `.aufbau.css`)
 
