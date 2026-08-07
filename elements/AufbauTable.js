@@ -2,6 +2,7 @@
 
 import { AufbauElement } from './core/index.js';
 import { importFile }    from '@aufbau/import';
+import { arrayfied, isArray } from '@aufbau/js';
 
 export default class AufbauTable extends AufbauElement {
   static attr = ['src', 'columns'];
@@ -11,7 +12,7 @@ export default class AufbauTable extends AufbauElement {
   get data ()      { return this._data; }
 
   async update () {
-    const src = this.getAttr('src');
+    const { src } = this.getAttr();
 
     if (src) {
       try {
@@ -32,12 +33,12 @@ export default class AufbauTable extends AufbauElement {
   }
 
   renderTable (raw) {
-    let rows = Array.isArray(raw) ? raw : [raw];
+    let rows = arrayfied(raw);
 
     // unwrap payloads like { data: [...] }
     if (rows.length === 1 && typeof rows[0] === 'object' && !Array.isArray(rows[0])) {
       const firstVal = Object.values(rows[0])[0];
-      if (Array.isArray(firstVal)) rows = firstVal;
+      if (isArray(firstVal)) rows = firstVal;
     }
 
     if (!rows.length) {
@@ -45,7 +46,7 @@ export default class AufbauTable extends AufbauElement {
       return;
     }
 
-    const columns = this.getAttr('columns');
+    const { columns } = this.getAttr();
     const sample  = rows[0];
 
     const keys = columns
