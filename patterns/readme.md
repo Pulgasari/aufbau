@@ -16,3 +16,19 @@ these are also built into @aufbau/stylesheet
   aufbau-pattern: dots bg(transparent) fg(#FF0000) rotate(90deg);
 }
 ```
+
+##
+
+```javascript
+import api from '@aufbau/patterns';
+
+const uri = api.toDataUri('dots', {
+  bg: 'transparent',
+  fg: '#FF0000',
+  rotate: '90deg',
+});
+
+const element = document.getElementById('example');
+element.style.backgroundImage  = `url('${uri}')`;
+element.style.backgroundRepeat = 'repeat';
+```
