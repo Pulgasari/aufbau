@@ -20,8 +20,11 @@ return class extends BaseClass {
   constructor () {
     super();
     this._mounted = false;
-    this._effects = disposer();
+    this._effects = dom.isposer();
   }
+  
+  /** shadow root when present, the element itself otherwise */
+  get root () { return this.shadowRoot ?? this; }
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
@@ -234,6 +237,25 @@ return class extends BaseClass {
   }
 
   // :::::: CHILDREN REFS :::::::::::::::::::::::::::::::::::::::
+
+  get $ () {
+    const root    = this.root;
+    const findOne = spec => decorate(dom.getElement(spec, root));
+  
+    return new Proxy(findOne, {
+      apply: (target, thisArg, args) => findOne(...args),
+      get (target, prop) {
+        if (prop in target)  return target[prop];
+        if (!isString(prop)) return undefined;
+        return decorate(dom.getElementById(toKebabCase(prop), root) ?? dom.getElementById(prop, root));
+      }
+    });
+  }
+  
+  get $$ () {
+    const root = this.root;
+    return spec => decorateAll(dom.getElements(spec, root));
+  }
 
   /** callable for selectors, property access for ids: this.$('.list') / this.$.playerContainer */
   get $ () {
