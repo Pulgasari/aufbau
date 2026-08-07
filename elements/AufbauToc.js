@@ -1,113 +1,71 @@
 // <aufbau-toc>
 
 import { AufbauElement } from './core/index.js';
+import { html, toSlug } from '@aufbau/js';
+import * as dom from '@domina/core';
 
 export default class AufbauToc extends AufbauElement {
   static attr = {
     target   : String,
-    selector : 'h1, h2, h3, h4, h5, h6'
+    selector : 'h1, h2, h3, h4, h5, h6',
+    title    : 'On This Page'
   };
 
-  constructor () {
-    super();
-    this._observer = null;
-  }
-
   onMount () {
-    this.initToc();
-    this.setupObserver();
-  }
-
-  onUnmount () {
-    this.cleanupObserver();
+    this.watch();
   }
 
   onAttributeChange () {
-    this.initToc();
-    this.setupObserver();
+    this.watch();
   }
 
-  cleanupObserver () {
-    if (this._observer) {
-      this._observer.disconnect();
-      this._observer = null;
-    }
+  /** re-collects whenever headings appear or disappear inside the target */
+  watch () {
+    this._stopWatching?.();
+    this._stopWatching = null;
+
+    const { target, selector } = this.getAttr();
+    const container = target ? dom.getElement(target) : null;
+    if (!container) return;
+
+    const rescan = () => this.invalidate().update();
+
+    this._stopWatching = this.track(dom.observe(selector, {
+      within    : container,
+      onInit    : rescan,
+      onAdded   : rescan,
+      onRemoved : rescan,
+    }));
   }
 
-  setupObserver () {
-    this.cleanupObserver();
+  /** headings need stable ids to be linkable, so they get one if missing */
+  collect () {
+    const { target, selector } = this.getAttr();
+    const container = target ? dom.getElement(target) : null;
+    if (!container) return [];
 
-    const { target: targetQuery } = this.getAttr();
-    const targetEl = targetQuery ? document.querySelector(targetQuery) : null;
-    if (!targetEl) return;
+    return dom.getElements(selector, container).map((el, index) => {
+      const text  = el.textContent?.trim() || '';
+      const level = Number(/^H([1-6])$/i.exec(el.tagName)?.[1] ?? el.dataset.level ?? 1);
 
-    this._observer = new MutationObserver(() => {
-      this._observer.disconnect();
-      this.initToc();
+      if (!el.id) el.id = toSlug(text) || `heading-${index}`;
 
-      this._observer.observe(targetEl, {
-        childList: true,
-        subtree: true
-      });
+      return { id: el.id, text, level };
     });
-
-    this._observer.observe(targetEl, {
-      childList: true,
-      subtree: true
-    });
   }
 
-  initToc () {
-    const { target: targetQuery, selector } = this.getAttr();
+  render () {
+    const { title } = this.getAttr();
+    const items = this.collect();
+    if (!items.length) return '';
 
-    const targetEl = targetQuery ? document.querySelector(targetQuery) : null;
-    if (!targetEl) {
-      this.innerHTML = '';
-      return;
-    }
-
-    const headings = targetEl.querySelectorAll(selector);
-    const items = [];
-
-    headings.forEach((el, index) => {
-      const text = el.textContent?.trim() || '';
-
-      let level = 1;
-      const match = el.tagName.match(/^H([1-6])$/i);
-      if (match) {
-        level = parseInt(match[1], 10);
-      } else if (el.dataset.level) {
-        level = parseInt(el.dataset.level, 10);
-      }
-
-      if (!el.id) {
-        el.id = text
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .replace(/\s+/g, '-') || `heading-${index}`;
-      }
-
-      items.push({ id: el.id, text, level });
-    });
-
-    this.render(items);
-  }
-
-  render (items) {
-    if (!items.length) {
-      this.innerHTML = '';
-      return;
-    }
-
-    this.innerHTML = `
+    return html`
       <nav class="docs-toc-nav">
-        <h4>On This Page</h4>
+        <h4>${title}</h4>
         <ul>
-          ${items.map(item => `
-            <li class="toc-level-${item.level}">
-              <a href="#${item.id}">${item.text}</a>
-            </li>
-          `).join('')}
+          ${items.map(item => html`
+            <li class="toc-level-${item.level}"><a href="#${item.id}">${item.text}</a></li>
+          `)}
         </ul>
       </nav>
     `;
