@@ -45,6 +45,8 @@ const map = { imports: {
     "@aufbau/stylesheet"      : "./stylesheet/index.js",
     "@aufbau/stylesheet/"     : "./stylesheet/",
     "@aufbau/utils"           : "./js/index.js",
+
+    "@domina/core" : "https://pulgasari.github.io/domina/core/index.js",
     
     "hljs" : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm"
     }
