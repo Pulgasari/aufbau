@@ -17,26 +17,20 @@ let themesPromise = null;
 
 const getHljs = () => (hljsPromise ??= import(HLJS_MODULE).then(m => m.default));
 
-// used when the jsdelivr file index is unreachable
-const FALLBACK_THEMES = [
-  'a11y-dark', 'a11y-light', 'agate', 'an-old-hope', 'androidstudio', 'arduino-light', 'arta', 'ascetic',
-  'atom-one-dark', 'atom-one-dark-reasonable', 'atom-one-light', 'brown-paper', 'codepen-embed', 'color-brewer',
-  'dark', 'default', 'devibeans', 'docco', 'far', 'felipec', 'foundation', 'github', 'github-dark',
-  'github-dark-dimmed', 'gml', 'googlecode', 'gradient-dark', 'gradient-light', 'grayscale', 'hybrid', 'idea',
-  'intellij-light', 'ir-black', 'isbl-editor-dark', 'isbl-editor-light', 'kimbie-dark', 'kimbie-light',
-  'lightfair', 'lioshi', 'magula', 'mono-blue', 'monokai', 'monokai-sublime', 'night-owl', 'nnfx-dark',
-  'nnfx-light', 'nord', 'obsidian', 'panda-syntax-dark', 'panda-syntax-light', 'paraiso-dark', 'paraiso-light',
-  'pojoaque', 'purebasic', 'qtcreator-dark', 'qtcreator-light', 'rainbow', 'routeros', 'school-book',
-  'shades-of-purple', 'srcery', 'stackoverflow-dark', 'stackoverflow-light', 'sunburst', 'tokyo-night-dark',
-  'tokyo-night-light', 'tomorrow-night-blue', 'tomorrow-night-bright', 'vs', 'vs2015', 'xcode', 'xt256'
-];
+// used ONLY when the jsdelivr file index is unreachable. the regular path stays
+// fully dynamic and offers every theme of the pinned version, see themes()
+const FALLBACK_THEMES = ['dracula', 'github', 'github-dark'];
+
+// themes that do not sit directly in /styles. the index returns these with their
+// folder already attached, the map only covers the short names used above
+const THEME_PATHS = { dracula: 'base16/dracula' };
 
 /**
  * loads and scopes a theme sheet. domina handles fetch, scoping, dedup and
  * adoption; adopted sheets cascade after author styles, so a page level hljs
  * <link> is overridden without !important.
  */
-const loadTheme = (theme) => dom.adoptStylesheet(`${HLJS_STYLES}${theme}.min.css`, {
+const loadTheme = (theme) => dom.adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
   scope : `aufbau-code[${THEME_ATTR}="${theme}"]`,
   key   : `hljs:${theme}`,
 });

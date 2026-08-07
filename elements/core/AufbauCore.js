@@ -4,7 +4,7 @@
 
 import { BASE, schemaOf }        from './schema.js';
 import { adoptClassStyles, BASE_LAYER } from './styles.js';
-import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
+import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
   dom, //delegate, disposer, emitEvent, offEvent, onEvent
@@ -175,18 +175,22 @@ return class extends BaseClass {
   get schema () { return schemaOf(this.constructor); }
   get tag    () { return this.getAttribute('is') || this.localName; }
 
-  /** config keys this element depends on. null means: react to any change */
+  /**
+   * config keys this element depends on. null means: react to any change.
+   * stored in the config store's canonical form, because that is the form the
+   * change list arrives in
+   */
   get configWatchlist () {
     if (this._configWatchlist !== undefined) return this._configWatchlist;
 
     const explicit = this.constructor.observedConfig;
-    if (isArray(explicit)) return (this._configWatchlist = new Set(explicit.map(toKebabCase)));
+    if (isArray(explicit)) return (this._configWatchlist = new Set(explicit.map(canonicalKey)));
 
     const keys = new Set;
     for (const [name, { config }] of Object.entries(this.schema)) {
       if (!config) continue;
-      if (config === true) configKeys(this.tag, name).forEach(key => keys.add(key));
-      else config.forEach(key => keys.add(toKebabCase(key)));
+      if (config === true) configKeys(this.tag, name).forEach(key => keys.add(canonicalKey(key)));
+      else config.forEach(key => keys.add(canonicalKey(key)));
     }
 
     return (this._configWatchlist = keys.size ? keys : null);
@@ -195,7 +199,7 @@ return class extends BaseClass {
   observesConfig (changed) {
     const watchlist = this.configWatchlist;
     if (!watchlist || !isArray(changed)) return true;
-    return changed.some(key => watchlist.has(key));
+    return changed.some(key => watchlist.has(canonicalKey(key)));
   }
 
   getConfig (name, fallback, keys = true) {

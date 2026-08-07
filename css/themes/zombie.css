@@ -1,6 +1,6 @@
 /* @aufbau/css/themes/zombie.css */
 
-:root, [data-theme="zombie"] {
+:root, :root[data-theme="zombie"] {
    --aufbau-bg     : #282a36;
    --aufbau-fg     : #f8f8f2;
    --aufbau-blue   : #8be9fd;

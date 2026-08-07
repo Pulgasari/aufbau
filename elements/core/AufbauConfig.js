@@ -73,6 +73,12 @@ export function commitConfig () {
 
 // :::::: PUBLIC API :::::::::::::::::::::::::::::::::::::::::::
 
+/**
+ * the store's canonical key form. the change list emitted with CONFIG_EVENT is
+ * canonical, so anything comparing against it has to normalize the same way.
+ */
+export const canonicalKey = (key) => AufbauConfigStore.key(key);
+
 /** key accepts any case form, 'codeTheme' and 'code-theme' resolve alike */
 export function getConfig (key, fallback) {
   const found = AufbauConfigStore.get(key);

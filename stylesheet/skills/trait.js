@@ -1,5 +1,7 @@
 // @aufbau/stylesheet/skills/trait.js
 
+import { blockEnd } from './parse.js';
+
 /**
  * Extracts @aufbau-trait blocks and resolves aufbau-use declarations.
  */
@@ -17,15 +19,7 @@ export function transformTraits (code) {
     const fullMatchStr = match[0];
     const rawTraitName = match[1];
     const startIdx = match.index;
-
-    let depth = 1;
-    let i = match.index + fullMatchStr.length;
-
-    while (i < code.length && depth > 0) {
-           if (code[i] === '{') depth++;
-      else if (code[i] === '}') depth--;
-      i++;
-    }
+    const i = blockEnd(code, match.index + fullMatchStr.length);
 
     const fullBlock   = code.slice(startIdx, i);
     const bodyContent = code.slice(startIdx + fullMatchStr.length, i - 1).trim();
@@ -53,16 +47,10 @@ export function transformTraits (code) {
 
   while ((classMatch = classHeaderRegex.exec(cleanCode)) !== null) {
     const className = classMatch[1];
-    let depth = 1;
-    let i = classMatch.index + classMatch[0].length;
+    const bodyStart = classMatch.index + classMatch[0].length;
+    const i = blockEnd(cleanCode, bodyStart);
 
-    while (i < cleanCode.length && depth > 0) {
-           if (cleanCode[i] === '{') depth++;
-      else if (cleanCode[i] === '}') depth--;
-      i++;
-    }
-
-    const classBody = cleanCode.slice(classMatch.index + classMatch[0].length, i - 1).trim();
+    const classBody = cleanCode.slice(bodyStart, i - 1).trim();
 
     if (!classMap.has(className)) {
       classMap.set(className,          classBody);

@@ -579,6 +579,20 @@ function extensionOf (path) {
   return path.split(/[?#]/)[0].split('.').pop().toLowerCase();
 }
 
+// bumped whenever the key layout changes, so stale entries fall out on their own
+const CACHE_VERSION = 2;
+
+/**
+ * a relative path is not an identity. the cache is shared per origin, so two
+ * pages in different directories importing '../readme.md' would otherwise hit
+ * the same entry and get each other's file.
+ */
+function cacheIdentity (path) {
+  if (typeof document === 'undefined') return path;
+  try   { return new URL(path, document.baseURI).href; }
+  catch { return path; }
+}
+
 export async function importFile (path, options) {
   options = toOptions(options);
 
@@ -586,13 +600,13 @@ export async function importFile (path, options) {
   const handler   = extensionMap[extension];
   if (!handler) throw new Error(`[@aufbau/import] the file extension .${extension} is not supported.`);
 
-  // key layout: import:<resource>:<query>:<fingerprint>
-  // the resource segment is query-free, so every cache-busted variant of one
-  // file shares a prefix and can be swept together.
-  const [resource, query = ''] = path.split(/[?#]/);
+  // key layout: import:v<version>:<resource>:<query>:<fingerprint>
+  // the resource segment is the absolute url and query-free, so every
+  // cache-busted variant of one file shares a prefix and can be swept together.
+  const [resource, query = ''] = cacheIdentity(path).split(/[?#]/);
   const fingerprint = serializeOptions(options);
   const useCache    = options.useCache !== false && fingerprint !== null;
-  const prefix      = `import:${resource}:`;
+  const prefix      = `import:v${CACHE_VERSION}:${resource}:`;
   const cacheKey    = `${prefix}${query}:${fingerprint}`;
 
   if (useCache) {

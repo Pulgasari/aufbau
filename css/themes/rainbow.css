@@ -1,14 +1,12 @@
-/* Rainbow Theme: Vibrant gradients and colorful palette */
-@layer themes {
-  .theme-rainbow {
-    --color-bg-app: #0f172a;
-    --color-bg-surface: #1e293b;
-    --color-bg-subtle: #334155;
-    --color-text-main: #f8fafc;
-    --color-text-muted: #94a3b8;
-    --color-primary: #ec4899;
-    --color-primary-text: #ffffff;
-    --color-border: #475569;
-    --color-accent: #8b5cf6;
-  }
+/* @aufbau/css/themes/rainbow.css */
+
+:root, :root[data-theme="rainbow"] {
+   --aufbau-bg     : #0f172a;
+   --aufbau-fg     : #f8fafc;
+   --aufbau-blue   : #38bdf8;
+   --aufbau-green  : #34d399;
+   --aufbau-orange : #fb923c;
+   --aufbau-red    : #ec4899;
+   --aufbau-purple : #8b5cf6;
+   --aufbau-yellow : #facc15;
 }

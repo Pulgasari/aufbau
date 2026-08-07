@@ -1,6 +1,7 @@
 // @aufbau/stylesheet/skills/tokens.js
 
 import { warnMissingToken } from './../dev/debug.js';
+import { stripComments }    from './parse.js';
 
 // :::::: pre-compiled RegExp rules
 
@@ -78,8 +79,12 @@ export function resolveColorShade(val, colorTokens) {
   return null;
 }
 
+// the single funnel for every @aufbau block body, so stripping comments here
+// covers media, color, colors and the generic categories at once.
+// note: the block regexes above still use [^}]*, so a '}' inside a comment cuts
+// the block short before it ever reaches this point
 function parseBodyLines(body, targetObj) {
-  const lines = body.split(REGEX_LINE_SPLIT);
+  const lines = stripComments(body).split(REGEX_LINE_SPLIT);
   for (let i = 0; i < lines.length; i++) {
     const parts = lines[i].split(REGEX_COLON_SPLIT);
     if (parts.length >= 2) {
