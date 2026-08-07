@@ -17,9 +17,7 @@ export default class AufbauText extends AufbauElement {
   }
 
   async update () {
-    const { src } = this.getAttr();
-    const raw = this.getAttr('raw') || this._originalContent;
-
+    const { src, raw = this._originalContent } = this.getAttr();
     let html = '';
 
     if (src) {
