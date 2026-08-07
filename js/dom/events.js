@@ -18,7 +18,7 @@ export const delegate = (root, selector, types, listener, options) => {
     const match = event.target?.closest?.(selector);
     if (match && root.contains(match)) listener.call(match, event, match);
   };
-  return on(root, types, handler, options);
+  return onEvent(root, types, handler, options);
 };
 
 export const disposer = () => {
@@ -49,9 +49,7 @@ export const onEvent = (targets, types, listener, options) => {
   const list  = toTargets(targets);
   const names = toTypes(types);
   for (const target of list) for (const type of names) target.addEventListener(type, listener, options);
-  return () => {
-    for (const target of list) for (const type of names) target.removeEventListener(type, listener, options);
-  };
+  return () => offEvent (targets, types, listener, options);
 };
 
-export const onceEvent = (targets, types, listener, options) => on(targets, types, listener, withOnce(options));
+export const onceEvent = (targets, types, listener, options) => onEvent(targets, types, listener, withOnce(options));
