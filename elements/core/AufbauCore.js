@@ -7,7 +7,7 @@ import { CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 import {
   coerce, createLogger, disposer,
   emitEvent, offEvent, onEvent,
-  isFn, isPlainObject, isString,
+  isArray, isFn, isPlainObject, isString,
   toBoolean, toKebabCase,
 } from '@aufbau/js';
 
@@ -56,7 +56,7 @@ return class extends BaseClass {
       }
 
       if (this.attr && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
-        const observed = (Array.isArray(this.attr) ? this.attr : Object.keys(this.attr)).map(toKebabCase);
+        const observed = (isArray(this.attr) ? this.attr : Object.keys(this.attr)).map(toKebabCase);
         Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
       }
 
@@ -94,7 +94,7 @@ return class extends BaseClass {
       const schema = this.schema;
       if (!schema) return (this._configWatchlist = null);
 
-      const keys = new Set();
+      const keys = new Set;
       for (const [name, entry] of Object.entries(schema)) {
         const { config } = parseSchemaEntry(entry);
         if (!config) continue;
@@ -107,16 +107,10 @@ return class extends BaseClass {
 
     observesConfig (changed) {
       const watchlist = this.configWatchlist;
-      if (!watchlist || !Array.isArray(changed)) return true;
+      if (!watchlist || !isArray(changed)) return true;
       return changed.some(key => watchlist.has(key));
     }
 
-    /**
-     * precedence: local attribute -> <aufbau-config> -> fallback
-     * @param {string} name
-     * @param {*} [fallback]
-     * @param {true|string|string[]} [keys=true] - config key(s), true auto namespaces
-     */
     getConfig (name, fallback, keys = true) {
       const kebab = toKebabCase(name);
       if (this.hasAttribute(kebab)) return this.getAttribute(kebab);
@@ -126,20 +120,7 @@ return class extends BaseClass {
     }
 
     // ::: events
-
-    track (unsubscribe) {
-      return this._effects.add(unsubscribe);
-    }
-
-    release () {
-      this._effects.dispose();
-      return this;
-    }
-
-    /**
-     * this.on(type, listener, options)                  -> self
-     * this.on(target|selector|list, type, listener, ...) -> children or any target
-     */
+    
     on (...args) {
       if (isString(args[0]) && isFn(args[1])) return this.track(onEvent(this, ...args));
 
@@ -150,16 +131,15 @@ return class extends BaseClass {
       return this.track(onEvent(targets, type, listener, options));
     }
 
-    off (...args) {
-      offEvent(this, ...args);
-      return this;
-    }
+    off  (...args) { offEvent(this, ...args); return this; }
+    emit (...args) { return emitEvent(this, ...args); }
 
-    emit (type, detail, options) {
-      return emitEvent(this, type, detail, options);
-    }
+    release () { this._effects.dispose(); return this; }
+    track (unsubscribe) { return this._effects.add(unsubscribe); }
 
     // ::: attributes
+
+    hasAttr (name) { return this.hasAttribute(toKebabCase(name)); }
 
     getAttr (nameOrType, type, fallback) {
       if (!isString(nameOrType)) {
