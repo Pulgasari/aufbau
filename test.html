@@ -41,6 +41,26 @@
 		<aufbau-input name="size"  type="number" look="stepper" min="8" max="64" step="2"></aufbau-input>
 		<aufbau-input name="brand" type="color"  look="swatch" value="#3355ff"></aufbau-input>
 
+		<h2>aufbau-picker</h2>
+		
+		<aufbau-picker name="view" look="segments" value="month">
+		  <aufbau-option value="day">Tag</aufbau-option>
+		  <aufbau-option value="month">Monat</aufbau-option>
+		  <aufbau-option value="year">Jahr</aufbau-option>
+		</aufbau-picker>
+		
+		<aufbau-picker 
+			name="framework" 
+			look="combobox" 
+			searchable src="/data/frameworks.yaml" 
+			placeholder="Framework wählen..."
+		></aufbau-picker>
+		
+		<aufbau-picker name="tags" look="radio" multiple>
+		  <aufbau-option value="js">JavaScript</aufbau-option>
+		  <aufbau-option value="css">CSS</aufbau-option>
+		</aufbau-picker>
+
 		<h2>aufbau-slider</h2>
 		<aufbau-slider min=0 max=100  step=1></aufbau-slider>
 		<aufbau-slider min=0 max=1000 step=1></aufbau-slider>
