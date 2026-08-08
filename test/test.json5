@@ -1,0 +1,7 @@
+// test.json5
+
+[
+  'i am data',
+  'coming from',
+  'json5-file',
+]
