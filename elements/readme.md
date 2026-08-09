@@ -545,16 +545,16 @@ AufbauAudio.init();
 ```
 
 ```javascript
-// Inside any method of your component:
+// inside any method of your component:
 
-// A) Single attribute using the static schema
-const vol = this.getAttr('volume');       // Returns parsed number (e.g. 80) or default 50
-const isAutoplay = this.getAttr('autoplay'); // Returns boolean (true/false)
+// A) single attribute using the static schema
+const volume     = this.getAttr('volume');   // returns parsed number (e.g. 80) or default 50
+const isAutoplay = this.getAttr('autoplay'); // returns boolean (true/false)
 
-// B) Overriding schema type on demand
-const rawVolumeString = this.getAttr('volume', String); // Forces returning '80' as String
+// B) overriding schema type on demand
+const volumeString = this.getAttr('volume', String); // Forces returning '80' as String
 
-// C) Overriding schema fallback on demand
+// C) overriding schema fallback on demand
 const customMin = this.getAttr('min', Number, 0); // Forces type Number with fallback 0
 ```
 
