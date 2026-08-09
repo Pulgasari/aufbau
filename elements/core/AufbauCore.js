@@ -2,8 +2,9 @@
 
 // :::::: IMPORTS
 
+import { adoptClassStyles }      from './styles.js';
+import { applySkin }             from './skin.js';
 import { BASE, schemaOf }        from './schema.js';
-import { adoptClassStyles, BASE_LAYER } from './styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
@@ -95,6 +96,7 @@ return class extends BaseClass {
     this._mounted = true;
     // lazy on purpose: an imported but unused element must not adopt anything
     adoptClassStyles(this.constructor, this.root);
+    applySkin();
     this.on(window, CONFIG_EVENT, (event) => {
       if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
     });
@@ -143,27 +145,36 @@ return class extends BaseClass {
   /** structure, without values. return null to opt out of markup entirely */
   render () { return null; }
 
+  /** runs after a real markup rebuild only, for work that rewrites the new nodes */
+  onRender () {}
+
   /** values and state, applied to the structure render() produced */
   sync () {}
 
   /**
    * the render pipeline. structure is only rebuilt when render() actually
    * produces different markup, otherwise every keystroke would drop focus and
-   * caret position out of the inner fields. sync() runs on every pass.
+   * caret position out of the inner fields. sync() runs on every pass,
+   * onRender() only when the nodes are actually new.
    */
   update () {
     if (!this._mounted) return this;
 
     const markup = this.render();
+    let rebuilt  = false;
+
     if (markup != null) {
       const next = String(markup);
       if (next !== this._markup) {
         this._markup = next;
         this.renderTarget.innerHTML = next;
+        rebuilt = true;
       }
     }
 
     this.sync();
+    if (rebuilt) this.onRender();
+
     return this;
   }
 

@@ -19,6 +19,57 @@ export default class AufbauToast extends AufbauElement {
     icon        : String
   };
 
+  // the container is created by notify() and stacks the toasts over the page,
+  // so it is structure rather than decoration
+  static styles = `
+    .aufbau-toast-container {
+      position: fixed;
+      inset-block-start: 1rem;
+      inset-inline-end: 1rem;
+      z-index: var(--aufbau-toast-z, 100);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-inline-size: min(24rem, calc(100vw - 2rem));
+      pointer-events: none;
+    }
+
+    aufbau-toast {
+      display: block;
+      pointer-events: auto;
+      transition: opacity 0.2s ease, translate 0.2s ease;
+    }
+
+    aufbau-toast.is-dismissing {
+      opacity: 0;
+      translate: 100% 0;
+    }
+
+    aufbau-toast .aufbau-toast-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--aufbau-control-gap, 0.5em);
+    }
+
+    aufbau-toast .toast-icon { flex: none; line-height: 1.4; }
+    aufbau-toast .toast-content { flex: 1 1 auto; min-inline-size: 0; }
+    aufbau-toast .toast-title { font-weight: 600; }
+    aufbau-toast .toast-message { overflow-wrap: anywhere; }
+
+    aufbau-toast .toast-close {
+      display: inline-flex;
+      align-items: center;
+      flex: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+  `;
+
   onMount () {
     const { duration } = this.getAttr();
 

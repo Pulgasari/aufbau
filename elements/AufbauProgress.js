@@ -12,6 +12,46 @@ export default class AufbauProgress extends AufbauElement {
     unit     : '%'
   };
 
+  static styles = `
+    aufbau-progress {
+      display: block;
+      --progress-size: 0.5em;
+    }
+
+    aufbau-progress .aufbau-progress-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      inline-size: 100%;
+      block-size: var(--progress-size);
+      overflow: hidden;
+    }
+
+    aufbau-progress .progress-bar {
+      block-size: 100%;
+      transition: inline-size 0.2s ease;
+    }
+
+    aufbau-progress .is-indeterminate .progress-bar {
+      inline-size: 35% !important;
+      animation: aufbau-progress-slide 1.2s ease-in-out infinite;
+    }
+
+    aufbau-progress .progress-text {
+      position: absolute;
+      inset-inline-end: 0;
+      font-size: 0.75em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @keyframes aufbau-progress-slide {
+      0%   { translate: -100% 0; }
+      100% { translate: 300% 0; }
+    }
+  `;
+
   onMount () {
     this._onScroll = this._onScroll.bind(this);
     this.setupScrollListener();
@@ -67,7 +107,7 @@ export default class AufbauProgress extends AufbauElement {
     }
 
     const val = Math.min(100, Math.max(0, percentage)).toFixed(1);
-    this.setAttributes({ value: val });
+    this.setAttr({ value: val });
   }
 
   update () {

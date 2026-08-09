@@ -26,6 +26,73 @@ export default class AufbauInput extends AufbauControl {
     type         : { type: String, default: 'text', values: TYPE_NAMES },
   };
 
+  // the icon is rendered before the field so look="stepper" keeps its
+  // minus/field/plus order in the source. `order` moves it to the inline end of
+  // the row without touching the markup, which is where an input icon belongs
+  static styles = `
+    aufbau-input { --input-icon-order: 2; }
+
+    aufbau-input .aufbau-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      inline-size: 100%;
+      min-inline-size: 0;
+    }
+
+    aufbau-input .input-field {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      order: 1;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+    }
+
+    aufbau-input .input-field:focus { outline: none; }
+
+    aufbau-input .input-icon {
+      flex: none;
+      order: var(--input-icon-order);
+      opacity: 0.65;
+    }
+
+    aufbau-input .input-swatch {
+      flex: none;
+      order: 3;
+      inline-size: 1.1em;
+      block-size: 1.1em;
+    }
+
+    aufbau-input .input-step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      margin: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    aufbau-input .btn-dec { order: 0; }
+    aufbau-input .btn-inc { order: 4; }
+
+    /* look="stepper" ships its own buttons, the native spinner would double them */
+    aufbau-input .look-stepper .input-field::-webkit-inner-spin-button,
+    aufbau-input .look-stepper .input-field::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+
+    aufbau-input .look-stepper .input-field { -moz-appearance: textfield; text-align: center; }
+  `;
+
   get type () {
     const raw = this.getAttribute('type');
     if (raw && MOVED[raw] && !warned.has(raw)) {

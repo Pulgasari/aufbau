@@ -10,4 +10,5 @@ export class AufbauElement         extends AufbauCore (HTMLElement)         {}
 export { AufbauConfig, AufbauControl, AufbauCore };
 
 export * from './options.js';
+export * from './skin.js';
 export * from './valueTypes.js';

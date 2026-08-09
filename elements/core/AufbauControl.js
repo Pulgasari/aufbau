@@ -9,8 +9,14 @@
 // shared state (disabled, aria, form value, validity) is applied.
 
 import AufbauCore from './AufbauCore.js';
+import { createLogger } from '@aufbau/js';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
+
+const PERSIST_PREFIX  = 'aufbau:';
+const PERSIST_SESSION = 'session';
+
+const log = createLogger('aufbau-control');
 
 export class AufbauControl extends AufbauCore (HTMLElement) {
 
@@ -21,10 +27,31 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
     disabled : Boolean,
     label    : String,
     name     : String,
+    persist  : String,
     readonly : Boolean,
     required : Boolean,
     value    : String,
   };
+
+  // structure shared by every control. colours, borders and radii belong to the
+  // skin, see ../../css/skins/. declared on the base class on purpose: styleOwners()
+  // keys sheets by their declaring class, so this is adopted exactly once
+  static styles = `
+    [hidden] { display: none !important; }
+
+    aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer {
+      display: inline-block;
+      box-sizing: border-box;
+      font: inherit;
+      color: inherit;
+    }
+
+    aufbau-input *, aufbau-picker *, aufbau-slider *, aufbau-toggle *, aufbau-upload *, aufbau-writer * {
+      box-sizing: border-box;
+    }
+
+    .is-disabled { pointer-events: none; }
+  `;
 
   constructor () {
     super();
@@ -33,9 +60,23 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   }
 
   connectedCallback () {
-    // captured before the first render so form.reset() has something to go back to
-    this._defaultValue ??= this.getAttribute('value') ?? '';
+    // strictly before readPersisted(), otherwise a restored value would become
+    // the state form.reset() goes back to
+    this.captureDefaults();
+
+    // before super, so the very first update() already sees the restored state
+    this.readPersisted();
+
     super.connectedCallback();
+  }
+
+  /**
+   * the authored markup state, kept for form.reset(). subclasses whose state is
+   * not in `value` override this and call super first.
+   */
+  captureDefaults () {
+    this._defaultValue ??= this.getAttribute('value') ?? '';
+    return this;
   }
 
   // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::
@@ -96,7 +137,13 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
     return this;
   }
 
-  syncFormState () { this._internals?.setFormValue(this.formValue); return this; }
+  syncFormState () {
+    this._internals?.setFormValue(this.formValue);
+    // the one point every write path passes: commit() as well as state that
+    // never touches value, like AufbauToggle.setChecked()
+    this.savePersisted();
+    return this;
+  }
 
   /**
    * subclasses extend this by overriding and calling super.validate() first,
@@ -120,6 +167,82 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   formResetCallback        ()         { this.commit(this.defaultValue, { notify: false }); }
   formStateRestoreCallback (state)    { this.commit(state, { notify: false }); }
   formDisabledCallback     (disabled) { this._formDisabled = disabled; this.update(); }
+
+  // :::::: PERSISTENCE :::::::::::::::::::::::::::::::::::::::::::
+
+  /*
+   * opt in per control via the `persist` attribute:
+   *
+   *   persist                  localStorage,   key from name or id
+   *   persist="session"        sessionStorage, key from name or id
+   *   persist="theme"          localStorage,   key "theme"
+   *   persist="session:theme"  sessionStorage, key "theme"
+   */
+
+  get persistTarget () {
+    if (!this.hasAttribute('persist')) return null;
+
+    const raw     = (this.getAttribute('persist') || '').trim();
+    const session = raw === PERSIST_SESSION || raw.startsWith(`${PERSIST_SESSION}:`);
+    const named   = session ? raw.slice(PERSIST_SESSION.length + 1) : raw;
+    const name    = named || this.getAttribute('name') || this.id;
+
+    if (!name) {
+      if (!this._persistWarned) {
+        this._persistWarned = true;
+        log.warn(`<${this.tag} persist> needs a name, an id or persist="<key>" to store under.`);
+      }
+      return null;
+    }
+
+    try {
+      const store = session ? sessionStorage : localStorage;
+      return { key: `${PERSIST_PREFIX}${name}`, store };
+    } catch (error) {
+      // storage can throw outright in private mode or under a strict policy
+      return null;
+    }
+  }
+
+  /**
+   * what gets written. the raw attribute rather than formValue on purpose:
+   * AufbauPicker returns a FormData from formValue when it is `multiple`.
+   */
+  get persistedState () { return this.getAttribute('value') ?? ''; }
+
+  /** reuses the per element restore path the form api already goes through */
+  restorePersisted (state) { this.formStateRestoreCallback(state); }
+
+  readPersisted () {
+    const target = this.persistTarget;
+    if (!target) return this;
+
+    try {
+      const stored = target.store.getItem(target.key);
+      if (stored != null) {
+        this._persistedLast = stored;
+        this.restorePersisted(stored);
+      }
+    } catch (error) {
+      log.warn(`could not read "${target.key}":`, error);
+    }
+
+    return this;
+  }
+
+  savePersisted () {
+    const target = this.persistTarget;
+    if (!target) return this;
+
+    const state = this.persistedState;
+    if (state === this._persistedLast) return this;
+    this._persistedLast = state;
+
+    try { target.store.setItem(target.key, state); }
+    catch (error) { log.warn(`could not write "${target.key}":`, error); }
+
+    return this;
+  }
 
   // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::
 
