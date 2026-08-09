@@ -11,7 +11,7 @@ ln -s <path-to>/domina domina
 python3 -m http.server 8099 --bind 127.0.0.1 &
 
 cd <path-to>/aufbau
-node test/flicker.test.mjs
+./test/run.sh
 ```
 
 `CHROMIUM` and `ORIGIN` override the browser binary and the server origin.
@@ -31,3 +31,10 @@ Proves the anti-flicker boot path end to end:
 The HTTP cache is disabled deliberately: with it on, the browser answers the
 stylesheet itself, the stall never happens and the test would pass without proving
 anything.
+
+## persist.test.mjs
+
+Proves control persistence after moving it onto `@aufbau/store`: a `<aufbau-toggle
+persist>` writes under the namespaced key, `persist="session:…"` stays out of
+localStorage, both survive a reload, and `sweep()` drops an older version without
+touching the current one or any foreign key.

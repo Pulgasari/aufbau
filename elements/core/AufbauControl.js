@@ -221,8 +221,13 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
 
     const state = this.persistedState;
     if (state === this._persistedLast) return this;
-    this._persistedLast = state;
 
+    // an empty control that was never stored has nothing worth writing. without
+    // this, merely putting `persist` on a control fills storage with "" on connect.
+    // clearing a control that *was* stored still persists, which is the point.
+    if (state === '' && !target.store.hasSync(target.key)) return this;
+
+    this._persistedLast = state;
     target.store.setSync(target.key, state);
     return this;
   }

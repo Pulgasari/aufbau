@@ -27,10 +27,7 @@ const page    = await context.newPage();
 
 const errors = [];
 page.on('pageerror', error => errors.push(String(error)));
-page.on('console', message => {
-  // the favicon 404 is the static server's, not ours
-  if (message.type() === 'error' && !message.text().includes('favicon')) errors.push(message.text());
-});
+page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
 
 // :::::: visit 1 — cold. nothing cached anywhere.
 
