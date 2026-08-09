@@ -15,8 +15,10 @@
     "@aufbau/import"     : "workspace:*",
     "@aufbau/plugins"    : "workspace:*",
     "@aufbau/shaders"    : "workspace:*",
+    "@aufbau/store"      : "workspace:*",
     "@aufbau/stylesheet" : "workspace:*",
-    "@aufbau/utils"      : "workspace:*"
+    "@aufbau/utils"      : "workspace:*",
+    "@bunker/kit"        : "^0.1.0"
   },
   "peerDependencies": {
     "@preact/signals": "^1.3.0",

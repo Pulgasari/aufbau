@@ -10,11 +10,9 @@
 
 import AufbauCore from './AufbauCore.js';
 import { createLogger } from '@aufbau/js';
+import { resolvePersist } from '@aufbau/store';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
-
-const PERSIST_PREFIX  = 'aufbau:';
-const PERSIST_SESSION = 'session';
 
 const log = createLogger('aufbau-control');
 
@@ -177,31 +175,22 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
    *   persist="session"        sessionStorage, key from name or id
    *   persist="theme"          localStorage,   key "theme"
    *   persist="session:theme"  sessionStorage, key "theme"
+   *
+   * the attribute grammar is parsed in @aufbau/store, which also owns the
+   * namespace, the quota handling and the private-mode fallback.
    */
 
   get persistTarget () {
     if (!this.hasAttribute('persist')) return null;
 
-    const raw     = (this.getAttribute('persist') || '').trim();
-    const session = raw === PERSIST_SESSION || raw.startsWith(`${PERSIST_SESSION}:`);
-    const named   = session ? raw.slice(PERSIST_SESSION.length + 1) : raw;
-    const name    = named || this.getAttribute('name') || this.id;
+    const target = resolvePersist(this.getAttribute('persist'), { id: this.id, name: this.getAttribute('name') });
 
-    if (!name) {
-      if (!this._persistWarned) {
-        this._persistWarned = true;
-        log.warn(`<${this.tag} persist> needs a name, an id or persist="<key>" to store under.`);
-      }
-      return null;
+    if (!target && !this._persistWarned) {
+      this._persistWarned = true;
+      log.warn(`<${this.tag} persist> needs a name, an id or persist="<key>" to store under.`);
     }
 
-    try {
-      const store = session ? sessionStorage : localStorage;
-      return { key: `${PERSIST_PREFIX}${name}`, store };
-    } catch (error) {
-      // storage can throw outright in private mode or under a strict policy
-      return null;
-    }
+    return target;
   }
 
   /**
@@ -217,14 +206,10 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
     const target = this.persistTarget;
     if (!target) return this;
 
-    try {
-      const stored = target.store.getItem(target.key);
-      if (stored != null) {
-        this._persistedLast = stored;
-        this.restorePersisted(stored);
-      }
-    } catch (error) {
-      log.warn(`could not read "${target.key}":`, error);
+    const stored = target.store.getSync(target.key);
+    if (stored !== null) {
+      this._persistedLast = stored;
+      this.restorePersisted(stored);
     }
 
     return this;
@@ -236,11 +221,14 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
 
     const state = this.persistedState;
     if (state === this._persistedLast) return this;
+
+    // an empty control that was never stored has nothing worth writing. without
+    // this, merely putting `persist` on a control fills storage with "" on connect.
+    // clearing a control that *was* stored still persists, which is the point.
+    if (state === '' && !target.store.hasSync(target.key)) return this;
+
     this._persistedLast = state;
-
-    try { target.store.setItem(target.key, state); }
-    catch (error) { log.warn(`could not write "${target.key}":`, error); }
-
+    target.store.setSync(target.key, state);
     return this;
   }
 

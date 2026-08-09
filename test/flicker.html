@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" href="data:," />
+<title>aufbau boot path</title>
+
+<!-- classic and blocking, ahead of every aufbau stylesheet link. see /boot.js -->
+<script src="../boot.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "@aufbau/cache"          : "../cache/index.js",
+    "@aufbau/elements"       : "../elements/index.js",
+    "@aufbau/elements/"      : "../elements/",
+    "@aufbau/import"         : "../import/index.js",
+    "@aufbau/js"             : "../js/index.js",
+    "@aufbau/patterns"       : "../patterns/index.js",
+    "@aufbau/plugins"        : "../plugins/index.js",
+    "@aufbau/plugins/client" : "../plugins/client/index.js",
+    "@aufbau/plugins/worker" : "../plugins/worker/index.js",
+    "@aufbau/shaders"        : "../shaders/index.js",
+    "@aufbau/store"          : "../store/index.js",
+    "@aufbau/stylesheet"     : "../stylesheet/index.js",
+    "@aufbau/stylesheet/"    : "../stylesheet/",
+    "@aufbau/utils"          : "../js/index.js",
+
+    "@bunker/cache"   : "/bunker/cache/index.js",
+    "@bunker/core"    : "/bunker/core/index.js",
+    "@bunker/db"      : "/bunker/db/index.js",
+    "@bunker/files"   : "/bunker/files/index.js",
+    "@bunker/storage" : "/bunker/storage/index.js",
+
+    "@domina/core"  : "/domina/core/index.js",
+    "@domina/core/" : "/domina/core/"
+  }
+}
+</script>
+
+<link rel="stylesheet" href="./flicker.ass">
+
+<script>
+  // runs once the parser has passed the <link>, but long before that stylesheet
+  // could have arrived over a throttled connection. if boot.js did its job, the
+  // page is already styled at this point.
+  window.__probe = {
+    bootStyles : document.querySelectorAll('style[data-aufbau-boot]').length,
+    at         : performance.now(),
+  };
+</script>
+</head>
+
+<body>
+  <div id="panel"><h1>boot path</h1></div>
+
+  <script>
+    // the parser has reached <body>, so the page has been painted at least once.
+    // on a warm visit the stylesheet is still in flight here, which makes this the
+    // moment that decides whether the reader sees a flash.
+    window.__bodyProbe = {
+      background   : getComputedStyle(document.body).backgroundColor,
+      bootStyles   : window.__probe.bootStyles,
+      linkResolved : [...document.styleSheets].some(sheet => sheet.href?.includes('flicker.ass')),
+      probe        : getComputedStyle(document.documentElement).getPropertyValue('--probe').trim(),
+    };
+  </script>
+
+  <script type="module">
+    import { observeStylesheets } from '@aufbau/plugins/client';
+    observeStylesheets();
+    window.__ready = true;
+  </script>
+</body>
+</html>

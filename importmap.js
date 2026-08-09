@@ -17,6 +17,7 @@ const pkg = [
   'plugins/vite',
   'plugins/worker',
   'shaders',
+  'store',
   'stylesheet',
   'utils',
 ];
@@ -42,9 +43,17 @@ const map = { imports: {
     "@aufbau/plugins/vite"    : "./plugins/vite/index.js",
     "@aufbau/plugins/worker"  : "./plugins/worker/index.js",
     "@aufbau/shaders"         : "./shaders/index.js",
+    "@aufbau/store"           : "./store/index.js",
     "@aufbau/stylesheet"      : "./stylesheet/index.js",
     "@aufbau/stylesheet/"     : "./stylesheet/",
     "@aufbau/utils"           : "./js/index.js",
+
+    "@bunker/cache"   : "https://pulgasari.github.io/bunker/cache/index.js",
+    "@bunker/core"    : "https://pulgasari.github.io/bunker/core/index.js",
+    "@bunker/db"      : "https://pulgasari.github.io/bunker/db/index.js",
+    "@bunker/files"   : "https://pulgasari.github.io/bunker/files/index.js",
+    "@bunker/kit"     : "https://pulgasari.github.io/bunker/kit/index.js",
+    "@bunker/storage" : "https://pulgasari.github.io/bunker/storage/index.js",
 
     "@domina/core" : "https://pulgasari.github.io/domina/core/index.js",
     "@poo/hljs"    : "https://pulgasari.github.io/poo/hljs/index.js",

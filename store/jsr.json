@@ -1,11 +1,11 @@
 {
-  "name": "@aufbau/cache",
+  "name": "@aufbau/store",
   "version": "1.0.0",
   "license": "MIT",
   "exports": "./index.js",
   "imports": {
-    "@bunker/cache" : "jsr:@bunker/cache@^0.1.0",
-    "@bunker/db"    : "jsr:@bunker/db@^0.1.0"
+    "@bunker/core"    : "jsr:@bunker/core@^0.1.0",
+    "@bunker/storage" : "jsr:@bunker/storage@^0.1.0"
   },
   "publish": {
     "include": [

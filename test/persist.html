@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" href="data:," />
+<title>aufbau control persistence</title>
+
+<script type="importmap">
+{
+  "imports": {
+    "@aufbau/cache"          : "../cache/index.js",
+    "@aufbau/elements"       : "../elements/index.js",
+    "@aufbau/elements/"      : "../elements/",
+    "@aufbau/import"         : "../import/index.js",
+    "@aufbau/js"             : "../js/index.js",
+    "@aufbau/patterns"       : "../patterns/index.js",
+    "@aufbau/plugins"        : "../plugins/index.js",
+    "@aufbau/plugins/client" : "../plugins/client/index.js",
+    "@aufbau/plugins/worker" : "../plugins/worker/index.js",
+    "@aufbau/shaders"        : "../shaders/index.js",
+    "@aufbau/store"          : "../store/index.js",
+    "@aufbau/stylesheet"     : "../stylesheet/index.js",
+    "@aufbau/stylesheet/"    : "../stylesheet/",
+    "@aufbau/utils"          : "../js/index.js",
+
+    "@bunker/cache"   : "/bunker/cache/index.js",
+    "@bunker/core"    : "/bunker/core/index.js",
+    "@bunker/db"      : "/bunker/db/index.js",
+    "@bunker/files"   : "/bunker/files/index.js",
+    "@bunker/storage" : "/bunker/storage/index.js",
+
+    "@domina/core"  : "/domina/core/index.js",
+    "@domina/core/" : "/domina/core/"
+  }
+}
+</script>
+</head>
+
+<body>
+  <aufbau-toggle id="dark" persist look="switch">dark mode</aufbau-toggle>
+  <aufbau-toggle id="beta" persist="session:beta">beta</aufbau-toggle>
+  <aufbau-toggle id="loose">not persisted</aufbau-toggle>
+
+  <script type="module">
+    // the element module registers itself on import
+    import '@aufbau/elements/AufbauToggle.js';
+    import { store, session } from '@aufbau/store';
+
+    await customElements.whenDefined('aufbau-toggle');
+
+    window.__store   = store;
+    window.__session = session;
+    window.__ready   = true;
+  </script>
+</body>
+</html>
