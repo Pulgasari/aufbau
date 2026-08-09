@@ -31,8 +31,10 @@
 
 #### web
 
-- [https://pulgasari.github.io/aufbau/docs/](https://pulgasari.github.io/aufbau/docs/)
-- [https://pulgasari.github.io/aufbau/elements/](https://pulgasari.github.io/aufbau/elements/)
+- [docs](https://pulgasari.github.io/aufbau/docs/)
+- [elements](https://pulgasari.github.io/aufbau/elements/)
+- [test](https://pulgasari.github.io/aufbau/test/index.html)
+- [test/flicker](https://pulgasari.github.io/aufbau/test/flicker.html)
 
 ---
 
