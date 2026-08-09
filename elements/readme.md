@@ -11,6 +11,8 @@ official **aufbau** *webcomponents\** library.
 [config](#config)
 [elements](#elements)
 
+[https://pulgasari.github.io/aufbau/elements/demo.html](https://pulgasari.github.io/aufbau/elements/demo.html)
+
 ---
 
 die control-elemente folgen drei achsen: `type` (welcher wert), `look` (wie es
