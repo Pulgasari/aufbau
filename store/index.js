@@ -7,42 +7,24 @@
   one version, and the `persist` attribute contract the elements speak.
 */
 
-import { codecs } from '@bunker/core';
+import { codecs }        from '@bunker/core';
 import { createStorage } from '@bunker/storage';
-import { createLogger } from '@aufbau/js';
+import { createLogger }  from '@aufbau/js';
 
-const NAMESPACE = 'aufbau';
-const VERSION   = 1;
+// ::::::
 
-const log = createLogger('aufbau-store');
+const namespace = 'aufbau';
+const version   = 1;
 
+const log     = createLogger('aufbau-store');
 const onError = ({ error, key, operation }) => log.warn(`could not ${operation} "${key}":`, error);
 
-// :::::: STORES ::::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: STORES
 
-const shared = { namespace: NAMESPACE, onError, version: VERSION };
-
-/** survives the tab. themes, skins, control values. */
-export const store = createStorage({ ...shared, area: 'local' });
-
-/** dies with the tab. */
-export const session = createStorage({ ...shared, area: 'session' });
-
-/*
-  compiled css, keyed by href.
-
-  kept out of the json store on purpose: the boot path reads a whole stylesheet
-  synchronously before the first paint, and json would make it pay for quoting and
-  escaping a value that is already a string. separate namespace so a sweep of one
-  never touches the other.
-*/
-export const sheets = createStorage({
-  area      : 'local',
-  codec     : codecs.text,
-  namespace : `${NAMESPACE}:sheets`,
-  onError,
-  version   : VERSION,
-});
+const shared  = { namespace, onError, version };
+const store   = createStorage({ area: 'local',   namespace, onError, version }); // survives the tab. themes, skins, control values
+const session = createStorage({ area: 'session', namespace, onError, version }); // dies with the tab
+const sheets  = createStorage({ area: 'local', codec: codecs.text, namespace: `${namespace}:sheets`, onError, version });
 
 /*
   which stylesheets a given page uses, keyed by pathname.
@@ -53,9 +35,9 @@ export const sheets = createStorage({
 */
 export const pages = createStorage({
   area      : 'local',
-  namespace : `${NAMESPACE}:pages`,
+  namespace : `${namespace}:pages`,
   onError,
-  version   : VERSION,
+  version,
 });
 
 /** the exact key layout boot.js reads. it is a standalone classic script and
@@ -80,8 +62,9 @@ const SESSION = 'session';
   returns null when there is nothing to store under, which is not an error: a
   control can carry `persist` before it has been given a name.
 */
+// gehört nach elements
 export function resolvePersist (spec, { id = '', name = '' } = {}) {
-  if (spec === null || spec === undefined) return null;
+  if (spec == null) return null;
 
   const raw       = String(spec).trim();
   const isSession = raw === SESSION || raw.startsWith(`${SESSION}:`);
@@ -97,6 +80,11 @@ export function resolvePersist (spec, { id = '', name = '' } = {}) {
 /** drops what an older version of aufbau left behind. cheap, worth calling at boot. */
 export function sweep () {
   return pages.sweepSync() + session.sweepSync() + sheets.sweepSync() + store.sweepSync();
+}
+
+export {
+  session, store,
+  sheets,
 }
 
 export default store;
