@@ -33,6 +33,78 @@ export default class AufbauUpload extends AufbauControl {
     text      : 'drop files here or click to browse',
   };
 
+  static styles = `
+    aufbau-upload { display: block; }
+
+    aufbau-upload .aufbau-upload-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: var(--aufbau-control-gap, 0.5em);
+    }
+
+    aufbau-upload .upload-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      padding: 1.5em 1em;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    aufbau-upload .look-button .upload-zone {
+      flex-direction: row;
+      padding: var(--aufbau-control-pad, 0.35em 0.55em);
+    }
+
+    aufbau-upload .look-list .upload-zone { display: none; }
+
+    aufbau-upload .upload-icon { --icon-size: 1.75em; flex: none; }
+
+    aufbau-upload .upload-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25em;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    aufbau-upload .upload-item {
+      display: flex;
+      align-items: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+    }
+
+    aufbau-upload .upload-name {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    aufbau-upload .upload-size {
+      flex: none;
+      opacity: 0.65;
+      font-variant-numeric: tabular-nums;
+    }
+
+    aufbau-upload .upload-remove {
+      display: inline-flex;
+      align-items: center;
+      flex: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+  `;
+
   // keeps authored children (a custom label, hints) alive across repaints
   get renderTarget () { return this.shell('aufbau-upload-ui'); }
 

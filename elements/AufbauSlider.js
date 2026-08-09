@@ -20,6 +20,100 @@ export default class AufbauSlider extends AufbauControl {
     unit     : String,
   };
 
+  // the fill consumes --slider-from / --slider-to, both are already written by
+  // sync(). in range mode the two native tracks are stacked on top of each other
+  // so they read as one axis with two handles
+  static styles = `
+    aufbau-slider { --slider-track-size: 0.35em; --slider-thumb-size: 1em; }
+
+    aufbau-slider .aufbau-slider-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      inline-size: 100%;
+    }
+
+    aufbau-slider .slider-tracks {
+      position: relative;
+      flex: 1 1 auto;
+      /* in range mode both tracks are taken out of flow, so there is nothing
+         left to give this box an intrinsic width. without a floor it collapses */
+      min-inline-size: var(--slider-min-size, 10em);
+      block-size: var(--slider-thumb-size);
+      display: flex;
+      align-items: center;
+      isolation: isolate;
+    }
+
+    aufbau-slider .slider-track {
+      appearance: none;
+      -webkit-appearance: none;
+      inline-size: 100%;
+      block-size: var(--slider-thumb-size);
+      margin: 0;
+      background: none;
+      z-index: 2;
+    }
+
+    aufbau-slider .slider-track:focus { outline: none; }
+
+    /* both handles have to stay reachable, so only the thumbs take pointer events */
+    aufbau-slider .is-range .slider-track {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    aufbau-slider .is-range .slider-track::-webkit-slider-thumb { pointer-events: auto; }
+    aufbau-slider .is-range .slider-track::-moz-range-thumb     { pointer-events: auto; }
+
+    aufbau-slider .slider-fill {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-start: var(--slider-from, 0%);
+      inline-size: calc(var(--slider-to, 0%) - var(--slider-from, 0%));
+      block-size: var(--slider-track-size);
+      translate: 0 -50%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    aufbau-slider .slider-display {
+      display: flex;
+      align-items: center;
+      gap: 0.25em;
+      flex: none;
+      font-variant-numeric: tabular-nums;
+    }
+
+    aufbau-slider .slider-number {
+      inline-size: var(--slider-readout-size, 5ch);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: end;
+    }
+
+    aufbau-slider .slider-number:focus { outline: none; }
+    aufbau-slider .slider-unit { opacity: 0.65; }
+
+    aufbau-slider .slider-step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      margin: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+  `;
+
   get valueType () { return valueType(this.getAttr('type')); }
 
   // :::::: AXIS ::::::::::::::::::::::::::::::::::::::::::::::::

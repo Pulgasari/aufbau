@@ -17,6 +17,113 @@ export default class AufbauPicker extends AufbauControl {
     src         : String,
   };
 
+  // the list overlays the page instead of pushing it apart, so the ui shell is
+  // the positioning context. everything decorative lives in the skin
+  static styles = `
+    aufbau-picker { position: relative; }
+
+    aufbau-picker .aufbau-picker-ui {
+      position: relative;
+      display: block;
+      inline-size: 100%;
+    }
+
+    aufbau-picker .picker-field {
+      display: flex;
+      align-items: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      inline-size: 100%;
+      min-inline-size: 0;
+      cursor: pointer;
+    }
+
+    aufbau-picker .picker-input {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: inherit;
+      text-overflow: ellipsis;
+    }
+
+    aufbau-picker .picker-input:focus { outline: none; }
+
+    aufbau-picker .picker-caret {
+      flex: none;
+      transition: rotate 0.15s ease;
+    }
+
+    aufbau-picker.is-open .picker-caret { rotate: 180deg; }
+
+    aufbau-picker .picker-list {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-start: 100%;
+      z-index: var(--aufbau-overlay-z, 20);
+      max-block-size: var(--picker-list-size, 15em);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    aufbau-picker .picker-option {
+      display: flex;
+      align-items: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      inline-size: 100%;
+      margin: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: start;
+      cursor: pointer;
+    }
+
+    aufbau-picker .picker-option[aria-disabled="true"],
+    aufbau-picker .picker-option:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    aufbau-picker .picker-label {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    aufbau-picker .picker-group {
+      display: flex;
+      gap: var(--aufbau-control-gap, 0.5em);
+      flex-wrap: wrap;
+    }
+
+    /* radio stacks and keeps its marks, segments sit in one seamless row */
+    aufbau-picker .picker-radio { flex-direction: column; }
+
+    aufbau-picker .picker-radio .picker-mark {
+      flex: none;
+      inline-size: 0.85em;
+      block-size: 0.85em;
+    }
+
+    aufbau-picker .picker-segments {
+      flex-wrap: nowrap;
+      gap: 0;
+    }
+
+    aufbau-picker .picker-segments .picker-option { justify-content: center; }
+    aufbau-picker .picker-segments .picker-mark   { display: none; }
+    aufbau-picker .picker-segments .picker-label  { flex: 0 1 auto; }
+
+    /* filterElements() marks non matching entries with this, see filter() below.
+       last on purpose: same specificity as the .picker-option rules above, so it
+       has to come after them to win */
+    aufbau-picker .is-hidden { display: none; }
+  `;
+
   // options live in the light dom, the ui gets its own shell next to them
   get renderTarget () { return this.shell('aufbau-picker-ui'); }
 

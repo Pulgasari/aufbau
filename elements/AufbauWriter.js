@@ -22,6 +22,36 @@ export default class AufbauWriter extends AufbauControl {
     spellcheck  : { type: Boolean, default: true },
   };
 
+  static styles = `
+    aufbau-writer { display: block; }
+
+    aufbau-writer .aufbau-writer-wrapper {
+      display: flex;
+      flex-direction: column;
+      inline-size: 100%;
+    }
+
+    aufbau-writer .writer-field {
+      inline-size: 100%;
+      margin: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      line-height: 1.4;
+    }
+
+    aufbau-writer .writer-field:focus { outline: none; }
+
+    aufbau-writer .writer-counter {
+      align-self: flex-end;
+      font-size: 0.75em;
+      line-height: 1;
+      opacity: 0.65;
+      font-variant-numeric: tabular-nums;
+    }
+  `;
+
   get field () { return this.$('.writer-field'); }
 
   onMount () {

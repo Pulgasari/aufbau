@@ -1,0 +1,326 @@
+/* @aufbau/css/skins/monochrome.css
+   the default look of @aufbau/elements. flat and outlined: one hairline border,
+   small radii, no shadows, no gradients.
+
+   every colour is derived from currentColor, so the skin inherits whatever the
+   page or the active theme sets and never fights it. the elements ship their own
+   structure, this file only decorates it.
+
+   loaded by elements/core/skin.js into @layer aufbau.elements.skin. switch it
+   with <aufbau-config elements-skin="..."> or setSkin(). */
+
+:root {
+  /* hairlines and tints track the local text colour */
+  --aufbau-control-line   : color-mix(in oklab, currentColor 35%, transparent);
+  --aufbau-control-border : 1px solid var(--aufbau-control-line);
+  --aufbau-control-focus  : color-mix(in oklab, currentColor 55%, transparent);
+  --aufbau-control-gap    : 0.5em;
+  --aufbau-control-hover  : color-mix(in oklab, currentColor 8%, transparent);
+  --aufbau-control-muted  : color-mix(in oklab, currentColor 55%, transparent);
+  --aufbau-control-pad    : 0.35em 0.55em;
+  --aufbau-control-radius : 0.25rem;
+  --aufbau-control-sunken : color-mix(in oklab, currentColor 6%, transparent);
+  --aufbau-control-track  : color-mix(in oklab, currentColor 18%, transparent);
+
+  /* the absolute pair, for the few rules that fill a box AND put text on it.
+     currentColor is useless there: the same rule sets `color`, and currentColor
+     resolves per element at used-value time, so it would become the new colour
+     and paint the text onto its own background. picks up @aufbau/css/themes
+     when one is loaded, the ua system colours otherwise. */
+  --aufbau-ink            : var(--aufbau-fg, CanvasText);
+  --aufbau-surface        : var(--aufbau-bg, Canvas);
+  --aufbau-accent         : var(--aufbau-ink);
+}
+
+/* ::: shared ::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.aufbau-input-wrapper,
+.aufbau-writer-wrapper,
+.picker-field,
+.dropdown-trigger,
+.aufbau-btn,
+.toggle-button,
+.upload-zone {
+  border: var(--aufbau-control-border);
+  border-radius: var(--aufbau-control-radius);
+  padding: var(--aufbau-control-pad);
+}
+
+.is-disabled { opacity: 0.5; }
+
+:is(aufbau-input, aufbau-picker, aufbau-writer):focus-within :is(.aufbau-input-wrapper, .picker-field, .aufbau-writer-wrapper) {
+  outline: 2px solid var(--aufbau-control-focus);
+  outline-offset: 1px;
+}
+
+:is(.aufbau-btn, .dropdown-trigger, .toggle-control, .picker-option, .input-step, .slider-step, .upload-remove, .copy-btn):focus-visible {
+  outline: 2px solid var(--aufbau-control-focus);
+  outline-offset: 1px;
+}
+
+:is(.aufbau-btn, .dropdown-trigger, .input-step, .slider-step, .upload-remove, .copy-btn):hover:not(:disabled) {
+  background-color: var(--aufbau-control-hover);
+}
+
+/* ::: button ::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.aufbau-btn { background-color: transparent; }
+
+.aufbau-btn.variant-primary {
+  background-color: var(--aufbau-accent);
+  border-color: var(--aufbau-accent);
+  color: var(--aufbau-surface);
+}
+
+.aufbau-btn.variant-ghost { border-color: transparent; }
+
+/* ::: input ::::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.input-step {
+  border-radius: var(--aufbau-control-radius);
+  padding: 0.15em;
+}
+
+.input-swatch {
+  border: var(--aufbau-control-border);
+  border-radius: calc(var(--aufbau-control-radius) * 0.6);
+}
+
+/* ::: toggle :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.toggle-switch {
+  background-color: var(--aufbau-control-track);
+  border-radius: 999px;
+  transition: background-color 0.15s ease;
+}
+
+.toggle-switch.is-active { background-color: var(--aufbau-accent); }
+
+.toggle-switch .toggle-thumb {
+  background-color: var(--aufbau-surface);
+  border: var(--aufbau-control-border);
+  border-radius: 999px;
+}
+
+.toggle-checkbox {
+  border: var(--aufbau-control-border);
+  border-radius: calc(var(--aufbau-control-radius) * 0.6);
+}
+
+/* the mark is drawn as a rotated corner, so it needs no icon request */
+.toggle-checkbox .toggle-thumb {
+  border-inline-end: 2px solid var(--aufbau-accent);
+  border-block-end: 2px solid var(--aufbau-accent);
+  rotate: 45deg;
+  scale: 0;
+  translate: 0 -10%;
+  transition: scale 0.12s ease;
+}
+
+.toggle-checkbox.is-active .toggle-thumb { scale: 1; }
+
+.toggle-checkbox.is-indeterminate .toggle-thumb {
+  border-inline-end: 0;
+  rotate: 0deg;
+  scale: 1;
+  block-size: 2px;
+  translate: 0;
+}
+
+.toggle-button {
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.toggle-button.is-active {
+  background-color: var(--aufbau-accent);
+  color: var(--aufbau-surface);
+}
+
+/* ::: picker :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.picker-list {
+  background-color: var(--aufbau-surface);
+  border: var(--aufbau-control-border);
+  border-radius: var(--aufbau-control-radius);
+  padding: 0.2em;
+}
+
+.picker-option {
+  border-radius: calc(var(--aufbau-control-radius) * 0.8);
+  padding: var(--aufbau-control-pad);
+}
+
+.picker-list .picker-option:hover { background-color: var(--aufbau-control-hover); }
+
+.picker-list .picker-option.is-selected {
+  background-color: var(--aufbau-accent);
+  color: var(--aufbau-surface);
+}
+
+.picker-radio .picker-option { padding-inline: 0; }
+
+.picker-radio .picker-mark {
+  border: var(--aufbau-control-border);
+  border-radius: 999px;
+  transition: border-width 0.12s ease;
+}
+
+.picker-radio .picker-option.is-selected .picker-mark {
+  border-color: var(--aufbau-accent);
+  border-width: 0.28em;
+}
+
+.picker-segments {
+  border: var(--aufbau-control-border);
+  border-radius: var(--aufbau-control-radius);
+  overflow: hidden;
+}
+
+.picker-segments .picker-option {
+  border-radius: 0;
+  border-inline-start: var(--aufbau-control-border);
+}
+
+.picker-segments .picker-option:first-child { border-inline-start: 0; }
+.picker-segments .picker-option:hover       { background-color: var(--aufbau-control-hover); }
+
+.picker-segments .picker-option.is-selected {
+  background-color: var(--aufbau-accent);
+  color: var(--aufbau-surface);
+}
+
+/* ::: slider :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.slider-tracks::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  block-size: var(--slider-track-size);
+  translate: 0 -50%;
+  background-color: var(--aufbau-control-track);
+  border-radius: 999px;
+}
+
+.slider-fill {
+  background-color: var(--aufbau-accent);
+  border-radius: 999px;
+}
+
+.type-color .slider-fill { background-color: var(--slider-color, var(--aufbau-accent)); }
+
+.slider-track::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: var(--slider-thumb-size);
+  block-size: var(--slider-thumb-size);
+  background-color: var(--aufbau-surface);
+  border: 2px solid var(--aufbau-accent);
+  border-radius: 999px;
+  cursor: grab;
+}
+
+.slider-track::-moz-range-thumb {
+  inline-size: var(--slider-thumb-size);
+  block-size: var(--slider-thumb-size);
+  background-color: var(--aufbau-surface);
+  border: 2px solid var(--aufbau-accent);
+  border-radius: 999px;
+  cursor: grab;
+}
+
+.slider-track::-webkit-slider-runnable-track { background: none; }
+.slider-track::-moz-range-track              { background: none; }
+
+.slider-number {
+  border-block-end: var(--aufbau-control-border);
+  padding-block-end: 0.1em;
+}
+
+/* ::: dropdown :::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.aufbau-dropdown-menu {
+  background-color: var(--aufbau-surface);
+  border: var(--aufbau-control-border);
+  border-radius: var(--aufbau-control-radius);
+  padding: 0.2em;
+  margin-block: 0.25em;
+}
+
+.aufbau-dropdown-menu > * {
+  border-radius: calc(var(--aufbau-control-radius) * 0.8);
+  padding: var(--aufbau-control-pad);
+}
+
+.aufbau-dropdown-menu > *:hover { background-color: var(--aufbau-control-hover); }
+
+/* ::: upload / writer ::::::::::::::::::::::::::::::::::::::::::: */
+
+.upload-zone {
+  border-style: dashed;
+  background-color: var(--aufbau-control-sunken);
+  transition: background-color 0.15s ease;
+}
+
+.upload-zone:hover, .is-dragover .upload-zone { background-color: var(--aufbau-control-hover); }
+
+.upload-item {
+  border-radius: calc(var(--aufbau-control-radius) * 0.8);
+  padding: 0.2em 0.4em;
+  background-color: var(--aufbau-control-sunken);
+}
+
+.writer-counter { color: var(--aufbau-control-muted); }
+
+/* ::: progress :::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.aufbau-progress-wrapper {
+  background-color: var(--aufbau-control-track);
+  border-radius: 999px;
+}
+
+.progress-bar {
+  background-color: var(--aufbau-accent);
+  border-radius: 999px;
+}
+
+/* ::: code :::::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.aufbau-code-wrapper {
+  border: var(--aufbau-control-border);
+  border-radius: var(--aufbau-control-radius);
+}
+
+.code-header {
+  border-block-end: var(--aufbau-control-border);
+  padding: 0.3em 0.6em;
+  color: var(--aufbau-control-muted);
+}
+
+.copy-btn {
+  border-radius: calc(var(--aufbau-control-radius) * 0.6);
+  padding: 0.2em;
+}
+
+aufbau-code pre { padding: 0.75em; }
+
+aufbau-code code[contenteditable]:focus {
+  background-color: var(--aufbau-control-sunken);
+}
+
+/* ::: toast ::::::::::::::::::::::::::::::::::::::::::::::::::::: */
+
+.aufbau-toast-wrapper {
+  background-color: var(--aufbau-surface);
+  border: var(--aufbau-control-border);
+  border-radius: var(--aufbau-control-radius);
+  border-inline-start-width: 3px;
+  padding: 0.6em 0.75em;
+}
+
+.aufbau-toast-wrapper.type-success { border-inline-start-color: var(--aufbau-success, currentColor); }
+.aufbau-toast-wrapper.type-warning { border-inline-start-color: var(--aufbau-warn, currentColor); }
+.aufbau-toast-wrapper.type-error   { border-inline-start-color: var(--aufbau-error, currentColor); }
+
+.toast-message { color: var(--aufbau-control-muted); }

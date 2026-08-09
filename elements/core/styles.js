@@ -7,6 +7,28 @@ import { isFn } from '@aufbau/js';
 // against a layered one, so page css keeps overriding component defaults
 export const BASE_LAYER = 'aufbau.elements';
 
+// the swappable look, see ./skin.js. deliberately a SIBLING of BASE_LAYER, not a
+// sub layer: a parent layer's own rules beat those of its sub layers, so
+// aufbau.elements.skin would lose against the very structure it has to decorate
+export const SKIN_LAYER = 'aufbau.skin';
+
+/**
+ * pins the layer order once, up front. without this statement the order falls
+ * out of whichever sheet happens to be adopted first, and adoption is async.
+ * prepended so it is the first sheet the cascade sees.
+ */
+let ordered = false;
+
+export function ensureLayerOrder (target = document) {
+  if (ordered || typeof CSSStyleSheet === 'undefined' || !('adoptedStyleSheets' in Document.prototype)) return;
+  ordered = true;
+
+  const root  = target.adoptedStyleSheets ? target : document;
+  const sheet = new CSSStyleSheet;
+  sheet.replaceSync(`@layer ${BASE_LAYER}, ${SKIN_LAYER};`);
+  root.adoptedStyleSheets = [sheet, ...root.adoptedStyleSheets];
+}
+
 /**
  * collects the classes in the prototype chain that declare their OWN `static
  * styles`, base class first. inherited declarations are not re-adopted under
@@ -34,10 +56,12 @@ const toCss = (styles, owner) => {
  * @param {Document|ShadowRoot|Element} [target]
  */
 export function adoptClassStyles (Cls, target = document) {
+  ensureLayerOrder(target);
+
   for (const owner of styleOwners(Cls)) {
     dom.adoptStylesheet(toCss(owner.styles, owner), {
       target,
-      layer : owner.styleLayer,
+      layer : owner.styleLayer ?? BASE_LAYER,
       key   : `aufbau:styles:${owner.name}`,
     });
   }

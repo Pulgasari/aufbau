@@ -17,9 +17,12 @@ function iconUrl (icon) {
 
 export default class AufbauIcon extends AufbauElement {
   static attr = {
-    icon  : String,
-    size  : String,
     color : String,
+    icon  : String,
+    // mask recolours the svg with currentColor and throws its own colours away,
+    // image keeps them. multicolour art (flags, logos, emoji) needs image
+    mode  : { type: String, default: 'mask', values: ['mask', 'image'] },
+    size  : String,
   };
 
   // the element is a coloured box masked by the icon svg. without these the
@@ -40,6 +43,16 @@ export default class AufbauIcon extends AufbauElement {
       mask-position: center;
       -webkit-mask-size: 100% 100%;
       mask-size: 100% 100%;
+    }
+
+    aufbau-icon[mode="image"] {
+      background-color: transparent;
+      background-image: var(--icon-url);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      -webkit-mask-image: none;
+      mask-image: none;
     }
 
     aufbau-icon:not([icon]) { display: none; }

@@ -14,6 +14,25 @@ export default class AufbauButton extends AufbauElement {
     variant  : 'default',
   };
 
+  static styles = `
+    aufbau-button { display: inline-block; }
+
+    aufbau-button .aufbau-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--aufbau-control-gap, 0.5em);
+      inline-size: 100%;
+      margin: 0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    aufbau-button .aufbau-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    aufbau-button .btn-content { line-height: 1.2; }
+  `;
+
   onMount () {
     // authored children are the label when no explicit one was given.
     // captured before the first render replaces them
