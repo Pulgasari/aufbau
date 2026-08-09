@@ -64,12 +64,35 @@
 
 /* ::: button ::::::::::::::::::::::::::::::::::::::::::::::::::: */
 
+/*
+aufbau-button,
+aufbau-input,
+aufbau-slider,
+aufbau-picker,
+aufbau-reader,
+aufbau-toggle,
+aufbau-writer,
+{
+   --bg  : transparent;  
+   --fg  : currentColor; 
+   --rad : 0;            
+
+   background-color : var(--bg, transparent);
+   border-radius    : var(--rad, 0);
+   color            : var(--fg, currentColor);
+}
+
+aufbau-button {
+   &[variant="ghost"] { border-color: transparent; }
+}
+*/
+
 .aufbau-btn { background-color: transparent; }
 
 .aufbau-btn.variant-primary {
-  background-color: var(--aufbau-accent);
-  border-color: var(--aufbau-accent);
-  color: var(--aufbau-surface);
+  background-color : var(--aufbau-accent);
+  border-color     : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
 }
 
 .aufbau-btn.variant-ghost { border-color: transparent; }
@@ -190,7 +213,7 @@
   color: var(--aufbau-surface);
 }
 
-/* ::: slider :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* :::::: <aufbau-slider> :::::: */
 
 .slider-tracks::before {
   content: '';
@@ -238,7 +261,7 @@
   padding-block-end: 0.1em;
 }
 
-/* ::: dropdown :::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* :::::: <aufbau-dropdown> :::::: */
 
 .aufbau-dropdown-menu {
   background-color: var(--aufbau-surface);
@@ -273,7 +296,7 @@
 
 .writer-counter { color: var(--aufbau-control-muted); }
 
-/* ::: progress :::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* :::::: <aufbau-progress> :::::: */
 
 .aufbau-progress-wrapper {
   background-color: var(--aufbau-control-track);
@@ -285,7 +308,7 @@
   border-radius: 999px;
 }
 
-/* ::: code :::::::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* :::::: <aufbau-code> :::::: */
 
 .aufbau-code-wrapper {
   border: var(--aufbau-control-border);
@@ -309,7 +332,7 @@ aufbau-code code[contenteditable]:focus {
   background-color: var(--aufbau-control-sunken);
 }
 
-/* ::: toast ::::::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* :::::: <aufbau-toast> :::::: */
 
 .aufbau-toast-wrapper {
   background-color: var(--aufbau-surface);
