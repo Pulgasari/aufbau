@@ -10,6 +10,9 @@
     "./vite": "./vite/index.js"
   },
   "dependencies": {
-    "@aufbau/stylesheet": "workspace:*"
+    "@aufbau/cache": "workspace:*",
+    "@aufbau/store": "workspace:*",
+    "@aufbau/stylesheet": "workspace:*",
+    "@bunker/files": "^0.1.0"
   }
 }

@@ -5,8 +5,8 @@ import { computed, effect, signal, Signal, useSignal } from '@preact/signals';
 
 // TODO: should `values` also apply to leaves inside a deep object?
 //       e.g. deep: { size: ['s','m','l'] } — structure carrying both. undecided.
-// TODO: bunker store — the interface already allows an async get(), so it can be
-//       added without touching anything else here.
+// TODO: back this with @bunker/db — the interface already allows an async get(), so
+//       it can be added without touching anything else here.
 
 
 // ====== helpers ===================================================

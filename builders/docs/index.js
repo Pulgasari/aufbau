@@ -2,6 +2,7 @@
 
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { slugify }              from '@aufbau/utils';
+import { store }                from '@aufbau/store';
 // imported for its static themes(), which also registers <aufbau-code>
 import AufbauCode               from '@aufbau/elements/AufbauCode.js';
 
@@ -13,18 +14,12 @@ aufbau.init(); //window.html = html;
 // the themes shipped in @aufbau/css/themes, all four loaded by index.aufbau.css
 const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 const DEFAULT_CODE = 'github-dark';
-const STORAGE_KEY  = 'aufbau-docs-theme';
+const STORAGE_KEY  = 'docs-theme';
 
-// storage is wrapped, private mode and disabled cookies must not break the docs
-const readStored = () => {
-  try   { return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {}; }
-  catch { return {}; }
-};
-
-const writeStored = (value) => {
-  try   { localStorage.setItem(STORAGE_KEY, JSON.stringify(value)); }
-  catch { /* nothing to do, the choice just will not survive a reload */ }
-};
+// @aufbau/store already swallows quota errors and falls back to memory in private
+// mode, so there is nothing left to wrap here
+const readStored  = () => store.getSync(STORAGE_KEY, {});
+const writeStored = (value) => store.setSync(STORAGE_KEY, value);
 
 const applyPageTheme = (theme) => {
   if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme;

@@ -1,60 +1,42 @@
 // @aufbau/cache
 
-export interface AufbauCacheOptions {
-  /** IndexedDB database name. Defaults to `aufbau-cache`. */
-  name?: string;
-  /** Default time-to-live in milliseconds applied by `set()`. `null` means no expiry. */
-  ttl?: number | null;
-}
+import type { Cache } from '@bunker/cache';
+import type { BunkerDB } from '@bunker/db';
 
-export interface AufbauCacheEntry<T = unknown> {
-  value: T;
-  /** Absolute expiry timestamp in milliseconds, or `null` when the entry never expires. */
-  expire: number | null;
-}
+/** The IndexedDB database every aufbau cache is backed by. */
+export declare const db: BunkerDB;
 
-export declare class AufbauCache {
-  constructor(options?: AufbauCacheOptions);
+/**
+ * General purpose cache over an IndexedDB L2. Entries do not age by default —
+ * pass a `ttl` at the call site when you want them to.
+ */
+export declare const cache: Cache;
 
-  readonly dbName: string;
-  readonly defaultTTL: number | null;
-  /** L1 in-memory layer. Exposed for inspection; prefer the public methods. */
-  readonly memory: Map<string, AufbauCacheEntry>;
-  readonly dbPromise: Promise<IDBDatabase | null>;
+/**
+ * Compiled stylesheets, keyed by the hash of their source.
+ *
+ * Content addressing means an entry cannot go stale: a different source is a
+ * different key. So there is no TTL here — the entry ceiling, not expiry, keeps the
+ * database bounded.
+ */
+export declare const sheets: Cache;
 
-  /**
-   * Reads through L1 memory, then L2 IndexedDB.
-   * Resolves to `null` on a miss or when the entry has expired.
-   */
-  get<T = unknown>(key: string): Promise<T | null>;
+/** The cache key a given ASS source compiles under. */
+export declare function stylesheetKey(source: string): string;
 
-  /**
-   * Writes to both layers. Omitting `ttl` falls back to the instance default.
-   * Values must be structured-cloneable.
-   */
-  set<T = unknown>(key: string, value: T, ttl?: number | null): Promise<void>;
+/**
+ * Compiles ASS to CSS once per distinct source, returning the cached result on
+ * every later call.
+ *
+ * `compile` is a parameter rather than an import so this package does not drag
+ * `@aufbau/stylesheet` in behind it.
+ */
+export declare function compileStylesheet(
+  source: string,
+  compile: (source: string) => string | Promise<string>,
+): Promise<string>;
 
-  /** Removes a key from both layers. */
-  delete(key: string): Promise<void>;
-
-  /**
-   * Lists all keys starting with `prefix`. Backed by a bound range scan,
-   * so no separate index is required.
-   */
-  keys(prefix?: string): Promise<string[]>;
-
-  /**
-   * Actively removes expired entries under `prefix`. Entries otherwise only
-   * expire lazily on read, so keys nobody reads are never cleaned up.
-   * Resolves to the number of entries removed from L2.
-   */
-  prune(prefix?: string): Promise<number>;
-
-  /** Empties both layers. */
-  clear(): Promise<void>;
-}
-
-/** Shared singleton instance backed by the `aufbau-cache` database. */
-export declare const cache: AufbauCache;
+/** Enforces the entry ceilings and drops expired entries. Safe on an idle callback. */
+export declare function prune(): Promise<number>;
 
 export default cache;

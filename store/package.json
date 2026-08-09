@@ -1,15 +1,15 @@
 {
-  "name": "@aufbau/cache",
+  "name": "@aufbau/store",
   "version": "1.0.0",
-  "description": "Aufbau's caching preset over @bunker/cache, including the content-addressed stylesheet cache.",
+  "description": "Aufbau's persistence preset: one namespace over @bunker/storage, plus the `persist` attribute contract.",
   "type": "module",
   "main": "./index.js",
   "exports": {
     ".": "./index.js"
   },
   "dependencies": {
-    "@bunker/cache" : "^0.1.0",
-    "@bunker/db"    : "^0.1.0"
+    "@bunker/core"    : "^0.1.0",
+    "@bunker/storage" : "^0.1.0"
   },
   "files": [
     "index.js",
@@ -20,6 +20,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/pulgasari/aufbau.git",
-    "directory": "cache"
+    "directory": "store"
   }
 }

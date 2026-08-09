@@ -13,10 +13,12 @@ import      aufbauImport        from '@aufbau/import';
 import * as aufbauPluginsClient from '@aufbau/plugins/client';
 import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
 import * as aufbauShaders       from '@aufbau/shaders';
+import * as aufbauStore         from '@aufbau/store';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
 
 // ::: OTHERS
+import * as bunker from '@bunker/kit';
 import * as domina from '@domina/core';
 //import      doc from '@domina/doc';
 
@@ -90,6 +92,12 @@ export async function interceptFetch (event) {
   // 1. stylesheet plugin
   const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
   if (stylesheetResponse) return stylesheetResponse;
+
+  // 2. fonts. cached as responses, so the browser's font pipeline is untouched
+  //    and font-display / unicode-range keep working
+  const fontResponse = await aufbauPluginsWorker.interceptFetchFont(event);
+  if (fontResponse) return fontResponse;
+
   return null;
 }
 
@@ -109,8 +117,13 @@ const aufbau = {
   elements   : aufbauElements,
   import     : aufbauImport,
   shaders    : aufbauShaders,
+  store      : aufbauStore,
   stylesheet : aufbauStylesheet,
   utils      : aufbauUtils,
+
+  // storage engine. the aufbau presets above sit on this, but it is exposed raw
+  // too, so an app can open its own database or cache without a second dependency.
+  bunker,
 
   // adapters
   plugins : {
