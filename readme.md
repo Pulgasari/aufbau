@@ -28,6 +28,11 @@
 [@aufbau/svg](#aufbau-svg)
 [@aufbau/webfonts](#aufbau-webfonts)
 
+#### web
+
+- [https://pulgasari.github.io/aufbau/docs/](https://pulgasari.github.io/aufbau/docs/)
+- [https://pulgasari.github.io/aufbau/elements/](https://pulgasari.github.io/aufbau/elements/)
+
 ---
 
 # [@aufbau/kits](kits/readme.md)
