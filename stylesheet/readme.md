@@ -243,3 +243,66 @@ export default defineConfig({
   ]
 });
 ```
+
+---
+
+#
+
+# rendering without a flash
+
+Aufbau stylesheets are compiled in the browser, which means there is a window in
+which a page can be shown before its real styles are ready. Two paths close it, and
+they cover different gaps.
+
+## 1. service worker
+
+The strongest fix. A service worker answers the browser's own request for the
+stylesheet, so the `<link>` stays an ordinary render-blocking link and resolves from
+cache. No JavaScript on the critical path, and the compile is paid once instead of on
+every navigation.
+
+```javascript
+import aufbau from '@aufbau/kits';
+self.addEventListener('fetch', (event) => {
+  event.respondWith(aufbau.interceptFetch(event).then(response => response ?? fetch(event.request)));
+});
+```
+
+It covers fonts too — serving the `woff2` from cache leaves the browser's font
+pipeline untouched, so `font-display` and `unicode-range` keep working.
+
+It does *not* cover the very first visit (the worker has to install first), and it
+needs HTTPS or localhost.
+
+## 2. boot script
+
+Covers exactly that gap, and any browser without a worker.
+
+```html
+<head>
+  <script src="https://pulgasari.github.io/aufbau/boot.js"></script>
+  <link rel="stylesheet" href="./app.ass">
+</head>
+```
+
+It must come **first**, and it must stay a plain classic script — not `type=module`,
+not `defer`, not `async`. All three postpone execution past the parser, which is
+precisely the window being closed.
+
+`localStorage` is the only web storage API that can be read synchronously, which
+makes it the only one able to put styles on the page before the first paint. The
+script reads the CSS the previous visit compiled, injects it, and then neutralises
+the `<link>` it just pre-empted — otherwise that link would block rendering anyway
+and then overwrite the compiled rules with raw `.ass`.
+
+A changed stylesheet is written on revalidation but applied on the **next** load. A
+late swap reflows a page the reader is already looking at, which is usually worse
+than the wait it saves. `configure({ swap: 'immediate' })` on
+`@aufbau/plugins/client` opts into swapping in place.
+
+## fonts
+
+Storage is only half of it. The rest is CSS: `font-display: optional` avoids the swap
+flash outright, `<link rel=preload as=font crossorigin>` starts the download earlier,
+and `size-adjust` / `ascent-override` on the fallback face stop the metric jump when
+the real font arrives.
