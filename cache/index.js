@@ -2,13 +2,14 @@
 // @ts-self-types="./index.d.ts"
 
 /*
-  aufbau's caching preset. the engine is @bunker/cache; what belongs to aufbau is
-  the wiring — one indexeddb database, one namespace per concern — and the
-  stylesheet cache, which is the reason this package exists at all.
+  aufbau's caching preset. the engine is @bunker/cache; 
+  what belongs to aufbau is the wiring — 
+  one indexeddb database, one namespace per concern — 
+  and the stylesheet cache, which is the reason this package exists at all.
 */
 
-import { createCache } from '@bunker/cache';
-import { createDb } from '@bunker/db';
+import { createCache }           from '@bunker/cache';
+import { createDb }              from '@bunker/db';
 import { createLogger, hashKey } from '@aufbau/js';
 
 const NAMESPACE = 'aufbau';
