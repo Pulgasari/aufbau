@@ -2,6 +2,10 @@
   
 import { interceptFetch } from 'https://pulgasari.github.io/aufbau/kits/aufbau.js';    
 
+const div = document.createElement('div');
+div.textContent = `!!!sw!!!`;
+document.body.append(div);
+
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     (async () => {
