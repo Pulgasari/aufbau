@@ -324,3 +324,48 @@ Die alten Namen bleiben als Alias bestehen.
 - `is.constructor` lieferte den `Object`-Konstruktor, weil die Registry-Prüfung
   mit `in` die Prototypenkette mitlief.
 - `is.js` und `is2.js` waren zu 95 % derselbe Code.
+
+---
+
+# ready.js — die boot-schranke
+
+`gate()` und `ready()` sind der einzige ort, an dem aufbau "fertig" überhaupt
+ausspricht. vorher gab es kein signal: `observeStylesheets()` gibt `undefined`
+zurück, `processStylesheets()` warf jedes promise weg, das es erzeugte, und
+`aufbau.init()` resolved, lange bevor ein einziges stylesheet kompiliert ist.
+
+```javascript
+import { gate, ready, readyState } from '@aufbau/js';
+
+gate('app', ladeDaten());                       // promise oder thunk, benannt
+const report = await ready({ timeout: 8000 });
+// { ok: false, elapsed: 8001, timedOut: true,
+//   gates: { stylesheets: 'ok', elements: 'ok', app: 'pending' } }
+```
+
+Zwei Eigenschaften machen es sicher, einen Ladebildschirm daran zu hängen:
+
+- **`ready()` rejected nie.** Ein Gate, das wirft, wird geloggt und zählt als
+  erledigt.
+- **`ready()` hängt nie.** Die Deadline löst es so oder so auf.
+
+Der benannte Report ist der eigentliche Wert des Timeout-Pfads: er sagt, *woran*
+es hing, nicht bloss dass etwas hing.
+
+`minimum` hält die Auflösung zurück, damit das nicht jeder Aufrufer nachbaut.
+Gates, die nach dem Auflösen registriert werden, werden ignoriert — das ist eine
+einmalige Boot-Schranke, keine Task-Queue.
+
+| gate | registriert von | default |
+|---|---|---|
+| `stylesheets` | `@aufbau/plugins/client` | an |
+| `elements` | `@aufbau/elements` | an |
+| `fonts` | `@aufbau/kits`, über `configs.splash.fonts` | aus |
+
+## quiescent(set)
+
+Die Helper hinter den beiden Standard-Gates. Beide Arbeitsmengen werden von
+MutationObservern gefüttert, können sich also jederzeit wieder füllen. Ein
+`size === 0`-Test allein würde bei t=0 durchgehen, bevor der erste Eintrag
+überhaupt eingereiht war — `quiescent` wartet deshalb darauf, dass die Menge leer
+ist **und einen Frame lang leer bleibt**.
