@@ -138,15 +138,13 @@ async function applyDefs (elements, id, vars) {
  */
 export async function setPattern (target, id, options = {}) {
   const { mode = 'datauri', ...userVars } = options;
-  const elements = toElements(target);
-  if (elements.length === 0) return;
-
-  const meta = await metaFor(id);
-  const vars = resolveVars(meta, userVars);
+  const elements = toElements(target); if (elements.length === 0) return;
+  const meta     = await metaFor(id);
+  const vars     = resolveVars(meta, userVars);
 
   return mode === 'defs'
-    ? applyDefs(elements, id, vars)
-    : applyDataUri(elements, id, vars);
+    ? applyDefs    (elements, id, vars)
+    : applyDataUri (elements, id, vars);
 }
 
 /**
