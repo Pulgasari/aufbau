@@ -29,12 +29,10 @@ const STYLESHEET_PATTERN = new URLPattern({ pathname: '*\\.aufbau\\.css' });
  * @param {FetchEvent} event
  * @returns {Promise<Response>|null}
  */
-async function interceptFetchStylesheet (event) {
-  const request = event.request;
-  if (request.method !== 'GET') return null;
-  //if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
+async function interceptFetchStylesheet ({ request }) {
+  if (request.method !== 'GET')              return null;
   if (!STYLESHEET_PATTERN.test(request.url)) return null;
-
+  //if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
 
   try {
     return await stylesheetFiles.staleWhileRevalidate(request, {
