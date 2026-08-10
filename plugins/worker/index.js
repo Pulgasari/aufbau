@@ -1,7 +1,7 @@
 // @aufbau/plugins/worker
 
-import transform from '@aufbau/stylesheet';
-import { createFiles } from '@bunker/files';
+import transformStylesheet from '@aufbau/stylesheet';
+import { createFiles }     from '@bunker/files';
 
 const TARGET_EXTENSIONS   = ['.aufbau.css', '.ass'];
 const REGEX_TARGET_EXT    = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replace('.', '\\.')).join('|')})$`, 'i');
@@ -25,21 +25,22 @@ const FONT_TTL = 30 * 24 * 60 * 60 * 1000;
  * @param {FetchEvent} event
  * @returns {Promise<Response>|null}
  */
-export async function interceptFetchStylesheet (event) {
+async function interceptFetchStylesheet (event) {
   const request = event.request;
   if (request.method !== 'GET') return null;
   if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
 
   try {
     return await files.staleWhileRevalidate(request, {
-      transform : (source) => transform(source),
+      transform : (source) => transformStylesheet(source),
       ttl       : TTL,
       type      : 'text/css; charset=utf-8',
     });
   } catch (error) {
     // a cold cache plus a dead network. hand the request back so the browser can
     // fail it the way it normally would.
-    console.error('[@aufbau/plugins/worker] stylesheet fetch failed:', error);
+    errorLog ('stylesheet fetch failed', error);
+    //console.error('[@aufbau/plugins/worker] stylesheet fetch failed:', error);
     return null;
   }
 }
@@ -54,7 +55,7 @@ export async function interceptFetchStylesheet (event) {
  * @param {FetchEvent} event
  * @returns {Promise<Response>|null}
  */
-export async function interceptFetchFont (event) {
+async function interceptFetchFont (event) {
   const request = event.request;
   if (request.method !== 'GET') return null;
   if (!REGEX_FONT_EXT.test(new URL(request.url).pathname)) return null;
@@ -62,7 +63,8 @@ export async function interceptFetchFont (event) {
   try {
     return await fontFiles.staleWhileRevalidate(request, { ttl: FONT_TTL });
   } catch (error) {
-    console.error('[@aufbau/plugins/worker] font fetch failed:', error);
+    errorLog ('font fetch failed', error);
+    //console.error('[@aufbau/plugins/worker] font fetch failed:', error);
     return null;
   }
 }
@@ -72,8 +74,8 @@ export async function interceptFetchFont (event) {
  * @param {string} ass
  * @returns {string} Transformed CSS
  */
-export function parseStylesheetWorkerMessage (ass) {
-  return ass ? transform(ass) : '';
+function parseStylesheetWorkerMessage (ass) {
+  return ass ? transformStylesheet(ass) : '';
 }
 
 
@@ -85,7 +87,7 @@ export function parseStylesheetWorkerMessage (ass) {
  * @param {FetchEvent} event
  * @returns {Promise<Response|null>}
  */
-export async function interceptFetchModule (event) {
+async function interceptFetchModule (event) {
   const request = event.request;
 
   // Only intercept GET requests matching our module pattern
@@ -102,10 +104,17 @@ export async function interceptFetchModule (event) {
       if (networkResponse.ok) cache.put(request, networkResponse.clone());
       return networkResponse;
     } 
-    catch (error) { console.error('Failed to fetch JS module:', error); }
+    //catch (error) { console.error('Failed to fetch JS module:', error); }
+    catch (error) { errorLog('JS module fetch failed', error); }
   }
 
   return null;
+}
+
+// :::::: HELPERS
+
+function errorLog (message, error) {
+  console.error(`[@aufbau/plugins/worker] ${message}:`, error);
 }
 
 // :::::: EXPORTS
@@ -117,5 +126,7 @@ export {
 
   interceptFetchFont,
   interceptFetchModule,
-  interceptFetchStylesheet.
+  interceptFetchStylesheet,
+  
+  parseStylesheetWorkerMessage,
 };
