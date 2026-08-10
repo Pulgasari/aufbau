@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" href="data:," />
+<title>aufbau splash</title>
+
+<!-- classic and blocking, first. data-splash is what injects the overlay css. -->
+<script src="../boot.js" data-splash></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "@aufbau/elements"  : "../elements/index.js",
+    "@aufbau/elements/" : "../elements/",
+    "@aufbau/js"        : "../js/index.js",
+    "@aufbau/store"     : "../store/index.js",
+    "@aufbau/utils"     : "../js/index.js",
+
+    "@bunker/core"    : "/bunker/core/index.js",
+    "@bunker/storage" : "/bunker/storage/index.js",
+
+    "@domina/core"  : "/domina/core/index.js",
+    "@domina/core/" : "/domina/core/"
+  }
+}
+</script>
+</head>
+
+<body>
+  <aufbau-splash role="status" aria-live="polite">lädt…</aufbau-splash>
+
+  <div id="app"><h1>app</h1></div>
+
+  <script>
+    /*
+      classic, so it runs while the parser is still here — the overlay is tuned
+      before it can have finished its reveal delay. every knob is a query param so
+      one page covers the slow, fast, failsafe and timeout cases.
+    */
+    const params = new URLSearchParams(location.search);
+    const splash = document.querySelector('aufbau-splash');
+
+    for (const [key, property] of [
+      ['delay', '--aufbau-splash-delay'],
+      ['fade',  '--aufbau-splash-fade'],
+      ['limit', '--aufbau-splash-limit'],
+    ]) if (params.has(key)) splash.style.setProperty(property, params.get(key));
+
+    for (const name of ['minimum', 'timeout']) {
+      if (params.has(name)) splash.setAttribute(name, params.get(name));
+    }
+
+    window.__splash = { done: null, reveals: 0, timeout: null };
+
+    // the only honest "was it actually seen" signal, same one the component uses
+    splash.addEventListener('animationstart', (event) => {
+      if (event.animationName === 'aufbau-splash-reveal') window.__splash.reveals++;
+    });
+
+    window.addEventListener('aufbau-splash-done',    (event) => { window.__splash.done    = event.detail.state; });
+    window.addEventListener('aufbau-splash-timeout', (event) => { window.__splash.timeout = event.detail.gates; });
+
+    window.__opacity = () => getComputedStyle(splash).opacity;
+    window.__hidden  = () => getComputedStyle(splash).visibility === 'hidden';
+  </script>
+
+  <script type="module">
+    import { autoloader } from '@aufbau/elements';
+    import { gate, sleep } from '@aufbau/js';
+
+    const params = new URLSearchParams(location.search);
+
+    if (params.has('slow')) gate('app', sleep(Number(params.get('slow'))));
+    if (params.has('hang')) gate('app', new Promise(() => {}));
+
+    autoloader();
+    window.__booted = true;
+  </script>
+</body>
+</html>

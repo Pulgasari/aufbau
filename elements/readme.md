@@ -134,6 +134,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-slider>`](#aufbau-slider) ·
+[`<aufbau-splash>`](#aufbau-splash) ·
 [`<aufbau-table>`](#aufbau-table) ·
 [`<aufbau-toc>`](#aufbau-toc) ·
 [`<aufbau-toggle>`](#aufbau-toggle) ·
@@ -398,6 +399,106 @@ implementierung.
 <!-- die achse ist die zeit -->
 <aufbau-slider name="von" type="time" value="09:00" min="06:00" max="22:00"></aufbau-slider>
 ```
+
+## aufbau-splash
+
+der initiale ladebildschirm. deckt das fenster zwischen dem ersten paint und dem
+moment ab, in dem der modulgraph durch ist — auf einer seite ohne bundler mit
+abstand das längste.
+
+```html
+<head>
+  <script src="https://pulgasari.github.io/aufbau/boot.js" data-splash></script>
+  <script src="https://pulgasari.github.io/importmap.js"></script>
+  <link rel="stylesheet" href="./app.ass" />
+</head>
+
+<body>
+  <aufbau-splash role="status" aria-live="polite">lädt…</aufbau-splash>
+  <div id="app"></div>
+</body>
+```
+
+| attribut | default | |
+|---|---|---|
+| `minimum` | `400` | wie lange ein bereits sichtbarer splash mindestens stehen bleibt |
+| `timeout` | `8000` | wann aufgegeben wird. muss unter `--aufbau-splash-limit` bleiben |
+
+| custom property | default | |
+|---|---|---|
+| `--aufbau-splash-delay` | `180ms` | wartezeit vor dem einblenden |
+| `--aufbau-splash-fade`  | `160ms` | dauer von ein- und ausblenden |
+| `--aufbau-splash-limit` | `10s`   | wann die reine css-failsafe zuschlägt |
+| `--aufbau-splash-z`     | `200`   | |
+| `--aufbau-bg` / `--aufbau-fg` | `Canvas` / `CanvasText` | farben, fallen auf `--bg` / `--fg` und dann auf die systemfarben zurück |
+
+### wie es funktioniert
+
+das overlay wird **nicht** vom element gemalt. `<aufbau-splash>` ist bis zum
+upgrade ein gewöhnliches `HTMLElement`, und genau auf dieses upgrade wird ja
+gewartet. das css kommt deshalb aus `boot.js` — einem klassischen, blockierenden
+script, das ohnehin als erstes läuft — und das element entscheidet nur, *wann* das
+overlay wieder verschwindet.
+
+zwei dinge folgen daraus:
+
+- die regeln benutzen einen **unbedingten** selektor plus `data-state`, nicht
+  `:not(:defined)`. `adoptClassStyles()` adoptiert asynchron und `applySkin()` holt
+  den skin übers netz, ein umschalten am upgrade würde also jede regel eine
+  bildfolge vor ihrem nachfolger fallenlassen. deshalb bringt das element auch
+  bewusst **keine `static styles`** mit: die übergabe ist ein no-op.
+- `data-splash` ist opt-in. ohne das attribut injiziert `boot.js` nichts.
+
+### erscheint er überhaupt?
+
+das einblenden hat eine verzögerung von 180 ms. ist die app vorher fertig, wird
+der splash nie sichtbar und geht direkt auf `data-state="skipped"`. das ersetzt
+jede heuristik — insbesondere die naheliegende, am service worker zu erkennen, ob
+es eine lücke gibt: `@aufbau/plugins/worker` cached nur stylesheets und fonts, der
+modulgraph fällt durch. `serviceWorker.controller` sagt also nichts über den
+dominanten posten aus.
+
+### wenn nichts mehr geht
+
+nach `--aufbau-splash-limit` blendet eine reine css-animation das overlay aus,
+ganz ohne javascript. das ist keine politur: fällt der modulgraph aus, hängt sonst
+niemand je den ladebildschirm ab. läuft das element, gibt `ready()` schon nach
+`timeout` auf, schreibt den gate-report nach `console.error` und feuert
+`aufbau-splash-timeout` — laut, weil ein stiller splash aus einer sichtbar
+kaputten seite eine macht, die sich nur langsam anfühlt.
+
+### ohne boot.js
+
+wer `boot.js` nicht lädt, pastet dasselbe css in den `<head>`, vor das
+app-stylesheet — es ist derselbe text, der in `boot.js` als `SPLASH` steht.
+
+```html
+<style>
+:root aufbau-splash{position:fixed;inset:0;z-index:var(--aufbau-splash-z,200);display:grid;place-items:center;gap:1rem;
+background:var(--aufbau-bg,var(--bg,Canvas));color:var(--aufbau-fg,var(--fg,CanvasText));font:1rem/1 system-ui,sans-serif;opacity:0;
+animation:aufbau-splash-reveal var(--aufbau-splash-fade,160ms) ease var(--aufbau-splash-delay,180ms) both,
+aufbau-splash-failsafe 0s linear var(--aufbau-splash-limit,10s) forwards}
+:root aufbau-splash[data-state="done"]{animation:aufbau-splash-dismiss var(--aufbau-splash-fade,160ms) ease both;pointer-events:none}
+:root aufbau-splash[data-state="skipped"]{display:none}
+@keyframes aufbau-splash-reveal{to{opacity:1}}
+@keyframes aufbau-splash-dismiss{from{opacity:1}to{opacity:0;visibility:hidden}}
+@keyframes aufbau-splash-failsafe{to{opacity:0;visibility:hidden;pointer-events:none}}
+@media(prefers-reduced-motion:reduce){:root aufbau-splash{--aufbau-splash-fade:0s}}
+</style>
+```
+
+### grenzen
+
+- **nur der initiale load.** für routenwechsel in einer spa gehört
+  [`<aufbau-progress>`](#aufbau-progress) indeterminate hin, nicht der splash.
+- **muss direktes kind von `<body>` sein.** jeder vorfahr mit `transform`,
+  `filter`, `contain` oder `will-change` darauf macht aus `position: fixed` ein
+  fixed *relativ zu diesem vorfahren*. das element schiebt sich beim upgrade
+  selbst dorthin, aber vor dem upgrade kann es das nicht.
+- **kein fortschrittsbalken.** für einen importgraphen ohne bundler gibt es kein
+  ehrliches fortschrittssignal.
+- er kuriert ein symptom. `<link rel=modulepreload>` auf den kit-entry und der
+  gebündelte esm.sh-pfad verkürzen die lücke deutlich stärker.
 
 ## aufbau-table
 

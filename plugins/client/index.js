@@ -2,7 +2,7 @@
 
 import transform from '@aufbau/stylesheet';
 import { compileStylesheet } from '@aufbau/cache';
-import { createLogger } from '@aufbau/js';
+import { createLogger, gate, quiescent } from '@aufbau/js';
 import { pages, sheets } from '@aufbau/store';
 
 const EXTENSIONS = ['.aufbau.css', '.ass'];
@@ -10,6 +10,32 @@ const EXTENSIONS = ['.aufbau.css', '.ass'];
 const log = createLogger('aufbau-client');
 
 let observer = null;
+
+/*
+  the promises processStylesheetLink used to hand back into a forEach that dropped
+  them. the `stylesheets` gate is the only reason they are kept.
+*/
+const inflight = new Set;
+
+// a failed sheet is still a finished sheet as far as the barrier is concerned,
+// so what goes into the set never rejects
+function track (promise) {
+  const settled = Promise.resolve(promise).catch(() => {});
+  inflight.add(settled);
+  settled.then(() => inflight.delete(settled));
+  return promise;
+}
+
+/**
+ * Resolves once every aufbau stylesheet on the page has been compiled and swapped
+ * in — and stays that way for a frame, because the observer below can queue more
+ * at any time.
+ */
+export function stylesheetsReady () {
+  return quiescent(inflight).then(() => {
+    document.documentElement.dataset.aufbauStylesheets = 'ready';
+  });
+}
 
 /*
   what to do when a background revalidation finds that a stylesheet changed.
@@ -132,7 +158,7 @@ export function processStylesheetElement (node) {
 export function processStylesheets (ctx) {
   if (typeof window === 'undefined' || !window.document) return;
   ctx ??= document;
-  ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
+  ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(node => track(processStylesheetLink(node)));
   ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
 }
 
@@ -142,15 +168,17 @@ export function processStylesheets (ctx) {
 export function observeStylesheets () {
   if (typeof window === 'undefined' || !window.document || observer) return;
 
+  // synchronous, so `inflight` is populated before anyone can reach ready()
   processStylesheets();
+  gate('stylesheets', stylesheetsReady);
 
   observer = new MutationObserver ((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === 1) { // Node.ELEMENT_NODE
-             if (node.tagName === 'LINK')  processStylesheetLink    (node);
-        else if (node.tagName === 'STYLE') processStylesheetElement (node);
-        else if (node.querySelectorAll)    processStylesheets       (node);
+             if (node.tagName === 'LINK')  track(processStylesheetLink (node));
+        else if (node.tagName === 'STYLE') processStylesheetElement    (node);
+        else if (node.querySelectorAll)    processStylesheets          (node);
         }
       }
     }

@@ -51,12 +51,26 @@ const configs = {
   // 'all'   : eagerly register every element up front
   // false   : do not touch @aufbau/elements at all
   elements   : { mode: 'auto' },
+  // the initial loading screen, see <aufbau-splash>. fonts is off because
+  // document.fonts.ready can stall on a slow webfont host, and that is the last
+  // thing worth holding the whole app behind
+  splash     : { fonts: false },
   // observe <link>/<style> and transform aufbau stylesheets client-side
   stylesheet : true,
 };
 
 export function config (options = {}) {
-  deepMerge(configs.elements, options);
+  const { elements, splash, stylesheet, ...rest } = options;
+
+  const normalized = normalizeElements(elements);
+  if (normalized)               deepMerge(configs.elements, normalized);
+  if (splash)                   deepMerge(configs.splash, splash);
+  if (stylesheet !== undefined) configs.stylesheet = stylesheet;
+
+  // bare keys keep going to the element config, which is how this has always
+  // been called: config({ mode: 'all' }), config({ 'toast-duration': 2000 })
+  deepMerge(configs.elements, rest);
+
   syncElementConfig(); // also runs on calls after boot, so config() stays live
   return configs;
 }
@@ -75,10 +89,15 @@ export async function init (options = {}) {
   if (typeof window === 'undefined' || initialized) return aufbau;
   initialized = true;
 
+  // both of these register their own ready() gate, and both do their first pass
+  // synchronously — so the gates are populated before <aufbau-splash> can await
   if (configs.stylesheet) aufbauPluginsClient.observeStylesheets();
-  
+
        if (configs.elements.mode === 'auto')      aufbauElements.autoloader();
   else if (configs.elements.mode === 'all') await aufbauElements.registerAll();
+
+  if (configs.splash.fonts) aufbauUtils.gate('fonts', domina.fontsReady);
+
   return aufbau;
 }
 
@@ -107,6 +126,11 @@ const aufbau = {
   // config + runtime
   config, configs,
   init, interceptFetch,
+
+  // the boot barrier <aufbau-splash> waits on. also useful on its own: gate() any
+  // promise the app must not be declared ready without
+  gate  : aufbauUtils.gate,
+  ready : aufbauUtils.ready,
 
   // dom bridge (see ./dom.js, candidate for @aufbau/utils)
   dom: domina,

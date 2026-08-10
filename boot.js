@@ -22,6 +22,58 @@ import it — a classic script has no imports — so the two are kept in step by
   const PAGES  = 'aufbau:pages:v1:';
   const SHEETS = 'aufbau:sheets:v1:';
 
+  // document.currentScript is only readable while this script is executing
+  const script = document.currentScript;
+
+  /*
+    the splash overlay, opt in with `data-splash` on the script tag. this css IS
+    the mechanism — <aufbau-splash> in @aufbau/elements only decides when it goes,
+    and it cannot decide anything until the module graph it covers has landed.
+
+    reveal carries `both`, so it back-fills opacity: 0 through its delay: a boot
+    that finishes inside those 180ms never shows the splash. failsafe carries
+    `forwards` only, so it contributes nothing until it fills, then wins by being
+    later in the list — the escape hatch for a graph that never lands at all.
+    data-state="done" replaces the list and cancels the failsafe with it, so the
+    component's timeout MUST stay below --aufbau-splash-limit.
+
+    keyframes are declared here and namespaced: @aufbau/css/animations.css hangs
+    off an @import in index.css and is unreachable this early.
+  */
+  const SPLASH = `
+:root aufbau-splash{position:fixed;inset:0;z-index:var(--aufbau-splash-z,200);display:grid;place-items:center;gap:1rem;
+background:var(--aufbau-bg,var(--bg,Canvas));color:var(--aufbau-fg,var(--fg,CanvasText));font:1rem/1 system-ui,sans-serif;opacity:0;
+animation:aufbau-splash-reveal var(--aufbau-splash-fade,160ms) ease var(--aufbau-splash-delay,180ms) both,
+aufbau-splash-failsafe 0s linear var(--aufbau-splash-limit,10s) forwards}
+:root aufbau-splash[data-state="done"]{animation:aufbau-splash-dismiss var(--aufbau-splash-fade,160ms) ease both;pointer-events:none}
+:root aufbau-splash[data-state="skipped"]{display:none}
+@keyframes aufbau-splash-reveal{to{opacity:1}}
+@keyframes aufbau-splash-dismiss{from{opacity:1}to{opacity:0;visibility:hidden}}
+@keyframes aufbau-splash-failsafe{to{opacity:0;visibility:hidden;pointer-events:none}}
+@media(prefers-reduced-motion:reduce){:root aufbau-splash{--aufbau-splash-fade:0s}}`;
+
+  /*
+    deliberately ahead of the storage block and in its own try/catch: that block
+    returns early without a manifest (a cold visit) and can throw outright in
+    private mode, and both are exactly when the splash is wanted. it reads nothing
+    below <head>, issues no request, and emits one node under a THIRD attribute —
+    so the data-aufbau-boot / data-aufbau-src assertions in test/flicker.test.mjs
+    are untouched. landing before the cached sheets is fine, the `:root` prefix
+    carries the specificity and a custom property defined later still resolves.
+  */
+  try {
+    if (script && script.dataset.splash !== undefined) {
+      const head  = document.head || document.getElementsByTagName('head')[0];
+      const style = document.createElement('style');
+
+      style.setAttribute('data-aufbau-splash', '');
+      style.textContent = SPLASH;
+      if (head) head.appendChild(style);
+    }
+  } catch (error) {
+    // a splash is a nicety. never let it cost the page.
+  }
+
   // everything here is best effort. a boot script that throws would take the page
   // down over a cache miss, which is a far worse outcome than a moment of flicker.
   try {

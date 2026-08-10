@@ -5,7 +5,8 @@
   "type"        : "module",
   "private"     : true,
   "scripts": {
-    "test:flicker": "node test/flicker.test.mjs"
+    "test:flicker": "node test/flicker.test.mjs",
+    "test:splash": "node test/splash.test.mjs"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

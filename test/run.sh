@@ -6,3 +6,4 @@ cd "$(dirname "$0")/.."
 
 node test/flicker.test.mjs
 node test/persist.test.mjs
+node test/splash.test.mjs
