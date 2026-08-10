@@ -34,16 +34,11 @@ async function interceptFetchStylesheet (event) {
   try {
     return await stylesheetFiles.staleWhileRevalidate(request, {
       transform : (source) => transformStylesheet(source),
-      ttl       : TTL_STYLESHEET,
-      type      : 'text/css; charset=utf-8',
+      ttl  : TTL_STYLESHEET,
+      type : 'text/css; charset=utf-8',
     });
-  } catch (error) {
-    // a cold cache plus a dead network. hand the request back so the browser can
-    // fail it the way it normally would.
-    errorLog ('stylesheet fetch failed', error);
-    //console.error('[@aufbau/plugins/worker] stylesheet fetch failed:', error);
-    return null;
   }
+  catch (e) { errorLog ('stylesheet fetch failed', e); return null; }
 }
 
 /**
