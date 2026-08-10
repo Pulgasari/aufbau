@@ -27,9 +27,10 @@ svg {
 
 
 body {
-  aufbau-webfont : 'Noto Serif';
   aufbau-colors  : aufbau;
+  aufbau-webfont : 'Manrope';
   /*
+  aufbau-webfont : 'Noto Serif';
   aufbau-webfont : 'Hubot Sans';
   aufbau-pattern : stripes rotate(45deg) colors(soviet) animate(slide 4s infinite);    
   */
