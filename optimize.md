@@ -34,3 +34,19 @@ self.addEventListener('fetch', (event) => {
   );
 });
 ```
+
+# Infos
+
+## Caching-Strategien
+
+### ​Cache-First (Stale-Never)
+
+Der Service Worker fängt jede Netzwerkanfrage ab. Er prüft im CacheStorage des Browsers, ob das Modul vorliegt. Ist es da, wird es direkt vom lokalen Speicher zugestellt – die Netzwerkanfrage an den Server wird komplett unterdrückt (0 ms Netzwerk-Latenz). Dies ist ideal für unveränderliche Versionen oder Vendor-Module.
+
+### ​Network-First
+
+Der Service Worker versucht zuerst, die neueste Modulversion vom Server zu holen. Gelingt dies (z. B. online), aktualisiert er den Cache und liefert die Datei aus. Schlägt die Anfrage fehl (offline oder schlechtes Netz), greift er auf den lokalen Cache als Fallback zurück.
+
+### ​Stale-While-Revalidate
+
+Das Modul wird sofort aus dem Cache an die Anwendung geliefert (schnellstmögliche Ladezeit). Gleichzeitig sendet der Service Worker im Hintergrund eine Netzwerkanfrage, um den Cache für den nächsten Seitenaufruf zu aktualisieren.
