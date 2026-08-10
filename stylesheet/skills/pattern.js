@@ -1,68 +1,47 @@
 // @aufbau/stylesheet/skills/pattern.js
 
-import * as patterns from '@aufbau/patterns';
+import { encodeSvg } from '@aufbau/js';
+
+// fallbacks mirror the var() defaults baked into svg/patterns/*.svg. kept here so
+// a token omitted in the ass source still resolves without touching the svg.
+const FALLBACKS = { bg: 'transparent', fg: 'currentColor', rotate: '0' };
+
+const REGEX_TOKEN   = /^([a-z-]+)\(([^)]*)\)$/i;
+const REGEX_SVG_VAR = /var\(\s*--aufbau-pattern-([\w-]+)\s*(?:,[^)]*)?\)/g;
 
 /**
- * Transforms aufbau-pattern declarations into SVG background images and CSS animations.
+ * turns `aufbau-pattern: dots bg(green) fg(yellow) rotate(30)` into a static,
+ * self-contained background-image data-uri.
+ *
+ * the raw svgs are loaded by an async pre-pass in ../index.js and handed in via
+ * tokens.patternSvgs — this function stays synchronous, like transformIcons.
+ *
+ * @param {string} rawVal the declaration value (property name already stripped)
+ * @param {Object} tokens pipeline tokens; reads tokens.color and tokens.patternSvgs
  */
-export function transformPattern (rawVal, tokens = {}) {
-  if (!rawVal) return '';
+export function transformPattern (rawVal, tokens) {
+  const parts = rawVal.trim().split(/\s+/);
+  const id    = parts.shift();
 
-  // 1. Extract rotate(...)
-  let rotate = 0;
-  const rotateMatch = rawVal.match(/rotate\s*\(\s*(-?\d+)(?:deg)?\s*\)/i);
-  if (rotateMatch) rotate = parseInt(rotateMatch[1], 10);
+  const raw = tokens?.patternSvgs?.[id];
+  // unknown id or svg not preloaded: leave the declaration untouched so a missing
+  // asset is visible in the output rather than silently dropped.
+  if (!raw) return `aufbau-pattern: ${rawVal};`;
 
-  // 2. Extract colors(...)
-  let bg = 'transparent';
-  let fg = 'currentColor';
-  const colorsMatch = rawVal.match(/colors\s*\(\s*([^)]+)\s*\)/i);
-
-  if (colorsMatch) {
-    const colorArgs = colorsMatch[1].trim().split(/\s+/);
-
-    if (colorArgs.length === 1) {
-      // Check for token pair reference (e.g., colors(dark))
-      const tokenPair = tokens.colors?.[colorArgs[0]];
-      if (tokenPair) {
-        bg = tokenPair.bg;
-        fg = tokenPair.fg;
-      } else {
-        fg = colorArgs[0];
-      }
-    } else if (colorArgs.length >= 2) {
-      bg = colorArgs[0];
-      fg = colorArgs[1];
-    }
+  const vars = { ...FALLBACKS };
+  for (const part of parts) {
+    const m = part.match(REGEX_TOKEN);
+    if (!m) continue;
+    const [, key, val] = m;
+    // colour tokens resolve through @aufbau color, exactly like aufbau-icon.
+    vars[key] = tokens?.color?.[val] ?? val;
   }
 
-  // 3. Extract animate(...)
-  let animationRule = '';
-  const animMatch = rawVal.match(/animate\s*\(\s*([^)]+)\s*\)/i);
+  const svg = raw.replace(REGEX_SVG_VAR, (whole, key) =>
+    key in vars ? String(vars[key]) : whole
+  );
 
-  if (animMatch) {
-    const animArgs = animMatch[1].trim().split(/\s+/);
-    const animName = animArgs[0];
-    const animRest = animArgs.slice(1).join(' ') || '3s linear infinite';
-    const keyframeName = animName.startsWith('aufbau-') ? animName : `aufbau-pattern-${animName}`;
-
-    animationRule = ` animation: ${keyframeName} ${animRest};`;
-  }
-
-  // 4. Extract pattern name by stripping function syntax
-  const cleanedName = rawVal
-    .replace(/rotate\s*\([^)]*\)/gi, '')
-    .replace(/colors\s*\([^)]*\)/gi, '')
-    .replace(/animate\s*\([^)]*\)/gi, '')
-    .trim();
-
-  const patternName = cleanedName.split(/\s+/)[0];
-  const generator   = patterns[patternName];
-
-  if (!generator) return `/* Unknown pattern: ${patternName} */`;
-
-  const svgDataUri = generator({ bg, fg, rotate });
-  return `background-image: url('${svgDataUri}'); background-repeat: repeat;${animationRule}`;
+  return `background-image: url("${encodeSvg(svg)}");`;
 }
 
 export default transformPattern;
