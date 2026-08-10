@@ -15,6 +15,35 @@ import transformUnset    from './skills/unset.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
 
+// oben ergänzen:
+import { patternImage } from '@aufbau/patterns';
+import { parsePattern } from './skills/pattern.js';
+
+const REGEX_PATTERN_USAGE = /aufbau-pattern:\s*([^;}\n]+);?/g;
+
+/**
+ * async pre-pass: for every distinct aufbau-pattern declaration, build its
+ * data-uri up front. the synchronous pipeline then only looks results up.
+ * keyed by the trimmed raw value so the sync transform matches without reparsing.
+ */
+async function buildPatternImages (code, tokens) {
+  const seen = new Map(); // rawVal -> { id, options }
+  for (const m of code.matchAll(REGEX_PATTERN_USAGE)) {
+    const rawVal = m[1].trim();
+    if (!seen.has(rawVal)) seen.set(rawVal, parsePattern(rawVal, tokens));
+  }
+
+  const images = {};
+  await Promise.all([...seen].map(async ([rawVal, { id, options }]) => {
+    try {
+      images[rawVal] = await patternImage(id, options);
+    } catch {
+      // leave unresolved; transformPattern falls back to the untouched declaration
+    }
+  }));
+  return images;
+}
+
 // const unique = [...new Set(array)];
 // const unique = Array.from(new Set(array));
 function mergeUnique (...arrays) {
@@ -145,9 +174,12 @@ export default function transform (code) {
 
   // Level 1: Fast Cache-Hit Check (0ms)
   const cacheKey = fastHash(code);
-  if (TRANSFORM_CACHE.has(cacheKey)) {
-    return TRANSFORM_CACHE.get(cacheKey);
-  }
+  if (TRANSFORM_CACHE.has(cacheKey)) return TRANSFORM_CACHE.get(cacheKey);
+
+  // tokens are needed by the pattern pre-pass (colour resolution), so extract
+  // once here; runPipeline receives them and skips re-extracting.
+  const { tokens } = extractTokens(code);
+  tokens.patternImages = await buildPatternImages(code, tokens);
 
   // Cache Miss: Perform Pipeline
   const result = runPipeline(code);
