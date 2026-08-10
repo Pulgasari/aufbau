@@ -82,12 +82,10 @@ function inlineVars (svg, vars) {
 }
 
 async function applyDataUri (elements, id, vars) {
-  const raw   = await loadRaw(id);
-  const svg   = inlineVars(raw, vars);
-  const image = `url("${encodeSvg(svg)}")`;
+  const image = `url("${encodeSvg(inlineVars(await loadRaw(id), vars))}")`;
   for (const el of elements) {
     el.style.backgroundImage = image;
-    el.dataset.aufbauPattern = id; // marker for removePattern
+    el.dataset.aufbauPattern = id;
   }
 }
 
