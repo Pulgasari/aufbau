@@ -122,7 +122,7 @@ function transformSmartProperties (code, tokens) {
 /**
  * Pipeline Execution Function
  */
-function runPipeline (code) {
+function runPipeline (code, pretokens) {
   // 0. Config-Verarbeitung (@aufbau-config)
   const { code: step0, imports: configImports, charset, fontRules } = transformConfig(code);
 
@@ -194,7 +194,7 @@ export default async function transform (code) {
   tokens.filterIds     = await injectFilterDefs(code);
 
   // Cache Miss: Perform Pipeline
-  const result = runPipeline(code);
+  const result = runPipeline(code, tokens);
 
   // Maintain max cache size (LRU eviction)
   if (TRANSFORM_CACHE.size >= MAX_CACHE_SIZE) {
