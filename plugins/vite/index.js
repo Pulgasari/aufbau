@@ -21,3 +21,17 @@ export function aufbauStylesheet () {
     }
   };
 }
+
+// plugins/vite/index.js
+export default function aufbauPreloadPlugin() {
+  return {
+    name: 'aufbau-modulepreload',
+    transformIndexHtml(html, ctx) {
+      // Inject modulepreload links for core modules dynamically
+      return html.replace(
+        '</head>',
+        '  <link rel="modulepreload" href="/kits/aufbau.js">\n</head>'
+      );
+    }
+  };
+}
