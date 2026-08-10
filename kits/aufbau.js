@@ -117,6 +117,10 @@ export async function interceptFetch (event) {
   const fontResponse = await aufbauPluginsWorker.interceptFetchFont(event);
   if (fontResponse) return fontResponse;
 
+  // 3. JS modules & CDN assets (Runtime Caching)
+  const moduleResponse = await aufbauPluginsWorker.interceptFetchModule(event);
+  if (moduleResponse) return moduleResponse;
+
   return null;
 }
 
