@@ -124,7 +124,14 @@ function runPipeline (code) {
   });
   
   // 1. Extract @aufbau blocks and generate tokens
-  const { tokens, code: step1 } = extractTokens(step0c);
+  // const { tokens, code: step1 } = extractTokens(step0c);
+
+  // 1. tokens: reuse the ones from transform() if given, else extract now.
+  //    the code still needs the @aufbau blocks stripped either way.
+  const extracted = extractTokens(step0c);
+  const tokens    = pretokens ?? extracted.tokens;
+  if (pretokens) pretokens.patternImages ??= {}; // safety if called directly
+  const step1 = extracted.code;
 
   // 1b. Process traits (@aufbau-trait & aufbau-use)
   const step1b = transformTraits(step1);
