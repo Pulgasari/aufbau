@@ -32,7 +32,7 @@ async function metaFor (id) {
 
 // raw svg strings, cached per id. used by both modes: data-uri substitutes into
 // the string, defs parses it into a live node.
-const rawCache = new Map();
+const rawCache = new Map;
 
 function loadRaw (id) {
   if (!rawCache.has(id)) {
@@ -171,4 +171,17 @@ export async function list () {
   return [...(await loadMeta()).values()];
 }
 
-export default { setPattern, removePattern, list };
+// baut den fertigen url("data:...")-string für ein pattern. kein dom.
+// setPattern nutzt das intern, der stylesheet-skill nutzt es auch.
+export async function patternImage (id, options = {}) {
+  const meta = await metaFor(id);
+  const vars = resolveVars(meta, options);
+  const raw  = await loadRaw(id);
+  return `url("${encodeSvg(inlineVars(raw, vars))}")`;
+}
+
+export default { 
+  setPattern, 
+  removePattern, 
+  list,
+};
