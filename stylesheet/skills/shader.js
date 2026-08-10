@@ -1,6 +1,6 @@
 // @aufbau/stylesheet/skills/shader.js
 
-import { presets } from '@aufbau/shaders';
+import { presets } from '@aufbau/filters';
 
 /**
  * Encodes an SVG string safely into a Data URI for inline CSS usage.
