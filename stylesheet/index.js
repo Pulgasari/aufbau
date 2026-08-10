@@ -5,18 +5,20 @@ import { observeDom }    from './plugins/client.js';
 import transformCenter   from './skills/center.js';
 import transformConfig   from './skills/config.js';
 import transformDirty    from './skills/dirty.js';
+import transformFilter   from './skills/filter.js';
 import transformIcons    from './skills/icon.js';
 import transformLayouts  from './skills/layout.js';
 import transformMedia    from './skills/media.js';
 import transformPattern  from './skills/pattern.js';
-import transformShader   from './skills/shader.js';
 import transformTraits   from './skills/trait.js';
 import transformUnset    from './skills/unset.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
 import { patternImage } from '@aufbau/patterns';
 import { parsePattern } from './skills/pattern.js';
+import { ensureFilter } from '@aufbau/filters';
 
+const REGEX_FILTER_USAGE  = /aufbau-filter:\s*([a-z0-9-]+)/gi;
 const REGEX_PATTERN_USAGE = /aufbau-pattern:\s*([^;}\n]+);?/g;
 
 /**
@@ -37,6 +39,27 @@ async function buildPatternImages (code, tokens) {
     catch {} // leave unresolved; transformPattern falls back to the untouched declaration
   }));
   return images;
+}
+
+/**
+ * async pre-pass: inject the <filter> defs for every filter referenced in the
+ * source, so the compiled `filter: url(#id)` resolves. returns the set of ids
+ * whose defs are present, which the sync transform checks before emitting.
+ */
+async function injectFilterDefs (code) {
+  const ids = new Set();
+  for (const m of code.matchAll(REGEX_FILTER_USAGE)) ids.add(m[1]);
+
+  const ready = new Set();
+  await Promise.all([...ids].map(async id => {
+    try {
+      await ensureFilter(id);
+      ready.add(id);
+    } catch {
+      // leave out; transformFilter falls back to the untouched declaration
+    }
+  }));
+  return ready;
 }
 
 // const unique = [...new Set(array)];
@@ -79,8 +102,8 @@ function transformSmartProperties (code, tokens) {
       case 'aufbau-grid'    : return transformGrid    (rawVal, tokens);
       case 'aufbau-center'  : return transformCenter  (rawVal);
       case 'aufbau-icon'    : return transformIcons   (rawVal, tokens);
+      case 'aufbau-filter'  : return transformFilter  (rawVal, tokens);
       case 'aufbau-pattern' : return transformPattern (rawVal, tokens);
-      case 'aufbau-shader'  : return transformShader  (fullMatch);
       case 'aufbau-colors'  : {
         const parts      = rawVal.trim().split(/\s+/);
         const pairName   = parts[0];
@@ -168,6 +191,7 @@ export default async function transform (code) {
   // once here; runPipeline receives them and skips re-extracting.
   const { tokens } = extractTokens(code);
   tokens.patternImages = await buildPatternImages(code, tokens);
+  tokens.filterIds     = await injectFilterDefs(code);
 
   // Cache Miss: Perform Pipeline
   const result = runPipeline(code);
