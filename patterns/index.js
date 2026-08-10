@@ -157,18 +157,12 @@ export async function setPattern (target, id, options = {}) {
  */
 export function removePattern (target) {
   for (const el of toElements(target)) {
-    const id = el.dataset.aufbauPattern;
     el.style.removeProperty('background-image');
-    if (id) {
-      for (const key of Object.keys(el.style)) {
-        // defensive: only touch our own props
-      }
-      // custom props are not enumerable via el.style keys reliably; clear known ones
-      for (const prop of [...el.style].filter(p => p.startsWith(PROP_PREFIX))) {
-        el.style.removeProperty(prop);
-      }
-      delete el.dataset.aufbauPattern;
+    // [...el.style] enumerates the inline-set properties, custom props included.
+    for (const prop of [...el.style].filter(p => p.startsWith(PROP_PREFIX))) {
+      el.style.removeProperty(prop);
     }
+    delete el.dataset.aufbauPattern;
   }
 }
 
