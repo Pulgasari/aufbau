@@ -300,6 +300,26 @@ late swap reflows a page the reader is already looking at, which is usually wors
 than the wait it saves. `configure({ swap: 'immediate' })` on
 `@aufbau/plugins/client` opts into swapping in place.
 
+## 3. the loading screen
+
+The two paths above close the window in which a page is shown *unstyled*. They do
+nothing about the one in which it is shown *empty* — the module graph still has to
+arrive, and without a bundler that is by far the longest wait on the page.
+
+`<aufbau-splash>` covers that one. It is the same trick one layer up: a blocking
+classic script puts the overlay on the page before anything else can, and the
+component only decides when it goes away.
+
+```html
+<script src="https://pulgasari.github.io/aufbau/boot.js" data-splash></script>
+...
+<aufbau-splash role="status" aria-live="polite">lädt…</aufbau-splash>
+```
+
+It reveals after a short delay, so a boot that beats the delay never shows it at
+all, and it clears itself from pure CSS if the module graph never lands. See
+[`@aufbau/elements`](../elements/readme.md#aufbau-splash).
+
 ## fonts
 
 Storage is only half of it. The rest is CSS: `font-display: optional` avoids the swap

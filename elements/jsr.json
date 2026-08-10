@@ -18,6 +18,7 @@
     "./AufbauProgress" : "./AufbauProgress.js",
     "./AufbauReader"   : "./AufbauReader.js",
     "./AufbauSlider"   : "./AufbauSlider.js",
+    "./AufbauSplash"   : "./AufbauSplash.js",
     "./AufbauTable"    : "./AufbauTable.js",
     "./AufbauToast"    : "./AufbauToast.js",
     "./AufbauToc"      : "./AufbauToc.js",
