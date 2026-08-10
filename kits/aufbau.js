@@ -9,10 +9,10 @@ every framework-kit builds on top of this file.
 // ::: AUFBAU
 import      aufbauCache         from '@aufbau/cache';
 import * as aufbauElements      from '@aufbau/elements';
+import * as aufbauFilters       from '@aufbau/filters';
 import      aufbauImport        from '@aufbau/import';
 import * as aufbauPluginsClient from '@aufbau/plugins/client';
 import * as aufbauPluginsWorker from '@aufbau/plugins/worker';
-import * as aufbauShaders       from '@aufbau/shaders';
 import * as aufbauStore         from '@aufbau/store';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
@@ -115,8 +115,8 @@ const aufbau = {
   // packages
   cache      : aufbauCache,
   elements   : aufbauElements,
+  filters    : aufbauFilters,
   import     : aufbauImport,
-  shaders    : aufbauShaders,
   store      : aufbauStore,
   stylesheet : aufbauStylesheet,
   utils      : aufbauUtils,
