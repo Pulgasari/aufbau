@@ -14,8 +14,6 @@ import transformTraits   from './skills/trait.js';
 import transformUnset    from './skills/unset.js';
 import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid } from './skills/layout.js';
-
-// oben ergänzen:
 import { patternImage } from '@aufbau/patterns';
 import { parsePattern } from './skills/pattern.js';
 
@@ -27,7 +25,7 @@ const REGEX_PATTERN_USAGE = /aufbau-pattern:\s*([^;}\n]+);?/g;
  * keyed by the trimmed raw value so the sync transform matches without reparsing.
  */
 async function buildPatternImages (code, tokens) {
-  const seen = new Map(); // rawVal -> { id, options }
+  const seen = new Map; // rawVal -> { id, options }
   for (const m of code.matchAll(REGEX_PATTERN_USAGE)) {
     const rawVal = m[1].trim();
     if (!seen.has(rawVal)) seen.set(rawVal, parsePattern(rawVal, tokens));
@@ -35,11 +33,8 @@ async function buildPatternImages (code, tokens) {
 
   const images = {};
   await Promise.all([...seen].map(async ([rawVal, { id, options }]) => {
-    try {
-      images[rawVal] = await patternImage(id, options);
-    } catch {
-      // leave unresolved; transformPattern falls back to the untouched declaration
-    }
+    try   { images[rawVal] = await patternImage(id, options); }
+    catch {} // leave unresolved; transformPattern falls back to the untouched declaration
   }));
   return images;
 }
@@ -63,7 +58,7 @@ const REGEX_AUFBAU_PROPERTIES = /(aufbau-[a-z-]+)\s*:\s*([^;}\n]+);?/g;
 
 // :::::: cache
 
-const TRANSFORM_CACHE = new Map();
+const TRANSFORM_CACHE = new Map;
 const MAX_CACHE_SIZE  = 500;
 
 function fastHash (str) {
@@ -157,20 +152,6 @@ function runPipeline (code) {
   }
   if (charset) prefix += `${charset}\n\n`;
   return `${prefix}${result}`.trim();
-
-  /*
-  // 6. Header Zusammensetzung (@import & @charset)
-  const allImports = [...configImports];
-  if (webfontImports.length > 0) {
-    for (const url of webfontImports) {
-      allImports.push(`@import url("${url}");`);
-    }
-  }
-  let prefix = '';
-  if (allImports.length > 0) prefix += `${allImports.join('\n')}\n\n`;
-  if (charset)               prefix += `${charset}\n\n`;
-  return `${prefix}${result}`.trim();
-  */
 }
 
 /**
@@ -200,35 +181,3 @@ export default function transform (code) {
   TRANSFORM_CACHE.set(cacheKey, result);
   return result;
 }
-
-
-/**
- * Helper: Registriert den Service Worker für .aufbau.css / .ass Dateien
- */
-/*
-export async function registerServiceWorker (swPath = '/aufbau-worker.js') {
-  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.register(swPath, { scope: '/' });
-      console.log('[Aufbau] Service Worker aktiv mit Scope:', reg.scope);
-    } catch (err) {
-      console.error('[Aufbau] Service Worker Registrierung fehlgeschlagen:', err);
-    }
-  }
-}
-*/
-
-/**
- * Helper: Startet die vollständige Browser-Runtime (Client Observer + Worker)
- */
-/*
-export function initBrowser (options = {}) {
-  if (typeof window === 'undefined') return;
-
-  // DOM Observer für <style type="text/aufbau">
-  observeDom();
-
-  // Service Worker optional mit-registrieren
-  if (options.useWorker) registerServiceWorker(options.workerPath);
-}
-*/
