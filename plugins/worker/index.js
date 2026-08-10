@@ -107,7 +107,6 @@ function errorLog (message, error) {
 // :::::: EXPORTS
 
 export { 
-  files: stylesheetFiles, 
   fontFiles,
   stylesheetFiles,
 
