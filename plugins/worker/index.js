@@ -54,8 +54,7 @@ async function interceptFetchStylesheet ({ request }) {
  * @param {FetchEvent} event
  * @returns {Promise<Response>|null}
  */
-async function interceptFetchFont (event) {
-  const request = event.request;
+async function interceptFetchFont ({ request }) {
   if (request.method !== 'GET') return null;
   if (!REGEX_FONT_EXT.test(new URL(request.url).pathname)) return null;
 
@@ -77,9 +76,7 @@ function parseStylesheetWorkerMessage (ass) {
  * @param {FetchEvent} event
  * @returns {Promise<Response|null>}
  */
-async function interceptFetchModule (event) {
-  const request = event.request;
-
+async function interceptFetchModule ({ request }) {
   // Only intercept GET requests matching our module pattern
   if (request.method === 'GET' && REGEX_AUFBAU_MODULE.test(request.url)) {
     const cache          = await caches.open(MODULE_CACHE_NAME);
