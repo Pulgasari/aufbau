@@ -8,6 +8,8 @@ defer
 caching
 ```
 
+# Snippets for Service Workers
+
 ```javascript
 // docs/sw.js
 const CACHE_NAME = 'aufbau-cache-v1';
@@ -32,6 +34,42 @@ self.addEventListener('fetch', (event) => {
       return cachedResponse || fetch(event.request);
     })
   );
+});
+```
+
+```javascript
+// sw.js - Service Worker in the consuming application
+const CACHE_NAME = 'aufbau-cdn-cache-v1';
+
+// Match URLs from CDNs or specific library paths
+const CDN_PATTERN = /^https:\/\/(cdn\.jsdelivr\.net|esm\.sh|unpkg\.com)\/.*aufbau.*/;
+
+self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
+  // Intercept requests matching the CDN pattern
+  if (CDN_PATTERN.test(url)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        // 1. try to get module from cache
+        const cachedResponse = await cache.match(event.request);
+        if (cachedResponse) return cachedResponse;
+
+        // 2. fetch from CDN if not cached yet
+        try {
+          const networkResponse = await fetch(event.request);
+          // cache the fetched CDN module for future requests
+          if (networkResponse.status === 200) {
+            cache.put(event.request, networkResponse.clone());
+          }
+          return networkResponse;
+        } catch (error) {
+          console.error('Failed to fetch module from CDN:', error);
+          throw error;
+        }
+      })
+    );
+  }
 });
 ```
 
