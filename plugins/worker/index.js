@@ -3,25 +3,22 @@
 import transform from '@aufbau/stylesheet';
 import { createFiles } from '@bunker/files';
 
-const TARGET_EXTENSIONS = ['.aufbau.css', '.ass'];
-const REGEX_TARGET_EXT  = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replace('.', '\\.')).join('|')})$`, 'i');
-const REGEX_FONT_EXT    = /\.(woff2?|otf|ttf)$/i;
+const TARGET_EXTENSIONS   = ['.aufbau.css', '.ass'];
+const REGEX_TARGET_EXT    = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replace('.', '\\.')).join('|')})$`, 'i');
+const REGEX_FONT_EXT      = /\.(woff2?|otf|ttf)$/i;
+const REGEX_AUFBAU_MODULE = /(\/@aufbau\/|github\.io\/aufbau\/|\/kits\/|\/elements\/.*\.js$)/;
+const MODULE_CACHE_NAME   = 'aufbau-modules-v1';
 
 // a service worker answering this request from cache is the only arrangement in
 // which the <link> stays an ordinary render-blocking link and still resolves
 // instantly. no javascript on the critical path, so nothing can flash.
-const files = createFiles({ name: 'aufbau-stylesheets' });
+const files     = createFiles({ name: 'aufbau-stylesheets' });
 const fontFiles = createFiles({ name: 'aufbau-fonts' });
 
-// how long a cached sheet is served without even asking. beyond it the cached copy
-// still goes out immediately, with a conditional revalidation behind it.
+// how long a cached sheet is served without even asking. beyond it the cached copy still goes out immediately, with a conditional revalidation behind it.
+// fonts are content-addressed by url in practice — a rebuild ships a new filename — so there is nothing to gain from asking about them often.    
 const TTL = 60 * 1000;
-
-// fonts are content-addressed by url in practice — a rebuild ships a new filename —
-// so there is nothing to gain from asking about them often.
 const FONT_TTL = 30 * 24 * 60 * 60 * 1000;
-
-export { files, fontFiles };
 
 /**
  * Service Worker fetch handler for intercepting .aufbau.css / .ass network requests.
@@ -79,41 +76,46 @@ export function parseStylesheetWorkerMessage (ass) {
   return ass ? transform(ass) : '';
 }
 
-const MODULE_CACHE_NAME = 'aufbau-modules-v1';
+
 
 // Matches local or CDN module URLs for aufbau packages
-const AUFBAU_MODULE_PATTERN = /(\/@aufbau\/|github\.io\/aufbau\/|\/kits\/|\/elements\/.*\.js$)/;
 
 /**
  * Intercepts requests for JavaScript modules and serves them Cache-First.
  * @param {FetchEvent} event
  * @returns {Promise<Response|null>}
  */
-export async function interceptFetchModule(event) {
+export async function interceptFetchModule (event) {
   const request = event.request;
 
   // Only intercept GET requests matching our module pattern
-  if (request.method === 'GET' && AUFBAU_MODULE_PATTERN.test(request.url)) {
-    const cache = await caches.open(MODULE_CACHE_NAME);
+  if (request.method === 'GET' && REGEX_AUFBAU_MODULE.test(request.url)) {
+    const cache          = await caches.open(MODULE_CACHE_NAME);
     const cachedResponse = await cache.match(request);
 
-    // 1. Serve immediately from cache if available
-    if (cachedResponse) {
-      return cachedResponse;
-    }
+    // 1. serve immediately from cache if available
+    if (cachedResponse) return cachedResponse;
 
-    // 2. Otherwise fetch from network and store in cache
+    // 2. otherwise fetch from network and store in cache
     try {
       const networkResponse = await fetch(request);
-      if (networkResponse.ok) {
-        cache.put(request, networkResponse.clone());
-      }
+      if (networkResponse.ok) cache.put(request, networkResponse.clone());
       return networkResponse;
-    } catch (error) {
-      console.error('Failed to fetch JS module:', error);
-    }
+    } 
+    catch (error) { console.error('Failed to fetch JS module:', error); }
   }
 
   return null;
 }
 
+// :::::: EXPORTS
+
+export { 
+  files, 
+  fontFiles,
+  stylesheetFiles: files,
+
+  interceptFetchFont,
+  interceptFetchModule,
+  interceptFetchStylesheet.
+};
