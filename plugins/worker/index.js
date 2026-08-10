@@ -12,13 +12,14 @@ const MODULE_CACHE_NAME   = 'aufbau-modules-v1';
 // a service worker answering this request from cache is the only arrangement in
 // which the <link> stays an ordinary render-blocking link and still resolves
 // instantly. no javascript on the critical path, so nothing can flash.
-const files     = createFiles({ name: 'aufbau-stylesheets' });
-const fontFiles = createFiles({ name: 'aufbau-fonts' });
+const stylesheetFiles = createFiles({ name: 'aufbau-stylesheets' });
+const       fontFiles = createFiles({ name: 'aufbau-fonts' });
 
 // how long a cached sheet is served without even asking. beyond it the cached copy still goes out immediately, with a conditional revalidation behind it.
 // fonts are content-addressed by url in practice — a rebuild ships a new filename — so there is nothing to gain from asking about them often.    
-const TTL = 60 * 1000;
-const FONT_TTL = 30 * 24 * 60 * 60 * 1000;
+const TTL_FONT       = 30 * 24 * 60 * 60 * 1000;
+const TTL_STYLESHEET = 60 * 1000;
+
 
 /**
  * Service Worker fetch handler for intercepting .aufbau.css / .ass network requests.
@@ -31,9 +32,9 @@ async function interceptFetchStylesheet (event) {
   if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
 
   try {
-    return await files.staleWhileRevalidate(request, {
+    return await stylesheetFiles.staleWhileRevalidate(request, {
       transform : (source) => transformStylesheet(source),
-      ttl       : TTL,
+      ttl       : TTL_STYLESHEET,
       type      : 'text/css; charset=utf-8',
     });
   } catch (error) {
@@ -60,13 +61,8 @@ async function interceptFetchFont (event) {
   if (request.method !== 'GET') return null;
   if (!REGEX_FONT_EXT.test(new URL(request.url).pathname)) return null;
 
-  try {
-    return await fontFiles.staleWhileRevalidate(request, { ttl: FONT_TTL });
-  } catch (error) {
-    errorLog ('font fetch failed', error);
-    //console.error('[@aufbau/plugins/worker] font fetch failed:', error);
-    return null;
-  }
+  try       { return await fontFiles.staleWhileRevalidate(request, { ttl: TTL_FONT }); }
+  catch (e) { errorLog ('font fetch failed', e); return null; }
 }
 
 /**
@@ -77,10 +73,6 @@ async function interceptFetchFont (event) {
 function parseStylesheetWorkerMessage (ass) {
   return ass ? transformStylesheet(ass) : '';
 }
-
-
-
-// Matches local or CDN module URLs for aufbau packages
 
 /**
  * Intercepts requests for JavaScript modules and serves them Cache-First.
@@ -120,9 +112,9 @@ function errorLog (message, error) {
 // :::::: EXPORTS
 
 export { 
-  files, 
+  files: stylesheetFiles, 
   fontFiles,
-  stylesheetFiles: files,
+  stylesheetFiles,
 
   interceptFetchFont,
   interceptFetchModule,
