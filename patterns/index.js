@@ -171,8 +171,14 @@ export async function list () {
   return [...(await loadMeta()).values()];
 }
 
-// baut den fertigen url("data:...")-string für ein pattern. kein dom.
-// setPattern nutzt das intern, der stylesheet-skill nutzt es auch.
+/**
+ * builds the finished url("data:...") string for a pattern, options resolved in.
+ * no dom. the shared core: setPattern paints an element with it, the stylesheet
+ * skill emits it as a background-image value.
+ * @param {string} id pattern id as listed in data.json5
+ * @param {Object} [options] per-var overrides, e.g. { bg: 'green' }
+ * @returns {Promise<string>}
+ */
 export async function patternImage (id, options = {}) {
   const meta = await metaFor(id);
   const vars = resolveVars(meta, options);
