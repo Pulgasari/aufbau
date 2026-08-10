@@ -20,6 +20,9 @@ const       fontFiles = createFiles({ name: 'aufbau-fonts' });
 const TTL_FONT       = 30 * 24 * 60 * 60 * 1000;
 const TTL_STYLESHEET = 60 * 1000;
 
+// Pre-compiled pattern outside the fetch loop
+const STYLESHEET_PATTERN = new URLPattern({ pathname: '*\\.aufbau\\.css' });
+
 
 /**
  * Service Worker fetch handler for intercepting .aufbau.css / .ass network requests.
@@ -29,11 +32,13 @@ const TTL_STYLESHEET = 60 * 1000;
 async function interceptFetchStylesheet (event) {
   const request = event.request;
   if (request.method !== 'GET') return null;
-  if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
+  //if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
+  if (!STYLESHEET_PATTERN.test(request.url)) return null;
+
 
   try {
     return await stylesheetFiles.staleWhileRevalidate(request, {
-      transform : (source) => transformStylesheet(source),
+      transform : transformStylesheet,
       ttl  : TTL_STYLESHEET,
       type : 'text/css; charset=utf-8',
     });
