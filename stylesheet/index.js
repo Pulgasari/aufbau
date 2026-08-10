@@ -157,7 +157,7 @@ function runPipeline (code) {
 /**
  * Haupt-Transform-Funktion für Aufbau Stylesheet mit Level 1 In-Memory Caching
  */
-export default function transform (code) {
+export default async function transform (code) {
   if (!code) return '';
 
   // Level 1: Fast Cache-Hit Check (0ms)
