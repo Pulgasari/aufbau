@@ -8,9 +8,8 @@ import { importFile } from '@aufbau/import';
 
 const SVG_SPECIFIER = '@aufbau/svg/filters/';
 const DATA_URL      = import.meta.resolve(SVG_SPECIFIER + 'data.json5');
-
-const PROP_PREFIX  = '--aufbau-filter-';
-const DEFS_HOST_ID = 'aufbau-filter-defs';
+const PROP_PREFIX   = '--aufbau-filter-';
+const DEFS_HOST_ID  = 'aufbau-filter-defs';
 
 // :::::: METADATA :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -30,7 +29,7 @@ async function metaFor (id) {
 
 // :::::: RAW SVG :::::::::::::::::::::::::::::::::::::::::::::::::
 
-const rawCache = new Map();
+const rawCache = new Map;
 
 function loadRaw (id) {
   if (!rawCache.has(id)) {
@@ -104,11 +103,9 @@ export async function ensureFilter (id) {
  * @param {Object} [options] per-var overrides, e.g. { amount: 4 }
  */
 export async function setFilter (target, id, options = {}) {
-  const elements = toElements(target);
-  if (elements.length === 0) return;
-
-  const meta = await metaFor(id);
-  const vars = resolveVars(meta, options);
+  const elements = toElements(target); if (elements.length === 0) return;
+  const meta     = await metaFor(id);
+  const vars     = resolveVars(meta, options);
 
   await ensureFilter(id);
   for (const el of elements) {
