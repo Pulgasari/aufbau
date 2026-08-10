@@ -128,6 +128,24 @@ export function removeFilter (target) {
   }
 }
 
+// in @aufbau/filters/index.js — ensureFilter öffentlich exportieren
+// (die funktion selbst bleibt wie sie ist, nur export davor)
+
+/**
+ * injects a filter's <defs> into the shared host once, without touching any
+ * target element. the stylesheet skill calls this so a compiled `filter: url(#id)`
+ * has its definition present in the dom.
+ * @param {string} id filter id as listed in data.json5
+ */
+export async function ensureFilter (id) {
+  const host = defsHost();
+  if (host.querySelector(`#aufbau-filter-${id}`)) return;
+
+  const raw  = await loadRaw(id);
+  const node = new DOMParser().parseFromString(raw, 'image/svg+xml').querySelector('filter');
+  if (node) host.appendChild(node);
+}
+
 /** exposes the parsed catalogue for preview pages and tooling. */
 export async function list () {
   return [...(await loadMeta()).values()];
