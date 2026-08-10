@@ -36,11 +36,13 @@
 
   <script type="module">
     import aufbau, { dom, html, preact } from './kit/index.js';
+	  const { define, update, signal, effect } = preact;
+    
     function Test () {
       return html`<div>moin!</div>`;
     }
     aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
-    const { define, update, signal, effect } = aufbau;
+    
 
     // Register custom CSS custom properties
     define({ key: 'bg', type: 'property' });
