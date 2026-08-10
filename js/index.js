@@ -9,26 +9,30 @@ export * from './core.js';   // and, compose, constant, curry, identity, not, on
 export * from './match.js';  // ifElse, match, unless, when
 export * from './is.js';     // is, test, isArray … isZero
 
-export * from './array.js';
-export * from './object.js';
-export * from './string.js';
-
 export * from './CanonicalMap.js';
-
 export * from './coerce.js';
 export * from './hash.js';
-export * from './html.js';
 export * from './log.js';
-export * from './memo.js';
-export * from './number.js';
-export * from './random.js';
 export * from './ready.js';
-export * from './timing.js';
-//export * from './url.js';
 
 // dom
 export * from './dom/events.js';
 export * as dom from '@domina/core';
+
+// maybe to bunker
+export * from './memo.js';
+
+// maybe to dingsbums
+export * from './array.js';
+export * from './number.js';
+export * from './object.js';
+export * from './random.js';
+export * from './string.js';
+export * from './timing.js';
+//export * from './url.js';
+
+// maybe to domina
+export * from './html.js';
 
 
 
