@@ -8,21 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
-  <script type="importmap">
-  {
-    "imports": {
-      "preact"             : "https://esm.sh/preact@10.20.1",
-      "preact/hooks"       : "https://esm.sh/preact@10.20.1/hooks",
-      "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact",
-      "htm"                : "https://esm.sh/htm@3.1.1",
-      "@aufbau/cache"      : "./cache/index.js",
-      "@aufbau/import"     : "./import/index.js",
-      "@aufbau/kit"        : "./kit/index.js",
-      "@aufbau/shaders"    : "./shaders/index.js",
-      "@aufbau/stylesheet" : "./stylesheet/index.js"
-    }
-  }
-  </script>
+	<script src="https://pulgasari.github.io/aufbau/boot.js"></script>
+  <script src="https://pulgasari.github.io/importmap.js"></script>
 </head>
 
 <body class="mobilefix">
@@ -48,7 +35,7 @@
   </footer>
 
   <script type="module">
-    import aufbau, { html } from './kit/index.js';
+    import aufbau, { dom, html, preact } from './kit/index.js';
     function Test () {
       return html`<div>moin!</div>`;
     }
