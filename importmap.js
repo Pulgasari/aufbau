@@ -22,6 +22,25 @@ const pkg = [
   'utils',
 ];
 
+/*
+const baseURLs  = {
+  '@aufbau' : './',
+  '@bunker' : 'https://pulgasari.github.io/bunker/',
+  '@domina' : 'https://pulgasari.github.io/domina/',
+  '@poo'    : 'https://pulgasari.github.io/poo/',
+};
+const importmap = {
+  "htm"              : "https://esm.sh/htm@3.1.1",
+  "preact"           : "https://esm.sh/preact@10.20.1",
+  "preact/hooks"     : "https://esm.sh/preact@10.20.1/hooks",
+  "@preact/signals"  : "https://esm.sh/@preact/signals@1.2.2?external=preact",
+
+  '@aufbau' : ['builders/docs', 'cache', 'elements', 'import', 'js', 'kits', 'patterns', 'plugins', { plugins: ['client', 'vite', 'worker'] }, 'shaders', 'store', 'stylesheet', 'utils'],
+  '@bunker' : ['cache', 'core', 'db', 'files', 'kit', 'storage'],
+  '@domina' : ['core'],
+};
+*/
+
 const map = { imports: {
       "htm"              : "https://esm.sh/htm@3.1.1",
       "preact"           : "https://esm.sh/preact@10.20.1",
