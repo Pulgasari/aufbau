@@ -1,10 +1,4 @@
-/* add to reset.css maybe
-div { min-height: 0; }
-body {
-  background : var(--aufbau-bg);
-  color      : var(--aufbau-fg);
-}
-*/
+
 
 svg {
   width: auto;
@@ -13,8 +7,6 @@ svg {
 
 @aufbau-config {
   import : reset, default, aufbau, docs, keyframes;
-  /* all four are loaded so the footer picker can switch between them at runtime.
-     the last one wins when no data-theme is set, so it is the default */
   themes : classic, oled, rainbow, zombie;
 }
 
