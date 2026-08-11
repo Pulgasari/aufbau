@@ -573,8 +573,10 @@ export function register (extension, handler, modes) {
 // splits off query and hash before reading the extension, so cache-busted
 // urls like '/data.csv?v=2' still resolve to the csv handler
 function extensionOf (path) {
-  return path.split(/[?#]/)[0].split('.').pop().toLowerCase();
+  const url = typeof path === 'string' ? path : (path?.href ?? String(path));
+  return url.split(/[?#]/)[0].split('.').pop().toLowerCase();
 }
+
 
 // bumped whenever the key layout changes, so stale entries fall out on their own
 const CACHE_VERSION = 2;
