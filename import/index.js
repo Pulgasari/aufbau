@@ -24,8 +24,8 @@ let cdn = 'https://esm.sh/';
 // one week. keeps superseded cache-busted urls from lingering forever.
 let defaultTTL = 7 * 24 * 60 * 60 * 1000;
 
-const overrides = new Map();
-const resolved  = new Map();
+const overrides = new Map;
+const resolved  = new Map;
 
 // strips the version suffix, scope-safe: '@scope/pkg@1.0.0' -> '@scope/pkg'
 function bare (specifier) {
@@ -230,7 +230,7 @@ function transformCSSResult (code, mode) {
   if (mode === 'styleElement') {
     return Object.assign(document.createElement('style'), { textContent: code });
   }
-  const sheet = new CSSStyleSheet();
+  const sheet = new CSSStyleSheet;
   sheet.replaceSync(code);
   return sheet;
 }
