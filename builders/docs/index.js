@@ -211,13 +211,13 @@ export function createDocsFW (config = {}) {
   const normalizedSidebar = normalizeSidebar(sidebar);
 
   // Signals
-  const currentRoute = aufbau.signal(parseHash(index));
-  const mdContent    = aufbau.signal('');
-  const tocList      = aufbau.signal([]);
-  const isLoading    = aufbau.signal(true);
-  const errorMessage = aufbau.signal(null);
-  const beforeSlot   = aufbau.signal(null);
-  const afterSlot    = aufbau.signal(null);
+  const currentRoute = preact.signal(parseHash(index));
+  const mdContent    = preact.signal('');
+  const tocList      = preact.signal([]);
+  const isLoading    = preact.signal(true);
+  const errorMessage = preact.signal(null);
+  const beforeSlot   = preact.signal(null);
+  const afterSlot    = preact.signal(null);
 
   // signals
   const state = aufbau.signals({
