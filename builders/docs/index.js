@@ -221,7 +221,6 @@ export function createDocsFW (config = {}) {
   const tocList      = aufbau.signal([]);
   const isLoading    = aufbau.signal(true);
   const errorMessage = aufbau.signal(null);
-
   const beforeSlot   = aufbau.signal(null);
   const afterSlot    = aufbau.signal(null);
 
