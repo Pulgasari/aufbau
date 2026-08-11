@@ -9,6 +9,7 @@ div { min-height: 0; }
 p {
   /* Language handling and word breaking */
   hyphens: auto;
+  hyphenate-limit-chars: 6 3 3; /* Min word length: 6, min chars before break: 3, min chars after break: 3 */   
   overflow-wrap: break-word;
   /*word-break: overflow-wrap*/
   
