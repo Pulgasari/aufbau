@@ -5,7 +5,6 @@ import cache from '@aufbau/cache';
 
 // :::::: VENDOR RESOLUTION ::::::::::::::::::::::::::::::::::::::
 
-// pinned versions in one place instead of scattered across handlers
 const registry = {
   fastXmlParser : 'fast-xml-parser@4.3.2',
   json5         : 'json5@2.2.3',
@@ -20,9 +19,7 @@ const registry = {
 };
 
 let cdn = 'https://esm.sh/';
-
-// one week. keeps superseded cache-busted urls from lingering forever.
-let defaultTTL = 7 * 24 * 60 * 60 * 1000;
+let defaultTTL = 7 * 24 * 60 * 60 * 1000; // one week
 
 const overrides = new Map;
 const resolved  = new Map;
