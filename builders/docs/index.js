@@ -1,33 +1,24 @@
 // @aufbau/builders/docs/index.js
 
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-import { isFn, isString, slugify } from '@aufbau/utils';
+import { isArray, isFn, isString, slugify } from '@aufbau/utils';
 import { store }   from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
-aufbau.init(); //window.html = html;
+aufbau.init();
 
 // :::::: THEMING :::::::::::::::::::::::::::::::::::::::::::::::
 
-// the themes shipped in @aufbau/css/themes, all four loaded by index.aufbau.css
 const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 const DEFAULT_CODE = 'github-dark';
-
-// adapter: bridge @aufbau/store into the betterSignal store interface
-// (betterSignal wants get/set; @aufbau/store exposes getSync/setSync).
-// @aufbau/store already swallows quota errors and falls back to memory in
-// private mode, so there is nothing left to wrap here
 const aufbauStore = () => ({
   get: key        => store.getSync(key, undefined),
   set: (key, val) => store.setSync(key, val),
 });
 
 const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
-const applyPageTheme = theme => { if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme; };
-//const applyPageTheme = theme => { if (typeof document !== 'undefined') dom.root.dataset.theme = theme; };
-
-
+const applyPageTheme = theme => dom.root.dataset.theme = theme;
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -69,19 +60,10 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
   return { title, img, svgContent };
 }
 
-
-/**
- * Resolves variables/aliases inside a path string.
- * Supports nested variables (e.g. $comps using $repo).
- * 
- * @param {string} pathStr - Raw path string (e.g. "$comps/readme.md")
- * @param {Object} vars - Variable dictionary (e.g. { repo: '../', comps: '$repo/webcomponents' })
- * @returns {string} Fully resolved file path
- */
 export function resolvePath(pathStr, vars = {}) {
-  if (!pathStr || typeof pathStr !== 'string') return pathStr;
+  if (!pathStr || !isString(pathStr)) return pathStr;
 
-  let resolved = pathStr;
+  let resolved  = pathStr;
   let maxPasses = 10; // Prevent infinite loops on circular variables
 
   while (maxPasses-- > 0) {
@@ -102,13 +84,6 @@ export function resolvePath(pathStr, vars = {}) {
   return resolved.replace(/(?<!:)\/{2,}/g, '/');
 }
 
-/**
- * Extract path and heading anchor ID from location hash.
- * Example: "#/$comps/readme.md#installation" -> { path: "$comps/readme.md", anchor: "installation" }
- * 
- * @param {string} [defaultPath='readme.md']
- * @returns {{ path: string, anchor: string|null }}
- */
 export function parseHash(defaultPath = 'readme.md') {
   const rawHash = window.location.hash.replace(/^#\/?/, '');
   if (!rawHash) return { path: defaultPath, anchor: null };
@@ -173,20 +148,16 @@ function upgradeCodeBlocks (doc) {
   dom.eachElements('pre > code', codeEl => {
     const lang = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
     const element = dom.createElement('aufbau-code', { lang, textContent: codeEl.textContent });
-    //const element = doc.createElement('aufbau-code'); element.setAttribute('lang', lang); element.textContent = codeEl.textContent;
     codeEl.parentElement.replaceWith(element);
   });
 }
 
 export function processContent (htmlContent) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
-
   dom.eachElements('h1, h2, h3, h4, h5, h6', (heading, index) => {
     if (!heading.id) heading.id = slugify(heading.textContent || '') || `heading-${index}`;
   });
-
   upgradeCodeBlocks(doc);
-
   return doc.body.innerHTML;
 }
 
@@ -208,10 +179,6 @@ export function processContent (htmlContent) {
   } = config;
 
   const normalizedSidebar = normalizeSidebar(sidebar);
-
-  // one reactive node, flat access without .value:
-  //   state.mdContent          -> get
-  //   state.mdContent = '...'  -> set
   const state = aufbau.signals({
     currentRoute : parseHash(index),
     mdContent    : '',
@@ -228,12 +195,9 @@ export function processContent (htmlContent) {
     svgContent: null
   });
 
-  // ::: theme signals — self-hydrating and self-persisting via the store adapter.
-  // constructing them already restores the stored value (sync store), so no
-  // manual read/write/persist plumbing remains
   const pageTheme = aufbau.signal({
     value  : PAGE_THEMES.at(-1),
-    values : PAGE_THEMES,               // invalid values are dropped + warned
+    values : PAGE_THEMES,
     key    : 'docs-theme-page',
     store  : aufbauStore,
   });
@@ -324,10 +288,6 @@ export function processContent (htmlContent) {
       return;
     }
 
-    // relative document link, resolved against the current doc's directory.
-    // deliberately resolved in UNRESOLVED space, with '$repo' still in place:
-    // routes stay symbolic and only turn into real paths at load time. resolving
-    // first would collapse '../' against the url root and drop the variable.
     const [to, anchor] = href.split('#');
     const next = new URL(to, new URL(path, 'file:///')).pathname.replace(/^\//, '');
     window.location.hash = `#/${next}${anchor ? `#${anchor}` : ''}`;
