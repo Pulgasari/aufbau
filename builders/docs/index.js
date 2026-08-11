@@ -226,7 +226,7 @@ export function createDocsFW (config = {}) {
     tocList      : [],
     isLoading    : true,
     afterSlot, beforeSlot, errorMessage,
-  };
+  });
 
   const brandState = aufbau.signal({
     title: isString(brand) ? brand : (brand?.title || title),
