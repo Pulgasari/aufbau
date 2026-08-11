@@ -1,27 +1,58 @@
-// Custom utility methods accepting target string as the first parameter
+// str.js
+
+// Helper functions for word splitting and casing
+const upperFirst = (word) => word.charAt(0).toUpperCase() + word.slice(1);
+
+const toWords = (value) => String(value ?? '')
+  .replace(/([a-z\d])([A-Z])/g, '$1 $2')
+  .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+  .replace(/[\s\-_.]+/g, ' ')
+  .trim()
+  .toLowerCase()
+  .split(' ')
+  .filter(Boolean);
+
+
+export const // Standalone exportable transform functions
+capitalize     = value => String(value ?? '').charAt(0).toUpperCase() + String(value ?? '').slice(1),
+toLowerCase    = value => String(value ?? '').toLowerCase(),
+toUpperCase    = value => String(value ?? '').toUpperCase(),
+toCamelCase    = value => toWords(value).map((word, index) => index ? upperFirst(word) : word).join(''),
+toConstantCase = value => toWords(value).join('_').toUpperCase(),
+toKebabCase    = value => toWords(value).join('-'),
+toPascalCase   = value => toWords(value).map(upperFirst).join(''),
+toSnakeCase    = value => toWords(value).join('_'),
+toTitleCase    = value => toWords(value).map(upperFirst).join(' '),
+trim           = value => String(value ?? '').trim(),
+trimEnd        = value => String(value ?? '').trimEnd(),
+trimStart      = value => String(value ?? '').trimStart(),
+unquote        = value => String(value ?? '').replace(/^(['"`])([\s\S]*)\1$/, '$2');
+
+export const 
+startsWith = (value, ...prefixes) => prefixes.some((prefix) => String(value ?? '').startsWith(prefix)),
+  endsWith = (value, ...suffixes) => suffixes.some((suffix) => String(value ?? '').endsWith(suffix));
+
 const utils = {
-  startsWith(val, ...prefixes) {
-    const s = String(val ?? '');
-    return prefixes.some((prefix) => s.startsWith(prefix));
-  },
-
-  endsWith(val, ...suffixes) {
-    const s = String(val ?? '');
-    return suffixes.some((suffix) => s.endsWith(suffix));
-  },
-
-  toTitleCase(val) {
-    const s = String(val ?? '');
-    return s
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/[-_]+/g, ' ')
-      .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
-  }
+  capitalize,
+  toLowerCase,
+  toUpperCase,
+  toCamelCase,
+  toConstantCase,
+  toKebabCase,
+  toPascalCase,
+  toSnakeCase,
+  toTitleCase,
+  trim,
+  trimEnd,
+  trimStart,
+  unquote,
+  startsWith,
+  endsWith
 };
 
 /**
- * Creates a dual-use string utility supporting both chainable str(val) calls
- * and static str.method(val) execution.
+ * Dual-use string utility supporting both chainable str(val) calls
+ * and direct static str.method(val) execution.
  */
 export const str = Object.assign(
   function str(val) {
