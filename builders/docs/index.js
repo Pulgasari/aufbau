@@ -182,6 +182,9 @@ export function processContent (htmlContent) {
   // import map, so the aufbau worker shares code through importScripts() instead,
   // and that exists only in a classic worker. see @aufbau/sw.js.
   if (sw) globalThis.navigator?.serviceWorker?.register(sw).catch(console.error);
+  // aufbau/docs/sw.js  als modul
+  //import { aufbauServiceWorker } from '../sw.js';
+  //aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
 
 
   const normalizedSidebar = normalizeSidebar(sidebar);
