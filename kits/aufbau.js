@@ -21,7 +21,7 @@ import * as aufbauUtils         from '@aufbau/js';
 import * as bunker from '@bunker/kit';
 import * as domina from '@domina/core';
 //import      doc from '@domina/doc';
-import str from '@aufbau/js/str.js';
+import str from '@pulgasari/str';
 
 
 // ::: LOCAL
