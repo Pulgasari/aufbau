@@ -1,7 +1,7 @@
 // @aufbau/builders/docs/index.js
 
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-import { isArray, isFn, isString, slugify } from '@aufbau/utils';
+import { isFn, isString, slugify } from '@aufbau/utils';
 import { store }   from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
@@ -13,19 +13,19 @@ aufbau.init(); //window.html = html;
 // the themes shipped in @aufbau/css/themes, all four loaded by index.aufbau.css
 const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 const DEFAULT_CODE = 'github-dark';
-const STORAGE_KEY  = 'docs-theme';
 
-// @aufbau/store already swallows quota errors and falls back to memory in private
-// mode, so there is nothing left to wrap here
-const readStored     = ()    => store.getSync(STORAGE_KEY, {});
-const writeStored    = value => store.setSync(STORAGE_KEY, value);
+// adapter: bridge @aufbau/store into the betterSignal store interface
+// (betterSignal wants get/set; @aufbau/store exposes getSync/setSync).
+// @aufbau/store already swallows quota errors and falls back to memory in
+// private mode, so there is nothing left to wrap here
+const aufbauStore = () => ({
+  get: key        => store.getSync(key, undefined),
+  set: (key, val) => store.setSync(key, val),
+});
+
 const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
-const applyPageTheme = theme => {
-  if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme;
-  //dom.element(':root').setData({ theme });
-  //dom.element(':root').dataset = { theme };
-  //dom.root.dataset = { theme };
-};
+const applyPageTheme = theme => { if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme; };
+//const applyPageTheme = theme => { if (typeof document !== 'undefined') dom.root.dataset.theme = theme; };
 
 
 
@@ -193,7 +193,7 @@ export function processContent (htmlContent) {
 /**
  * Initializes and mounts the Docs Framework.
  */
-export function createDocsFW (config = {}) {
+ export function createDocsFW (config = {}) {
   const {
     brand      = null,
     title      = 'Documentation',
@@ -209,22 +209,17 @@ export function createDocsFW (config = {}) {
 
   const normalizedSidebar = normalizeSidebar(sidebar);
 
-  // Signals
-  const currentRoute = preact.signal(parseHash(index));
-  const mdContent    = preact.signal('');
-  const tocList      = preact.signal([]);
-  const isLoading    = preact.signal(true);
-  const errorMessage = preact.signal(null);
-  const beforeSlot   = preact.signal(null);
-  const afterSlot    = preact.signal(null);
-
-  // signals
+  // one reactive node, flat access without .value:
+  //   state.mdContent          -> get
+  //   state.mdContent = '...'  -> set
   const state = aufbau.signals({
     currentRoute : parseHash(index),
     mdContent    : '',
     tocList      : [],
     isLoading    : true,
-    afterSlot, beforeSlot, errorMessage,
+    errorMessage : null,
+    beforeSlot   : null,
+    afterSlot    : null,
   });
 
   const brandState = aufbau.signal({
@@ -233,14 +228,24 @@ export function createDocsFW (config = {}) {
     svgContent: null
   });
 
-  // ::: theme state, restored and applied before the first render
-
-  const stored     = readStored();
-  const pageTheme  = aufbau.signal(stored.page ?? PAGE_THEMES.at(-1));
-  const codeTheme  = aufbau.signal(stored.code ?? DEFAULT_CODE);
+  // ::: theme signals — self-hydrating and self-persisting via the store adapter.
+  // constructing them already restores the stored value (sync store), so no
+  // manual read/write/persist plumbing remains
+  const pageTheme = aufbau.signal({
+    value  : PAGE_THEMES.at(-1),
+    values : PAGE_THEMES,               // invalid values are dropped + warned
+    key    : 'docs-theme-page',
+    store  : aufbauStore,
+  });
+  const codeTheme = aufbau.signal({
+    value : DEFAULT_CODE,
+    key   : 'docs-theme-code',
+    store : aufbauStore,
+  });
   // seeded with the active one so the picker is never momentarily empty
   const codeThemes = aufbau.signal([codeTheme.value]);
 
+  // side-effects betterSignal doesn't own — trigger once with the hydrated value
   applyPageTheme(pageTheme.value);
   applyCodeTheme(codeTheme.value);
 
@@ -250,62 +255,47 @@ export function createDocsFW (config = {}) {
     codeThemes.value = list.includes(codeTheme.value) ? list : [codeTheme.value, ...list];
   });
 
-  const persistThemes = () => writeStored({ code: codeTheme.value, page: pageTheme.value });
-
   // Hash router event listener
   if (typeof window !== 'undefined') {
     window.addEventListener('hashchange', () => {
-      currentRoute.value = parseHash(index);
+      state.currentRoute = parseHash(index);
     });
   }
 
   // Reactive data loader effect
   preact.effect(() => {
-    const { path, anchor } = currentRoute.value;
+    const { path, anchor } = state.currentRoute;
 
     async function loadDocument() {
-      isLoading.value = true;
-      errorMessage.value = null;
+      state.isLoading    = true;
+      state.errorMessage = null;
 
       try {
-        // Resolve variables in doc path (e.g. $comps/readme.md -> ../webcomponents/readme.md)
         const resolvedPath = resolvePath(path, vars);
         const importPath = (resolvedPath.startsWith('.') || resolvedPath.startsWith('/') || resolvedPath.startsWith('http'))
           ? resolvedPath
           : `./${resolvedPath}`;
 
-        // Fetch brand config parallel with document & extensions
         const [resolvedBrand, rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
           resolveBrandConfig(brand, title, vars),
           aufbau.import(importPath),
           resolveExtension(before, vars),
           resolveExtension(after, vars)
         ]);
-  
-        brandState.value = resolvedBrand;
-        mdContent.value  = processContent(rawHtml);
-        beforeSlot.value = resolvedBefore;
-        afterSlot.value  = resolvedAfter;
-        isLoading.value  = false;
 
-        // Post-render DOM manipulation.
-        // no highlighting pass here: upgradeCodeBlocks turned every fenced block
-        // into <aufbau-code>, which highlights itself
+        brandState.value  = resolvedBrand;
+        state.mdContent   = processContent(rawHtml);
+        state.beforeSlot  = resolvedBefore;
+        state.afterSlot   = resolvedAfter;
+        state.isLoading   = false;
+
         requestAnimationFrame(() => {
-          /*
-          if (anchor) {
-            const targetEl = document.getElementById(anchor);
-            if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
-          } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-          */
           anchor ? dom.scrollTo('#'+anchor) : dom.scrollToTop(0);
         });
       } catch (err) {
         console.error('[DocsFW Error]:', err);
-        errorMessage.value = `Failed to load document: ${path}`;
-        isLoading.value    = false;
+        state.errorMessage = `Failed to load document: ${path}`;
+        state.isLoading    = false;
       }
     }
 
@@ -321,12 +311,12 @@ export function createDocsFW (config = {}) {
     const link = event.target.closest?.('a[href]');
     if (!link || event.defaultPrevented) return;
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
-  
+
     const href = link.getAttribute('href');
     if (!href || isExternal(href) || link.target === '_blank') return;
-  
+
     event.preventDefault();
-    const { path } = currentRoute.value;
+    const { path } = state.currentRoute;
 
     // plain anchor: stay in the current document
     if (href.startsWith('#')) {
@@ -355,7 +345,7 @@ export function createDocsFW (config = {}) {
   // internal link that owns the hash-routing convention
   function RouterLink ({ to, anchor, class: className, children }) {
     const href  = `#/${to}${anchor ? `#${anchor}` : ''}`;
-    const active = currentRoute.value.path === to;
+    const active = state.currentRoute.path === to;
   
     return html`
       <a href=${href} class=${[className, active && 'active'].filter(Boolean).join(' ')}>
@@ -390,8 +380,8 @@ export function createDocsFW (config = {}) {
 
 
   function TableOfContents() {
-    const items = tocList.value;
-    const currentPath = currentRoute.value.path;
+    const items = state.tocList;
+    const currentPath = state.currentRoute.path;
 
     if (!items.length) return null;
 
@@ -414,19 +404,16 @@ export function createDocsFW (config = {}) {
   }
 
   function MainContent() {
-    if (isLoading.value)    return html`<div class="docs-status">Loading documentation...</div>`;
-    if (errorMessage.value) return html`<div class="docs-status error">${errorMessage.value}</div>`;
+    if (state.isLoading)    return html`<div class="docs-status">Loading documentation...</div>`;
+    if (state.errorMessage) return html`<div class="docs-status error">${state.errorMessage}</div>`;
 
     return html`
       <div class="docs-body-wrapper">
         <div class="docs-content-container">
-          <${ExtensionSlot} slotData=${beforeSlot.value} />
-          <article
-            id="docs-content"
-            class="markdown-body"
-            dangerouslySetInnerHTML=${{ __html: mdContent.value }}
-          />
-          <${ExtensionSlot} slotData=${afterSlot.value} />
+          <${ExtensionSlot} slotData=${state.beforeSlot} />
+          <article id="docs-content" class="markdown-body"
+            dangerouslySetInnerHTML=${{ __html: state.mdContent }} />
+          <${ExtensionSlot} slotData=${state.afterSlot} />
         </div>
         ${toc ? html`<aufbau-toc class="docs-toc" target="#docs-content" selector=${toc} />` : null}
       </div>
@@ -437,9 +424,8 @@ export function createDocsFW (config = {}) {
     const choose = (signal, apply) => (event) => {
       const value = event.target.value;
       if (!value || value === signal.value) return;
-      signal.value = value;
-      apply(value);
-      persistThemes();
+      signal.value = value;   // persists itself via the store adapter
+      apply(value);           // side-effect the signal doesn't own
     };
 
     const picker = (id, label, options, signal, apply, extra = {}) => html`
