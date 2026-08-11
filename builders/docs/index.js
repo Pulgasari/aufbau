@@ -2,7 +2,7 @@
 
 import aufbau, { dom, html, preact, str } from '@aufbau/kits/preact-htm';
 import { isArray, isFn, isString, slugify } from '@aufbau/utils';
-import { store }   from '@aufbau/store';
+import { store, signalStore as aufbauStore }   from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
@@ -12,10 +12,7 @@ aufbau.init();
 
 const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 const DEFAULT_CODE = 'github-dark';
-const aufbauStore = () => ({
-  get: key        => store.getSync(key, undefined),
-  set: (key, val) => store.setSync(key, val),
-});
+
 
 const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
 const applyPageTheme = theme => dom.root.dataset.theme = theme;
