@@ -219,6 +219,15 @@ export function createDocsFW (config = {}) {
   const beforeSlot   = aufbau.signal(null);
   const afterSlot    = aufbau.signal(null);
 
+  // signals
+  const state = aufbau.signals({
+    currentRoute : parseHash(index),
+    mdContent    : '',
+    tocList      : [],
+    isLoading    : true,
+    afterSlot, beforeSlot, errorMessage,
+  };
+
   const brandState = aufbau.signal({
     title: isString(brand) ? brand : (brand?.title || title),
     img: null,
