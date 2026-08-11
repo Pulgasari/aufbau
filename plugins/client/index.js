@@ -82,11 +82,9 @@ export function observeStylesheets () {
 /*
 // File: aufbau/plugins/client/index.js
 const CACHE_NAME = 'aufbau-css-v1';
-/**
- * Stores compiled CSS in the shared Cache Storage under the original file URL.
- * @param {string} url - Original request URL of the .aufbau.css file
- * @param {string} compiledCss - CSS string compiled by aufbau/stylesheet
- */
+// Stores compiled CSS in the shared Cache Storage under the original file URL.
+// @param {string} url - Original request URL of the .aufbau.css file
+// @param {string} compiledCss - CSS string compiled by aufbau/stylesheet
 export async function cacheCompiledCss(url, compiledCss) {
   if (!('caches' in window)) return;
 
