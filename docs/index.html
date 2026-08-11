@@ -19,12 +19,17 @@
 <script type='module'>
 import { createDocsFW, html } from '@aufbau/builders/docs';
 
-// Service Worker registration for local assets
+globalThis.navigator?.serviceWorker?.register(
+  new URL('./sw.js', import.meta.url), { type: 'module' }
+).catch(console.error);
+
+/*
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
     .register(new URL('./sw.js', import.meta.url), { type: 'module' })
     .catch(err => console.error('[SW Error]:', err));
 }
+*/
 
 function VersionBanner() {
   return html`
