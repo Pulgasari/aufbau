@@ -19,6 +19,7 @@ const aufbauStore = () => ({
 
 const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
 const applyPageTheme = theme => dom.root.dataset.theme = theme;
+const toImportPath   = path  => str(path).startsWith('.', '/', 'http') ? path : `./${path}`;
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -43,10 +44,7 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
     if (trimmed.startsWith('<svg')) {
       svgContent = trimmed;
     } else {
-      const resolved = resolvePath(trimmed, vars);
-      const importPath = str(resolved).startsWith('.', '/', 'http') ? resolved : `./${resolved}`;
-      //const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http')) ? resolved : `./${resolved}`;
-
+      const importPath = toImportPath(resolvePath(trimmed, vars));
       try {
         const imported = await aufbau.import(importPath);
         svgContent = isString(imported) ? imported : null;
@@ -125,8 +123,7 @@ async function resolveExtension (ext, vars = {}) {
     }
 
     // Resolve path variables and import
-    const resolved = resolvePath(trimmed, vars);
-    const importPath = str(resolved).startsWith('.', '/', 'http') ? resolved : `./${resolved}`;
+    const importPath = toImportPath(resolvePath(trimmed, vars));
 
     try {
       const imported = await aufbau.import(importPath);
@@ -243,11 +240,7 @@ export function processContent (htmlContent) {
       state.errorMessage = null;
 
       try {
-        const resolvedPath = resolvePath(path, vars);
-        const importPath = (resolvedPath.startsWith('.') || resolvedPath.startsWith('/') || resolvedPath.startsWith('http'))
-          ? resolvedPath
-          : `./${resolvedPath}`;
-
+        const importPath = toImportPath(resolvePath(path, vars));
         const [resolvedBrand, rawHtml, beforeSlot, afterSlot] = await Promise.all([
           resolveBrandConfig(brand, title, vars),
           aufbau.import(importPath),
@@ -255,12 +248,8 @@ export function processContent (htmlContent) {
           resolveExtension(after, vars)
         ]);
 
-        brandState.value  = resolvedBrand;
-        //state.mdContent   = processContent(rawHtml);
-        //state.beforeSlot  = beforeSlot;
-        //state.afterSlot   = afterSlot;
-        //state.isLoading   = false;
         state.$update({
+          brand: resolvedBrand,
           afterSlot, beforeSlot,
           mdContent: processContent(rawHtml),
           isLoading: false,
@@ -330,7 +319,7 @@ export function processContent (htmlContent) {
   // UI Components
   function Header () {
     const activePath = state.currentRoute.path;
-    const { title: brandTitle, img: brandImg, svgContent: brandSvg } = brandState.value;
+    const { title: brandTitle, img: brandImg, svgContent: brandSvg } = state.brand;
 
     return html`
       <header id="app-header">
