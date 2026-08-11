@@ -1,44 +1,19 @@
-// aufbau/docs/sw.js
-  
-import { interceptFetch } from 'https://pulgasari.github.io/aufbau/kits/aufbau.js';    
+/* aufbau/docs/sw.js
 
-console.log(`!!!sw!!!`);
+classic script on purpose — a service worker has no import map, so bare specifiers
+never resolve there. importScripts() performs no specifier resolution at all and
+is how a worker shares code. see ../sw.js for the reasoning in full.
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    (async () => {
-      // Intercept Aufbau stylesheets and assets
-      const aufbauResponse = await interceptFetch(event);
-      if (aufbauResponse) return aufbauResponse;
-
-      // Fallback to network fetch
-      return fetch(event.request);
-    })()
-  );
-});
-
-/*
-const CACHE_NAME = 'aufbau-cache-v1';
-const MODULES_TO_CACHE = [
-  './boot.js',
-  './kits/aufbau.js',
-  './elements/core/index.js'
-];
-
-// Install event: Pre-cache core JS modules
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(MODULES_TO_CACHE))
-  );
-});
-
-// Fetch event: Serve cached modules instantly
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Return cached version if found, otherwise request from network
-      return cachedResponse || fetch(event.request);
-    })
-  );
-});
+register WITHOUT type: 'module'.
 */
+
+importScripts('../sw.js');
+
+aufbauServiceWorker({
+  // highest fan-in modules of this page's graph, measured with aufbau/test/graph.mjs
+  precache: [
+    '../js/index.js',
+    '../kits/preact-htm.js',
+    '../../domina/core/index.js',
+  ],
+});

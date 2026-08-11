@@ -178,8 +178,10 @@ export function processContent (htmlContent) {
     sw         = false,
   } = config;
 
-  // maybe: register service worker
-  if (sw) globalThis.navigator?.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
+  // maybe: register service worker. classic, NOT type: 'module' — a worker has no
+  // import map, so the aufbau worker shares code through importScripts() instead,
+  // and that exists only in a classic worker. see @aufbau/sw.js.
+  if (sw) globalThis.navigator?.serviceWorker?.register(sw).catch(console.error);
 
 
   const normalizedSidebar = normalizeSidebar(sidebar);

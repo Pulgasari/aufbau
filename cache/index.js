@@ -10,6 +10,7 @@
 
 import { createCache }           from '@bunker/cache';
 import { createDb }              from '@bunker/db';
+import { createFiles }           from '@bunker/files';
 import { createLogger, hashKey } from '@aufbau/js';
 
 const NAMESPACE = 'aufbau';
@@ -64,6 +65,43 @@ export async function compileStylesheet (source, compile) {
   await sheets.set(key, css);
   return css;
 }
+
+// :::::: RESPONSES :::::::::::::::::::::::::::::::::::::::::::::
+
+/*
+  cachestorage rather than indexeddb, because what goes in here is meant to come
+  back out as an http response.
+
+  entries are real Response objects, so a service worker can hand one straight to
+  respondWith and the browser's own pipelines survive the round trip — css is
+  parsed by the css parser, font-display and unicode-range keep working. that is
+  the whole reason this is not just another value in `cache` above.
+*/
+
+/** the exact cache name sw.js reads. the two are kept in step by hand, the same
+    arrangement as BOOT_KEYS between @aufbau/store and boot.js. */
+export const RESPONSE_CACHE = 'aufbau-stylesheets';
+
+export const responses = createFiles({ name: RESPONSE_CACHE, onError });
+
+/*
+  hands a compiled stylesheet to the service worker.
+
+  a worker never controls the navigation that registered it, so it cannot help the
+  first visit — but from the second on it can answer the <link> straight from this
+  cache. that keeps an ordinary render-blocking link and still resolves instantly,
+  which is the one arrangement with no javascript on the critical path at all.
+
+  the worker therefore never needs a compiler: the page has already done the work
+  by the time the worker can intercept anything.
+*/
+export async function publishStylesheet (href, css) {
+  return responses.put(href, new Response(css, {
+    headers: { 'content-type': 'text/css; charset=utf-8' },
+  }));
+}
+
+// :::::: MAINTENANCE :::::::::::::::::::::::::::::::::::::::::::
 
 /** enforces the ceilings and drops expired entries. safe on an idle callback. */
 export async function prune () {
