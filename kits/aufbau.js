@@ -137,7 +137,7 @@ const aufbau = {
   ready : aufbauUtils.ready,
 
   // dom bridge (see ./dom.js, candidate for @aufbau/utils)
-  dom: domina,
+  dom: domina, domina,
   define, update, updateDataset, updateProperty,
 
   // packages
