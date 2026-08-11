@@ -18,19 +18,18 @@ import * as bunker from '@bunker/kit';
 import * as domina from '@domina/core';
 import      str    from '@pulgasari/str';
 
-
 // ::: LOCAL
-import { define, update, updateDataset, updateProperty } from './dom.js';
+const aufbauInfo = await aufbauImport('./aufbau.json5');
 const { deepMerge, isPlainObject } = aufbauUtils;
+
+// :::::: MISC ::::::::::::::::::::::::::::::::::::::::::::::::
+
+const RESERVED_ELEMENT_KEYS = new Set(['mode']);
+const normalizeElements = value => value ?? null;
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
-const RESERVED_ELEMENT_KEYS = new Set(['mode']);
-
-const normalizeElements = value => value ?? null;
-
-/** pushes element config into the AufbauConfigStore as the lowest layer */
+// pushes element config into the AufbauConfigStore as the lowest layer
 function syncElementConfig () {
   const entries = {};
   for (const [key, value] of Object.entries(configs.elements)) {
@@ -74,36 +73,27 @@ export function config (options = {}) {
 
 let initialized = false;
 
-/**
- * boots the aufbau runtime in the browser. idempotent, no-op outside the browser.
- * @param {Partial<typeof defaults>} [options]
- */
+// boots the aufbau runtime in the browser
 export async function init (options = {}) {
   config(options);
 
   if (typeof window === 'undefined' || initialized) return aufbau;
   initialized = true;
-
-  // both of these register their own ready() gate, and both do their first pass
-  // synchronously — so the gates are populated before <aufbau-splash> can await
+  
   if (configs.stylesheet) aufbauPluginsClient.observeStylesheets();
 
        if (configs.elements.mode === 'auto')      aufbauElements.autoloader();
   else if (configs.elements.mode === 'all') await aufbauElements.registerAll();
 
-  if (configs.splash.fonts) aufbauUtils.gate('fonts', domina.fontsReady);
+  //if (configs.splash.fonts) aufbauUtils.gate('fonts', domina.fontsReady);
 
   return aufbau;
 }
 
 // ::: WORKERS STUFF
 
-/**
- * combined master fetch handler for service workers.
- * checks all registered aufbau plugins in sequence.
- * @param {FetchEvent} event
- * @returns {Promise<Response|null>}
- */
+// combined master fetch handler for service workers
+// checks all registered aufbau plugins in sequence
 export async function interceptFetch (event) {
   // 1. stylesheet plugin
   const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
@@ -148,24 +138,6 @@ self.addEventListener('fetch', (event) => {
 //import { aufbauServiceWorker } from '../sw.js';
 //aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
 
-/*
-
-ok wir machen das jetzt mal konkret: ich hatte hier schonma was implementiert, wollte es mit llm neu machen und sauberer machen, aber iwie bin ich jetzt total verwirrt.
-
-- worker-logik liegt in `aufbau/plugins`
-- aufbau liegt in `aufbau/runtime` (ziehe ich grade nach dort um, lag vorher mit in `aufbau/kits`), diese kombiniert quasi alle aufbau-packages.
-- in `aufbau/kits` wird `aufbau/runtime` dann mit zb preact und htm zu einem kit kombiniert.
-- in `aufbau/builders/docs` hab ich nun eine md-doc-files-auf-github-render-engine, die auf `aufbau/kits/preact-htm` basierr
-- und die `aufbau/docs` (ist kein package sondern ein repo-ordner für aufbau-docs als github-pages-webseite, aber halt nich über jekyll sondern meine engine
-
-- nun will ich in `aufbau/runtime` die besprochene fähigkeit mitliefern, dass `.aufbau.css` files kompiliert (das macht `aufbau/stylesheet` package) und gecached werden und via sw intercepted dann usw. 
-- die `aufbau/kits`, die docs-render-engine usw kann dann auch, kommt ja durch `aufbau/runtime`
-
-kannst du mir folgen? verstehst du was ich im sinn habe?
-
-schau dir jedenfalls mal ale besagten packages/ordner an.
-*/
-
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -173,15 +145,9 @@ const aufbau = {
   // config + runtime
   config, configs,
   init, interceptFetch,
-
-  // the boot barrier <aufbau-splash> waits on. also useful on its own: gate() any
-  // promise the app must not be declared ready without
-  gate  : aufbauUtils.gate,
-  ready : aufbauUtils.ready,
-
-  // dom bridge (see ./dom.js, candidate for @aufbau/utils)
+  
+  //
   dom: domina, domina, str,
-  define, update, updateDataset, updateProperty,
 
   // packages
   cache      : aufbauCache,
