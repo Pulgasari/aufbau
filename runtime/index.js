@@ -19,7 +19,7 @@ import * as domina from '@domina/core';
 import      str    from '@pulgasari/str';
 
 // ::: LOCAL
-const configs = await aufbauImport('./configs.json5');
+const configs = await aufbauImport('@aufbau/runtime/configs.json5');
 const { deepMerge, isPlainObject } = aufbauUtils;
 
 // :::::: MISC ::::::::::::::::::::::::::::::::::::::::::::::::
