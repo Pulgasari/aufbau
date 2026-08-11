@@ -20,6 +20,10 @@ const aufbauStore = () => ({
 const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
 const applyPageTheme = theme => dom.root.dataset.theme = theme;
 const toImportPath   = path  => str(path).startsWith('.', '/', 'http') ? path : `./${path}`;
+const importFile     = async (path, vars) => {
+  const imported = await aufbau.import(toImportPath(resolvePath(path, vars)));
+  return isString(imported) ? imported : null;
+};
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -44,10 +48,10 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
     if (trimmed.startsWith('<svg')) {
       svgContent = trimmed;
     } else {
-      const importPath = toImportPath(resolvePath(trimmed, vars));
       try {
-        const imported = await aufbau.import(importPath);
-        svgContent = isString(imported) ? imported : null;
+        //const imported = await aufbau.import(toImportPath(resolvePath(trimmed, vars)));
+        //svgContent = isString(imported) ? imported : null;
+        svgContent = await importFile(trimmed, vars);
       } catch (err) {
         console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, err);
       }
@@ -94,9 +98,6 @@ export function parseHash(defaultPath = 'readme.md') {
   };
 }
 
-/**
- * Normalize sidebar configuration from either Array or Object format.
- */
 function normalizeSidebar (sidebar) {
   if (isArray(sidebar)) return sidebar;
   if (sidebar && typeof sidebar === 'object') {
@@ -105,10 +106,6 @@ function normalizeSidebar (sidebar) {
   return [];
 }
 
-/**
- * Resolve content extensions (before / after content injections).
- * Supports: File paths (.html, .md), raw HTML strings, or Preact Component functions.
- */
 async function resolveExtension (ext, vars = {}) {
   if (!ext)      return null;
   if (isFn(ext)) return { type: 'component', value: ext };
@@ -121,13 +118,12 @@ async function resolveExtension (ext, vars = {}) {
     if (trimmed.startsWith('<') || trimmed.includes('\n')) {
       return { type: 'html', value: trimmed };
     }
-
-    // Resolve path variables and import
-    const importPath = toImportPath(resolvePath(trimmed, vars));
-
+    
     try {
-      const imported = await aufbau.import(importPath);
-      return { type: 'html', value: isString(imported) ? imported : '' };
+      //const imported = await aufbau.import(toImportPath(resolvePath(trimmed, vars)));
+      //return { type: 'html', value: isString(imported) ? imported : '' };
+      const value = await importFile(trimmed, vars);
+      return { type: 'html', value };
     } catch (err) {
       console.warn(`[DocsFW] Failed to load extension content from "${importPath}":`, err);
       return null;
@@ -240,10 +236,9 @@ export function processContent (htmlContent) {
       state.errorMessage = null;
 
       try {
-        const importPath = toImportPath(resolvePath(path, vars));
         const [resolvedBrand, rawHtml, beforeSlot, afterSlot] = await Promise.all([
           resolveBrandConfig(brand, title, vars),
-          aufbau.import(importPath),
+          aufbau.import(toImportPath(resolvePath(path, vars))),
           resolveExtension(before, vars),
           resolveExtension(after, vars)
         ]);
