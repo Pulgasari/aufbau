@@ -461,7 +461,7 @@ export function createDocsFW (config = {}) {
 
     return html`
       <div class="theme-controls">
-        ${picker('page-theme', 'theme',  PAGE_THEMES,       pageTheme, applyPageTheme)}
+        ${picker('page-theme', 'theme',  PAGE_THEMES,       pageTheme, applyPageTheme, { searchable: true })}
         ${picker('code-theme', 'syntax', codeThemes.value,  codeTheme, applyCodeTheme, { searchable: true })}
       </div>
     `;
