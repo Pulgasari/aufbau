@@ -4,6 +4,17 @@
 
 // ::: AUFBAU
 import aufbau  from './aufbau.js';
+import { betterSignal } from '../js/preact/x.js';
+
+// single scalar signal
+aufbau.signal = betterSignal;
+
+// batch: object in, deep-node proxy out.
+// each key becomes an independent leaf signal, accessible without .value:
+//   state.currentRoute        -> get
+//   state.currentRoute = '..' -> set
+aufbau.signals = (obj) => betterSignal({ value: obj, deep: true });
+
 
 // ::: HTM
 import htm from 'htm'; 
