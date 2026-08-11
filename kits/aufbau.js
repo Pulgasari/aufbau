@@ -30,6 +30,7 @@ const { deepMerge, isPlainObject } = aufbauUtils;
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
+const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 const RESERVED_ELEMENT_KEYS = new Set(['mode']);
 
 // keeps the old shorthand working: elements: 'auto' -> elements: { mode: 'auto' }
@@ -76,7 +77,7 @@ export function config (options = {}) {
   return configs;
 }
 
-// :::::: RUNTIME :::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: RUNTIME
 
 let initialized = false;
 
@@ -143,6 +144,15 @@ self.addEventListener('fetch', (event) => {
   );
 });
 */
+
+// maybe: register service worker. classic, NOT type: 'module' — a worker has no
+// import map, so the aufbau worker shares code through importScripts() instead,
+// and that exists only in a classic worker. see @aufbau/sw.js.
+//if (sw) globalThis.navigator?.serviceWorker?.register(sw).catch(console.error);
+// aufbau/docs/sw.js  als modul
+//import { aufbauServiceWorker } from '../sw.js';
+//aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
+
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
