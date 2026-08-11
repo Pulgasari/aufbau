@@ -1,136 +1,32 @@
 // @aufbau/plugins/client
 
-import transform                                from '@aufbau/stylesheet';
+import transformASS                             from '@aufbau/stylesheet';
 import { compileStylesheet, publishStylesheet } from '@aufbau/cache';
-import { createLogger, gate, idle, quiescent }  from '@aufbau/js';
+import { createLogger  }  from '@aufbau/js';
 import { pages, sheets }                        from '@aufbau/store';
+
+// :::::: DATA
 
 const EXTENSIONS = ['.aufbau.css', '.ass'];
 
-const log = createLogger('aufbau-client');
+// :::::: HELPERS
 
+const isClient     = ()   => typeof window !== 'undefined' && window.document;
+const isStylesheet = href => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));
+
+// :::::: REFS
+
+const log = createLogger('aufbau-client');
 let observer = null;
 
-/*
-  the promises processStylesheetLink used to hand back into a forEach that dropped
-  them. the `stylesheets` gate is the only reason they are kept.
-*/
-const inflight = new Set;
-
-// a failed sheet is still a finished sheet as far as the barrier is concerned,
-// so what goes into the set never rejects
-function track (promise) {
-  const settled = Promise.resolve(promise).catch(() => {});
-  inflight.add(settled);
-  settled.then(() => inflight.delete(settled));
-  return promise;
-}
-
-/**
- * Resolves once every aufbau stylesheet on the page has been compiled and swapped
- * in — and stays that way for a frame, because the observer below can queue more
- * at any time.
- */
-export function stylesheetsReady () {
-  return quiescent(inflight).then(() => {
-    document.documentElement.dataset.aufbauStylesheets = 'ready';
-  });
-}
-
-/*
-  what to do when a background revalidation finds that a stylesheet changed.
-
-  'next-load'  write it, apply it on the next visit. the default, because a late
-               swap reflows a page the reader is already looking at — usually worse
-               than the short wait it saves.
-  'immediate'  swap the rule text in place. the <style> element stays put, so the
-               cascade position survives.
-*/
-let swapPolicy = 'next-load';
-
-export function configure ({ swap } = {}) {
-  if (swap === 'immediate' || swap === 'next-load') swapPolicy = swap;
-  return { swap: swapPolicy };
-}
-
-const isStylesheet = (href) => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));
-
-const bootStyleFor = (href) => document.querySelector(`style[data-aufbau-boot="${CSS.escape(href)}"]`);
-
-/*
-  the manifest boot.js reads on the next visit.
-
-  taken from the dom in document order rather than from the order things finished
-  loading, so the styles are re-injected in the order the cascade expects.
-*/
-function recordManifest () {
-  const hrefs = [...document.querySelectorAll('style[data-aufbau-src]')]
-    .map(style => style.getAttribute('data-aufbau-src'));
-
-  if (hrefs.length) pages.setSync(location.pathname, hrefs);
-}
-
-/*
-  every processed stylesheet used to call recordManifest directly, so a page with
-  n sheets paid n full document queries and n synchronous localStorage writes —
-  and all but the last were writing an incomplete manifest anyway.
-
-  coalesced to one pass per microtask: the last one wins, and it is the only one
-  that ever sees every sheet.
-*/
-let manifestScheduled = false;
-
-function scheduleManifest () {
-  if (manifestScheduled) return;
-  manifestScheduled = true;
-
-  queueMicrotask(() => { manifestScheduled = false; recordManifest(); });
-}
-
-/*
-  hands the compiled css to the service worker for the next visit, off the
-  critical path. a failure here costs nothing — the page is already styled and the
-  worker simply falls through to the network.
-*/
-function publish (href, css) {
-  idle(() => publishStylesheet(href, css).catch(error => log.debug(`could not publish ${href}:`, error)));
-}
-
-/**
- * Fetches and transforms an external .aufbau.css or .ass stylesheet element.
- * @param {HTMLLinkElement} node
- */
+// fetches and transforms an external .aufbau.css or .ass stylesheet element
 export async function processStylesheetLink (node) {
-  const href = node.getAttribute('href');
-  if (!isStylesheet(href)) return;
-
-  const booted = bootStyleFor(href);
-
-  /*
-    a boot style is already applied, so there is nothing to wait for. move it into
-    the link's exact position instead of appending a second copy: replaceWith moves
-    the existing element, which leaves the final dom identical to an uncached load.
-  */
-  if (booted) {
-    node.replaceWith(booted);
-    booted.setAttribute('data-aufbau-src', href);
-    booted.removeAttribute('data-aufbau-boot');
-    scheduleManifest();
-
-    // deferred on purpose. this used to fire its fetch immediately, in the middle
-    // of the initial load, competing with the module graph for the very
-    // connections that decide when the page becomes interactive — while the page
-    // was already fully styled and had nothing to gain from the answer.
-    idle(() => revalidate(href, booted));
-    return;
-  }
+  const href = node.getAttribute('href'); if (!isStylesheet(href)) return;
 
   try {
-    const response = await fetch(href);
-    if (!response.ok) return;
-
-    const source = await response.text();
-    const css    = await compileStylesheet(source, transform);
+    const response = await fetch(href); if (!response.ok) return;
+    const source   = await response.text();
+    const css      = await compileStylesheet(source, transform);
 
     const style = document.createElement('style');
     style.textContent = css;
@@ -138,89 +34,48 @@ export async function processStylesheetLink (node) {
     node.replaceWith(style);
 
     sheets.setSync(href, css);
-    publish(href, css);
-    scheduleManifest();
   } catch (error) {
     log.error(`failed to process link stylesheet: ${href}`, error);
   }
 }
 
-/*
-  refetches a stylesheet that was served from the boot cache and reconciles it.
-
-  runs after the page is interactive and stays entirely off the critical path — the
-  page is already styled by the time this starts.
-*/
-async function revalidate (href, style) {
-  try {
-    const response = await fetch(href);
-    if (!response.ok) return;
-
-    const source = await response.text();
-    const css    = await compileStylesheet(source, transform);
-
-    if (css === style.textContent) return; // unchanged, nothing to write or swap
-
-    sheets.setSync(href, css);
-    publish(href, css);
-    if (swapPolicy === 'immediate') style.textContent = css;
-  } catch (error) {
-    // offline, or the file moved. the cached styles stay on the page, which is the
-    // whole point of having served them.
-    log.debug(`could not revalidate ${href}:`, error);
-  }
-}
-
-/**
- * Transforms an inline <style type="text/aufbau"> element.
- * @param {HTMLStyleElement} node
- */
+// transforms an inline <style type="text/aufbau"> element
 export function processStylesheetElement (node) {
   if (node.type !== 'text/aufbau' || node.hasAttribute('data-aufbau-processed')) return;
 
   // stays synchronous on purpose: the element is already in the document, so an
   // await here would hand the parser a frame of unstyled content for no gain.
-  node.textContent = transform(node.textContent);
+  node.textContent = transformASS(node.textContent);
   node.type = 'text/css';
   node.setAttribute('data-aufbau-processed', 'true');
 }
 
-/**
- * Scans and transforms all existing stylesheets and inline styles in the DOM.
- */
+// scans and transforms all existing stylesheets and inline styles in the DOM.
 export function processStylesheets (ctx) {
-  if (typeof window === 'undefined' || !window.document) return;
+  if (!isClient()) return;
   ctx ??= document;
   ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(node => track(processStylesheetLink(node)));
   ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
 }
 
-/**
- * Observes DOM mutations specifically for Aufbau stylesheet elements and link tags.
- */
+// observes DOM mutations specifically for Aufbau stylesheet elements and link tags.
 export function observeStylesheets () {
-  if (typeof window === 'undefined' || !window.document || observer) return;
-
-  // synchronous, so `inflight` is populated before anyone can reach ready()
-  processStylesheets();
-  gate('stylesheets', stylesheetsReady);
+  if (!isClient() || observer) return;
+  processStylesheets(); // synchronous, so `inflight` is populated before anyone can reach ready()
 
   observer = new MutationObserver ((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === 1) { // Node.ELEMENT_NODE
-             if (node.tagName === 'LINK')  track(processStylesheetLink (node));
-        else if (node.tagName === 'STYLE') processStylesheetElement    (node);
-        else if (node.querySelectorAll)    processStylesheets          (node);
+             if (node.tagName === 'LINK')  processStylesheetLink    (node);
+        else if (node.tagName === 'STYLE') processStylesheetElement (node);
+        else if (node.querySelectorAll)    processStylesheets       (node);
         }
       }
     }
   });
 
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true
-  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 }
 
 
