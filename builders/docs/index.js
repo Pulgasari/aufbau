@@ -44,6 +44,7 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
       svgContent = trimmed;
     } else {
       const resolved = resolvePath(trimmed, vars);
+      //const importPath = str(resolved).startsWith('.', '/', 'http') ? resolved : `./${resolved}`;
       const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http'))
         ? resolved
         : `./${resolved}`;
