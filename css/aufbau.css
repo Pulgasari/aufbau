@@ -3,6 +3,8 @@ body {
   color            : var(--aufbau-fg);
 }
 
+div { min-height: 0; }
+
 /* Global text baseline */
 p {
   /* Language handling and word breaking */
