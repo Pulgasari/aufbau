@@ -4,11 +4,6 @@
   // false  = do not touch @aufbau/elements at all
   elements : { mode: 'auto' },
 
-  // the initial loading screen, see <aufbau-splash>. fonts is off because
-  // document.fonts.ready can stall on a slow webfont host, and that is the last
-  // thing worth holding the whole app behind
-  splash     : { fonts: false },
-
   // observe <link>/<style> and transform aufbau stylesheets client-side
   stylesheet : true,
 
