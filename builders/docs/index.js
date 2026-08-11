@@ -24,6 +24,17 @@ const importFile     = async (path, vars) => {
   const imported = await aufbau.import(toImportPath(resolvePath(path, vars)));
   return isString(imported) ? imported : null;
 };
+// resolve vars, import, return the string content or null on failure
+async function importText (raw, vars, label) {
+  const resolved = resolvePath(raw, vars);
+  try {
+    const imported = await aufbau.import(toImportPath(resolved));
+    return isString(imported) ? imported : null;
+  } catch (err) {
+    console.warn(`[DocsFW] Failed to load ${label} from "${resolved}":`, err);
+    return null;
+  }
+}
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -211,8 +222,8 @@ export function processContent (htmlContent) {
   const codeThemes = aufbau.signal([codeTheme.value]);
 
   // side-effects betterSignal doesn't own — trigger once with the hydrated value
-  applyPageTheme(pageTheme.value);
-  applyCodeTheme(codeTheme.value);
+  preact.effect(() => applyPageTheme(pageTheme.value));
+  preact.effect(() => applyCodeTheme(codeTheme.value));
 
   // the full list of every theme in the pinned highlight.js version. falls back
   // to the short list inside <aufbau-code> only when the index is unreachable
