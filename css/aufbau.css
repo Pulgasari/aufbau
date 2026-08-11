@@ -17,6 +17,8 @@ body {
 
 /* Global text baseline */
 p {
+  line-height: 1.25;
+  
   /* Language handling and word breaking */
   hyphens: auto;
   hyphenate-limit-chars: 6 3 3; /* Min word length: 6, min chars before break: 3, min chars after break: 3 */   
