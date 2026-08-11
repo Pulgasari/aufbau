@@ -185,6 +185,7 @@ export function processContent (htmlContent) {
   // aufbau/docs/sw.js  als modul
   //import { aufbauServiceWorker } from '../sw.js';
   //aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
+   //const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 
 
   const normalizedSidebar = normalizeSidebar(sidebar);
