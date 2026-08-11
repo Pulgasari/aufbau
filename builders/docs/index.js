@@ -173,7 +173,7 @@ async function resolveExtension (ext, vars = {}) {
 function upgradeCodeBlocks (doc) {
   doc.querySelectorAll('pre > code').forEach(codeEl => {
     const lang = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
-    const element = dom.createElement('aufbau-code', { lang, textContent = codeEl.textContent });
+    const element = dom.createElement('aufbau-code', { lang, textContent: codeEl.textContent });
     //const element = doc.createElement('aufbau-code'); element.setAttribute('lang', lang); element.textContent = codeEl.textContent;
     codeEl.parentElement.replaceWith(element);
   });
