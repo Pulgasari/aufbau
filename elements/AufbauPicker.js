@@ -240,6 +240,25 @@ export default class AufbauPicker extends AufbauControl {
     this.classList.toggle('is-open', open);
   }
 
+  // Call this function whenever the options menu opens or window resizes
+  updatePlacement () {
+    if (!this.isOpen) return;
+  
+    const rect = this.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate remaining vertical space
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const estimatedMenuHeight = 220; // Target height or measured element height
+  
+    // Flip upward if space below is tight and there is more space above
+    const placeTop = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
+    this.dataset.placement = placeTop ? 'top' : 'bottom';
+  }
+
+
+
   filter (query) {
     dom.filterElements({
       container     : this.$('.picker-list'),
