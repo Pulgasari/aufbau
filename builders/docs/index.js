@@ -389,11 +389,9 @@ export function processContent (htmlContent) {
   }
 
   function ThemeControls () {
-    const choose = (signal, apply) => (event) => {
+    const choose = signal => event => {
       const value = event.target.value;
-      if (!value || value === signal.value) return;
-      signal.value = value;   // persists itself via the store adapter
-      apply(value);           // side-effect the signal doesn't own
+      if (value && value !== signal.value) signal.value = value;  // effect applies + store persists
     };
 
     const picker = (id, label, options, signal, apply, extra = {}) => html`
