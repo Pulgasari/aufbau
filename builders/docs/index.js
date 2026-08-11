@@ -1,10 +1,9 @@
 // @aufbau/builders/docs/index.js
 
-import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
-import { slugify }              from '@aufbau/utils';
-import { store }                from '@aufbau/store';
-// imported for its static themes(), which also registers <aufbau-code>
-import AufbauCode               from '@aufbau/elements/AufbauCode.js';
+import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
+import { slugify } from '@aufbau/utils';
+import { store }   from '@aufbau/store';
+import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
 aufbau.init(); //window.html = html;
@@ -20,14 +19,15 @@ const STORAGE_KEY  = 'docs-theme';
 // mode, so there is nothing left to wrap here
 const readStored  = ()    => store.getSync(STORAGE_KEY, {});
 const writeStored = value => store.setSync(STORAGE_KEY, value);
-
+const applyCodeTheme = (theme) => aufbau.elements.setConfig({ code: { theme } });
 const applyPageTheme = (theme) => {
   if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme;
+  //dom.element(':root').setData({ theme });
+  //dom.element(':root').dataset = { theme };
+  //dom.root.dataset = { theme };
 };
 
-// <aufbau-code> reads `code-theme` from the config store on its own,
-// so every existing code block follows without being touched here
-const applyCodeTheme = (theme) => aufbau.elements.setConfig({ code: { theme } });
+
 
 /**
  * Resolve brand configuration (supports string, image path, or inline SVG).
@@ -296,6 +296,7 @@ export function createDocsFW (config = {}) {
           } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
+          //anchor ? dom.scrollTo('#'+anchor) : dom.scrollToTop(0);
         });
       } catch (err) {
         console.error('[DocsFW Error]:', err);
@@ -409,13 +410,8 @@ export function createDocsFW (config = {}) {
   }
 
   function MainContent() {
-    if (isLoading.value) {
-      return html`<div class="docs-status">Loading documentation...</div>`;
-    }
-
-    if (errorMessage.value) {
-      return html`<div class="docs-status error">${errorMessage.value}</div>`;
-    }
+    if (isLoading.value)    return html`<div class="docs-status">Loading documentation...</div>`;
+    if (errorMessage.value) return html`<div class="docs-status error">${errorMessage.value}</div>`;
 
     return html`
       <div class="docs-body-wrapper">
