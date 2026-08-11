@@ -59,14 +59,22 @@ export default class AufbauPicker extends AufbauControl {
 
     aufbau-picker.is-open .picker-caret { rotate: 180deg; }
 
+    /* top-layer overlay setup via fixed positioning */
     aufbau-picker .picker-list {
-      position: absolute;
-      inset-inline: 0;
-      inset-block-start: 100%;
+      position: fixed;
       z-index: var(--aufbau-overlay-z, 20);
       max-block-size: var(--picker-list-size, 15em);
       overflow-y: auto;
       overscroll-behavior: contain;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    aufbau-picker .picker-list:popover-open {
+      display: block;
     }
 
     aufbau-picker .picker-option {
@@ -131,7 +139,11 @@ export default class AufbauPicker extends AufbauControl {
     return [...readOptions(this, { ignore: this.renderTarget }), ...(this._remoteOptions ?? [])];
   }
 
-  get isOpen () { return !this.$('.picker-list')?.hidden; }
+  get isOpen () {
+    const list = this.$('.picker-list');
+    if (!list) return false;
+    return list.matches?.(':popover-open') || !list.hidden;
+  }
 
   // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -198,6 +210,11 @@ export default class AufbauPicker extends AufbauControl {
     this.on('keydown', (event) => this.onKeydown(event));
     this.onOutside(() => this.close());
 
+    // recalculate popover coordinates on scroll or viewport resize
+    const handleReposition = () => { if (this.isOpen) this.updatePlacement(); };
+    window.addEventListener('resize', handleReposition, { passive: true });
+    window.addEventListener('scroll', handleReposition, { capture: true, passive: true });
+
     // initial selection may come from <aufbau-option selected>. it is the
     // default too, otherwise form.reset() would clear a preselected picker
     if (!this.hasAttribute('value')) {
@@ -235,29 +252,55 @@ export default class AufbauPicker extends AufbauControl {
     const list = this.$('.picker-list');
     if (!list || this.isDisabled) return;
 
-    dom.setAttr(list, { hidden: !open });
+    if (open) {
+      if (list.showPopover && !list.matches(':popover-open')) {
+        list.showPopover();
+      } else {
+        dom.setAttr(list, { hidden: false });
+      }
+      this.updatePlacement();
+    } else {
+      if (list.hidePopover && list.matches(':popover-open')) {
+        list.hidePopover();
+      } else {
+        dom.setAttr(list, { hidden: true });
+      }
+    }
+
     dom.setAttr(this.$('.picker-field'), { ariaExpanded: String(open) });
     this.classList.toggle('is-open', open);
   }
 
-  // Call this function whenever the options menu opens or window resizes
+  /** computes top-layer placement and auto-flips above trigger when space is constrained */
   updatePlacement () {
-    if (!this.isOpen) return;
-  
-    const rect = this.getBoundingClientRect();
+    const list = this.$('.picker-list');
+    const field = this.$('.picker-field');
+    if (!list || !field || !this.isOpen) return;
+
+    const rect = field.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    
-    // Calculate remaining vertical space
+    const estimatedMenuHeight = Math.min(list.scrollHeight || 240, 240);
+
     const spaceBelow = viewportHeight - rect.bottom;
     const spaceAbove = rect.top;
-    const estimatedMenuHeight = 220; // Target height or measured element height
-  
-    // Flip upward if space below is tight and there is more space above
     const placeTop = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
+
     this.dataset.placement = placeTop ? 'top' : 'bottom';
+
+    // align width and position relative to trigger field in viewport space
+    list.style.inlineSize = `${rect.width}px`;
+    list.style.left = `${rect.left}px`;
+
+    if (placeTop) {
+      list.style.top = 'auto';
+      list.style.bottom = `${viewportHeight - rect.top + 4}px`;
+      list.style.maxBlockSize = `${Math.min(spaceAbove - 12, 240)}px`;
+    } else {
+      list.style.bottom = 'auto';
+      list.style.top = `${rect.bottom + 4}px`;
+      list.style.maxBlockSize = `${Math.min(spaceBelow - 12, 240)}px`;
+    }
   }
-
-
 
   filter (query) {
     dom.filterElements({
@@ -266,6 +309,7 @@ export default class AufbauPicker extends AufbauControl {
       filters       : [['', query, 'contains']],
       mismatchClass : 'is-hidden',
     });
+    this.updatePlacement();
   }
 
   onKeydown (event) {
@@ -313,8 +357,7 @@ export default class AufbauPicker extends AufbauControl {
           <input class="picker-input" type="text" ${attrs({ placeholder, readonly: !searchable })} />
           <aufbau-icon icon="lucide:chevron-down" class="picker-caret"></aufbau-icon>
         </div>
-        <div class="picker-list" role="listbox" ${attrs({ 'aria-multiselectable': multiple })} hidden>
-          ${options.map(entry => html`
+        <div class="picker-list" popover="manual" role="listbox" ${attrs({ 'aria-multiselectable': multiple })}>${options.map(entry => html`
             <div class="picker-option" role="option" data-value="${entry.value}" tabindex="-1" ${attrs({ 'aria-disabled': entry.disabled })}>
               ${entry.icon && html`<aufbau-icon icon="${entry.icon}"></aufbau-icon>`}
               <span class="picker-label">${entry.label}</span>
