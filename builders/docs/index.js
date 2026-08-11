@@ -444,7 +444,6 @@ export function processContent (htmlContent) {
 
   // Mount framework to target node
   const $target = dom.getElement(target);
-  //const $target = isString(target) ? document.querySelector(target) : target;
   if ($target) preact.render(html`<${App} />`, $target);
   
 }
