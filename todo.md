@@ -21,6 +21,7 @@
 - [x] property: `aufbau-colors`
 - [x] property: `aufbau-icon`
 - [ ] property: `aufbau-pattern`
+- [ ] property: `aufbau-typo`
 - [x] property: `aufbau-webfont`
 
 
