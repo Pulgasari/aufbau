@@ -54,7 +54,7 @@ export function processStylesheetElement (node) {
 export function processStylesheets (ctx) {
   if (!isClient()) return;
   ctx ??= document;
-  ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(node => track(processStylesheetLink(node)));
+  ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
   ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
 }
 
