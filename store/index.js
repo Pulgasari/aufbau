@@ -82,9 +82,15 @@ export function sweep () {
   return pages.sweepSync() + session.sweepSync() + sheets.sweepSync() + store.sweepSync();
 }
 
+const signalStore = () => ({
+  get: key        => store.getSync(key, undefined),
+  set: (key, val) => store.setSync(key, val),
+});
+
 export {
   session, store,
   sheets,
+  signalStore
 }
 
 export default store;
