@@ -116,3 +116,26 @@ export {
   
   parseStylesheetWorkerMessage,
 };
+
+// File: aufbau/plugins/worker/index.js
+
+const CACHE_NAME = 'aufbau-css-v1';
+
+export function initWorker() {
+  // 1. Intercept .aufbau.css network requests
+  self.addEventListener('fetch', (event) => {
+    if (event.request.url.endsWith('.aufbau.css')) {
+      event.respondWith(
+        caches.open(CACHE_NAME).then(async (cache) => {
+          const cachedResponse = await cache.match(event.request);
+          
+          // Return cached response if compiled CSS exists, otherwise fetch original
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return fetch(event.request);
+        })
+      );
+    }
+  });
+}
