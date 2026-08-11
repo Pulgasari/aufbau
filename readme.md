@@ -68,7 +68,7 @@ const css = await compileStylesheet(source, transform);
 
 read more [here](elements/readme.md).
 
-## @aufbau/hyperfetch
+## [@aufbau/filters](filters/readme.md)
 
 ## [@aufbau/import](cache/readme.md)
 
@@ -92,9 +92,7 @@ import aufbau from '@aufbau/kit';
 const config = await aufbau.import('config.jsonc');
 ```
 
-## @aufbau/patterns
-
-## @aufbau/shaders
+## [@aufbau/patterns](patterns/readme.md)
 
 ## [@aufbau/store](store/readme.md)
 
