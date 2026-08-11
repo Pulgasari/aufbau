@@ -1,7 +1,7 @@
 // @aufbau/builders/docs/index.js
 
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-import { isFn, isString, slugify } from '@aufbau/utils';
+import { isArray, isFn, isString, slugify } from '@aufbau/utils';
 import { store }   from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
@@ -126,7 +126,7 @@ export function parseHash(defaultPath = 'readme.md') {
  * Normalize sidebar configuration from either Array or Object format.
  */
 function normalizeSidebar (sidebar) {
-  if (Array.isArray(sidebar)) return sidebar;
+  if (isArray(sidebar)) return sidebar;
   if (sidebar && typeof sidebar === 'object') {
     return Object.entries(sidebar).map(([title, path]) => ({ title, path }));
   }
@@ -138,8 +138,7 @@ function normalizeSidebar (sidebar) {
  * Supports: File paths (.html, .md), raw HTML strings, or Preact Component functions.
  */
 async function resolveExtension (ext, vars = {}) {
-  if (!ext) return null;
-
+  if (!ext)      return null;
   if (isFn(ext)) return { type: 'component', value: ext };
 
   if (isString(ext)) {
@@ -171,7 +170,7 @@ async function resolveExtension (ext, vars = {}) {
 // rewrite fenced code blocks into <aufbau-code>, so highlighting and copy-to-clipboard
 // come from the element instead of a docsfw-level hljs pass
 function upgradeCodeBlocks (doc) {
-  doc.querySelectorAll('pre > code').forEach(codeEl => {
+  dom.eachElements('pre > code', codeEl => {
     const lang = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
     const element = dom.createElement('aufbau-code', { lang, textContent: codeEl.textContent });
     //const element = doc.createElement('aufbau-code'); element.setAttribute('lang', lang); element.textContent = codeEl.textContent;
