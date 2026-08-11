@@ -19,8 +19,9 @@
 - [x] at-rule: `@aufbau-trait`
 - [ ] property: `aufbau-animate`
 - [x] property: `aufbau-colors`
+- [x] property: `aufbau-filter`
 - [x] property: `aufbau-icon`
-- [ ] property: `aufbau-pattern`
+- [x] property: `aufbau-pattern`
 - [ ] property: `aufbau-typo`
 - [x] property: `aufbau-webfont`
 
