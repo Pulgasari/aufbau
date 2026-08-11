@@ -17,10 +17,10 @@ const STORAGE_KEY  = 'docs-theme';
 
 // @aufbau/store already swallows quota errors and falls back to memory in private
 // mode, so there is nothing left to wrap here
-const readStored  = ()    => store.getSync(STORAGE_KEY, {});
-const writeStored = value => store.setSync(STORAGE_KEY, value);
-const applyCodeTheme = (theme) => aufbau.elements.setConfig({ code: { theme } });
-const applyPageTheme = (theme) => {
+const readStored     = ()    => store.getSync(STORAGE_KEY, {});
+const writeStored    = value => store.setSync(STORAGE_KEY, value);
+const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
+const applyPageTheme = theme => {
   if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme;
   //dom.element(':root').setData({ theme });
   //dom.element(':root').dataset = { theme };
