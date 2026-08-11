@@ -16,6 +16,20 @@ export default class AufbauPicker extends AufbauControl {
     searchable  : Boolean,
     src         : String,
   };
+  
+  /*
+  static styles2 = {
+    'aufbau-picker': {
+      position: 'relative',
+
+      '.ui' : {
+        position: 'relative',
+        display: 'block',
+        inlineSize: '100%',
+      }
+    }
+  };
+  */
 
   // the list overlays the page instead of pushing it apart, so the ui shell is
   // the positioning context. everything decorative lives in the skin
