@@ -100,3 +100,22 @@ export async function cacheCompiledCss(url, compiledCss) {
   await cache.put(url, response);
 }
 */
+
+import { createLogger, hashKey } from '@aufbau/js';
+export const sheets = createCache({
+  driver, onError,
+  maxEntries : 64,
+  namespace  : `${NAMESPACE}:sheets`,
+  version    : VERSION,
+});
+
+export const stylesheetKey = (source) => hashKey(source);
+export async function compileStylesheet (source, compile) {
+  const key    = stylesheetKey(source);
+  const cached = await sheets.get(key);
+  if (cached !== null) return cached;
+
+  const css = await compile(source);
+  await sheets.set(key, css);
+  return css;
+}
