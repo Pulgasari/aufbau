@@ -158,6 +158,12 @@ ok wir machen das jetzt mal konkret: ich hatte hier schonma was implementiert, w
 - in `aufbau/builders/docs` hab ich nun eine md-doc-files-auf-github-render-engine, die auf `aufbau/kits/preact-htm` basierr
 - und die `aufbau/docs` (ist kein package sondern ein repo-ordner für aufbau-docs als github-pages-webseite, aber halt nich über jekyll sondern meine engine
 
+- nun will ich in `aufbau/runtime` die besprochene fähigkeit mitliefern, dass `.aufbau.css` files kompiliert (das macht `aufbau/stylesheet` package) und gecached werden und via sw intercepted dann usw. 
+- die `aufbau/kits`, die docs-render-engine usw kann dann auch, kommt ja durch `aufbau/runtime`
+
+kannst du mir folgen? verstehst du was ich im sinn habe?
+
+schau dir jedenfalls mal ale besagten packages/ordner an.
 */
 
 
