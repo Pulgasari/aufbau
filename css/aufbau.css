@@ -2,3 +2,30 @@ body {
   background-color : var(--aufbau-bg);
   color            : var(--aufbau-fg);
 }
+
+/* Global text baseline */
+p {
+  /* Language handling and word breaking */
+  hyphens: auto;
+  overflow-wrap: break-word;
+
+  /* Modern text layout rules */
+  text-wrap: pretty;
+
+  /* Enhanced font rendering */
+  text-rendering: optimizeLegibility;
+   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading optimization */
+h1, h2, h3, h4 {
+  line-height: 1.25;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+/* Tabular figures for numbers */
+.numeric-data {
+  font-variant-numeric: tabular-nums;
+}
