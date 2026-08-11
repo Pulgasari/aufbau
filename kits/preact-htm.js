@@ -47,7 +47,7 @@ export * from 'preact/hooks';
 export * from '@preact/signals';
 
 const dom = aufbau.domina;
-const str = aufbau.domina;
+const str = aufbau.str;
 
 export { aufbau, dom, htm, html, preact, str };
 
