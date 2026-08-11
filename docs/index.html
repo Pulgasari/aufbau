@@ -19,27 +19,8 @@
 <script type='module'>
 import { createDocsFW, html } from '@aufbau/builders/docs';
 
-globalThis.navigator?.serviceWorker?.register(
-  new URL('./sw.js', import.meta.url), { type: 'module' }
-).catch(console.error);
-
-/*
-if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register(new URL('./sw.js', import.meta.url), { type: 'module' })
-    .catch(err => console.error('[SW Error]:', err));
-}
-*/
-
-function VersionBanner() {
-  return html`
-    <div class="version-banner">
-      <span>Version 2026.1 Active</span>
-    </div>
-  `;
-}
-
 createDocsFW({
+  sw     : new URL('./sw.js', import.meta.url),
   index  : '$repo/readme.md',
   target : '#app',
   brand: {
@@ -60,8 +41,7 @@ createDocsFW({
   },
 
   footerText : 'aufbau | 2026',
-  before     : VersionBanner,
-  after      : '<p class="content-feedback">Found an issue? Edit this page on GitHub.</p>'       
+  // after, before       
 });
 </script>
   
