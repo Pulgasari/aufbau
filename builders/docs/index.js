@@ -187,6 +187,11 @@ export function processContent (htmlContent) {
     errorMessage : null,
     beforeSlot   : null,
     afterSlot    : null,
+    brand        : {
+      title: isString(brand) ? brand : (brand?.title || title),
+      img: null,
+      svgContent: null
+    }
   });
 
   const brandState = aufbau.signal({
@@ -316,7 +321,7 @@ export function processContent (htmlContent) {
 
   // UI Components
   function Header () {
-    const activePath = currentRoute.value.path;
+    const activePath = state.currentRoute.path;
     const { title: brandTitle, img: brandImg, svgContent: brandSvg } = brandState.value;
 
     return html`
