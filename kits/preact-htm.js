@@ -35,7 +35,9 @@ export * from 'preact';
 export * from 'preact/hooks';
 export * from '@preact/signals';
 
-export { aufbau, dom: aufbau.domina, htm, html, preact };
+const dom = aufbau.domina;
+
+export { aufbau, dom, htm, html, preact };
 
 export default aufbau;
 
