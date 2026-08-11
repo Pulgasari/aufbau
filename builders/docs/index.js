@@ -173,8 +173,13 @@ export function processContent (htmlContent) {
     footerText = 'Powered by @aufbau/docsfw',
     toc        = 'h2, h3',
     before     = null,
-    after      = null
+    after      = null,
+    sw         = false,
   } = config;
+
+  // maybe: register service worker
+  if (sw) globalThis.navigator?.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
+
 
   const normalizedSidebar = normalizeSidebar(sidebar);
   const state = aufbau.signals({
