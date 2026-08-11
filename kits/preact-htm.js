@@ -3,18 +3,7 @@
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: AUFBAU
-import aufbau  from './aufbau.js';
-import { betterSignal } from '../js/preact/x.js';
-
-// single scalar signal
-aufbau.signal = betterSignal;
-
-// batch: object in, deep-node proxy out.
-// each key becomes an independent leaf signal, accessible without .value:
-//   state.currentRoute        -> get
-//   state.currentRoute = '..' -> set
-aufbau.signals = (obj) => betterSignal({ value: obj, deep: true });
-
+import aufbau from './../runtime/index.js';
 
 // ::: HTM
 import htm from 'htm'; 
@@ -23,6 +12,7 @@ import htm from 'htm';
 import * as preactCore    from 'preact';
 import * as preactHooks   from 'preact/hooks';
 import * as preactSignals from '@preact/signals';
+import { betterSignal }   from './../js/preact/x.js';
 
 // :::::: BUNDLE ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -40,22 +30,22 @@ Object.assign(
   { htm, html, preact }
 );
 
+aufbau.signal  = betterSignal;
+aufbau.signals = obj => betterSignal({ value: obj, deep: true });
+
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 export * from 'preact';
 export * from 'preact/hooks';
 export * from '@preact/signals';
 
-const dom = aufbau.domina;
-const str = aufbau.str;
-
-export { aufbau, dom, htm, html, preact, str };
-
+export const { bunker, dom, domina, str } = aufbau;
+export { aufbau, htm, html, preact };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
-import aufbau, { html, signal, render } from '@aufbau/kits/preact-htm';
+import aufbau, { dom, html, preact, str } from '@aufbau/kits/preact-htm';
 
 await aufbau.init();
 
