@@ -10,7 +10,8 @@ p {
   /* Language handling and word breaking */
   hyphens: auto;
   overflow-wrap: break-word;
-
+  /*word-break: overflow-wrap*/
+  
   /* Modern text layout rules */
   text-wrap: pretty;
 
