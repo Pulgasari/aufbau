@@ -19,7 +19,7 @@ import * as domina from '@domina/core';
 import      str    from '@pulgasari/str';
 
 // ::: LOCAL
-const aufbauInfo = await aufbauImport('./configs.json5');
+const configs = await aufbauImport('./configs.json5');
 const { deepMerge, isPlainObject } = aufbauUtils;
 
 // :::::: MISC ::::::::::::::::::::::::::::::::::::::::::::::::
@@ -37,21 +37,6 @@ function syncElementConfig () {
   }
   aufbauElements.setConfig(entries, { layer: 'defaults' });
 }
-
-
-
-const configs = {
-  // 'auto'  : lazy autoloader, elements are fetched when they appear in the dom
-  // 'all'   : eagerly register every element up front
-  // false   : do not touch @aufbau/elements at all
-  elements   : { mode: 'auto' },
-  // the initial loading screen, see <aufbau-splash>. fonts is off because
-  // document.fonts.ready can stall on a slow webfont host, and that is the last
-  // thing worth holding the whole app behind
-  splash     : { fonts: false },
-  // observe <link>/<style> and transform aufbau stylesheets client-side
-  stylesheet : true,
-};
 
 export function config (options = {}) {
   const { elements, splash, stylesheet, ...rest } = options;
