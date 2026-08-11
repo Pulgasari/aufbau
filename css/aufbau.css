@@ -5,6 +5,16 @@ body {
 
 div { min-height: 0; }
 
+
+/* TYPO */
+
+body {
+  /* enhanced font rendering */
+  text-rendering: optimizeLegibility;
+   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Global text baseline */
 p {
   /* Language handling and word breaking */
@@ -15,11 +25,6 @@ p {
   
   /* Modern text layout rules */
   text-wrap: pretty;
-
-  /* Enhanced font rendering */
-  text-rendering: optimizeLegibility;
-   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Heading optimization */
