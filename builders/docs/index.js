@@ -1,7 +1,7 @@
 // @aufbau/builders/docs/index.js
 
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-import { slugify } from '@aufbau/utils';
+import { isFn, isString, slugify } from '@aufbau/utils';
 import { store }   from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
@@ -59,7 +59,7 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
 
       try {
         const imported = await aufbau.import(importPath);
-        svgContent = typeof imported === 'string' ? imported : null;
+        svgContent = isString(imported) ? imported : null;
       } catch (err) {
         console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, err);
       }
@@ -140,11 +140,9 @@ function normalizeSidebar (sidebar) {
 async function resolveExtension (ext, vars = {}) {
   if (!ext) return null;
 
-  if (typeof ext === 'function') {
-    return { type: 'component', value: ext };
-  }
+  if (isFn(ext)) return { type: 'component', value: ext };
 
-  if (typeof ext === 'string') {
+  if (isString(ext)) {
     const trimmed = ext.trim();
     
     // Inline HTML check
@@ -160,7 +158,7 @@ async function resolveExtension (ext, vars = {}) {
 
     try {
       const imported = await aufbau.import(importPath);
-      return { type: 'html', value: typeof imported === 'string' ? imported : '' };
+      return { type: 'html', value: isString(imported) ? imported : '' };
     } catch (err) {
       console.warn(`[DocsFW] Failed to load extension content from "${importPath}":`, err);
       return null;
@@ -225,7 +223,7 @@ export function createDocsFW (config = {}) {
   const afterSlot    = aufbau.signal(null);
 
   const brandState = aufbau.signal({
-    title: typeof brand === 'string' ? brand : (brand?.title || title),
+    title: isString(brand) ? brand : (brand?.title || title),
     img: null,
     svgContent: null
   });
@@ -489,7 +487,8 @@ export function createDocsFW (config = {}) {
   }
 
   // Mount framework to target node
-  const $target = typeof target === 'string' ? document.querySelector(target) : target;
+  const $target = dom.getElement(target);
+  //const $target = isString(target) ? document.querySelector(target) : target;
   if ($target) preact.render(html`<${App} />`, $target);
   
 }
