@@ -74,4 +74,4 @@ export const str = Object.assign(
   utils
 );
 
-export default;
+export default str;
