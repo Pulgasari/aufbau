@@ -222,3 +222,30 @@ export function observeStylesheets () {
     subtree: true
   });
 }
+
+
+
+// File: aufbau/plugins/client/index.js
+
+const CACHE_NAME = 'aufbau-css-v1';
+
+/**
+ * Stores compiled CSS in the shared Cache Storage under the original file URL.
+ * @param {string} url - Original request URL of the .aufbau.css file
+ * @param {string} compiledCss - CSS string compiled by aufbau/stylesheet
+ */
+export async function cacheCompiledCss(url, compiledCss) {
+  if (!('caches' in window)) return;
+
+  const cache = await caches.open(CACHE_NAME);
+  const response = new Response(compiledCss, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/css; charset=utf-8',
+      'X-Aufbau-Compiled': 'true'
+    }
+  });
+
+  await cache.put(url, response);
+}
+
