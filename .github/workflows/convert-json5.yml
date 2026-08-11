@@ -1,0 +1,35 @@
+name: Convert JSON5 to JSON
+
+on:
+  push:
+    paths:
+      - '**/*.json5'
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required permission to push commits back to the repo
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Convert all JSON5 files
+        run: |
+          # Locate every .json5 file and compile it to .json in the same folder
+          find . -type f -name "*.json5" | while read -r file; do
+            output="${file%.json5}.json"
+            echo "Converting $file -> $output"
+            npx json5 -c "$file" -o "$output"
+          done
+
+      - name: Commit and push updated JSON files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-generate json from json5 [skip ci]"
+          file_pattern: "*.json"
