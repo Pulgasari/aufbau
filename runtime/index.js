@@ -148,6 +148,18 @@ self.addEventListener('fetch', (event) => {
 //import { aufbauServiceWorker } from '../sw.js';
 //aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
 
+/*
+
+ok wir machen das jetzt mal konkret: ich hatte hier schonma was implementiert, wollte es mit llm neu machen und sauberer machen, aber iwie bin ich jetzt total verwirrt.
+
+- worker-logik liegt in `aufbau/plugins`
+- aufbau liegt in `aufbau/runtime` (ziehe ich grade nach dort um, lag vorher mit in `aufbau/kits`), diese kombiniert quasi alle aufbau-packages.
+- in `aufbau/kits` wird `aufbau/runtime` dann mit zb preact und htm zu einem kit kombiniert.
+- in `aufbau/builders/docs` hab ich nun eine md-doc-files-auf-github-render-engine, die auf `aufbau/kits/preact-htm` basierr
+- und die `aufbau/docs` (ist kein package sondern ein repo-ordner für aufbau-docs als github-pages-webseite, aber halt nich über jekyll sondern meine engine
+
+*/
+
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
