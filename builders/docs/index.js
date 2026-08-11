@@ -248,7 +248,7 @@ export function processContent (htmlContent) {
           ? resolvedPath
           : `./${resolvedPath}`;
 
-        const [resolvedBrand, rawHtml, resolvedBefore, resolvedAfter] = await Promise.all([
+        const [resolvedBrand, rawHtml, beforeSlot, afterSlot] = await Promise.all([
           resolveBrandConfig(brand, title, vars),
           aufbau.import(importPath),
           resolveExtension(before, vars),
@@ -256,10 +256,15 @@ export function processContent (htmlContent) {
         ]);
 
         brandState.value  = resolvedBrand;
-        state.mdContent   = processContent(rawHtml);
-        state.beforeSlot  = resolvedBefore;
-        state.afterSlot   = resolvedAfter;
-        state.isLoading   = false;
+        //state.mdContent   = processContent(rawHtml);
+        //state.beforeSlot  = beforeSlot;
+        //state.afterSlot   = afterSlot;
+        //state.isLoading   = false;
+        state.$update({
+          afterSlot, beforeSlot,
+          mdContent: processContent(rawHtml),
+          isLoading: false,
+        });
 
         requestAnimationFrame(() => {
           anchor ? dom.scrollTo('#'+anchor) : dom.scrollToTop(0);
