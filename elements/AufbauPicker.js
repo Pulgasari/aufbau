@@ -20,13 +20,15 @@ export default class AufbauPicker extends AufbauControl {
   // the list overlays the page instead of pushing it apart, so the ui shell is
   // the positioning context. everything decorative lives in the skin
   static styles = `
-    aufbau-picker { position: relative; }
-
-    aufbau-picker .aufbau-picker-ui {
+    aufbau-picker { 
       position: relative;
-      display: block;
-      inline-size: 100%;
-    }
+
+      .aufbau-picker-ui {
+        position: relative;
+        display: block;
+        inline-size: 100%;
+      }
+    } 
 
     aufbau-picker .picker-field {
       display: flex;
@@ -71,10 +73,8 @@ export default class AufbauPicker extends AufbauControl {
       border: none;
       background: none;
       color: inherit;
-    }
 
-    aufbau-picker .picker-list:popover-open {
-      display: block;
+      &:popover-open { display: block; }
     }
 
     aufbau-picker .picker-option {
@@ -89,10 +89,10 @@ export default class AufbauPicker extends AufbauControl {
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
 
-    aufbau-picker .picker-option[aria-disabled="true"],
-    aufbau-picker .picker-option:disabled { cursor: not-allowed; opacity: 0.5; }
+      &[aria-disabled="true"],
+      &:disabled { cursor: not-allowed; opacity: 0.5; }
+    }
 
     aufbau-picker .picker-label {
       flex: 1 1 auto;
@@ -120,11 +120,13 @@ export default class AufbauPicker extends AufbauControl {
     aufbau-picker .picker-segments {
       flex-wrap: nowrap;
       gap: 0;
+
+      .picker-option { justify-content: center; }
+      .picker-mark   { display: none; }
+      .picker-label  { flex: 0 1 auto; }
     }
 
-    aufbau-picker .picker-segments .picker-option { justify-content: center; }
-    aufbau-picker .picker-segments .picker-mark   { display: none; }
-    aufbau-picker .picker-segments .picker-label  { flex: 0 1 auto; }
+    
 
     /* filterElements() marks non matching entries with this, see filter() below.
        last on purpose: same specificity as the .picker-option rules above, so it
