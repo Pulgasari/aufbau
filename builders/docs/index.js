@@ -289,13 +289,15 @@ export function createDocsFW (config = {}) {
         // no highlighting pass here: upgradeCodeBlocks turned every fenced block
         // into <aufbau-code>, which highlights itself
         requestAnimationFrame(() => {
+          /*
           if (anchor) {
             const targetEl = document.getElementById(anchor);
             if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
           } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
-          //anchor ? dom.scrollTo('#'+anchor) : dom.scrollToTop(0);
+          */
+          anchor ? dom.scrollTo('#'+anchor) : dom.scrollToTop(0);
         });
       } catch (err) {
         console.error('[DocsFW Error]:', err);
