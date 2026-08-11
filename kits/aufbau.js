@@ -21,6 +21,7 @@ import * as aufbauUtils         from '@aufbau/js';
 import * as bunker from '@bunker/kit';
 import * as domina from '@domina/core';
 //import      doc from '@domina/doc';
+import str from '@aufbau/js/str.js';
 
 
 // ::: LOCAL
@@ -137,7 +138,7 @@ const aufbau = {
   ready : aufbauUtils.ready,
 
   // dom bridge (see ./dom.js, candidate for @aufbau/utils)
-  dom: domina, domina,
+  dom: domina, domina, str,
   define, update, updateDataset, updateProperty,
 
   // packages
