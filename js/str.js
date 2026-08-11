@@ -73,3 +73,5 @@ export const str = Object.assign(
   },
   utils
 );
+
+export default;
