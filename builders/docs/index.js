@@ -1,6 +1,6 @@
 // @aufbau/builders/docs/index.js
 
-import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
+import aufbau, { dom, html, preact, str } from '@aufbau/kits/preact-htm';
 import { isArray, isFn, isString, slugify } from '@aufbau/utils';
 import { store }   from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
@@ -44,10 +44,8 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
       svgContent = trimmed;
     } else {
       const resolved = resolvePath(trimmed, vars);
-      //const importPath = str(resolved).startsWith('.', '/', 'http') ? resolved : `./${resolved}`;
-      const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http'))
-        ? resolved
-        : `./${resolved}`;
+      const importPath = str(resolved).startsWith('.', '/', 'http') ? resolved : `./${resolved}`;
+      //const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http')) ? resolved : `./${resolved}`;
 
       try {
         const imported = await aufbau.import(importPath);
@@ -121,15 +119,14 @@ async function resolveExtension (ext, vars = {}) {
     const trimmed = ext.trim();
     
     // Inline HTML check
+    //if (str(trimmed).like('<*\n'))
     if (trimmed.startsWith('<') || trimmed.includes('\n')) {
       return { type: 'html', value: trimmed };
     }
 
     // Resolve path variables and import
     const resolved = resolvePath(trimmed, vars);
-    const importPath = (resolved.startsWith('.') || resolved.startsWith('/') || resolved.startsWith('http')) 
-      ? resolved 
-      : `./${resolved}`;
+    const importPath = str(resolved).startsWith('.', '/', 'http') ? resolved : `./${resolved}`;
 
     try {
       const imported = await aufbau.import(importPath);
