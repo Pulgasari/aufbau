@@ -12,6 +12,19 @@ export const debounce = (callback, delay = 100) => {
   return debounced;
 };
 
+/*
+  runs work once the browser is not busy — for anything that must happen but must
+  not compete with the critical path.
+
+  `deadline` is not optional in spirit: without it an idle callback on a busy page
+  can be postponed indefinitely, and work that never runs is worse than work that
+  runs late. safari has no requestIdleCallback at all, hence the fallback.
+*/
+export const idle = (callback, deadline = 2000) =>
+  typeof requestIdleCallback === 'function'
+    ? requestIdleCallback(callback, { timeout: deadline })
+    : setTimeout(callback, 1);
+
 export const interval = (callback, delay = 1000) => {
   const id = setInterval(callback, delay);
   return () => clearInterval(id);

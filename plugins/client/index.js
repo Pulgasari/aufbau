@@ -1,8 +1,8 @@
 // @aufbau/plugins/client
 
 import transform from '@aufbau/stylesheet';
-import { compileStylesheet } from '@aufbau/cache';
-import { createLogger, gate, quiescent } from '@aufbau/js';
+import { compileStylesheet, publishStylesheet } from '@aufbau/cache';
+import { createLogger, gate, idle, quiescent } from '@aufbau/js';
 import { pages, sheets } from '@aufbau/store';
 
 const EXTENSIONS = ['.aufbau.css', '.ass'];
@@ -70,6 +70,32 @@ function recordManifest () {
   if (hrefs.length) pages.setSync(location.pathname, hrefs);
 }
 
+/*
+  every processed stylesheet used to call recordManifest directly, so a page with
+  n sheets paid n full document queries and n synchronous localStorage writes —
+  and all but the last were writing an incomplete manifest anyway.
+
+  coalesced to one pass per microtask: the last one wins, and it is the only one
+  that ever sees every sheet.
+*/
+let manifestScheduled = false;
+
+function scheduleManifest () {
+  if (manifestScheduled) return;
+  manifestScheduled = true;
+
+  queueMicrotask(() => { manifestScheduled = false; recordManifest(); });
+}
+
+/*
+  hands the compiled css to the service worker for the next visit, off the
+  critical path. a failure here costs nothing — the page is already styled and the
+  worker simply falls through to the network.
+*/
+function publish (href, css) {
+  idle(() => publishStylesheet(href, css).catch(error => log.debug(`could not publish ${href}:`, error)));
+}
+
 /**
  * Fetches and transforms an external .aufbau.css or .ass stylesheet element.
  * @param {HTMLLinkElement} node
@@ -89,8 +115,13 @@ export async function processStylesheetLink (node) {
     node.replaceWith(booted);
     booted.setAttribute('data-aufbau-src', href);
     booted.removeAttribute('data-aufbau-boot');
-    recordManifest();
-    revalidate(href, booted);
+    scheduleManifest();
+
+    // deferred on purpose. this used to fire its fetch immediately, in the middle
+    // of the initial load, competing with the module graph for the very
+    // connections that decide when the page becomes interactive — while the page
+    // was already fully styled and had nothing to gain from the answer.
+    idle(() => revalidate(href, booted));
     return;
   }
 
@@ -107,7 +138,8 @@ export async function processStylesheetLink (node) {
     node.replaceWith(style);
 
     sheets.setSync(href, css);
-    recordManifest();
+    publish(href, css);
+    scheduleManifest();
   } catch (error) {
     log.error(`failed to process link stylesheet: ${href}`, error);
   }
@@ -130,6 +162,7 @@ async function revalidate (href, style) {
     if (css === style.textContent) return; // unchanged, nothing to write or swap
 
     sheets.setSync(href, css);
+    publish(href, css);
     if (swapPolicy === 'immediate') style.textContent = css;
   } catch (error) {
     // offline, or the file moved. the cached styles stay on the page, which is the
