@@ -1,9 +1,9 @@
 // @aufbau/plugins/client
 
-import transform from '@aufbau/stylesheet';
+import transform                                from '@aufbau/stylesheet';
 import { compileStylesheet, publishStylesheet } from '@aufbau/cache';
-import { createLogger, gate, idle, quiescent } from '@aufbau/js';
-import { pages, sheets } from '@aufbau/store';
+import { createLogger, gate, idle, quiescent }  from '@aufbau/js';
+import { pages, sheets }                        from '@aufbau/store';
 
 const EXTENSIONS = ['.aufbau.css', '.ass'];
 
@@ -224,11 +224,9 @@ export function observeStylesheets () {
 }
 
 
-
+/*
 // File: aufbau/plugins/client/index.js
-
 const CACHE_NAME = 'aufbau-css-v1';
-
 /**
  * Stores compiled CSS in the shared Cache Storage under the original file URL.
  * @param {string} url - Original request URL of the .aufbau.css file
@@ -248,4 +246,4 @@ export async function cacheCompiledCss(url, compiledCss) {
 
   await cache.put(url, response);
 }
-
+*/
