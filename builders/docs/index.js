@@ -173,11 +173,8 @@ async function resolveExtension (ext, vars = {}) {
 function upgradeCodeBlocks (doc) {
   doc.querySelectorAll('pre > code').forEach(codeEl => {
     const lang = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
-
-    const element = doc.createElement('aufbau-code');
-    element.setAttribute('lang', lang);
-    element.textContent = codeEl.textContent; // the element escapes on its own
-
+    const element = dom.createElement('aufbau-code', { lang, textContent = codeEl.textContent });
+    //const element = doc.createElement('aufbau-code'); element.setAttribute('lang', lang); element.textContent = codeEl.textContent;
     codeEl.parentElement.replaceWith(element);
   });
 }
@@ -185,7 +182,7 @@ function upgradeCodeBlocks (doc) {
 export function processContent (htmlContent) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
 
-  doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading, index) => {
+  dom.eachElements('h1, h2, h3, h4, h5, h6', (heading, index) => {
     if (!heading.id) heading.id = slugify(heading.textContent || '') || `heading-${index}`;
   });
 
