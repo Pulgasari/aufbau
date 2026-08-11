@@ -71,8 +71,9 @@ export default class AufbauPicker extends AufbauControl {
       margin: 0;
       padding: 0;
       border: none;
-      background: none;
-      color: inherit;
+      background: var(--aufbau-bg, var(--bg, Canvas));
+      color: var(--aufbau-fg, var(--fg, CanvasText));
+
 
       &:popover-open { display: block; }
     }
