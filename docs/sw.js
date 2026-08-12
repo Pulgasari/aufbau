@@ -12,8 +12,6 @@ const debug = {
 debug.log('createCache TOPLEVEL:', !!createCache);
 
 self.addEventListener('fetch', (event) => {
-  debug.log('FetchRequest detected.');
-  
   const url           = event.request.url;
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
 
