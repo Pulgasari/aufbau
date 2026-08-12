@@ -32,6 +32,19 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
+/*
+// Component.js in your framework
+async function loadComponentStyle(cssUrl) {
+  // Service worker will handle this fetch with SWR as well
+  const response = await fetch(cssUrl);
+  const cssText = await response.text();
+
+  const sheet = new CSSStyleSheet();
+  await sheet.replace(cssText);
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+}
+*/
+
 
 /*
 classic script on purpose — a service worker has no import map, so bare specifiers
