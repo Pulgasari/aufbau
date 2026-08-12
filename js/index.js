@@ -26,9 +26,9 @@ export * from './memo.js';
 export * from './array.js';
 export * from './number.js';
 export * from './object.js';
-export * from './random.js';
+//export * from './random.js';
 export * from './string.js';
-export * from './timing.js';
+//export * from './timing.js';
 //export * from './url.js';
 
 // maybe to domina
