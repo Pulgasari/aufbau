@@ -7,12 +7,14 @@ const defaultStylesheet = new CSSStyleSheet();
 const cssCache = createCache({ name: 'framework-css' });
 
 export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
+  console.log('[SS] init default stylesheet ...');
   // 1. read cached transformed CSS & hash from CacheStorage
   const cachedData = await cssCache.getMeta(cssURL);
 
   // 2. STALE: apply cached transformed CSS immediately if available
   if (cachedData?.content) defaultStylesheet.replaceSync(cachedData.content);
-
+  if (cachedData?.content) console.log('[SS] default stylesheet served from cache.'); 
+  
   // ensure sheet is registered in adoptedStyleSheets
   if (!document.adoptedStyleSheets.includes(defaultStylesheet)) {
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, defaultStylesheet];    
@@ -24,8 +26,11 @@ export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
     const rawCSS   = await response.text();
     const hash     = getContentHash(rawCSS);
 
+    console.log('[SS] revalidate default stylesheet ...');
+
     // update if source content changed or cache missed
     if (!cachedData || cachedData.hash !== hash) {
+      console.log('[SS] ... it changed !!!');
       const transformedCSS = await transformACSS(rawCSS);
 
       // hot replace stylesheet rules in memory instantly
@@ -34,6 +39,7 @@ export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
       // update cache with new content and hash
       await cssCache.setMeta(cssURL, transformedCSS, hash);
     }
+    else console.log('[SS] ... nothing changed.');
   } catch (error) {
     console.warn('[Aufbau] Failed to revalidate stylesheet:', error);
   }
