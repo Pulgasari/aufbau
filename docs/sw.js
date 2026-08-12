@@ -2,7 +2,9 @@
 
 // :::::: CACHE
 
-import createCache from './../runtime/cache.js';
+import createCache   from './../runtime/cache.js';
+import transformACSS from './../stylesheet/index.js';
+
 const cssCache = createCache({ name: 'css' });
 const hashCode = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 
