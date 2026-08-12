@@ -182,7 +182,9 @@ export function processContent (htmlContent) {
   } = config;
 
   // connect with aufbau config/init interface
-   initDefaultStylesheet('./index.aufbau.css');
+   const defaultDocsStylesheetURL = import.meta.resolve('./index.aufbau.css');
+   console.log('defaultDocsStylesheetURL:', defaultDocsStylesheetURL);
+   initDefaultStylesheet(defaultDocsStylesheetURL);
 
   // maybe: register service worker. classic, NOT type: 'module' — a worker has no
   // import map, so the aufbau worker shares code through importScripts() instead,
