@@ -38,6 +38,7 @@ function hashCode (s) {
     h = Math.imul(31, h) + s.charCodeAt(i) | 0;
   return h;
 }
+//const hashCode = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 
 // ::::::
 
