@@ -1,0 +1,12 @@
+/* @aufbau/css/palettes/zombie.css */
+
+:root, :root[data-theme="zombie"] {
+   --aufbau-bg     : #282a36;
+   --aufbau-fg     : #f8f8f2;
+   --aufbau-blue   : #8be9fd;
+   --aufbau-green  : #50fa7b;
+   --aufbau-orange : #ffb86c;
+   --aufbau-red    : #ff79c6;
+   --aufbau-purple : #bd93f9;
+   --aufbau-yellow : #f1fa8c;
+}
