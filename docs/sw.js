@@ -20,9 +20,7 @@ self.addEventListener('fetch', (event) => {
   if (isAufbauStyle) {
     debug.log('AufbauStylesheet detected:', url);
     debug.log('createCache:', !!createCache);
-    if (createCache) console.log('[SW] createCache available.');
-    if (createCache) console.log(createCache);
-    if (caches) console.log('caches:', caches);
+    if (caches) debug.log('caches:', caches);
   }
   
 });
