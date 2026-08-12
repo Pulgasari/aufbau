@@ -16,25 +16,12 @@ const REGEX_DECLARATION    = /([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g;
 // :::::: defaults
 
 const DEFAULT_TOKENS = {
-  gap: {
-    tiny   : '0.25rem',
-    small  : '0.50rem',
-    normal : '1.00rem',
-    big    : '2.00rem',
-    huge   : '3.00rem',
-  },
   'aspect-ratio': {
-    square   : '1 / 1',
-    video    : '16 / 9',
-    portrait : '4 / 5',
     cinema   : '21 / 9',
     photo    : '3 / 2',
-  },
-  media: {
-    mobile  : '480px',
-    tablet  : '768px',
-    desktop : '1024px',
-    wide    : '1280px',
+    portrait : '4 / 5',
+    square   : '1 / 1',
+    video    : '16 / 9',
   },
   'box-shadow': {
     sm   : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
@@ -42,7 +29,23 @@ const DEFAULT_TOKENS = {
     lg   : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
     xl   : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
     none : 'none',
-  }
+  },
+  gap: {
+    tiny   : '0.25rem',
+    small  : '0.50rem',
+    normal : '1.00rem',
+    big    : '2.00rem',
+    huge   : '3.00rem',
+  },
+  media: {
+    mobile  : '480px',
+    tablet  : '768px',
+    desktop : '1024px',
+    wide    : '1280px',
+  },
+
+  margin  : DEFAULT_TOKENS.gap,
+  padding : DEFAULT_TOKENS.gap,
 };
 
 const PROPERTY_FAMILY_MAP = [
