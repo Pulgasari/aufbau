@@ -39,6 +39,13 @@ function hashCode (s) {
   return h;
 }
 //const hashCode = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
+// https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0?permalink_comment_id=4557681#gistcomment-4557681     
+function hashCode(s) {
+  return [...s].reduce(
+    (hash, c) => (Math.imul(31, hash) + c.charCodeAt(0)) | 0,
+    0
+  );
+}
 
 // ::::::
 
