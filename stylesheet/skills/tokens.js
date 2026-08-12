@@ -4,14 +4,17 @@ import { stripComments } from './parse.js';
 
 // :::::: pre-compiled RegExp rules
 
-const REGEX_LINE_SPLIT     = /\r?\n/;
 const REGEX_COLON_SPLIT    = /:(.+)/;
-const REGEX_SHADE_PATTERN  = /^([a-zA-Z0-9_-]+)-(d|l|a)(\d+)$/;
+const REGEX_LINE_SPLIT     = /\r?\n/;
+
+const REGEX_DECLARATION    = /([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g;
+
 const REGEX_AUFBAU_MEDIA   = /@aufbau-media\s+(?:breakpoints\s*)?\{([^}]*)\}/gi;
 const REGEX_AUFBAU_COLOR   = /@aufbau\s+color\s*\{([^}]*)\}/gi;
 const REGEX_AUFBAU_COLORS  = /@aufbau\s+colors\s*\{([^}]*)\}/gi;
 const REGEX_AUFBAU_GENERIC = /@aufbau\s+([a-zA-Z0-9-_,\s]+?)\s*\{([^}]*)\}/g;
-const REGEX_DECLARATION    = /([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+);?/g;
+
+const REGEX_SHADE_PATTERN  = /^([a-zA-Z0-9_-]+)-(d|l|a)(\d+)$/;
 
 // :::::: defaults
 
