@@ -1,11 +1,10 @@
 // @aufbau/runtime/client.js
 
-//import { publishStylesheet }     from '@aufbau/cache';
-import { createLogger, hashKey } from '@aufbau/js';
-import { pages, sheets }         from '@aufbau/store';
-import transformACSS             from '@aufbau/stylesheet';
-import { createCache }           from '@bunker/cache';
-import * as dom                  from '@domina/core';
+import { hashKey }       from '@aufbau/js';
+import { pages, sheets } from '@aufbau/store';
+import transformACSS     from '@aufbau/stylesheet';
+import { createCache }   from '@bunker/cache';
+import * as dom          from '@domina/core';
 
 // :::::: DATA
 
@@ -28,7 +27,6 @@ const stylesheetKey = source => hashKey(source);
 
 // :::::: REFS
 
-const log = createLogger('aufbau-client');
 let observer = null;
 
 // :::::: METHODS
@@ -51,7 +49,7 @@ export async function processStylesheetLink (node) {
     sheets.setSync(href, css);
     console.log('aufbau-stylesheet transformed and cached:', href);
   } catch (error) {
-    log.error(`failed to process link stylesheet: ${href}`, error);
+    console.error(`failed to process link stylesheet: ${href}`, error);
   }
 }
 
