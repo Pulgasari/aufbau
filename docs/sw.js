@@ -33,6 +33,12 @@ const hash = (value) => {
 
 const hashKey = (value) => hash(value).toString(36);
 
+function hashCode (s) {
+  for (let i = 0, h = 0; i < s.length; i++)
+    h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  return h;
+}
+
 // ::::::
 
 debug.log('createCache TOPLEVEL:', !!createCache);
@@ -46,10 +52,12 @@ self.addEventListener('fetch', async (event) => {
     debug.log('createCache:', !!createCache);
     if (caches) debug.log('caches:', caches);
 
-    const cssFileKey = hashKey(url);
-    const cacheResult = await cssCache.get(cssFileKey);
+    const cssFileKey1 = hashKey  (url);
+    const cssFileKey2 = hashCode (url);
+    const cacheResult = await cssCache.get(cssFileKey1);
     
-    debug.log('cssFileKey:', cssFileKey);
+    debug.log('cssFileKey1:', cssFileKey1);
+    debug.log('cssFileKey2:', cssFileKey2);
     debug.log('has cacheResult:', !!cacheResult);
     debug.log('cacheResult:', cacheResult);
     
