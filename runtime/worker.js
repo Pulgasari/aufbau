@@ -145,7 +145,7 @@ export function initWorker() {
 
 
 
-/ ::: WORKERS STUFF
+// ::: WORKERS STUFF
 
 // combined master fetch handler for service workers
 // checks all registered aufbau plugins in sequence
