@@ -1,12 +1,14 @@
 // @aufbau/js/CanonicalMap.js
 
-import {
+import str from '@pulgasari/str';
+
+const {
   toCamelCase, 
   toConstantCase,
   toKebabCase, 
   toPascalCase, 
   toSnakeCase
-} from './string.js';
+} = str;
 
 const FORMS = {
   camel    : toCamelCase,    // userProfileStatus
