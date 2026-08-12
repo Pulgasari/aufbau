@@ -139,3 +139,56 @@ export function initWorker() {
     }
   });
 }
+
+
+
+
+
+
+/ ::: WORKERS STUFF
+
+// combined master fetch handler for service workers
+// checks all registered aufbau plugins in sequence
+export async function interceptFetch (event) {
+  // 1. stylesheet plugin
+  const stylesheetResponse = await aufbauPluginsWorker.interceptFetchStylesheet(event);
+  if (stylesheetResponse) return stylesheetResponse;
+
+  // 2. fonts. cached as responses, so the browser's font pipeline is untouched
+  //    and font-display / unicode-range keep working
+  const fontResponse = await aufbauPluginsWorker.interceptFetchFont(event);
+  if (fontResponse) return fontResponse;
+
+  // 3. JS modules & CDN assets (Runtime Caching)
+  const moduleResponse = await aufbauPluginsWorker.interceptFetchModule(event);
+  if (moduleResponse) return moduleResponse;
+
+  return null;
+}
+
+/*
+// poo/playground/sw.js
+
+import { interceptFetch } from '@aufbau/kit';
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    (async () => {
+      // Intercept Aufbau stylesheets and assets
+      const aufbauResponse = await interceptFetch(event);
+      if (aufbauResponse) return aufbauResponse;
+
+      // Fallback to network fetch
+      return fetch(event.request);
+    })()
+  );
+});
+*/
+
+// maybe: register service worker. classic, NOT type: 'module' — a worker has no
+// import map, so the aufbau worker shares code through importScripts() instead,
+// and that exists only in a classic worker. see @aufbau/sw.js.
+//if (sw) globalThis.navigator?.serviceWorker?.register(sw).catch(console.error);
+// aufbau/docs/sw.js  als modul
+//import { aufbauServiceWorker } from '../sw.js';
+//aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
