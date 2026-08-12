@@ -4,7 +4,8 @@ import createCache from './../runtime/cache.js';
 
 const DEBUG = true;
 const debug = {
-  log = (...args) => DEBUG && console.log(`[SW]`, ...args),
+  log  : (...args) => DEBUG && console.log  (`[SW]`, ...args),
+  warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
 };
 
 debug.log('createCache TOPLEVEL:', !!createCache);
