@@ -1,6 +1,6 @@
   // @aufbau/runtime/cache.js
 
-export function createCacheStorageDriver (options = {}) {
+export function create (options = {}) {
   
   const { name = 'cache', namespace = 'aufbau' } = options;
   const cacheName = namespace + ':' + name;
@@ -36,3 +36,5 @@ export function createCacheStorageDriver (options = {}) {
     
   };
 }
+
+export default create;
