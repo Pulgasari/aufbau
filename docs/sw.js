@@ -61,6 +61,7 @@ self.addEventListener('fetch', (event) => {
   const url           = event.request.url;
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
 
+  /*
   if (isAufbauStyle) {
     debug.log('AufbauStylesheet detected:', url);
     logAllCacheEntries();
@@ -91,6 +92,8 @@ self.addEventListener('fetch', (event) => {
       return new Response (transformedCss, { headers: { 'Content-Type': 'text/css; charset=utf-8' }});
     })());
   }
+  */
+  
 });
 
 
