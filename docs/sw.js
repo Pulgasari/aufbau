@@ -15,6 +15,25 @@ const debug = {
   warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
 };
 
+// :::::: TEMP
+
+// Inspect all caches and their stored requests
+async function logAllCacheEntries() {
+  // Retrieve names of all existing caches
+  const cacheNames = await caches.keys();
+
+  for (const cacheName of cacheNames) {
+    const cache = await caches.open(cacheName);
+    // Retrieve all stored Request objects for the current cache
+    const requests = await cache.keys();
+
+    console.log(`[Cache Storage] Cache Name: ${cacheName}`);
+    requests.forEach((request) => {
+      console.log(`  - ${request.url}`);
+    });
+  }
+}
+
 // ::::::
 
 debug.log('createCache TOPLEVEL:', !!createCache);
@@ -34,7 +53,8 @@ self.addEventListener('fetch', async (event) => {
     debug.log('cssFileKey:', cssFileKey);
     debug.log('has cacheResult:', !!cacheResult);
     debug.log('cacheResult:', cacheResult);
-    
+
+    logAllCacheEntries();
   }
   
 });
