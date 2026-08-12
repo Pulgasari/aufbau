@@ -23,7 +23,7 @@ export async function compileStylesheet (input, compile) {
   let   output = await cssCache.get(key);
 
   if (!output) {
-    output = await compile(source);
+    output = await compile(input);
     await cssCache.set(key, output);
   }
   
