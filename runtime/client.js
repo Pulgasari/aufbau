@@ -63,7 +63,7 @@ export function processStyleElement (node) {
 // scans and transforms all existing stylesheets and inline styles in the DOM.
 export function processStylesheets (ctx = document) {
   ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
-  ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
+  ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStyleElement);
 }
 
 // observes DOM for Aufbau stylesheets
@@ -75,9 +75,9 @@ export function observeStylesheets (ctx = document.head) {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === 1) { // Node.ELEMENT_NODE
-             if (node.tagName === 'LINK')  processStylesheetLink    (node);
-        else if (node.tagName === 'STYLE') processStylesheetElement (node);
-        else if (node.querySelectorAll)    processStylesheets       (node);
+             if (node.tagName === 'LINK')  processStylesheetLink (node);
+        else if (node.tagName === 'STYLE') processStyleElement   (node);
+        else if (node.querySelectorAll)    processStylesheets    (node);
         }
       }
     }
