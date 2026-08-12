@@ -37,7 +37,7 @@ const hashKey = (value) => hash(value).toString(36);
 
 debug.log('createCache TOPLEVEL:', !!createCache);
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', async (event) => {
   const url           = event.request.url;
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
 
