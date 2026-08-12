@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>docs</title>
   <!-- aufbau -->
+  <script>
+    const search = globalThis.location?.search ?? '';
+    globalThis.DEBUG = new URLSearchParams(search).has('debug');
+    console.log('DEBUG:', DEBUG);
+  </script>
   <script src="https://pulgasari.github.io/importmap.js"></script>
   <link rel="stylesheet" href="https://pulgasari.github.io/aufbau/builders/docs/index.aufbau.css" />
   <!-- google fonts -->
