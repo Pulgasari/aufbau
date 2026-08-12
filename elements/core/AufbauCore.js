@@ -2,9 +2,9 @@
 
 // :::::: IMPORTS
 
-import { adoptClassStyles }      from './styles.js';
-import { applySkin }             from './skin.js';
-import { BASE, schemaOf }        from './schema.js';
+import { BASE, schemaOf }   from './schema.js';
+import { applySkin }        from './skin.js';
+import { adoptClassStyles } from './styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import {
