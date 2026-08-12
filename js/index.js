@@ -16,7 +16,6 @@ export * from './log.js';
 
 // dom
 export * from './dom/events.js';
-export * as dom from '@domina/core';
 
 // maybe to bunker
 export * from './memo.js';
@@ -28,6 +27,10 @@ export * from './object.js';
 
 // maybe to domina
 export * from './html.js';
+
+// by vendor
+export * as dom from '@domina/core';
+export *        from '@pulgasari/str';
 
 
 
