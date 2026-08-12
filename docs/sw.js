@@ -4,6 +4,7 @@
 
 import createCache from './../runtime/cache.js';
 const cssCache = createCache({ name: 'css' });
+const hashCode = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 
 // :::::: DEBUGGER
 
@@ -13,11 +14,6 @@ const debug = {
   info : (...args) => DEBUG && console.info (`[SW]`, ...args),
   warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
 };
-
-
-// :::::: HASHING
-
-const hashCode = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 
 // ::::::
 
