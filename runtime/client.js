@@ -1,9 +1,11 @@
 // @aufbau/runtime/client.js
 
 import createCache   from './cache.js';
-import { hashKey }   from '@aufbau/js';
-import transformACSS from '@aufbau/stylesheet';
+//import { hashKey }   from '@aufbau/js';
+import transformACSS from './../stylesheet/index.js'; //from '@aufbau/stylesheet';
 //import * as dom    from '@domina/core';
+
+const hashKey = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 
 // :::::: DATA
 
