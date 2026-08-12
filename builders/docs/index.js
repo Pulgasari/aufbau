@@ -177,8 +177,12 @@ export function processContent (htmlContent) {
     toc        = 'h2, h3',
     before     = null,
     after      = null,
+
     sw         = false,
   } = config;
+
+  // connect with aufbau config/init interface
+   initDefaultStylesheet('./index.aufbau.css');
 
   // maybe: register service worker. classic, NOT type: 'module' — a worker has no
   // import map, so the aufbau worker shares code through importScripts() instead,
