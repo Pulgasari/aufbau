@@ -2,7 +2,13 @@
 
 const RAW = Symbol.for('aufbau.raw');
 
-const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const ESCAPES = { 
+  '&' : '&amp;', 
+  '<' : '&lt;',
+  '>' : '&gt;', 
+  '"' : '&quot;', 
+  "'" : '&#39;'
+};
 
 // quotes included, values are interpolated into attributes as often as into text
 export const escapeHtml = value =>
