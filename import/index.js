@@ -3,6 +3,10 @@
 
 import cache from '@aufbau/cache';
 
+import { createCache } from '@bunker/cache';
+const cache = createCache({ driver, onError, maxEntries: 512, namespace: 'aufbau', version: 1 });
+
+
 // :::::: VENDOR RESOLUTION ::::::::::::::::::::::::::::::::::::::
 
 const registry = {
