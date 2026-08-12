@@ -3,7 +3,9 @@
 import createCache from './../runtime/cache.js';
 //import transformACSS from '@aufbau/stylesheet';
 
-//const debugLog = message => DEBUG && console.log(`[SW] ${message}`);
+const DEBUG = true;
+
+const debugLog = message => DEBUG && console.log(`[SW] ${message}`);
 
 self.addEventListener('fetch', (event) => {
   console.log('[SW] FetchRequest detected.');
