@@ -8,8 +8,8 @@
 // subclasses override render()/sync() as usual and call super.sync() so the
 // shared state (disabled, aria, form value, validity) is applied.
 
-import AufbauCore from './AufbauCore.js';
-import { createLogger } from '@aufbau/js';
+import AufbauCore         from './AufbauCore.js';
+import { createLogger }   from '@aufbau/js';
 import { resolvePersist } from '@aufbau/store';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
