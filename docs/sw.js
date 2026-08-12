@@ -49,8 +49,8 @@ self.addEventListener('fetch', (event) => {
     const cssFileKey = hashKey(url);
     const cacheResult = cssCache.get(cssFileKey);
     
-    debug.log('cssFileKey:', !!cssFileKey);
-    debug.log('cacheResult:', !!cacheResult);
+    debug.log('cssFileKey:', cssFileKey);
+    debug.log('cacheResult:', cacheResult);
     
   }
   
