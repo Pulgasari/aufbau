@@ -1,7 +1,6 @@
 // @aufbau/stylesheet/skills/tokens.js
 
-import { warnMissingToken } from './../dev/debug.js';
-import { stripComments }    from './parse.js';
+import { stripComments } from './parse.js';
 
 // :::::: pre-compiled RegExp rules
 
@@ -58,16 +57,12 @@ const PROPERTY_FAMILY_MAP = [
 ];
 
 export function resolveColorShade(val, colorTokens) {
-  if (!colorTokens) return null;
+  if (!colorTokens)     return null;
   if (colorTokens[val]) return colorTokens[val];
 
-  const shadeMatch = val.match(REGEX_SHADE_PATTERN);
-  if (!shadeMatch) return null;
-
+  const shadeMatch = val.match(REGEX_SHADE_PATTERN); if (!shadeMatch) return null;
   const [, baseName, type, pctStr] = shadeMatch;
-  const baseColor = colorTokens[baseName];
-  if (!baseColor) return null;
-
+  const baseColor = colorTokens[baseName]; if (!baseColor) return null;
   const pct = parseInt(pctStr, 10);
   if (isNaN(pct) || pct < 0 || pct > 100) return null;
 
@@ -181,4 +176,12 @@ export function resolveToken(tokens, category, key) {
   
   return key; // Fallback für direkte Wertangaben wie gap(1rem)
 }
+export function resolveToken2 (tokens, category, key) {
+  return !key ? '' : tokens?.[category]?.[key] ?? key;
+}
+
+
+
+
+
 
