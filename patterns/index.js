@@ -13,7 +13,7 @@ function encodeSvg (svg) {
 // single place the svg asset location is spelled out. import.meta.resolve runs
 // the specifier through the host import-map; fetch/importFile cannot read the
 // import-map on their own, so we resolve to a real url first.
-const SVG_SPECIFIER = '@aufbau/svg/patterns/';
+const SVG_SPECIFIER = './../svg/patterns/'; // '@aufbau/svg/patterns/';
 const DATA_URL      = import.meta.resolve(SVG_SPECIFIER + 'data.json5');
 const PROP_PREFIX   = '--aufbau-pattern-';
 const DEFS_HOST_ID  = 'aufbau-pattern-defs';
