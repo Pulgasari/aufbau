@@ -88,7 +88,6 @@ export * from './core/AufbauConfig.js';
 
 export {
   autoloader,
-  elementsReady,
   load,
   registerAll
 };
