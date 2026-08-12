@@ -1,6 +1,6 @@
 // aufbau/docs/sw.js
 
-import createCache from './../runtime.cache.js';
+import createCache from './../runtime/cache.js';
 //import transformACSS from '@aufbau/stylesheet';
 
 self.addEventListener('fetch', (event) => {
