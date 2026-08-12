@@ -8,7 +8,7 @@ import importFile from './../import/index.js';
 // only resolves against a <filter> living in the document. there is no
 // data-uri equivalent that filters the host element, so no mode switch here.
 
-const SVG_SPECIFIER = '@aufbau/svg/filters/';
+const SVG_SPECIFIER = './../svg/filters/'; // '@aufbau/svg/filters/';
 const DATA_URL      = import.meta.resolve(SVG_SPECIFIER + 'data.json5');
 const PROP_PREFIX   = '--aufbau-filter-';
 const DEFS_HOST_ID  = 'aufbau-filter-defs';
