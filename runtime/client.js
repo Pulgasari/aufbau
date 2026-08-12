@@ -1,37 +1,36 @@
 // @aufbau/runtime/client.js
 
-import { hashKey }       from '@aufbau/js';
-import { pages, sheets } from '@aufbau/store';
-import transformACSS     from '@aufbau/stylesheet';
-import { createCache }   from '@bunker/cache';
-import * as dom          from '@domina/core';
+import createCache   from './cache.js';
+import { hashKey }   from '@aufbau/js';
+import transformACSS from '@aufbau/stylesheet';
+//import * as dom    from '@domina/core';
 
 // :::::: DATA
 
+const cssCache   = createCache ({ name: 'css' }); //aufbau.cache.css.hashKey = fileContent;
 const EXTENSIONS = ['.aufbau.css', '.ass'];
-const NAMESPACE  = 'aufbau';
-const VERSION    = 1;
-
-const stylesheetsCache = createCache({
-  driver, onError,
-  maxEntries : 64,
-  namespace  : `${NAMESPACE}:sheets`,
-  version    : VERSION,
-});
+let   observer   = null;
 
 // :::::: HELPERS
 
-const isClient      = ()     => typeof window !== 'undefined' && window.document;
-const isStylesheet  = href   => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));
-const stylesheetKey = source => hashKey(source);
-
-// :::::: REFS
-
-let observer = null;
+const isClient     = ()   => typeof window !== 'undefined' && window.document;
+const isStylesheet = href => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));    
 
 // :::::: METHODS
 
-// fetches and transforms an external .aufbau.css or .ass stylesheet element
+export async function compileStylesheet (input, compile) {
+  const key    = hashKey(input);
+  let   output = await cssCache.get(key);
+
+  if (!output) {
+    output = await compile(source);
+    await cssCache.set(key, output);
+  }
+  
+  return output;
+}
+
+// <link href='... .aufbau.css' />
 export async function processStylesheetLink (node) {
   const href = node.getAttribute('href'); if (!isStylesheet(href)) return;
   console.log('aufbau-stylesheet detected:', href);
@@ -41,19 +40,18 @@ export async function processStylesheetLink (node) {
     const source   = await response.text();
     const css      = await compileStylesheet(source, transformASS);
 
-    const style = document.createElement('style');
-    style.textContent = css;
-    style.setAttribute('data-aufbau-src', href);
-    node.replaceWith(style);
+    const element = document.createElement('style');
+    element.textContent = css;
+    element.setAttribute('data-aufbau-src', href);
+    node.replaceWith(element);
 
-    sheets.setSync(href, css);
+    cssCache.set(href, css);
     console.log('aufbau-stylesheet transformed and cached:', href);
-  } catch (error) {
-    console.error(`failed to process link stylesheet: ${href}`, error);
   }
+  catch (e) { console.error(`failed to process link stylesheet: ${href}`, e); }
 }
 
-// transforms an inline <style type="text/aufbau"> element
+// <style type='text/aufbau'>
 export function processStyleElement (node) {
   if (node.type !== 'text/aufbau' || node.hasAttribute('data-aufbau-processed')) return;
 
@@ -63,21 +61,17 @@ export function processStyleElement (node) {
 }
 
 // scans and transforms all existing stylesheets and inline styles in the DOM.
-export function processStylesheets (ctx) {
-  if (!isClient()) return;
-  ctx ??= document;
+export function processStylesheets (ctx = document) {
   ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
   ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
-  //dom.elements({ tag: 'link',  rel: 'stylesheet'   }).each(processStylesheetLink);
-  //dom.elements({ tag: 'style', type: 'text/aufbau' }).each(processStylesheetElement);
 }
 
-// observes DOM mutations specifically for Aufbau stylesheet elements and link tags.
-export function observeStylesheets () {
+// observes DOM for Aufbau stylesheets
+export function observeStylesheets (ctx = document.head) {
   if (!isClient() || observer) return;
   processStylesheets(); // synchronous, so `inflight` is populated before anyone can reach ready()
 
-  observer = new MutationObserver ((mutations) => {
+  observer = new MutationObserver (mutations => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node.nodeType === 1) { // Node.ELEMENT_NODE
@@ -89,19 +83,5 @@ export function observeStylesheets () {
     }
   });
 
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-}
-
-
-
-
-
-export async function compileStylesheet (source, compile) {
-  const key    = stylesheetKey(source);
-  const cached = await sheets.get(key);
-  if (cached !== null) return cached;
-
-  const css = await compile(source);
-  await sheets.set(key, css);
-  return css;
+  observer.observe (ctx, { childList: true, subtree: true });
 }
