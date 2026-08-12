@@ -1,6 +1,9 @@
   // @aufbau/runtime/cache.js
 
-export function create (options = {}) {
+const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
+
+
+function createCache (options = {}) {
   
   const { name = 'cache', namespace = 'aufbau' } = options;
   const cacheName = namespace + ':' + name;
@@ -56,4 +59,5 @@ export function create (options = {}) {
   };
 }
 
-export default create;
+export { createCache, getContentHash };
+export default createCache;
