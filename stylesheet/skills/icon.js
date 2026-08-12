@@ -13,9 +13,9 @@ export function transformIcons (code, tokens) {
     const iconMatch = val.match(/["']?([a-zA-Z0-9_-]+[:\/][a-zA-Z0-9_-]+)["']?/);
     if (!iconMatch) return fullMatch;
 
-    const rawIcon = iconMatch[1];
+    const rawIcon  = iconMatch[1];
     const iconPath = rawIcon.replace(':', '/') + '.svg';
-    const iconUrl = `${ICONIFY_BASE}${iconPath}`;
+    const iconUrl  = `${ICONIFY_BASE}${iconPath}`;
 
     // Size extraction (Default: 1em)
     let size = '1em';
