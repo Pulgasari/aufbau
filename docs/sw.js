@@ -17,35 +17,7 @@ const debug = {
 
 // :::::: HASHING
 
-const stableStringify = (value) =>
-    typeof value === 'string'                    ? value
-  : value === null || typeof value !== 'object'  ? String(value)
-  : Array.isArray(value)                         ? `[${value.map(stableStringify).join(',')}]`
-  : `{${Object.keys(value).sort().map(key => `${key}:${stableStringify(value[key])}`).join(',')}}`;
-
-const hash = (value) => {
-  const text = typeof value === 'string' ? value : stableStringify(value);
-  let result = 5381;
-  let index  = text.length;
-  while (index) result = (result * 33) ^ text.charCodeAt(--index);
-  return result >>> 0;
-};
-
-const hashKey = (value) => hash(value).toString(36);
-
-function hashCode (s) {
-  for (var i = 0, h = 0; i < s.length; i++)
-    h = Math.imul(31, h) + s.charCodeAt(i) | 0;
-  return h;
-}
-//const hashCode = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
-// https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0?permalink_comment_id=4557681#gistcomment-4557681     
-function hashCode2 (s) {
-  return [...s].reduce(
-    (hash, c) => (Math.imul(31, hash) + c.charCodeAt(0)) | 0,
-    0
-  );
-}
+const hashCode = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 
 // ::::::
 
@@ -60,14 +32,10 @@ self.addEventListener('fetch', async (event) => {
     debug.log('createCache:', !!createCache);
     if (caches) debug.log('caches:', caches);
 
-    const cssFileKey1 = hashKey   (url);
-    const cssFileKey2 = hashCode  (url);
-    const cssFileKey3 = hashCode2 (url);
+    const cssFileKey  = hashCode(url);
     const cacheResult = await cssCache.get(cssFileKey1);
     
-    debug.log('cssFileKey1:', cssFileKey1);
-    debug.log('cssFileKey2:', cssFileKey2);
-    debug.log('cssFileKey3:', cssFileKey3);
+    debug.log('cssFileKey:', cssFileKey);
     debug.log('has cacheResult:', !!cacheResult);
     debug.log('cacheResult:', cacheResult);
     
