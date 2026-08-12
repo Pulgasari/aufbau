@@ -1,5 +1,45 @@
 // aufbau/docs/sw.js
 
+import transformACSS from '@aufbau/stylesheet';
+
+const CSS_CACHE = 'aufbau-compiled-css-v1';
+
+self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+  const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
+
+  if (isAufbauStyle) {
+    event.respondWith(
+      caches.open(CSS_CACHE).then(async (cache) => {
+        // 1. Check if we already have the compiled CSS Response in CacheStorage
+        const cachedResponse = await cache.match(event.request);
+        if (cachedResponse) {
+          // Serve compiled CSS instantly to the browser (0ms, no DOM manipulation!)
+          return cachedResponse;
+        }
+
+        // 2. Otherwise fetch the raw source from server
+        const rawResponse = await fetch(event.request);
+        const sourceText  = await rawResponse.text();
+
+        // 3. Compile raw dialect to native CSS
+        const compiledCss = transformACSS(sourceText);
+
+        // 4. Create a synthetic HTTP response with 'text/css'
+        const cssResponse = new Response(compiledCss, {
+          headers: { 'Content-Type': 'text/css; charset=utf-8' }
+        });
+
+        // 5. Save synthetic response to CacheStorage and return it
+        cache.put(event.request, cssResponse.clone());
+        return cssResponse;
+      })
+    );
+  }
+});
+
+
+/*
 const CSS_CACHE_NAME = 'framework-css-v1';
 
 self.addEventListener('fetch', (event) => {
@@ -31,6 +71,7 @@ self.addEventListener('fetch', (event) => {
     );
   }
 });
+*/
 
 /*
 // Component.js in your framework
