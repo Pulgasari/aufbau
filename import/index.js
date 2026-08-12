@@ -1,11 +1,16 @@
 // @aufbau/import
 // @ts-self-types="./index.d.ts"
 
-import cache from '@aufbau/cache';
-
 import { createCache } from '@bunker/cache';
-const cache = createCache({ driver, onError, maxEntries: 512, namespace: 'aufbau', version: 1 });
+import { createDb }    from '@bunker/db';
+import { createFiles } from '@bunker/files';
 
+const namespace = 'aufbau';
+const version   = 1;
+const onError   = ({ error, key, operation }) => console.warn(`could not ${operation} "${key}":`, error);   
+const db        = createDb(namespace);
+const driver    = db.driver('kv');
+const cache     = createCache({ driver, onError, maxEntries: 512, namespace, version });
 
 // :::::: VENDOR RESOLUTION ::::::::::::::::::::::::::::::::::::::
 
