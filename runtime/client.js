@@ -38,7 +38,7 @@ export async function processStylesheetLink (node) {
   try {
     const response = await fetch(href); if (!response.ok) return;
     const source   = await response.text();
-    const css      = await compileStylesheet(source, transformASS);
+    const css      = await compileStylesheet(source, transformACSS);
 
     const element = document.createElement('style');
     element.textContent = css;
