@@ -54,7 +54,7 @@ const DIRTY_VALUE_MAP = {
 /**
  * Transforms aufbau-dirty shorthand declarations into standard CSS properties.
  */
-export function transformDirty(rawVal) {
+export function transformDirty (rawVal) {
   if (!rawVal) return '';
 
   const tokens = rawVal.trim().split(/\s+/);
@@ -63,11 +63,8 @@ export function transformDirty(rawVal) {
   for (const token of tokens) {
     const cleanToken = token.toLowerCase();
     const prop = DIRTY_VALUE_MAP[cleanToken];
-
-    if (prop) {
-      // Last value for a property wins
-      matchedProps.set(prop, token);
-    }
+    // Last value for a property wins
+    if (prop) matchedProps.set(prop, token);
   }
 
   const declarations = [];
