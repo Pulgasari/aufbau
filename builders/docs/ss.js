@@ -1,14 +1,12 @@
 // @aufbau/runtime/stylesheet.js
 
-import createCache   from './../runtime/cache.js';
+import { createCache, getContentHash } from './../runtime/cache.js';
 import transformACSS from './../stylesheet/index.js';
 
 export const frameworkStyleSheet = new CSSStyleSheet();
 
 const cssCache = createCache({ name: 'framework-css' });
 
-const getContentHash = (str) =>
-  [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
 
 export async function initFrameworkStyle(cssUrl = './index.aufbau.css') {
   // 1. Read cached transformed CSS & hash from CacheStorage
