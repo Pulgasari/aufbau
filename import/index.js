@@ -1,9 +1,10 @@
 // @aufbau/import
 // @ts-self-types="./index.d.ts"
 
+// :::::: CACHE ::::::::::::ÄÄÄÄ::::::::::::::::::::::::::::::::::::::
+
 import { createCache } from '@bunker/cache';
 import { createDb }    from '@bunker/db';
-import { createFiles } from '@bunker/files';
 
 const namespace = 'aufbau';
 const version   = 1;
