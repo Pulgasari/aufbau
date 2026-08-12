@@ -1,0 +1,107 @@
+// @aufbau/runtime/client.js
+
+import { publishStylesheet }     from '@aufbau/cache';
+import { createLogger, hashKey } from '@aufbau/js';
+import { pages, sheets }         from '@aufbau/store';
+import transformACSS             from '@aufbau/stylesheet';
+import { createCache }           from '@bunker/cache';
+import * as dom                  from '@domina/core';
+
+// :::::: DATA
+
+const EXTENSIONS = ['.aufbau.css', '.ass'];
+const NAMESPACE  = 'aufbau';
+const VERSION    = 1;
+
+const stylesheetsCache = createCache({
+  driver, onError,
+  maxEntries : 64,
+  namespace  : `${NAMESPACE}:sheets`,
+  version    : VERSION,
+});
+
+// :::::: HELPERS
+
+const isClient      = ()     => typeof window !== 'undefined' && window.document;
+const isStylesheet  = href   => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));
+const stylesheetKey = source => hashKey(source);
+
+// :::::: REFS
+
+const log = createLogger('aufbau-client');
+let observer = null;
+
+// :::::: METHODS
+
+// fetches and transforms an external .aufbau.css or .ass stylesheet element
+export async function processStylesheetLink (node) {
+  const href = node.getAttribute('href'); if (!isStylesheet(href)) return;
+
+  try {
+    const response = await fetch(href); if (!response.ok) return;
+    const source   = await response.text();
+    const css      = await compileStylesheet(source, transformASS);
+
+    const style = document.createElement('style');
+    style.textContent = css;
+    style.setAttribute('data-aufbau-src', href);
+    node.replaceWith(style);
+
+    sheets.setSync(href, css);
+  } catch (error) {
+    log.error(`failed to process link stylesheet: ${href}`, error);
+  }
+}
+
+// transforms an inline <style type="text/aufbau"> element
+export function processStyleElement (node) {
+  if (node.type !== 'text/aufbau' || node.hasAttribute('data-aufbau-processed')) return;
+
+  node.textContent = transformACSS(node.textContent);
+  node.type = 'text/css';
+  node.setAttribute('data-aufbau-processed', 'true');
+}
+
+// scans and transforms all existing stylesheets and inline styles in the DOM.
+export function processStylesheets (ctx) {
+  if (!isClient()) return;
+  ctx ??= document;
+  ctx.querySelectorAll   ('link[rel="stylesheet"]').forEach(processStylesheetLink);
+  ctx.querySelectorAll('style[type="text/aufbau"]').forEach(processStylesheetElement);
+  //dom.elements({ tag: 'link',  rel: 'stylesheet'   }).each(processStylesheetLink);
+  //dom.elements({ tag: 'style', type: 'text/aufbau' }).each(processStylesheetElement);
+}
+
+// observes DOM mutations specifically for Aufbau stylesheet elements and link tags.
+export function observeStylesheets () {
+  if (!isClient() || observer) return;
+  processStylesheets(); // synchronous, so `inflight` is populated before anyone can reach ready()
+
+  observer = new MutationObserver ((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === 1) { // Node.ELEMENT_NODE
+             if (node.tagName === 'LINK')  processStylesheetLink    (node);
+        else if (node.tagName === 'STYLE') processStylesheetElement (node);
+        else if (node.querySelectorAll)    processStylesheets       (node);
+        }
+      }
+    }
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+}
+
+
+
+
+
+export async function compileStylesheet (source, compile) {
+  const key    = stylesheetKey(source);
+  const cached = await sheets.get(key);
+  if (cached !== null) return cached;
+
+  const css = await compile(source);
+  await sheets.set(key, css);
+  return css;
+}
