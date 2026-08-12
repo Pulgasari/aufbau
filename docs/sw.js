@@ -1,22 +1,23 @@
 // aufbau/docs/sw.js
 
 import createCache from './../runtime/cache.js';
-//import transformACSS from '@aufbau/stylesheet';
 
 const DEBUG = true;
+const debug = {
+  log = (...args) => DEBUG && console.log(`[SW]`, ...args),
+};
 
-const debugLog = message => DEBUG && console.log(`[SW] ${message}`);
+debug.log('createCache TOPLEVEL:', !!createCache);
 
 self.addEventListener('fetch', (event) => {
-  console.log('[SW] FetchRequest detected.');
-  console.log('(SW] DEBUG:', DEBUG);
-  console.log('(SW] self.DEBUG:', self.DEBUG);
+  debug.log('FetchRequest detected.');
   
   const url           = event.request.url;
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
 
   if (isAufbauStyle) {
-    console.log('[SW] AufbauStylesheet detected:', url);
+    debug.log('AufbauStylesheet detected:', url);
+    debug.log('createCache:', !!createCache);
     if (createCache) console.log('[SW] createCache available.');
     if (createCache) console.log(createCache);
     if (caches) console.log('caches:', caches);
