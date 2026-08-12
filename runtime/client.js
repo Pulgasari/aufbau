@@ -1,6 +1,6 @@
 // @aufbau/runtime/client.js
 
-import { publishStylesheet }     from '@aufbau/cache';
+//import { publishStylesheet }     from '@aufbau/cache';
 import { createLogger, hashKey } from '@aufbau/js';
 import { pages, sheets }         from '@aufbau/store';
 import transformACSS             from '@aufbau/stylesheet';
@@ -36,7 +36,8 @@ let observer = null;
 // fetches and transforms an external .aufbau.css or .ass stylesheet element
 export async function processStylesheetLink (node) {
   const href = node.getAttribute('href'); if (!isStylesheet(href)) return;
-
+  console.log('aufbau-stylesheet detected:', href);
+  
   try {
     const response = await fetch(href); if (!response.ok) return;
     const source   = await response.text();
@@ -48,6 +49,7 @@ export async function processStylesheetLink (node) {
     node.replaceWith(style);
 
     sheets.setSync(href, css);
+    console.log('aufbau-stylesheet transformed and cached:', href);
   } catch (error) {
     log.error(`failed to process link stylesheet: ${href}`, error);
   }
