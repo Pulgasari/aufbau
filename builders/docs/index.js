@@ -1,8 +1,8 @@
 // @aufbau/builders/docs/index.js
 
-import aufbau, { dom, html, preact, str }      from '@aufbau/kits/preact-htm';
-import { isArray, isFn, isString, toSlugCase } from '@aufbau/utils';
-import { store, signalStore as aufbauStore }   from '@aufbau/store';
+import aufbau, { dom, html, preact, str }    from '@aufbau/kits/preact-htm';
+import { isArray, isFn, isString }           from '@aufbau/utils';
+import { store, signalStore as aufbauStore } from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
@@ -155,7 +155,7 @@ function upgradeCodeBlocks (doc) {
 export function processContent (htmlContent) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
   dom.eachElements('h1, h2, h3, h4, h5, h6', (heading, index) => {
-    if (!heading.id) heading.id = toSlugCase(heading.textContent || '') || `heading-${index}`;
+    if (!heading.id) heading.id = str.toSlugCase(heading.textContent || '') || `heading-${index}`;
   });
   upgradeCodeBlocks(doc);
   return doc.body.innerHTML;
