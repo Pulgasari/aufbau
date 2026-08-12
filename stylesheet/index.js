@@ -1,7 +1,8 @@
 // @aufbau/stylesheet
 
-import { extractTokens, transformTokenProperties } from './skills/tokens.js';
-import { observeDom }    from './plugins/client.js';
+// :::::: IMPORTS
+
+import { parsePattern }  from './skills/pattern.js';
 import transformCenter   from './skills/center.js';
 import transformConfig   from './skills/config.js';
 import transformDirty    from './skills/dirty.js';
@@ -13,13 +14,48 @@ import transformPattern  from './skills/pattern.js';
 import transformTraits   from './skills/trait.js';
 import transformUnset    from './skills/unset.js';
 import transformWebfonts from './skills/webfont.js';
-import { transformFlex, transformGrid } from './skills/layout.js';
-import { patternImage } from '@aufbau/patterns';
-import { parsePattern } from './skills/pattern.js';
-import { ensureFilter } from '@aufbau/filters';
 
+import { transformFlex, transformGrid }            from './skills/layout.js';
+import { extractTokens, transformTokenProperties } from './skills/tokens.js';
+
+import { ensureFilter } from '@aufbau/filters';
+import { patternImage } from '@aufbau/patterns';
+//import { observeDom } from './plugins/client.js';
+
+// :::::: MOVE IT OUT
+
+// const unique = [...new Set(array)];
+// const unique = Array.from(new Set(array));
+function mergeUnique (...arrays) {
+  const set = new Set();
+  for (let i = 0; i < arrays.length; i++) {
+    const arr = arrays[i];
+    for (let j = 0; j < arr.length; j++) {
+      set.add(arr[j]);
+    }
+  }
+  return Array.from(set);
+}
+
+// ::: cache
+
+const TRANSFORM_CACHE = new Map;
+const MAX_CACHE_SIZE  = 500;
+
+function fastHash (str) {
+  let hash = 5381;
+  let i    = str.length;
+  while (i) hash = (hash * 33) ^ str.charCodeAt(--i);
+  return hash >>> 0;
+}
+
+// :::::: REGEXP PATTERNS
+
+const REGEX_AUFBAU_PROPERTIES = /(aufbau-[a-z-]+)\s*:\s*([^;}\n]+);?/g;
 const REGEX_FILTER_USAGE  = /aufbau-filter:\s*([a-z0-9-]+)/gi;
 const REGEX_PATTERN_USAGE = /aufbau-pattern:\s*([^;}\n]+);?/g;
+
+// ::::::
 
 /**
  * async pre-pass: for every distinct aufbau-pattern declaration, build its
@@ -62,34 +98,12 @@ async function injectFilterDefs (code) {
   return ready;
 }
 
-// const unique = [...new Set(array)];
-// const unique = Array.from(new Set(array));
-function mergeUnique (...arrays) {
-  const set = new Set();
-  for (let i = 0; i < arrays.length; i++) {
-    const arr = arrays[i];
-    for (let j = 0; j < arr.length; j++) {
-      set.add(arr[j]);
-    }
-  }
-  return Array.from(set);
-}
+
 
 // :::::: pre-compiled RegExp rules
 
-const REGEX_AUFBAU_PROPERTIES = /(aufbau-[a-z-]+)\s*:\s*([^;}\n]+);?/g;
 
-// :::::: cache
 
-const TRANSFORM_CACHE = new Map;
-const MAX_CACHE_SIZE  = 500;
-
-function fastHash (str) {
-  let hash = 5381;
-  let i    = str.length;
-  while (i) hash = (hash * 33) ^ str.charCodeAt(--i);
-  return hash >>> 0;
-}
 
 /**
  * Level 3: Single-Pass Property Matcher
@@ -107,7 +121,7 @@ function transformSmartProperties (code, tokens) {
       case 'aufbau-colors'  : {
         const parts      = rawVal.trim().split(/\s+/);
         const pairName   = parts[0];
-        const isInverted = parts.includes('inverted') || parts.includes('invert');
+        const isInverted = parts.includes9('inverted') || parts.includes('invert');
         const pair       = tokens.colors?.[pairName];
         if (!pair) return fullMatch;
         const bg = isInverted ? pair.fg : pair.bg;
