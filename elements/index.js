@@ -52,7 +52,7 @@ async function registerAll () {
 
 function request (tag) {
   if (!tag || customElements.get(tag)) return;
-  load(tag).then(() => console.log('aufbau-element loaded:', tag);
+  load(tag).then(() => console.log('aufbau-element loaded:', tag));
 }
 
 function scan (node) {
