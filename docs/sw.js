@@ -2,11 +2,10 @@
 
 // :::::: CACHE
 
-import createCache   from './../runtime/cache.js';
+import { createCache, getContentHash } from './../runtime/cache.js';
 import transformACSS from './../stylesheet/index.js';
 
 const cssCache = createCache({ name: 'css' });
-const getContentHash = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
 
 // function to revalidate content in the background
 const revalidateInBackground = async () => {
