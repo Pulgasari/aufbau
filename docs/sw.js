@@ -40,7 +40,7 @@ function hashCode (s) {
 }
 //const hashCode = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
 // https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0?permalink_comment_id=4557681#gistcomment-4557681     
-function hashCode(s) {
+function hashCode2 (s) {
   return [...s].reduce(
     (hash, c) => (Math.imul(31, hash) + c.charCodeAt(0)) | 0,
     0
@@ -60,12 +60,14 @@ self.addEventListener('fetch', async (event) => {
     debug.log('createCache:', !!createCache);
     if (caches) debug.log('caches:', caches);
 
-    const cssFileKey1 = hashKey  (url);
-    const cssFileKey2 = hashCode (url);
+    const cssFileKey1 = hashKey   (url);
+    const cssFileKey2 = hashCode  (url);
+    const cssFileKey3 = hashCode2 (url);
     const cacheResult = await cssCache.get(cssFileKey1);
     
     debug.log('cssFileKey1:', cssFileKey1);
     debug.log('cssFileKey2:', cssFileKey2);
+    debug.log('cssFileKey3:', cssFileKey3);
     debug.log('has cacheResult:', !!cacheResult);
     debug.log('cacheResult:', cacheResult);
     
