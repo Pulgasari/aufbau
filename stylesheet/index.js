@@ -121,7 +121,7 @@ function transformSmartProperties (code, tokens) {
       case 'aufbau-colors'  : {
         const parts      = rawVal.trim().split(/\s+/);
         const pairName   = parts[0];
-        const isInverted = parts.includes9('inverted') || parts.includes('invert');
+        const isInverted = parts.includes('inverted') || parts.includes('invert');
         const pair       = tokens.colors?.[pairName];
         if (!pair) return fullMatch;
         const bg = isInverted ? pair.fg : pair.bg;
