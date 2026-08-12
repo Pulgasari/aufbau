@@ -85,7 +85,7 @@ export async function init (options = {}) {
 const aufbau = {
   // config + runtime
   config, configs,
-  init, interceptFetch,
+  init, //interceptFetch,
   
   //
   dom: domina, domina, str,
