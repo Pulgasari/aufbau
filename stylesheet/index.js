@@ -98,13 +98,6 @@ async function injectFilterDefs (code) {
   return ready;
 }
 
-
-
-// :::::: pre-compiled RegExp rules
-
-
-
-
 /**
  * Level 3: Single-Pass Property Matcher
  * Verarbeitet alle `aufbau-*` Custom Properties in EINEM EINZIGEN Durchlauf.
