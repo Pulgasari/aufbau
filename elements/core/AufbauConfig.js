@@ -2,7 +2,8 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
-import { CanonicalMap, createLogger, dom, isArray, isPlainObject, isString, toJson, toKebabCase } from '@aufbau/js';
+import { CanonicalMap, createLogger, dom, isArray, isPlainObject, isString, toJson, str } from '@aufbau/js';
+const { toKebabCase } = str;
 
 const log = createLogger('aufbau-config');
 
