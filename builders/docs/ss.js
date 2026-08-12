@@ -40,3 +40,5 @@ export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
 
   return defaultStylesheet;
 }
+
+export default initDefaultStylesheet;
