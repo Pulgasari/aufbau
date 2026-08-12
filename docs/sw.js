@@ -5,6 +5,7 @@ import createCache from './../runtime/cache.js';
 const DEBUG = true;
 const debug = {
   log  : (...args) => DEBUG && console.log  (`[SW]`, ...args),
+  info : (...args) => DEBUG && console.info (`[SW]`, ...args),
   warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
 };
 
