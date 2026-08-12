@@ -1,5 +1,24 @@
 // aufbau/docs/sw.js
 
+import createCache from './../runtime.cache.js';
+//import transformACSS from '@aufbau/stylesheet';
+
+self.addEventListener('fetch', (event) => {
+  console.log('[SW] FetchRequest detected.');
+  
+  const url           = event.request.url;
+  const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
+
+  if (isAufbauStyle) {
+    console.log('[SW] AufbauStylesheet detected:', url);
+    if (createCache) console.log('[SW] createCache available.');
+  }
+  
+});
+
+
+/*
+
 import transformACSS from '@aufbau/stylesheet';
 
 const CSS_CACHE = 'aufbau-compiled-css-v1';
@@ -37,6 +56,8 @@ self.addEventListener('fetch', (event) => {
     );
   }
 });
+
+*/
 
 
 /*
