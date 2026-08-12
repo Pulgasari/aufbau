@@ -18,6 +18,7 @@ import * as aufbauWorker from './worker.js';
 const fileURL = new URL("./configs.json5", import.meta.url);
 const configs = await aufbauImport(fileURL);
 const { deepMerge, isPlainObject } = aufbauUtils;
+console.log('[runtime] configs:', configs);
 
 // ::: VENDORS
 
