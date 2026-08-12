@@ -18,8 +18,8 @@ import transformWebfonts from './skills/webfont.js';
 import { transformFlex, transformGrid }            from './skills/layout.js';
 import { extractTokens, transformTokenProperties } from './skills/tokens.js';
 
-import { ensureFilter } from '@aufbau/filters';
-import { patternImage } from '@aufbau/patterns';
+import { ensureFilter } from './../filters/index.js';  // @aufbau/filters
+import { patternImage } from './../patterns/index.js'; // @aufbau/patterns
 //import { observeDom } from './plugins/client.js';
 
 // :::::: MOVE IT OUT
