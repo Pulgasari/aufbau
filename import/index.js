@@ -1,7 +1,7 @@
 // @aufbau/import
 // @ts-self-types="./index.d.ts"
 
-// :::::: CACHE ::::::::::::ÄÄÄÄ::::::::::::::::::::::::::::::::::::::
+// :::::: CACHE :::::::::::::::::::::::::::::::::::::::::::::::::::
 
 import { createCache } from '@bunker/cache';
 import { createDb }    from '@bunker/db';
