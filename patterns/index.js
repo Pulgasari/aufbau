@@ -1,7 +1,10 @@
 // @aufbau/patterns/index.js
 
-import { importFile } from '@aufbau/import';
+//import { importFile } from '@aufbau/import';
 import { encodeSvg }  from '@aufbau/js';
+
+import importFile from './../import/index.js';
+
 
 // single place the svg asset location is spelled out. import.meta.resolve runs
 // the specifier through the host import-map; fetch/importFile cannot read the
