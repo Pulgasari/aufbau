@@ -5,6 +5,7 @@ import createCache from './../runtime/cache.js';
 
 self.addEventListener('fetch', (event) => {
   console.log('[SW] FetchRequest detected.');
+  console.log('(SW] DEBUG:', DEBUG);
   
   const url           = event.request.url;
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
