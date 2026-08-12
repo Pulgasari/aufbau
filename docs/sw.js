@@ -40,7 +40,7 @@ const debug = {
 // :::::: TEMP
 
 // Inspect all caches and their stored requests
-async function logAllCacheEntries() {
+async function logAllCacheEntries () {
   // Retrieve names of all existing caches
   const cacheNames = await caches.keys();
 
@@ -63,6 +63,9 @@ self.addEventListener('fetch', (event) => {
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
 
   if (isAufbauStyle) {
+    debug.log('AufbauStylesheet detected:', url);
+    logAllCacheEntries();
+    
     event.respondWith((async () => {
       // 1. check if cached version is immediately available
       const cachedData = await cssCache.getMeta(event.request);
