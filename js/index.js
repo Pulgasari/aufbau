@@ -13,7 +13,6 @@ export * from './CanonicalMap.js';
 export * from './coerce.js';
 export * from './hash.js';
 export * from './log.js';
-export * from './ready.js';
 
 // dom
 export * from './dom/events.js';
