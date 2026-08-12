@@ -180,7 +180,38 @@ export function resolveToken2 (tokens, category, key) {
   return !key ? '' : tokens?.[category]?.[key] ?? key;
 }
 
+// :::::: token warnings
 
+const REGEX_BARE_IDENT = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+
+const CSS_WIDE_KEYWORDS = new Set([
+  'inherit', 'initial', 'unset', 'revert', 'revert-layer',
+  'auto', 'none', 'normal', 'currentcolor', 'transparent'
+]);
+
+const warnedTokens = new Set();
+
+// fires only for bare identifiers that look like a token name but are not part of
+// the category's token set. literal css values (units, hex, functions, shorthands
+// with spaces) are skipped, as is anything the engine accepts as valid css.
+// deduped per prop/value pair to keep the log quiet on large sheets.
+function warnMissingToken(prop, value, categoryTokens) {
+  if (!REGEX_BARE_IDENT.test(value))                 return;
+  if (CSS_WIDE_KEYWORDS.has(value.toLowerCase()))    return;
+  if (typeof CSS !== 'undefined' && CSS.supports?.(prop, value)) return;
+
+  const id = `${prop}:${value}`;
+  if (warnedTokens.has(id)) return;
+  warnedTokens.add(id);
+
+  const known = Object.keys(categoryTokens).join(', ') || '(empty)';
+  console.warn(`[aufbau] unknown token "${value}" for "${prop}" — available: ${known}`);
+}
+
+// call between compile runs in a long-lived process (dev server, watch mode)
+export function resetTokenWarnings() {
+  warnedTokens.clear();
+}
 
 
 
