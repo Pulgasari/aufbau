@@ -1,6 +1,8 @@
 // @aufbau/filters/index.js
 
-import { importFile } from '@aufbau/import';
+//import { importFile } from '@aufbau/import';
+import importFile from './../import/index.js';
+
 
 // filters, unlike patterns, are inherently defs-based: css `filter: url(#id)`
 // only resolves against a <filter> living in the document. there is no
