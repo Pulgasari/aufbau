@@ -1,9 +1,13 @@
 // @aufbau/patterns/index.js
 
 //import { importFile } from '@aufbau/import';
-import { encodeSvg }  from '@aufbau/js';
+//import { encodeSvg }  from '@aufbau/js';
 
 import importFile from './../import/index.js';
+function encodeSvg (svg) {
+  const compact = svg.replace(/\s+/g, ' ').replace(/"/g, "'").trim();
+  return `data:image/svg+xml,${compact.replace(/[<>#%{}|\\^`]/g, c => '%' + c.charCodeAt(0).toString(16))}`;
+}
 
 
 // single place the svg asset location is spelled out. import.meta.resolve runs
