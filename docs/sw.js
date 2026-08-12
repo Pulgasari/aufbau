@@ -1,6 +1,11 @@
 // aufbau/docs/sw.js
 
+// :::::: CACHE
+
 import createCache from './../runtime/cache.js';
+const cssCache = createCache({ name: 'css' });
+
+// :::::: DEBUGGER
 
 const DEBUG = true;
 const debug = {
@@ -8,6 +13,27 @@ const debug = {
   info : (...args) => DEBUG && console.info (`[SW]`, ...args),
   warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
 };
+
+
+// :::::: HASHING
+
+const stableStringify = (value) =>
+    typeof value === 'string'                    ? value
+  : value === null || typeof value !== 'object'  ? String(value)
+  : Array.isArray(value)                         ? `[${value.map(stableStringify).join(',')}]`
+  : `{${Object.keys(value).sort().map(key => `${key}:${stableStringify(value[key])}`).join(',')}}`;
+
+const hash = (value) => {
+  const text = typeof value === 'string' ? value : stableStringify(value);
+  let result = 5381;
+  let index  = text.length;
+  while (index) result = (result * 33) ^ text.charCodeAt(--index);
+  return result >>> 0;
+};
+
+const hashKey = (value) => hash(value).toString(36);
+
+// ::::::
 
 debug.log('createCache TOPLEVEL:', !!createCache);
 
@@ -19,6 +45,13 @@ self.addEventListener('fetch', (event) => {
     debug.log('AufbauStylesheet detected:', url);
     debug.log('createCache:', !!createCache);
     if (caches) debug.log('caches:', caches);
+
+    const cssFileKey = hashKey(url);
+    const cacheResult = cssCache.get(cssFileKey);
+    
+    debug.log('cssFileKey:', !!cssFileKey);
+    debug.log('cacheResult:', !!cacheResult);
+    
   }
   
 });
