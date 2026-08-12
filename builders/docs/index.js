@@ -1,5 +1,6 @@
 // @aufbau/builders/docs/index.js
 
+import initDefaultStylesheet from './ss.js';
 import aufbau, { dom, html, preact, str }    from '@aufbau/kits/preact-htm';
 import { isArray, isFn, isString }           from '@aufbau/utils';
 import { store, signalStore as aufbauStore } from '@aufbau/store';
