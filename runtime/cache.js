@@ -1,44 +1,61 @@
 // @aufbau/runtime/cache.js
 
-
-
 const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
 
 
+// shared between both factories. everything else is layer specific.
+const createStore = (namespace, name) => {
+
+  const cacheName = namespace + ':' + name;
+
+  return {
+    open  : async () => (await caches?.  open(cacheName)) ?? null,
+    clear : async () => (await caches?.delete(cacheName)) ?? false,
+
+    delete : async (key) => {
+      const cache = (await caches?.open(cacheName)) ?? null;
+      return        (await cache?.delete(key))      ?? false;
+    },
+  };
+};
+
+
+// text layer. stores transformed content plus the source hash in a header.
 function createCache (options = {}) {
 
   const { name = 'cache', namespace = 'aufbau' } = options;
-  const cacheName = namespace + ':' + name;
-
-  // hoisted because the higher level methods below call them.
-  // everything that is not referenced internally stays inline in the returned object.
+  const { open, ...store } = createStore(namespace, name);
 
   const set = async (key, content, options = {}) => {
-    const { type = 'text/plain', charset = 'utf-8', headers = {} } = options;
+    const { type = 'text/plain', charset = 'utf-8', hash = null, headers = {} } = options;
     try {
-      const response = new Response (content, { headers: { 'Content-Type': charset ? (type + '; charset=' + charset) : type, ...headers }});   
-      const cache    = (await caches?.open(cacheName)) ?? null;
+      const response = new Response(content, {
+        headers: {
+          // pass charset: null for binary payloads
+          'Content-Type': charset ? type + '; charset=' + charset : type,
+          ...(hash && { 'X-Content-Hash': hash }),
+          ...headers,
+        }
+      });
+      const cache = await open();
       await cache?.put(key, response);
     }
     catch (e) { console.error('Failed to write to CacheStorage:', e); }
   };
 
-  const getMeta = async (key) => {
+  // private. one match for both the body and the stored source hash.
+  const read = async (key) => {
     try {
-      const cache = (await caches?.open(cacheName)) ?? null;
-      const match = (await cache?.match(key))       ?? null;
-      return        (await match?.json())           ?? null;
+      const cache = await open();
+      const match = (await cache?.match(key)) ?? null;
+      return match ? { content: await match.text(), hash: match.headers.get('X-Content-Hash') } : null;
     }
     catch (e) { return null; }
   };
 
-  const setMeta = async (key, content, hash) => {
-    await set(key, JSON.stringify({ content, hash }), { type: 'application/json' });
-  };
-
-  // private. fetch, transform, store.
+  // private. pull from source, transform, store.
   // returns null when the source is unchanged, unreachable or not ok.
-  const load = async (key, { url, fetchOptions, transform, knownHash = null }) => {
+  const pull = async (key, { url, fetchOptions, transform, setOptions, knownHash = null }) => {
     try {
       const response = await fetch(url, fetchOptions);
       if (!response.ok) return null;
@@ -48,109 +65,181 @@ function createCache (options = {}) {
       if (hash === knownHash) return null;
 
       const content = await transform(raw);
-      await setMeta(key, content, hash);
+      await set(key, content, { ...setOptions, hash });
       return { content, hash };
     }
-    catch (e) { console.warn('Fetch failed:', key, e); return null; }
+    catch (e) { console.warn('Pull failed:', key, e); return null; }
   };
 
   return {
 
-    // --- raw layer
-
-    async clear () {
-      return (await caches?.delete(cacheName)) ?? false;
-    },
-
-    async delete (key) {
-      const cache = (await caches?.open(cacheName)) ?? null;
-      return        (await cache?.delete(key))      ?? false;
-    },
-
-    async get (key) {
-      try {
-        const cache = (await caches?.open(cacheName)) ?? null;
-        const match = (await cache?.match(key))       ?? null;
-        return        (await match?.text())           ?? null;
-      }
-      catch (e) { return null; }
-    },
+    ...store,
 
     set,
-    getMeta,
-    setMeta,
 
-    // --- text layer: transformed content + source hash in a json envelope
-
-    // cache-first. hit wins, no revalidation. transform only runs on a miss.
-    async getOrFetch (key, options = {}) {
-      const { url = key, fetchOptions = { cache: 'no-cache' }, transform = (raw) => raw } = options;
-
-      const cached = await getMeta(key);
-      if (cached?.content) return cached.content;
-
-      const fresh = await load(key, { url, fetchOptions, transform });
-      return fresh?.content ?? null;
+    async get (key) {
+      return (await read(key))?.content ?? null;
     },
 
-    // returns the cached value right away plus a promise for the revalidation pass.
-    // the caller decides whether to await it (cold start) or let it run (warm start).
-    async staleWhileRevalidate (key, options = {}) {
+    // pulls only on a miss. a hit guarantees zero requests.
+    async getOrPull (key, options = {}) {
+      const { url = key, fetchOptions = { cache: 'no-cache' }, transform = (raw) => raw, ...setOptions } = options;
+
+      const cached = await read(key);
+      if (cached?.content) return cached.content;
+
+      return (await pull(key, { url, fetchOptions, transform, setOptions }))?.content ?? null;
+    },
+
+    // returns the cached value right away, pulls in any case.
+    // pulled resolves to null when nothing changed. await it on a cold start, ignore it otherwise.
+    async getAndPull (key, options = {}) {
       const {
         url          = key,
         fetchOptions = { cache: 'no-cache' },
         transform    = (raw) => raw,
-        onRevalidate = null,
+        onPull       = null,
+        ...setOptions
       } = options;
 
-      const cached = await getMeta(key);
-      const stale  = cached?.content ?? null;
+      const entry  = await read(key);
+      const cached = entry?.content ?? null;
 
-      const revalidated = (async () => {
-        const fresh = await load(key, { url, fetchOptions, transform, knownHash: cached?.hash ?? null });
-        if (fresh) await onRevalidate?.(fresh.content, { key, hash: fresh.hash, stale });
+      const pulled = (async () => {
+        const fresh = await pull(key, { url, fetchOptions, transform, setOptions, knownHash: entry?.hash ?? null });
+        if (fresh) await onPull?.(fresh.content, { key, hash: fresh.hash, cached });
         return fresh?.content ?? null;
       })();
 
-      return { stale, revalidated };
-    },
-
-    // --- response layer: raw responses for the service worker, binary safe, no envelope
-
-    async fetchCacheFirst (request) {
-      const cache  = (await caches?.open(cacheName)) ?? null;
-      const cached = (await cache?.match(request))   ?? null;
-      if (cached) return cached;
-
-      const response = await fetch(request);
-      if (response.ok) await cache?.put(request, response.clone());
-      return response;
-    },
-
-    async fetchStaleWhileRevalidate (request, options = {}) {
-      const { onUpdate = null } = options;
-
-      const cache  = (await caches?.open(cacheName)) ?? null;
-      const cached = (await cache?.match(request))   ?? null;
-
-      const fetching = fetch(request)
-        .then((response) => {
-          if (!response.ok) return cached ?? response;
-          // etag comparison instead of body hashing, the payload may be binary
-          if (cached && cached.headers.get('etag') !== response.headers.get('etag')) onUpdate?.(request);
-          cache?.put(request, response.clone());
-          return response;
-        })
-        .catch(() => cached);
-
-      return cached ?? fetching;
+      return { cached, pulled };
     },
 
   };
 }
 
-export { createCache, getContentHash };
+
+// response layer. raw responses for the service worker, binary safe, no transform.
+function createResponseCache (options = {}) {
+
+  const { name = 'assets', namespace = 'aufbau' } = options;
+  const { open, ...store } = createStore(namespace, name);
+
+  const put = async (cache, request, response) => {
+    if (response.ok) await cache?.put(request, response.clone());
+    return response;
+  };
+
+  return {
+
+    ...store,
+
+    async get (request) {
+      const cache = await open();
+      return (await cache?.match(request)) ?? null;
+    },
+
+    async set (request, response) {
+      const cache = await open();
+      await put(cache, request, response);
+    },
+
+    async getOrPull (request) {
+      const cache  = await open();
+      const cached = (await cache?.match(request)) ?? null;
+      if (cached) return cached;
+
+      try { return await put(cache, request, await fetch(request)); }
+      catch (e) { console.warn('Pull failed:', request.url ?? request, e); return null; }
+    },
+
+    // pulled resolves to null when offline or not ok, so guard before responding with it.
+    async getAndPull (request, options = {}) {
+      const { onPull = null } = options;
+
+      const cache  = await open();
+      const cached = (await cache?.match(request)) ?? null;
+
+      const pulled = fetch(request)
+        .then(async (response) => {
+          if (!response.ok) return null;
+          // etag comparison instead of body hashing, the payload may be binary
+          if (cached && cached.headers.get('etag') !== response.headers.get('etag')) await onPull?.(request, response);
+          return put(cache, request, response);
+        })
+        .catch((e) => { console.warn('Pull failed:', request.url ?? request, e); return null; });
+
+      return { cached, pulled };
+    },
+
+  };
+}
+
+export { createCache, createResponseCache, getContentHash };
 export default createCache;
+
+// sugar layer. two proxy levels: namespace -> cache -> key.
+function createCaches (options = {}) {
+
+  const { namespace = 'aufbau', caches: defs = {} } = options;
+  const config    = new Map(Object.entries(defs));
+  const instances = new Map();
+
+  // key access resolves to a value, never to the { cached, pulled } pair.
+  // use the underlying method directly when you need both.
+  const wrap = (name) => {
+    const cache = createCache({ name, namespace });
+    const conf  = config.get(name) ?? {};
+
+    return new Proxy(cache, {
+
+      get (target, prop) {
+        if (typeof prop === 'symbol' || prop in target) return Reflect.get(target, prop);
+        const opts = { ...conf, ...conf.keys?.[prop] };
+        if (opts.strategy !== 'getAndPull') return target[opts.strategy ?? 'get'](prop, opts);
+        return target.getAndPull(prop, opts).then(({ cached, pulled }) => cached ?? pulled);
+      },
+
+      set (target, prop, value) {
+        if (value === null) target.delete(prop);
+        else target.set(prop, value, { ...conf, ...conf.keys?.[prop] });
+        return true;
+      },
+
+      deleteProperty (target, prop) { target.delete(prop); return true; },
+
+    });
+  };
+
+  const instance = (name) => {
+    if (!instances.has(name)) instances.set(name, wrap(name));
+    return instances.get(name);
+  };
+
+  const drop = (name) => {
+    instances.delete(name);
+    return caches?.delete(namespace + ':' + name) ?? false;
+  };
+
+  const api = {
+    // register or extend a cache definition after construction
+    define (name, conf = {}) {
+      config.set(name, { ...config.get(name), ...conf, keys: { ...config.get(name)?.keys, ...conf.keys } });
+      instances.delete(name);   // rebuild with the new config on next access
+      return instance(name);
+    },
+    delete: drop,
+    async clear () { await Promise.all([...config.keys(), ...instances.keys()].map(drop)); },
+  };
+
+  return new Proxy(api, {
+    get (target, prop) {
+      if (typeof prop === 'symbol' || prop in target) return Reflect.get(target, prop);
+      return instance(prop);
+    },
+    set (target, prop, value) { if (value === null) drop(prop); return true; },
+    deleteProperty (target, prop) { drop(prop); return true; },
+  });
+}
 
 /*
 clear
