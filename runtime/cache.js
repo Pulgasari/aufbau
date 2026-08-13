@@ -7,7 +7,6 @@ const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.ch
 function createCache (options = {}) {
 
   const { name = 'cache', namespace = 'aufbau' } = options;
-  const { open, ...store } = createStore(namespace, name);
   const cacheName = namespace + ':' + name;
 
   const set = async (key, content, options = {}) => {
@@ -110,7 +109,7 @@ function createCache (options = {}) {
 function createResponseCache (options = {}) {
 
   const { name = 'assets', namespace = 'aufbau' } = options;
-  const { open, ...store } = createStore(namespace, name);
+  const cacheName = namespace + ':' + name;
 
   const put = async (cache, request, response) => {
     if (response.ok) await cache?.put(request, response.clone());
@@ -167,10 +166,8 @@ function createResponseCache (options = {}) {
   };
 }
 
-export { createCache, createResponseCache, getContentHash };
-export default createCache;
+// :::::: SUGAR LAYER | two proxy levels: namespace -> cache -> key.
 
-// sugar layer. two proxy levels: namespace -> cache -> key.
 function createCaches (options = {}) {
 
   const { namespace = 'aufbau', caches: defs = {} } = options;
@@ -233,6 +230,18 @@ function createCaches (options = {}) {
     deleteProperty (target, prop) { drop(prop); return true; },
   });
 }
+
+// :::::: EXPORTS
+
+export { 
+  createCache, 
+  createResponseCache,
+  createCaches,
+  getContentHash
+};
+
+export default createCache;
+
 
 /*
 clear
