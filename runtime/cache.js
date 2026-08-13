@@ -3,11 +3,14 @@
 /*
 clear
 delete
+
 get
-set,
-getMeta,
-setMeta,
+getMeta
 getOrFetch
+
+set
+setMeta
+
 fetchCacheFirst
 fetchStaleWhileRevalidate
 staleWhileRevalidate
