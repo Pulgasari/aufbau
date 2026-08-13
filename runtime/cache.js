@@ -16,6 +16,7 @@ fetchStaleWhileRevalidate
 staleWhileRevalidate
 
 getAndFetch        getOrFetch
+getAndPull         getOrPull
 getAndRefresh      getOrRefresh
 getAndRevalidate   getOrRevalidate
 getAndSync         getOrSync
