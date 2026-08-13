@@ -28,14 +28,15 @@ function createCache (options = {}) {
       catch (e) { return null; }
     },
 
-    async set (key, content) {
+    async set (key, content, options = {}) {
+      const { charset = 'utf-8', headers = {}, type = 'text/plain' } = options;
       try {
-        const response = new Response (content, { headers: { 'Content-Type': 'text/css; charset=utf-8' }});   
+        const response = new Response (content, { headers: { 'Content-Type': charset ? (type + '; charset=' + charset) : type, ...headers }});   
         const cache    = (await caches?.open(cacheName)) ?? null;
         await cache?.put(key, response);
       }
       catch (e) { console.error('Failed to write to CacheStorage:', e); }
-    },
+    }
 
     async getMeta (key) {
       try {
