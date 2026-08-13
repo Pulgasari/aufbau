@@ -2,30 +2,11 @@
 
 // :::::: CACHE
 
-import { createCache, getContentHash } from './../runtime/cache.js';
-import transformACSS from './../stylesheet/index.js';
+import { createCache } from './../runtime/cache.js';
+import transformACSS   from './../stylesheet/index.js';
 
 const cssCache = createCache({ name: 'css' });
-
-// function to revalidate content in the background
-const revalidateInBackground = async () => {
-  try {
-    const networkResponse = await fetch(event.request);
-    const rawCSS          = await networkResponse.text();
-    const currentHash     = getContentHash(rawCSS);
-
-    // update cache only if content hash has changed or no cached version exists
-    if (!cachedData || cachedData.hash !== currentHash) {
-      debug.log('Source changed or missing. Re-transforming in background:', url);
-      const transformedCss = await transformACSS(rawCss);
-      await cssCache.setMeta(event.request, transformedCss, currentHash);
-    } else {
-      debug.log('cache is up to date:', url);
-    }
-  } catch (error) {
-    debug.warn('background revalidation failed:', error);
-  }
-};
+const  jsCache = createCache({ name:  'js' });
 
 // :::::: DEBUGGER
 
