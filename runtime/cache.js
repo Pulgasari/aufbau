@@ -14,6 +14,12 @@ setMeta
 fetchCacheFirst
 fetchStaleWhileRevalidate
 staleWhileRevalidate
+
+getAndFetch        getOrFetch
+getAndRefresh      getOrRefresh
+getAndRevalidate   getOrRevalidate
+getAndSync         getOrSync
+getAndUpdate       getOrUpdate
 */
 
 const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
