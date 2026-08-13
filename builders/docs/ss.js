@@ -1,49 +1,28 @@
 // @aufbau/runtime/stylesheet.js
 
-import { createCache, getContentHash } from './../../runtime/cache.js';
-import transformACSS from './../../stylesheet/index.js';
+import { createCache } from './../../runtime/cache.js';
+import transformACSS   from './../../stylesheet/index.js';
 
 const defaultStylesheet = new CSSStyleSheet();
 const cssCache = createCache({ name: 'framework-css' });
 
 export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
-  console.log('[SS] init default stylesheet ...');
-  // 1. read cached transformed CSS & hash from CacheStorage
-  const cachedData = await cssCache.getMeta(cssURL);
 
-  // 2. STALE: apply cached transformed CSS immediately if available
-  if (cachedData?.content) defaultStylesheet.replaceSync(cachedData.content);
-  if (cachedData?.content) console.log('[SS] default stylesheet served from cache.'); 
-  
-  // ensure sheet is registered in adoptedStyleSheets
+  const { cached, pulled } = await cssCache.getAndPull(cssURL, {
+    type      : 'text/css',
+    transform : transformACSS,
+    onPull    : (css) => defaultStylesheet.replace(css),
+  });
+
+  // stale: apply cached css synchronously, before yielding to the pull
+  if (cached) defaultStylesheet.replaceSync(cached);
+  console.log(cached ? '[SS] served from cache.' : '[SS] cache miss, waiting for source ...');
+
   if (!document.adoptedStyleSheets.includes(defaultStylesheet)) {
-    document.adoptedStyleSheets = [...document.adoptedStyleSheets, defaultStylesheet];    
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, defaultStylesheet];
   }
 
-  // 3. REVALIDATE: Check server in background
-  try {
-    const response = await fetch(cssURL, { cache: 'no-cache' });
-    const rawCSS   = await response.text();
-    const hash     = getContentHash(rawCSS);
-
-    console.log('[SS] revalidate default stylesheet ...');
-
-    // update if source content changed or cache missed
-    if (!cachedData || cachedData.hash !== hash) {
-      console.log('[SS] ... it changed !!!');
-      const transformedCSS = await transformACSS(rawCSS);
-
-      // hot replace stylesheet rules in memory instantly
-      await defaultStylesheet.replace(transformedCSS);
-
-      // update cache with new content and hash
-      await cssCache.setMeta(cssURL, transformedCSS, hash);
-    }
-    else console.log('[SS] ... nothing changed.');
-  } catch (error) {
-    console.warn('[Aufbau] Failed to revalidate stylesheet:', error);
-  }
-
+  if (!cached) await pulled; // cold start
   return defaultStylesheet;
 }
 
