@@ -3,25 +3,26 @@
 import { createCache } from './../../runtime/cache.js';
 import transformACSS   from './../../stylesheet/index.js';
 
-const defaultStylesheet = new CSSStyleSheet();
-const cssCache = createCache({ name: 'framework-css' });
+const stylesheet = new CSSStyleSheet;
+const cssCache   = createCache({ name: 'framework-css' });
 
 export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
 
   const { cached, pulled } = await cssCache.getAndPull(cssURL, {
-    type      : 'text/css',
+    onPull    : css => stylesheet.replace(css),
     transform : transformACSS,
-    onPull    : (css) => defaultStylesheet.replace(css),
+    type      : 'text/css',
+    
   });
   
-  if (cached) defaultStylesheet.replaceSync(cached); // stale
+  if (cached) stylesheet.replaceSync(cached); // stale
   console.log(cached ? '[SS] served from cache.' : '[SS] cache miss, waiting for source ...');
   
-  if (!document.adoptedStyleSheets.includes(defaultStylesheet))
-  document.adoptedStyleSheets = [...document.adoptedStyleSheets, defaultStylesheet];
+  if (!document.adoptedStyleSheets.includes(stylesheet))
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, stylesheet];
 
   if (!cached) await pulled; // cold start
-  return defaultStylesheet;
+  return stylesheet;
 }
 
 export default initDefaultStylesheet;
