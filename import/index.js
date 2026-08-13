@@ -6,8 +6,8 @@
 //import { createCache } from '@bunker/cache';
 //import { createDb }    from '@bunker/db';
 
-import { createCache } from 'https://pulgasari.github.io/bunker/cache/index.js';
-import { createDb }    from 'https://pulgasari.github.io/bunker/db/index.js';
+import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
+import { createDb }    from 'https://code.pulgasari.dev/bunker/db/index.js';
 
 const namespace = 'aufbau';
 const version   = 1;
