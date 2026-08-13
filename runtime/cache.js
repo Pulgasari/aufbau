@@ -1,27 +1,6 @@
 // @aufbau/runtime/cache.js
 
-/*
-clear
-delete
 
-get
-getMeta
-getOrFetch
-
-set
-setMeta
-
-fetchCacheFirst
-fetchStaleWhileRevalidate
-staleWhileRevalidate
-
-getAndFetch        getOrFetch
-getAndPull         getOrPull
-getAndRefresh      getOrRefresh
-getAndRevalidate   getOrRevalidate
-getAndSync         getOrSync
-getAndUpdate       getOrUpdate
-*/
 
 const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
 
@@ -172,6 +151,29 @@ function createCache (options = {}) {
 
 export { createCache, getContentHash };
 export default createCache;
+
+/*
+clear
+delete
+
+get
+getMeta
+getOrFetch
+
+set
+setMeta
+
+fetchCacheFirst
+fetchStaleWhileRevalidate
+staleWhileRevalidate
+
+getAndFetch        getOrFetch
+getAndPull         getOrPull
+getAndRefresh      getOrRefresh
+getAndRevalidate   getOrRevalidate
+getAndSync         getOrSync
+getAndUpdate       getOrUpdate
+*/
 
 /*
 // @aufbau/runtime/cache.js
