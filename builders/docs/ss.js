@@ -1,6 +1,6 @@
 // @aufbau/runtime/stylesheet.js
 
-import * as dom        from 'https://pulgasari.dev/domina/core/index.js';
+import * as dom        from 'https://code.pulgasari.dev/domina/core/index.js';
 import { createCache } from './../../runtime/cache.js';
 import transformACSS   from './../../stylesheet/index.js';
 
