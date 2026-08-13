@@ -74,7 +74,7 @@ function createCache (options = {}) {
   };
 
   return {
-
+    set,
     clear     : async ()    => (await caches?.delete(cacheName)) ?? false,
     get       : async (key) => (await read(key))?.content        ?? null,
     getOrPull : async (key, options = {}) => (await read(key) || await pull(key, options))?.content ?? null,
