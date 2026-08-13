@@ -1,4 +1,15 @@
-// @aufbau/runtime/cache.js
+// @aufbau/runtime/cache.js | 10.2
+
+/*
+pull        =  private. pull from source, transform, store.
+               returns null when the source is unchanged, unreachable or not ok.
+getAndPull  =  returns the cached value right away, pulls in any case.
+               pulled resolves to null when nothing changed. await it on a cold start, ignore it otherwise.
+getOrPull   =  pulls only on a miss. a hit guarantees zero requests.
+
+--- createResponseCache
+getAndPull  =   pulled resolves to null when offline or not ok, so guard before responding with it.
+*/
 
 // :::::: HELPERS
 
@@ -37,18 +48,24 @@ function createCache (options = {}) {
     }
     catch (e) { return null; }
   };
-
-  // private. pull from source, transform, store.
-  // returns null when the source is unchanged, unreachable or not ok.
-  const pull = async (key, { url, fetchOptions, transform, setOptions, knownHash = null }) => {
+  
+  const pull = async (key, options = {}, knownHash = null) => {
+    const {
+      url          = key,
+      fetchOptions = { cache: 'no-cache' },
+      transform    = (raw) => raw,
+      onPull, // consumed by getAndPull, discarded here
+      ...setOptions
+    } = options;
+  
     try {
       const response = await fetch(url, fetchOptions);
       if (!response.ok) return null;
-
+  
       const raw  = await response.text();
       const hash = getContentHash(raw);
       if (hash === knownHash) return null;
-
+  
       const content = await transform(raw);
       await set(key, content, { ...setOptions, hash });
       return { content, hash };
@@ -58,49 +75,25 @@ function createCache (options = {}) {
 
   return {
 
-    clear : async () => (await caches?.delete(cacheName)) ?? false,
-
+    clear     : async ()    => (await caches?.delete(cacheName)) ?? false,
+    get       : async (key) => (await read(key))?.content        ?? null,
+    getOrPull : async (key, options = {}) => (await read(key) || await pull(key, options))?.content ?? null,
+    
     delete : async (key) => {
       const cache = (await caches?.open(cacheName)) ?? null;
       return        (await cache?.delete(key))      ?? false;
     },
 
-    set,
-
-    async get (key) {
-      return (await read(key))?.content ?? null;
-    },
-
-    // pulls only on a miss. a hit guarantees zero requests.
-    async getOrPull (key, options = {}) {
-      const { url = key, fetchOptions = { cache: 'no-cache' }, transform = (raw) => raw, ...setOptions } = options;
-
-      const cached = await read(key);
-      if (cached?.content) return cached.content;
-
-      return (await pull(key, { url, fetchOptions, transform, setOptions }))?.content ?? null;
-    },
-
-    // returns the cached value right away, pulls in any case.
-    // pulled resolves to null when nothing changed. await it on a cold start, ignore it otherwise.
     async getAndPull (key, options = {}) {
-      const {
-        url          = key,
-        fetchOptions = { cache: 'no-cache' },
-        transform    = (raw) => raw,
-        onPull       = null,
-        ...setOptions
-      } = options;
-
       const entry  = await read(key);
       const cached = entry?.content ?? null;
-
+    
       const pulled = (async () => {
-        const fresh = await pull(key, { url, fetchOptions, transform, setOptions, knownHash: entry?.hash ?? null });
-        if (fresh) await onPull?.(fresh.content, { key, hash: fresh.hash, cached });
+        const fresh = await pull(key, options, entry?.hash ?? null);
+        if (fresh) await options.onPull?.(fresh.content, { key, hash: fresh.hash, cached });
         return fresh?.content ?? null;
       })();
-
+    
       return { cached, pulled };
     },
 
@@ -130,7 +123,7 @@ function createResponseCache (options = {}) {
 
     async get (request) {
       const cache = (await caches?.open(cacheName)) ?? null;
-      return (await cache?.match(request)) ?? null;
+      return        (await cache?.match(request))   ?? null;
     },
 
     async set (request, response) {
@@ -146,13 +139,12 @@ function createResponseCache (options = {}) {
       try { return await put(cache, request, await fetch(request)); }
       catch (e) { console.warn('Pull failed:', request.url ?? request, e); return null; }
     },
-
-    // pulled resolves to null when offline or not ok, so guard before responding with it.
+    
     async getAndPull (request, options = {}) {
       const { onPull = null } = options;
 
       const cache  = (await caches?.open(cacheName)) ?? null;
-      const cached = (await cache?.match(request)) ?? null;
+      const cached = (await cache?.match(request))   ?? null;
 
       const pulled = fetch(request)
         .then(async (response) => {
