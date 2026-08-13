@@ -1,7 +1,10 @@
 // @aufbau/runtime/cache.js
 
+// :::::: HELPERS
+
 const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
 
+// ::::: WRAPPER
 
 // text layer. stores transformed content plus the source hash in a header.
 function createCache (options = {}) {
@@ -168,7 +171,7 @@ function createResponseCache (options = {}) {
 
 // :::::: SUGAR LAYER | two proxy levels: namespace -> cache -> key.
 
-function createCaches (options = {}) {
+function createCacheProxy (options = {}) {
 
   const { namespace = 'aufbau', caches: defs = {} } = options;
   const config    = new Map(Object.entries(defs));
@@ -214,7 +217,7 @@ function createCaches (options = {}) {
     // register or extend a cache definition after construction
     define (name, conf = {}) {
       config.set(name, { ...config.get(name), ...conf, keys: { ...config.get(name)?.keys, ...conf.keys } });
-      instances.delete(name);   // rebuild with the new config on next access
+      instances.delete(name); // rebuild with the new config on next access
       return instance(name);
     },
     delete: drop,
@@ -236,8 +239,8 @@ function createCaches (options = {}) {
 export { 
   createCache, 
   createResponseCache,
-  createCaches,
-  getContentHash
+  createCacheProxy,
+  getContentHash,
 };
 
 export default createCache;
