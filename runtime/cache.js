@@ -3,41 +3,24 @@
 const getContentHash = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(36);
 
 
-// shared between both factories. everything else is layer specific.
-const createStore = (namespace, name) => {
-
-  const cacheName = namespace + ':' + name;
-
-  return {
-    open  : async () => (await caches?.  open(cacheName)) ?? null,
-    clear : async () => (await caches?.delete(cacheName)) ?? false,
-
-    delete : async (key) => {
-      const cache = (await caches?.open(cacheName)) ?? null;
-      return        (await cache?.delete(key))      ?? false;
-    },
-  };
-};
-
-
 // text layer. stores transformed content plus the source hash in a header.
 function createCache (options = {}) {
 
   const { name = 'cache', namespace = 'aufbau' } = options;
   const { open, ...store } = createStore(namespace, name);
+  const cacheName = namespace + ':' + name;
 
   const set = async (key, content, options = {}) => {
     const { type = 'text/plain', charset = 'utf-8', hash = null, headers = {} } = options;
     try {
       const response = new Response(content, {
-        headers: {
-          // pass charset: null for binary payloads
+        headers: { // pass charset: null for binary payloads
           'Content-Type': charset ? type + '; charset=' + charset : type,
           ...(hash && { 'X-Content-Hash': hash }),
           ...headers,
         }
       });
-      const cache = await open();
+      const cache = (await caches?.open(cacheName)) ?? null;
       await cache?.put(key, response);
     }
     catch (e) { console.error('Failed to write to CacheStorage:', e); }
@@ -46,8 +29,8 @@ function createCache (options = {}) {
   // private. one match for both the body and the stored source hash.
   const read = async (key) => {
     try {
-      const cache = await open();
-      const match = (await cache?.match(key)) ?? null;
+      const cache = (await caches?.open(cacheName)) ?? null;
+      const match = (await cache?.match(key))       ?? null;
       return match ? { content: await match.text(), hash: match.headers.get('X-Content-Hash') } : null;
     }
     catch (e) { return null; }
@@ -73,7 +56,12 @@ function createCache (options = {}) {
 
   return {
 
-    ...store,
+    clear : async () => (await caches?.delete(cacheName)) ?? false,
+
+    delete : async (key) => {
+      const cache = (await caches?.open(cacheName)) ?? null;
+      return        (await cache?.delete(key))      ?? false;
+    },
 
     set,
 
@@ -131,21 +119,26 @@ function createResponseCache (options = {}) {
 
   return {
 
-    ...store,
+    clear : async () => (await caches?.delete(cacheName)) ?? false,
+
+    delete : async (key) => {
+      const cache = (await caches?.open(cacheName)) ?? null;
+      return        (await cache?.delete(key))      ?? false;
+    },
 
     async get (request) {
-      const cache = await open();
+      const cache = (await caches?.open(cacheName)) ?? null;
       return (await cache?.match(request)) ?? null;
     },
 
     async set (request, response) {
-      const cache = await open();
+      const cache = (await caches?.open(cacheName)) ?? null;
       await put(cache, request, response);
     },
 
     async getOrPull (request) {
-      const cache  = await open();
-      const cached = (await cache?.match(request)) ?? null;
+      const cache  = (await caches?.open(cacheName)) ?? null;
+      const cached = (await cache?.match(request))   ?? null;
       if (cached) return cached;
 
       try { return await put(cache, request, await fetch(request)); }
@@ -156,7 +149,7 @@ function createResponseCache (options = {}) {
     async getAndPull (request, options = {}) {
       const { onPull = null } = options;
 
-      const cache  = await open();
+      const cache  = (await caches?.open(cacheName)) ?? null;
       const cached = (await cache?.match(request)) ?? null;
 
       const pulled = fetch(request)
