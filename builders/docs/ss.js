@@ -13,9 +13,8 @@ export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
     transform : transformACSS,
     onPull    : (css) => defaultStylesheet.replace(css),
   });
-
-  // stale: apply cached css synchronously, before yielding to the pull
-  if (cached) defaultStylesheet.replaceSync(cached);
+  
+  if (cached) defaultStylesheet.replaceSync(cached); // stale
   console.log(cached ? '[SS] served from cache.' : '[SS] cache miss, waiting for source ...');
 
   if (!document.adoptedStyleSheets.includes(defaultStylesheet)) {
