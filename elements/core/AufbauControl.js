@@ -167,18 +167,13 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   formDisabledCallback     (disabled) { this._formDisabled = disabled; this.update(); }
 
   // :::::: PERSISTENCE :::::::::::::::::::::::::::::::::::::::::::
-
-  /*
-   * opt in per control via the `persist` attribute:
-   *
-   *   persist                  localStorage,   key from name or id
-   *   persist="session"        sessionStorage, key from name or id
-   *   persist="theme"          localStorage,   key "theme"
-   *   persist="session:theme"  sessionStorage, key "theme"
-   *
-   * the attribute grammar is parsed in @aufbau/store, which also owns the
-   * namespace, the quota handling and the private-mode fallback.
-   */
+  // opt in per control via the `persist` attribute:
+  // persist                  localStorage    key from name or id
+  // persist="session"        sessionStorage  key from name or id
+  // persist="theme"          localStorage    key "theme"
+  // persist="session:theme"  sessionStorage  key "theme"
+  // the attribute grammar is parsed in @aufbau/store, which also owns the
+  // namespace, the quota handling and the private-mode fallback.
 
   get persistTarget () {
     if (!this.hasAttribute('persist')) return null;
