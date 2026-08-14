@@ -4,20 +4,9 @@ import { isFn }      from '@aufbau/js';
 import * as dom      from '@domina/core';
 import { arrayfied } from './utils.js';
 
-// every element base sheet lands here. an unlayered author rule always wins
-// against a layered one, so page css keeps overriding component defaults
 export const BASE_LAYER = 'aufbau.elements';
-
-// the swappable look, see ./skin.js. deliberately a SIBLING of BASE_LAYER, not a
-// sub layer: a parent layer's own rules beat those of its sub layers, so
-// aufbau.elements.skin would lose against the very structure it has to decorate
 export const SKIN_LAYER = 'aufbau.skin';
 
-/**
- * pins the layer order once, up front. without this statement the order falls
- * out of whichever sheet happens to be adopted first, and adoption is async.
- * prepended so it is the first sheet the cascade sees.
- */
 let ordered = false;
 
 export function ensureLayerOrder (target = document) {
@@ -30,11 +19,6 @@ export function ensureLayerOrder (target = document) {
   root.adoptedStyleSheets = [sheet, ...root.adoptedStyleSheets];
 }
 
-/**
- * collects the classes in the prototype chain that declare their OWN `static
- * styles`, base class first. inherited declarations are not re-adopted under
- * the subclass name, they keep the key of the class that declared them.
- */
 function styleOwners (Cls) {
   const owners = [];
   for (let c = Cls; isFn(c); c = Object.getPrototypeOf(c)) {
@@ -45,17 +29,9 @@ function styleOwners (Cls) {
 
 const toCss = (styles, owner) => {
   const value = isFn(styles) ? styles.call(owner) : styles;
-  return (Array.isArray(value) ? value : [value]).filter(Boolean).join('\n');
+  return arrayfied(value).filter(Boolean).join('\n');
 };
 
-/**
- * adopts the `static styles` of a class and everything it inherited.
- * deduplicated per declaring class per root, so a hundred instances and a
- * dozen re-imports still adopt a single sheet.
- *
- * @param {Function} Cls
- * @param {Document|ShadowRoot|Element} [target]
- */
 export function adoptClassStyles (Cls, target = document) {
   ensureLayerOrder(target);
 
@@ -68,10 +44,39 @@ export function adoptClassStyles (Cls, target = document) {
   }
 }
 
-/**
- * standalone variant for code that is not a component class.
- * @param {string} key - dedup key
- * @param {string} css
- */
 export const adoptBaseStyles = (key, css) =>
   dom.adoptStylesheet(css, { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
+
+/*
+
+-- BASE_LAYER
+every element base sheet lands here. an unlayered author rule always wins
+against a layered one, so page css keeps overriding component defaults
+
+-- SKIN_LAYER
+the swappable look, see ./skin.js. deliberately a SIBLING of BASE_LAYER, not a
+sub layer: a parent layer's own rules beat those of its sub layers, so
+aufbau.elements.skin would lose against the very structure it has to decorate
+
+-- ordered
+pins the layer order once, up front. without this statement the order falls
+out of whichever sheet happens to be adopted first, and adoption is async.
+prepended so it is the first sheet the cascade sees.
+
+-- styleOwners
+collects the classes in the prototype chain that declare their OWN `static styles`, base class first.
+inherited declarations are not re-adopted under the subclass name, they keep the key of the class that declared them.     
+
+-- adoptBaseStyles
+standalone variant for code that is not a component class.
+@param {string} key - dedup key
+@param {string} css
+
+-- adoptClassStyles
+adopts the `static styles` of a class and everything it inherited.
+deduplicated per declaring class per root, so a hundred instances
+and a dozen re-imports still adopt a single sheet.
+@param {Function} Cls
+@param {Document|ShadowRoot|Element} [target]
+
+*/
