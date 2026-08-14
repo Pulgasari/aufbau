@@ -2,24 +2,22 @@
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 
+// :::::: IMPORTS
+
 import { CanonicalMap, createLogger, dom, isArray, isPlainObject, isString, toJson, str } from '@aufbau/js';
 const { toKebabCase } = str;
 
+// ::::::
+
 const log = createLogger('aufbau-config');
-
-//const KEY_FORMS = ['kebab', 'camel']; // stored kebab, readable in both forms
-//const AufbauConfigStore = new CanonicalMap(null, KEY_FORMS);
-
 const AufbauConfigStore = new CanonicalMap; // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
-const DEFAULTS = Symbol('defaults');
-const RESERVED = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
-const RUNTIME  = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
-const sources  = new Map; // one source map per <aufbau-config> element, merged in connect order
-
-//const newSource = () => new CanonicalMap(null, KEY_FORMS);
-const newSource = () => new CanonicalMap;
-const toValue = (value) => value == null ? null : String(value);
+const DEFAULTS     = Symbol('defaults');
+const RESERVED     = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
+const RUNTIME      = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
+const sources      = new Map; // one source map per <aufbau-config> element, merged in connect order
+const newSource    = () => new CanonicalMap;
+const toValue      = (value) => value == null ? null : String(value);
 
 // { code: { theme: 'nord' } } -> 'code-theme'. the store normalizes each path itself
 function flatten (input, prefix = '', out = newSource()) {
