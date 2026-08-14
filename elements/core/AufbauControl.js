@@ -80,7 +80,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::
 
   // the pair subclasses override to own their value shape
-  parseValue  (raw)   { return raw == null ? '' : String(raw); }
+  parseValue  (raw)   { return raw   == null ? '' : String(raw);   }
   formatValue (value) { return value == null ? '' : String(value); }
 
   get defaultValue ()     { return this._defaultValue ?? ''; }
