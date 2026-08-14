@@ -14,6 +14,8 @@ import {
   toBoolean, toCamelCase, toKebabCase,
 } from '@aufbau/js';
 
+const log = createLogger('aufbau-core');
+
 // :::::: DECORATION
 
 // non-enumerable definition, keeps the descriptor boilerplate in one place
@@ -54,38 +56,26 @@ function decorateAll (list) {
 const disposer = () => {
   const entries = new Set;
   return {
-    add      (stop) { if (typeof stop === 'function') entries.add(stop); return stop; },
+    add      (stop) { if (isFn(stop)) entries.add(stop); return stop; },
     dispose  ()     { for (const stop of entries) { try { stop(); } catch {} } entries.clear(); },
     get size ()     { return entries.size; }
   };
 };
 
-const log = createLogger('aufbau-core');
+
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
 
   constructor () {
     super();
-    this._mounted = false;
     this._effects = disposer();
+    this._mounted = false;
   }
   
-  /** shadow root when present, the element itself otherwise */
-  get root () { return this.shadowRoot ?? this; }
-
-  /**
-   * where render() output goes. defaults to the whole root, so a plain element
-   * simply owns its markup. containers that must keep their light dom children
-   * alive (picker, upload, reader …) override this with a dedicated shell.
-   */
+  get root         () { return this.shadowRoot ?? this; }
   get renderTarget () { return this.root; }
-
-  /**
-   * lazily creates a dedicated render shell inside the element, so authored
-   * light dom children are never wiped by a re-render. override renderTarget
-   * with `this.shell('aufbau-picker-ui')` to opt in.
-   */
+  
   shell (className, { prepend = false } = {}) {
     if (this._shell?.isConnected) return this._shell;
 
@@ -103,8 +93,7 @@ return class extends BaseClass {
 
   connectedCallback () {
     this._mounted = true;
-    // lazy on purpose: an imported but unused element must not adopt anything
-    adoptClassStyles(this.constructor, this.root);
+    adoptClassStyles(this.constructor, this.root); // lazy on purpose: an imported but unused element must not adopt anything    
     applySkin();
     this.on(window, CONFIG_EVENT, (event) => {
       if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
@@ -127,21 +116,19 @@ return class extends BaseClass {
   }
 
   static init (options) {
-    const tagName    = isString(options)      ? options : options?.name;
-    const extendsTag = isPlainObject(options) ? options.extends : this.extendsTag;
-
-    const name = tagName || toKebabCase(this.name);
-    if (!name || !name.includes('-')) {
-      return log.warn(`invalid tag name "${name}", custom elements require a hyphen.`);
-    }
+    const tagName    = isString      (options) ? options         : options?.name;
+    const extendsTag = isPlainObject (options) ? options.extends : this.extendsTag;
+    const name       = tagName || toKebabCase(this.name);
+    
+    if (!name || !name.includes('-')) return log.warn(`invalid tag name "${name}", custom elements require a hyphen.`);    
+    if (customElements.get(name)) return;
 
     // schema keys are already kebab-case, so they map 1:1 onto observedAttributes
     const observed = Object.keys(schemaOf(this));
     if (observed.length && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
-      Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
+      Object.defineProperty (this, 'observedAttributes', { configurable: true, get: () => observed });
     }
 
-    if (customElements.get(name)) return;
     customElements.define(name, this, extendsTag ? { extends: extendsTag } : undefined);
   }
 
@@ -150,15 +137,9 @@ return class extends BaseClass {
   onAttributeChange (name, oldValue, newValue) {}
   onMount   () {}
   onUnmount () {}
-
-  /** structure, without values. return null to opt out of markup entirely */
-  render () { return null; }
-
-  /** runs after a real markup rebuild only, for work that rewrites the new nodes */
-  onRender () {}
-
-  /** values and state, applied to the structure render() produced */
-  sync () {}
+  onRender  () {}
+  render    () { return null; }
+  sync      () {}
 
   /**
    * the render pipeline. structure is only rebuilt when render() actually
@@ -195,11 +176,6 @@ return class extends BaseClass {
   get schema () { return schemaOf(this.constructor); }
   get tag    () { return this.getAttribute('is') || this.localName; }
 
-  /**
-   * config keys this element depends on. null means: react to any change.
-   * stored in the config store's canonical form, because that is the form the
-   * change list arrives in
-   */
   get configWatchlist () {
     if (this._configWatchlist !== undefined) return this._configWatchlist;
 
@@ -228,6 +204,8 @@ return class extends BaseClass {
 
     const found = resolveConfig(this.tag, kebab, keys);
     return found === undefined ? fallback : found;
+
+    //return this.getAttr(name) ?? resolveConfig(this.tag, name) ?? fallback;
   }
 
   // :::::: EVENTS ::::::::::::::::::::::::::::::::::::::::::::::
@@ -254,17 +232,13 @@ return class extends BaseClass {
   off  (...args) { dom.offEvent(this, ...args); return this; }
   emit (...args) { return dom.emitEvent(this, ...args); }
 
-  /**
-   * fires when an interaction happens anywhere but inside this element.
-   * composedPath() is used on purpose, it sees through shadow roots.
-   */
   onOutside (handler, { type = 'pointerdown' } = {}) {
     return this.on(document, type, (event) => {
       if (!event.composedPath().includes(this)) handler(event);
     });
   }
 
-  release () { this._effects.dispose(); return this; }
+  release ()            { this._effects.dispose(); return this; }
   track   (unsubscribe) { return this._effects.add(unsubscribe); }
 
   // :::::: ATTRIBUTES ::::::::::::::::::::::::::::::::::::::::::
@@ -339,3 +313,37 @@ return class extends BaseClass {
 };};
 
 export default AufbauCore;
+
+/*
+
+-- configWatchlist()
+config keys this element depends on. null means: react to any change.
+stored in the config store's canonical form, because that is the form the change list arrives in
+
+-- onOutside
+fires when an interaction happens anywhere but inside this element.
+composedPath() is used on purpose, it sees through shadow roots.
+
+-- onRender()
+runs after a real markup rebuild only, for work that rewrites the new nodes
+
+-- render()
+structure, without values. return null to opt out of markup entirely
+
+-- renderTarget()
+where render() output goes. defaults to the whole root, so a plain element
+simply owns its markup. containers that must keep their light dom children
+alive (picker, upload, reader …) override this with a dedicated shell.
+
+-- root()
+shadow root when present, the element itself otherwise 
+
+-- shell()
+lazily creates a dedicated render shell inside the element, so authored
+light dom children are never wiped by a re-render. override renderTarget
+with `this.shell('aufbau-picker-ui')` to opt in.
+
+-- sync()
+values and state, applied to the structure render() produced
+
+*/
