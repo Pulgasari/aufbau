@@ -229,7 +229,7 @@ return class extends BaseClass {
     // delegated: type first, selector second. dom.delegate takes
     // (container, types, selector, fn), so the order carries straight through
     if (isString(first) && isString(second) && isFn(third)) {
-      return this.track(dom.delegate(this, first, second, third, fourth));
+      return this.track(dom.delegateEvent(this, first, second, third, fourth));
     }
 
     // the element itself
