@@ -1,7 +1,8 @@
 // @aufbau/elements/core/styles.js
 
-import * as dom from '@domina/core';
-import { isFn } from '@aufbau/js';
+import { isFn }      from '@aufbau/js';
+import * as dom      from '@domina/core';
+import { arrayfied } from './utils.js';
 
 // every element base sheet lands here. an unlayered author rule always wins
 // against a layered one, so page css keeps overriding component defaults
