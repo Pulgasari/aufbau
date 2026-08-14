@@ -4,6 +4,8 @@ import { dom } from '@aufbau/js';
 //import { emitEvent, offEvent, onEvent } from '@aufbau/js';
 export { dom };
 
+export const arrayfied = value => Array.isArray(value) ? value : [value];
+
 // non-enumerable definition, keeps the descriptor boilerplate in one place
 const define = (target, props) => {
   for (const [key, value] of Object.entries(props)) {
