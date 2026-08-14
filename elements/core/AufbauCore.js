@@ -51,6 +51,15 @@ function decorateAll (list) {
   });
 }
 
+const disposer = () => {
+  const entries = new Set;
+  return {
+    add      (stop) { if (typeof stop === 'function') entries.add(stop); return stop; },
+    dispose  ()     { for (const stop of entries) { try { stop(); } catch {} } entries.clear(); },
+    get size ()     { return entries.size; }
+  };
+};
+
 const log = createLogger('aufbau-core');
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
@@ -59,7 +68,7 @@ return class extends BaseClass {
   constructor () {
     super();
     this._mounted = false;
-    this._effects = dom.disposer();
+    this._effects = disposer();
   }
   
   /** shadow root when present, the element itself otherwise */
