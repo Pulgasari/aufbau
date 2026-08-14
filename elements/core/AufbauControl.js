@@ -83,10 +83,11 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   parseValue  (raw)   { return raw == null ? '' : String(raw); }
   formatValue (value) { return value == null ? '' : String(value); }
 
-  get value ()     { return this.parseValue(this.getAttribute('value')); }
-  set value (next) { this.commit(next, { notify: false }); }
+  get defaultValue ()     { return this._defaultValue ?? ''; }
+  get value        ()     { return this.parseValue(this.getAttribute('value')); }
+  set value        (next) { this.commit(next, { notify: false }); }
 
-  get defaultValue () { return this._defaultValue ?? ''; }
+  
 
   /** what goes into FormData. null means the control submits nothing */
   get formValue () {
