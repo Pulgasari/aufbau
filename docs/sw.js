@@ -10,7 +10,7 @@ const  jsCache = createResponseCache({ name: 'js' });
 
 // :::::: CACHE CONFIG
 
-const CACHE = { css: true, js: false };
+const CACHE = { css: false, js: true };
 
 // :::::: DEBUGGER
 
