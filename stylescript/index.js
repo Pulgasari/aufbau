@@ -1,6 +1,10 @@
 // stylescript/index.js
 
-import { createStylesheet, adoptStylesheet } from 'domina';
+import {
+  adoptStylesheet,
+  createStylesheet,
+  isArray, isFn, isObject, isString,
+} from '@domina';
 
 /**
  * Normalizes any style definition (Object, Array, CSS string, or Builder) into a flat CSS string.
@@ -15,7 +19,7 @@ export function compileStyleInput(input) {
 
   // 2. Chainable Builder function
   if (typeof input === 'function') {
-    const builder = new StyleBuilder();
+    const builder = new StyleBuilder;
     input(builder);
     return builder.toCSS();
   }
