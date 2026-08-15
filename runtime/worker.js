@@ -1,7 +1,7 @@
 // @aufbau/runtime/worker.js
 
 import transformStylesheet from '@aufbau/stylesheet';
-import { createFiles }     from '@bunker/files';
+import { createCache }     from '@bunker/cache';
 
 const TARGET_EXTENSIONS   = ['.aufbau.css', '.ass'];
 const REGEX_TARGET_EXT    = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replace('.', '\\.')).join('|')})$`, 'i');
@@ -12,8 +12,8 @@ const MODULE_CACHE_NAME   = 'aufbau-modules-v1';
 // a service worker answering this request from cache is the only arrangement in
 // which the <link> stays an ordinary render-blocking link and still resolves
 // instantly. no javascript on the critical path, so nothing can flash.
-const stylesheetFiles = createFiles({ name: 'aufbau-stylesheets' });
-const       fontFiles = createFiles({ name: 'aufbau-fonts' });
+const stylesheetCache = createCache({ name: 'aufbau-stylesheets' });
+const       fontCache = createCache({ name: 'aufbau-fonts' });
 
 // how long a cached sheet is served without even asking. beyond it the cached copy still goes out immediately, with a conditional revalidation behind it.
 // fonts are content-addressed by url in practice — a rebuild ships a new filename — so there is nothing to gain from asking about them often.    
@@ -35,7 +35,7 @@ async function interceptFetchStylesheet ({ request }) {
   //if (!REGEX_TARGET_EXT.test(new URL(request.url).pathname)) return null;
 
   try {
-    return await stylesheetFiles.staleWhileRevalidate(request, {
+    return await stylesheetCache.staleWhileRevalidate(request, {
       transform : transformStylesheet,
       ttl  : TTL_STYLESHEET,
       type : 'text/css; charset=utf-8',
@@ -58,7 +58,7 @@ async function interceptFetchFont ({ request }) {
   if (request.method !== 'GET') return null;
   if (!REGEX_FONT_EXT.test(new URL(request.url).pathname)) return null;
 
-  try       { return await fontFiles.staleWhileRevalidate(request, { ttl: TTL_FONT }); }
+  try       { return await fontCache.staleWhileRevalidate(request, { ttl: TTL_FONT }); }
   catch (e) { errorLog ('font fetch failed', e); return null; }
 }
 
@@ -107,8 +107,8 @@ function errorLog (message, error) {
 // :::::: EXPORTS
 
 export { 
-  fontFiles,
-  stylesheetFiles,
+  fontCache,
+  stylesheetCache,
 
   interceptFetchFont,
   interceptFetchModule,

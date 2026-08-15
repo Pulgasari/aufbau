@@ -3,18 +3,18 @@
 
 // :::::: CACHE :::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//import { createCache } from '@bunker/cache';
-//import { createDb }    from '@bunker/db';
+//import { createPolicy } from '@bunker/policy';
+//import { createDb }     from '@bunker/db';
 
-import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
-import { createDb }    from 'https://code.pulgasari.dev/bunker/db/index.js';
+import { createPolicy } from 'https://code.pulgasari.dev/bunker/policy/index.js';
+import { createDb }     from 'https://code.pulgasari.dev/bunker/db/index.js';
 
 const namespace = 'aufbau';
 const version   = 1;
 const onError   = ({ error, key, operation }) => console.warn(`could not ${operation} "${key}":`, error);   
 const db        = createDb(namespace);
 const driver    = db.driver('kv');
-const cache     = createCache({ driver, onError, maxEntries: 512, namespace, version });
+const cache     = createPolicy({ driver, onError, maxEntries: 512, namespace, version });
 
 // :::::: VENDOR RESOLUTION ::::::::::::::::::::::::::::::::::::::
 

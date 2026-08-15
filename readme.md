@@ -53,7 +53,7 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 
 ## [@aufbau/cache](cache/readme.md)
 
-Caching preset over [`@bunker/cache`](https://github.com/pulgasari/bunker), backed by
+Caching preset over [`@bunker/policy`](https://github.com/pulgasari/bunker), backed by
 one IndexedDB database. Holds the content-addressed stylesheet cache, so compiling an
 `.ass` file happens once per distinct source rather than on every load.
 
