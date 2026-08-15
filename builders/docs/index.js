@@ -10,7 +10,7 @@ const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
 aufbau.init();
 
 // :::::: muss raus
-
+const isExternal = (href) => /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
 const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 const DEFAULT_CODE = 'github-dark';
 
@@ -35,9 +35,6 @@ async function importText (raw, vars, label) {
   }
 }
 
-/**
- * Resolve brand configuration (supports string, image path, or inline SVG).
- */
 async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
   let title = titleOption || 'Documentation';
   let img        = null;
@@ -58,13 +55,8 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
     if (trimmed.startsWith('<svg')) {
       svgContent = trimmed;
     } else {
-      try {
-        //const imported = await aufbau.import(toImportPath(resolvePath(trimmed, vars)));
-        //svgContent = isString(imported) ? imported : null;
-        svgContent = await importFile(trimmed, vars);
-      } catch (err) {
-        console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, err);
-      }
+      try       { svgContent = await importFile(trimmed, vars); }
+      catch (e) { console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, e); }
     }
   }
 
@@ -285,8 +277,6 @@ export function processContent (htmlContent) {
     loadDocument();
   });
 
-  // external protocol or protocol-relative url
-  const isExternal = (href) => /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
   
   // translates github-compatible hrefs into router hashes at click time,
   // so the markdown source stays readable on github itself
