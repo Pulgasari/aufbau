@@ -25,9 +25,10 @@ const debug = {
 
 const cssHeaders = { 'Content-Type': 'text/css; charset=utf-8' };
 
-const isStyle  = (path)          => path.endsWith('.aufbau.css') || path.endsWith('.ass');
+//const isStyle  = (path)          => path.endsWith('.aufbau.css') || path.endsWith('.ass');
 const isScript = (request, path) => request.destination === 'script' || path.endsWith('.js');
 
+/*
 const handleStyle = async (event) => {
   const request = event.request;
 
@@ -45,9 +46,10 @@ const handleStyle = async (event) => {
   const fresh = await pulled;
   return fresh ? new Response(fresh, { headers: cssHeaders }) : fetch(request);
 };
-
+*/
 const handleScript = async (event) => {
   const request = event.request;
+  console.log('[SW] js-script detected:', event.request.url);
   if (!CACHE.js) return fetch(request); // transparent passthrough while the layer is off
 
   const { cached, pulled } = await jsCache.getAndPull(request);
