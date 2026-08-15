@@ -25,6 +25,12 @@
 - [ ] property: `aufbau-typo`
 - [x] property: `aufbau-webfont`
 
+## @aufbau/stylescript
+
+aufbauend aus `@domina/core` methods und sugar für `stylesheet(s)` (die beide im zuge dessen vermutlich auch noch erweitert werden).
+
+das was sich in `@aufbau/stylesheet` und `@aufbau/ass` schon andeutete, aber als "pseudo-css" getan wurde, und sowieso via js gehandelt werden muss, konzeptionell direkt als js.
+
 
 ---
 
