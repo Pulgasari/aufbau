@@ -1,4 +1,5 @@
-// stylescript/types/color.js
+// types/Color.js
+
 import { CssValue } from './base.js';
 
 class ColorInstance extends CssValue {
