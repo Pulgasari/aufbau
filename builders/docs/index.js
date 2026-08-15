@@ -56,7 +56,7 @@ async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
       svgContent = trimmed;
     } else {
       try       { svgContent = await importFile(trimmed, vars); }
-      catch (e) { console.warn(`[DocsFW] Failed to load brand SVG from "${importPath}":`, e); }
+      catch (e) { console.warn(`[DocsFW] Failed to load brand SVG from "${trimmed}":`, e); }
     }
   }
 
@@ -125,7 +125,7 @@ async function resolveExtension (ext, vars = {}) {
       const value = await importFile(trimmed, vars);
       return { type: 'html', value };
     } catch (err) {
-      console.warn(`[DocsFW] Failed to load extension content from "${importPath}":`, err);
+      console.warn(`[DocsFW] Failed to load extension content from "${trimmed}":`, err);
       return null;
     }
   }
@@ -133,21 +133,53 @@ async function resolveExtension (ext, vars = {}) {
   return null;
 }
 
+const ASSET_ELEMENTS   = 'img[src], source[src], video[src], video[poster], audio[src]';
+const ASSET_ATTRIBUTES = ['src', 'poster'];
+
+/*
+  markdown resolves against the file it came from, the rendered html against the page
+  showing it — and here those are two different directories. an asset url is therefore
+  rebased onto the markdown file itself, and a leading slash onto the repo root, which
+  is what the same path means when github renders the file.
+
+  hrefs are deliberately left alone: onContentClick routes every non-absolute one
+  through the hash router, and an absolutised link would count as external there.
+*/
+function rebaseAssets (doc, docURL, rootURL) {
+  dom.eachElements(ASSET_ELEMENTS, element => {
+    for (const attribute of ASSET_ATTRIBUTES) {
+      const value = element.getAttribute(attribute);
+      if (!value || value.startsWith('#') || isExternal(value)) continue;
+
+      element.setAttribute(attribute, value.startsWith('/')
+        ? new URL(value.replace(/^\/+/, ''), rootURL).href
+        : new URL(value, docURL).href);
+    }
+  }, doc);
+}
+
 // rewrite fenced code blocks into <aufbau-code>, so highlighting and copy-to-clipboard
 // come from the element instead of a docsfw-level hljs pass
 function upgradeCodeBlocks (doc) {
   dom.eachElements('pre > code', codeEl => {
-    const lang = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
-    const element = dom.createElement('aufbau-code', { lang, textContent: codeEl.textContent });
+    const lang    = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
+    // doc.createElement, not dom.createElement: the latter builds in the live document,
+    // which upgrades the custom element in a page it is never going to live in
+    const element = doc.createElement('aufbau-code');
+    element.setAttribute('lang', lang);
+    element.textContent = codeEl.textContent;
     codeEl.parentElement.replaceWith(element);
-  });
+  }, doc);
 }
 
-export function processContent (htmlContent) {
+// every pass takes `doc` as its context. without it eachElements falls back to the
+// live document, and the html returned here is the untouched parse
+export function processContent (htmlContent, { docURL, rootURL } = {}) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
   dom.eachElements('h1, h2, h3, h4, h5, h6', (heading, index) => {
     if (!heading.id) heading.id = str.toSlugCase(heading.textContent || '') || `heading-${index}`;
-  });
+  }, doc);
+  if (docURL) rebaseAssets(doc, docURL, rootURL ?? docURL);
   upgradeCodeBlocks(doc);
   return doc.body.innerHTML;
 }
@@ -157,6 +189,7 @@ export function processContent (htmlContent) {
     brand      = null,
     title      = 'Documentation',
     index      = 'readme.md',
+    root       = null, // what a leading slash in markdown points at, see rootURL below
     sidebar    = [],
     vars       = {},
     target     = '#app',
@@ -174,6 +207,10 @@ export function processContent (htmlContent) {
   initDefaultStylesheet(defaultDocsStylesheetURL);
   if (sw) globalThis.navigator?.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
 
+
+  // the repo root, defaulted from the $repo convention the config already uses.
+  // resolved once, every markdown page rebases its assets against it
+  const rootURL = new URL(resolvePath(root ?? vars.repo ?? './', vars), document.baseURI).href;
 
   const normalizedSidebar = normalizeSidebar(sidebar);
   const state = aufbau.signals({
@@ -242,10 +279,13 @@ export function processContent (htmlContent) {
           resolveExtension(after, vars)
         ]);
 
+        // where the markdown actually lives, which is not where the page lives
+        const docURL = new URL(resolvePath(path, vars), document.baseURI).href;
+
         state.$update({
           brand: resolvedBrand,
           afterSlot, beforeSlot,
-          mdContent: processContent(rawHtml),
+          mdContent: processContent(rawHtml, { docURL, rootURL }),
           isLoading: false,
         });
 

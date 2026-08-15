@@ -82,8 +82,17 @@ export function sweep () {
   return pages.sweepSync() + session.sweepSync() + sheets.sweepSync() + store.sweepSync();
 }
 
+/*
+  a miss has to read as undefined: that is the one value betterSignal takes as
+  "nothing stored" and leaves the declared default alone. passing undefined as the
+  fallback does NOT get it — getSync declares `fallback = null`, and a default
+  parameter fires on exactly that argument, so the miss came back as null and
+  overwrote every persisted signal's initial value. hence the sentinel.
+*/
+const MISS = Symbol('miss');
+
 const signalStore = () => ({
-  get: key        => store.getSync(key, undefined),
+  get: key        => { const value = store.getSync(key, MISS); return value === MISS ? undefined : value; },
   set: (key, val) => store.setSync(key, val),
 });
 
