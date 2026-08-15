@@ -19,7 +19,7 @@ export interface BaseOptions {
   parserOptions?: Record<string, unknown>;
   /** Cache lifetime in milliseconds. Falls back to the configured default. */
   ttl?: number | null;
-  /** Set to `false` to bypass `@aufbau/cache` for this call. */
+  /** Set to `false` to bypass the cache for this call. */
   useCache?: boolean;
 }
 
@@ -309,7 +309,7 @@ export declare function importYAML<T = unknown, K extends keyof DataModes<T> = '
 // :::::: MAIN ENTRY
 
 /**
- * Dispatches on the file extension and caches the result via `@aufbau/cache`.
+ * Dispatches on the file extension and caches the result via `@bunker/policy`.
  * The extension is read after stripping query and hash, so cache-busted URLs
  * resolve normally.
  *
