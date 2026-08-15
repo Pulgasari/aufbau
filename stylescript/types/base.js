@@ -77,3 +77,34 @@ class CalcInstance extends CssValue {
     return String(this.raw);
   }
 }
+
+
+// stylescript/types/base.js
+import { resolveValue } from './resolver.js';
+
+export class CssValue {
+  constructor(value) {
+    this.raw = value;
+  }
+
+  _binaryOp(other, op) {
+    // Automatically parse raw string or number inputs into typed instances
+    const target = resolveValue(other, this.unit || 'px');
+
+    // Same unit optimization (e.g. 10px + 20px = 30px)
+    if (this.unit && target.unit && this.unit === target.unit) {
+      const resultAmount = op === '+' ? this.amount + target.amount : this.amount - target.amount;
+      return new this.constructor(resultAmount, this.unit);
+    }
+
+    // Mixed units or complex expressions -> Fallback to CSS calc()
+    return new CssValue(`calc(${this} ${op} ${target})`);
+  }
+
+  add(other) { return this._binaryOp(other, '+'); }
+  sub(other) { return this._binaryOp(other, '-'); }
+
+  [Symbol.toPrimitive]() {
+    return this.toString();
+  }
+}
