@@ -153,7 +153,9 @@ console.log(isTypeOf(primary, Color)); // true
 
 Kleiner Feinschliff für `ass.isColor`:
 
-​Damit auch `const { isColor } = ass;` ohne `this`-Kontext nicht bricht, definieren wir die Shorthands im Core einfach als Pfeilfunktionen:
+​Damit auch `const { isColor } = ass;` ohne `this`-Kontext nicht bricht, definieren wir die Shorthands im Core einfach als Pfeilfunktionen.
+
+So kannst du in Modulen wahlweise `import { Color, rem, isColor } from 'stylescript'` als Named Imports nutzen oder `ass` als Namespace-Objekt importieren und beliebig destrukturieren.
 
 ```javascript
 // stylescript/core.js
