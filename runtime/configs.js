@@ -1,4 +1,4 @@
-{
+const x = {
   // 'auto' = lazy autoloader, elements are fetched when they appear in the dom
   // 'all'  = eagerly register every element up front
   // false  = do not touch @aufbau/elements at all
@@ -12,4 +12,6 @@
   looks   : ['flat', 'rounded'],
   skins   : ['monochrome'],
   themes  : ['classic', 'oled', 'rainbow', 'zombie'],
-}
+};
+
+export default x;
