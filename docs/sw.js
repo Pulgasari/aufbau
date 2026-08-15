@@ -32,7 +32,7 @@ const handleStyle = async (event) => {
   const request = event.request;
 
   // the transform is mandatory, only the cache layer is optional
-  if (!(await getConfig()).css) {
+  if (!CACHE.css) {
     const response = await fetch(request);
     if (!response.ok) return response;
     return new Response(await transformACSS(await response.text()), { headers: cssHeaders });
@@ -48,7 +48,7 @@ const handleStyle = async (event) => {
 
 const handleScript = async (event) => {
   const request = event.request;
-  if (!(await getConfig()).js) return fetch(request); // transparent passthrough while the layer is off
+  if (!CACHE.js) return fetch(request); // transparent passthrough while the layer is off
 
   const { cached, pulled } = await jsCache.getAndPull(request);
   event.waitUntil(pulled);
