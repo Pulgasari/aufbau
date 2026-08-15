@@ -5,8 +5,8 @@
 // import them directly when you need them:
 //   import { even, filled } from '@aufbau/utils/fp/predicates.js';
 
-export * from './core.js';   // and, compose, constant, curry, identity, not, once, or, pipe, tap
-export * from './match.js';  // ifElse, match, unless, when
+//export * from './core.js';   // and, compose, constant, curry, identity, not, once, or, pipe, tap
+//export * from './match.js';  // ifElse, match, unless, when
 //export * from './is.js';     // is, test, isArray … isZero
 
 export * from './CanonicalMap.js';
