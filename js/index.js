@@ -30,8 +30,9 @@ export * from './html.js';
 
 // by vendor
 export * as dom from '@domina/core';
-export *        from '@pulgasari/is';  // https://code.pulgasari.dev/js/is.js
-export *        from '@pulgasari/str'; // https://code.pulgasari.dev/js/str.js
+export *        from '@pulgasari/is';     // https://code.pulgasari.dev/js/is.js
+export *        from '@pulgasari/logger'; // https://code.pulgasari.dev/js/logger.js
+export *        from '@pulgasari/str';    // https://code.pulgasari.dev/js/str.js
 
 // export * from 'https://code.pulgasari.dev/js/logger.js';
 
