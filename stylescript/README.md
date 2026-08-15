@@ -128,4 +128,25 @@ const buttonStyle = {
   padding: padding,
   borderColor: hoverBg,
 };
+
+// ======= destructing ========
+import { ass } from './stylescript/core.js';
+
+// 1. Destructure classes & tools from 'ass'
+const { Color, Length, isTypeOf } = ass;
+
+const bg = Color('#000');
+const primary = Color.hsl(300, 50, 25);
+const padding = Length.rem(1.5);
+
+// 2. Destructure static methods directly
+const { hsl, rgb, oklch } = Color;
+const { rem, px, vh } = Length;
+
+const secondary = hsl(200, 80, 40);
+const gap = rem(1);
+const border = px(2);
+
+// 3. Standalone type checks work without breaking
+console.log(isTypeOf(primary, Color)); // true
 ```
