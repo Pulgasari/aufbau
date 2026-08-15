@@ -2,7 +2,7 @@
 
 import initDefaultStylesheet from './ss.js';
 import aufbau, { dom, html, preact, str }    from '@aufbau/kits/preact-htm';
-import { isArray, isFn, isString }           from '@aufbau/utils';
+import { isArray, isFn, isString }           from '@aufbau/js';
 import { store, signalStore as aufbauStore } from '@aufbau/store';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
