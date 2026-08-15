@@ -3,7 +3,7 @@
 
 import { blockEnd, stripComments } from './parse.js';
 
-const BASE_CSS_URL   = 'https://pulgasari.github.io/aufbau/css/';
+const BASE_CSS_URL   = 'https://code.pulgasari.dev/aufbau/css/';
 const BASE_THEME_URL = BASE_CSS_URL + 'themes/';
 
 const FONT_SELECTOR_ALIASES = {

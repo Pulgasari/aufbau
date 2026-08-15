@@ -1,3 +1,3 @@
 # @aufbau/webfonts
 
-web: [https://pulgasari.github.io/aufbau/webfonts/](https://pulgasari.github.io/aufbau/webfonts/)
+web: [https://code.pulgasari.dev/aufbau/webfonts/](https://code.pulgasari.dev/aufbau/webfonts/)

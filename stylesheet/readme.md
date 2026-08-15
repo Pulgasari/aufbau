@@ -280,7 +280,7 @@ Covers exactly that gap, and any browser without a worker.
 
 ```html
 <head>
-  <script src="https://pulgasari.github.io/aufbau/boot.js"></script>
+  <script src="https://code.pulgasari.dev/aufbau/boot.js"></script>
   <link rel="stylesheet" href="./app.ass">
 </head>
 ```
@@ -311,7 +311,7 @@ classic script puts the overlay on the page before anything else can, and the
 component only decides when it goes away.
 
 ```html
-<script src="https://pulgasari.github.io/aufbau/boot.js" data-splash></script>
+<script src="https://code.pulgasari.dev/aufbau/boot.js" data-splash></script>
 ...
 <aufbau-splash role="status" aria-live="polite">lädt…</aufbau-splash>
 ```
