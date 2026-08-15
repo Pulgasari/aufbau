@@ -84,3 +84,19 @@ appSheet.define({
 
 appSheet.adopt(document);
 ```
+
+```javascript
+// Result: { margin: 'unset', padding: 'unset', border: 'unset' }
+unset('margin', 'padding', 'border')
+
+// Also works with arrays
+unset(['backgroundColor', 'color'])
+```
+
+```javascript
+// Standard Iconify Icon with token color
+icon('bx:search', { size: '1.5rem', color: shade('brand', { darken: 15 }) })
+
+// Simple inline icon inheriting text color
+icon('lucide:check')
+```
