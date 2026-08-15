@@ -140,55 +140,6 @@ self.addEventListener('fetch', (event) => {
 
 /*
 
-// :::::: CACHE
-
-import createCache   from './../runtime/cache.js';
-import transformACSS from './../stylesheet/index.js';
-
-const cssCache = createCache({ name: 'css' });
-const hashCode = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
-
-// :::::: DEBUGGER
-
-const DEBUG = true;
-const debug = {
-  log  : (...args) => DEBUG && console.log  (`[SW]`, ...args),
-  info : (...args) => DEBUG && console.info (`[SW]`, ...args),
-  warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
-};
-
-
-
-// ::::::
-
-debug.log('createCache TOPLEVEL:', !!createCache);
-
-self.addEventListener('fetch', async (event) => {
-  const url           = event.request.url;
-  const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
-
-  if (isAufbauStyle) {
-    debug.log('AufbauStylesheet detected:', url);
-    debug.log('createCache:', !!createCache);
-    if (caches) debug.log('caches:', caches);
-
-    const cssFileKey  = hashCode(url);
-    const cacheResult = await cssCache.get(cssFileKey);
-    
-    debug.log('cssFileKey:', cssFileKey);
-    debug.log('has cacheResult:', !!cacheResult);
-    debug.log('cacheResult:', cacheResult);
-
-    
-  }
-  
-});
-
-*/
-
-
-/*
-
 import transformACSS from '@aufbau/stylesheet';
 
 const CSS_CACHE = 'aufbau-compiled-css-v1';
