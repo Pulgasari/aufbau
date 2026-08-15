@@ -1,45 +1,33 @@
-// @aufbau/runtime/stylesheet.js
+// @aufbau/builders/docs/ss.js
 
-import * as dom        from 'https://code.pulgasari.dev/domina/core/index.js';
-import { createCache } from './../../runtime/cache.js';
-import transformACSS   from './../../stylesheet/index.js';
+import { createCache } from '@bunker/cache';
+import transformACSS   from '@aufbau/stylesheet';
 
 const stylesheet = new CSSStyleSheet;
-const cssCache   = createCache({ name: 'framework-css' });
+const cssCache   = createCache({ name: 'aufbau-framework-css' });
 
-// Inspect all caches and their stored requests
-async function logAllCacheEntries () {
-  // Retrieve names of all existing caches
-  const cacheNames = await caches.keys();
+/*
+  adopts the compiled framework stylesheet, from cache where there is one.
 
-  for (const cacheName of cacheNames) {
-    const cache = await caches.open(cacheName);
-    // Retrieve all stored Request objects for the current cache
-    const requests = await cache.keys();
-
-    console.log(`[Cache Storage] Cache Name: ${cacheName}`);
-    requests.forEach(request => console.log(`  - ${request.url}`));
-  }
-}
-
+  a hit is applied synchronously and revalidated behind the page; the fresh version
+  lands through onRevalidate. applying it mid-session is deliberate here — this is
+  the docs shell, where a late reflow is cheaper than a stale layout.
+*/
 export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
-
-  logAllCacheEntries ();
-  
-  const { cached, pulled } = await cssCache.getAndPull(cssURL, {
-    onPull    : css => stylesheet.replace(css),
-    transform : transformACSS,
-    type      : 'text/css',
-    
+  const response = await cssCache.staleWhileRevalidate(cssURL, {
+    onRevalidate : async (fresh) => stylesheet.replace(await fresh.text()),
+    transform    : transformACSS,
+    type         : 'text/css',
   });
-  
-  if (cached) stylesheet.replaceSync(cached); // stale
-  console.log(cached ? '[SS] served from cache.' : '[SS] cache miss, waiting for source ...');
-  
-  if (!document.adoptedStyleSheets.includes(stylesheet))
-  document.adoptedStyleSheets = [...document.adoptedStyleSheets, stylesheet];
 
-  if (!cached) await pulled; // cold start
+  // null only when there was no cache and the fetch failed. leave the sheet empty
+  // rather than taking the page down over a stylesheet.
+  if (response) stylesheet.replaceSync(await response.text());
+
+  if (!document.adoptedStyleSheets.includes(stylesheet)) {
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, stylesheet];
+  }
+
   return stylesheet;
 }
 

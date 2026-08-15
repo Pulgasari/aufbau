@@ -3,18 +3,21 @@
 
 // :::::: CACHE :::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//import { createCache } from '@bunker/cache';
-//import { createDb }    from '@bunker/db';
+//import { createPolicy }      from '@bunker/policy';
+//import { BunkerDB, createDb } from '@bunker/db';
 
-import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
-import { createDb }    from 'https://code.pulgasari.dev/bunker/db/index.js';
+import { createPolicy }      from 'https://code.pulgasari.dev/bunker/policy/index.js';
+import { BunkerDB, createDb } from 'https://code.pulgasari.dev/bunker/db/index.js';
 
 const namespace = 'aufbau';
 const version   = 1;
-const onError   = ({ error, key, operation }) => console.warn(`could not ${operation} "${key}":`, error);   
-const db        = createDb(namespace);
-const driver    = db.driver('kv');
-const cache     = createCache({ driver, onError, maxEntries: 512, namespace, version });
+const onError   = ({ error, key, operation }) => console.warn(`could not ${operation} "${key}":`, error);
+
+// without indexeddb every driver call rejects and onError warns once per import.
+// leaving the driver off degrades to the in-memory l1 instead, which is what node,
+// a worker without idb and safari's private mode actually want.
+const driver = BunkerDB.isSupported() ? createDb(namespace).driver('kv') : undefined;
+const cache  = createPolicy({ driver, onError, max: 256, maxEntries: 512, namespace, version });
 
 // :::::: VENDOR RESOLUTION ::::::::::::::::::::::::::::::::::::::
 
@@ -27,7 +30,7 @@ const registry = {
   sass          : 'sass@1.70.0',
   smolToml      : 'smol-toml@1.1.4',
   sucrase       : 'sucrase@3.35.0',
-  svgjs         : '',
+  svgjs         : '@svgdotjs/svg.js@3.2.0',
   yaml          : 'yaml@2.3.4'
 };
 
@@ -426,15 +429,14 @@ export async function importSVG (path, options = {}) {
 
   // strip xml declaration and doctype headers for clean html5 inlining
   const clean = text.replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
-  if (mode !== 'element') return clean;
+  if (mode === 'string') return clean;
 
-  if (mode === 'svgjs') {
-    const { SVG } = await vendor('svgJs');
-    return SVG(el); // adopts the live node, no re-parse
-  }
+  const doc     = new DOMParser().parseFromString(clean, 'image/svg+xml');
+  const element = doc.querySelector('svg') || doc.documentElement;
+  if (mode === 'element') return element;
 
-  const doc = new DOMParser().parseFromString(clean, 'image/svg+xml');
-  return doc.querySelector('svg') || doc.documentElement;
+  const { SVG } = await vendor('svgjs');
+  return SVG(element); // adopts the live node, no re-parse
 }
 
 export async function importText (path, options = {}) {
@@ -622,8 +624,10 @@ export async function importFile (path, options) {
   const cacheKey    = `${prefix}${query}:${fingerprint}`;
 
   if (useCache) {
-    const hit = await cache.get(cacheKey);
-    if (hit !== null) return hit;
+    // entry() rather than get(), which answers null for a miss and for a stored
+    // null alike — a .json file holding `null` would otherwise never cache
+    const hit = await cache.entry(cacheKey);
+    if (hit.state === 'fresh') return hit.value;
   }
 
   const result = await handler(path, options);
@@ -631,7 +635,9 @@ export async function importFile (path, options) {
   // skip dom nodes, stylesheets and anything carrying functions
   if (useCache && isCacheable(result)) {
     try {
-      await cache.set(cacheKey, result, options.ttl ?? defaultTTL);
+      // the third argument is an overrides object, not a number: passing the ttl
+      // bare left entries with no expiry at all, since a Number has no .ttl
+      await cache.set(cacheKey, result, { ttl: options.ttl ?? defaultTTL });
       // opportunistic sweep of expired siblings, deliberately not awaited
       cache.prune(prefix).catch(() => {});
     } catch (e) {

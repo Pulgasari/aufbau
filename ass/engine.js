@@ -90,14 +90,14 @@ export class ASSEngine {
     if (Array.isArray(this.config.import)) {
       for (const name of this.config.import) {
         if (!name) continue;
-        const url = name.startsWith('http') ? name : `https://pulgasari.github.io/aufbau/css/${name}.css`;
+        const url = name.startsWith('http') ? name : `https://code.pulgasari.dev/aufbau/css/${name}.css`;
         rules.push({ type: 'AtRule', name: { value: '@import' }, params: [{ value: `"${url}"` }] });
       }
     }
     if (Array.isArray(this.config.themes)) {
       for (const theme of this.config.themes) {
         if (!theme) continue;
-        const url = theme.startsWith('http') ? theme : `https://pulgasari.github.io/aufbau/css/themes/${theme}.css`;
+        const url = theme.startsWith('http') ? theme : `https://code.pulgasari.dev/aufbau/css/themes/${theme}.css`;
         rules.push({ type: 'AtRule', name: { value: '@import' }, params: [{ value: `"${url}"` }] });
       }
     }

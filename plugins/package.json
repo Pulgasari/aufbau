@@ -13,6 +13,6 @@
     "@aufbau/cache": "workspace:*",
     "@aufbau/store": "workspace:*",
     "@aufbau/stylesheet": "workspace:*",
-    "@bunker/files": "^0.1.0"
+    "@bunker/cache": "^0.1.0"
   }
 }

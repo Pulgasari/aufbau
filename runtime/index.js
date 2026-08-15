@@ -11,7 +11,6 @@ import * as aufbauStore         from '@aufbau/store';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
 
-import      aufbauCache  from './cache.js';
 import * as aufbauClient from './client.js';
 import * as aufbauWorker from './worker.js';
 
@@ -94,7 +93,6 @@ const aufbau = {
   dom: domina, domina, str,
 
   // packages
-  cache      : aufbauCache,
   elements   : aufbauElements,
   filters    : aufbauFilters,
   import     : aufbauImport,
@@ -104,6 +102,7 @@ const aufbau = {
 
   // storage engine. the aufbau presets above sit on this, but it is exposed raw
   // too, so an app can open its own database or cache without a second dependency.
+  // aufbau.cache used to be a second cache layer of its own; it is bunker.cache now.
   bunker,
 
   // adapters

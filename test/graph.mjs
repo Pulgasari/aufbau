@@ -224,7 +224,7 @@ const target  = args.filter((arg, index) => !arg.startsWith('--') && index !== s
 const entry   = resolve(HERE, '..', target);
 const imports = loadImportmap(mapFile);
 
-console.log(`using pulgasari.github.io/${mapFile}  (${Object.keys(imports).length} entries)`);
+console.log(`using code.pulgasari.dev/${mapFile}  (${Object.keys(imports).length} entries)`);
 
 // a broken graph is a failed run, so this is usable as a check in ci
 process.exit(report(entry, walk(entry, imports)) > 0 ? 1 : 0);

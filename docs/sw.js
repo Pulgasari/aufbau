@@ -2,11 +2,14 @@
 
 // :::::: CACHE
 
-import { createCache, createResponseCache } from './../runtime/cache.js';
-import transformACSS from './../stylesheet/index.js';
+// relative on purpose: a service worker has no import map, so a bare specifier
+// never resolves here. the path holds in the published layout too, where aufbau/
+// and bunker/ sit side by side under the site root.
+import { createCache } from './../../bunker/cache/index.js'; // from '@bunker/cache'
+import transformACSS   from './../stylesheet/index.js';
 
-const cssCache = createCache({ name: 'css' });
-const  jsCache = createResponseCache({ name: 'js' });
+const cssCache = createCache({ name: 'aufbau-docs-css' });
+const  jsCache = createCache({ name: 'aufbau-docs-js' });
 
 // :::::: CACHE CONFIG
 
@@ -39,22 +42,22 @@ const handleStyle = async (event) => {
     return new Response(await transformACSS(await response.text()), { headers: cssHeaders });
   }
 
-  const { cached, pulled } = await cssCache.getAndPull(request.url, { transform: transformACSS, type: 'text/css' });
-  event.waitUntil(pulled); // keep the sw alive for the background revalidation
-  if (cached) return new Response(cached, { headers: cssHeaders });
-
-  const fresh = await pulled;
-  return fresh ? new Response(fresh, { headers: cssHeaders }) : fetch(request);
+  return await cssCache.staleWhileRevalidate(request, {
+    keepAlive : (pending) => event.waitUntil(pending),
+    transform : transformACSS,
+    type      : 'text/css; charset=utf-8',
+  }) ?? fetch(request);
 };
 */
 const handleScript = async (event) => {
   const request = event.request;
   if (!CACHE.js) return fetch(request); // transparent passthrough while the layer is off
 
-  const { cached, pulled } = await jsCache.getAndPull(request);
-  event.waitUntil(pulled);
-  if (cached) return cached;
-  return (await pulled) ?? fetch(request); // cold start, or surface the real error response
+  // keepAlive holds the worker open for the background revalidation; a null answer
+  // means no cache and a failed fetch, so surface the real error response instead
+  return await jsCache.staleWhileRevalidate(request, {
+    keepAlive : (pending) => event.waitUntil(pending),
+  }) ?? fetch(request);
 };
 
 // :::::: LISTENERS
@@ -132,55 +135,6 @@ self.addEventListener('fetch', (event) => {
   }
   
 });
-*/
-
-
-/*
-
-// :::::: CACHE
-
-import createCache   from './../runtime/cache.js';
-import transformACSS from './../stylesheet/index.js';
-
-const cssCache = createCache({ name: 'css' });
-const hashCode = (str) => [...str].reduce((s,c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
-
-// :::::: DEBUGGER
-
-const DEBUG = true;
-const debug = {
-  log  : (...args) => DEBUG && console.log  (`[SW]`, ...args),
-  info : (...args) => DEBUG && console.info (`[SW]`, ...args),
-  warn : (...args) => DEBUG && console.warn (`[SW]`, ...args),
-};
-
-
-
-// ::::::
-
-debug.log('createCache TOPLEVEL:', !!createCache);
-
-self.addEventListener('fetch', async (event) => {
-  const url           = event.request.url;
-  const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
-
-  if (isAufbauStyle) {
-    debug.log('AufbauStylesheet detected:', url);
-    debug.log('createCache:', !!createCache);
-    if (caches) debug.log('caches:', caches);
-
-    const cssFileKey  = hashCode(url);
-    const cacheResult = await cssCache.get(cssFileKey);
-    
-    debug.log('cssFileKey:', cssFileKey);
-    debug.log('has cacheResult:', !!cacheResult);
-    debug.log('cacheResult:', cacheResult);
-
-    
-  }
-  
-});
-
 */
 
 

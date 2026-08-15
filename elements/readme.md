@@ -11,7 +11,7 @@ official **aufbau** *webcomponents\** library.
 [config](#config)
 [elements](#elements)
 
-**preview:** [https://pulgasari.github.io/aufbau/elements/](https://pulgasari.github.io/aufbau/elements/)
+**preview:** [https://code.pulgasari.dev/aufbau/elements/](https://code.pulgasari.dev/aufbau/elements/)
 
 ---
 
@@ -408,8 +408,8 @@ abstand das längste.
 
 ```html
 <head>
-  <script src="https://pulgasari.github.io/aufbau/boot.js" data-splash></script>
-  <script src="https://pulgasari.github.io/importmap.js"></script>
+  <script src="https://code.pulgasari.dev/aufbau/boot.js" data-splash></script>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
   <link rel="stylesheet" href="./app.ass" />
 </head>
 

@@ -6,7 +6,7 @@
 
 #### docs
 
-*read the fucking [docs](https://pulgasari.github.io/aufbau/docs/)! >.<*
+*read the fucking [docs](https://code.pulgasari.dev/aufbau/docs/)! >.<*
 
 #### kits
 
@@ -31,10 +31,10 @@
 
 #### web
 
-[docs](https://pulgasari.github.io/aufbau/docs/)
-[elements](https://pulgasari.github.io/aufbau/elements/)
-[test](https://pulgasari.github.io/aufbau/test/index.html)
-[test/flicker](https://pulgasari.github.io/aufbau/test/flicker.html)
+[docs](https://code.pulgasari.dev/aufbau/docs/)
+[elements](https://code.pulgasari.dev/aufbau/elements/)
+[test](https://code.pulgasari.dev/aufbau/test/index.html)
+[test/flicker](https://code.pulgasari.dev/aufbau/test/flicker.html)
 
 ---
 
@@ -53,7 +53,7 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 
 ## [@aufbau/cache](cache/readme.md)
 
-Caching preset over [`@bunker/cache`](https://github.com/pulgasari/bunker), backed by
+Caching preset over [`@bunker/policy`](https://github.com/pulgasari/bunker), backed by
 one IndexedDB database. Holds the content-addressed stylesheet cache, so compiling an
 `.ass` file happens once per distinct source rather than on every load.
 
