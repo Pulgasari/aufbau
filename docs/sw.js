@@ -49,7 +49,7 @@ const handleStyle = async (event) => {
 */
 const handleScript = async (event) => {
   const request = event.request;
-  console.log('[SW] js-script detected:', event.request.url);
+  debug.log('js-script detected:', event.request.url);
   if (!CACHE.js) return fetch(request); // transparent passthrough while the layer is off
 
   const { cached, pulled } = await jsCache.getAndPull(request);
