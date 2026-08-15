@@ -180,3 +180,34 @@ export const ass = {
   isLength,
 };
 ```
+
+```javascript
+import { Length, Angle, Time, clamp, min } from './stylescript/types/index.js';
+
+const { rem, px } = Length;
+const { deg } = Angle;
+const { ms } = Time;
+
+// 1. Direct Same-Unit Math (JS evaluates directly -> "3rem")
+const basePadding = rem(1);
+const doublePadding = basePadding.add(rem(2)); 
+
+// 2. Mixed-Unit Math (Auto-fallback to calc -> "calc(10px + 1.5rem)")
+const mixedOffset = px(10).add(rem(1.5));
+
+// 3. Scalar Multiplication (JS evaluates directly -> "30px")
+const borderWidth = px(10).mul(3);
+
+// 4. Responsive Clamp & Math Functions
+const fontSize = clamp(rem(1), px(12).add(rem(2)), rem(3)); // "clamp(1rem, calc(12px + 2rem), 3rem)"
+const containerWidth = min(rem(60), '100%');                // "min(60rem, 100%)"
+
+// 5. Applied in Style Object
+const cardStyle = {
+  padding: doublePadding,
+  margin: mixedOffset,
+  fontSize: fontSize,
+  transform: `rotate(${deg(45)})`,
+  transition: `all ${ms(300)} ease-in-out`,
+};
+```
