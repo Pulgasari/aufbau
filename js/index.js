@@ -7,7 +7,7 @@
 
 export * from './core.js';   // and, compose, constant, curry, identity, not, once, or, pipe, tap
 export * from './match.js';  // ifElse, match, unless, when
-export * from './is.js';     // is, test, isArray … isZero
+//export * from './is.js';     // is, test, isArray … isZero
 
 export * from './CanonicalMap.js';
 export * from './coerce.js';
@@ -30,7 +30,11 @@ export * from './html.js';
 
 // by vendor
 export * as dom from '@domina/core';
-export *        from '@pulgasari/str';
+export *        from '@pulgasari/is';  // https://code.pulgasari.dev/js/is.js
+export *        from '@pulgasari/str'; // https://code.pulgasari.dev/js/str.js
+
+// export * from 'https://code.pulgasari.dev/js/logger.js';
+
 
 
 
