@@ -211,3 +211,27 @@ const cardStyle = {
   transition: `all ${ms(300)} ease-in-out`,
 };
 ```
+
+```javascript
+import { Length } from './stylescript/types/length.js';
+import { Num } from './stylescript/types/resolver.js';
+
+const { px } = Length;
+
+// 1. String-Parsing with typed methods
+const a = px(10).add('1.5rem');      // "calc(10px + 1.5rem)"
+const b = Num('10px').add('1.5rem'); // "calc(10px + 1.5rem)"
+
+// 2. Same unit optimization via raw strings
+const c = Num('10px').add('20px');   // "30px" (JS evaluates directly!)
+
+// 3. Mixed types and numbers
+const d = Num('100%').sub('20px');   // "calc(100% - 20px)"
+const e = Num(10).add(5);            // "15px" (Uses default 'px' unit)
+
+// 4. Auto-resolving inside style definitions
+const cardStyle = {
+  margin: Num('2rem').add('10px'),
+  width: Num('100vw').sub('40px'),
+};
+```
