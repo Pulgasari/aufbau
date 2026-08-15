@@ -63,6 +63,7 @@ or copypaste:
   "@bunker/db"             : "https://code.pulgasari.dev/bunker/db/index.js",
   "@bunker/policy"         : "https://code.pulgasari.dev/bunker/policy/index.js",
   "@bunker/storage"        : "https://code.pulgasari.dev/bunker/storage/index.js",
+  "@bunker/utils"          : "https://code.pulgasari.dev/bunker/utils/index.js",
 
   "@domina/core"           : "https://code.pulgasari.dev/domina/core/index.js"
 }}</script>

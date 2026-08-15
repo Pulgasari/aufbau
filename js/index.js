@@ -17,9 +17,6 @@ export * from './log.js';
 // dom
 export * from './dom/events.js';
 
-// maybe to bunker
-export * from './memo.js';
-
 // maybe to dingsbums
 export * from './array.js';
 export * from './number.js';
@@ -30,6 +27,9 @@ export * from './html.js';
 
 // by vendor
 export * as dom from '@domina/core';
+// named, not a star: this barrel must stay collision-free, and utils carries
+// generic names (hash, lru) that a star export would silently make ambiguous.
+export { lazy, lru, memoize } from '@bunker/utils';
 export *        from '@pulgasari/is';     // https://code.pulgasari.dev/js/is.js
 export *        from '@pulgasari/logger'; // https://code.pulgasari.dev/js/logger.js
 export *        from '@pulgasari/str';    // https://code.pulgasari.dev/js/str.js
