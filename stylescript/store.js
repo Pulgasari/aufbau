@@ -1,5 +1,6 @@
 // stylescript/store.js
-import CanonicalMap from './CanonicalMap.js';
+
+import { CanonicalMap } from './vendors.js';
 
 // Trait Registry powered by CanonicalMap
 export class TraitStore {
