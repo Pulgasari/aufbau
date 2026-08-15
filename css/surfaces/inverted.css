@@ -1,0 +1,8 @@
+#app-header { 
+  background-color : var(--aufbau-fg);
+  color            : var(--aufbau-bg);
+}
+#app-footer {
+  background-color : var(--aufbau-fg);
+  color            : var(--aufbau-bg);
+}
