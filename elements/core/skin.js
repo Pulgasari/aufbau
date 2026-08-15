@@ -61,7 +61,7 @@ export {
   CONFIG_KEY as SKIN_CONFIG_KEY,
   DEFAULT_SKIN, 
   SKIN_KEY,
-  activeSkin
+  activeSkin,
   applySkin,
   setSkin,
 };
