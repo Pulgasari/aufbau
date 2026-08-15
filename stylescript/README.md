@@ -150,3 +150,31 @@ const border = px(2);
 // 3. Standalone type checks work without breaking
 console.log(isTypeOf(primary, Color)); // true
 ```
+
+Kleiner Feinschliff für `ass.isColor`:
+
+​Damit auch `const { isColor } = ass;` ohne `this`-Kontext nicht bricht, definieren wir die Shorthands im Core einfach als Pfeilfunktionen:
+
+```javascript
+// stylescript/core.js
+import { Color }  from './types/color.js';
+import { Length } from './types/length.js';
+
+export const isTypeOf = (value, Type) => {
+  if (value == null)         return false;
+  if (value instanceof Type) return true;
+  const prototype = Object.getPrototypeOf(Type);
+  return prototype ? value instanceof prototype : false;
+};
+
+export const isColor  = (val) => isTypeOf(val, Color);
+export const isLength = (val) => isTypeOf(val, Length);
+
+export const ass = {
+  Color,
+  Length,
+  isTypeOf,
+  isColor,
+  isLength,
+};
+```
