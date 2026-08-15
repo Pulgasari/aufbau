@@ -49,7 +49,6 @@ const handleStyle = async (event) => {
 */
 const handleScript = async (event) => {
   const request = event.request;
-  debug.log('js-script detected:', event.request.url);
   if (!CACHE.js) return fetch(request); // transparent passthrough while the layer is off
 
   const { cached, pulled } = await jsCache.getAndPull(request);
@@ -71,7 +70,10 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
 //if (CACHE.css && isStyle(url.pathname))           return event.respondWith(handleStyle(event));
-  if (CACHE.js  && isScript(request, url.pathname)) return event.respondWith(handleScript(event));
+  if (isScript(request, url.pathname)) {
+    debug.log('js detected:', url.pathname, CACHE.js ? '(cached)' : '(passthrough)');
+    if (CACHE.js) return event.respondWith(handleScript(event));
+  }
 });
 
 /*
