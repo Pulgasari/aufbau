@@ -122,8 +122,6 @@ async function resolveExtension (ext, vars = {}) {
     }
     
     try {
-      //const imported = await aufbau.import(toImportPath(resolvePath(trimmed, vars)));
-      //return { type: 'html', value: isString(imported) ? imported : '' };
       const value = await importFile(trimmed, vars);
       return { type: 'html', value };
     } catch (err) {
@@ -154,9 +152,6 @@ export function processContent (htmlContent) {
   return doc.body.innerHTML;
 }
 
-/**
- * Initializes and mounts the Docs Framework.
- */
  export function createDocsFW (config = {}) {
   const {
     brand      = null,
@@ -174,18 +169,10 @@ export function processContent (htmlContent) {
   } = config;
 
   // connect with aufbau config/init interface
-   const defaultDocsStylesheetURL = import.meta.resolve('./index.aufbau.css');
-   console.log('defaultDocsStylesheetURL:', defaultDocsStylesheetURL);
-   initDefaultStylesheet(defaultDocsStylesheetURL);
-
-  // maybe: register service worker. classic, NOT type: 'module' — a worker has no
-  // import map, so the aufbau worker shares code through importScripts() instead,
-  // and that exists only in a classic worker. see @aufbau/sw.js.
+  const defaultDocsStylesheetURL = import.meta.resolve('./index.aufbau.css');
+  console.log('defaultDocsStylesheetURL:', defaultDocsStylesheetURL);
+  initDefaultStylesheet(defaultDocsStylesheetURL);
   if (sw) globalThis.navigator?.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
-  // aufbau/docs/sw.js  als modul
-  //import { aufbauServiceWorker } from '../sw.js';
-  //aufbauServiceWorker({ precache: ['../js/index.js', '../kits/preact-htm.js'] });
-   //const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
 
 
   const normalizedSidebar = normalizeSidebar(sidebar);
