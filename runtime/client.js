@@ -1,54 +1,42 @@
 // @aufbau/runtime/client.js
 
-import createCache   from './cache.js';
-//import { hashKey }   from '@aufbau/js';
-import transformACSS from './../stylesheet/index.js'; //from '@aufbau/stylesheet';
-//import * as dom    from '@domina/core';
-
-const hashKey = (str) => [...str].reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0);
+import { createCache } from '@bunker/cache';
+import transformACSS   from './../stylesheet/index.js'; //from '@aufbau/stylesheet';
 
 // :::::: DATA
 
-const cssCache   = createCache ({ name: 'css' }); //aufbau.cache.css.hashKey = fileContent;
+const cssCache   = createCache({ name: 'aufbau-stylesheets' });
 const EXTENSIONS = ['.aufbau.css', '.ass'];
 let   observer   = null;
 
 // :::::: HELPERS
 
 const isClient     = ()   => typeof window !== 'undefined' && window.document;
-const isStylesheet = href => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));    
+const isStylesheet = href => Boolean(href) && EXTENSIONS.some(extension => href.endsWith(extension));
 
 // :::::: METHODS
 
-export async function compileStylesheet (input, compile) {
-  const key    = hashKey(input);
-  let   output = await cssCache.get(key);
+/*
+  <link href='... .aufbau.css' />
 
-  if (!output) {
-    output = await compile(input);
-    await cssCache.set(key, output);
-  }
-  
-  return output;
-}
-
-// <link href='... .aufbau.css' />
+  the url is the identity, so a second page importing the same sheet is a hit. the
+  compile runs inside the cache layer as its transform, which means it happens once
+  per distinct source rather than once per navigation — and a 304 skips even that.
+*/
 export async function processStylesheetLink (node) {
   const href = node.getAttribute('href'); if (!isStylesheet(href)) return;
-  console.log('aufbau-stylesheet detected:', href);
-  
+
   try {
-    const response = await fetch(href); if (!response.ok) return;
-    const source   = await response.text();
-    const css      = await compileStylesheet(source, transformACSS);
+    const response = await cssCache.staleWhileRevalidate(href, {
+      transform : transformACSS,
+      type      : 'text/css; charset=utf-8',
+    });
+    if (!response) return;
 
     const element = document.createElement('style');
-    element.textContent = css;
+    element.textContent = await response.text();
     element.setAttribute('data-aufbau-src', href);
     node.replaceWith(element);
-
-    cssCache.set(href, css);
-    console.log('aufbau-stylesheet transformed and cached:', href);
   }
   catch (e) { console.error(`failed to process link stylesheet: ${href}`, e); }
 }
