@@ -100,3 +100,32 @@ icon('bx:search', { size: '1.5rem', color: shade('brand', { darken: 15 }) })
 // Simple inline icon inheriting text color
 icon('lucide:check')
 ```
+
+```javascript
+import { ass } from './stylescript/core.js';
+
+// 1. Direct Instantiation & Static Helpers
+const bg = ass.Color('#000');
+const primary = ass.Color.hsl(300, 50, 25);
+const primaryString = ass.Color.hsl('300 50 25');
+
+// 2. Chained Manipulations
+const hoverBg = primary.darken(10);
+const alphaBg = bg.alpha(0.5);
+
+// 3. Length Operations
+const padding = ass.Length.rem(1.5);
+const doublePadding = padding.scale(2); // "3rem"
+
+// 4. Type Checking
+console.log(ass.isTypeOf(primary, ass.Color)); // true
+console.log(ass.isTypeOf(padding, ass.Length)); // true
+console.log(ass.isTypeOf('#000', ass.Color));   // false (raw string)
+
+// 5. Native CSS Serialization inside style objects
+const buttonStyle = {
+  backgroundColor: primary,
+  padding: padding,
+  borderColor: hoverBg,
+};
+```
