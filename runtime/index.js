@@ -15,8 +15,10 @@ import      aufbauCache  from './cache.js';
 import * as aufbauClient from './client.js';
 import * as aufbauWorker from './worker.js';
 
-const fileURL = new URL("./configs.json5", import.meta.url);
-const configs = await aufbauImport(fileURL);
+//const fileURL = new URL("./configs.json5", import.meta.url);
+//const configs = await aufbauImport(fileURL);
+import configs from './configs.js';
+
 const { deepMerge, isPlainObject } = aufbauUtils;
 console.log('[runtime] configs:', configs);
 
