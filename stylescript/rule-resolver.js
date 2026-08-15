@@ -1,5 +1,5 @@
 // stylescript/rule-resolver.js
-import CanonicalMap from './CanonicalMap.js';
+import { CanonicalMap } from './vendors.js';
 
 // Normalizes raw input style objects to resolve property collisions
 export function normalizeStyleObject(inputObject) {
