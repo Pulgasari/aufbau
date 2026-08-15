@@ -4,65 +4,35 @@ import { createCache } from '@bunker/cache';
 import transformACSS   from '@aufbau/stylesheet';
 import * as dom        from '@domina/core';
 
-const stylesheet = new CSSStyleSheet;
-const cssCache   = createCache({ name: 'aufbau-framework-css' });
-
-const IMPORT_RULE = /@import\s+url\(\s*['"]?([^'")]+)['"]?\s*\)[^;]*;/g;
-
-/*
-  a constructed sheet drops @import outright — replace() and replaceSync() are
-  specified to throw the rules away. the compiled .aufbau.css leads with a whole
-  block of them (@aufbau-config import/themes, aufbau-webfont), so everything the
-  shell builds on would silently never load.
-
-  they are pulled out and hung into the head as <link>s instead, and left behind
-  as a comment so the compiled text still reads like what came out of the
-  transform. cascade order stays right: links are author sheets, the adopted one
-  comes after them, so the shell keeps overriding the base css.
-*/
-function extractImports (css) {
-  const urls = [];
-  const code = css.replace(IMPORT_RULE, (rule, url) => {
-    urls.push(url);
-    return `/* ${rule} -> <link> */`;
-  });
-  return { code, urls };
-}
+const KEY      = 'aufbau:docs:shell';
+const cssCache = createCache({ name: 'aufbau-framework-css' });
 
 /*
   adopts the compiled framework stylesheet, from cache where there is one.
 
-  a hit is applied synchronously and revalidated behind the page; the fresh version
+  a hit is applied straight away and revalidated behind the page; the fresh version
   lands through onRevalidate. applying it mid-session is deliberate here — this is
-  the docs shell, where a late reflow is cheaper than a stale layout.
+  the docs shell, where a late reflow is cheaper than a stale layout. `replace` keeps
+  both passes on the same sheet object, so its position in the cascade survives.
+
+  imports: 'link' because the compiled css leads with a block of @import — the
+  @aufbau-config imports, the themes and the webfonts — and a constructed sheet
+  drops those on the floor. base is the stylesheet, not the page: a hand written
+  @import inside a .aufbau.css means the file next to it.
 */
 export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
-  // relative to the stylesheet, not to the page: a hand written @import inside a
-  // .aufbau.css means the file next to it. the generated ones are absolute anyway
-  const base = new URL(cssURL, document.baseURI).href;
-
-  const adopt = (css, sync) => {
-    const { code, urls } = extractImports(css);
-    // setLink dedupes on rel + href, so the revalidation pass adds nothing twice
-    for (const url of urls) dom.setLink({ href: new URL(url, base).href, rel: 'stylesheet' });
-    return sync ? stylesheet.replaceSync(code) : stylesheet.replace(code);
-  };
+  const base  = new URL(cssURL, document.baseURI).href;
+  const adopt = (css) => dom.adoptStylesheet(css, { base, imports: 'link', key: KEY, replace: true });
 
   const response = await cssCache.staleWhileRevalidate(cssURL, {
-    onRevalidate : async (fresh) => adopt(await fresh.text(), false),
+    onRevalidate : async (fresh) => adopt(await fresh.text()),
     transform    : transformACSS,
     type         : 'text/css',
   });
 
-  // null only when there was no cache and the fetch failed. leave the sheet empty
-  // rather than taking the page down over a stylesheet.
-  if (response) adopt(await response.text(), true);
-
-  if (!document.adoptedStyleSheets.includes(stylesheet)) {
-    document.adoptedStyleSheets = [...document.adoptedStyleSheets, stylesheet];
-  }
-
-  return stylesheet;
+  // null only when there was no cache and the fetch failed. leave the page unstyled
+  // rather than taking it down over a stylesheet.
+  return response ? adopt(await response.text()) : null;
 }
 
 export default initDefaultStylesheet;
