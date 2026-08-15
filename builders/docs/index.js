@@ -215,8 +215,6 @@ export function processContent (htmlContent) {
   preact.effect(() => applyPageTheme(pageTheme.value));
   preact.effect(() => applyCodeTheme(codeTheme.value));
 
-  // the full list of every theme in the pinned highlight.js version. falls back
-  // to the short list inside <aufbau-code> only when the index is unreachable
   AufbauCode.themes().then(list => {
     codeThemes.value = list.includes(codeTheme.value) ? list : [codeTheme.value, ...list];
   });
