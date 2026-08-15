@@ -2,11 +2,15 @@
 
 // :::::: CACHE
 
-import { createCache } from './../runtime/cache.js';
-import transformACSS   from './../stylesheet/index.js';
+import { createCache, createResponseCache } from './../runtime/cache.js';
+import transformACSS from './../stylesheet/index.js';
 
 const cssCache = createCache({ name: 'css' });
-const  jsCache = createCache({ name:  'js' });
+const  jsCache = createResponseCache({ name: 'js' });
+
+// :::::: CACHE CONFIG
+
+const CACHE = { css: true, js: false };
 
 // :::::: DEBUGGER
 
@@ -30,19 +34,85 @@ async function logAllCacheEntries () {
     const requests = await cache.keys();
 
     console.log(`[Cache Storage] Cache Name: ${cacheName}`);
-    requests.forEach((request) => {
-      console.log(`  - ${request.url}`);
-    });
+    requests.forEach(request => console.log(`  - ${request.url}`));
   }
 }
 
+// :::::: HANDLERS
+
+const cssHeaders = { 'Content-Type': 'text/css; charset=utf-8' };
+
+const isStyle  = (path)          => path.endsWith('.aufbau.css') || path.endsWith('.ass');
+const isScript = (request, path) => request.destination === 'script' || path.endsWith('.js');
+
+const handleStyle = async (event) => {
+  const request = event.request;
+
+  // the transform is mandatory, only the cache layer is optional
+  if (!(await getConfig()).css) {
+    const response = await fetch(request);
+    if (!response.ok) return response;
+    return new Response(await transformACSS(await response.text()), { headers: cssHeaders });
+  }
+
+  const { cached, pulled } = await cssCache.getAndPull(request.url, { transform: transformACSS, type: 'text/css' });
+  event.waitUntil(pulled); // keep the sw alive for the background revalidation
+  if (cached) return new Response(cached, { headers: cssHeaders });
+
+  const fresh = await pulled;
+  return fresh ? new Response(fresh, { headers: cssHeaders }) : fetch(request);
+};
+
+const handleScript = async (event) => {
+  const request = event.request;
+  if (!(await getConfig()).js) return fetch(request); // transparent passthrough while the layer is off
+
+  const { cached, pulled } = await jsCache.getAndPull(request);
+  event.waitUntil(pulled);
+  if (cached) return cached;
+  return (await pulled) ?? fetch(request); // cold start, or surface the real error response
+};
+
+// :::::: LISTENERS
+
+self.addEventListener('install',  () => self.skipWaiting());
+self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+//if (CACHE.css && isStyle(url.pathname))           return event.respondWith(handleStyle(event));
+  if (CACHE.js  && isScript(request, url.pathname)) return event.respondWith(handleScript(event));
+});
+
+/*
+self.addEventListener('message', (event) => {
+  const { type, layer, value } = event.data ?? {};
+
+  event.waitUntil((async () => {
+    if (type === 'layer') {
+      const next = { ...(await getConfig()), [layer]: value };
+      config = Promise.resolve(next);
+      await configCache.set('layers', JSON.stringify(next), { type: 'application/json' });
+      if (!value) await (layer === 'css' ? cssCache : jsCache).clear(); // drop stale entries when a layer goes off
+      debug.log('layers', next);
+    }
+    if (type === 'clear') await Promise.all([cssCache.clear(), jsCache.clear()]);
+  })());
+});
+*/
+
 // :::::: FETCH LISTENER
 
+/*
 self.addEventListener('fetch', (event) => {
   const url           = event.request.url;
   const isAufbauStyle = url.endsWith('.aufbau.css') || url.endsWith('.ass');
 
-  /*
   if (isAufbauStyle) {
     debug.log('AufbauStylesheet detected:', url);
     logAllCacheEntries();
@@ -73,9 +143,9 @@ self.addEventListener('fetch', (event) => {
       return new Response (transformedCss, { headers: { 'Content-Type': 'text/css; charset=utf-8' }});
     })());
   }
-  */
   
 });
+*/
 
 
 /*
