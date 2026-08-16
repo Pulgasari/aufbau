@@ -1,0 +1,82 @@
+<!-- aufbau/stylescript/test/controller.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stylescript controller</title>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+</head>
+
+<body>
+  <div id="content"><h1>stylescript controller</h1><p id="probe">probe</p></div>
+
+  <script type="module">
+    import { ass, createController, stylesheet } from '@aufbau/stylescript';
+
+    const results = [];
+    const check = (label, pass) => { results.push([label, pass]); console[pass ? 'log' : 'error'](`${pass ? 'ok' : 'FAIL'}: ${label}`); };
+
+    // ── aliases (property-name) + tokens (literal value substitution) ─────────
+    ass.aliases.bg = 'background-color';
+    ass.aliases.fg = 'color';
+    ass.aliases    = { fs: 'font-size', rad: 'border-radius' };  // bulk merge
+    ass.tokens.cc  = 'currentcolor';
+
+    // ── vars (custom properties) ──────────────────────────────────────────────
+    ass.vars.brand = '#5865f2';
+    check('vars read -> var(--brand, …)', String(ass.vars.brand) === 'var(--brand, #5865f2)');
+
+    // ── named, layered sheet + deep-merge via `=` setter ──────────────────────
+    ass.sheets.layout = ass.createSheet({ id: 'layout', layer: 'base' });
+
+    ass.sheets.layout = {
+      body:       { bg: '#0d0f12', fg: '#f1f5f9', margin: 0, padding: '2rem', fs: '16px' },
+      '#content': { maxWidth: '800px', margin: '0 auto' },
+      '#probe':   { rad: '6px', borderBottom: `1px solid cc` },
+    };
+    ass.sheets.layout = { '#probe': { padding: '0.3rem' } };   // deep-merged, not replaced
+
+    ass.adopt();
+
+    // ── assertions ────────────────────────────────────────────────────────────
+    const style = document.querySelector('style#layout');
+    check('sheet rendered as <style id="layout">', !!style);
+    check('data-aufbau-script set',  style?.getAttribute('data-aufbau-script') === 'layout');
+    check('data-aufbau-hash set',    !!style?.getAttribute('data-aufbau-hash'));
+
+    const cssText = style?.textContent ?? '';
+    check('alias bg -> background-color', cssText.includes('background-color: #0d0f12'));
+    check('alias fg -> color',           cssText.includes('color: #f1f5f9'));
+    check('alias fs -> font-size',       cssText.includes('font-size: 16px'));
+    check('alias rad -> border-radius',  cssText.includes('border-radius: 6px'));
+    check('token cc -> currentcolor in compound value', cssText.includes('1px solid currentcolor'));
+    check('layer baked',                 cssText.startsWith('@layer base {'));
+    check('deep-merge kept both #probe decls', cssText.includes('border-radius: 6px') && cssText.includes('padding: 0.3rem'));
+
+    const probe = getComputedStyle(document.getElementById('probe'));
+    check('computed border-radius applied', probe.borderRadius === '6px');
+
+    check('localStorage seeded (sheet)',   !!localStorage.getItem('aufbau:stylescript:sheets:v1:layout'));
+    check('localStorage seeded (manifest)', (JSON.parse(localStorage.getItem('aufbau:stylescript:pages:v1:' + location.pathname) ?? '[]')).some(([name]) => name === 'layout'));
+
+    // vars emitted as :root block
+    const varsStyle = document.querySelector('style#__vars__');
+    check(':root vars block emitted', (varsStyle?.textContent ?? '').includes('--brand: #5865f2'));
+
+    // ── isolated controller does not touch the global one ─────────────────────
+    const widget = createController();
+    widget.tokens.cc = '#ff0000';
+    check('isolated controller: own token', widget.value('cc') === '#ff0000' && ass.value('cc') === 'currentcolor');
+
+    // ── standalone single-sheet module pattern ────────────────────────────────
+    const skin = stylesheet({ id: 'skin' });
+    skin.define({ body: { bg: '#101418' } });
+    check('standalone stylesheet() bound to default controller', skin.controller === ass);
+
+    window.__results = results;
+    window.__ready   = true;
+    console.log(`stylescript controller: ${results.filter(([, p]) => p).length}/${results.length} passed`);
+  </script>
+</body>
+</html>

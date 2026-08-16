@@ -3,41 +3,60 @@
 import {
   adoptStylesheet,
   createStylesheet,
+  isArray, isFn, isObject, isString,
+  setStyleElement,
 } from './../vendors.js';
 
+import { deepMerge }         from './../../js/object.js';
 import { cache }             from './../cache.js';
-import { compileStyleInput } from './../methods/index.js';
+import { compileStyleInput } from './../methods/compileStyleInput.js';
 import { hash }              from './../methods/hash.js';
 
 /**
- * Main StyleScript Sheet Factory using domina under the hood.
+ * A stylesheet definition: a deep-mergeable rule tree with a content-addressed
+ * identity (name::hash). Pure until adopt(), which renders it either as a
+ * <style id> element (document) or an adopted constructable sheet (shadow root).
  */
 export class StyleSheet {
-  constructor (name, inputOptions = {}) {
-    this.name  = name;
-    this.store = inputOptions.store ?? cache;
+  constructor (name, options = {}) {
+    this.name       = name ?? options.id ?? null;
+    this.id         = options.id ?? name ?? null;
+    this.layer      = options.layer ?? null;
+    this.media      = options.media ?? null;
+    this.controller = options.controller ?? null;
+    this.store      = options.store ?? cache;
+    this.target     = options.target ?? null;
 
-    this.rawCSS = '';
-    this.dirty  = false;
+    this.tree    = {};
+    this.rawTail = '';
+    this.dirty   = false;
 
     this.compiledCSS   = '';
     this.hash          = '';
     this.key           = '';
     this.adoptedKey    = null;
     this.sheetInstance = null;
+    this.element       = null;
   }
 
+  // objects deep-merge into the rule tree; strings/functions/arrays are not
+  // mergeable, so they compile immediately and append to a raw tail.
   define (input) {
-    this.rawCSS += compileStyleInput(input) + '\n';
-    this.dirty   = true;
+    if (isString(input) || isFn(input) || isArray(input)) {
+      this.rawTail += compileStyleInput(input, this.controller) + '\n';
+    } else if (isObject(input)) {
+      deepMerge(this.tree, input);
+    }
+    this.dirty = true;
     return this;
   }
 
-  // single source of "finished css + identity". recomputes only after a define().
-  // key is content-addressed (name::hash) so it changes exactly when the css does.
+  // single source of "finished css + identity". the cascade layer is baked into
+  // the text here so both render paths carry it identically.
   compile () {
     if (this.dirty || this.key === '') {
-      this.compiledCSS = this.rawCSS;
+      const body = compileStyleInput(this.tree, this.controller) + this.rawTail;
+      this.compiledCSS = this.layer ? `@layer ${this.layer} {\n${body}}\n` : body;
       this.hash        = hash(this.compiledCSS);
       this.key         = `${this.name}::${this.hash}`;
       this.dirty       = false;
@@ -46,28 +65,42 @@ export class StyleSheet {
   }
 
   /**
-   * Builds and adopts the stylesheet via domina, dedup-keyed on content identity,
-   * and seeds the localStorage boot cache. Idempotent: a second adopt() with the
-   * same content is a no-op; a content change (new hash -> new key) re-adopts.
+   * Renders and adopts. Idempotent on content (same key -> no-op). A document
+   * target renders a <style id> (stable DOM identity the boot path reconciles
+   * against); a shadow root renders an adopted constructable sheet.
    */
-  adopt (target = document) {
-    const css = this.compile();
+  adopt (target = this.target ?? (typeof document !== 'undefined' ? document : null)) {
+    this.compile();
 
-    if (this.adoptedKey === this.key && this.sheetInstance) return this.sheetInstance;
+    if (this.adoptedKey === this.key && (this.element || this.sheetInstance)) {
+      return this.element ?? this.sheetInstance;
+    }
 
-    // constructable sheets carry no id; passing key engages domina's own registry
-    // dedup, and target is an options field, not a positional node.
-    this.sheetInstance = createStylesheet(css, {});
-    adoptStylesheet(this.sheetInstance, { target, key: this.key });
-    this.adoptedKey    = this.key;
+    const root = this.rootFor(target);
+    if (root && root.nodeType === 11) this.adoptConstructable(root);
+    else                              this.adoptElement();
 
-    // reconciliation with a future blocking boot.js: once the canonical
-    // constructable sheet is in place, drop any pre-paint boot <style> for this
-    // name (stale or matching) so nothing double-applies. same or superseded css,
-    // and the sheet is already adopted, so there is no unstyled gap.
-    this.releaseBootStyles(target);
-
+    this.adoptedKey = this.key;
     this.persist();
+    return this.element ?? this.sheetInstance;
+  }
+
+  // <style id> upsert. a boot.js style with the same id is reused (textContent
+  // overwritten), so the pre-paint copy reconciles without duplicating.
+  adoptElement () {
+    this.element = setStyleElement(this.compiledCSS, { id: this.id, media: this.media ?? undefined });
+    if (this.element) {
+      this.element.setAttribute('data-aufbau-script', this.name);
+      this.element.setAttribute('data-aufbau-hash', this.hash);
+    }
+    return this.element;
+  }
+
+  // constructable path: the layer is already baked into compiledCSS, so it is
+  // not passed again to createStylesheet. keyed adopt engages domina's dedup.
+  adoptConstructable (root) {
+    this.sheetInstance = createStylesheet(this.compiledCSS, { media: this.media ?? undefined });
+    adoptStylesheet(this.sheetInstance, { target: root, key: this.key });
     return this.sheetInstance;
   }
 
@@ -76,18 +109,18 @@ export class StyleSheet {
     return this;
   }
 
-  releaseBootStyles (target = document) {
-    const root = this.rootFor(target);
-    if (!root?.querySelectorAll) return;
-
-    for (const boot of root.querySelectorAll(`style[data-aufbau-script="${this.name}"]`)) {
-      boot.remove();
+  release () {
+    if (this.element) {
+      setStyleElement(null, { id: this.id });
+      this.element = null;
     }
+    this.adoptedKey = null;
+    return this;
   }
 
   // mirrors domina's rootOf: a document or shadow root is used as is, an element
   // resolves to its own shadow root, else its containing root or the document.
-  rootFor (target = document) {
+  rootFor (target) {
     const fallback = typeof document !== 'undefined' ? document : null;
     if (!target) return fallback;
     if (target.nodeType === 9 || target.nodeType === 11) return target;

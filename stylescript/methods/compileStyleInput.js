@@ -1,42 +1,36 @@
-// stylescript/index.js
+// methods/compileStyleInput.js
 
 import {
-  adoptStylesheet,
-  createStylesheet,
   isArray, isFn, isObject, isString,
 } from './../vendors.js';
 
-import { RuleBuilder }  from './../classes/RuleBuilder.js';
-import { StyleBuilder } from './../classes/StyleBuilder.js';
+import { StyleBuilder }      from './../classes/StyleBuilder.js';
+import { resolveDeclaration } from './resolveDeclaration.js';
 
 /**
- * Normalizes any style definition (Object, Array, CSS string, or Builder) into a flat CSS string.
- * @param {Object|Array|string|Function} input - Raw style inputs
- * @returns {string} Compiled CSS
+ * Normalizes any style definition (Object, Array, CSS string, or Builder) into a
+ * flat CSS string. An optional context (a controller) applies alias/token resolution.
  */
-export function compileStyleInput (input) {
-  // 1. Tagged template or raw CSS string
+export function compileStyleInput (input, context) {
+  // 1. tagged template or raw css string
   if (isString(input)) return input;
 
-  // 2. Chainable Builder function
+  // 2. chainable builder function
   if (isFn(input)) {
-    const builder = new StyleBuilder;
+    const builder = new StyleBuilder(context);
     input(builder);
     return builder.toCSS();
   }
 
-  // 3. Flat Array or Object structure
-  if (isArray(input) || isObject(input)) {
-    return parseObjectOrArray(input);
-  }
+  // 3. flat array or object structure
+  if (isArray(input) || isObject(input)) return parseObjectOrArray(input, '', context);
 
   return '';
 }
 
-/**
- * Helper to recursively flatten arrays and parse nested style objects.
- */
-function parseObjectOrArray (styles, parentSelector = '') {
+// recursively flattens arrays and parses nested style objects, resolving each
+// declaration through the shared resolver.
+function parseObjectOrArray (styles, parentSelector = '', context) {
   const flatStyles = Array.isArray(styles) ? styles.flat(Infinity) : [styles];
   let cssString = '';
 
@@ -48,25 +42,24 @@ function parseObjectOrArray (styles, parentSelector = '') {
 
     for (const [selector, rules] of Object.entries(block)) {
       if (typeof rules === 'object' && rules !== null) {
-        const fullSelector = parentSelector 
-          ? selector.includes('&') 
+        const fullSelector = parentSelector
+          ? selector.includes('&')
             ? selector.replace(/&/g, parentSelector)
             : `${parentSelector} ${selector}`
           : selector;
 
-        // Process nested properties vs inner selectors
         const declarations = [];
         const nestedBlocks = [];
 
         const flatRules = Array.isArray(rules) ? rules.flat(Infinity) : [rules];
-        
+
         for (const ruleItem of flatRules) {
-          for (const [prop, val] of Object.entries(ruleItem)) {
-            if (typeof val === 'object' && val !== null) {
-              nestedBlocks.push({ [prop]: val });
+          for (const [prop, value] of Object.entries(ruleItem)) {
+            if (typeof value === 'object' && value !== null) {
+              nestedBlocks.push({ [prop]: value });
             } else {
-              const cssProp = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-              declarations.push(`  ${cssProp}: ${val};`);
+              const [cssProp, cssValue] = resolveDeclaration(prop, value, context);
+              declarations.push(`  ${cssProp}: ${cssValue};`);
             }
           }
         }
@@ -76,7 +69,7 @@ function parseObjectOrArray (styles, parentSelector = '') {
         }
 
         for (const nested of nestedBlocks) {
-          cssString += parseObjectOrArray(nested, fullSelector);
+          cssString += parseObjectOrArray(nested, fullSelector, context);
         }
       }
     }
@@ -85,13 +78,7 @@ function parseObjectOrArray (styles, parentSelector = '') {
   return cssString;
 }
 
-
-
-
-
-
-
-// Tagged template helper
+// tagged template helper
 export function css (strings, ...values) {
   return strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
 }

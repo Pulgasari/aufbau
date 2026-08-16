@@ -8,7 +8,8 @@
 // the boot-injector contract this defines (injector itself is not built yet):
 //   sheet text : aufbau:stylescript:sheets:v1:<name>   -> raw compiled css
 //   manifest   : aufbau:stylescript:pages:v1:<pathname> -> json [[name, hash], ...]
-//   boot style : <style data-aufbau-script="<name>" data-aufbau-hash="<hash>">
+//   boot style : <style id="<name>" data-aufbau-script="<name>" data-aufbau-hash="<hash>">
+//                (id = name so the runtime <style> upsert reconciles it in place)
 
 const VERSION = 'v1';
 
