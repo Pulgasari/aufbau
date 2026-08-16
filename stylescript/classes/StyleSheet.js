@@ -31,3 +31,5 @@ export class StyleSheet {
     return this.sheetInstance;
   }
 }
+
+export default StyleSheet;
