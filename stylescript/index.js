@@ -1,10 +1,15 @@
 // stylescript/core.js
-import { Color }  from './types/color.js';
-import { Length } from './types/length.js';
+
+import { Angle }  from './types/Angle.js';
+import { Color }  from './types/Color.js';
+import { Length } from './types/Length.js';
+import { Time }   from './types/Time.js';
 
 export const ass = {
+  Angle,
   Color,
   Length,
+  Time,
 
   // Universal type checking engine
   isTypeOf (value, Type) {
@@ -16,6 +21,8 @@ export const ass = {
     return prototype ? value instanceof prototype : false;
   },
 
+  isAngle  (value) { return this.isTypeOf (value, Angle);  },
   isColor  (value) { return this.isTypeOf (value, Color);  },
-  isLength (value) { return this.isTypeOf (value, Length); }
+  isLength (value) { return this.isTypeOf (value, Length); },
+  isTime   (value) { return this.isTypeOf (value, Time);   },
 };
