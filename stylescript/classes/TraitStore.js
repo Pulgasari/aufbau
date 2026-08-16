@@ -18,3 +18,5 @@ export class TraitStore {
     return this.traits.get(name);
   }
 }
+
+export default TraitStore;
