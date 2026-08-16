@@ -1,6 +1,6 @@
 // types/Length.js
 
-import { CssValue } from './base.js';
+import { CssValue, createFactory } from './base.js';
 
 class LengthInstance extends CssValue {
   constructor (value, unit = 'px') {
