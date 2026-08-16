@@ -138,9 +138,6 @@
 <h2>getFormValues()</h2>
 <output id="dump"></output>
 
-<h2>aufbau-reader</h2>
-<aufbau-reader raw="# Inline&#10;Kommt durch **denselben** markdown-compiler wie `src`."></aufbau-reader>
-
 <h2>aufbau-button</h2>
 <div class="row">
   <aufbau-button label="Speichern" icon="lucide:save" variant="primary"></aufbau-button>
@@ -148,11 +145,23 @@
   <aufbau-button label="Deaktiviert" disabled></aufbau-button>
 </div>
 
+<h2>aufbau-code</h2>
+<aufbau-code lang="javascript">
+	const greet = (name) => `Hello, ${name}!`;
+	console.log(greet('aufbau'));
+</aufbau-code>
+<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+
 <h2>aufbau-dropdown</h2>
 <aufbau-dropdown label="Optionen">
   <a href="#edit">Bearbeiten</a>
   <a href="#delete">Löschen</a>
 </aufbau-dropdown>
+
+<h2>aufbau-reader</h2>
+<aufbau-reader raw="# Inline&#10;Kommt durch **denselben** markdown-compiler wie `src`."></aufbau-reader>
+
+
 
 <script type="module">
   import { autoloader } from '@aufbau/elements';
