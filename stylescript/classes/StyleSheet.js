@@ -5,7 +5,7 @@ import {
   createStylesheet,
 } from './../vendors.js';
 
-import { compileStyleInput } from './../methods.js';
+import { compileStyleInput } from './../methods/index.js';
 
 /**
  * Main StyleScript Sheet Factory using domina under the hood.
