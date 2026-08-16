@@ -4,7 +4,7 @@ import {
   adoptStylesheet,
   createStylesheet,
   isArray, isFn, isObject, isString,
-} from '@domina';
+} from './vendors.js';
 
 /**
  * Normalizes any style definition (Object, Array, CSS string, or Builder) into a flat CSS string.
@@ -13,19 +13,17 @@ import {
  */
 export function compileStyleInput(input) {
   // 1. Tagged template or raw CSS string
-  if (typeof input === 'string') {
-    return input;
-  }
+  if (isString((input)) return input;
 
   // 2. Chainable Builder function
-  if (typeof input === 'function') {
+  if (isFn(input)) {
     const builder = new StyleBuilder;
     input(builder);
     return builder.toCSS();
   }
 
   // 3. Flat Array or Object structure
-  if (Array.isArray(input) || typeof input === 'object') {
+  if (isArray(input) || isObject(input)) {
     return parseObjectOrArray(input);
   }
 
@@ -35,7 +33,7 @@ export function compileStyleInput(input) {
 /**
  * Helper to recursively flatten arrays and parse nested style objects.
  */
-function parseObjectOrArray(styles, parentSelector = '') {
+function parseObjectOrArray (styles, parentSelector = '') {
   const flatStyles = Array.isArray(styles) ? styles.flat(Infinity) : [styles];
   let cssString = '';
 
