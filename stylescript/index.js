@@ -10,6 +10,7 @@ import * as methods from './methods/index.js';
 
 export * from './classes/index.js';
 export * from './methods/index.js';
+export * from './types/index.js';
 
 
 export const ass = {
