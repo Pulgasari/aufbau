@@ -7,7 +7,7 @@
  * @param {Object} [options] - Icon configuration
  * @returns {Object} CSS Mask style object
  */
-export function icon(iconName, options = {}) {
+export function icon (iconName, options = {}) {
   const { size = '1em', color = 'currentColor' } = options;
   
   let url = iconName;
