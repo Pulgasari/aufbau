@@ -5,7 +5,7 @@ import { RuleBuilder } from './RuleBuilder.js';
 /**
  * Chainable Style Builder Engine.
  */
-class StyleBuilder {
+export class StyleBuilder {
   constructor() {
     this.rules = [];
   }
@@ -21,3 +21,5 @@ class StyleBuilder {
     return this.rules.map(r => `${r.selector} {\n${r.styles.join('\n')}\n}`).join('\n');
   }
 }
+
+export default StyleBuilder;
