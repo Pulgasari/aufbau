@@ -5,8 +5,10 @@ import { Color }  from './types/Color.js';
 import { Length } from './types/Length.js';
 import { Time }   from './types/Time.js';
 
+import * as classes from './classes/index.js';
 import * as methods from './methods/index.js';
 
+export * from './classes/index.js';
 export * from './methods/index.js';
 
 
@@ -15,7 +17,8 @@ export const ass = {
   Color,
   Length,
   Time,
-  
+
+  ...classes,
   ...methods,
 
   // Universal type checking engine
