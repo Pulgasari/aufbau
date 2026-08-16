@@ -14,7 +14,7 @@ import { StyleBuilder } from './classes/StyleBuilder.js';
  * @param {Object|Array|string|Function} input - Raw style inputs
  * @returns {string} Compiled CSS
  */
-export function compileStyleInput(input) {
+export function compileStyleInput (input) {
   // 1. Tagged template or raw CSS string
   if (isString((input)) return input;
 
