@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>test</title>
+  <link rel="stylesheet" href="./index.aufbau.css" />
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+</head>
+
+<body class="mobilefix">
+
+	<header>
+    <h1>aufbau</h1>
+		<p>
+      this page is intended to test stylescript.
+    </p>
+	</header>
+
+	<main id='content'>
+		<h2>aufbau-button</h2>
+		<aufbau-button icon='bx:search'>search</aufbau-button>
+
+		<h2>aufbau-code</h2>
+		<aufbau-code lang="javascript">
+		const greet = (name) => `Hello, ${name}!`;
+		console.log(greet('aufbau'));
+		</aufbau-code>
+		<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+
+		<h2>aufbau-flag</h2>
+		<aufbau-flag></aufbau-flag>
+		<aufbau-flag code="de" variant="circle"></aufbau-flag>
+		<aufbau-flag code="us"></aufbau-flag>
+		
+		<h2>aufbau-icon</h2>
+		<aufbau-icon icon='bx:search'></aufbau-icon>
+
+		<h2>aufbau-input</h2>
+		<aufbau-input type='color'  value='#880088'></aufbau-input>
+		<aufbau-input type='number' placeholder='nr...'></aufbau-input>
+		<aufbau-input type='text'   placeholder='text...'></aufbau-input>
+		
+		<aufbau-input name="mail" type="email" placeholder="Enter your email"></aufbau-input>
+		<aufbau-input name="size"  type="number" look="stepper" min="8" max="64" step="2"></aufbau-input>
+		<aufbau-input name="brand" type="color"  look="swatch" value="#3355ff"></aufbau-input>
+
+		<h2>aufbau-picker</h2>
+		
+		<aufbau-picker name="view" look="segments" value="month">
+		  <aufbau-option value="day">Tag</aufbau-option>
+		  <aufbau-option value="month">Monat</aufbau-option>
+		  <aufbau-option value="year">Jahr</aufbau-option>
+		</aufbau-picker>
+		
+		<aufbau-picker 
+			name="framework" 
+			look="combobox" 
+			searchable src="./test.json5" 
+			placeholder="Framework wählen..."
+		></aufbau-picker>
+		
+		<aufbau-picker name="tags" look="radio" multiple>
+		  <aufbau-option value="js">JavaScript</aufbau-option>
+		  <aufbau-option value="css">CSS</aufbau-option>
+		</aufbau-picker>
+
+		<h2>aufbau-progress</h2>
+		
+		<aufbau-progress type="scroll" target="body"></aufbau-progress>
+		<aufbau-progress value="75" max="100" show-text unit="%"></aufbau-progress>
+
+		<h2>aufbau-reader</h2>
+		
+		<aufbau-reader src="./test.md"></aufbau-reader>
+		<aufbau-reader raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-reader>
+		<aufbau-reader>
+		# Titel
+		Text mit **markdown**.
+		</aufbau-reader>
+
+		<h2>aufbau-slider</h2>
+		
+		<aufbau-slider min=0 max=100  step=1></aufbau-slider>
+		<aufbau-slider min=0 max=1000 step=1></aufbau-slider>
+		<aufbau-slider min="0" max="1000" step="50" unit="ms" value="300" name="delay" type="number"   controls editable></aufbau-slider>
+
+		<aufbau-slider name="preis" type="number" range value="20,80" min="0" max="100"></aufbau-slider>
+		<aufbau-slider name="hue" type="color" value="#3355ff"></aufbau-slider>
+		<aufbau-slider name="von" type="time" value="09:00" min="06:00" max="22:00"></aufbau-slider>
+
+		<h2>aufbau-toc</h2>
+		<aufbau-toc target="#content" selector="h2"></aufbau-toc>
+
+		<h2>aufbau-toggle</h2>
+		<aufbau-toggle></aufbau-toggle>
+		<aufbau-toggle look='checkbox'></aufbau-toggle>
+
+		<aufbau-toggle name="darkmode" label="Darkmode aktivieren" checked></aufbau-toggle>
+		<aufbau-toggle name="agb" look="checkbox" label="AGB akzeptieren" required></aufbau-toggle>
+		<aufbau-toggle name="pin" look="button" label="Anheften"></aufbau-toggle>
+
+		<h2>aufbau-upload</h2>
+		<aufbau-upload name="avatar" accept="image/*"></aufbau-upload>
+		<aufbau-upload name="belege" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload>
+		<aufbau-upload name="logo" look="button" text="Datei wählen"></aufbau-upload>
+
+		<h2>aufbau-writer</h2>
+		<aufbau-writer name="bio" placeholder="Kurz über dich..." counter maxlength="280"></aufbau-writer>
+		<aufbau-writer name="notiz" autogrow min-rows="3" max-rows="12"></aufbau-writer>
+		<aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer>
+	</main>
+
+  <script type="module">
+    import { autoloader } from '@aufbau/elements';
+    autoloader();
+  </script>
+
+</body>
+  </html>
