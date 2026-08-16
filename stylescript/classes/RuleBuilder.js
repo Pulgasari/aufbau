@@ -29,3 +29,5 @@ export class RuleBuilder {
     return this.declarations;
   }
 }
+
+export default RuleBuilder;
