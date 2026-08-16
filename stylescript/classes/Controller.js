@@ -4,6 +4,7 @@ import { CanonicalMap } from './../vendors.js';
 
 import { defineTokens }                   from './../methods/defineTokens.js';
 import { kebabProperty, serializeValue }  from './../methods/resolveDeclaration.js';
+import { shade }                          from './../shades.js';
 import { StyleSheet }                     from './StyleSheet.js';
 
 // matches a bare css identifier, so value tokens are only substituted on exact
@@ -73,20 +74,46 @@ export class Controller {
 
   value (raw) {
     if (typeof raw !== 'string') return serializeValue(raw);
-    if (this._tokens.size === 0)  return raw;
+    if (this._tokens.size === 0 && Object.keys(this._vars).length === 0) return raw;
 
     const whole = this._tokens.get(raw);
     if (whole !== undefined) return String(whole);
 
-    return raw.replace(WORD, (word) => {
-      const hit = this._tokens.get(word);
-      return hit === undefined ? word : String(hit);
-    });
+    return raw.replace(WORD, (word) => this._resolveWord(word));
   }
 
   // resolves a trait name to its declaration set (used by the `use` key).
   resolveTrait (name) {
     return this._traits.get(name) ?? {};
+  }
+
+  // resolves a single value word: a literal token, or a shade suffix on a known
+  // token/var (brand-a20 / brand-d15 / brand-l20 -> color-mix), else the word itself.
+  _resolveWord (word) {
+    const token = this._tokens.get(word);
+    if (token !== undefined) return String(token);
+
+    const match = word.match(/^(.+)-(a|d|l)(\d+)$/);
+    if (match) {
+      const base = this._resolveBase(match[1]);
+      if (base !== undefined) {
+        const amount = parseInt(match[3], 10);
+        const options = match[2] === 'a' ? { alpha: amount / 100 }
+                      : match[2] === 'd' ? { darken: amount }
+                      :                    { lighten: amount };
+        return shade(base, options);
+      }
+    }
+
+    return word;
+  }
+
+  // a shade base may be a literal token value or a custom-property (var(--x)).
+  _resolveBase (name) {
+    const token = this._tokens.get(name);
+    if (token !== undefined)  return String(token);
+    if (name in this._vars)   return `var(${toVarName(name)})`;
+    return undefined;
   }
 
   // ── sheets ────────────────────────────────────────────────────────────────

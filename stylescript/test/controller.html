@@ -45,8 +45,8 @@
     ass.traits.shadow = { boxShadow: '0 1px 4px #0003' };
 
     ass.sheets.ui = {
-      '.card-a': { ...ass.traits.card, bg: '#111' },        // spread-native
-      '.card-b': { use: ['card', 'shadow'], bg: '#222' },   // use-key reference
+      '.card-a': { ...ass.traits.card, bg: '#111', borderColor: 'brand-d15' },  // spread + shade string
+      '.card-b': { use: ['card', 'shadow'], bg: '#222' },                       // use-key reference
     };
 
     ass.adopt();
@@ -73,6 +73,7 @@
     const uiCss = document.querySelector('style#ui')?.textContent ?? '';
     check('trait spread-native inlined', uiCss.includes('.card-a') && uiCss.includes('border-radius: 8px'));
     check('trait use-key inlined',       uiCss.includes('.card-b') && uiCss.includes('box-shadow: 0 1px 4px #0003') && uiCss.includes('border-radius: 8px'));
+    check('shade string brand-d15 -> color-mix', uiCss.includes('color-mix(in srgb, var(--brand) 85%, black)'));
 
     check('localStorage seeded (sheet)',   !!localStorage.getItem('aufbau:stylescript:sheets:v1:layout'));
     check('localStorage seeded (manifest)', (JSON.parse(localStorage.getItem('aufbau:stylescript:pages:v1:' + location.pathname) ?? '[]')).some(([name]) => name === 'layout'));

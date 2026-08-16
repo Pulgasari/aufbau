@@ -10,6 +10,8 @@ import { ass, createController, stylesheet } from './factory.js';
 export * from './cache.js';
 export * from './classes/index.js';
 export * from './methods/index.js';
+export * from './shades.js';
+export * from './shorthands/index.js';
 export * from './types/index.js';
 
 // back-compat: the default controller also carries the type kit and guards, so
