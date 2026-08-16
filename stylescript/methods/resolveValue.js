@@ -1,6 +1,6 @@
 // resolveValue.js
 
-import { CssValue, Angle, Length, Time } from './types/index.js';
+import { CssValue, Angle, Length, Time } from './../types/index.js';
 
 const VALUE_REGEX = /^(-?\d*(?:\.\d+)?)\s*([a-z%]*)$/i;
 
