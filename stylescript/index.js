@@ -6,6 +6,9 @@ import {
   isArray, isFn, isObject, isString,
 } from './vendors.js';
 
+import { RuleBuilder }  from './classes/RuleBuilder.js';
+import { StyleBuilder } from './classes/StyleBuilder.js';
+
 /**
  * Normalizes any style definition (Object, Array, CSS string, or Builder) into a flat CSS string.
  * @param {Object|Array|string|Function} input - Raw style inputs
