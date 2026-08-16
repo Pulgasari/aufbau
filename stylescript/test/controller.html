@@ -40,6 +40,15 @@
     };
     ass.sheets.layout = { '#probe': { padding: '0.3rem' } };   // deep-merged, not replaced
 
+    // ── traits: spread-native + use-key ───────────────────────────────────────
+    ass.traits.card   = { padding: '1rem', rad: '8px' };
+    ass.traits.shadow = { boxShadow: '0 1px 4px #0003' };
+
+    ass.sheets.ui = {
+      '.card-a': { ...ass.traits.card, bg: '#111' },        // spread-native
+      '.card-b': { use: ['card', 'shadow'], bg: '#222' },   // use-key reference
+    };
+
     ass.adopt();
 
     // ── assertions ────────────────────────────────────────────────────────────
@@ -60,6 +69,10 @@
 
     const probe = getComputedStyle(document.getElementById('probe'));
     check('computed border-radius applied', probe.borderRadius === '6px');
+
+    const uiCss = document.querySelector('style#ui')?.textContent ?? '';
+    check('trait spread-native inlined', uiCss.includes('.card-a') && uiCss.includes('border-radius: 8px'));
+    check('trait use-key inlined',       uiCss.includes('.card-b') && uiCss.includes('box-shadow: 0 1px 4px #0003') && uiCss.includes('border-radius: 8px'));
 
     check('localStorage seeded (sheet)',   !!localStorage.getItem('aufbau:stylescript:sheets:v1:layout'));
     check('localStorage seeded (manifest)', (JSON.parse(localStorage.getItem('aufbau:stylescript:pages:v1:' + location.pathname) ?? '[]')).some(([name]) => name === 'layout'));

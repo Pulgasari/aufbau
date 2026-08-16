@@ -29,12 +29,14 @@ export class Controller {
 
     this._aliases    = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
     this._tokens     = new Map(Object.entries(options.tokens ?? {}));
+    this._traits     = new Map(Object.entries(options.traits ?? {}));
     this._vars       = { ...(options.vars ?? {}) };
     this._sheets     = new Map;
     this._layerOrder = options.layers ? [...options.layers] : null;
 
     this._aliasesProxy = this._registryProxy(this._aliases);
     this._tokensProxy  = this._registryProxy(this._tokens);
+    this._traitsProxy  = this._registryProxy(this._traits);
     this._varsProxy    = this._makeVarsProxy();
     this._sheetsProxy  = this._makeSheetsProxy();
   }
@@ -46,6 +48,11 @@ export class Controller {
 
   get tokens ()    { return this._tokensProxy; }
   set tokens (obj) { this._mergeInto(this._tokens, obj); }
+
+  // reusable declaration sets. read one back for spread (`...ass.traits.card`),
+  // or reference it by name via the `use` key inside a style object.
+  get traits ()    { return this._traitsProxy; }
+  set traits (obj) { this._mergeInto(this._traits, obj); }
 
   get vars ()    { return this._varsProxy; }
   set vars (obj) { Object.assign(this._vars, obj); }
@@ -75,6 +82,11 @@ export class Controller {
       const hit = this._tokens.get(word);
       return hit === undefined ? word : String(hit);
     });
+  }
+
+  // resolves a trait name to its declaration set (used by the `use` key).
+  resolveTrait (name) {
+    return this._traits.get(name) ?? {};
   }
 
   // ── sheets ────────────────────────────────────────────────────────────────
