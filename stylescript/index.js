@@ -8,6 +8,7 @@ import { Time }   from './types/Time.js';
 import * as classes from './classes/index.js';
 import * as methods from './methods/index.js';
 
+export * from './cache.js';
 export * from './classes/index.js';
 export * from './methods/index.js';
 export * from './types/index.js';
