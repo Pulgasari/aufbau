@@ -25,7 +25,7 @@ sheet.define(generateTokenCSS(':root'));
 // 4. Apply styles to body and content container
 sheet.define({
   'body': {
-    backgroundColor: tokens.colors.bg,
+    backgroundColor: '#0d0f12',
     color: tokens.colors.fg,
     fontFamily: 'system-ui, -apple-system, sans-serif',
     margin: 0,
