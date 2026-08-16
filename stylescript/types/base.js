@@ -50,7 +50,7 @@ export class CssValue {
 }
 
 // factory wrapper maker to allow both Color(...) and new Color(...) syntax
-function createFactory (TypeClass, staticMethods = {}) {
+export function createFactory (TypeClass, staticMethods = {}) {
   const factory = function (...args) {
     return new TypeClass(...args);
   };
