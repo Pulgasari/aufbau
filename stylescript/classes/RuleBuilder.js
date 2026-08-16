@@ -1,31 +1,32 @@
 // classes/RuleBuilder.js
 
+import { resolveDeclaration } from './../methods/resolveDeclaration.js';
+
 export class RuleBuilder {
-  constructor() {
+  constructor (context) {
+    this.context      = context;
     this.declarations = [];
   }
 
-  set(prop, value) {
+  set (prop, value) {
     if (typeof prop === 'object') {
-      for (const [k, v] of Object.entries(prop)) {
-        this.set(k, v);
-      }
+      for (const [key, val] of Object.entries(prop)) this.set(key, val);
     } else {
-      const cssProp = prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`);
-      this.declarations.push(`  ${cssProp}: ${value};`);
+      const [cssProp, cssValue] = resolveDeclaration(prop, value, this.context);
+      this.declarations.push(`  ${cssProp}: ${cssValue};`);
     }
     return this;
   }
 
-  use(trait) {
+  use (trait) {
     return this.set(trait);
   }
 
-  flex(direction = 'row', align = 'stretch') {
+  flex (direction = 'row', align = 'stretch') {
     return this.set({ display: 'flex', flexDirection: direction, alignItems: align });
   }
 
-  getStyles() {
+  getStyles () {
     return this.declarations;
   }
 }
