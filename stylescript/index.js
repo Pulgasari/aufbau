@@ -1,5 +1,5 @@
 // stylescript/core.js
-import { Color } from './types/color.js';
+import { Color }  from './types/color.js';
 import { Length } from './types/length.js';
 
 export const ass = {
@@ -7,8 +7,8 @@ export const ass = {
   Length,
 
   // Universal type checking engine
-  isTypeOf(value, Type) {
-    if (value == null) return false;
+  isTypeOf (value, Type) {
+    if (value == null)         return false;
     if (value instanceof Type) return true;
     
     // Handle factory functions with prototype inheritance
@@ -16,11 +16,6 @@ export const ass = {
     return prototype ? value instanceof prototype : false;
   },
 
-  isColor(val) {
-    return this.isTypeOf(val, Color);
-  },
-
-  isLength(val) {
-    return this.isTypeOf(val, Length);
-  }
+  isColor  (value) { return this.isTypeOf (value, Color);  },
+  isLength (value) { return this.isTypeOf (value, Length); }
 };
