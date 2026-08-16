@@ -1,5 +1,7 @@
 // classes/StyleBuilder.js
 
+import { RuleBuilder } from './RuleBuilder.js';
+
 /**
  * Chainable Style Builder Engine.
  */
@@ -9,7 +11,7 @@ class StyleBuilder {
   }
 
   rule(selector, callback) {
-    const subBuilder = new RuleBuilder();
+    const subBuilder = new RuleBuilder;
     callback(subBuilder);
     this.rules.push({ selector, styles: subBuilder.getStyles() });
     return this;
