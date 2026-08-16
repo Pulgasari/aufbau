@@ -1,4 +1,4 @@
-// stylescript/store.js
+// classes/TraitStore.js
 
 import { CanonicalMap } from './vendors.js';
 
