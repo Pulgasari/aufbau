@@ -1,21 +1,21 @@
 // types/Time.js
 
-import { CssValue } from './base.js';
+import { createFactory } from './base.js';
+import { Num }           from './Num.js';
 
-class TimeInstance extends CssValue {
+class TimeInstance extends Num {
   constructor (amount, unit = 'ms') {
-    super(`${amount}${unit}`);
-    this.amount = amount;
-    this.unit   = unit;
+    super(amount, unit);
   }
-  toSeconds() { return this.unit === 's' ? this : new TimeInstance(this.amount / 1000, 's'); }
-  toString() { return `${this.amount}${this.unit}`; }
+
+  toSeconds () {
+    return this.unit === 's' ? this : new TimeInstance(this.amount / 1000, 's');
+  }
 }
 
-export const Time = Object.assign(
-  (value, unit) => new TimeInstance (value, unit),
-  {
-    ms : (value) => new TimeInstance (value, 'ms'),
-    s  : (value) => new TimeInstance (value, 's'),
-  }
-);
+export const Time = createFactory (TimeInstance, {
+  ms : (value) => new TimeInstance (value, 'ms'),
+  s  : (value) => new TimeInstance (value, 's'),
+});
+
+export default Time;

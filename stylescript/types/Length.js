@@ -1,33 +1,20 @@
 // types/Length.js
 
-import { CssValue, createFactory } from './base.js';
+import { createFactory } from './base.js';
+import { Num }           from './Num.js';
 
-class LengthInstance extends CssValue {
+class LengthInstance extends Num {
   constructor (value, unit = 'px') {
-    super();
-    if (typeof value === 'number') {
-      this.amount = value;
-      this.unit   = unit;
-    } else {
-      const match = String(value).match(/^([0-9.]+)(.*)$/);
-      this.amount = match ? parseFloat(match[1]) : 0;
-      this.unit   = match && match[2] ? match[2] : unit;
-    }
-  }
-
-  scale (factor) {
-    return new LengthInstance(this.amount * factor, this.unit);
-  }
-
-  toString () {
-    return `${this.amount}${this.unit}`;
+    super(value, unit);
   }
 }
 
 export const Length = createFactory (LengthInstance, {
+  em  : (value) => new LengthInstance (value, 'em'),
   px  : (value) => new LengthInstance (value, 'px'),
   rem : (value) => new LengthInstance (value, 'rem'),
-  em  : (value) => new LengthInstance (value, 'em'),
   vh  : (value) => new LengthInstance (value, 'vh'),
   vw  : (value) => new LengthInstance (value, 'vw'),
 });
+
+export default Length;
