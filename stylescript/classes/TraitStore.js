@@ -1,6 +1,6 @@
 // classes/TraitStore.js
 
-import { CanonicalMap } from './vendors.js';
+import { CanonicalMap } from './../vendors.js';
 
 // Trait Registry powered by CanonicalMap
 export class TraitStore {
