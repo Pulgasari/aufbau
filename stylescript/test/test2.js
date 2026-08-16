@@ -32,9 +32,21 @@ stylesheet += ({
 
 import { controller: ass } from '@aufbau/stylescript';
 
+// define aliases for property-names
+// - single or multiple at once
+// - re-assignment overrides
+ass.aliases.bg = 'background-color';
+ass.aliases.fg = 'color';
+ass.aliases = {
+  fs  : 'font-size',
+  rad : 'border-radius',
+};
+
 ass.tokens.cc = 'currentColor';
 
-ass.sheets.layout = ass.create({ id: 'layout', layer: 'base' });
+ass.sheets.layout = ass.createSheet({ id: 'layout' , layer: 'base' });
+ass.sheets.skin   = ass.createSheet({ id: 'skin'   , layer: 'base' });
+ass.sheets.typo   = ass.createSheet({ id: 'typo'   , layer: 'base' });
 
 ass.sheets.layout += ({
   'body': {
