@@ -1,6 +1,6 @@
 // types/Color.js
 
-import { CssValue } from './base.js';
+import { CssValue, createFactory } from './base.js';
 
 class ColorInstance extends CssValue {
   constructor(value) {
@@ -24,7 +24,7 @@ class ColorInstance extends CssValue {
 }
 
 // Export dual-purpose Color factory & type
-export const Color = createFactory(ColorInstance, {
+export const Color = createFactory (ColorInstance, {
   hsl (h,s,l) {
     if (typeof h === 'string' && s === undefined) {
       return new ColorInstance(`hsl(${h})`);
