@@ -46,6 +46,15 @@
     };
     ass.sheets.layout = { '#probe': { padding: '0.3rem' } };   // deep-merged, not replaced
 
+    // ── responsive: breakpoints + @media nesting ──────────────────────────────
+    ass.breakpoints.tablet = '768px';
+    ass.sheets.layout = {
+      '#content': {
+        '@tablet': { padding: '2rem' },                   // shorthand -> @media (min-width: 768px)
+        '@media (min-width: 1200px)': { maxWidth: '1100px' }, // raw at-rule passthrough
+      },
+    };
+
     // ── traits: spread-native + use-key ───────────────────────────────────────
     ass.traits.card   = { padding: '1rem', rad: '8px' };
     ass.traits.shadow = { boxShadow: '0 1px 4px #0003' };
@@ -77,6 +86,11 @@
     check('boot style reconciled in place (single style#layout)', document.querySelectorAll('style#layout').length === 1);
     check('data-aufbau-boot marker dropped on reconcile',         !style?.hasAttribute('data-aufbau-boot'));
     check('stale boot css replaced',                              !cssText.includes('outline: 3px solid red'));
+
+    // responsive
+    check('breakpoint @tablet -> @media (min-width: 768px)', cssText.includes('@media (min-width: 768px) {'));
+    check('@media wraps the selector',                       /@media \(min-width: 768px\) \{\s*#content \{[^}]*padding: 2rem/.test(cssText));
+    check('raw @media passthrough',                          cssText.includes('@media (min-width: 1200px) {') && cssText.includes('max-width: 1100px'));
 
     const probe = getComputedStyle(document.getElementById('probe'));
     check('computed border-radius applied', probe.borderRadius === '6px');

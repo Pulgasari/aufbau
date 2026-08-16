@@ -28,18 +28,20 @@ export class Controller {
   constructor (options = {}) {
     this.target = options.target ?? null;
 
-    this._aliases    = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
-    this._tokens     = new Map(Object.entries(options.tokens ?? {}));
-    this._traits     = new Map(Object.entries(options.traits ?? {}));
-    this._vars       = { ...(options.vars ?? {}) };
-    this._sheets     = new Map;
-    this._layerOrder = options.layers ? [...options.layers] : null;
+    this._aliases     = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
+    this._breakpoints = new Map(Object.entries(options.breakpoints ?? {}));
+    this._tokens      = new Map(Object.entries(options.tokens ?? {}));
+    this._traits      = new Map(Object.entries(options.traits ?? {}));
+    this._vars        = { ...(options.vars ?? {}) };
+    this._sheets      = new Map;
+    this._layerOrder  = options.layers ? [...options.layers] : null;
 
-    this._aliasesProxy = this._registryProxy(this._aliases);
-    this._tokensProxy  = this._registryProxy(this._tokens);
-    this._traitsProxy  = this._registryProxy(this._traits);
-    this._varsProxy    = this._makeVarsProxy();
-    this._sheetsProxy  = this._makeSheetsProxy();
+    this._aliasesProxy     = this._registryProxy(this._aliases);
+    this._breakpointsProxy = this._registryProxy(this._breakpoints);
+    this._tokensProxy      = this._registryProxy(this._tokens);
+    this._traitsProxy      = this._registryProxy(this._traits);
+    this._varsProxy        = this._makeVarsProxy();
+    this._sheetsProxy      = this._makeSheetsProxy();
   }
 
   // ── registries (get -> proxy, set -> merge, never replace the proxy) ──────
@@ -49,6 +51,10 @@ export class Controller {
 
   get tokens ()    { return this._tokensProxy; }
   set tokens (obj) { this._mergeInto(this._tokens, obj); }
+
+  // named breakpoints for the `@<name>` at-rule shorthand in style objects.
+  get breakpoints ()    { return this._breakpointsProxy; }
+  set breakpoints (obj) { this._mergeInto(this._breakpoints, obj); }
 
   // reusable declaration sets. read one back for spread (`...ass.traits.card`),
   // or reference it by name via the `use` key inside a style object.
@@ -85,6 +91,11 @@ export class Controller {
   // resolves a trait name to its declaration set (used by the `use` key).
   resolveTrait (name) {
     return this._traits.get(name) ?? {};
+  }
+
+  // resolves a breakpoint name to its value (used by the `@<name>` at-rule key).
+  breakpoint (name) {
+    return this._breakpoints.get(name);
   }
 
   // resolves a single value word: a literal token, or a shade suffix on a known
