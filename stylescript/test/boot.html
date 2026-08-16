@@ -1,0 +1,66 @@
+<!-- aufbau/stylescript/test/boot.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stylescript boot</title>
+
+  <!--
+    proves boot.js replays cached css before the first paint, with no module code.
+
+    1. seed the cache synchronously, simulating what a previous visit's adopt() wrote.
+    2. boot.js runs next (blocking) and must inject the cached <style> before paint.
+    3. probes right after confirm the page is already styled from cache.
+
+    open directly in a browser; results are in the console and window.__results.
+  -->
+
+  <!-- 1. seed the stylescript cache before boot.js (this is what adopt() persists) -->
+  <script>
+    (function () {
+      var css  = '@layer base {\n#probe { background-color: rgb(17, 34, 51); color: #fff; padding: 1rem; }\n}\n';
+      var hash = 'testhash';
+      try {
+        localStorage.setItem('aufbau:stylescript:sheets:v1:layout', css);
+        localStorage.setItem('aufbau:stylescript:pages:v1:' + location.pathname, JSON.stringify([['layout', hash]]));
+      } catch (error) {}
+    })();
+  </script>
+
+  <!-- 2. boot.js, classic and blocking -->
+  <script src="../boot.js"></script>
+
+  <!-- 3. runs once the parser passed boot.js, before <body> paints -->
+  <script>
+    window.__bootProbe = {
+      hasLayout : !!document.getElementById('layout'),
+      injected  : document.querySelectorAll('style[data-aufbau-boot]').length,
+    };
+  </script>
+</head>
+
+<body>
+  <div id="probe">probe</div>
+
+  <script>
+    (function () {
+      var results = [];
+      var check = function (label, pass) { results.push([label, pass]); console[pass ? 'log' : 'error']((pass ? 'ok' : 'FAIL') + ': ' + label); };
+
+      var probe = getComputedStyle(document.getElementById('probe'));
+
+      check('boot.js injected a boot style before <head> ended', window.__bootProbe.injected === 1);
+      check('the <style id="layout"> exists',                    window.__bootProbe.hasLayout);
+      check('#probe painted from cache (theme background)',      probe.backgroundColor === 'rgb(17, 34, 51)');
+      check('layer + declarations applied (padding)',           probe.padding === '16px');
+      check('exactly one boot style, not duplicated',           document.querySelectorAll('style[data-aufbau-boot]').length === 1);
+      check('boot style carries id + hash',                     document.getElementById('layout')?.getAttribute('data-aufbau-hash') === 'testhash');
+
+      window.__results = results;
+      window.__ready   = true;
+      console.log('stylescript boot: ' + results.filter(function (r) { return r[1]; }).length + '/' + results.length + ' passed');
+    })();
+  </script>
+</body>
+</html>

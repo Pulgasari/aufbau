@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>stylescript controller</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
+
+  <!-- a stale pre-paint boot style, as boot.js would inject on a warm visit. the
+       module's adopt() must reconcile it in place (upsert by id), not duplicate it. -->
+  <style id="layout" data-aufbau-script="layout" data-aufbau-hash="stale" data-aufbau-boot>
+    @layer base { #probe { outline: 3px solid red } }
+  </style>
 </head>
 
 <body>
@@ -66,6 +72,11 @@
     check('layer baked',                 cssText.startsWith('@layer base {'));
     check('layer order statement emitted', (document.querySelector('style#__layers__')?.textContent ?? '').includes('@layer tokens, base, components;'));
     check('deep-merge kept both #probe decls', cssText.includes('border-radius: 6px') && cssText.includes('padding: 0.3rem'));
+
+    // reconciliation with the pre-seeded boot style
+    check('boot style reconciled in place (single style#layout)', document.querySelectorAll('style#layout').length === 1);
+    check('data-aufbau-boot marker dropped on reconcile',         !style?.hasAttribute('data-aufbau-boot'));
+    check('stale boot css replaced',                              !cssText.includes('outline: 3px solid red'));
 
     const probe = getComputedStyle(document.getElementById('probe'));
     check('computed border-radius applied', probe.borderRadius === '6px');
