@@ -42,16 +42,18 @@ ass.aliases = {
   rad : 'border-radius',
 };
 
+// define aliases for values
 ass.tokens.cc = 'currentColor';
 
+// define stylesheets
 ass.sheets.layout = ass.createSheet({ id: 'layout' , layer: 'base' });
 ass.sheets.skin   = ass.createSheet({ id: 'skin'   , layer: 'base' });
 ass.sheets.typo   = ass.createSheet({ id: 'typo'   , layer: 'base' });
 
 ass.sheets.layout += ({
   'body': {
-    backgroundColor: '#0d0f12',
-    color: '#f1f5f9',
+    bg: '#0d0f12',
+    fg: '#f1f5f9',
     fontFamily: 'system-ui, -apple-system, sans-serif',
     margin: 0,
     padding: '2rem',
