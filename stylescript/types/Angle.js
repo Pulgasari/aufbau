@@ -1,21 +1,19 @@
 // types/Angle.js
 
-import { CssValue } from './base.js';
+import { createFactory } from './base.js';
+import { Num }           from './Num.js';
 
-class AngleInstance extends CssValue {
+class AngleInstance extends Num {
   constructor (amount, unit = 'deg') {
-    super(`${amount}${unit}`);
-    this.amount = amount;
-    this.unit   = unit;
+    super(amount, unit);
   }
-  toString() { return `${this.amount}${this.unit}`; }
 }
 
-export const Angle = Object.assign(
-  (val, unit) => new AngleInstance(val, unit),
-  {
-    deg  : (v) => new AngleInstance(v, 'deg'),
-    rad  : (v) => new AngleInstance(v, 'rad'),
-    turn : (v) => new AngleInstance(v, 'turn'),
-  }
-);
+export const Angle = createFactory (AngleInstance, {
+  deg  : (value) => new AngleInstance (value, 'deg'),
+  grad : (value) => new AngleInstance (value, 'grad'),
+  rad  : (value) => new AngleInstance (value, 'rad'),
+  turn : (value) => new AngleInstance (value, 'turn'),
+});
+
+export default Angle;

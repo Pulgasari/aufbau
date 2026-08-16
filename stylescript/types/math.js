@@ -1,17 +1,10 @@
 // stylescript/types/math.js
-import { CssValue } from './base.js';
 
-// Calc and CSS Math Function Helpers
-export const calc = (expr) => new CssValue(`calc(${expr})`);
+import { CalcValue } from './base.js';
 
-export const clamp = (min, val, max) => {
-  return new CssValue(`clamp(${min}, ${val}, ${max})`);
-};
-
-export const min = (...values) => {
-  return new CssValue(`min(${values.join(', ')})`);
-};
-
-export const max = (...values) => {
-  return new CssValue(`max(${values.join(', ')})`);
-};
+// css math function helpers. each returns an opaque CalcValue that serializes to
+// the expression and composes inside style objects and template strings.
+export const calc  = (expr)            => new CalcValue(`calc(${expr})`);
+export const clamp = (min, val, max)   => new CalcValue(`clamp(${min}, ${val}, ${max})`);
+export const max   = (...values)       => new CalcValue(`max(${values.join(', ')})`);
+export const min   = (...values)       => new CalcValue(`min(${values.join(', ')})`);

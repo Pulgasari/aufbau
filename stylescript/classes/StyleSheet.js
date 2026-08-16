@@ -92,6 +92,8 @@ export class StyleSheet {
     if (this.element) {
       this.element.setAttribute('data-aufbau-script', this.name);
       this.element.setAttribute('data-aufbau-hash', this.hash);
+      // a reconciled boot <style> is now the processed one; drop the boot marker.
+      this.element.removeAttribute('data-aufbau-boot');
     }
     return this.element;
   }

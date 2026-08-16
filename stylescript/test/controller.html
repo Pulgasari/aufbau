@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>stylescript controller</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
+
+  <!-- a stale pre-paint boot style, as boot.js would inject on a warm visit. the
+       module's adopt() must reconcile it in place (upsert by id), not duplicate it. -->
+  <style id="layout" data-aufbau-script="layout" data-aufbau-hash="stale" data-aufbau-boot>
+    @layer base { #probe { outline: 3px solid red } }
+  </style>
 </head>
 
 <body>
@@ -27,6 +33,9 @@
     ass.vars.brand = '#5865f2';
     check('vars read -> var(--brand, …)', String(ass.vars.brand) === 'var(--brand, #5865f2)');
 
+    // ── cascade layer order ───────────────────────────────────────────────────
+    ass.layers = ['tokens', 'base', 'components'];
+
     // ── named, layered sheet + deep-merge via `=` setter ──────────────────────
     ass.sheets.layout = ass.createSheet({ id: 'layout', layer: 'base' });
 
@@ -36,6 +45,15 @@
       '#probe':   { rad: '6px', borderBottom: `1px solid cc` },
     };
     ass.sheets.layout = { '#probe': { padding: '0.3rem' } };   // deep-merged, not replaced
+
+    // ── traits: spread-native + use-key ───────────────────────────────────────
+    ass.traits.card   = { padding: '1rem', rad: '8px' };
+    ass.traits.shadow = { boxShadow: '0 1px 4px #0003' };
+
+    ass.sheets.ui = {
+      '.card-a': { ...ass.traits.card, bg: '#111', borderColor: 'brand-d15' },  // spread + shade string
+      '.card-b': { use: ['card', 'shadow'], bg: '#222' },                       // use-key reference
+    };
 
     ass.adopt();
 
@@ -52,10 +70,21 @@
     check('alias rad -> border-radius',  cssText.includes('border-radius: 6px'));
     check('token cc -> currentcolor in compound value', cssText.includes('1px solid currentcolor'));
     check('layer baked',                 cssText.startsWith('@layer base {'));
+    check('layer order statement emitted', (document.querySelector('style#__layers__')?.textContent ?? '').includes('@layer tokens, base, components;'));
     check('deep-merge kept both #probe decls', cssText.includes('border-radius: 6px') && cssText.includes('padding: 0.3rem'));
+
+    // reconciliation with the pre-seeded boot style
+    check('boot style reconciled in place (single style#layout)', document.querySelectorAll('style#layout').length === 1);
+    check('data-aufbau-boot marker dropped on reconcile',         !style?.hasAttribute('data-aufbau-boot'));
+    check('stale boot css replaced',                              !cssText.includes('outline: 3px solid red'));
 
     const probe = getComputedStyle(document.getElementById('probe'));
     check('computed border-radius applied', probe.borderRadius === '6px');
+
+    const uiCss = document.querySelector('style#ui')?.textContent ?? '';
+    check('trait spread-native inlined', uiCss.includes('.card-a') && uiCss.includes('border-radius: 8px'));
+    check('trait use-key inlined',       uiCss.includes('.card-b') && uiCss.includes('box-shadow: 0 1px 4px #0003') && uiCss.includes('border-radius: 8px'));
+    check('shade string brand-d15 -> color-mix', uiCss.includes('color-mix(in srgb, var(--brand) 85%, black)'));
 
     check('localStorage seeded (sheet)',   !!localStorage.getItem('aufbau:stylescript:sheets:v1:layout'));
     check('localStorage seeded (manifest)', (JSON.parse(localStorage.getItem('aufbau:stylescript:pages:v1:' + location.pathname) ?? '[]')).some(([name]) => name === 'layout'));

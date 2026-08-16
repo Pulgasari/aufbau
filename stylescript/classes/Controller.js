@@ -4,6 +4,7 @@ import { CanonicalMap } from './../vendors.js';
 
 import { defineTokens }                   from './../methods/defineTokens.js';
 import { kebabProperty, serializeValue }  from './../methods/resolveDeclaration.js';
+import { shade }                          from './../shades.js';
 import { StyleSheet }                     from './StyleSheet.js';
 
 // matches a bare css identifier, so value tokens are only substituted on exact
@@ -27,13 +28,16 @@ export class Controller {
   constructor (options = {}) {
     this.target = options.target ?? null;
 
-    this._aliases = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
-    this._tokens  = new Map(Object.entries(options.tokens ?? {}));
-    this._vars    = { ...(options.vars ?? {}) };
-    this._sheets  = new Map;
+    this._aliases    = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
+    this._tokens     = new Map(Object.entries(options.tokens ?? {}));
+    this._traits     = new Map(Object.entries(options.traits ?? {}));
+    this._vars       = { ...(options.vars ?? {}) };
+    this._sheets     = new Map;
+    this._layerOrder = options.layers ? [...options.layers] : null;
 
     this._aliasesProxy = this._registryProxy(this._aliases);
     this._tokensProxy  = this._registryProxy(this._tokens);
+    this._traitsProxy  = this._registryProxy(this._traits);
     this._varsProxy    = this._makeVarsProxy();
     this._sheetsProxy  = this._makeSheetsProxy();
   }
@@ -46,11 +50,21 @@ export class Controller {
   get tokens ()    { return this._tokensProxy; }
   set tokens (obj) { this._mergeInto(this._tokens, obj); }
 
+  // reusable declaration sets. read one back for spread (`...ass.traits.card`),
+  // or reference it by name via the `use` key inside a style object.
+  get traits ()    { return this._traitsProxy; }
+  set traits (obj) { this._mergeInto(this._traits, obj); }
+
   get vars ()    { return this._varsProxy; }
   set vars (obj) { Object.assign(this._vars, obj); }
 
   get sheets ()    { return this._sheetsProxy; }
   set sheets (obj) { for (const [key, value] of Object.entries(obj)) this._assignSheet(key, value); }
+
+  // declares cascade layer order, e.g. controller.layers = ['tokens', 'base', …]
+  // -> a single `@layer tokens, base, …;` statement, adopted before everything.
+  get layers ()     { return this._layerOrder ? [...this._layerOrder] : []; }
+  set layers (list) { this._layerOrder = [...list]; }
 
   // ── resolution (called by resolveDeclaration via the compiler) ────────────
 
@@ -60,15 +74,46 @@ export class Controller {
 
   value (raw) {
     if (typeof raw !== 'string') return serializeValue(raw);
-    if (this._tokens.size === 0)  return raw;
+    if (this._tokens.size === 0 && Object.keys(this._vars).length === 0) return raw;
 
     const whole = this._tokens.get(raw);
     if (whole !== undefined) return String(whole);
 
-    return raw.replace(WORD, (word) => {
-      const hit = this._tokens.get(word);
-      return hit === undefined ? word : String(hit);
-    });
+    return raw.replace(WORD, (word) => this._resolveWord(word));
+  }
+
+  // resolves a trait name to its declaration set (used by the `use` key).
+  resolveTrait (name) {
+    return this._traits.get(name) ?? {};
+  }
+
+  // resolves a single value word: a literal token, or a shade suffix on a known
+  // token/var (brand-a20 / brand-d15 / brand-l20 -> color-mix), else the word itself.
+  _resolveWord (word) {
+    const token = this._tokens.get(word);
+    if (token !== undefined) return String(token);
+
+    const match = word.match(/^(.+)-(a|d|l)(\d+)$/);
+    if (match) {
+      const base = this._resolveBase(match[1]);
+      if (base !== undefined) {
+        const amount = parseInt(match[3], 10);
+        const options = match[2] === 'a' ? { alpha: amount / 100 }
+                      : match[2] === 'd' ? { darken: amount }
+                      :                    { lighten: amount };
+        return shade(base, options);
+      }
+    }
+
+    return word;
+  }
+
+  // a shade base may be a literal token value or a custom-property (var(--x)).
+  _resolveBase (name) {
+    const token = this._tokens.get(name);
+    if (token !== undefined)  return String(token);
+    if (name in this._vars)   return `var(${toVarName(name)})`;
+    return undefined;
   }
 
   // ── sheets ────────────────────────────────────────────────────────────────
@@ -81,9 +126,16 @@ export class Controller {
     });
   }
 
+  // adopts in a fixed order: the layer declaration first, then the :root vars
+  // (tokens layer), then every user sheet.
   adopt (target) {
+    if (this._layerOrder?.length)       this._layersSheet().adopt(target);
     if (Object.keys(this._vars).length) this._varsSheet().adopt(target);
-    for (const sheet of this._sheets.values()) sheet.adopt(target);
+
+    for (const [id, sheet] of this._sheets) {
+      if (id === '__layers__' || id === '__vars__') continue;
+      sheet.adopt(target);
+    }
     return this;
   }
 
@@ -107,6 +159,17 @@ export class Controller {
     let sheet = this._sheets.get(key);
     if (!sheet) this._sheets.set(key, sheet = this.createSheet({ id: key }));
     sheet.define(value);
+    return sheet;
+  }
+
+  // emits the bare `@layer a, b, c;` order statement (no domina primitive exists).
+  _layersSheet () {
+    const sheet = this._sheets.get('__layers__') ?? this.createSheet({ id: '__layers__' });
+
+    sheet.tree    = {};
+    sheet.rawTail = `@layer ${this._layerOrder.join(', ')};\n`;
+    sheet.dirty   = true;
+    this._sheets.set('__layers__', sheet);
     return sheet;
   }
 

@@ -54,7 +54,7 @@ function parseObjectOrArray (styles, parentSelector = '', context) {
         const flatRules = Array.isArray(rules) ? rules.flat(Infinity) : [rules];
 
         for (const ruleItem of flatRules) {
-          for (const [prop, value] of Object.entries(ruleItem)) {
+          for (const [prop, value] of Object.entries(expandUse(ruleItem, context))) {
             if (typeof value === 'object' && value !== null) {
               nestedBlocks.push({ [prop]: value });
             } else {
@@ -76,6 +76,20 @@ function parseObjectOrArray (styles, parentSelector = '', context) {
   }
 
   return cssString;
+}
+
+// resolves a `use` key (trait name or array of names) by inlining the referenced
+// declaration sets ahead of the object's own declarations, which win on conflict.
+// without a controller context the `use` key is dropped.
+function expandUse (ruleItem, context) {
+  if (!ruleItem || ruleItem.use === undefined) return ruleItem;
+
+  const { use, ...own } = ruleItem;
+  if (!context?.resolveTrait) return own;
+
+  const names  = Array.isArray(use) ? use : [use];
+  const traits = names.map(name => context.resolveTrait(name));
+  return Object.assign({}, ...traits, own);
 }
 
 // tagged template helper

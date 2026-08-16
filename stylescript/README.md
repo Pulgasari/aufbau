@@ -1,237 +1,151 @@
 # @aufbau/stylescript
 
-## scratches
+Styles authored directly in JavaScript. The JS-native counterpart to
+`@aufbau/stylesheet`'s `.ass` pseudo-CSS: a central controller holds aliases,
+tokens, custom-property vars and reusable traits, and renders named, layered
+stylesheets — with a content-addressed cache so warm visits don't flicker.
 
-```javascript
-import { StyleSheet, css } from 'stylescript';
+## Controller
 
-const sheet = new StyleSheet('app-styles');
+`ass` is the default global controller; `createController()` makes an isolated one
+(own aliases/tokens/vars/traits/sheets and default adopt target).
 
-// Variant 1: Flattened Arrays (No Spreading required!)
-sheet.define({
-  '.card': [
-    { display: 'flex', padding: '1rem' },
-    { backgroundColor: '#111', color: '#fff' },
-    { '&:hover': { opacity: 0.9 } }
-  ]
-});
+```js
+import { ass, createController, stylesheet } from '@aufbau/stylescript';
 
-// Variant 2: Method Chaining
-sheet.define((builder) => {
-  builder.rule('.btn', (r) => r
-    .flex('row', 'center')
-    .set({ padding: '0.5rem 1rem', borderRadius: '4px' })
-  );
-});
-
-// Variant 3: Tagged Template Literal / CSS-String
-sheet.define(css`
-  .icon {
-    width: 24px;
-    height: 24px;
-    fill: currentColor;
-  }
-`);
-
-// Adopt directly into DOM via domina under the hood
-sheet.adopt(document);
+// isolated context, e.g. per widget / shadow root
+const widget = createController({ target: shadowRoot });
 ```
 
-```javascript
-import { defineTokens } from './stylescript/tokens.js';
-import { shade, parseAufbauShade } from './stylescript/shade.js';
-import { StyleSheet } from './stylescript/index.js';
+## Registries
 
-// 1. Register Token Definitions
-export const { tokens, toCSS: generateTokenCSS } = defineTokens({
-  colors: {
-    brand: '#5865f2',
-    oled: ['#000000', '#ffffff'],
-  },
-  gap: {
-    small: '0.5rem',
-    big: '2.0rem',
-  }
-});
+Each registry is a proxy: read a key back, set one, or bulk-assign an object (which
+merges, it does not replace the registry).
 
-// 2. Build StyleSheet
-const appSheet = new StyleSheet('theme-sheet');
+```js
+// property-name aliases (literal)
+ass.aliases.bg = 'background-color';
+ass.aliases    = { fg: 'color', fs: 'font-size', rad: 'border-radius' };
 
-// Inject Token Custom Properties into :root
-appSheet.define(generateTokenCSS(':root'));
+// value tokens (literal substitution, whole value or bare word inside a value)
+ass.tokens.cc = 'currentcolor';
 
-// Use Tokens & Shade Engine inside Rules
-appSheet.define({
-  'body': {
-    backgroundColor: tokens.colors.oled.bg, // var(--colors-oled-bg)
-    color: tokens.colors.oled.fg,           // var(--colors-oled-fg)
-    gap: tokens.gap.big,                    // var(--gap-big, 2.0rem)
-  },
+// custom-property vars -> emits :root { --brand: … } and reads back as var()
+ass.vars.brand = '#5865f2';
+String(ass.vars.brand); // "var(--brand, #5865f2)"
 
-  '.card': {
-    // Generated via JS helper: color-mix(in srgb, var(--colors-brand, #5865f2) 20%, transparent)
-    backgroundColor: shade(tokens.colors.brand, { alpha: 0.2 }),
-
-    // Generated via JS helper: color-mix(in srgb, var(--colors-brand, #5865f2) 85%, black)
-    borderColor: shade(tokens.colors.brand, { darken: 15 }),
-  },
-
-  '.badge': {
-    // Aufbau String Notation (brand-a20)
-    backgroundColor: parseAufbauShade('brand-a20', tokens),
-  }
-});
-
-appSheet.adopt(document);
+// traits: reusable declaration sets (see below)
+ass.traits.card = { padding: '1rem', rad: '8px' };
 ```
 
-```javascript
-// Result: { margin: 'unset', padding: 'unset', border: 'unset' }
-unset('margin', 'padding', 'border')
+## Sheets
 
-// Also works with arrays
-unset(['backgroundColor', 'color'])
-```
+`createSheet()` builds a sheet bound to the controller (no auto-registration);
+`stylesheet()` is the same, bound to the default `ass` — the module-per-sheet
+pattern. Assign into `ass.sheets` to register and author:
 
-```javascript
-// Standard Iconify Icon with token color
-icon('bx:search', { size: '1.5rem', color: shade('brand', { darken: 15 }) })
+```js
+ass.sheets.layout = ass.createSheet({ id: 'layout', layer: 'base' });
 
-// Simple inline icon inheriting text color
-icon('lucide:check')
-```
-
-```javascript
-import { ass } from './stylescript/core.js';
-
-// 1. Direct Instantiation & Static Helpers
-const bg = ass.Color('#000');
-const primary = ass.Color.hsl(300, 50, 25);
-const primaryString = ass.Color.hsl('300 50 25');
-
-// 2. Chained Manipulations
-const hoverBg = primary.darken(10);
-const alphaBg = bg.alpha(0.5);
-
-// 3. Length Operations
-const padding = ass.Length.rem(1.5);
-const doublePadding = padding.scale(2); // "3rem"
-
-// 4. Type Checking
-console.log(ass.isTypeOf(primary, ass.Color)); // true
-console.log(ass.isTypeOf(padding, ass.Length)); // true
-console.log(ass.isTypeOf('#000', ass.Color));   // false (raw string)
-
-// 5. Native CSS Serialization inside style objects
-const buttonStyle = {
-  backgroundColor: primary,
-  padding: padding,
-  borderColor: hoverBg,
+// assigning a plain object DEEP-MERGES it into the sheet (it does not replace)
+ass.sheets.layout = {
+  body:       { bg: '#0d0f12', fg: '#f1f5f9', margin: 0, padding: '2rem' },
+  '#content': { maxWidth: '800px', margin: '0 auto' },
+  'h1, h2':   { borderBottom: `1px solid cc` },
 };
+ass.sheets.layout = { '#content': { padding: '1rem' } }; // merged in, not overwritten
 
-// ======= destructing ========
-import { ass } from './stylescript/core.js';
-
-// 1. Destructure classes & tools from 'ass'
-const { Color, Length, isTypeOf } = ass;
-
-const bg = Color('#000');
-const primary = Color.hsl(300, 50, 25);
-const padding = Length.rem(1.5);
-
-// 2. Destructure static methods directly
-const { hsl, rgb, oklch } = Color;
-const { rem, px, vh } = Length;
-
-const secondary = hsl(200, 80, 40);
-const gap = rem(1);
-const border = px(2);
-
-// 3. Standalone type checks work without breaking
-console.log(isTypeOf(primary, Color)); // true
+ass.adopt(); // adopts every registered sheet (+ layer order + :root vars)
 ```
 
-Kleiner Feinschliff für `ass.isColor`:
+A held reference uses `.define()` (chainable) and `.adopt()/.release()`:
 
-​Damit auch `const { isColor } = ass;` ohne `this`-Kontext nicht bricht, definieren wir die Shorthands im Core einfach als Pfeilfunktionen.
+```js
+import skin from './skin.js'; // export default stylesheet({ id: 'skin' }).define({ … })
+skin.adopt();
+```
 
-So kannst du in Modulen wahlweise `import { Color, rem, isColor } from 'stylescript'` als Named Imports nutzen oder `ass` als Namespace-Objekt importieren und beliebig destrukturieren.
+Render target: a document renders a `<style id>` (stable identity the boot path
+reconciles by id); a shadow root renders an adopted constructable sheet.
 
-```javascript
-// stylescript/core.js
-import { Color }  from './types/color.js';
-import { Length } from './types/length.js';
+## Traits
 
-export const isTypeOf = (value, Type) => {
-  if (value == null)         return false;
-  if (value instanceof Type) return true;
-  const prototype = Object.getPrototypeOf(Type);
-  return prototype ? value instanceof prototype : false;
-};
+Reusable declaration sets, offered two ways:
 
-export const isColor  = (val) => isTypeOf(val, Color);
-export const isLength = (val) => isTypeOf(val, Length);
+```js
+ass.traits.card   = { padding: '1rem', rad: '8px' };
+ass.traits.shadow = { boxShadow: '0 1px 4px #0003' };
 
-export const ass = {
-  Color,
-  Length,
-  isTypeOf,
-  isColor,
-  isLength,
+ass.sheets.ui = {
+  '.card-a': { ...ass.traits.card, bg: '#111' },        // spread-native, no magic
+  '.card-b': { use: ['card', 'shadow'], bg: '#222' },   // use-key, compiler inlines
 };
 ```
 
-```javascript
-import { Length, Angle, Time, clamp, min } from './stylescript/types/index.js';
+`use` inlines the named traits ahead of the object's own declarations, which win on
+conflict.
 
-const { rem, px } = Length;
-const { deg } = Angle;
-const { ms } = Time;
+## Cascade layers
 
-// 1. Direct Same-Unit Math (JS evaluates directly -> "3rem")
-const basePadding = rem(1);
-const doublePadding = basePadding.add(rem(2)); 
-
-// 2. Mixed-Unit Math (Auto-fallback to calc -> "calc(10px + 1.5rem)")
-const mixedOffset = px(10).add(rem(1.5));
-
-// 3. Scalar Multiplication (JS evaluates directly -> "30px")
-const borderWidth = px(10).mul(3);
-
-// 4. Responsive Clamp & Math Functions
-const fontSize = clamp(rem(1), px(12).add(rem(2)), rem(3)); // "clamp(1rem, calc(12px + 2rem), 3rem)"
-const containerWidth = min(rem(60), '100%');                // "min(60rem, 100%)"
-
-// 5. Applied in Style Object
-const cardStyle = {
-  padding: doublePadding,
-  margin: mixedOffset,
-  fontSize: fontSize,
-  transform: `rotate(${deg(45)})`,
-  transition: `all ${ms(300)} ease-in-out`,
-};
+```js
+ass.layers = ['tokens', 'base', 'components', 'utilities']; // -> @layer …;
+ass.createSheet({ id: 'x', layer: 'components' });          // -> @layer components { … }
 ```
 
-```javascript
-import { Length } from './stylescript/types/length.js';
-import { Num } from './stylescript/types/resolver.js';
+`adopt()` orders output as: layer declaration, then `:root` vars, then user sheets.
 
-const { px } = Length;
+## Shades
 
-// 1. String-Parsing with typed methods
-const a = px(10).add('1.5rem');      // "calc(10px + 1.5rem)"
-const b = Num('10px').add('1.5rem'); // "calc(10px + 1.5rem)"
+`brand-a20` / `brand-d15` / `brand-l20` resolve to `color-mix()` when `brand` is a
+known token or var (alpha / darken / lighten by percent):
 
-// 2. Same unit optimization via raw strings
-const c = Num('10px').add('20px');   // "30px" (JS evaluates directly!)
+```js
+ass.vars.brand = '#5865f2';
+ass.sheets.ui  = { '.tag': { bg: 'brand-a20', borderColor: 'brand-d15' } };
+// background-color: color-mix(in srgb, var(--brand) 20%, transparent);
+// border-color:     color-mix(in srgb, var(--brand) 85%, black);
+```
 
-// 3. Mixed types and numbers
-const d = Num('100%').sub('20px');   // "calc(100% - 20px)"
-const e = Num(10).add(5);            // "15px" (Uses default 'px' unit)
+Or call `shade()` directly: `shade('brand', { darken: 15 })`, `shade('brand', -15)`.
 
-// 4. Auto-resolving inside style definitions
-const cardStyle = {
-  margin: Num('2rem').add('10px'),
-  width: Num('100vw').sub('40px'),
-};
+## Value types
+
+`Num` is the numeric base (amount + unit + arithmetic); `Length`, `Angle`, `Time`
+specialize it. `Color` is an opaque value with color-mix operations. `CssValue` is
+the minimal base everything serializes through; `CalcValue` wraps a math expression.
+
+```js
+import { Num, Length, Color, clamp, min } from '@aufbau/stylescript';
+
+Length.rem(1).add(Length.px(10)); // "calc(1rem + 10px)"
+Length.px(10).scale(3);           // "30px"
+new Num('10px').add('20px');      // "30px" (same unit evaluates directly)
+
+Color('#000').alpha(0.5);         // "color-mix(in srgb, #000 50%, transparent)"
+Color('red').darken(15);          // "color-mix(in srgb, red 85%, black)"
+Color.hsl(300, 50, 25);           // "hsl(300 50% 25%)"
+
+clamp(Length.rem(1), '2vw', Length.rem(3)); // "clamp(1rem, 2vw, 3rem)"
+```
+
+Any typed value drops straight into a style object or a template string.
+
+## Shorthands
+
+```js
+import { icon, unset } from '@aufbau/stylescript';
+
+icon('bx:search', { size: '1.5rem', color: 'currentColor' }); // mask-based icon styles
+unset('margin', 'padding');                                    // { margin: 'unset', padding: 'unset' }
+```
+
+## Anti-flicker
+
+Every adopted sheet writes its compiled css + content hash to `localStorage`
+(`aufbau:stylescript:sheets|pages:v1`, see `cache.js`). `boot.js` — a classic,
+blocking, first-in-`<head>` script — replays that cache as `<style>` elements before
+the first paint, so a warm visit is styled while the module graph still loads:
+
+```html
+<script src="/aufbau/stylescript/boot.js"></script>
 ```
