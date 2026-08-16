@@ -1,28 +1,5 @@
 // stylescript/types/base.js
 
-// Base class for all StyleScript type instances
-export class CssValue {
-  [Symbol.toPrimitive](hint) {
-    return this.toString();
-  }
-}
-
-/**
- * Factory wrapper maker to allow both Color(...) and new Color(...) syntax
- */
-function createFactory (TypeClass, staticMethods = {}) {
-  const factory = function (...args) {
-    return new TypeClass(...args);
-  };
-
-  Object.setPrototypeOf (factory, TypeClass);
-  Object.assign         (factory, staticMethods);
-  return factory;
-}
-
-
-// stylescript/types/base.js
-
 export class CssValue {
   constructor(value) {
     this.raw = value;
@@ -72,6 +49,18 @@ export class CssValue {
   }
 }
 
+// factory wrapper maker to allow both Color(...) and new Color(...) syntax
+function createFactory (TypeClass, staticMethods = {}) {
+  const factory = function (...args) {
+    return new TypeClass(...args);
+  };
+
+  Object.setPrototypeOf (factory, TypeClass);
+  Object.assign         (factory, staticMethods);
+  return factory;
+}
+
+/*
 class CalcInstance extends CssValue {
   toString() {
     return String(this.raw);
@@ -108,3 +97,4 @@ export class CssValue {
     return this.toString();
   }
 }
+*/
