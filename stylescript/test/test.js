@@ -26,7 +26,7 @@ sheet.define(generateTokenCSS(':root'));
 sheet.define({
   'body': {
     backgroundColor: '#0d0f12',
-    color: tokens.colors.fg,
+    color: '#f1f5f9',
     fontFamily: 'system-ui, -apple-system, sans-serif',
     margin: 0,
     padding: '2rem',
