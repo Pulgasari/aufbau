@@ -27,10 +27,11 @@ export class Controller {
   constructor (options = {}) {
     this.target = options.target ?? null;
 
-    this._aliases = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
-    this._tokens  = new Map(Object.entries(options.tokens ?? {}));
-    this._vars    = { ...(options.vars ?? {}) };
-    this._sheets  = new Map;
+    this._aliases    = new CanonicalMap(options.aliases ?? {}, ['kebab', 'camel']);
+    this._tokens     = new Map(Object.entries(options.tokens ?? {}));
+    this._vars       = { ...(options.vars ?? {}) };
+    this._sheets     = new Map;
+    this._layerOrder = options.layers ? [...options.layers] : null;
 
     this._aliasesProxy = this._registryProxy(this._aliases);
     this._tokensProxy  = this._registryProxy(this._tokens);
@@ -51,6 +52,11 @@ export class Controller {
 
   get sheets ()    { return this._sheetsProxy; }
   set sheets (obj) { for (const [key, value] of Object.entries(obj)) this._assignSheet(key, value); }
+
+  // declares cascade layer order, e.g. controller.layers = ['tokens', 'base', …]
+  // -> a single `@layer tokens, base, …;` statement, adopted before everything.
+  get layers ()     { return this._layerOrder ? [...this._layerOrder] : []; }
+  set layers (list) { this._layerOrder = [...list]; }
 
   // ── resolution (called by resolveDeclaration via the compiler) ────────────
 
@@ -81,9 +87,16 @@ export class Controller {
     });
   }
 
+  // adopts in a fixed order: the layer declaration first, then the :root vars
+  // (tokens layer), then every user sheet.
   adopt (target) {
+    if (this._layerOrder?.length)       this._layersSheet().adopt(target);
     if (Object.keys(this._vars).length) this._varsSheet().adopt(target);
-    for (const sheet of this._sheets.values()) sheet.adopt(target);
+
+    for (const [id, sheet] of this._sheets) {
+      if (id === '__layers__' || id === '__vars__') continue;
+      sheet.adopt(target);
+    }
     return this;
   }
 
@@ -107,6 +120,17 @@ export class Controller {
     let sheet = this._sheets.get(key);
     if (!sheet) this._sheets.set(key, sheet = this.createSheet({ id: key }));
     sheet.define(value);
+    return sheet;
+  }
+
+  // emits the bare `@layer a, b, c;` order statement (no domina primitive exists).
+  _layersSheet () {
+    const sheet = this._sheets.get('__layers__') ?? this.createSheet({ id: '__layers__' });
+
+    sheet.tree    = {};
+    sheet.rawTail = `@layer ${this._layerOrder.join(', ')};\n`;
+    sheet.dirty   = true;
+    this._sheets.set('__layers__', sheet);
     return sheet;
   }
 

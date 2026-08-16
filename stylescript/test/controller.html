@@ -27,6 +27,9 @@
     ass.vars.brand = '#5865f2';
     check('vars read -> var(--brand, …)', String(ass.vars.brand) === 'var(--brand, #5865f2)');
 
+    // ── cascade layer order ───────────────────────────────────────────────────
+    ass.layers = ['tokens', 'base', 'components'];
+
     // ── named, layered sheet + deep-merge via `=` setter ──────────────────────
     ass.sheets.layout = ass.createSheet({ id: 'layout', layer: 'base' });
 
@@ -52,6 +55,7 @@
     check('alias rad -> border-radius',  cssText.includes('border-radius: 6px'));
     check('token cc -> currentcolor in compound value', cssText.includes('1px solid currentcolor'));
     check('layer baked',                 cssText.startsWith('@layer base {'));
+    check('layer order statement emitted', (document.querySelector('style#__layers__')?.textContent ?? '').includes('@layer tokens, base, components;'));
     check('deep-merge kept both #probe decls', cssText.includes('border-radius: 6px') && cssText.includes('padding: 0.3rem'));
 
     const probe = getComputedStyle(document.getElementById('probe'));
