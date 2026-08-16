@@ -139,6 +139,7 @@
 <output id="dump"></output>
 
 <h2>aufbau-button</h2>
+	
 <div class="row">
   <aufbau-button label="Speichern" icon="lucide:save" variant="primary"></aufbau-button>
   <aufbau-button variant="danger"><strong>Löschen</strong> <small>(irreversibel)</small></aufbau-button>
@@ -146,6 +147,7 @@
 </div>
 
 <h2>aufbau-code</h2>
+	
 <aufbau-code lang="javascript">
 	const greet = (name) => `Hello, ${name}!`;
 	console.log(greet('aufbau'));
@@ -153,12 +155,29 @@
 <aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
 
 <h2>aufbau-dropdown</h2>
+
 <aufbau-dropdown label="Optionen">
   <a href="#edit">Bearbeiten</a>
   <a href="#delete">Löschen</a>
 </aufbau-dropdown>
 
+<h2>aufbau-flag</h2>
+	
+<aufbau-flag></aufbau-flag>
+<aufbau-flag code="de" variant="circle"></aufbau-flag>
+<aufbau-flag code="us"></aufbau-flag>
+		
+<h2>aufbau-icon</h2>
+	
+<aufbau-icon icon='bx:search'></aufbau-icon>
+
+<h2>aufbau-progress</h2>
+		
+<aufbau-progress type="scroll" target="body"></aufbau-progress>
+<aufbau-progress value="75" max="100" show-text unit="%"></aufbau-progress>
+
 <h2>aufbau-reader</h2>
+	
 <aufbau-reader raw="# Inline&#10;Kommt durch **denselben** markdown-compiler wie `src`."></aufbau-reader>
 
 
