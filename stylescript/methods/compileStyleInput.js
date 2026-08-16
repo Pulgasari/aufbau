@@ -4,10 +4,10 @@ import {
   adoptStylesheet,
   createStylesheet,
   isArray, isFn, isObject, isString,
-} from './vendors.js';
+} from './../vendors.js';
 
-import { RuleBuilder }  from './classes/RuleBuilder.js';
-import { StyleBuilder } from './classes/StyleBuilder.js';
+import { RuleBuilder }  from './../classes/RuleBuilder.js';
+import { StyleBuilder } from './../classes/StyleBuilder.js';
 
 /**
  * Normalizes any style definition (Object, Array, CSS string, or Builder) into a flat CSS string.
@@ -16,7 +16,7 @@ import { StyleBuilder } from './classes/StyleBuilder.js';
  */
 export function compileStyleInput (input) {
   // 1. Tagged template or raw CSS string
-  if (isString((input)) return input;
+  if (isString(input)) return input;
 
   // 2. Chainable Builder function
   if (isFn(input)) {
