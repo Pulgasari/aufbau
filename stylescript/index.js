@@ -5,11 +5,18 @@ import { Color }  from './types/Color.js';
 import { Length } from './types/Length.js';
 import { Time }   from './types/Time.js';
 
+import * as methods from './methods/index.js';
+
+export * from './methods/index.js';
+
+
 export const ass = {
   Angle,
   Color,
   Length,
   Time,
+  
+  ...methods,
 
   // Universal type checking engine
   isTypeOf (value, Type) {
