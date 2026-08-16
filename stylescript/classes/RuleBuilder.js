@@ -1,6 +1,6 @@
 // classes/RuleBuilder.js
 
-class RuleBuilder {
+export class RuleBuilder {
   constructor() {
     this.declarations = [];
   }
