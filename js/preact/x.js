@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'preact/hooks';
 import { computed, effect, signal, Signal, useSignal } from '@preact/signals';
+import { createStorage } from '@bunker/storage';
 
 // TODO: should `values` also apply to leaves inside a deep object?
 //       e.g. deep: { size: ['s','m','l'] } — structure carrying both. undecided.
@@ -52,6 +53,17 @@ export let cookie = ({ days = 365, path = '/' } = {}) => ({
 export let local   = (options) => webStore(globalThis.localStorage,   options);
 export let none    = ()        => ({ get: () => undefined, set: () => {} });
 export let session = (options) => webStore(globalThis.sessionStorage, options);
+
+// aufbau-namespaced store over @bunker/storage (namespace + version + quota
+// fallback), for `betterSignal({ store: signalStore, key })`. a miss must read as
+// undefined — the one value betterSignal takes as "nothing stored" so the declared
+// default survives — hence the sentinel over getSync's null fallback.
+let _aufbauStorage = createStorage({ area: 'local', namespace: 'aufbau', version: 1 });
+let MISS_STORE     = Symbol('miss');
+export let signalStore = () => ({
+  get: key        => { let value = _aufbauStorage.getSync(key, MISS_STORE); return value === MISS_STORE ? undefined : value; },
+  set: (key, val) => _aufbauStorage.setSync(key, val),
+});
 
 // accepts both `store: local` and `store: cookie({ days: 7 })`
 let resolveStore = store => typeof store === 'function' ? store() : (store ?? none());
