@@ -52,7 +52,7 @@ async function registerAll () {
 
 function request (tag) {
   if (!tag || customElements.get(tag)) return;
-  load(tag).then(() => console.log('aufbau-element loaded:', tag));
+  load(tag);
 }
 
 function scan (node) {
@@ -64,8 +64,7 @@ function scan (node) {
 function autoloader ({ base, root = document } = {}) {
   if (typeof window === 'undefined') return () => {};
   if (base) baseURL = base;
-  
-  console.log('[@aufbau/elements] autoloader initialized.');
+
   scan(root.documentElement ?? root);
   
   // 2. only walk what actually got added, no repeated full-document scans
