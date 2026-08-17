@@ -19,11 +19,12 @@ export default class AufbauFilter extends AufbauElement {
   };
 
   onMount () {
-    let timer = null;
-
+    // the handle has to live on the instance so onUnmount can clear it —
+    // a local `let timer` left this._timer undefined and the cleanup a no-op,
+    // so a pending debounce still fired applyFilter() after disconnect
     this.on('aufbau-input', (e) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => this.applyFilter(e.detail.value), this.getAttr('debounce'));
+      clearTimeout(this._timer);
+      this._timer = setTimeout(() => this.applyFilter(e.detail.value), this.getAttr('debounce'));
     });
 
     this.on('aufbau-filter-reset', () => this.applyFilter(''));

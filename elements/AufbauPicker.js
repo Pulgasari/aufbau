@@ -159,7 +159,12 @@ export default class AufbauPicker extends AufbauControl {
   get isOpen () {
     const list = this.$('.picker-list');
     if (!list) return false;
-    return list.matches?.(':popover-open') || !list.hidden;
+    // when the popover api is in play it is the single source of truth — the
+    // `hidden` attribute is only ever written on the fallback path in setOpen().
+    // reading `|| !list.hidden` here reported a freshly rendered (closed) list as
+    // open, because `hidden` starts out false, so the first toggle() closed it.
+    if (typeof list.showPopover === 'function' && list.popover) return list.matches(':popover-open');
+    return !list.hidden;
   }
 
   // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::
@@ -227,10 +232,12 @@ export default class AufbauPicker extends AufbauControl {
     this.on('keydown', (event) => this.onKeydown(event));
     this.onOutside(() => this.close());
 
-    // recalculate popover coordinates on scroll or viewport resize
+    // recalculate popover coordinates on scroll or viewport resize. routed
+    // through this.on() so release() tears them down on disconnect — a raw
+    // window.addEventListener here leaked two listeners per mount
     const handleReposition = () => { if (this.isOpen) this.updatePlacement(); };
-    window.addEventListener('resize', handleReposition, { passive: true });
-    window.addEventListener('scroll', handleReposition, { capture: true, passive: true });
+    this.on(window, 'resize', handleReposition, { passive: true });
+    this.on(window, 'scroll', handleReposition, { capture: true, passive: true });
 
     // initial selection may come from <aufbau-option selected>. it is the
     // default too, otherwise form.reset() would clear a preselected picker
