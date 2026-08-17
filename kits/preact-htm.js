@@ -12,7 +12,7 @@ import htm from 'htm';
 import * as preactCore    from 'preact';
 import * as preactHooks   from 'preact/hooks';
 import * as preactSignals from '@preact/signals';
-import { betterSignal }   from './../js/preact/x.js';
+import { betterSignal, signalStore } from './../js/preact/x.js';
 
 // :::::: BUNDLE ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -40,7 +40,7 @@ export * from 'preact/hooks';
 export * from '@preact/signals';
 
 export const { bunker, dom, domina, str } = aufbau;
-export { aufbau, htm, html, preact };
+export { aufbau, htm, html, preact, signalStore };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::

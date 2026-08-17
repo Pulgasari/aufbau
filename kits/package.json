@@ -13,9 +13,7 @@
     "@aufbau/cache"      : "workspace:*",
     "@aufbau/elements"   : "workspace:*",
     "@aufbau/import"     : "workspace:*",
-    "@aufbau/plugins"    : "workspace:*",
     "@aufbau/shaders"    : "workspace:*",
-    "@aufbau/store"      : "workspace:*",
     "@aufbau/stylesheet" : "workspace:*",
     "@aufbau/utils"      : "workspace:*",
     "@bunker/kit"        : "^0.1.0"

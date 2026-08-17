@@ -10,7 +10,7 @@
 
 import AufbauCore         from './AufbauCore.js';
 import { createLogger }   from '@aufbau/js';
-import { resolvePersist } from '@aufbau/store';
+import { resolvePersist } from './persist.js';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
 
@@ -173,7 +173,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   // persist="session"        sessionStorage  key from name or id
   // persist="theme"          localStorage    key "theme"
   // persist="session:theme"  sessionStorage  key "theme"
-  // the attribute grammar is parsed in @aufbau/store, which also owns the
+  // the attribute grammar is parsed in ./persist.js, which also owns the
   // namespace, the quota handling and the private-mode fallback.
 
   get persistTarget () {

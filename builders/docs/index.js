@@ -1,9 +1,8 @@
 // @aufbau/builders/docs/index.js
 
 import initDefaultStylesheet from './ss.js';
-import aufbau, { dom, html, preact, str }    from '@aufbau/kits/preact-htm';
-import { isArray, isFn, isString }           from '@aufbau/js';
-import { store, signalStore as aufbauStore } from '@aufbau/store';
+import aufbau, { dom, html, preact, signalStore as aufbauStore, str } from '@aufbau/kits/preact-htm';
+import { isArray, isFn, isString } from '@aufbau/js';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax

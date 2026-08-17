@@ -7,7 +7,7 @@
 import * as aufbauElements      from '@aufbau/elements';
 import * as aufbauFilters       from '@aufbau/filters';
 import      aufbauImport        from '@aufbau/import';
-import * as aufbauStore         from '@aufbau/store';
+import * as aufbauStore         from './store.js';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
 
