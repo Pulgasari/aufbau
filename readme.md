@@ -14,20 +14,17 @@
 
 #### packages
 
-[@aufbau/cache](#aufbau-cache)
-[@aufbau/elements](#aufbau-elements)
-[@aufbau/import](#aufbau-import)
-[@aufbau/patterns](#aufbau-patterns)
-[@aufbau/plugins](#aufbau-plugins)
-[@aufbau/shaders](#aufbau-shaders)
-[@aufbau/store](#aufbau-store)
-[@aufbau/stylesheet](#aufbau-stylesheet)
+- [@aufbau/elements](#aufbau-elements)
+- [@aufbau/import](#aufbau-import)
+- [@aufbau/patterns](#aufbau-patterns)
+- [@aufbau/plugins](#aufbau-plugins)
+- [@aufbau/stylesheet](#aufbau-stylesheet)
 
 #### resources
 
-[@aufbau/css](#aufbau-css)
-[@aufbau/svg](#aufbau-svg)
-[@aufbau/webfonts](#aufbau-webfonts)
+- [@aufbau/css](#aufbau-css)
+- [@aufbau/svg](#aufbau-svg)
+- [@aufbau/webfonts](#aufbau-webfonts)
 
 #### web
 
