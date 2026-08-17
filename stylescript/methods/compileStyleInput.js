@@ -41,41 +41,68 @@ function parseObjectOrArray (styles, parentSelector = '', context) {
     }
 
     for (const [selector, rules] of Object.entries(block)) {
-      if (typeof rules === 'object' && rules !== null) {
-        const fullSelector = parentSelector
-          ? selector.includes('&')
-            ? selector.replace(/&/g, parentSelector)
-            : `${parentSelector} ${selector}`
-          : selector;
+      if (typeof rules !== 'object' || rules === null) continue;
 
-        const declarations = [];
-        const nestedBlocks = [];
+      // top-level at-rule (@media/@tablet/@supports …): its body is a selector map
+      const topAtRule = !parentSelector && resolveAtRule(selector, context);
+      if (topAtRule) {
+        cssString += `${topAtRule} {\n${parseObjectOrArray(rules, '', context)}}\n`;
+        continue;
+      }
 
-        const flatRules = Array.isArray(rules) ? rules.flat(Infinity) : [rules];
+      const fullSelector = parentSelector
+        ? selector.includes('&')
+          ? selector.replace(/&/g, parentSelector)
+          : `${parentSelector} ${selector}`
+        : selector;
 
-        for (const ruleItem of flatRules) {
-          for (const [prop, value] of Object.entries(expandUse(ruleItem, context))) {
-            if (typeof value === 'object' && value !== null) {
-              nestedBlocks.push({ [prop]: value });
-            } else {
-              const [cssProp, cssValue] = resolveDeclaration(prop, value, context);
-              declarations.push(`  ${cssProp}: ${cssValue};`);
-            }
+      const declarations = [];
+      const nestedBlocks = [];
+      const atBlocks     = [];
+
+      const flatRules = Array.isArray(rules) ? rules.flat(Infinity) : [rules];
+
+      for (const ruleItem of flatRules) {
+        for (const [prop, value] of Object.entries(expandUse(ruleItem, context))) {
+          if (typeof value === 'object' && value !== null) {
+            const nestedAtRule = resolveAtRule(prop, context);
+            if (nestedAtRule) atBlocks.push({ atRule: nestedAtRule, rules: value });
+            else              nestedBlocks.push({ [prop]: value });
+          } else {
+            const [cssProp, cssValue] = resolveDeclaration(prop, value, context);
+            declarations.push(`  ${cssProp}: ${cssValue};`);
           }
         }
+      }
 
-        if (declarations.length > 0) {
-          cssString += `${fullSelector} {\n${declarations.join('\n')}\n}\n`;
-        }
+      if (declarations.length > 0) {
+        cssString += `${fullSelector} {\n${declarations.join('\n')}\n}\n`;
+      }
 
-        for (const nested of nestedBlocks) {
-          cssString += parseObjectOrArray(nested, fullSelector, context);
-        }
+      for (const nested of nestedBlocks) {
+        cssString += parseObjectOrArray(nested, fullSelector, context);
+      }
+
+      // at-rule nested inside a selector: @media { fullSelector { … } }
+      for (const { atRule, rules: atRules } of atBlocks) {
+        cssString += `${atRule} {\n${parseObjectOrArray({ [fullSelector]: atRules }, '', context)}}\n`;
       }
     }
   }
 
   return cssString;
+}
+
+// resolves an at-rule key. a bare `@<breakpoint>` becomes @media (min-width: …)
+// when the controller knows the breakpoint; any other `@…` key is passed through
+// verbatim (@media (…), @supports (…), @container …). non-@ keys are not at-rules.
+function resolveAtRule (key, context) {
+  if (typeof key !== 'string' || key[0] !== '@') return null;
+
+  const breakpoint = context?.breakpoint?.(key.slice(1));
+  if (breakpoint) return `@media (min-width: ${breakpoint})`;
+
+  return key;
 }
 
 // resolves a `use` key (trait name or array of names) by inlining the referenced

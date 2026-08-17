@@ -29,9 +29,11 @@
     ass.aliases    = { fs: 'font-size', rad: 'border-radius' };  // bulk merge
     ass.tokens.cc  = 'currentcolor';
 
-    // ── vars (custom properties) ──────────────────────────────────────────────
-    ass.vars.brand = '#5865f2';
-    check('vars read -> var(--brand, …)', String(ass.vars.brand) === 'var(--brand, #5865f2)');
+    // ── vars (custom properties) + light-dark theming ─────────────────────────
+    ass.vars.brand   = '#5865f2';
+    ass.vars.surface = ['#ffffff', '#111111'];   // [light, dark] -> light-dark()
+    check('vars read -> var(--brand, …)',  String(ass.vars.brand) === 'var(--brand, #5865f2)');
+    check('light-dark var reads as var()', String(ass.vars.surface) === 'var(--surface)');
 
     // ── cascade layer order ───────────────────────────────────────────────────
     ass.layers = ['tokens', 'base', 'components'];
@@ -46,6 +48,15 @@
     };
     ass.sheets.layout = { '#probe': { padding: '0.3rem' } };   // deep-merged, not replaced
 
+    // ── responsive: breakpoints + @media nesting ──────────────────────────────
+    ass.breakpoints.tablet = '768px';
+    ass.sheets.layout = {
+      '#content': {
+        '@tablet': { padding: '2rem' },                   // shorthand -> @media (min-width: 768px)
+        '@media (min-width: 1200px)': { maxWidth: '1100px' }, // raw at-rule passthrough
+      },
+    };
+
     // ── traits: spread-native + use-key ───────────────────────────────────────
     ass.traits.card   = { padding: '1rem', rad: '8px' };
     ass.traits.shadow = { boxShadow: '0 1px 4px #0003' };
@@ -54,6 +65,10 @@
       '.card-a': { ...ass.traits.card, bg: '#111', borderColor: 'brand-d15' },  // spread + shade string
       '.card-b': { use: ['card', 'shadow'], bg: '#222' },                       // use-key reference
     };
+
+    // ── motion sugar ───────────────────────────────────────────────────────────
+    ass.reducedMotion = true;
+    ass.sheets.ui = { '.btn': { motion: 'transform 0.2s spring, opacity 0.15s' } };
 
     ass.adopt();
 
@@ -78,6 +93,11 @@
     check('data-aufbau-boot marker dropped on reconcile',         !style?.hasAttribute('data-aufbau-boot'));
     check('stale boot css replaced',                              !cssText.includes('outline: 3px solid red'));
 
+    // responsive
+    check('breakpoint @tablet -> @media (min-width: 768px)', cssText.includes('@media (min-width: 768px) {'));
+    check('@media wraps the selector',                       /@media \(min-width: 768px\) \{\s*#content \{[^}]*padding: 2rem/.test(cssText));
+    check('raw @media passthrough',                          cssText.includes('@media (min-width: 1200px) {') && cssText.includes('max-width: 1100px'));
+
     const probe = getComputedStyle(document.getElementById('probe'));
     check('computed border-radius applied', probe.borderRadius === '6px');
 
@@ -85,13 +105,18 @@
     check('trait spread-native inlined', uiCss.includes('.card-a') && uiCss.includes('border-radius: 8px'));
     check('trait use-key inlined',       uiCss.includes('.card-b') && uiCss.includes('box-shadow: 0 1px 4px #0003') && uiCss.includes('border-radius: 8px'));
     check('shade string brand-d15 -> color-mix', uiCss.includes('color-mix(in srgb, var(--brand) 85%, black)'));
+    check('motion -> transition + spring easing', uiCss.includes('transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s'));
+    check('reduced-motion reset emitted', (document.querySelector('style#__motion__')?.textContent ?? '').includes('prefers-reduced-motion: reduce'));
 
     check('localStorage seeded (sheet)',   !!localStorage.getItem('aufbau:stylescript:sheets:v1:layout'));
     check('localStorage seeded (manifest)', (JSON.parse(localStorage.getItem('aufbau:stylescript:pages:v1:' + location.pathname) ?? '[]')).some(([name]) => name === 'layout'));
 
     // vars emitted as :root block
     const varsStyle = document.querySelector('style#__vars__');
-    check(':root vars block emitted', (varsStyle?.textContent ?? '').includes('--brand: #5865f2'));
+    const varsCss   = varsStyle?.textContent ?? '';
+    check(':root vars block emitted',              varsCss.includes('--brand: #5865f2'));
+    check('light-dark pair -> light-dark()',       varsCss.includes('--surface: light-dark(#ffffff, #111111)'));
+    check('color-scheme enabled for light-dark',   varsCss.includes('color-scheme: light dark'));
 
     // ── isolated controller does not touch the global one ─────────────────────
     const widget = createController();

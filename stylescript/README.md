@@ -30,9 +30,14 @@ ass.aliases    = { fg: 'color', fs: 'font-size', rad: 'border-radius' };
 // value tokens (literal substitution, whole value or bare word inside a value)
 ass.tokens.cc = 'currentcolor';
 
-// custom-property vars -> emits :root { --brand: … } and reads back as var()
-ass.vars.brand = '#5865f2';
+// custom-property vars -> emits :root { --brand: … } and reads back as var().
+// a [light, dark] pair becomes light-dark() (see Theming).
+ass.vars.brand   = '#5865f2';
+ass.vars.surface = ['#ffffff', '#111111'];
 String(ass.vars.brand); // "var(--brand, #5865f2)"
+
+// breakpoints for the @<name> media shorthand (see Responsive)
+ass.breakpoints.tablet = '768px';
 
 // traits: reusable declaration sets (see below)
 ass.traits.card = { padding: '1rem', rad: '8px' };
@@ -92,7 +97,49 @@ ass.layers = ['tokens', 'base', 'components', 'utilities']; // -> @layer …;
 ass.createSheet({ id: 'x', layer: 'components' });          // -> @layer components { … }
 ```
 
-`adopt()` orders output as: layer declaration, then `:root` vars, then user sheets.
+`adopt()` orders output as: layer declaration, then `:root` vars, then the
+reduced-motion reset, then user sheets.
+
+## Responsive
+
+A nested `@<breakpoint>` key resolves to `@media (min-width: …)`; any other `@…`
+key (`@media (…)`, `@supports`, `@container`) passes through verbatim.
+
+```js
+ass.breakpoints.tablet = '768px';
+
+ass.sheets.layout = {
+  '#content': {
+    padding: '1rem',
+    '@tablet': { padding: '2rem' },                    // -> @media (min-width: 768px)
+    '@media (min-width: 1200px)': { maxWidth: '1100px' },
+  },
+};
+```
+
+## Motion
+
+`motion` is a built-in alias for `transition`; `spring` / `smooth` / `snappy`
+resolve to a `cubic-bezier()`. Turn on the global reduced-motion reset once.
+
+```js
+ass.reducedMotion = true;
+ass.sheets.ui = { '.btn': { motion: 'transform 0.2s spring, opacity 0.15s' } };
+// transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s;
+// +  @media (prefers-reduced-motion: reduce) { … }
+```
+
+## Theming
+
+A `[light, dark]` vars pair becomes `light-dark()`, and emitting any pair turns on
+`color-scheme` so the browser honors it.
+
+```js
+ass.vars.surface = ['#ffffff', '#111111'];
+ass.sheets.app   = { body: { bg: ass.vars.surface } }; // vars are referenced explicitly
+// :root { color-scheme: light dark; --surface: light-dark(#ffffff, #111111); }
+// body  { background-color: var(--surface); }
+```
 
 ## Shades
 
