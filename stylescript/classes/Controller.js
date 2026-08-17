@@ -2,7 +2,6 @@
 
 import { CanonicalMap } from './../vendors.js';
 
-import { defineTokens }                   from './../methods/defineTokens.js';
 import { kebabProperty, serializeValue }  from './../methods/resolveDeclaration.js';
 import { shade }                          from './../shades.js';
 import { StyleSheet }                     from './StyleSheet.js';
@@ -218,12 +217,25 @@ export class Controller {
   }
 
   // emits the collected vars as a :root custom-property block in the tokens layer.
+  // a two-element array is a [light, dark] pair -> light-dark(), which also turns
+  // on color-scheme so the browser honors it.
   _varsSheet () {
-    const { toCSS } = defineTokens(this._vars);
     const sheet = this._sheets.get('__vars__') ?? this.createSheet({ id: '__vars__', layer: 'tokens' });
+    const lines = [];
+    let lightDark = false;
+
+    for (const [key, value] of Object.entries(this._vars)) {
+      if (Array.isArray(value) && value.length === 2) {
+        lines.push(`  ${toVarName(key)}: light-dark(${value[0]}, ${value[1]});`);
+        lightDark = true;
+      } else {
+        lines.push(`  ${toVarName(key)}: ${value};`);
+      }
+    }
+    if (lightDark) lines.unshift('  color-scheme: light dark;');
 
     sheet.tree    = {};
-    sheet.rawTail = toCSS(':root') + '\n';
+    sheet.rawTail = `:root {\n${lines.join('\n')}\n}\n`;
     sheet.dirty   = true;
     this._sheets.set('__vars__', sheet);
     return sheet;
@@ -250,9 +262,9 @@ export class Controller {
       get (_, key) {
         if (isReserved(key) || !(key in vars)) return undefined;
         const value = vars[key];
-        return (value !== null && typeof value === 'object')
-          ? value
-          : `var(${toVarName(key)}, ${value})`;
+        if (Array.isArray(value))                        return `var(${toVarName(key)})`;
+        if (value !== null && typeof value === 'object') return value;
+        return `var(${toVarName(key)}, ${value})`;
       },
       set (_, key, value)     { if (typeof key !== 'string') return false; vars[key] = value; return true; },
       deleteProperty (_, key) { delete vars[key]; return true; },

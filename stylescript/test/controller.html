@@ -29,9 +29,11 @@
     ass.aliases    = { fs: 'font-size', rad: 'border-radius' };  // bulk merge
     ass.tokens.cc  = 'currentcolor';
 
-    // ── vars (custom properties) ──────────────────────────────────────────────
-    ass.vars.brand = '#5865f2';
-    check('vars read -> var(--brand, …)', String(ass.vars.brand) === 'var(--brand, #5865f2)');
+    // ── vars (custom properties) + light-dark theming ─────────────────────────
+    ass.vars.brand   = '#5865f2';
+    ass.vars.surface = ['#ffffff', '#111111'];   // [light, dark] -> light-dark()
+    check('vars read -> var(--brand, …)',  String(ass.vars.brand) === 'var(--brand, #5865f2)');
+    check('light-dark var reads as var()', String(ass.vars.surface) === 'var(--surface)');
 
     // ── cascade layer order ───────────────────────────────────────────────────
     ass.layers = ['tokens', 'base', 'components'];
@@ -111,7 +113,10 @@
 
     // vars emitted as :root block
     const varsStyle = document.querySelector('style#__vars__');
-    check(':root vars block emitted', (varsStyle?.textContent ?? '').includes('--brand: #5865f2'));
+    const varsCss   = varsStyle?.textContent ?? '';
+    check(':root vars block emitted',              varsCss.includes('--brand: #5865f2'));
+    check('light-dark pair -> light-dark()',       varsCss.includes('--surface: light-dark(#ffffff, #111111)'));
+    check('color-scheme enabled for light-dark',   varsCss.includes('color-scheme: light dark'));
 
     // ── isolated controller does not touch the global one ─────────────────────
     const widget = createController();
