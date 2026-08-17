@@ -11,6 +11,14 @@ import { StyleSheet }                     from './StyleSheet.js';
 // whole-word hits — never inside a longer identifier or a hex color.
 const WORD = /[A-Za-z_][\w-]*/g;
 
+// built-in property aliases and named easings (the motion sugar).
+const BUILTIN_ALIAS = { motion: 'transition' };
+const EASING = {
+  smooth : 'cubic-bezier(0.4, 0, 0.2, 1)',
+  snappy : 'cubic-bezier(0.4, 0, 0, 1)',
+  spring : 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+};
+
 // proxy keys that must not be treated as registry entries: coercion hooks and
 // thenable probes (so `await controller.x` does not hang on a fake thenable).
 const isReserved = (key) =>
@@ -35,6 +43,7 @@ export class Controller {
     this._vars        = { ...(options.vars ?? {}) };
     this._sheets      = new Map;
     this._layerOrder  = options.layers ? [...options.layers] : null;
+    this._reducedMotion = options.reducedMotion ?? false;
 
     this._aliasesProxy     = this._registryProxy(this._aliases);
     this._breakpointsProxy = this._registryProxy(this._breakpoints);
@@ -72,15 +81,18 @@ export class Controller {
   get layers ()     { return this._layerOrder ? [...this._layerOrder] : []; }
   set layers (list) { this._layerOrder = [...list]; }
 
+  // opt-in global prefers-reduced-motion reset, emitted once on adopt.
+  get reducedMotion ()   { return this._reducedMotion; }
+  set reducedMotion (on) { this._reducedMotion = !!on; }
+
   // ── resolution (called by resolveDeclaration via the compiler) ────────────
 
   property (name) {
-    return this._aliases.get(name) ?? kebabProperty(name);
+    return this._aliases.get(name) ?? BUILTIN_ALIAS[name] ?? kebabProperty(name);
   }
 
   value (raw) {
     if (typeof raw !== 'string') return serializeValue(raw);
-    if (this._tokens.size === 0 && Object.keys(this._vars).length === 0) return raw;
 
     const whole = this._tokens.get(raw);
     if (whole !== undefined) return String(whole);
@@ -103,6 +115,8 @@ export class Controller {
   _resolveWord (word) {
     const token = this._tokens.get(word);
     if (token !== undefined) return String(token);
+
+    if (word in EASING) return EASING[word];
 
     const match = word.match(/^(.+)-(a|d|l)(\d+)$/);
     if (match) {
@@ -142,9 +156,10 @@ export class Controller {
   adopt (target) {
     if (this._layerOrder?.length)       this._layersSheet().adopt(target);
     if (Object.keys(this._vars).length) this._varsSheet().adopt(target);
+    if (this._reducedMotion)            this._motionSheet().adopt(target);
 
     for (const [id, sheet] of this._sheets) {
-      if (id === '__layers__' || id === '__vars__') continue;
+      if (id === '__layers__' || id === '__vars__' || id === '__motion__') continue;
       sheet.adopt(target);
     }
     return this;
@@ -181,6 +196,24 @@ export class Controller {
     sheet.rawTail = `@layer ${this._layerOrder.join(', ')};\n`;
     sheet.dirty   = true;
     this._sheets.set('__layers__', sheet);
+    return sheet;
+  }
+
+  // emits the standard global prefers-reduced-motion reset.
+  _motionSheet () {
+    const sheet = this._sheets.get('__motion__') ?? this.createSheet({ id: '__motion__' });
+
+    sheet.tree    = {};
+    sheet.rawTail =
+      '@media (prefers-reduced-motion: reduce) {\n' +
+      '  *, ::before, ::after {\n' +
+      '    animation-duration: 0.01ms !important;\n' +
+      '    animation-iteration-count: 1 !important;\n' +
+      '    transition-duration: 0.01ms !important;\n' +
+      '    scroll-behavior: auto !important;\n' +
+      '  }\n}\n';
+    sheet.dirty   = true;
+    this._sheets.set('__motion__', sheet);
     return sheet;
   }
 

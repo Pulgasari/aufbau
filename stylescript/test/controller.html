@@ -64,6 +64,10 @@
       '.card-b': { use: ['card', 'shadow'], bg: '#222' },                       // use-key reference
     };
 
+    // ── motion sugar ───────────────────────────────────────────────────────────
+    ass.reducedMotion = true;
+    ass.sheets.ui = { '.btn': { motion: 'transform 0.2s spring, opacity 0.15s' } };
+
     ass.adopt();
 
     // ── assertions ────────────────────────────────────────────────────────────
@@ -99,6 +103,8 @@
     check('trait spread-native inlined', uiCss.includes('.card-a') && uiCss.includes('border-radius: 8px'));
     check('trait use-key inlined',       uiCss.includes('.card-b') && uiCss.includes('box-shadow: 0 1px 4px #0003') && uiCss.includes('border-radius: 8px'));
     check('shade string brand-d15 -> color-mix', uiCss.includes('color-mix(in srgb, var(--brand) 85%, black)'));
+    check('motion -> transition + spring easing', uiCss.includes('transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s'));
+    check('reduced-motion reset emitted', (document.querySelector('style#__motion__')?.textContent ?? '').includes('prefers-reduced-motion: reduce'));
 
     check('localStorage seeded (sheet)',   !!localStorage.getItem('aufbau:stylescript:sheets:v1:layout'));
     check('localStorage seeded (manifest)', (JSON.parse(localStorage.getItem('aufbau:stylescript:pages:v1:' + location.pathname) ?? '[]')).some(([name]) => name === 'layout'));
