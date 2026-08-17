@@ -11,7 +11,6 @@
     "@aufbau/cache"      : "jsr:@aufbau/cache@^1.0.0",
     "@aufbau/elements"   : "jsr:@aufbau/elements@^1.0.0",
     "@aufbau/import"     : "jsr:@aufbau/import@^1.0.0",
-    "@aufbau/plugins"    : "jsr:@aufbau/plugins@^1.0.0",
     "@aufbau/shaders"    : "jsr:@aufbau/shaders@^1.0.0",
     "@aufbau/stylesheet" : "jsr:@aufbau/stylesheet@^1.0.0",
     "@aufbau/utils"      : "jsr:@aufbau/utils@^1.0.0",
