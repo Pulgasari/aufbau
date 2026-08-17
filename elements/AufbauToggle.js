@@ -2,7 +2,9 @@
 // a boolean. one-of-n belongs to <aufbau-picker>, not here.
 
 import { AufbauControl } from './core/index.js';
-import { html } from '@aufbau/js';
+import { attrs, html } from '@aufbau/js';
+
+let toggleUID = 0;
 
 export default class AufbauToggle extends AufbauControl {
   static attr = {
@@ -95,6 +97,9 @@ export default class AufbauToggle extends AufbauControl {
     aufbau-toggle .toggle-label { line-height: 1.2; }
   `;
 
+  // stable per-instance id so the visible label can name the inner switch
+  get labelId () { return this._labelId ??= `aufbau-toggle-label-${++toggleUID}`; }
+
   get checked ()     { return this.getAttr('checked'); }
   set checked (next) { this.setChecked(Boolean(next), { notify: false }); }
 
@@ -142,21 +147,30 @@ export default class AufbauToggle extends AufbauControl {
     const { icon, iconChecked, label, look } = this.getAttr();
     const withIcon = Boolean(icon || iconChecked);
 
+    // the switch has no text of its own, so the visible label names it via
+    // aria-labelledby. without this the control was announced with no name
     return html`
-      <button type="button" class="toggle-control toggle-${look}" role="${look === 'checkbox' ? 'checkbox' : 'switch'}" aria-checked="false" tabindex="0">
+      <button type="button" class="toggle-control toggle-${look}"
+              role="${look === 'checkbox' ? 'checkbox' : 'switch'}"
+              aria-checked="false" tabindex="0"
+              ${attrs({ 'aria-labelledby': label ? this.labelId : null })}>
         ${withIcon ? html`<aufbau-icon class="toggle-icon"></aufbau-icon>`
                    : html`<span class="toggle-thumb"></span>`}
       </button>
-      ${label && html`<span class="toggle-label">${label}</span>`}
+      ${label && html`<span class="toggle-label" id="${this.labelId}">${label}</span>`}
     `;
   }
 
   sync () {
     super.sync();
 
-    const { checked, icon, iconChecked, indeterminate } = this.getAttr();
+    const { checked, icon, iconChecked, indeterminate, label } = this.getAttr();
     const control = this.$('.toggle-control');
     if (!control) return;
+
+    // the visible label already names the switch via aria-labelledby, so drop
+    // the duplicate name super.sync() put on the host — one control, one name
+    if (label && this._internals) this._internals.ariaLabel = null;
 
     control.setAttribute('aria-checked', indeterminate ? 'mixed' : String(checked));
     control.classList.toggle('is-active', checked);
