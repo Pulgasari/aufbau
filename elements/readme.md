@@ -254,6 +254,13 @@ console.log(greet('aufbau'));
 
 ## aufbau-index
 
+layout-container für eine reihe von items — media-grid, gallery-rail oder liste.
+reines layout: es rendert nichts eigenes, die children bleiben wie ausgezeichnet.
+`viewmode` schaltet über css um, `item-size` / `item-shape` / `gap` sind die
+knöpfe. `item-look` ist die kurzform für `item-size` + `item-shape` in einem.
+
+`viewmode`: `grid` (default), `list`, `gallery`, `masonry`.
+
 ```html
 <!-- Grid view with rounded items -->
 <aufbau-index viewmode="grid" item-size="180px" item-shape="rounded" gap="1.5rem">
@@ -263,10 +270,33 @@ console.log(greet('aufbau'));
   <aufbau-item shape="circle">I am a circle!</aufbau-item>
 </aufbau-index>
 
+<!-- item-look kurzform: größe + form in einem attribut -->
+<aufbau-index viewmode="grid" item-look="180px squircle" gap="1rem">
+  <aufbau-item><img src="cover1.jpg" alt="" /></aufbau-item>
+  <aufbau-item><img src="cover2.jpg" alt="" /></aufbau-item>
+</aufbau-index>
+
+<!-- Vertikale Liste -->
+<aufbau-index viewmode="list" gap="0.5rem">
+  <aufbau-item>Row 1</aufbau-item>
+  <aufbau-item>Row 2</aufbau-item>
+</aufbau-index>
+
 <!-- Horizontal Gallery view -->
 <aufbau-index viewmode="gallery" item-size="300px" item-shape="squircle">
   <aufbau-item><img src="photo1.jpg" alt="Photo 1" /></aufbau-item>
   <aufbau-item><img src="photo2.jpg" alt="Photo 2" /></aufbau-item>
+</aufbau-index>
+```
+
+und zusammen mit [`<aufbau-filter>`](#aufbau-filter) wird die suche direkt an
+das layout gehängt:
+
+```html
+<aufbau-filter target="aufbau-index aufbau-item" placeholder="Search items..."></aufbau-filter>
+<aufbau-index viewmode="grid" item-look="200px squircle">
+  <aufbau-item>Apple</aufbau-item>
+  <aufbau-item>Banana</aufbau-item>
 </aufbau-index>
 ```
 
