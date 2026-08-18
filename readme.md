@@ -48,19 +48,6 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 
 # packages
 
-## [@aufbau/cache](cache/readme.md)
-
-Caching preset over [`@bunker/policy`](https://github.com/pulgasari/bunker), backed by
-one IndexedDB database. Holds the content-addressed stylesheet cache, so compiling an
-`.ass` file happens once per distinct source rather than on every load.
-
-```javascript
-import { compileStylesheet, sheets } from '@aufbau/cache';
-import transform from '@aufbau/stylesheet';
-
-const css = await compileStylesheet(source, transform);
-```
-
 ## [@aufbau/elements](elements/readme.md)
 
 read more [here](elements/readme.md).
@@ -90,17 +77,6 @@ const config = await aufbau.import('config.jsonc');
 ```
 
 ## [@aufbau/patterns](patterns/readme.md)
-
-## [@aufbau/store](store/readme.md)
-
-Persistence preset over [`@bunker/storage`](https://github.com/pulgasari/bunker).
-One namespace, one version, and the `persist` attribute contract the elements speak.
-Nothing throws: a full quota returns `false`, private mode falls back to memory.
-
-```javascript
-import { store } from '@aufbau/store';
-store.setSync('theme', 'oled');
-```
 
 ## [@aufbau/stylesheet](stylesheet/readme.md)
 
