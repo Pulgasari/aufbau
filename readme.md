@@ -16,9 +16,8 @@
 
 - [@aufbau/elements](#aufbau-elements)
 - [@aufbau/import](#aufbau-import)
-- [@aufbau/patterns](#aufbau-patterns)
-- [@aufbau/plugins](#aufbau-plugins)
-- [@aufbau/stylesheet](#aufbau-stylesheet)
+- [@aufbau/stylescript](#aufbau-stylescript) *(experimental)*
+- [@aufbau/stylesheet](#aufbau-stylesheet) *(experimental)*
 
 #### resources
 
