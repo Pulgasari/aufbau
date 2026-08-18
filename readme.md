@@ -25,12 +25,11 @@
 - [@aufbau/svg](#aufbau-svg)
 - [@aufbau/webfonts](#aufbau-webfonts)
 
-#### web
+#### test
 
-[docs](https://code.pulgasari.dev/aufbau/docs/)
-[elements](https://code.pulgasari.dev/aufbau/elements/)
-[test](https://code.pulgasari.dev/aufbau/test/index.html)
-[test/flicker](https://code.pulgasari.dev/aufbau/test/flicker.html)
+- [elements](https://code.pulgasari.dev/aufbau/elements/)
+- [test](https://code.pulgasari.dev/aufbau/test/index.html)
+- [test/flicker](https://code.pulgasari.dev/aufbau/test/flicker.html)
 
 ---
 
