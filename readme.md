@@ -14,8 +14,8 @@
 
 #### packages
 
-- [@aufbau/elements](#aufbau-elements)
-- [@aufbau/import](#aufbau-import)
+- [@aufbau/elements](elements/readme.md)
+- [@aufbau/import](import/readme.md)
 - [@aufbau/stylescript](#aufbau-stylescript) *(experimental)*
 - [@aufbau/stylesheet](#aufbau-stylesheet) *(experimental)*
 
