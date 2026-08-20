@@ -51,6 +51,9 @@ import * as zoomBlur         from './zoom-blur.js';
 import * as gaussianBlur     from './gaussian-blur.js';
 import * as bloom            from './bloom.js';
 import * as chromatic        from './chromatic.js';
+import * as noise            from './noise.js';
+import * as displace         from './displace.js';
+import * as glitch           from './glitch.js';
 import * as thermal          from './thermal.js';
 import * as tiltShift        from './tilt-shift.js';
 import * as vignette         from './vignette.js';
@@ -58,12 +61,13 @@ import * as wave             from './wave.js';
 import * as wobble           from './wobble.js';
 
 const modules = [
-  badTv, barrelBlur, bloom, blur, brightness, chromatic, contrast, dither, dotMatrix,
-  dotScreen, duotone, edges, emboss, fisheye, gaussianBlur, glitchHeavyCyber, glitchLive,
-  glitchRgb, glow, grain, grayscale, halftone, hueSaturation, instacolor, invert, jitter,
-  kaleidoscope, levels, linocut, melt, mirror, nightVision, pixelate, pixelSort,
-  polarPixelate, posterize, rainbow, rgbShift, saturate, scanlines, sepia, shake, sharpen,
-  slices, smear, solarize, thermal, threshold, tiltShift, vignette, wave, wobble, zoomBlur,
+  badTv, barrelBlur, bloom, blur, brightness, chromatic, contrast, displace, dither,
+  dotMatrix, dotScreen, duotone, edges, emboss, fisheye, gaussianBlur, glitch,
+  glitchHeavyCyber, glitchLive, glitchRgb, glow, grain, grayscale, halftone, hueSaturation,
+  instacolor, invert, jitter, kaleidoscope, levels, linocut, melt, mirror, nightVision,
+  noise, pixelate, pixelSort, polarPixelate, posterize, rainbow, rgbShift, saturate,
+  scanlines, sepia, shake, sharpen, slices, smear, solarize, thermal, threshold, tiltShift,
+  vignette, wave, wobble, zoomBlur,
 ];
 
 // each entry: { id, name, vars, render (svg), css, canvas, webgl }.

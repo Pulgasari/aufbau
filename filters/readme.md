@@ -102,9 +102,17 @@ filterCanvas(myCanvas, 'pixelate', { size: 12 });
 filterCanvas(myCanvas, 'sepia');
 filterCanvas(myCanvas, 'kaleidoscope', { segments: 8 }); // delegates to webgl
 
-// or call the webgl backend directly (fisheye, kaleidoscope, zoom-blur, bloom, …):
-import { filterWebgl } from '@aufbau/filters';
+// or call the webgl backend directly (fisheye, kaleidoscope, zoom-blur, bloom, glitch, …):
+import { filterWebgl, filterWebglChain } from '@aufbau/filters';
 filterWebgl(myCanvas, 'fisheye', { amount: 1.2 });
+
+// chain several webgl filters gpu-resident (no 2d round-trip between them). noise-driven
+// filters animate through uTime — pass `time` each frame in a rAF loop:
+filterWebglChain(myCanvas, [
+  { id: 'displace', options: { amount: 24, time: performance.now() / 1000 } },
+  { id: 'glitch',   options: { intensity: 0.6, time: performance.now() / 1000 } },
+  { id: 'bloom',    options: { threshold: 0.6 } },
+]);
 ```
 
 ## the editor pipeline

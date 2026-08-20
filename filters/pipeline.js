@@ -5,11 +5,20 @@
 // removing a stage and re-rendering always starts clean.
 //
 // stages run through filterCanvas, so any backend mixes freely — imageData (pixelate,
-// dither), css/svg bridge, and webgl (fisheye, bloom) in one stack. consecutive webgl
-// stages currently round-trip through the 2d canvas; a gpu-resident fast path that keeps
-// the texture between webgl stages is a later optimisation (see backends.md).
+// dither), css/svg bridge, and webgl (fisheye, bloom) in one stack. runs of consecutive
+// webgl stages are executed gpu-resident as one chain (no 2d round-trip between them);
+// imageData/bridge stages break a run and go through filterToCanvas.
 
 import { filterToCanvas } from './canvas.js';
+import { filterChainWebgl } from './webgl.js';
+import { filters } from './lib/index.js';
+
+// a stage runs on the gpu exactly when filterToCanvas would delegate to webgl: it has a
+// webgl backend and no imageData/css/svg backend to take precedence.
+function isWebgl (id) {
+  const m = filters[id];
+  return !!(m && m.webgl && !m.canvas && !m.css && !m.render);
+}
 
 function sourceSize (source) {
   return {
@@ -43,9 +52,20 @@ export function createPipeline (source) {
       work.width = width; work.height = height;
       wctx.clearRect(0, 0, width, height);
       wctx.drawImage(source, 0, 0, width, height);
-      for (const stage of stages) {
-        if (stage.enabled) filterToCanvas(work, stage.id, stage.options);
+
+      // apply enabled stages, coalescing consecutive webgl stages into one gpu chain.
+      const active = stages.filter(s => s.enabled);
+      for (let i = 0; i < active.length;) {
+        if (isWebgl(active[i].id)) {
+          let j = i; while (j < active.length && isWebgl(active[j].id)) j++;
+          filterChainWebgl(work, active.slice(i, j).map(s => ({ id: s.id, options: s.options })));
+          i = j;
+        } else {
+          filterToCanvas(work, active[i].id, active[i].options);
+          i++;
+        }
       }
+
       target.width = width; target.height = height;
       const tctx = target.getContext('2d');
       tctx.clearRect(0, 0, width, height);

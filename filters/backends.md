@@ -134,26 +134,29 @@ composited back onto the 2d canvas. Every fragment gets the shared preamble: `uS
 (previous pass, or the original for pass 0), `uSource0` (the untouched original, for combine
 passes), `uResolution`, `uTime` (for animated shaders driven in a rAF loop), `vUv`.
 
-`filterWebgl(canvas, id, options)` runs it; `filterCanvas` delegates here for webgl-only
-filters. Shipped: single-pass **fisheye**, **mirror**, **kaleidoscope**, **zoom-blur**,
-**chromatic**; multi-pass **gaussian-blur** (separable h+v) and **bloom**
-(threshold→blur→blur→combine). Effects svg/canvas cannot express, at framerate.
+`filterWebgl(canvas, id, options)` runs one filter; `filterWebglChain(canvas, stages)` runs
+several as one **gpu-resident** chain — three ping-pong render targets rotate so each
+filter's input survives its passes (its `uSource0`) and its output feeds the next, and only
+the final pass touches the screen (no 2d round-trip between stages; byte-identical to running
+them sequentially). `filterCanvas` delegates here for webgl-only filters.
 
-Still to do: porting the remaining heavy svg effects (glitch, grain, displacement) to
-shaders for realtime video, and a gpu-resident pipeline that keeps the texture between
-consecutive webgl stages (today they round-trip through the 2d canvas — see below). WebGPU
-is the eventual upgrade. Lazily importable (`@aufbau/filters/webgl`) so DOM-only users never
-pay for it.
+Shipped: single-pass **fisheye**, **mirror**, **kaleidoscope**, **zoom-blur**, **chromatic**;
+multi-pass **gaussian-blur** (separable h+v) and **bloom** (threshold→blur→blur→combine);
+noise-driven **noise** (grain), **displace** (turbulence warp) and **glitch** — the realtime
+gpu ports of the svg grain/wave/glitch families, carrying their own fbm (`noise.js`) since
+glsl has no feTurbulence, and animated by `uTime` (drive it in a rAF loop). Effects svg/canvas
+cannot express, at framerate. WebGPU is the eventual upgrade. Lazily importable
+(`@aufbau/filters/webgl`) so DOM-only users never pay for it.
 
 ### pipeline — *done (editor stack)*
 
 `createPipeline(source)` (`pipeline.js`) holds a source (canvas/image/video/bitmap) and an
 ordered, non-destructive list of stages. `render(target)` copies the source to a scratch
-canvas, applies each enabled stage through `filterCanvas` (so any backend mixes — imageData,
-css/svg bridge, webgl — in one stack), and blits to the target; the source is never mutated,
-so `add`/`remove`/`move`/`set`/`toggle` + re-render always start clean. This is the editor
-foundation. Optimisation left for later: keep consecutive webgl stages gpu-resident instead
-of round-tripping through the 2d canvas each stage. See [`editor.html`](editor.html).
+canvas, applies each enabled stage — coalescing runs of consecutive webgl stages into one
+`filterWebglChain` call (gpu-resident) and sending imageData/bridge stages through
+`filterCanvas` — then blits to the target; the source is never mutated, so
+`add`/`remove`/`move`/`set`/`toggle` + re-render always start clean. This is the editor
+foundation. See [`editor.html`](editor.html).
 
 ---
 
@@ -191,12 +194,12 @@ webgl backends.
 2. **canvas backend** *(done)* — `filterCanvas` with the imageData tier
    (`pixelate`, `polar-pixelate`, `dither`, `threshold`) and the `ctx.filter` bridge
    (css string / baked svg) for every other filter. demo: [`canvas.html`](canvas.html).
-3. **webgl backend** *(single + multi-pass done)* — shader runner with framebuffer
-   ping-pong; `filterWebgl`, single-pass `fisheye`/`mirror`/`kaleidoscope`/`zoom-blur`/
-   `chromatic`, multi-pass `gaussian-blur`/`bloom`. next: port heavy svg effects to shaders,
-   gpu-resident chaining.
+3. **webgl backend** *(done)* — framebuffer-ping-pong runner, single- and multi-pass,
+   gpu-resident chaining (`filterWebglChain`). single-pass `fisheye`/`mirror`/`kaleidoscope`/
+   `zoom-blur`/`chromatic`, multi-pass `gaussian-blur`/`bloom`, noise-driven `noise`/
+   `displace`/`glitch`. next (later): WebGPU, more ported effects.
 4. **editor pipeline** *(done)* — `createPipeline(source)`: non-destructive, mixed-backend
-   stage stack; `editor.html` demo.
+   stage stack, gpu-resident where stages allow; `editor.html` demo.
 5. **generator** already writes the svg assets; extend it to also emit a JSON capability
    catalogue so tooling/editor know each filter's backends without importing them.
 

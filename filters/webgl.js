@@ -1,15 +1,18 @@
 // @aufbau/filters/webgl.js
-// the webgl backend: a fragment-shader runner supporting single- and multi-pass filters.
+// the webgl backend: a fragment-shader runner supporting single- and multi-pass filters,
+// and chaining several filters gpu-resident (no 2d round-trip between them).
+//
 // a filter exports either
 //   webgl = { fragment, uniforms(options) }                         // single pass
 //   webgl = { passes: [ { fragment, uniforms(options) }, … ] }      // multi pass
-// each pass renders a fullscreen quad; intermediate passes render into ping-pong
-// framebuffers, the last into the gl canvas which is composited back onto the 2d canvas.
-// every fragment gets the shared preamble: uSource (previous pass / original for pass 0),
-// uSource0 (the original, for combine passes like bloom), uResolution, uTime, vUv.
+// every fragment gets the shared preamble: uSource (previous pass, or the filter's input
+// for pass 0), uSource0 (the filter's own input, kept across all its passes — for combine
+// passes like bloom), uResolution, uTime (for animated shaders driven in a rAF loop), vUv.
 //
-// dom/gl is only touched at call time, so this stays safe to import in node. one webgl
-// canvas, program cache and ping-pong targets are reused across calls (editor-friendly).
+// filterChainWebgl runs a list of webgl filters as one gpu pass-chain: three ping-pong
+// render targets rotate so each filter's input survives its passes and its output feeds the
+// next filter, and only the final pass touches the screen. dom/gl is only used at call time
+// (node-safe import). the gl canvas, program cache and targets are reused across calls.
 
 import { filters } from './lib/index.js';
 
@@ -26,7 +29,7 @@ uniform float uTime;
 
 let gl, glCanvas, quad;
 const programs = new Map;
-const targets  = [null, null]; // ping-pong { fbo, tex, w, h }
+const rts = [null, null, null]; // three ping-pong render targets { fbo, tex, w, h }
 
 function context (width, height) {
   if (!glCanvas) {
@@ -66,8 +69,8 @@ function program (fragment) {
 
 // a ping-pong render target (framebuffer + backing texture), reallocated on resize.
 function target (slot, width, height) {
-  let t = targets[slot];
-  if (!t) { t = targets[slot] = { fbo: gl.createFramebuffer(), tex: gl.createTexture(), w: 0, h: 0 }; }
+  let t = rts[slot];
+  if (!t) { t = rts[slot] = { fbo: gl.createFramebuffer(), tex: gl.createTexture(), w: 0, h: 0 }; }
   if (t.w !== width || t.h !== height) {
     gl.bindTexture(gl.TEXTURE_2D, t.tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -82,7 +85,7 @@ function target (slot, width, height) {
   return t;
 }
 
-// uploads a canvas/image as a texture (flipped to match the single-pass convention).
+// uploads a canvas/image as a texture (flipped so the on-screen orientation is preserved).
 function sourceTexture (source) {
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -108,55 +111,73 @@ function setUniform (p, name, value) {
   }
 }
 
-function passList (meta) {
-  return meta.webgl.passes ?? [{ fragment: meta.webgl.fragment, uniforms: meta.webgl.uniforms }];
+const passList = meta => meta.webgl.passes ?? [{ fragment: meta.webgl.fragment, uniforms: meta.webgl.uniforms }];
+
+/**
+ * runs a list of webgl filters as one gpu-resident chain, in place on a 2d canvas.
+ * @param {HTMLCanvasElement} canvas
+ * @param {{id:string, options?:object}[]} stages — filters with a webgl backend
+ */
+export function filterChainWebgl (canvas, stages) {
+  const chain = stages.filter(s => filters[s.id]?.webgl);
+  if (chain.length === 0) return;
+
+  const { width, height } = canvas;
+  context(width, height);
+  const source = sourceTexture(canvas);
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+
+  let inputTex = source, inputRt = -1; // inputRt = -1 means the input is the uploaded source
+
+  for (let k = 0; k < chain.length; k++) {
+    const meta    = filters[chain[k].id];
+    const passes  = passList(meta);
+    const options = chain[k].options || {};
+    const time    = options.time ?? 0;
+    const origin  = inputTex;                          // this filter's input, kept as uSource0
+    const scratch = [0, 1, 2].filter(i => i !== inputRt); // two targets that never hold the input
+    let read = inputTex, readRt = inputRt;
+
+    for (let i = 0; i < passes.length; i++) {
+      const toScreen = i === passes.length - 1 && k === chain.length - 1;
+      const writeRt  = toScreen ? -1 : (scratch.find(s => s !== readRt) ?? scratch[0]);
+      const dest     = toScreen ? null : target(writeRt, width, height);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, toScreen ? null : dest.fbo);
+      gl.viewport(0, 0, width, height);
+
+      const prog = program(passes[i].fragment);
+      gl.useProgram(prog);
+      const aPos = gl.getAttribLocation(prog, 'aPos');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, read);
+      gl.uniform1i(gl.getUniformLocation(prog, 'uSource'), 0);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, origin);
+      gl.uniform1i(gl.getUniformLocation(prog, 'uSource0'), 1);
+      gl.uniform2f(gl.getUniformLocation(prog, 'uResolution'), width, height);
+      gl.uniform1f(gl.getUniformLocation(prog, 'uTime'), time);
+      const uniforms = passes[i].uniforms ? passes[i].uniforms(options) : {};
+      for (const [name, value] of Object.entries(uniforms)) setUniform(prog, name, value);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (!toScreen) { read = dest.tex; readRt = writeRt; }
+    }
+    inputTex = read; inputRt = readRt; // this filter's output feeds the next
+  }
+
+  gl.deleteTexture(source);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(glCanvas, 0, 0);
 }
 
-/** runs a filter's webgl backend on a 2d canvas in place. */
+/** runs a single filter's webgl backend on a 2d canvas in place. */
 export function filterToWebgl (canvas, id, options = {}) {
   const meta = filters[id];
   if (!meta) throw new Error(`[@aufbau/filters] unknown filter "${id}"`);
   if (!meta.webgl) throw new Error(`[@aufbau/filters] "${id}" has no webgl backend`);
-
-  const { width, height } = canvas;
-  context(width, height);
-  const passes   = passList(meta);
-  const original = sourceTexture(canvas);
-  const time     = options.time ?? 0;
-  let read = original;
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-
-  for (let i = 0; i < passes.length; i++) {
-    const pass = passes[i];
-    const last = i === passes.length - 1;
-    const dest = last ? null : target(i % 2, width, height);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, last ? null : dest.fbo);
-    gl.viewport(0, 0, width, height);
-
-    const p = program(pass.fragment);
-    gl.useProgram(p);
-    const aPos = gl.getAttribLocation(p, 'aPos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, read);
-    gl.uniform1i(gl.getUniformLocation(p, 'uSource'), 0);
-    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, original);
-    gl.uniform1i(gl.getUniformLocation(p, 'uSource0'), 1);
-    gl.uniform2f(gl.getUniformLocation(p, 'uResolution'), width, height);
-    gl.uniform1f(gl.getUniformLocation(p, 'uTime'), time);
-    const uniforms = pass.uniforms ? pass.uniforms(options) : {};
-    for (const [name, value] of Object.entries(uniforms)) setUniform(p, name, value);
-
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    if (!last) read = dest.tex;
-  }
-
-  gl.deleteTexture(original);
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, width, height);
-  ctx.drawImage(glCanvas, 0, 0);
+  filterChainWebgl(canvas, [{ id, options }]);
 }
 
 // feature probe, used by supports()/resolvers without forcing context creation on import.

@@ -10,10 +10,14 @@
 import { PREFIX, defsHost, resolve, svgId, toElements } from './core.js';
 import { filters } from './lib/index.js';
 import { filterToCanvas } from './canvas.js';
-import { filterToWebgl } from './webgl.js';
+import { filterToWebgl, filterChainWebgl } from './webgl.js';
+import { createPipeline } from './pipeline.js';
 
 // non-destructive filter stack for editor-style use — see pipeline.js.
-export { createPipeline } from './pipeline.js';
+export { createPipeline };
+
+// runs several webgl filters as one gpu-resident chain (no 2d round-trip between them).
+export const filterWebglChain = filterChainWebgl;
 
 // applies a filter to a <canvas> in place — imageData backend when the filter has one,
 // the ctx.filter bridge (css string, or a baked svg <filter>) for css/svg filters, or
@@ -169,6 +173,6 @@ export function useFilter (id, options = {}) {
 export { filters };
 
 export default {
-  applyFilter, ensureFilter, filterCanvas, filterCss, filterSvg, filterWebgl, filters,
-  list, removeFilter, supports, useFilter,
+  applyFilter, createPipeline, ensureFilter, filterCanvas, filterCss, filterSvg, filterWebgl,
+  filterWebglChain, filters, list, removeFilter, supports, useFilter,
 };
