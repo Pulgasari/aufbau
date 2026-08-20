@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/filters · editor</title>
+  <style>
+    :root {
+      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
+      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 13px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
+      display: grid; grid-template-columns: 190px 1fr 320px; min-height: 100vh;
+    }
+    aside, .stack { border-right: 1px solid var(--line); padding: 14px; height: 100vh; overflow: auto; position: sticky; top: 0; }
+    .stack { border-right: 0; border-left: 1px solid var(--line); }
+    h1 { font-size: 13px; margin: 0 0 4px; }
+    aside p { color: var(--muted); margin: 0 0 14px; font-size: 11px; }
+    aside a { color: var(--accent); }
+    nav button {
+      display: block; width: 100%; text-align: left; background: none; border: 0;
+      color: var(--fg); padding: 6px 9px; border-radius: 6px; cursor: pointer; font: inherit;
+    }
+    nav button:hover { background: var(--panel); }
+    main { padding: 24px; display: grid; gap: 14px; align-content: start; }
+    .preview { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0a0b0f; }
+    canvas { display: block; width: 100%; height: auto; }
+    .hint { color: var(--muted); font-size: 12px; }
+    .stack h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+    .card.off { opacity: 0.5; }
+    .card header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .card header .name { flex: 1; font-weight: 700; }
+    .card header button { background: var(--code); border: 1px solid var(--line); color: var(--fg);
+      border-radius: 5px; width: 24px; height: 24px; cursor: pointer; font: inherit; padding: 0; }
+    .card header button:hover { border-color: var(--accent); }
+    .badge { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+    .row { display: grid; grid-template-columns: 74px 1fr 46px; align-items: center; gap: 8px; margin-top: 6px; }
+    .row label { color: var(--muted); font-size: 12px; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .val { text-align: right; font-size: 12px; }
+    .empty { color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>add filter</h1>
+    <p>a non-destructive stack — every stage runs through the pipeline over one source.
+      <br/><a href="canvas.html">← canvas</a> · <a href="index.html">dom</a></p>
+    <nav id="palette"></nav>
+  </aside>
+
+  <main>
+    <div class="preview"><canvas id="preview"></canvas></div>
+    <div class="hint" id="hint"></div>
+  </main>
+
+  <div class="stack">
+    <h2>pipeline</h2>
+    <div id="stack"></div>
+  </div>
+
+  <script type="module">
+    import { list, createPipeline } from './index.js';
+
+    const catalogue = list();
+    const byId      = Object.fromEntries(catalogue.map(f => [f.id, f]));
+    const preview   = document.getElementById('preview');
+    const palette   = document.getElementById('palette');
+    const stackEl   = document.getElementById('stack');
+    const hint      = document.getElementById('hint');
+
+    // the source scene, drawn once onto an offscreen canvas the pipeline reads from.
+    const source = document.createElement('canvas');
+    source.width = 760; source.height = 300;
+    (function drawScene () {
+      const ctx = source.getContext('2d');
+      const { width: w, height: h } = source;
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#3b2fd6'); grad.addColorStop(0.5, '#c026a3'); grad.addColorStop(1, '#0fb8a0');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+      for (const [x, y, r, c] of [[140, 90, 60, '#ffd166'], [620, 210, 80, '#ef476f'], [430, 70, 40, '#06d6a0']]) {
+        ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
+      for (let x = 0; x < w; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 40, h); ctx.stroke(); }
+      ctx.fillStyle = '#fff'; ctx.font = '800 120px ui-monospace, monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('aufbau', w / 2, h / 2 + 6);
+    })();
+
+    const pipe = createPipeline(source);
+
+    function backendOf (f) {
+      const b = f.backends;
+      return b.webgl ? 'webgl' : (!b.svg && !b.css) ? 'imageData' : 'bridge';
+    }
+
+    // palette
+    for (const f of catalogue) {
+      const button = document.createElement('button');
+      button.textContent = f.name;
+      button.onclick = () => { pipe.add(f.id, defaults(f)); rebuild(); };
+      palette.appendChild(button);
+    }
+
+    const defaults = f => Object.fromEntries(Object.entries(f.vars).map(([k, s]) => [k, s.default]));
+
+    function render () {
+      pipe.render(preview);
+      hint.textContent = pipe.stages.length
+        ? `${pipe.stages.filter(s => s.enabled).length} active stage(s) · source is never mutated — reorder/toggle/tweak re-runs the whole stack`
+        : 'empty pipeline — add a filter from the left. stages of any backend mix freely.';
+    }
+
+    // right-hand stack ui
+    function rebuild () {
+      stackEl.replaceChildren();
+      if (pipe.stages.length === 0) {
+        const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'no stages yet.';
+        stackEl.appendChild(e);
+      }
+      pipe.stages.forEach((stage, index) => {
+        const f    = byId[stage.id];
+        const card = document.createElement('div');
+        card.className = 'card' + (stage.enabled ? '' : ' off');
+        const head = document.createElement('header');
+        head.innerHTML =
+          `<input type="checkbox" ${stage.enabled ? 'checked' : ''}/>` +
+          `<span class="name">${f.name}</span><span class="badge">${backendOf(f)}</span>` +
+          `<button data-a="up">↑</button><button data-a="down">↓</button><button data-a="rm">✕</button>`;
+        head.querySelector('input').onchange = e => { pipe.toggle(index, e.target.checked); rebuild(); };
+        head.querySelector('[data-a="up"]').onclick   = () => { if (index > 0) { pipe.move(index, index - 1); rebuild(); } };
+        head.querySelector('[data-a="down"]').onclick = () => { if (index < pipe.stages.length - 1) { pipe.move(index, index + 1); rebuild(); } };
+        head.querySelector('[data-a="rm"]').onclick   = () => { pipe.remove(index); rebuild(); };
+        card.appendChild(head);
+
+        for (const [key, spec] of Object.entries(f.vars)) {
+          const row = document.createElement('div'); row.className = 'row';
+          if (spec.type === 'boolean') {
+            row.innerHTML = `<label>${key}</label><input type="checkbox" ${stage.options[key] ? 'checked' : ''}/><span class="val"></span>`;
+            row.querySelector('input').onchange = e => { pipe.set(index, { [key]: e.target.checked }); render(); };
+          } else if (spec.type === 'number' || spec.type === 'integer') {
+            row.innerHTML = `<label>${key}</label><input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${stage.options[key]}"/><span class="val">${stage.options[key]}</span>`;
+            const out = row.querySelector('.val');
+            row.querySelector('input').oninput = e => { pipe.set(index, { [key]: Number(e.target.value) }); out.textContent = e.target.value; render(); };
+          } else { continue; }
+          card.appendChild(row);
+        }
+        stackEl.appendChild(card);
+      });
+      render();
+    }
+
+    // seed a demo stack so the page shows something immediately.
+    pipe.add('levels', { black: 0.05, white: 0.95, gamma: 1.1 })
+        .add('bloom', { threshold: 0.6, radius: 6, strength: 1 })
+        .add('kaleidoscope', { segments: 6, angle: 0 });
+    rebuild();
+  </script>
+</body>
+</html>

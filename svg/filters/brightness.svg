@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-brightness">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="var(--aufbau-filter-amount, 1)"/>
+        <feFuncG type="linear" slope="var(--aufbau-filter-amount, 1)"/>
+        <feFuncB type="linear" slope="var(--aufbau-filter-amount, 1)"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>

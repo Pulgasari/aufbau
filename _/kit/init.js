@@ -16,7 +16,8 @@
       "htm": "https://esm.sh/htm@3.1.1",
       "@aufbau/kit": new URL('kit/index.js', baseUrl).href,
       "@aufbau/stylesheet": new URL('stylesheet/index.js', baseUrl).href,
-      "@aufbau/shaders": new URL('shaders/index.js', baseUrl).href,
+      "@aufbau/filters": new URL('filters/index.js', baseUrl).href,
+      "@aufbau/patterns": new URL('patterns/index.js', baseUrl).href,
       "@aufbau/cache": new URL('cache/index.js', baseUrl).href,
       "@aufbau/import": new URL('import/index.js', baseUrl).href
     }

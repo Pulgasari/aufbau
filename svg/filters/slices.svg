@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-slices">
+      <feTurbulence type="turbulence" baseFrequency="0.00001 0.0960" numOctaves="1" seed="2" result="noise">
+        <animate attributeName="seed" values="0;4;8;12" dur="0.5s" calcMode="discrete" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="var(--aufbau-filter-amount, 20)" xChannelSelector="R" yChannelSelector="A"/>
+    </filter>
+  </defs>
+</svg>

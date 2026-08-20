@@ -1,18 +1,8 @@
-<filter id="aufbau-filter-wave">
-  
-  <feTurbulence 
-    type="fractalNoise" 
-    baseFrequency="var(--filter-frequency, 0.02)" 
-    numOctaves="var(--filter-octaves, 2)" 
-    result="noise"
-    />
-  
-  <feDisplacementMap 
-    in="SourceGraphic" 
-    in2="noise" 
-    scale="var(--filter-scale, 20)" 
-    xChannelSelector="R" 
-    yChannelSelector="G"
-    />
-  
-</filter>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-wave">
+      <feTurbulence type="fractalNoise" baseFrequency="var(--aufbau-filter-frequency, 0.02)" numOctaves="var(--aufbau-filter-octaves, 2)" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="var(--aufbau-filter-scale, 20)" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>

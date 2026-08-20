@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-posterize">
+      <feComponentTransfer>
+        <feFuncR type="discrete" tableValues="0.000 0.333 0.667 1.000"/>
+        <feFuncG type="discrete" tableValues="0.000 0.333 0.667 1.000"/>
+        <feFuncB type="discrete" tableValues="0.000 0.333 0.667 1.000"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>

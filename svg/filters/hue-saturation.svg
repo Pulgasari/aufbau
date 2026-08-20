@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-hue-saturation">
+      <feColorMatrix type="hueRotate" values="var(--aufbau-filter-hue, 0)"/>
+      <feColorMatrix type="saturate" values="var(--aufbau-filter-saturation, 1)"/>
+    </filter>
+  </defs>
+</svg>

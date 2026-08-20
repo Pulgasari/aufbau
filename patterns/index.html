@@ -1,30 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>svg</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/patterns</title>
+  <style>
+    :root {
+      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
+      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 14px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
+      display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
+    }
+    aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
+    aside h1 { font-size: 14px; margin: 0 0 4px; }
+    aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
+    nav button {
+      display: block; width: 100%; text-align: left; background: none; border: 0;
+      color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
+    }
+    nav button:hover { background: var(--panel); }
+    nav button[aria-current="true"] { background: var(--accent); color: #fff; }
+    main { padding: 24px; display: grid; gap: 20px; align-content: start; max-width: 900px; }
+    .stage { min-height: 260px; border: 1px solid var(--line); border-radius: 12px;
+      background-repeat: repeat; background-color: #f4f5f7; }
+    h2 { margin: 0; font-size: 16px; }
+    .controls { display: grid; gap: 12px; }
+    .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
+    .row label { color: var(--muted); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    input[type="color"] { width: 100%; height: 30px; background: var(--code); border: 1px solid var(--line); border-radius: 6px; }
+    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
+      border-radius: 6px; padding: 6px 8px; font: inherit; width: 100%; }
+    .val { text-align: right; color: var(--fg); }
+    .panels { display: grid; gap: 12px; }
+    pre { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px; overflow: auto; font-size: 12px; color: #cfd3df; }
+    .tag { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  </style>
 </head>
-
 <body>
+  <aside>
+    <h1>@aufbau/patterns</h1>
+    <p>patterns are js functions that generate svg. pick one and tweak it live.</p>
+    <nav id="nav"></nav>
+  </aside>
 
-	<main>
-	</main>
+  <main>
+    <div class="stage" id="stage"></div>
+    <h2 id="title"></h2>
+    <div class="controls" id="controls"></div>
+    <div class="panels">
+      <div><div class="tag">generated &lt;svg&gt; (baked)</div><pre id="svg"></pre></div>
+      <div><div class="tag">css usage</div><pre id="css"></pre></div>
+      <div><div class="tag">js usage</div><pre id="js"></pre></div>
+    </div>
+  </main>
 
   <script type="module">
-    import aufbau { html, preact } from '@aufbau/kits/preact-htm'; aufbau.init();
-    const patterns = await aufbau.import('index.json5');
+    import { list, patternImage, patternSvg } from './index.js';
 
-    function Patterns () {
-      return html`
-        <aufbau-icon icon='bx:search'></aufbau-icon>
-        <aufbau-index></aufbau-index>
-      `;
+    const catalogue = list();
+    const nav   = document.getElementById('nav');
+    const stage = document.getElementById('stage');
+    const els   = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
+    for (const k in els) els[k] = document.getElementById(els[k]);
+
+    let current = catalogue[0];
+    let options = {};
+
+    for (const pattern of catalogue) {
+      const button = document.createElement('button');
+      button.textContent = pattern.name;
+      button.onclick = () => select(pattern);
+      button.dataset.id = pattern.id;
+      nav.appendChild(button);
     }
-  </script>
 
+    function select (pattern) {
+      current = pattern;
+      options = {};
+      for (const [key, spec] of Object.entries(pattern.vars)) options[key] = spec.default;
+      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === pattern.id));
+      buildControls();
+      render();
+    }
+
+    function buildControls () {
+      els.title.textContent = `${current.name}  ·  ${current.id}`;
+      els.controls.replaceChildren();
+      for (const [key, spec] of Object.entries(current.vars)) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const numeric = spec.type === 'number' || spec.type === 'integer';
+        if (numeric) {
+          row.innerHTML = `<label>${key}</label>
+            <input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/>
+            <span class="val">${spec.default}</span>`;
+          const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
+          input.oninput = () => { options[key] = Number(input.value); out.textContent = input.value; render(); };
+        } else if (spec.type === 'color' && String(spec.default).startsWith('#')) {
+          row.innerHTML = `<label>${key}</label><input type="color" value="${spec.default}"/>`;
+          const input = row.querySelector('input');
+          input.oninput = () => { options[key] = input.value; render(); };
+        } else {
+          row.innerHTML = `<label>${key}</label><input type="text" value="${spec.default}"/>`;
+          const input = row.querySelector('input');
+          input.oninput = () => { options[key] = input.value; render(); };
+        }
+        els.controls.appendChild(row);
+      }
+    }
+
+    function render () {
+      stage.style.backgroundImage = patternImage(current.id, options);
+      els.svg.textContent = patternSvg(current.id, options);
+      els.css.textContent = `.box {\n  background-image: ${patternImage(current.id, options)};\n  background-repeat: repeat;\n}`;
+      const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
+      els.js.textContent =
+        `import ${current.id} from '@aufbau/patterns/${current.id}';\n` +
+        `// or: import { applyPattern } from '@aufbau/patterns';\n\n` +
+        `applyPattern('.box', '${current.id}', ${opts});`;
+    }
+
+    select(current);
+  </script>
 </body>
 </html>

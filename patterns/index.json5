@@ -1,7 +1,0 @@
-// @aufbau/svg/index.json5
-
-[
-  { id: 'dots'    , name: 'Dots'    },
-  { id: 'grid'    , name: 'Grid'    },
-  { id: 'stripes' , name: 'Stripes' },
-]

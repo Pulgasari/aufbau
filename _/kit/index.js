@@ -14,7 +14,8 @@ export {
 // ::: AUFBAU
 import cache           from '@aufbau/cache';
 import importeur       from '@aufbau/import';
-import * as shaders    from '@aufbau/shaders';
+import * as filters    from '@aufbau/filters';
+import * as patterns   from '@aufbau/patterns';
 import * as stylesheet from '@aufbau/stylesheet';
 import { observeStylesheets }       from '@aufbau/plugins/client';
 import { interceptFetchStylesheet } from '@aufbau/plugins/worker';
@@ -203,7 +204,7 @@ export const aufbau = {
   init, interceptFetch, interceptFetchStylesheet,
   cache, import: importeur,
   createApp, injectImportMap,
-  shaders, stylesheet,
+  filters, patterns, stylesheet,
   define, update, updateDataset, updateProperty,
 
   // Preact + HTM

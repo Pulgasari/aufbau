@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/filters</title>
+  <style>
+    :root {
+      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
+      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 14px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
+      display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
+    }
+    aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
+    aside h1 { font-size: 14px; margin: 0 0 4px; }
+    aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
+    nav button {
+      display: block; width: 100%; text-align: left; background: none; border: 0;
+      color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
+    }
+    nav button:hover { background: var(--panel); }
+    nav button[aria-current="true"] { background: var(--accent); color: #fff; }
+    main { padding: 24px; display: grid; gap: 20px; align-content: start; max-width: 900px; }
+    .stage {
+      display: grid; place-items: center; min-height: 260px; border: 1px solid var(--line);
+      border-radius: 12px; background:
+        radial-gradient(120% 120% at 20% 0%, #2b2f6b 0%, transparent 55%),
+        radial-gradient(120% 120% at 100% 100%, #6b2b53 0%, transparent 55%), #0a0b0f;
+      overflow: hidden;
+    }
+    .subject { font-weight: 800; font-size: clamp(40px, 10vw, 96px); letter-spacing: -.04em;
+      background: linear-gradient(90deg, #ff5f6d, #ffc371, #47e5bc, #5865f2);
+      -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
+    h2 { margin: 0; font-size: 16px; }
+    .controls { display: grid; gap: 12px; }
+    .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
+    .row label { color: var(--muted); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .val { text-align: right; color: var(--fg); }
+    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
+      border-radius: 6px; padding: 6px 8px; font: inherit; grid-column: 2 / 4; }
+    .panels { display: grid; gap: 12px; }
+    pre { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px; overflow: auto; font-size: 12px; color: #cfd3df; }
+    .tag { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>@aufbau/filters</h1>
+    <p>filters are js functions that generate svg. pick one and tweak it live.<br/>
+      <a href="canvas.html" style="color:var(--accent)">canvas backend →</a></p>
+    <nav id="nav"></nav>
+  </aside>
+
+  <main>
+    <div class="stage"><div class="subject" id="subject">aufbau</div></div>
+    <h2 id="title"></h2>
+    <div class="controls" id="controls"></div>
+    <div class="panels">
+      <div><div class="tag">generated &lt;filter&gt; (baked)</div><pre id="svg"></pre></div>
+      <div><div class="tag">css usage</div><pre id="css"></pre></div>
+      <div><div class="tag">js usage</div><pre id="js"></pre></div>
+    </div>
+  </main>
+
+  <!-- shared host the previewed <filter> lives in -->
+  <svg id="defs" aria-hidden="true" style="position:absolute;width:0;height:0"></svg>
+
+  <script type="module">
+    import { list, filterSvg, filterCss } from './index.js';
+
+    // this page previews on a dom element, so only css/svg filters. canvas-only
+    // ones (pixelate, dither, …) live in canvas.html.
+    const catalogue = list().filter(f => f.backends.svg || f.backends.css);
+    const nav       = document.getElementById('nav');
+    const defs      = document.getElementById('defs');
+    const subject   = document.getElementById('subject');
+    const els       = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
+    for (const k in els) els[k] = document.getElementById(els[k]);
+
+    let current = catalogue[0];
+    let options = {};
+    let counter = 0;
+
+    // sidebar
+    for (const filter of catalogue) {
+      const button = document.createElement('button');
+      button.textContent = filter.name;
+      button.onclick = () => select(filter);
+      button.dataset.id = filter.id;
+      nav.appendChild(button);
+    }
+
+    function select (filter) {
+      current = filter;
+      options = {};
+      for (const [key, spec] of Object.entries(filter.vars)) options[key] = spec.default;
+      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === filter.id));
+      buildControls();
+      render();
+    }
+
+    function buildControls () {
+      const backends = ['svg', current.backends.css && 'css'].filter(Boolean).join(' + ');
+      els.title.textContent = `${current.name}  ·  ${current.id}  ·  ${backends}`;
+      els.controls.replaceChildren();
+      for (const [key, spec] of Object.entries(current.vars)) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const numeric = spec.type === 'number' || spec.type === 'integer';
+        if (spec.type === 'boolean') {
+          row.innerHTML = `<label>${key}</label>
+            <input type="checkbox" ${spec.default ? 'checked' : ''}/>
+            <span class="val">${spec.default}</span>`;
+          const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
+          input.onchange = () => { options[key] = input.checked; out.textContent = input.checked; render(); };
+        } else if (numeric) {
+          row.innerHTML = `<label>${key}</label>
+            <input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/>
+            <span class="val">${spec.default}</span>`;
+          const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
+          input.oninput = () => { options[key] = Number(input.value); out.textContent = input.value; render(); };
+        } else {
+          row.innerHTML = `<label>${key}</label><input type="text" value="${spec.default}"/>`;
+          const input = row.querySelector('input');
+          input.oninput = () => { options[key] = input.value; render(); };
+        }
+        els.controls.appendChild(row);
+      }
+    }
+
+    function render () {
+      const cssValue = filterCss(current.id, options); // css backend, or null
+
+      if (cssValue) {
+        // preview through the native css backend when the filter has one.
+        subject.style.filter = cssValue;
+      } else {
+        // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
+        const uid    = `preview-${current.id}-${counter++}`;
+        const markup = filterSvg(current.id, { ...options, svgId: uid });
+        const node   = new DOMParser().parseFromString(
+          `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml'
+        ).querySelector('filter');
+        defs.replaceChildren(node);
+        subject.style.filter = `url(#${uid})`;
+      }
+
+      els.svg.textContent = filterSvg(current.id, options);
+      els.css.textContent = cssValue
+        ? `#logo { filter: ${cssValue}; }  /* css backend */`
+        : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`;
+      const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
+      els.js.textContent =
+        `import ${camel(current.id)} from '@aufbau/filters/${current.id}';\n` +
+        `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
+        `applyFilter('#logo', '${current.id}', ${opts});`;
+    }
+
+    const camel = s => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
+    select(current);
+  </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/filters · canvas</title>
+  <style>
+    :root {
+      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
+      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 14px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
+      display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
+    }
+    aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
+    aside h1 { font-size: 14px; margin: 0 0 4px; }
+    aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
+    nav button {
+      display: block; width: 100%; text-align: left; background: none; border: 0;
+      color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
+    }
+    nav button:hover { background: var(--panel); }
+    nav button[aria-current="true"] { background: var(--accent); color: #fff; }
+    main { padding: 24px; display: grid; gap: 20px; align-content: start; max-width: 900px; }
+    .stage { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0a0b0f; }
+    canvas { display: block; width: 100%; height: auto; }
+    h2 { margin: 0; font-size: 16px; }
+    .controls { display: grid; gap: 12px; }
+    .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
+    .row label { color: var(--muted); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
+      border-radius: 6px; padding: 6px 8px; font: inherit; grid-column: 2 / 4; }
+    .val { text-align: right; color: var(--fg); }
+    .panels { display: grid; gap: 12px; }
+    pre { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px; overflow: auto; font-size: 12px; color: #cfd3df; }
+    .tag { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>@aufbau/filters · canvas</h1>
+    <p>every filter on a &lt;canvas&gt; via filterCanvas — imageData where the filter has
+      it, else the ctx.filter bridge.<br/><a href="index.html">← dom backend</a></p>
+    <nav id="nav"></nav>
+  </aside>
+
+  <main>
+    <div class="stage"><canvas id="stage" width="760" height="300"></canvas></div>
+    <h2 id="title"></h2>
+    <div class="controls" id="controls"></div>
+    <div class="panels">
+      <div><div class="tag">backend</div><pre id="backend"></pre></div>
+      <div><div class="tag">js usage</div><pre id="js"></pre></div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { list, filterCanvas } from './index.js';
+
+    const catalogue = list(); // every filter is canvas-capable (imageData or bridge)
+    const nav    = document.getElementById('nav');
+    const canvas = document.getElementById('stage');
+    const ctx    = canvas.getContext('2d');
+    const els    = { title: 'title', controls: 'controls', backend: 'backend', js: 'js' };
+    for (const k in els) els[k] = document.getElementById(els[k]);
+
+    let current = catalogue[0];
+    let options = {};
+
+    // a busy test scene: gradient, discs, stripes and big text — enough high-frequency
+    // detail that pixelate/dither/threshold read clearly.
+    function drawScene () {
+      const { width: w, height: h } = canvas;
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#3b2fd6'); grad.addColorStop(0.5, '#c026a3'); grad.addColorStop(1, '#0fb8a0');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+      for (const [x, y, r, c] of [[140, 90, 60, '#ffd166'], [620, 210, 80, '#ef476f'], [430, 70, 40, '#06d6a0']]) {
+        ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
+      for (let x = 0; x < w; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 40, h); ctx.stroke(); }
+      ctx.fillStyle = '#fff'; ctx.font = '800 120px ui-monospace, monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('aufbau', w / 2, h / 2 + 6);
+    }
+
+    for (const f of catalogue) {
+      const button = document.createElement('button');
+      button.textContent = f.name;
+      button.onclick = () => select(f);
+      button.dataset.id = f.id;
+      nav.appendChild(button);
+    }
+
+    function select (f) {
+      current = f;
+      options = {};
+      for (const [key, spec] of Object.entries(f.vars)) options[key] = spec.default;
+      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === f.id));
+      buildControls();
+      render();
+    }
+
+    function buildControls () {
+      els.title.textContent = `${current.name}  ·  ${current.id}`;
+      els.controls.replaceChildren();
+      for (const [key, spec] of Object.entries(current.vars)) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const numeric = spec.type === 'number' || spec.type === 'integer';
+        if (spec.type === 'boolean') {
+          row.innerHTML = `<label>${key}</label><input type="checkbox" ${spec.default ? 'checked' : ''}/><span class="val">${spec.default}</span>`;
+          const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
+          input.onchange = () => { options[key] = input.checked; out.textContent = input.checked; render(); };
+        } else if (numeric) {
+          row.innerHTML = `<label>${key}</label><input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/><span class="val">${spec.default}</span>`;
+          const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
+          input.oninput = () => { options[key] = Number(input.value); out.textContent = input.value; render(); };
+        } else {
+          row.innerHTML = `<label>${key}</label><input type="text" value="${spec.default}"/>`;
+          const input = row.querySelector('input');
+          input.oninput = () => { options[key] = input.value; render(); };
+        }
+        els.controls.appendChild(row);
+      }
+    }
+
+    function render () {
+      drawScene();
+      try { filterCanvas(canvas, current.id, options); }
+      catch (e) { els.backend.textContent = String(e.message); }
+
+      const b = current.backends;
+      els.backend.textContent =
+        b.webgl                 ? 'webgl — fragment shader on the gpu (svg/canvas cannot do it).'
+        : (!b.svg && !b.css)    ? 'imageData — the filter walks the pixels directly.'
+        : b.css                 ? 'bridge — ctx.filter = css string.'
+        :                         'bridge — ctx.filter = url(#baked-svg-filter).';
+      const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
+      els.js.textContent =
+        `import { filterCanvas } from '@aufbau/filters';\n\n` +
+        `filterCanvas(canvas, '${current.id}', ${opts});`;
+    }
+
+    select(current);
+  </script>
+</body>
+</html>

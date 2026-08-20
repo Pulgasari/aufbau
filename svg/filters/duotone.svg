@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-duotone">
+      <feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.10196078431372549 0.9137254901960784"/>
+        <feFuncG type="table" tableValues="0.10196078431372549 0.27058823529411763"/>
+        <feFuncB type="table" tableValues="0.1803921568627451 0.3764705882352941"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>
