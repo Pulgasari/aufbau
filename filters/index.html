@@ -75,16 +75,9 @@
 
   <script type="module">
     import { list, filterSvg, filterCss } from './index.js';
-    
-    //import { autoloader } from '@aufbau/elements';
-    //import importFile     from '@aufbau/import';
-    //import * as dom       from '@domina/core';
-    
+    import aufbau, { dom, str } from '@aufbau/runtime';
+    aufbau.init();
 
-    import aufbau, { dom } from '@aufbau/runtime'; aufbau.init();
-    import str             from '@pulgasari/str';
-
-    
     const aufbauLogoSVG = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
     dom.element('#subject').setHTML(aufbauLogoSVG);
     
