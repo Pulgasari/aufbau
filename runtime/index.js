@@ -85,20 +85,21 @@ export async function init (options = {}) {
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
+const dom = domina;
+
 const aufbau = {
   // config + runtime
   config, configs,
   init, //interceptFetch,
   
   //
-  dom: domina, domina, str,
+  dom, domina, str,
 
   // packages
   elements   : aufbauElements,
   filters    : aufbauFilters,
   import     : aufbauImport,
   patterns   : aufbauPatterns,
-  store      : aufbauStore,
   stylesheet : aufbauStylesheet,
   utils      : aufbauUtils,
 
@@ -116,7 +117,7 @@ const aufbau = {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { aufbau };
+export { aufbau, dom, domina };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
