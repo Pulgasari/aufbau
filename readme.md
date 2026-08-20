@@ -15,6 +15,7 @@
 #### packages
 
 - [@aufbau/elements](elements/)
+- [@aufbau/filters](filters/)
 - [@aufbau/import](import/readme.md)
 - [@aufbau/stylescript](#aufbau-stylescript) *(experimental)*
 - [@aufbau/stylesheet](#aufbau-stylesheet) *(experimental)*
