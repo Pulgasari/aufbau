@@ -1,4 +1,9 @@
-# @aufbau/shaders
+# @aufbau/filters
+
+```javascript
+import { useFilter } from '@aufbau/filters';
+
+```
 
 ```css
 #logo {
