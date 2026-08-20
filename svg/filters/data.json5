@@ -115,6 +115,20 @@
     }
   },
   {
+    "id": "dot-screen",
+    "name": "Dot Screen",
+    "vars": {
+      "size": {
+        "type": "number",
+        "default": 8,
+        "min": 3,
+        "max": 32,
+        "step": 1,
+        "unit": "px"
+      }
+    }
+  },
+  {
     "id": "duotone",
     "name": "DuoTone",
     "vars": {
@@ -155,6 +169,19 @@
         "max": 3,
         "step": 0.1,
         "bake": true
+      }
+    }
+  },
+  {
+    "id": "fisheye",
+    "name": "Fisheye",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1,
+        "min": -2,
+        "max": 2,
+        "step": 0.05
       }
     }
   },
@@ -385,6 +412,54 @@
     }
   },
   {
+    "id": "kaleidoscope",
+    "name": "Kaleidoscope",
+    "vars": {
+      "segments": {
+        "type": "integer",
+        "default": 6,
+        "min": 2,
+        "max": 24,
+        "step": 1
+      },
+      "angle": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg"
+      }
+    }
+  },
+  {
+    "id": "levels",
+    "name": "Levels",
+    "vars": {
+      "black": {
+        "type": "number",
+        "default": 0,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      },
+      "white": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      },
+      "gamma": {
+        "type": "number",
+        "default": 1,
+        "min": 0.1,
+        "max": 3,
+        "step": 0.05
+      }
+    }
+  },
+  {
     "id": "linocut",
     "name": "Linocut",
     "vars": {
@@ -417,6 +492,20 @@
         "type": "time",
         "default": "4s",
         "bake": true
+      }
+    }
+  },
+  {
+    "id": "mirror",
+    "name": "Mirror",
+    "vars": {
+      "vertical": {
+        "type": "boolean",
+        "default": false
+      },
+      "flip": {
+        "type": "boolean",
+        "default": false
       }
     }
   },
@@ -454,6 +543,23 @@
         "max": 64,
         "step": 1,
         "unit": "px"
+      }
+    }
+  },
+  {
+    "id": "pixel-sort",
+    "name": "Pixel Sort",
+    "vars": {
+      "threshold": {
+        "type": "number",
+        "default": 0.5,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      },
+      "vertical": {
+        "type": "boolean",
+        "default": false
       }
     }
   },
@@ -812,6 +918,19 @@
         "type": "time",
         "default": "3s",
         "bake": true
+      }
+    }
+  },
+  {
+    "id": "zoom-blur",
+    "name": "Zoom Blur",
+    "vars": {
+      "strength": {
+        "type": "number",
+        "default": 0.2,
+        "min": 0,
+        "max": 1,
+        "step": 0.02
       }
     }
   }

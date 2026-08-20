@@ -32,6 +32,10 @@
       "name": "Dot Matrix"
     },
     {
+      "id": "dot-screen",
+      "name": "Dot Screen"
+    },
+    {
       "id": "duotone",
       "name": "DuoTone"
     },
@@ -42,6 +46,10 @@
     {
       "id": "emboss",
       "name": "Emboss"
+    },
+    {
+      "id": "fisheye",
+      "name": "Fisheye"
     },
     {
       "id": "glitch-heavy-cyber",
@@ -88,6 +96,14 @@
       "name": "Jitter"
     },
     {
+      "id": "kaleidoscope",
+      "name": "Kaleidoscope"
+    },
+    {
+      "id": "levels",
+      "name": "Levels"
+    },
+    {
       "id": "linocut",
       "name": "Linocut"
     },
@@ -96,12 +112,20 @@
       "name": "Melt"
     },
     {
+      "id": "mirror",
+      "name": "Mirror"
+    },
+    {
       "id": "night-vision",
       "name": "Night Vision"
     },
     {
       "id": "pixelate",
       "name": "Pixelate"
+    },
+    {
+      "id": "pixel-sort",
+      "name": "Pixel Sort"
     },
     {
       "id": "polar-pixelate",
@@ -174,6 +198,10 @@
     {
       "id": "wobble",
       "name": "Wobble"
+    },
+    {
+      "id": "zoom-blur",
+      "name": "Zoom Blur"
     }
   ],
   "patterns": [

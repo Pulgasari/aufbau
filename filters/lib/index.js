@@ -40,7 +40,14 @@ import * as solarize         from './solarize.js';
 import * as pixelate         from './pixelate.js';
 import * as polarPixelate    from './polar-pixelate.js';
 import * as dither           from './dither.js';
+import * as dotScreen        from './dot-screen.js';
+import * as levels           from './levels.js';
+import * as pixelSort        from './pixel-sort.js';
 import * as threshold        from './threshold.js';
+import * as fisheye          from './fisheye.js';
+import * as kaleidoscope     from './kaleidoscope.js';
+import * as mirror           from './mirror.js';
+import * as zoomBlur         from './zoom-blur.js';
 import * as thermal          from './thermal.js';
 import * as tiltShift        from './tilt-shift.js';
 import * as vignette         from './vignette.js';
@@ -48,26 +55,28 @@ import * as wave             from './wave.js';
 import * as wobble           from './wobble.js';
 
 const modules = [
-  badTv, barrelBlur, blur, brightness, contrast, dither, dotMatrix, duotone, edges,
-  emboss, glitchHeavyCyber, glitchLive, glitchRgb, glow, grain, grayscale, halftone,
-  hueSaturation, instacolor, invert, jitter, linocut, melt, nightVision, pixelate,
-  polarPixelate, posterize, rainbow, rgbShift, saturate, scanlines, sepia, shake,
-  sharpen, slices, smear, solarize, thermal, threshold, tiltShift, vignette, wave, wobble,
+  badTv, barrelBlur, blur, brightness, contrast, dither, dotMatrix, dotScreen, duotone,
+  edges, emboss, fisheye, glitchHeavyCyber, glitchLive, glitchRgb, glow, grain, grayscale,
+  halftone, hueSaturation, instacolor, invert, jitter, kaleidoscope, levels, linocut, melt,
+  mirror, nightVision, pixelate, pixelSort, polarPixelate, posterize, rainbow, rgbShift,
+  saturate, scanlines, sepia, shake, sharpen, slices, smear, solarize, thermal, threshold,
+  tiltShift, vignette, wave, wobble, zoomBlur,
 ];
 
-// each entry: { id, name, vars, render (svg), css, canvas }.
-// - render : svg backend. the default export, UNLESS the module provides a `canvas`
-//            backend (then its svg, if any, must come from a named `svg` export).
+// each entry: { id, name, vars, render (svg), css, canvas, webgl }.
+// - render : svg backend. the default export, UNLESS the module provides a `canvas` or
+//            `webgl` backend (then its svg, if any, must come from a named `svg` export).
 // - css    : native-css backend, or null.
 // - canvas : imageData backend (mutates pixels in place), or null.
-// webgl slots in here the same way later — see backends.md.
+// - webgl  : { fragment, uniforms } fragment-shader backend, or null.
 export const filters = Object.fromEntries(
   modules.map(m => [m.id, {
     id     : m.id,
     name   : m.name,
     vars   : m.vars,
-    render : m.svg ?? (m.canvas ? null : m.default) ?? null,
+    render : m.svg ?? ((m.canvas || m.webgl) ? null : m.default) ?? null,
     css    : m.css ?? null,
     canvas : m.canvas ?? null,
+    webgl  : m.webgl ?? null,
   }])
 );

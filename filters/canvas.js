@@ -8,6 +8,7 @@
 
 import { defsHost, svgId } from './core.js';
 import { filters } from './lib/index.js';
+import { filterToWebgl } from './webgl.js';
 
 function metaFor (id) {
   const meta = filters[id];
@@ -49,7 +50,7 @@ export function filterToCanvas (canvas, id, options = {}) {
   const ctx  = canvas.getContext('2d');
   const { width, height } = canvas;
 
-  if (meta.canvas && backend !== 'bridge') {
+  if (meta.canvas && backend !== 'bridge' && backend !== 'webgl') {
     const image = ctx.getImageData(0, 0, width, height);
     meta.canvas(image, opts);
     ctx.putImageData(image, 0, 0);
@@ -57,10 +58,15 @@ export function filterToCanvas (canvas, id, options = {}) {
   }
   if (backend === 'imagedata') throw new Error(`[@aufbau/filters] "${id}" has no imageData backend`);
 
-  const value = meta.css ? meta.css(opts)
+  // css/svg bridge; fall through to webgl for filters that only have that backend.
+  const value = backend === 'webgl' ? null
+              : meta.css ? meta.css(opts)
               : meta.render ? `url(#${bakedFilterId(id, meta, opts)})`
               : null;
-  if (!value) throw new Error(`[@aufbau/filters] "${id}" cannot render to canvas`);
+  if (!value) {
+    if (meta.webgl) return filterToWebgl(canvas, id, options);
+    throw new Error(`[@aufbau/filters] "${id}" cannot render to canvas`);
+  }
 
   // draw the canvas through the filter onto a scratch copy, then back over the original.
   const scratch = document.createElement('canvas');

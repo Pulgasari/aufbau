@@ -84,9 +84,10 @@ glitch.css;               // "filter: url(#aufbau-filter-glitch-rgb);"
 
 ## backends
 
-a filter is an effect that can be realised through more than one technique. the default
-export is the **svg** backend; some filters also carry a native **css** backend, and some
-are **canvas**-only (imageData). see [`backends.md`](backends.md) for the full model.
+a filter is an effect that can be realised through more than one technique: **svg** (the
+default export), native **css**, **canvas** (imageData), and **webgl** (fragment shader).
+not every filter has every backend — `pixelate`/`dither` are canvas-only, `fisheye`/
+`kaleidoscope` are webgl-only. see [`backends.md`](backends.md) for the full model.
 
 ```javascript
 import { filterCss, filterCanvas, supports } from '@aufbau/filters';
@@ -95,10 +96,15 @@ supports('blur');                    // { css: true, svg: true, canvas: true }
 filterCss('blur', { amount: 4 });    // "blur(4px)"  (null if no css backend)
 applyFilter('#el', 'blur', { amount: 4, backend: 'css' }); // force a backend
 
-// canvas: imageData filters (pixelate, polar-pixelate, dither, threshold) or, for any
-// css/svg filter, the ctx.filter bridge — all through one call, in place.
+// canvas: imageData filters (pixelate, dither, dot-screen, levels, pixel-sort…), the
+// ctx.filter bridge for any css/svg filter, or the webgl backend — all through one call.
 filterCanvas(myCanvas, 'pixelate', { size: 12 });
 filterCanvas(myCanvas, 'sepia');
+filterCanvas(myCanvas, 'kaleidoscope', { segments: 8 }); // delegates to webgl
+
+// or call the webgl backend directly (fisheye, mirror, kaleidoscope, zoom-blur):
+import { filterWebgl } from '@aufbau/filters';
+filterWebgl(myCanvas, 'fisheye', { amount: 1.2 });
 ```
 
 try the canvas filters live in [`canvas.html`](canvas.html).

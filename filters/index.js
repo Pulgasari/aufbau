@@ -10,11 +10,16 @@
 import { PREFIX, defsHost, resolve, svgId, toElements } from './core.js';
 import { filters } from './lib/index.js';
 import { filterToCanvas } from './canvas.js';
+import { filterToWebgl } from './webgl.js';
 
-// applies a filter to a <canvas> in place — imageData backend when the filter has
-// one, otherwise the ctx.filter bridge (css string, or a baked svg <filter>). the
-// only api that reaches the imageData-only filters (pixelate, dither, …).
+// applies a filter to a <canvas> in place — imageData backend when the filter has one,
+// the ctx.filter bridge (css string, or a baked svg <filter>) for css/svg filters, or
+// the webgl backend for filters that only have one. the universal canvas entry point.
 export const filterCanvas = filterToCanvas;
+
+// runs a filter's webgl backend on a canvas in place (fisheye, mirror, kaleidoscope,
+// zoom-blur). filterCanvas delegates here for webgl-only filters.
+export const filterWebgl = filterToWebgl;
 
 // :::::: CATALOGUE ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -27,9 +32,12 @@ function metaFor (id) {
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
 // want markup go through filterSvg (or import the module directly).
 export function list () {
-  return Object.values(filters).map(({ id, name, vars, render, css, canvas }) => ({
+  return Object.values(filters).map(({ id, name, vars, render, css, canvas, webgl }) => ({
     id, name, vars,
-    backends: { css: !!css, svg: !!render, canvas: !!canvas || !!render || !!css },
+    backends: {
+      css: !!css, svg: !!render, webgl: !!webgl,
+      canvas: !!canvas || !!render || !!css || !!webgl,
+    },
   }));
 }
 
@@ -55,7 +63,10 @@ export function filterCss (id, options = {}) {
 // imageData backend or any bridge-able filter (svg/css). webgl lands here later.
 export function supports (id) {
   const meta = metaFor(id);
-  return { css: !!meta.css, svg: !!meta.render, canvas: !!meta.canvas || !!meta.render || !!meta.css };
+  return {
+    css: !!meta.css, svg: !!meta.render, webgl: !!meta.webgl,
+    canvas: !!meta.canvas || !!meta.render || !!meta.css || !!meta.webgl,
+  };
 }
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
@@ -155,6 +166,6 @@ export function useFilter (id, options = {}) {
 export { filters };
 
 export default {
-  applyFilter, ensureFilter, filterCanvas, filterCss, filterSvg, filters, list,
-  removeFilter, supports, useFilter,
+  applyFilter, ensureFilter, filterCanvas, filterCss, filterSvg, filterWebgl, filters,
+  list, removeFilter, supports, useFilter,
 };

@@ -124,15 +124,21 @@ Note: `ctx.filter` with `url(#…)` needs the svg filter in the document (handle
 solid in Chrome/Firefox; Safari added canvas `filter` in 16.4 and its `url()` support is
 still spotty — the css-string bridge and the imageData tier are the safe paths there.
 
-### webgl — *later, sketch only*
+### webgl — *started (single-pass)*
 
-A `webgl` backend = a GLSL fragment shader + a uniform mapping from `vars`. A small runner
-compiles the shader, uploads the source as a texture, renders to a framebuffer; multi-pass
-effects chain framebuffers (blur = 2 passes, bloom = threshold+blur+combine). This is the
-realtime, "cover everything" tier: pixelate, polar pixelate, fisheye/barrel *distortion*
-(real, not our approximation), zoom/radial blur, kaleidoscope/mirror, chromatic aberration,
-displacement, convolutions — all at video framerate. Lazily loaded so DOM-only users never
-pay for it. WebGPU is the eventual upgrade (compute shaders for heavy pipelines).
+A `webgl` backend = `{ fragment, uniforms(options) }`: a GLSL fragment shader plus a
+mapping from `vars` to uniforms. The runner (`webgl.js`) compiles the shader once (cached),
+uploads the source canvas as a texture, and renders a fullscreen quad; `filterWebgl(canvas,
+id, options)` composites the result back onto the 2d canvas, and `filterCanvas` delegates
+here for webgl-only filters. Shipped single-pass: **fisheye** (real lens distortion),
+**mirror**, **kaleidoscope**, **zoom-blur** (real radial blur) — effects svg/canvas cannot
+do, at framerate. Shared preamble gives every shader `uSource`, `vUv`, `uResolution`.
+
+Still to do: **multi-pass** (framebuffer ping-pong — gaussian blur = 2 passes, bloom =
+threshold+blur+combine), porting the heavy svg effects (glitch, grain, displacement) to
+shaders for realtime video, and a proper editor pipeline (a stack of passes on one texture).
+WebGPU is the eventual upgrade (compute shaders for heavy pipelines). Lazily importable
+(`@aufbau/filters/webgl`) so DOM-only users never pay for it.
 
 ---
 
@@ -170,8 +176,9 @@ webgl backends.
 2. **canvas backend** *(done)* — `filterCanvas` with the imageData tier
    (`pixelate`, `polar-pixelate`, `dither`, `threshold`) and the `ctx.filter` bridge
    (css string / baked svg) for every other filter. demo: [`canvas.html`](canvas.html).
-3. **webgl backend** — shader runner + uniform mapping; port the heavy/realtime effects;
-   real `pixelate`/`fisheye`/`mirror`/`zoom-blur`.
+3. **webgl backend** *(single-pass done)* — shader runner + uniform mapping; `filterWebgl`
+   and `fisheye`/`mirror`/`kaleidoscope`/`zoom-blur`. next: multi-pass (framebuffer
+   ping-pong), porting heavy effects to shaders, an editor pass-stack.
 4. **generator** already writes the svg assets; extend it to also emit a JSON capability
    catalogue so tooling/editor know each filter's backends without importing them.
 

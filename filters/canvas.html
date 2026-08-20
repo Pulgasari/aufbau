@@ -61,7 +61,7 @@
   </main>
 
   <script type="module">
-    import { list, filterCanvas, supports } from './index.js';
+    import { list, filterCanvas } from './index.js';
 
     const catalogue = list(); // every filter is canvas-capable (imageData or bridge)
     const nav    = document.getElementById('nav');
@@ -108,9 +108,6 @@
     }
 
     function buildControls () {
-      const caps = supports(current.id);
-      const kind = caps.canvas && current.backends.svg === false && current.backends.css === false
-        ? 'imageData' : caps.canvas ? 'imageData / bridge' : 'bridge';
       els.title.textContent = `${current.name}  ·  ${current.id}`;
       els.controls.replaceChildren();
       for (const [key, spec] of Object.entries(current.vars)) {
@@ -139,12 +136,12 @@
       try { filterCanvas(canvas, current.id, options); }
       catch (e) { els.backend.textContent = String(e.message); }
 
-      const imageData = current.backends.svg === false && current.backends.css === false;
-      els.backend.textContent = imageData
-        ? 'imageData — the filter walks the pixels directly (svg/css cannot express it).'
-        : current.backends.css
-          ? 'bridge — ctx.filter = css string.'
-          : 'bridge — ctx.filter = url(#baked-svg-filter).';
+      const b = current.backends;
+      els.backend.textContent =
+        b.webgl                 ? 'webgl — fragment shader on the gpu (svg/canvas cannot do it).'
+        : (!b.svg && !b.css)    ? 'imageData — the filter walks the pixels directly.'
+        : b.css                 ? 'bridge — ctx.filter = css string.'
+        :                         'bridge — ctx.filter = url(#baked-svg-filter).';
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
       els.js.textContent =
         `import { filterCanvas } from '@aufbau/filters';\n\n` +
