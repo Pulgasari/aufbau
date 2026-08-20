@@ -326,3 +326,50 @@ Storage is only half of it. The rest is CSS: `font-display: optional` avoids the
 flash outright, `<link rel=preload as=font crossorigin>` starts the download earlier,
 and `size-adjust` / `ascent-override` on the fallback face stop the metric jump when
 the real font arrives.
+
+---
+
+**Aufbau Stylesheets** (`.ass` or `.aufbau.css`)
+
+```
+deno install jsr:@aufbau/stylesheet
+```
+
+it provides a bunch of pseudo-css-properties and mechanisms to handle css files better. (it's not really like scss.)
+
+```css
+/* aufbau-webfont :: use a google webfont */
+body { aufbau-webfont: "JetBrains Mono"; }
+
+/* aufbau-icon :: use any icon provided by iconify */
+.close-btn  { aufbau-icon: 'lucide:x'; }
+.search-btn { aufbau-icon: 'bx:search' size(24px) color(#008800); }
+```
+
+```css
+/* @aufbau :: define and use value aliases */
+
+/* works for any css property */
+/* these become also available on 'padding-left' etc. */
+@aufbau gap, margin, padding {
+  tiny   : 0.25rem;
+  small  : 0.50rem;
+  normal : 1.00rem;
+  big    : 2.00rem;
+  huge   : 3.00rem;
+}
+body     { gap: normal; padding: normal; }
+body > * { padding: small; }
+
+/* become available on background-color, color, fill etc. */
+@aufbau color {
+  almostblack : #000001;
+  brand       : #5865f2;
+}
+.card { background: almostblack; color: brand; }
+.card {
+  background-color : brand-a20; /* +20% transparency */
+  border-color     : brand-d15; /* +15% black */
+  color            : brand-l10; /* +10% white */
+}
+```
