@@ -12,12 +12,20 @@
       "name": "Barrel Blur"
     },
     {
+      "id": "bloom",
+      "name": "Bloom"
+    },
+    {
       "id": "blur",
       "name": "Blur"
     },
     {
       "id": "brightness",
       "name": "Brightness"
+    },
+    {
+      "id": "chromatic",
+      "name": "Chromatic"
     },
     {
       "id": "contrast",
@@ -50,6 +58,10 @@
     {
       "id": "fisheye",
       "name": "Fisheye"
+    },
+    {
+      "id": "gaussian-blur",
+      "name": "Gaussian Blur"
     },
     {
       "id": "glitch-heavy-cyber",

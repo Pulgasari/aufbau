@@ -12,6 +12,9 @@ import { filters } from './lib/index.js';
 import { filterToCanvas } from './canvas.js';
 import { filterToWebgl } from './webgl.js';
 
+// non-destructive filter stack for editor-style use — see pipeline.js.
+export { createPipeline } from './pipeline.js';
+
 // applies a filter to a <canvas> in place — imageData backend when the filter has one,
 // the ctx.filter bridge (css string, or a baked svg <filter>) for css/svg filters, or
 // the webgl backend for filters that only have one. the universal canvas entry point.

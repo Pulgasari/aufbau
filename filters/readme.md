@@ -102,9 +102,29 @@ filterCanvas(myCanvas, 'pixelate', { size: 12 });
 filterCanvas(myCanvas, 'sepia');
 filterCanvas(myCanvas, 'kaleidoscope', { segments: 8 }); // delegates to webgl
 
-// or call the webgl backend directly (fisheye, mirror, kaleidoscope, zoom-blur):
+// or call the webgl backend directly (fisheye, kaleidoscope, zoom-blur, bloom, …):
 import { filterWebgl } from '@aufbau/filters';
 filterWebgl(myCanvas, 'fisheye', { amount: 1.2 });
+```
+
+## the editor pipeline
+
+`createPipeline` holds a source and a non-destructive stack of stages — any backend mixes
+freely, and the source is never mutated, so tweaking/reordering/toggling and re-rendering
+always starts clean. See [`editor.html`](editor.html) for a working editor.
+
+```javascript
+import { createPipeline } from '@aufbau/filters';
+
+const pipe = createPipeline(sourceCanvas)
+  .add('levels', { gamma: 1.2 })   // imageData
+  .add('bloom', { threshold: 0.6 }) // webgl, multi-pass
+  .add('kaleidoscope', { segments: 6 }); // webgl
+
+pipe.render(targetCanvas);          // apply the whole stack
+pipe.set(1, { strength: 2 });       // tweak a stage …
+pipe.toggle(2); pipe.move(0, 2);    // … reorder / toggle
+pipe.render(targetCanvas);          // re-run, source untouched
 ```
 
 try the canvas filters live in [`canvas.html`](canvas.html).

@@ -48,6 +48,33 @@
     }
   },
   {
+    "id": "bloom",
+    "name": "Bloom",
+    "vars": {
+      "threshold": {
+        "type": "number",
+        "default": 0.6,
+        "min": 0,
+        "max": 1,
+        "step": 0.02
+      },
+      "radius": {
+        "type": "number",
+        "default": 6,
+        "min": 0,
+        "max": 20,
+        "step": 0.5
+      },
+      "strength": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 3,
+        "step": 0.1
+      }
+    }
+  },
+  {
     "id": "blur",
     "name": "Blur",
     "vars": {
@@ -71,6 +98,28 @@
         "min": 0,
         "max": 3,
         "step": 0.05
+      }
+    }
+  },
+  {
+    "id": "chromatic",
+    "name": "Chromatic",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 6,
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px"
+      },
+      "angle": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg"
       }
     }
   },
@@ -182,6 +231,20 @@
         "min": -2,
         "max": 2,
         "step": 0.05
+      }
+    }
+  },
+  {
+    "id": "gaussian-blur",
+    "name": "Gaussian Blur",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 4,
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "px"
       }
     }
   },

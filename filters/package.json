@@ -9,6 +9,7 @@
     "./core": "./core.js",
     "./canvas": "./canvas.js",
     "./webgl": "./webgl.js",
+    "./pipeline": "./pipeline.js",
     "./*": "./lib/*.js"
   },
   "license": "MIT"
