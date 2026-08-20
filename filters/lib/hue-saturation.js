@@ -15,3 +15,7 @@ export default function hueSaturation (options = {}) {
     <feColorMatrix type="saturate" values="${v.saturation}"/>
   `, options);
 }
+
+// css backend: native hue-rotate() + saturate().
+export const css = (options = {}) =>
+  `hue-rotate(${options.hue ?? vars.hue.default}deg) saturate(${options.saturation ?? vars.saturation.default})`;

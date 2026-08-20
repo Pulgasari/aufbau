@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-saturate">
+      <feColorMatrix type="saturate" values="var(--aufbau-filter-amount, 1.5)"/>
+    </filter>
+  </defs>
+</svg>

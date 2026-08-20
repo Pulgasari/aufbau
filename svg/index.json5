@@ -16,6 +16,14 @@
       "name": "Blur"
     },
     {
+      "id": "brightness",
+      "name": "Brightness"
+    },
+    {
+      "id": "contrast",
+      "name": "Contrast"
+    },
+    {
       "id": "dot-matrix",
       "name": "Dot Matrix"
     },
@@ -52,6 +60,10 @@
       "name": "Grain"
     },
     {
+      "id": "grayscale",
+      "name": "Grayscale"
+    },
+    {
       "id": "halftone",
       "name": "Half Tone"
     },
@@ -62,6 +74,10 @@
     {
       "id": "instacolor",
       "name": "InstaColor"
+    },
+    {
+      "id": "invert",
+      "name": "Invert"
     },
     {
       "id": "jitter",
@@ -92,8 +108,16 @@
       "name": "RGB Shift"
     },
     {
+      "id": "saturate",
+      "name": "Saturate"
+    },
+    {
       "id": "scanlines",
       "name": "Scanlines"
+    },
+    {
+      "id": "sepia",
+      "name": "Sepia"
     },
     {
       "id": "shake",

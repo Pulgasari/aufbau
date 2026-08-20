@@ -21,15 +21,30 @@ function metaFor (id) {
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
 // want markup go through filterSvg (or import the module directly).
 export function list () {
-  return Object.values(filters).map(({ id, name, vars }) => ({ id, name, vars }));
+  return Object.values(filters).map(({ id, name, vars, css }) => ({
+    id, name, vars, backends: { css: !!css, svg: true },
+  }));
 }
 
 // :::::: SVG BUILDING :::::::::::::::::::::::::::::::::::::::::::
 
-// the <filter> markup for an id. baked by default; pass { live: true } for the
-// var()-driven form used by defs injection and the static assets.
+// the <filter> markup for an id (svg backend). baked by default; pass { live: true }
+// for the var()-driven form used by defs injection and the static assets.
 export function filterSvg (id, options = {}) {
   return metaFor(id).render(options);
+}
+
+// the native css <filter-function> for an id (css backend), or null when the filter
+// has no css equivalent. e.g. filterCss('blur', { amount: 4 }) -> "blur(4px)".
+export function filterCss (id, options = {}) {
+  const fn = metaFor(id).css;
+  return fn ? fn(options) : null;
+}
+
+// which backends a filter can be realised through. svg is always available; css only
+// for the native subset. canvas/webgl land here as those backends ship (see backends.md).
+export function supports (id) {
+  return { css: !!metaFor(id).css, svg: true };
 }
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
@@ -65,24 +80,36 @@ export async function ensureFilter (id, options = {}) {
 
 // :::::: PUBLIC API ::::::::::::::::::::::::::::::::::::::::::::::
 
-// applies a filter to one or more targets via css `filter: url(#id)`. only the
-// options a caller actually passes are written as inherited custom properties; the
-// rest fall back to the defaults baked into the injected <filter>.
+// applies a filter to one or more targets. `backend` selects how:
+//   'auto' (default) — native css when the filter has it (cheapest, gpu, animatable),
+//                       otherwise the svg defs-injection path.
+//   'css'            — force css; no-op if the filter has no css backend.
+//   'svg'            — force the svg path even when css is available.
+// for the svg path, only the options a caller passes are written as inherited custom
+// properties; the rest fall back to the defaults baked into the injected <filter>.
 export function applyFilter (target, id, options = {}) {
+  const { backend = 'auto', ...opts } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
-  const meta      = metaFor(id);
-  const elementId = variantId(id, meta, options);
-  ensureFilter(id, { ...options, svgId: elementId });
+  const meta = metaFor(id);
 
+  if (meta.css && (backend === 'css' || backend === 'auto')) {
+    const value = meta.css(opts);
+    if (value) {
+      for (const el of elements) { el.style.filter = value; el.dataset.aufbauFilter = id; }
+      return;
+    }
+  }
+  if (backend === 'css') return; // explicitly asked for css, but this filter has none
+
+  const elementId = variantId(id, meta, opts);
+  ensureFilter(id, { ...opts, svgId: elementId });
   const url = `url(#${elementId})`;
   for (const el of elements) {
-    // only live (non-baked, non-boolean) options ride on custom properties; the
-    // structural ones are already baked into the variant element above.
     for (const key in meta.vars) {
       const spec = meta.vars[key];
-      if (!spec.bake && spec.type !== 'boolean' && options[key] != null) {
-        el.style.setProperty(`${PREFIX}${key}`, String(options[key]));
+      if (!spec.bake && spec.type !== 'boolean' && opts[key] != null) {
+        el.style.setProperty(`${PREFIX}${key}`, String(opts[key]));
       }
     }
     el.style.filter = url;
@@ -99,20 +126,23 @@ export function removeFilter (target) {
   }
 }
 
-// binds one filter + option set into a small handle, handy for stylescript and
-// component code: `const glitch = useFilter('glitch-rgb', { offsetX: 6 })`.
+// binds one filter + option set into a small, backend-aware handle, handy for
+// stylescript and component code: `const glitch = useFilter('glitch-rgb', { offsetX: 6 })`.
 export function useFilter (id, options = {}) {
-  const elementId = svgId(id);
   return {
     id,
-    css    : `filter: url(#${elementId});`,
-    ensure : () => ensureFilter(id, options),
-    apply  : target => applyFilter(target, id, options),
-    remove : target => removeFilter(target),
-    svg    : (opts = options) => filterSvg(id, opts),
+    url      : `url(#${svgId(id)})`,                    // the svg reference
+    css      : (opts = options) => filterCss(id, opts), // native css filter-function, or null
+    svg      : (opts = options) => filterSvg(id, opts), // <filter> markup
+    supports : () => supports(id),
+    ensure   : () => ensureFilter(id, options),
+    apply    : (target, opts = options) => applyFilter(target, id, opts),
+    remove   : target => removeFilter(target),
   };
 }
 
 export { filters };
 
-export default { applyFilter, ensureFilter, filterSvg, filters, list, removeFilter, useFilter };
+export default {
+  applyFilter, ensureFilter, filterCss, filterSvg, filters, list, removeFilter, supports, useFilter,
+};

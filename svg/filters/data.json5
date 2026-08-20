@@ -62,6 +62,32 @@
     }
   },
   {
+    "id": "brightness",
+    "name": "Brightness",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 3,
+        "step": 0.05
+      }
+    }
+  },
+  {
+    "id": "contrast",
+    "name": "Contrast",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 3,
+        "step": 0.05
+      }
+    }
+  },
+  {
     "id": "dot-matrix",
     "name": "Dot Matrix",
     "vars": {
@@ -234,6 +260,19 @@
     }
   },
   {
+    "id": "grayscale",
+    "name": "Grayscale",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.05
+      }
+    }
+  },
+  {
     "id": "halftone",
     "name": "Half Tone",
     "vars": {
@@ -287,6 +326,19 @@
         "max": 2,
         "step": 0.05,
         "bake": true
+      }
+    }
+  },
+  {
+    "id": "invert",
+    "name": "Invert",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.05
       }
     }
   },
@@ -431,6 +483,19 @@
     }
   },
   {
+    "id": "saturate",
+    "name": "Saturate",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1.5,
+        "min": 0,
+        "max": 4,
+        "step": 0.05
+      }
+    }
+  },
+  {
     "id": "scanlines",
     "name": "Scanlines",
     "vars": {
@@ -466,6 +531,19 @@
         "type": "time",
         "default": "4s",
         "bake": true
+      }
+    }
+  },
+  {
+    "id": "sepia",
+    "name": "Sepia",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.05
       }
     }
   },

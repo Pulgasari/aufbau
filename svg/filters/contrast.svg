@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-contrast">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="var(--aufbau-filter-amount, 1)" intercept="0.000"/>
+        <feFuncG type="linear" slope="var(--aufbau-filter-amount, 1)" intercept="0.000"/>
+        <feFuncB type="linear" slope="var(--aufbau-filter-amount, 1)" intercept="0.000"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>

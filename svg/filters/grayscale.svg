@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-grayscale">
+      <feColorMatrix type="saturate" values="0.000"/>
+    </filter>
+  </defs>
+</svg>

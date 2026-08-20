@@ -11,3 +11,6 @@ export default function blur (options = {}) {
   const v = resolve(vars, options);
   return filterTag(id, `<feGaussianBlur stdDeviation="${v.amount}"/>`, options);
 }
+
+// css backend: native blur() function.
+export const css = (options = {}) => `blur(${options.amount ?? vars.amount.default}px)`;

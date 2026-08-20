@@ -72,7 +72,7 @@
   <svg id="defs" aria-hidden="true" style="position:absolute;width:0;height:0"></svg>
 
   <script type="module">
-    import { list, filterSvg } from './index.js';
+    import { list, filterSvg, filterCss } from './index.js';
 
     const catalogue = list();
     const nav       = document.getElementById('nav');
@@ -104,7 +104,8 @@
     }
 
     function buildControls () {
-      els.title.textContent = `${current.name}  ·  ${current.id}`;
+      const backends = ['svg', current.backends.css && 'css'].filter(Boolean).join(' + ');
+      els.title.textContent = `${current.name}  ·  ${current.id}  ·  ${backends}`;
       els.controls.replaceChildren();
       for (const [key, spec] of Object.entries(current.vars)) {
         const row = document.createElement('div');
@@ -132,17 +133,26 @@
     }
 
     function render () {
-      // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
-      const uid    = `preview-${current.id}-${counter++}`;
-      const markup = filterSvg(current.id, { ...options, svgId: uid });
-      const node   = new DOMParser().parseFromString(
-        `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml'
-      ).querySelector('filter');
-      defs.replaceChildren(node);
-      subject.style.filter = `url(#${uid})`;
+      const cssValue = filterCss(current.id, options); // css backend, or null
+
+      if (cssValue) {
+        // preview through the native css backend when the filter has one.
+        subject.style.filter = cssValue;
+      } else {
+        // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
+        const uid    = `preview-${current.id}-${counter++}`;
+        const markup = filterSvg(current.id, { ...options, svgId: uid });
+        const node   = new DOMParser().parseFromString(
+          `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml'
+        ).querySelector('filter');
+        defs.replaceChildren(node);
+        subject.style.filter = `url(#${uid})`;
+      }
 
       els.svg.textContent = filterSvg(current.id, options);
-      els.css.textContent = `#logo { filter: url(#aufbau-filter-${current.id}); }`;
+      els.css.textContent = cssValue
+        ? `#logo { filter: ${cssValue}; }  /* css backend */`
+        : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`;
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
       els.js.textContent =
         `import ${camel(current.id)} from '@aufbau/filters/${current.id}';\n` +
