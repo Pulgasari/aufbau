@@ -1,16 +1,11 @@
 # @aufbau/filters
 
-```javascript
-import { useFilter } from '@aufbau/filters';
-
-```
-
 ```css
 #logo {
-  aufbau-shader: heavy-cyber-glitch scale(60) speed(1.2s);
+  aufbau-filter: heavy-cyber-glitch scale(60) speed(1.2s);
 }
 
 .wave-banner {
-  aufbau-shader: wave frequency(0.04) scale(35);
+  aufbau-filter: wave frequency(0.04) scale(35);
 }
 ```
