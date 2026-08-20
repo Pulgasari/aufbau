@@ -75,12 +75,15 @@
 
   <script type="module">
     import { list, filterSvg, filterCss } from './index.js';
-    import importFile from '@aufbau/import';
-    import * as dom   from '@domina/core';
-    import      str   from '@pulgasari/str';
+    import { autoloader } from '@aufbau/elements';
+    import importFile     from '@aufbau/import';
+    import * as dom       from '@domina/core';
+    import      str       from '@pulgasari/str';
+
+    autoloader ();
+    const aufbauLogoSVG = await importFile('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
+    dom.element('#subject').setHTML(aufbauLogoSVG);
     
-    const aufbauLogoSVG = await importFile('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'element' });
-    dom.element('#subject').setContent(aufbauLogoSVG);
 
     // this page previews on a dom element, so only css/svg filters. canvas-only
     // ones (pixelate, dither, …) live in canvas.html.
