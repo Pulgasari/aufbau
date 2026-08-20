@@ -53,7 +53,8 @@
 <body>
   <aside>
     <h1>@aufbau/filters</h1>
-    <p>filters are js functions that generate svg. pick one and tweak it live.</p>
+    <p>filters are js functions that generate svg. pick one and tweak it live.<br/>
+      <a href="canvas.html" style="color:var(--accent)">canvas backend →</a></p>
     <nav id="nav"></nav>
   </aside>
 
@@ -74,7 +75,9 @@
   <script type="module">
     import { list, filterSvg, filterCss } from './index.js';
 
-    const catalogue = list();
+    // this page previews on a dom element, so only css/svg filters. canvas-only
+    // ones (pixelate, dither, …) live in canvas.html.
+    const catalogue = list().filter(f => f.backends.svg || f.backends.css);
     const nav       = document.getElementById('nav');
     const defs      = document.getElementById('defs');
     const subject   = document.getElementById('subject');

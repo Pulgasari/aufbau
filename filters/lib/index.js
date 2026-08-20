@@ -37,6 +37,10 @@ import * as sharpen          from './sharpen.js';
 import * as slices           from './slices.js';
 import * as smear            from './smear.js';
 import * as solarize         from './solarize.js';
+import * as pixelate         from './pixelate.js';
+import * as polarPixelate    from './polar-pixelate.js';
+import * as dither           from './dither.js';
+import * as threshold        from './threshold.js';
 import * as thermal          from './thermal.js';
 import * as tiltShift        from './tilt-shift.js';
 import * as vignette         from './vignette.js';
@@ -44,16 +48,26 @@ import * as wave             from './wave.js';
 import * as wobble           from './wobble.js';
 
 const modules = [
-  badTv, barrelBlur, blur, brightness, contrast, dotMatrix, duotone, edges, emboss,
-  glitchHeavyCyber, glitchLive, glitchRgb, glow, grain, grayscale, halftone,
-  hueSaturation, instacolor, invert, jitter, linocut, melt, nightVision, posterize,
-  rainbow, rgbShift, saturate, scanlines, sepia, shake, sharpen, slices, smear,
-  solarize, thermal, tiltShift, vignette, wave, wobble,
+  badTv, barrelBlur, blur, brightness, contrast, dither, dotMatrix, duotone, edges,
+  emboss, glitchHeavyCyber, glitchLive, glitchRgb, glow, grain, grayscale, halftone,
+  hueSaturation, instacolor, invert, jitter, linocut, melt, nightVision, pixelate,
+  polarPixelate, posterize, rainbow, rgbShift, saturate, scanlines, sepia, shake,
+  sharpen, slices, smear, solarize, thermal, threshold, tiltShift, vignette, wave, wobble,
 ];
 
-// each entry: { id, name, vars, render (svg), css }. render is the svg backend (the
-// default export); css is the optional native-css backend (null when unsupported).
-// canvas/webgl backends will slot in here the same way — see backends.md.
+// each entry: { id, name, vars, render (svg), css, canvas }.
+// - render : svg backend. the default export, UNLESS the module provides a `canvas`
+//            backend (then its svg, if any, must come from a named `svg` export).
+// - css    : native-css backend, or null.
+// - canvas : imageData backend (mutates pixels in place), or null.
+// webgl slots in here the same way later — see backends.md.
 export const filters = Object.fromEntries(
-  modules.map(m => [m.id, { id: m.id, name: m.name, vars: m.vars, render: m.default, css: m.css ?? null }])
+  modules.map(m => [m.id, {
+    id     : m.id,
+    name   : m.name,
+    vars   : m.vars,
+    render : m.svg ?? (m.canvas ? null : m.default) ?? null,
+    css    : m.css ?? null,
+    canvas : m.canvas ?? null,
+  }])
 );

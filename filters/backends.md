@@ -105,19 +105,24 @@ natively, so a live form (`blur(var(--aufbau-filter-amount,2))`) is a trivial ex
 33 filters. See [`readme.md`](readme.md). Stays the default/richest DOM backend for
 everything CSS can't express.
 
-### canvas 2d — *next*
+### canvas 2d — *done*
 
-Two tiers:
+`filterCanvas(canvas, id, options)` applies a filter to a canvas in place, over two tiers:
 
-1. **bridge (free):** `filterToCanvas(ctx, id, o)` sets `ctx.filter` to the css string
-   (if available) or to `url(#id)` after ensuring the svg `<filter>` is in the document,
-   then the caller's next `drawImage` is filtered. This gives *every* current filter a
-   canvas path with no per-filter code. Good for compositing and simple export.
-2. **imageData (new capability):** filters that svg/css cannot do get an explicit
-   `canvas(imageData, o)` that walks pixels. This is where **pixelate**, **polar
-   pixelate**, **dithering** (Floyd–Steinberg, Bayer/ordered), **true halftone**
-   (dot size ∝ luminance), **threshold**, **posterize by LUT**, **curves/levels** live —
-   the pixels.js-style set. CPU-bound; fine for editor ops and export, not for 60fps video.
+1. **imageData:** filters that svg/css cannot do export `canvas(imageData, options)` and
+   walk pixels directly. Shipped: **pixelate**, **polar-pixelate**, **dither** (Bayer
+   ordered), **threshold**. Next: **true halftone** (dot size ∝ luminance), **levels/
+   curves**, **channels**, the pixels.js-style set. CPU-bound; fine for editor ops and
+   export, not for 60fps video.
+2. **bridge:** for everything else, `ctx.filter` is set to the css string (when the
+   filter has a css backend) or to `url(#id)` after injecting a **baked** svg `<filter>`
+   (concrete values — canvas draws can't read css custom properties), then the canvas is
+   drawn through it onto a scratch copy and back. Gives *every* css/svg filter a canvas
+   path with no per-filter code. `backend: 'imagedata' | 'bridge' | 'auto'` forces a tier.
+
+Note: `ctx.filter` with `url(#…)` needs the svg filter in the document (handled) and is
+solid in Chrome/Firefox; Safari added canvas `filter` in 16.4 and its `url()` support is
+still spotty — the css-string bridge and the imageData tier are the safe paths there.
 
 ### webgl — *later, sketch only*
 
@@ -160,10 +165,11 @@ webgl backends.
 
 ## 6. Roadmap
 
-1. **css backend + contract** *(this step)* — descriptor/backends model, `filterCss`,
+1. **css backend + contract** *(done)* — descriptor/backends model, `filterCss`,
    `supports`, `applyFilter({backend})`, the 8 css-capable filters.
-2. **canvas backend** — the `ctx.filter` bridge (`filterToCanvas`) for all filters, then
-   the first imageData filters: `pixelate`, `polar-pixelate`, `dither`, `threshold`.
+2. **canvas backend** *(done)* — `filterCanvas` with the imageData tier
+   (`pixelate`, `polar-pixelate`, `dither`, `threshold`) and the `ctx.filter` bridge
+   (css string / baked svg) for every other filter. demo: [`canvas.html`](canvas.html).
 3. **webgl backend** — shader runner + uniform mapping; port the heavy/realtime effects;
    real `pixelate`/`fisheye`/`mirror`/`zoom-blur`.
 4. **generator** already writes the svg assets; extend it to also emit a JSON capability

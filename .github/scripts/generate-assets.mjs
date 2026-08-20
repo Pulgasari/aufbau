@@ -52,7 +52,10 @@ async function write (path, content) {
 async function generateKind (kind, registry, toSvg) {
   console.log(kind + ':');
   const entries = Object.values(registry);
-  for (const meta of entries) await write(`${kind}/${meta.id}.svg`, prettify(toSvg(meta)));
+  // canvas-only filters (render === null) have no svg asset; catalogue still lists them.
+  for (const meta of entries) {
+    if (meta.render) await write(`${kind}/${meta.id}.svg`, prettify(toSvg(meta)));
+  }
   await write(`${kind}/data.json5`, toJson5(`@aufbau/svg/${kind}/data.json5`, entries));
   return entries.map(({ id, name }) => ({ id, name }));
 }

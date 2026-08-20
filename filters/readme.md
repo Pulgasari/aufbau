@@ -82,6 +82,27 @@ glitch.apply('#logo');    // apply to targets
 glitch.css;               // "filter: url(#aufbau-filter-glitch-rgb);"
 ```
 
+## backends
+
+a filter is an effect that can be realised through more than one technique. the default
+export is the **svg** backend; some filters also carry a native **css** backend, and some
+are **canvas**-only (imageData). see [`backends.md`](backends.md) for the full model.
+
+```javascript
+import { filterCss, filterCanvas, supports } from '@aufbau/filters';
+
+supports('blur');                    // { css: true, svg: true, canvas: true }
+filterCss('blur', { amount: 4 });    // "blur(4px)"  (null if no css backend)
+applyFilter('#el', 'blur', { amount: 4, backend: 'css' }); // force a backend
+
+// canvas: imageData filters (pixelate, polar-pixelate, dither, threshold) or, for any
+// css/svg filter, the ctx.filter bridge — all through one call, in place.
+filterCanvas(myCanvas, 'pixelate', { size: 12 });
+filterCanvas(myCanvas, 'sepia');
+```
+
+try the canvas filters live in [`canvas.html`](canvas.html).
+
 ## usage with @aufbau/stylesheet
 
 built into `@aufbau/stylesheet`, which injects the defs during its async pre-pass:

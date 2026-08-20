@@ -24,6 +24,10 @@
       "name": "Contrast"
     },
     {
+      "id": "dither",
+      "name": "Dither"
+    },
+    {
       "id": "dot-matrix",
       "name": "Dot Matrix"
     },
@@ -96,6 +100,14 @@
       "name": "Night Vision"
     },
     {
+      "id": "pixelate",
+      "name": "Pixelate"
+    },
+    {
+      "id": "polar-pixelate",
+      "name": "Polar Pixelate"
+    },
+    {
       "id": "posterize",
       "name": "Posterize"
     },
@@ -142,6 +154,10 @@
     {
       "id": "thermal",
       "name": "Thermal"
+    },
+    {
+      "id": "threshold",
+      "name": "Threshold"
     },
     {
       "id": "tilt-shift",

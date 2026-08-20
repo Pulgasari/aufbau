@@ -9,6 +9,12 @@
 
 import { PREFIX, defsHost, resolve, svgId, toElements } from './core.js';
 import { filters } from './lib/index.js';
+import { filterToCanvas } from './canvas.js';
+
+// applies a filter to a <canvas> in place — imageData backend when the filter has
+// one, otherwise the ctx.filter bridge (css string, or a baked svg <filter>). the
+// only api that reaches the imageData-only filters (pixelate, dither, …).
+export const filterCanvas = filterToCanvas;
 
 // :::::: CATALOGUE ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -21,17 +27,21 @@ function metaFor (id) {
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
 // want markup go through filterSvg (or import the module directly).
 export function list () {
-  return Object.values(filters).map(({ id, name, vars, css }) => ({
-    id, name, vars, backends: { css: !!css, svg: true },
+  return Object.values(filters).map(({ id, name, vars, render, css, canvas }) => ({
+    id, name, vars,
+    backends: { css: !!css, svg: !!render, canvas: !!canvas || !!render || !!css },
   }));
 }
 
 // :::::: SVG BUILDING :::::::::::::::::::::::::::::::::::::::::::
 
 // the <filter> markup for an id (svg backend). baked by default; pass { live: true }
-// for the var()-driven form used by defs injection and the static assets.
+// for the var()-driven form used by defs injection and the static assets. throws for
+// canvas-only filters (pixelate, dither, …), which have no svg representation.
 export function filterSvg (id, options = {}) {
-  return metaFor(id).render(options);
+  const render = metaFor(id).render;
+  if (!render) throw new Error(`[@aufbau/filters] "${id}" has no svg backend (canvas-only)`);
+  return render(options);
 }
 
 // the native css <filter-function> for an id (css backend), or null when the filter
@@ -41,10 +51,11 @@ export function filterCss (id, options = {}) {
   return fn ? fn(options) : null;
 }
 
-// which backends a filter can be realised through. svg is always available; css only
-// for the native subset. canvas/webgl land here as those backends ship (see backends.md).
+// which backends a filter can be realised through. `canvas` is true for a dedicated
+// imageData backend or any bridge-able filter (svg/css). webgl lands here later.
 export function supports (id) {
-  return { css: !!metaFor(id).css, svg: true };
+  const meta = metaFor(id);
+  return { css: !!meta.css, svg: !!meta.render, canvas: !!meta.canvas || !!meta.render || !!meta.css };
 }
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
@@ -144,5 +155,6 @@ export function useFilter (id, options = {}) {
 export { filters };
 
 export default {
-  applyFilter, ensureFilter, filterCss, filterSvg, filters, list, removeFilter, supports, useFilter,
+  applyFilter, ensureFilter, filterCanvas, filterCss, filterSvg, filters, list,
+  removeFilter, supports, useFilter,
 };

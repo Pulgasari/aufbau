@@ -88,6 +88,19 @@
     }
   },
   {
+    "id": "dither",
+    "name": "Dither",
+    "vars": {
+      "levels": {
+        "type": "integer",
+        "default": 2,
+        "min": 2,
+        "max": 6,
+        "step": 1
+      }
+    }
+  },
+  {
     "id": "dot-matrix",
     "name": "Dot Matrix",
     "vars": {
@@ -431,6 +444,40 @@
     }
   },
   {
+    "id": "pixelate",
+    "name": "Pixelate",
+    "vars": {
+      "size": {
+        "type": "number",
+        "default": 8,
+        "min": 1,
+        "max": 64,
+        "step": 1,
+        "unit": "px"
+      }
+    }
+  },
+  {
+    "id": "polar-pixelate",
+    "name": "Polar Pixelate",
+    "vars": {
+      "rings": {
+        "type": "integer",
+        "default": 16,
+        "min": 2,
+        "max": 80,
+        "step": 1
+      },
+      "segments": {
+        "type": "integer",
+        "default": 60,
+        "min": 3,
+        "max": 180,
+        "step": 1
+      }
+    }
+  },
+  {
     "id": "posterize",
     "name": "Posterize",
     "vars": {
@@ -654,6 +701,19 @@
     "id": "thermal",
     "name": "Thermal",
     "vars": {}
+  },
+  {
+    "id": "threshold",
+    "name": "Threshold",
+    "vars": {
+      "level": {
+        "type": "number",
+        "default": 0.5,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      }
+    }
   },
   {
     "id": "tilt-shift",
