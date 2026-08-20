@@ -17,8 +17,9 @@
       display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
     }
     aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
-    aside h1 { font-size: 14px; margin: 0 0 4px; }
+    aside h1 { font-size: 14px; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
     aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
+    aufbau-icon { color: var(--accent); font-size: 18px; }
     nav button {
       display: block; width: 100%; text-align: left; background: none; border: 0;
       color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
@@ -33,9 +34,8 @@
         radial-gradient(120% 120% at 100% 100%, #6b2b53 0%, transparent 55%), #0a0b0f;
       overflow: hidden;
     }
-    .subject { font-weight: 800; font-size: clamp(40px, 10vw, 96px); letter-spacing: -.04em;
-      background: linear-gradient(90deg, #ff5f6d, #ffc371, #47e5bc, #5865f2);
-      -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
+    .subject { font-weight: 800; font-size: clamp(40px, 10vw, 96px); letter-spacing: -.04em; color: #fff; user-select: none; }
+    .subject svg { width: min(60vw, 440px); height: auto; display: block; }
     h2 { margin: 0; font-size: 16px; }
     .controls { display: grid; gap: 12px; }
     .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
@@ -53,9 +53,9 @@
 </head>
 <body>
   <aside>
-    <h1>@aufbau/filters</h1>
+    <h1><aufbau-icon icon="lucide:sparkles"></aufbau-icon> @aufbau/filters</h1>
     <p>filters are js functions that generate svg. pick one and tweak it live.<br/>
-      <a href="canvas.html" style="color:var(--accent)">canvas backend →</a></p>
+      <a href="canvas.html">canvas backend →</a> · <a href="editor.html">editor →</a></p>
     <nav id="nav"></nav>
   </aside>
 
@@ -74,28 +74,32 @@
   <svg id="defs" aria-hidden="true" style="position:absolute;width:0;height:0"></svg>
 
   <script type="module">
+    // the filters api is imported locally (this is the package under test); everything
+    // else — dom helpers, asset import, custom elements — comes from the aufbau runtime.
     import { list, filterSvg, filterCss } from './index.js';
-    import aufbau, { dom, str } from '@aufbau/runtime';
-    aufbau.init();
+    import aufbau, { dom } from '@aufbau/runtime';
 
-    const aufbauLogoSVG = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
-    dom.element('#subject').setHTML(aufbauLogoSVG);
-    
+    await aufbau.init({ mode: 'auto' });
 
-    // this page previews on a dom element, so only css/svg filters. canvas-only
-    // ones (pixelate, dither, …) live in canvas.html.
+    // use the real aufbau logo as the preview subject; fall back to the text on failure.
+    try {
+      const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
+      dom.element('#subject').setHTML(logo);
+    } catch { /* keep the text fallback */ }
+
+    // this page previews on a dom element, so only css/svg filters. canvas-only ones
+    // (pixelate, dither, …) live in canvas.html.
     const catalogue = list().filter(f => f.backends.svg || f.backends.css);
-    const nav       = document.getElementById('nav');
-    const defs      = document.getElementById('defs');
-    const subject   = document.getElementById('subject');
-    const els       = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
+    const nav     = document.getElementById('nav');
+    const defs    = document.getElementById('defs');
+    const subject = document.getElementById('subject');
+    const els     = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
     for (const k in els) els[k] = document.getElementById(els[k]);
 
     let current = catalogue[0];
     let options = {};
     let counter = 0;
 
-    // sidebar
     for (const filter of catalogue) {
       const button = document.createElement('button');
       button.textContent = filter.name;
@@ -146,8 +150,7 @@
       const cssValue = filterCss(current.id, options); // css backend, or null
 
       if (cssValue) {
-        // preview through the native css backend when the filter has one.
-        subject.style.filter = cssValue;
+        subject.style.filter = cssValue;               // preview through the native css backend
       } else {
         // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
         const uid    = `preview-${current.id}-${counter++}`;
