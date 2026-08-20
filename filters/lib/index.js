@@ -87,3 +87,14 @@ export const filters = Object.fromEntries(
     webgl  : m.webgl ?? null,
   }])
 );
+
+// the capability of a registry entry: which backends can realise it. single source of
+// truth for supports()/list() (runtime) and the generated catalogue (tooling). canvas is
+// true when a filter has an imageData backend OR can go through the ctx.filter bridge
+// (css/svg) OR delegates to webgl — i.e. filterCanvas can always render it.
+export const backendsOf = meta => ({
+  css    : !!meta.css,
+  svg    : !!meta.render,
+  canvas : !!meta.canvas || !!meta.render || !!meta.css || !!meta.webgl,
+  webgl  : !!meta.webgl,
+});

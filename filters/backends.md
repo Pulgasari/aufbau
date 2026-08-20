@@ -200,8 +200,12 @@ webgl backends.
    `displace`/`glitch`. next (later): WebGPU, more ported effects.
 4. **editor pipeline** *(done)* — `createPipeline(source)`: non-destructive, mixed-backend
    stage stack, gpu-resident where stages allow; `editor.html` demo.
-5. **generator** already writes the svg assets; extend it to also emit a JSON capability
-   catalogue so tooling/editor know each filter's backends without importing them.
+5. **capability catalogue** *(done)* — the generator bakes each filter's `backends`
+   (`{ css, svg, canvas, webgl }`) into `svg/filters/data.json5` and the lightweight
+   `svg/index.json5`, so tooling and the editor can pick a backend from the catalogue
+   without importing any js. `backendsOf(meta)` in `lib/index.js` is the single source of
+   truth, shared by `supports()`/`list()` at runtime and the generator. patterns list their
+   two application `modes` (`datauri`, `defs`) the same way.
 
 ## 7. imageData filter ideas (pixels.js-adjacent) for step 2
 

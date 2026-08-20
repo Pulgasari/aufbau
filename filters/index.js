@@ -8,7 +8,7 @@
 // equivalent that filters the host element, so there is no data-uri mode here.
 
 import { PREFIX, defsHost, resolve, svgId, toElements } from './core.js';
-import { filters } from './lib/index.js';
+import { filters, backendsOf } from './lib/index.js';
 import { filterToCanvas } from './canvas.js';
 import { filterToWebgl, filterChainWebgl } from './webgl.js';
 import { createPipeline } from './pipeline.js';
@@ -39,12 +39,8 @@ function metaFor (id) {
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
 // want markup go through filterSvg (or import the module directly).
 export function list () {
-  return Object.values(filters).map(({ id, name, vars, render, css, canvas, webgl }) => ({
-    id, name, vars,
-    backends: {
-      css: !!css, svg: !!render, webgl: !!webgl,
-      canvas: !!canvas || !!render || !!css || !!webgl,
-    },
+  return Object.values(filters).map(meta => ({
+    id: meta.id, name: meta.name, vars: meta.vars, backends: backendsOf(meta),
   }));
 }
 
@@ -69,11 +65,7 @@ export function filterCss (id, options = {}) {
 // which backends a filter can be realised through. `canvas` is true for a dedicated
 // imageData backend or any bridge-able filter (svg/css). webgl lands here later.
 export function supports (id) {
-  const meta = metaFor(id);
-  return {
-    css: !!meta.css, svg: !!meta.render, webgl: !!meta.webgl,
-    canvas: !!meta.canvas || !!meta.render || !!meta.css || !!meta.webgl,
-  };
+  return backendsOf(metaFor(id));
 }
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::

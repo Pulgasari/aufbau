@@ -87,7 +87,11 @@ glitch.css;               // "filter: url(#aufbau-filter-glitch-rgb);"
 a filter is an effect that can be realised through more than one technique: **svg** (the
 default export), native **css**, **canvas** (imageData), and **webgl** (fragment shader).
 not every filter has every backend — `pixelate`/`dither` are canvas-only, `fisheye`/
-`kaleidoscope` are webgl-only. see [`backends.md`](backends.md) for the full model.
+`kaleidoscope` are webgl-only. `supports(id)` reports the backends at runtime, and the
+generated catalogue ([`../svg/filters/data.json5`](../svg/filters/data.json5), and the
+lightweight [`../svg/index.json5`](../svg/index.json5)) carries each filter's `backends`
+so build-free tooling and the editor can pick one without importing the js. see
+[`backends.md`](backends.md) for the full model.
 
 ```javascript
 import { filterCss, filterCanvas, supports } from '@aufbau/filters';

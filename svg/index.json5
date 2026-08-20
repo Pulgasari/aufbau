@@ -5,227 +5,563 @@
   "filters": [
     {
       "id": "bad-tv",
-      "name": "Bad TV"
+      "name": "Bad TV",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "barrel-blur",
-      "name": "Barrel Blur"
+      "name": "Barrel Blur",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "bloom",
-      "name": "Bloom"
+      "name": "Bloom",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "blur",
-      "name": "Blur"
+      "name": "Blur",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "brightness",
-      "name": "Brightness"
+      "name": "Brightness",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "chromatic",
-      "name": "Chromatic"
+      "name": "Chromatic",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "contrast",
-      "name": "Contrast"
+      "name": "Contrast",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "displace",
-      "name": "Displace"
+      "name": "Displace",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "dither",
-      "name": "Dither"
+      "name": "Dither",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "dot-matrix",
-      "name": "Dot Matrix"
+      "name": "Dot Matrix",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "dot-screen",
-      "name": "Dot Screen"
+      "name": "Dot Screen",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "duotone",
-      "name": "DuoTone"
+      "name": "DuoTone",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "edges",
-      "name": "Edges"
+      "name": "Edges",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "emboss",
-      "name": "Emboss"
+      "name": "Emboss",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "fisheye",
-      "name": "Fisheye"
+      "name": "Fisheye",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "gaussian-blur",
-      "name": "Gaussian Blur"
+      "name": "Gaussian Blur",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "glitch",
-      "name": "Glitch"
+      "name": "Glitch",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "glitch-heavy-cyber",
-      "name": "Heavy Cyber Glitch"
+      "name": "Heavy Cyber Glitch",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "glitch-live",
-      "name": "Live Glitch"
+      "name": "Live Glitch",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "glitch-rgb",
-      "name": "RGB Glitch"
+      "name": "RGB Glitch",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "glow",
-      "name": "Glow"
+      "name": "Glow",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "grain",
-      "name": "Grain"
+      "name": "Grain",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "grayscale",
-      "name": "Grayscale"
+      "name": "Grayscale",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "halftone",
-      "name": "Half Tone"
+      "name": "Half Tone",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "hue-saturation",
-      "name": "Hue & Saturation"
+      "name": "Hue & Saturation",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "instacolor",
-      "name": "InstaColor"
+      "name": "InstaColor",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "invert",
-      "name": "Invert"
+      "name": "Invert",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "jitter",
-      "name": "Jitter"
+      "name": "Jitter",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "kaleidoscope",
-      "name": "Kaleidoscope"
+      "name": "Kaleidoscope",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "levels",
-      "name": "Levels"
+      "name": "Levels",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "linocut",
-      "name": "Linocut"
+      "name": "Linocut",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "melt",
-      "name": "Melt"
+      "name": "Melt",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "mirror",
-      "name": "Mirror"
+      "name": "Mirror",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "night-vision",
-      "name": "Night Vision"
+      "name": "Night Vision",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "noise",
-      "name": "Noise"
+      "name": "Noise",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     },
     {
       "id": "pixelate",
-      "name": "Pixelate"
+      "name": "Pixelate",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "pixel-sort",
-      "name": "Pixel Sort"
+      "name": "Pixel Sort",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "polar-pixelate",
-      "name": "Polar Pixelate"
+      "name": "Polar Pixelate",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "posterize",
-      "name": "Posterize"
+      "name": "Posterize",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "rainbow",
-      "name": "Rainbow"
+      "name": "Rainbow",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "rgb-shift",
-      "name": "RGB Shift"
+      "name": "RGB Shift",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "saturate",
-      "name": "Saturate"
+      "name": "Saturate",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "scanlines",
-      "name": "Scanlines"
+      "name": "Scanlines",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "sepia",
-      "name": "Sepia"
+      "name": "Sepia",
+      "backends": {
+        "css": true,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "shake",
-      "name": "Shake"
+      "name": "Shake",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "sharpen",
-      "name": "Sharpen"
+      "name": "Sharpen",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "slices",
-      "name": "Slices"
+      "name": "Slices",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "smear",
-      "name": "Smear"
+      "name": "Smear",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "solarize",
-      "name": "Solarize"
+      "name": "Solarize",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "thermal",
-      "name": "Thermal"
+      "name": "Thermal",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "threshold",
-      "name": "Threshold"
+      "name": "Threshold",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "tilt-shift",
-      "name": "Tilt Shift"
+      "name": "Tilt Shift",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "vignette",
-      "name": "Vignette"
+      "name": "Vignette",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "wave",
-      "name": "Wave"
+      "name": "Wave",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "wobble",
-      "name": "Wobble"
+      "name": "Wobble",
+      "backends": {
+        "css": false,
+        "svg": true,
+        "canvas": true,
+        "webgl": false
+      }
     },
     {
       "id": "zoom-blur",
-      "name": "Zoom Blur"
+      "name": "Zoom Blur",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
+      }
     }
   ],
   "patterns": [

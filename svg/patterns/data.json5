@@ -40,7 +40,11 @@
         "step": 1,
         "bake": true
       }
-    }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
   },
   {
     "id": "grid",
@@ -80,7 +84,11 @@
         "bake": true,
         "unit": "px"
       }
-    }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
   },
   {
     "id": "stripes",
@@ -120,6 +128,10 @@
         "bake": true,
         "unit": "px"
       }
-    }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
   }
 ]
