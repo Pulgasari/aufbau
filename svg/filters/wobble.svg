@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-wobble">
+      <feTurbulence type="fractalNoise" baseFrequency="var(--aufbau-filter-frequency, 0.02)" numOctaves="2" result="noise">
+        <animate attributeName="baseFrequency" values="0.02; 0.0320; 0.02" dur="3s" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="var(--aufbau-filter-amount, 8)" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>

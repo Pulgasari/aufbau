@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-smear">
+      <feGaussianBlur stdDeviation="var(--aufbau-filter-x, 8) var(--aufbau-filter-y, 0)"/>
+    </filter>
+  </defs>
+</svg>

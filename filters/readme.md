@@ -25,6 +25,38 @@ is the form the injected `<defs>` and the generated `.svg` assets use so css cus
 properties keep driving the primitives. some vars are `bake`-only (animation timing,
 filter-primitive geometry) because those attributes cannot read a css var.
 
+## still vs. motion
+
+every animated filter carries an `animate` option (default `true`). set it `false` to
+drop the `<animate>` tracks and freeze the effect at its resting frame:
+
+```javascript
+import badTv from '@aufbau/filters/bad-tv';
+
+badTv();                    // rolling, warping bad signal
+badTv({ animate: false });  // the same distortion, held still
+```
+
+it works through the dom api too — `applyFilter('#el', 'bad-tv', { animate: false })`
+injects a separate static variant, so motion and still can coexist on the page.
+
+## the catalogue
+
+33 filters, grouped loosely: colour/tone (`posterize`, `solarize`, `duotone`,
+`hue-saturation`, `instacolor`, `thermal`, `linocut`), convolutions (`edges`,
+`emboss`, `sharpen`), blur/light (`blur`, `glow`, `smear`, `tilt-shift`,
+`barrel-blur`, `vignette`), displacement (`wave`, `jitter`, `melt`, `wobble`,
+`shake`, `slices`), chromatic/glitch (`rgb-shift`, `glitch-rgb`, `glitch-live`,
+`glitch-heavy-cyber`, `rainbow`, `bad-tv`), grain/screen (`grain`, `scanlines`,
+`dot-matrix`, `halftone`, `night-vision`). `list()` returns the live catalogue.
+
+a few (`dot-matrix`, `halftone`, `linocut`, `barrel-blur`, `slices`) are stylised
+approximations — svg filter primitives cannot express a true half-tone screen, radial
+blur or slice glitch, so those trade exactness for a convincing look. genuinely
+out-of-reach effects (pixelate, polar pixelate, mirror) are left out: pixelation needs
+downsampling (`image-rendering`/canvas) and mirror is a geometry transform
+(`transform: scaleX(-1)`), neither of which is a filter primitive.
+
 ## the dom api
 
 ```javascript

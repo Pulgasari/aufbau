@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-halftone">
+      <feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0" result="gray"/>
+      <feComponentTransfer in="gray" result="contrast">
+        <feFuncR type="linear" slope="1.6" intercept="-0.3"/>
+        <feFuncG type="linear" slope="1.6" intercept="-0.3"/>
+        <feFuncB type="linear" slope="1.6" intercept="-0.3"/>
+      </feComponentTransfer>
+      <feImage href="data:image/svg+xml,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%225%22 height=%225%22%3e %3crect width=%225%22 height=%225%22 fill=%22%23000000%22/%3e %3ccircle cx=%222.5%22 cy=%222.5%22 r=%222.25%22 fill=%22%23ffffff%22/%3e %3c/svg%3e" x="0" y="0" width="5" height="5" result="dot"/>
+      <feTile in="dot" result="grid"/>
+      <feComposite in="contrast" in2="grid" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
+    </filter>
+  </defs>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-rainbow">
+      <feColorMatrix type="hueRotate" values="0">
+        <animate attributeName="values" values="0; 360" dur="3s" repeatCount="indefinite"/>
+      </feColorMatrix>
+    </filter>
+  </defs>
+</svg>

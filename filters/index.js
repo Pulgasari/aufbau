@@ -34,12 +34,26 @@ export function filterSvg (id, options = {}) {
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
 
+// structural options — baked geometry or a boolean like `animate` — change the
+// markup's topology, so they cannot ride on a live custom property; each distinct
+// combination needs its own injected element. builds a stable id suffix for the
+// non-default ones so variants coexist in the host.
+function variantId (id, meta, options) {
+  const structural = Object.entries(meta.vars).filter(([key, spec]) =>
+    (spec.bake || spec.type === 'boolean') && options[key] != null && String(options[key]) !== String(spec.default)
+  );
+  if (structural.length === 0) return svgId(id);
+  const suffix = structural.map(([key]) => `${key}-${String(options[key]).replace(/[^\w-]/g, '')}`).join('-');
+  return `${svgId(id)}-${suffix}`;
+}
+
 // injects a filter's <filter> into the shared host once, without touching any
 // target. the stylesheet skill calls this so a compiled `filter: url(#id)` has its
-// definition present. defaults to the live form so custom properties stay in play.
+// definition present. defaults to the live form so custom properties stay in play;
+// non-default structural options get their own variant element.
 export async function ensureFilter (id, options = {}) {
   const host      = defsHost();
-  const elementId = options.svgId ?? svgId(id);
+  const elementId = options.svgId ?? variantId(id, metaFor(id), options);
   if (host.querySelector(`#${CSS.escape(elementId)}`)) return elementId;
 
   const markup = filterSvg(id, { live: true, ...options, svgId: elementId });
@@ -57,13 +71,19 @@ export async function ensureFilter (id, options = {}) {
 export function applyFilter (target, id, options = {}) {
   const elements = toElements(target);
   if (elements.length === 0) return;
-  const meta = metaFor(id);
-  ensureFilter(id);
+  const meta      = metaFor(id);
+  const elementId = variantId(id, meta, options);
+  ensureFilter(id, { ...options, svgId: elementId });
 
-  const url = `url(#${svgId(id)})`;
+  const url = `url(#${elementId})`;
   for (const el of elements) {
+    // only live (non-baked, non-boolean) options ride on custom properties; the
+    // structural ones are already baked into the variant element above.
     for (const key in meta.vars) {
-      if (options[key] != null) el.style.setProperty(`${PREFIX}${key}`, String(options[key]));
+      const spec = meta.vars[key];
+      if (!spec.bake && spec.type !== 'boolean' && options[key] != null) {
+        el.style.setProperty(`${PREFIX}${key}`, String(options[key]));
+      }
     }
     el.style.filter = url;
     el.dataset.aufbauFilter = id;

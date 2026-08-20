@@ -4,8 +4,32 @@
 {
   "filters": [
     {
+      "id": "bad-tv",
+      "name": "Bad TV"
+    },
+    {
+      "id": "barrel-blur",
+      "name": "Barrel Blur"
+    },
+    {
       "id": "blur",
       "name": "Blur"
+    },
+    {
+      "id": "dot-matrix",
+      "name": "Dot Matrix"
+    },
+    {
+      "id": "duotone",
+      "name": "DuoTone"
+    },
+    {
+      "id": "edges",
+      "name": "Edges"
+    },
+    {
+      "id": "emboss",
+      "name": "Emboss"
     },
     {
       "id": "glitch-heavy-cyber",
@@ -20,12 +44,96 @@
       "name": "RGB Glitch"
     },
     {
+      "id": "glow",
+      "name": "Glow"
+    },
+    {
       "id": "grain",
       "name": "Grain"
     },
     {
+      "id": "halftone",
+      "name": "Half Tone"
+    },
+    {
+      "id": "hue-saturation",
+      "name": "Hue & Saturation"
+    },
+    {
+      "id": "instacolor",
+      "name": "InstaColor"
+    },
+    {
+      "id": "jitter",
+      "name": "Jitter"
+    },
+    {
+      "id": "linocut",
+      "name": "Linocut"
+    },
+    {
+      "id": "melt",
+      "name": "Melt"
+    },
+    {
+      "id": "night-vision",
+      "name": "Night Vision"
+    },
+    {
+      "id": "posterize",
+      "name": "Posterize"
+    },
+    {
+      "id": "rainbow",
+      "name": "Rainbow"
+    },
+    {
+      "id": "rgb-shift",
+      "name": "RGB Shift"
+    },
+    {
+      "id": "scanlines",
+      "name": "Scanlines"
+    },
+    {
+      "id": "shake",
+      "name": "Shake"
+    },
+    {
+      "id": "sharpen",
+      "name": "Sharpen"
+    },
+    {
+      "id": "slices",
+      "name": "Slices"
+    },
+    {
+      "id": "smear",
+      "name": "Smear"
+    },
+    {
+      "id": "solarize",
+      "name": "Solarize"
+    },
+    {
+      "id": "thermal",
+      "name": "Thermal"
+    },
+    {
+      "id": "tilt-shift",
+      "name": "Tilt Shift"
+    },
+    {
+      "id": "vignette",
+      "name": "Vignette"
+    },
+    {
       "id": "wave",
       "name": "Wave"
+    },
+    {
+      "id": "wobble",
+      "name": "Wobble"
     }
   ],
   "patterns": [

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-dot-matrix">
+      <feImage href="data:image/svg+xml,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%226%22 height=%226%22%3e %3crect width=%226%22 height=%226%22 fill=%22%23000000%22/%3e %3ccircle cx=%223%22 cy=%223%22 r=%222.52%22 fill=%22%23ffffff%22/%3e %3c/svg%3e" x="0" y="0" width="6" height="6" result="dot"/>
+      <feTile in="dot" result="grid"/>
+      <feComposite in="SourceGraphic" in2="grid" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
+    </filter>
+  </defs>
+</svg>

@@ -4,6 +4,50 @@
 
 [
   {
+    "id": "bad-tv",
+    "name": "Bad TV",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "distortion": {
+        "type": "number",
+        "default": 8,
+        "min": 0,
+        "max": 40,
+        "step": 1
+      },
+      "speed": {
+        "type": "time",
+        "default": "2s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "barrel-blur",
+    "name": "Barrel Blur",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 8,
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "px"
+      },
+      "size": {
+        "type": "number",
+        "default": 0.4,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "bake": true
+      }
+    }
+  },
+  {
     "id": "blur",
     "name": "Blur",
     "vars": {
@@ -18,9 +62,71 @@
     }
   },
   {
+    "id": "dot-matrix",
+    "name": "Dot Matrix",
+    "vars": {
+      "size": {
+        "type": "number",
+        "default": 6,
+        "min": 3,
+        "max": 24,
+        "step": 1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "duotone",
+    "name": "DuoTone",
+    "vars": {
+      "shadow": {
+        "type": "color",
+        "default": "#1a1a2e",
+        "bake": true
+      },
+      "highlight": {
+        "type": "color",
+        "default": "#e94560",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "edges",
+    "name": "Edges",
+    "vars": {
+      "strength": {
+        "type": "number",
+        "default": 1,
+        "min": 0.2,
+        "max": 3,
+        "step": 0.1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "emboss",
+    "name": "Emboss",
+    "vars": {
+      "strength": {
+        "type": "number",
+        "default": 1,
+        "min": 0.2,
+        "max": 3,
+        "step": 0.1,
+        "bake": true
+      }
+    }
+  },
+  {
     "id": "glitch-heavy-cyber",
     "name": "Heavy Cyber Glitch",
     "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
       "frequency": {
         "type": "text",
         "default": "0.0 0.95",
@@ -45,6 +151,10 @@
     "id": "glitch-live",
     "name": "Live Glitch",
     "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
       "speed": {
         "type": "time",
         "default": "2s",
@@ -70,6 +180,28 @@
         "min": -20,
         "max": 20,
         "step": 1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "glow",
+    "name": "Glow",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 4,
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "px"
+      },
+      "strength": {
+        "type": "number",
+        "default": 1.4,
+        "min": 0,
+        "max": 4,
+        "step": 0.1,
         "bake": true
       }
     }
@@ -102,6 +234,394 @@
     }
   },
   {
+    "id": "halftone",
+    "name": "Half Tone",
+    "vars": {
+      "size": {
+        "type": "number",
+        "default": 5,
+        "min": 3,
+        "max": 20,
+        "step": 1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "hue-saturation",
+    "name": "Hue & Saturation",
+    "vars": {
+      "hue": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg"
+      },
+      "saturation": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 3,
+        "step": 0.05
+      }
+    }
+  },
+  {
+    "id": "instacolor",
+    "name": "InstaColor",
+    "vars": {
+      "warmth": {
+        "type": "number",
+        "default": 0.08,
+        "min": 0,
+        "max": 0.3,
+        "step": 0.01,
+        "bake": true
+      },
+      "contrast": {
+        "type": "number",
+        "default": 1.15,
+        "min": 0.5,
+        "max": 2,
+        "step": 0.05,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "jitter",
+    "name": "Jitter",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "amount": {
+        "type": "number",
+        "default": 5,
+        "min": 0,
+        "max": 40,
+        "step": 1
+      },
+      "frequency": {
+        "type": "number",
+        "default": 0.5,
+        "min": 0.05,
+        "max": 2,
+        "step": 0.05
+      },
+      "speed": {
+        "type": "time",
+        "default": "0.6s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "linocut",
+    "name": "Linocut",
+    "vars": {
+      "levels": {
+        "type": "integer",
+        "default": 2,
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "melt",
+    "name": "Melt",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "amount": {
+        "type": "number",
+        "default": 15,
+        "min": 0,
+        "max": 60,
+        "step": 1
+      },
+      "speed": {
+        "type": "time",
+        "default": "4s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "night-vision",
+    "name": "Night Vision",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "noise": {
+        "type": "number",
+        "default": 0.5,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "bake": true
+      },
+      "speed": {
+        "type": "time",
+        "default": "0.4s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "posterize",
+    "name": "Posterize",
+    "vars": {
+      "levels": {
+        "type": "integer",
+        "default": 4,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "rainbow",
+    "name": "Rainbow",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "speed": {
+        "type": "time",
+        "default": "3s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "rgb-shift",
+    "name": "RGB Shift",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 4,
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "bake": true
+      },
+      "angle": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "scanlines",
+    "name": "Scanlines",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": false
+      },
+      "gap": {
+        "type": "number",
+        "default": 4,
+        "min": 2,
+        "max": 20,
+        "step": 1,
+        "bake": true
+      },
+      "thickness": {
+        "type": "number",
+        "default": 1,
+        "min": 0.5,
+        "max": 6,
+        "step": 0.5,
+        "bake": true
+      },
+      "opacity": {
+        "type": "number",
+        "default": 0.35,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "bake": true
+      },
+      "speed": {
+        "type": "time",
+        "default": "4s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "shake",
+    "name": "Shake",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "amount": {
+        "type": "number",
+        "default": 5,
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "bake": true
+      },
+      "speed": {
+        "type": "time",
+        "default": "0.4s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "sharpen",
+    "name": "Sharpen",
+    "vars": {
+      "strength": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "slices",
+    "name": "Slices",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": false
+      },
+      "amount": {
+        "type": "number",
+        "default": 20,
+        "min": 0,
+        "max": 80,
+        "step": 1
+      },
+      "count": {
+        "type": "number",
+        "default": 8,
+        "min": 2,
+        "max": 40,
+        "step": 1,
+        "bake": true
+      },
+      "speed": {
+        "type": "time",
+        "default": "0.5s",
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "smear",
+    "name": "Smear",
+    "vars": {
+      "x": {
+        "type": "number",
+        "default": 8,
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px"
+      },
+      "y": {
+        "type": "number",
+        "default": 0,
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px"
+      }
+    }
+  },
+  {
+    "id": "solarize",
+    "name": "Solarize",
+    "vars": {
+      "intensity": {
+        "type": "number",
+        "default": 1,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "thermal",
+    "name": "Thermal",
+    "vars": {}
+  },
+  {
+    "id": "tilt-shift",
+    "name": "Tilt Shift",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 6,
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "px"
+      },
+      "band": {
+        "type": "number",
+        "default": 0.3,
+        "min": 0.05,
+        "max": 0.9,
+        "step": 0.05,
+        "bake": true
+      }
+    }
+  },
+  {
+    "id": "vignette",
+    "name": "Vignette",
+    "vars": {
+      "amount": {
+        "type": "number",
+        "default": 0.6,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 0.5,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "bake": true
+      }
+    }
+  },
+  {
     "id": "wave",
     "name": "Wave",
     "vars": {
@@ -125,6 +645,35 @@
         "min": 0,
         "max": 100,
         "step": 1
+      }
+    }
+  },
+  {
+    "id": "wobble",
+    "name": "Wobble",
+    "vars": {
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "amount": {
+        "type": "number",
+        "default": 8,
+        "min": 0,
+        "max": 40,
+        "step": 1
+      },
+      "frequency": {
+        "type": "number",
+        "default": 0.02,
+        "min": 0.005,
+        "max": 0.1,
+        "step": 0.005
+      },
+      "speed": {
+        "type": "time",
+        "default": "3s",
+        "bake": true
       }
     }
   }

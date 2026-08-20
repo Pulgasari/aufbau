@@ -19,11 +19,32 @@ export function resolve (vars, options = {}) {
   const live = options.live === true;
   const out  = {};
   for (const key in vars) {
-    const spec  = vars[key];
+    const spec = vars[key];
+    if (spec.type === 'boolean') continue; // control-flow, not a value (e.g. `animate`)
     const baked = String(options[key] ?? spec.default);
     out[key] = live && !spec.bake ? `var(${PREFIX}${key}, ${spec.default})` : baked;
   }
   return out;
+}
+
+// emits an <animate>/<animateTransform> child for a primitive, or nothing when the
+// caller opted out via `{ animate: false }`. attrs is a bag of animation attributes;
+// repeatCount defaults to indefinite unless given. pass tag:'animateTransform' for
+// transform tracks. this is the single switch behind every filter's still/motion
+// option, so a static frame is just the primitive's base attributes with no track.
+export function anim (options, attrs = {}) {
+  if (options.animate === false) return '';
+  const { tag = 'animate', ...rest } = attrs;
+  const body    = Object.entries(rest).map(([k, value]) => `${k}="${value}"`).join(' ');
+  const repeat  = 'repeatCount' in rest ? '' : ' repeatCount="indefinite"';
+  return `<${tag} ${body}${repeat}/>`;
+}
+
+// percent-encodes an svg fragment as a data uri, for use as an feImage href inside a
+// filter (masks, tiles, gradients that svg filter primitives cannot express alone).
+export function dataUri (svg) {
+  const compact = svg.replace(/\s+/g, ' ').trim();
+  return `data:image/svg+xml,${compact.replace(/[<>#%{}|\\^`"]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))}`;
 }
 
 // wraps filter primitives in a <filter>. `options.svgId` overrides the element id,

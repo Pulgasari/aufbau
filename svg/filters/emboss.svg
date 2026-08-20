@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-emboss">
+      <feConvolveMatrix order="3" preserveAlpha="true" divisor="1" bias="0.5"
+        kernelMatrix="-2.00 -1.00 0  -1.00 1 1.00  0 1.00 2.00"/>
+      </filter>
+    </defs>
+  </svg>

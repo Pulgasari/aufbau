@@ -110,7 +110,13 @@
         const row = document.createElement('div');
         row.className = 'row';
         const numeric = spec.type === 'number' || spec.type === 'integer';
-        if (numeric) {
+        if (spec.type === 'boolean') {
+          row.innerHTML = `<label>${key}</label>
+            <input type="checkbox" ${spec.default ? 'checked' : ''}/>
+            <span class="val">${spec.default}</span>`;
+          const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
+          input.onchange = () => { options[key] = input.checked; out.textContent = input.checked; render(); };
+        } else if (numeric) {
           row.innerHTML = `<label>${key}</label>
             <input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/>
             <span class="val">${spec.default}</span>`;

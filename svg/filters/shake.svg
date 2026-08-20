@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-shake">
+      <feOffset dx="0" dy="0" in="SourceGraphic">
+        <animate attributeName="dx" values="0; 5; -5; 2.5; 0" dur="0.4s" repeatCount="indefinite"/>
+        <animate attributeName="dy" values="0; -5; 5; 0" dur="0.4s" repeatCount="indefinite"/>
+      </feOffset>
+    </filter>
+  </defs>
+</svg>

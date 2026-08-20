@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-bad-tv">
+      <feTurbulence type="fractalNoise" baseFrequency="0 0.0008" numOctaves="1" seed="3" result="noise">
+        <animate attributeName="seed" values="3;7;11;15" dur="2s" calcMode="discrete" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="var(--aufbau-filter-distortion, 8)" xChannelSelector="R" yChannelSelector="A" result="warp"/>
+      <feOffset in="warp" dx="1.5" dy="0" result="r0"/>
+      <feColorMatrix in="r0" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="ri"/>
+      <feOffset in="warp" dx="-1.5" dy="0" result="b0"/>
+      <feColorMatrix in="b0"   type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="bi"/>
+      <feColorMatrix in="warp" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="gi"/>
+      <feBlend mode="screen" in="ri" in2="gi" result="rg"/>
+      <feBlend mode="screen" in="rg" in2="bi" result="rgb"/>
+      <feImage href="data:image/svg+xml,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%224%22 height=%223%22%3e %3crect width=%224%22 height=%221%22 fill=%22%23000000%22 fill-opacity=%220.35%22/%3e %3c/svg%3e" x="0" y="0" width="4" height="3" result="tile"/>
+      <feTile in="tile" result="lines"/>
+      <feComposite in="lines" in2="rgb" operator="over"/>
+    </filter>
+  </defs>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-melt">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.05" numOctaves="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="var(--aufbau-filter-amount, 15)" xChannelSelector="A" yChannelSelector="G">
+        <animate attributeName="scale" values="0; 15; 0" dur="4s" repeatCount="indefinite"/>
+      </feDisplacementMap>
+    </filter>
+  </defs>
+</svg>

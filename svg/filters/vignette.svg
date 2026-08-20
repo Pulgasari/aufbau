@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-vignette">
+      <feImage href="data:image/svg+xml,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3e %3cradialGradient id=%22g%22 cx=%2250%25%22 cy=%2250%25%22 r=%2275%25%22%3e %3cstop offset=%220.5%22 stop-color=%22%23ffffff%22/%3e %3cstop offset=%221%22 stop-color=%22%23666666%22/%3e %3c/radialGradient%3e %3crect width=%22100%22 height=%22100%22 fill=%22url(%23g)%22/%3e %3c/svg%3e" preserveAspectRatio="none" result="mask"/>
+      <feComposite in="SourceGraphic" in2="mask" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
+    </filter>
+  </defs>
+</svg>
