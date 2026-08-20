@@ -117,7 +117,7 @@ const aufbau = {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { aufbau, dom, domina };
+export { aufbau, dom, domina, str };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
