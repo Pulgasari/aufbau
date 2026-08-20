@@ -7,6 +7,7 @@
 import * as aufbauElements      from '@aufbau/elements';
 import * as aufbauFilters       from '@aufbau/filters';
 import      aufbauImport        from '@aufbau/import';
+import * as aufbauPatterns      from '@aufbau/patterns';
 import * as aufbauStore         from './store.js';
 import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
@@ -96,6 +97,7 @@ const aufbau = {
   elements   : aufbauElements,
   filters    : aufbauFilters,
   import     : aufbauImport,
+  patterns   : aufbauPatterns,
   store      : aufbauStore,
   stylesheet : aufbauStylesheet,
   utils      : aufbauUtils,

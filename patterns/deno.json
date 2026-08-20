@@ -1,0 +1,11 @@
+{
+  "name": "@aufbau/patterns",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./index.js",
+    "./core": "./core.js",
+    "./dots": "./lib/dots.js",
+    "./grid": "./lib/grid.js",
+    "./stripes": "./lib/stripes.js"
+  }
+}

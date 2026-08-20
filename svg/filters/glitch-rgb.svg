@@ -1,13 +1,13 @@
-<filter id="aufbau-filter-glitch-rgb">
-  
-  <feOffset dx="var(--filter-offset-x)" dy="var(--filter-offset-y)" in="SourceGraphic" result="red-channel" />
-  <feColorMatrix type="matrix" in="red-channel" result="red-isolated" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
-
-  <feOffset dx="var(--filter-offset-x)" dy="var(--filter-offset-y)" in="SourceGraphic" result="blue-channel" />
-  <feColorMatrix type="matrix" in="blue-channel"  result="blue-isolated"  values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" />
-  <feColorMatrix type="matrix" in="SourceGraphic" result="green-isolated" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" />   
-
-  <feBlend mode="screen" in="red-isolated" in2="green-isolated" result="red-green" />
-  <feBlend mode="screen" in="red-green"    in2="blue-isolated" />
-  
- </filter>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <defs>
+    <filter id="aufbau-filter-glitch-rgb">
+      <feOffset dx="3" dy="0" in="SourceGraphic" result="red-channel"/>
+      <feColorMatrix type="matrix" in="red-channel" result="red-isolated" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+      <feOffset dx="-3" dy="-0" in="SourceGraphic" result="blue-channel"/>
+      <feColorMatrix type="matrix" in="blue-channel"  result="blue-isolated"  values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+      <feColorMatrix type="matrix" in="SourceGraphic" result="green-isolated" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+      <feBlend mode="screen" in="red-isolated" in2="green-isolated" result="red-green"/>
+      <feBlend mode="screen" in="red-green"    in2="blue-isolated"/>
+    </filter>
+  </defs>
+</svg>

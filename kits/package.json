@@ -12,8 +12,9 @@
   "dependencies": {
     "@aufbau/cache"      : "workspace:*",
     "@aufbau/elements"   : "workspace:*",
+    "@aufbau/filters"    : "workspace:*",
     "@aufbau/import"     : "workspace:*",
-    "@aufbau/shaders"    : "workspace:*",
+    "@aufbau/patterns"   : "workspace:*",
     "@aufbau/stylesheet" : "workspace:*",
     "@aufbau/utils"      : "workspace:*",
     "@bunker/kit"        : "^0.1.0"

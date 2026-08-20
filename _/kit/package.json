@@ -9,9 +9,10 @@
   },
   "dependencies": {
     "@aufbau/cache": "workspace:*",
+    "@aufbau/filters": "workspace:*",
     "@aufbau/import": "workspace:*",
+    "@aufbau/patterns": "workspace:*",
     "@aufbau/plugins": "workspace:*",
-    "@aufbau/shaders": "workspace:*",
     "@aufbau/stylesheet": "workspace:*",
     "@preact/signals": "^1.3.0",
     "htm": "^3.1.1",

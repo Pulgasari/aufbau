@@ -1,5 +1,14 @@
 {
-  "name": "@aufbau/shaders",
+  "name": "@aufbau/filters",
   "version": "1.0.0",
-  "exports": "./index.js"
+  "exports": {
+    ".": "./index.js",
+    "./core": "./core.js",
+    "./blur": "./lib/blur.js",
+    "./glitch-heavy-cyber": "./lib/glitch-heavy-cyber.js",
+    "./glitch-live": "./lib/glitch-live.js",
+    "./glitch-rgb": "./lib/glitch-rgb.js",
+    "./grain": "./lib/grain.js",
+    "./wave": "./lib/wave.js"
+  }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>@aufbau/patterns</title>
+  <title>@aufbau/filters</title>
   <style>
     :root {
       --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
@@ -25,66 +25,80 @@
     nav button:hover { background: var(--panel); }
     nav button[aria-current="true"] { background: var(--accent); color: #fff; }
     main { padding: 24px; display: grid; gap: 20px; align-content: start; max-width: 900px; }
-    .stage { min-height: 260px; border: 1px solid var(--line); border-radius: 12px;
-      background-repeat: repeat; background-color: #f4f5f7; }
+    .stage {
+      display: grid; place-items: center; min-height: 260px; border: 1px solid var(--line);
+      border-radius: 12px; background:
+        radial-gradient(120% 120% at 20% 0%, #2b2f6b 0%, transparent 55%),
+        radial-gradient(120% 120% at 100% 100%, #6b2b53 0%, transparent 55%), #0a0b0f;
+      overflow: hidden;
+    }
+    .subject { font-weight: 800; font-size: clamp(40px, 10vw, 96px); letter-spacing: -.04em;
+      background: linear-gradient(90deg, #ff5f6d, #ffc371, #47e5bc, #5865f2);
+      -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
     h2 { margin: 0; font-size: 16px; }
     .controls { display: grid; gap: 12px; }
     .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
     .row label { color: var(--muted); }
     input[type="range"] { width: 100%; accent-color: var(--accent); }
-    input[type="color"] { width: 100%; height: 30px; background: var(--code); border: 1px solid var(--line); border-radius: 6px; }
-    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
-      border-radius: 6px; padding: 6px 8px; font: inherit; width: 100%; }
     .val { text-align: right; color: var(--fg); }
+    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
+      border-radius: 6px; padding: 6px 8px; font: inherit; grid-column: 2 / 4; }
     .panels { display: grid; gap: 12px; }
     pre { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px;
       padding: 14px; overflow: auto; font-size: 12px; color: #cfd3df; }
     .tag { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    a { color: var(--accent); }
   </style>
 </head>
 <body>
   <aside>
-    <h1>@aufbau/patterns</h1>
-    <p>patterns are js functions that generate svg. pick one and tweak it live.</p>
+    <h1>@aufbau/filters</h1>
+    <p>filters are js functions that generate svg. pick one and tweak it live.</p>
     <nav id="nav"></nav>
   </aside>
 
   <main>
-    <div class="stage" id="stage"></div>
+    <div class="stage"><div class="subject" id="subject">aufbau</div></div>
     <h2 id="title"></h2>
     <div class="controls" id="controls"></div>
     <div class="panels">
-      <div><div class="tag">generated &lt;svg&gt; (baked)</div><pre id="svg"></pre></div>
+      <div><div class="tag">generated &lt;filter&gt; (baked)</div><pre id="svg"></pre></div>
       <div><div class="tag">css usage</div><pre id="css"></pre></div>
       <div><div class="tag">js usage</div><pre id="js"></pre></div>
     </div>
   </main>
 
+  <!-- shared host the previewed <filter> lives in -->
+  <svg id="defs" aria-hidden="true" style="position:absolute;width:0;height:0"></svg>
+
   <script type="module">
-    import { list, patternImage, patternSvg } from './index.js';
+    import { list, filterSvg } from './index.js';
 
     const catalogue = list();
-    const nav   = document.getElementById('nav');
-    const stage = document.getElementById('stage');
-    const els   = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
+    const nav       = document.getElementById('nav');
+    const defs      = document.getElementById('defs');
+    const subject   = document.getElementById('subject');
+    const els       = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
     for (const k in els) els[k] = document.getElementById(els[k]);
 
     let current = catalogue[0];
     let options = {};
+    let counter = 0;
 
-    for (const pattern of catalogue) {
+    // sidebar
+    for (const filter of catalogue) {
       const button = document.createElement('button');
-      button.textContent = pattern.name;
-      button.onclick = () => select(pattern);
-      button.dataset.id = pattern.id;
+      button.textContent = filter.name;
+      button.onclick = () => select(filter);
+      button.dataset.id = filter.id;
       nav.appendChild(button);
     }
 
-    function select (pattern) {
-      current = pattern;
+    function select (filter) {
+      current = filter;
       options = {};
-      for (const [key, spec] of Object.entries(pattern.vars)) options[key] = spec.default;
-      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === pattern.id));
+      for (const [key, spec] of Object.entries(filter.vars)) options[key] = spec.default;
+      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === filter.id));
       buildControls();
       render();
     }
@@ -102,10 +116,6 @@
             <span class="val">${spec.default}</span>`;
           const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
           input.oninput = () => { options[key] = Number(input.value); out.textContent = input.value; render(); };
-        } else if (spec.type === 'color' && String(spec.default).startsWith('#')) {
-          row.innerHTML = `<label>${key}</label><input type="color" value="${spec.default}"/>`;
-          const input = row.querySelector('input');
-          input.oninput = () => { options[key] = input.value; render(); };
         } else {
           row.innerHTML = `<label>${key}</label><input type="text" value="${spec.default}"/>`;
           const input = row.querySelector('input');
@@ -116,15 +126,25 @@
     }
 
     function render () {
-      stage.style.backgroundImage = patternImage(current.id, options);
-      els.svg.textContent = patternSvg(current.id, options);
-      els.css.textContent = `.box {\n  background-image: ${patternImage(current.id, options)};\n  background-repeat: repeat;\n}`;
+      // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
+      const uid    = `preview-${current.id}-${counter++}`;
+      const markup = filterSvg(current.id, { ...options, svgId: uid });
+      const node   = new DOMParser().parseFromString(
+        `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml'
+      ).querySelector('filter');
+      defs.replaceChildren(node);
+      subject.style.filter = `url(#${uid})`;
+
+      els.svg.textContent = filterSvg(current.id, options);
+      els.css.textContent = `#logo { filter: url(#aufbau-filter-${current.id}); }`;
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
       els.js.textContent =
-        `import ${current.id} from '@aufbau/patterns/${current.id}';\n` +
-        `// or: import { applyPattern } from '@aufbau/patterns';\n\n` +
-        `applyPattern('.box', '${current.id}', ${opts});`;
+        `import ${camel(current.id)} from '@aufbau/filters/${current.id}';\n` +
+        `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
+        `applyFilter('#logo', '${current.id}', ${opts});`;
     }
+
+    const camel = s => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
     select(current);
   </script>

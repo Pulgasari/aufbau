@@ -1,0 +1,37 @@
+name: Generate SVG assets
+
+# regenerates svg/filters/*, svg/patterns/* and their data.json5 catalogues from the
+# filter/pattern functions whenever the source lib changes. the committed .json5 then
+# triggers the convert-json5 workflow, which emits the matching .json.
+
+on:
+  push:
+    paths:
+      - 'filters/lib/**'
+      - 'filters/core.js'
+      - 'patterns/lib/**'
+      - 'patterns/core.js'
+      - '.github/scripts/generate-assets.mjs'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # required to push the regenerated assets back to the repo
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate assets
+        run: node .github/scripts/generate-assets.mjs
+
+      - name: Commit and push regenerated assets
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: regenerate svg assets from filter/pattern functions"
+          file_pattern: "svg/**/*.svg svg/**/*.json5 svg/*.json5"
