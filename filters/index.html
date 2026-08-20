@@ -80,7 +80,7 @@
     import      str   from '@pulgasari/str';
     
     const aufbauLogoSVG = await importFile('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'element' });
-    dom.element('#subject').replace(aufbauLogoSVG);
+    dom.element('#subject').setContent(aufbauLogoSVG);
 
     // this page previews on a dom element, so only css/svg filters. canvas-only
     // ones (pixelate, dither, …) live in canvas.html.
