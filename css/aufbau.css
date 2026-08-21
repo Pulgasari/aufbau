@@ -68,7 +68,34 @@ h1, h2, h3, h4, h5, h6 {
 
 
   
-
+a, abbr, acronym, address, applet, article, aside, audio,
+b, big, blockquote, body,
+canvas, caption, center, cite, code,
+dd, del, details, dfn, div, dl, dt,
+em, embed,
+fieldset, figure, figcaption, footer, form,
+h1, h2, h3, h4, h5, h6, header, hgroup, html,
+i, iframe, img, ins,
+kbd,
+label, legend,
+mark, menu,
+nav,
+object, output,
+p, pre,
+ruby,
+q,
+s, samp, section, small, span, strike, strong, sub, summary, sup,
+table, tbody, tfoot, thead, td, th, tr, tt,
+time,
+u,
+var, video {
+	border         : 0;
+	border-color   : currentcolor; 
+	border-style   : solid; 
+	border-width   : 0;
+  font-size      : 100%;
+	vertical-align : baseline;
+}
 
 
 
