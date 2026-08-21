@@ -18,41 +18,42 @@ const pruned = obj => Object.fromEntries(Object.entries(obj).filter(([, v]) => v
 // a spec entry -> { tag, attrs, options? } describing one aufbau control.
 function toControl (key, spec, value) {
   const v     = value ?? spec.default;
+  value ??= spec.default;
   const attrs = { name: key };
+  const { max, min, step, type, unit, values } = spec;
 
-  if (spec.values) return { tag: 'aufbau-picker', attrs: { ...attrs, value: v }, options: spec.values };
+  if (values) return { tag: 'aufbau-picker', attrs: { ...attrs, value }, options: spec.values };
 
-  switch (spec.type) {
-    case 'boolean':
-      return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: v ? '' : null }) };
-    case 'integer':
-    case 'number':
-      return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: spec.min, max: spec.max, step: spec.step, unit: spec.unit, value: v }) };
-    case 'angle':
-      return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: spec.min ?? 0, max: spec.max ?? 360, step: spec.step ?? 1, unit: spec.unit ?? 'deg', value: v }) };
-    case 'color':
-      return String(v).startsWith('#')
-        ? { tag: 'aufbau-input', attrs: { ...attrs, type: 'color', look: 'swatch', value: v } }
-        : { tag: 'aufbau-input', attrs: { ...attrs, type: 'text', value: v } };
-    default: // time, text, anything else
-      return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'text', value: v }) };
+  switch (type) {
+    case 'boolean' : return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: value ? '' : null }) };
+    case 'integer' :
+    case 'number'  : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min, max, step, unit, value }) };
+    case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };
+    case 'color'   : return { tag: 'aufbau-input', attrs: { ...attrs, type: 'color', look: 'swatch', value } }
+    default        : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'text', value }) }; // time, text, anything else
   }
 }
 
-const options = opt => (Array.isArray(opt) ? opt : [opt, opt]); // [value, label]
+const normalizeOption = option => (Array.isArray(option) ? option : [optiok, option]); // [value, label]
 
 // :::::: ELEMENT OUTPUT :::::::::::::::::::::::::::::::::::::::::
 
 function fieldElement (key, spec, value) {
   const { tag, attrs, options: opts } = toControl(key, spec, value);
   const control = dom.createElement(tag, attrs);
-  if (opts) for (const opt of opts) {
-    const [val, label] = options(opt);
-    control.appendChild(dom.createElement('aufbau-option', { value: val, textContent: label }));
+  
+  if (opts) for (const option of opts) {
+    const [value, textContent] = normalizeOption(option);
+    const $option = dom.createElement('aufbau-option', { value, textContent });
+    control.appendChild($option);
   }
+  
   const field = dom.createElement('label', { class: 'aufbau-field' });
-  field.appendChild(dom.createElement('span', { class: 'aufbau-field-label', textContent: spec.label ?? key }));
+  const $span = dom.createElement('span', { class: 'aufbau-field-label', textContent: spec.label ?? key });
+  
+  field.appendChild($span);
   field.appendChild(control);
+  
   return field;
 }
 
@@ -81,38 +82,25 @@ function coerce (spec, el) {
 }
 
 /** reads a built controls container back into a typed values object, keyed by spec. */
-export function readValues (container, spec) {
+function readValues (container, spec) {
   const out = {};
   for (const [key, s] of Object.entries(spec)) {
-    const el = container.querySelector?.(`[name="${key}"]`);
-    if (el) out[key] = coerce(s, el);
+    const element = container.querySelector?.(`[name="${key}"]`);
+    if (element) out[key] = coerce(s, element);
   }
   return out;
 }
 
 // :::::: PUBLIC :::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/**
- * builds one field.
- * @param {string} format 'element' (default) or 'html'
- */
-export function field (key, spec, value, { format = 'element' } = {}) {
+function field (key, spec, value, { format = 'element' } = {}) {
   return format === 'html' ? fieldHtml(key, spec, value) : fieldElement(key, spec, value);
 }
 
-/**
- * builds a whole controls block from a spec.
- * @param {object} spec               field descriptors keyed by name
- * @param {object} [opts]
- * @param {object} [opts.values]      current values (fall back to each field's default)
- * @param {'element'|'html'} [opts.format='element']
- * @param {string} [opts.wrap='div']  wrapper tag
- * @param {string} [opts.className='aufbau-controls']
- * @param {(values, name, event)=>void} [opts.onChange]  element mode only: wired to input/change
- * @returns {HTMLElement|string}
- */
-export function controls (spec, opts = {}) {
-  const { values = {}, format = 'element', onChange, wrap = 'div', className = 'aufbau-controls' } = opts;
+function controls (spec, opts = {}) {
+  const { 
+    values = {}, 
+    format = 'element', onChange, wrap = 'div', className = 'aufbau-controls' } = opts;
 
   if (format === 'html') {
     return `<${wrap} class="${className}">` +
@@ -120,15 +108,17 @@ export function controls (spec, opts = {}) {
       `</${wrap}>`;
   }
 
-  const container = dom.createElement(wrap, { class: className });
+  const container = dom.createElement(wrap, { className });
   for (const [key, s] of Object.entries(spec)) container.appendChild(fieldElement(key, s, values[key]));
 
   if (onChange) {
     const handler = event => onChange(readValues(container, spec), event.target?.getAttribute?.('name') ?? null, event);
-    container.addEventListener('input', handler);   // sliders/inputs: live while dragging/typing
-    container.addEventListener('change', handler);   // toggles/pickers: on commit
+    //container.addEventListener('input', handler);   // sliders/inputs: live while dragging/typing
+    //container.addEventListener('change', handler);   // toggles/pickers: on commit
+    dom.onEvent(container, ['change', 'input'], handler);
   }
   return container;
 }
 
+export         { controls, field, readValues };
 export default { controls, field, readValues };
