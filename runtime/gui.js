@@ -1,13 +1,4 @@
 // @aufbau/runtime/gui.js
-// builds form controls from a spec object — one entry per field — out of the aufbau form
-// elements (<aufbau-slider>, <aufbau-toggle>, <aufbau-input>, <aufbau-picker>). returns
-// live elements (default) or an html string, and reads the values back coerced to the
-// spec's types. the spec shape mirrors @aufbau/filters vars:
-//
-//   { [key]: { type, default, min?, max?, step?, unit?, values?, label? } }
-//
-// type: 'number' | 'integer' | 'angle' | 'boolean' | 'color' | 'time' | 'text', or an
-// enum via `values: ['a', 'b']` (or `[[value, label], …]`) which renders an <aufbau-picker>.
 
 import * as dom from '@domina/core';
 
@@ -99,20 +90,18 @@ function field (key, spec, value, { format = 'element' } = {}) {
 
 function controls (spec, opts = {}) {
   const {
-    className = 'aufbau-controls',
-    format    = 'element', 
-    values    = {}, 
-    wrap      = 'div', 
+    format = 'element', 
+    values = {}, 
+    wrap   = 'div', 
     onChange,
   } = opts;
 
   if (format === 'html') {
-    return `<${wrap} class="${className}">`
-         + Object.entries(spec).map(([key, s]) => fieldHTML(key, s, values[key])).join('')
-         + `</${wrap}>`;
+    const body = Object.entries(spec).map(([key, s]) => fieldHTML(key, s, values[key])).join('');
+    return wrap ? `<${wrap}>${body}</${wrap}>` : body;
   }
 
-  const container = dom.createElement(wrap, { className });
+  const container = wrap ? dom.createElement(wrap) : dom.createFragment();
   for (const [key, s] of Object.entries(spec)) container.appendChild(fieldElement(key, s, values[key]));
 
   if (onChange) {
