@@ -92,6 +92,22 @@
       ],
     },
 
+    {
+      id         : 'manrope',
+      name       : 'Manrope',
+      designer   : null,
+      source     : null,
+      license    : null,
+      commercial : true,
+      category   : 'sans',
+      fallback   : 'sans-serif',
+      features   : [],
+      faces      : [
+        // variable: weight is a range, the preview clamps its slider to it
+        { weight: '100 900', style: 'normal', file: 'ttf/manrope.ttf' },
+      ],
+    },
+
     // ::: mono ::::::::::::::::::::::::::::::::::::::::::::::::
 
     {
