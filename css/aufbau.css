@@ -20,8 +20,8 @@ mark, menu,
 nav,
 object, output,
 p, pre,
-ruby,
 q,
+ruby,
 s, samp, section, small, span, strike, strong, sub, summary, sup,
 table, tbody, tfoot, thead, td, th, tr, tt,
 time,
@@ -68,6 +68,12 @@ table {
 }
 
 /*/////////////////////// COLORS ///////////////////////*/
+
+root {
+	--aufbau-error   : red;
+    --aufbau-success : green;
+    --aufbau-warn    : yellow;
+}
 
 body {
   background-color : var(--aufbau-bg);
