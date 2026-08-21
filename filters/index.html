@@ -138,7 +138,7 @@
         appendTo : nav,
         data     : { id: filter.id },
         onclick  : () => select(filter),
-        text     : filter.name,
+        textContent : filter.name,
       });
       /*
       const button = document.createElement('button');
@@ -172,13 +172,15 @@
             <span class="val">${spec.default}</span>`;
           const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
           input.onchange = () => { options[key] = input.checked; out.textContent = input.checked; render(); };
-        } else if (numeric) {
+        }
+        else if (numeric) {
           row.innerHTML = `<label>${key}</label>
             <input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/>
             <span class="val">${spec.default}</span>`;
           const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
           input.oninput = () => { options[key] = Number(input.value); out.textContent = input.value; render(); };
-        } else {
+        }
+        else {
           row.innerHTML = `<label>${key}</label><input type="text" value="${spec.default}"/>`;
           const input = row.querySelector('input');
           input.oninput = () => { options[key] = input.value; render(); };
