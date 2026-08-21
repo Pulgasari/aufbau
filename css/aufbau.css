@@ -45,8 +45,6 @@ button {
   justify-content : center;
 }
 
-button, label {  }
-
 div { min-height: 0; }
 
 img { /*display: inline-block;*/
@@ -60,6 +58,14 @@ select:focus { border: none; outline: none; }
 
 svg { max-width : 100%; }
 
+ol, ul {
+	list-style: none;
+}
+
+table {
+	border-collapse : collapse;
+	border-spacing  : 0;
+}
 
 /*/////////////////////// COLORS ///////////////////////*/
 
@@ -69,8 +75,9 @@ body {
 }
 
 /*//////////////////////// TYPO ////////////////////////*/
-
-body {
+body { 
+  line-height: 1;
+  
   text-rendering: optimizeLegibility;
    -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -92,6 +99,11 @@ p {
   text-wrap     : pretty;
 }
 
+blockquote, q {
+  quotes: none;
+  &::before, &::after { content: ''; content: none; }
+}
+
 /*//////////////////// TRAIT CLASSES ///////////////////*/
 
 .hidden  { display: none; }
@@ -104,10 +116,6 @@ p {
   justify-content : center;
 }
   
-
-
-
-
 
 
  
