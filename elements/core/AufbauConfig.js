@@ -74,6 +74,7 @@ export function commitConfig () {
 
 const canonicalKey   = (key)      => AufbauConfigStore.key(key);
 const onConfigChange = (listener) => dom.onEvent (window, CONFIG_EVENT, listener);
+const setConfig      = (a,b,c)    => isString(a) ? setConfigValue(a,b,c) : setConfigObject(a,b);
 
 /** key accepts any case form, 'codeTheme' and 'code-theme' resolve alike */
 export function getConfig (key, fallback) {
@@ -81,6 +82,7 @@ export function getConfig (key, fallback) {
   return found === undefined ? fallback : found;
 }
 
+/*
 export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   const isKey   = isString(keyOrMap);
   const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
@@ -91,6 +93,29 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   isKey ? entries.set(keyOrMap, toValue(valueOrOptions))
         : entries.merge(flatten(keyOrMap));
 
+  commitConfig();
+  return AufbauConfigStore;
+}
+*/
+
+/** Internal helper to resolve target source storage */
+function getSource (options = {}) {
+  const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
+  const entries = sources.get(owner) ?? newSource();
+  sources.set(owner, entries);
+  return entries;
+}
+
+/** Set a single configuration entry */
+function setConfigValue (key, value, options) {
+  getSource(options).set(key, toValue(value));
+  commitConfig();
+  return AufbauConfigStore;
+}
+
+/** Merge an object of configuration entries */
+function setConfigObject (map, options) {
+  getSource(options).merge(flatten(map));
   commitConfig();
   return AufbauConfigStore;
 }
@@ -185,6 +210,9 @@ export {
   CONFIG_EVENT,
   canonicalKey,
   onConfigChange,
+  setConfig,
+  setConfigObject,
+  setConfigValue,
 }
 
 export default AufbauConfig;
