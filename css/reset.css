@@ -8,7 +8,6 @@
 a   { text-decoration: none; }
 img { max-width: 100%; }
 
-
 button, label { user-select: none; }
 
  input:focus { border: none; outline: none; }
@@ -49,22 +48,15 @@ footer, header, hgroup, menu, nav, section {
 	display: block;
 }
 
-body {
-	line-height: 1;
-}
+body { line-height: 1; }
+
 blockquote, q {
-	quotes: none;
+  quotes: none;
+  &::before, &::after { content: ''; content: none; }
 }
-blockquote:before, 
-blockquote:after,
-q:before, 
-q:after {
-	content: '';
-	content: none;
-}
-button {
-  cursor: pointer;
-}
+
+
+button { cursor: pointer; }
 img {
   max-width: 100%;
   /*display: block;*/
