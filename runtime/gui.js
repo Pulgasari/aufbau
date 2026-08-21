@@ -41,10 +41,10 @@ function fieldElement (key, spec, value) {
   const { tag, attrs, options } = toControl(key, spec, value);
   const $control = dom.createElement(tag, attrs);
   
-  if (opts) for (const option of options) {
+  if (options) for (const option of options) {
     const [value, textContent] = normalizeOption(option);
     const $option = dom.createElement('aufbau-option', { value, textContent });
-    $control.appendChild($option);
+    $control.append($option);
   }
   
   const $field = dom.createElement('label');
