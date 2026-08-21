@@ -152,7 +152,7 @@ function toControl5 (key, spec, value) {
     case 'integer' :
     case 'number'  : return { tag: 'aufbau-slider', attrs: pruned(attrs, { type: 'number' }) };
     case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned(attrs, { type: 'number', min: 0, max: 360, step: 1, unit: 'deg' }) };    
-    case 'color'   : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'color', look: 'swatch' } };
+    case 'color'   : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'color', look: 'swatch' }) };
     default        : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'text' }) }; // time, text, anything else
   }
 }
