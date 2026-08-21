@@ -8,22 +8,34 @@
   <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css"/>
 </head>
 <body>
+  
   <aside>
-    <h1><aufbau-icon icon="lucide:sparkles"></aufbau-icon> @aufbau/filters</h1>
-    <p>filters are js functions that generate svg. pick one and tweak it live.<br/>
-      <a href="canvas.html">canvas backend →</a> · <a href="editor.html">editor →</a></p>
-    <nav id="nav"></nav>
+    <h1>
+      <aufbau-icon icon="lucide:sparkles"></aufbau-icon>
+      @aufbau/filters
+    </h1>
+    <p>
+      filters are js functions that generate svg. pick one and tweak it live.<br/>
+      <a href="canvas.html">canvas backend →</a> · <a href="editor.html">editor →</a>
+    </p>
   </aside>
 
   <main>
+
+    <nav id="nav"></nav>
+    
     <div class="stage"><div class="subject" id="subject">aufbau</div></div>
+    
     <h2 id="title"></h2>
+    
     <div class="controls" id="controls"></div>
+    
     <div class="panels">
       <aufbau-code id="svg" lang="svg"></aufbau-code>
       <aufbau-code id="css" lang="css"></aufbau-code>
       <aufbau-code id="js"  lang="js"></aufbau-code>
     </div>
+    
   </main>
 
   <!-- shared host the previewed <filter> lives in -->
