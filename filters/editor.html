@@ -5,47 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters · editor</title>
-  <style>
-    :root {
-      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
-      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--fg);
-      font: 13px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
-      display: grid; grid-template-columns: 190px 1fr 320px; min-height: 100vh;
-    }
-    aside, .stack { border-right: 1px solid var(--line); padding: 14px; height: 100vh; overflow: auto; position: sticky; top: 0; }
-    .stack { border-right: 0; border-left: 1px solid var(--line); }
-    h1 { font-size: 13px; margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
-    aufbau-icon { color: var(--accent); font-size: 16px; }
-    aside p { color: var(--muted); margin: 0 0 14px; font-size: 11px; }
-    aside a { color: var(--accent); }
-    nav button {
-      display: block; width: 100%; text-align: left; background: none; border: 0;
-      color: var(--fg); padding: 6px 9px; border-radius: 6px; cursor: pointer; font: inherit;
-    }
-    nav button:hover { background: var(--panel); }
-    main { padding: 24px; display: grid; gap: 14px; align-content: start; }
-    .preview { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0a0b0f; }
-    canvas { display: block; width: 100%; height: auto; }
-    .hint { color: var(--muted); font-size: 12px; }
-    .stack h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
-    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
-    .card.off { opacity: 0.5; }
-    .card header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-    .card header .name { flex: 1; font-weight: 700; }
-    .card header button { background: var(--code); border: 1px solid var(--line); color: var(--fg);
-      border-radius: 5px; width: 24px; height: 24px; cursor: pointer; font: inherit; padding: 0; }
-    .card header button:hover { border-color: var(--accent); }
-    .badge { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
-    .row { display: grid; grid-template-columns: 74px 1fr 46px; align-items: center; gap: 8px; margin-top: 6px; }
-    .row label { color: var(--muted); font-size: 12px; }
-    input[type="range"] { width: 100%; accent-color: var(--accent); }
-    .val { text-align: right; font-size: 12px; }
-    .empty { color: var(--muted); font-size: 12px; }
-  </style>
+  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css"/>
 </head>
 <body>
   <aside>
@@ -67,16 +27,16 @@
 
   <script type="module">
     import { list, createPipeline } from './index.js';
-    import aufbau from '@aufbau/runtime';
+    import aufbau, { dom } from '@aufbau/runtime';
 
     await aufbau.init({ mode: 'auto' });
 
     const catalogue = list();
     const byId      = Object.fromEntries(catalogue.map(f => [f.id, f]));
-    const preview   = document.getElementById('preview');
-    const palette   = document.getElementById('palette');
-    const stackEl   = document.getElementById('stack');
-    const hint      = document.getElementById('hint');
+    const $palette  = dom.element('#palette');
+    const $stack    = dom.element('#stack');
+    const $hint     = dom.element('#hint');
+    const preview   = dom.getElement('#preview');
 
     // the source scene, drawn once onto an offscreen canvas the pipeline reads from.
     const source = document.createElement('canvas');
@@ -123,29 +83,28 @@
     const defaults = f => Object.fromEntries(Object.entries(f.vars).map(([k, s]) => [k, s.default]));
 
     for (const f of catalogue) {
-      const button = document.createElement('button');
-      button.textContent = f.name;
-      button.onclick = () => { pipe.add(f.id, defaults(f)); rebuild(); };
-      palette.appendChild(button);
+      dom.createElement('button', {
+        appendTo    : $palette.node,
+        onclick     : () => { pipe.add(f.id, defaults(f)); rebuild(); },
+        textContent : f.name,
+      });
     }
 
     function render () {
       pipe.render(preview);
-      hint.textContent = pipe.stages.length
+      $hint.setText(pipe.stages.length
         ? `${pipe.stages.filter(s => s.enabled).length} active stage(s) · source is never mutated — reorder/toggle/tweak re-runs the whole stack`
-        : 'empty pipeline — add a filter from the left. stages of any backend mix freely.';
+        : 'empty pipeline — add a filter from the left. stages of any backend mix freely.');
     }
 
     function rebuild () {
-      stackEl.replaceChildren();
+      $stack.empty();
       if (pipe.stages.length === 0) {
-        const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'no stages yet.';
-        stackEl.appendChild(e);
+        dom.createElement('div', { class: 'empty', textContent: 'no stages yet.', appendTo: $stack.node });
       }
       pipe.stages.forEach((stage, index) => {
         const f    = byId[stage.id];
-        const card = document.createElement('div');
-        card.className = 'card' + (stage.enabled ? '' : ' off');
+        const card = dom.createElement('div', { class: 'card' + (stage.enabled ? '' : ' off'), appendTo: $stack.node });
         const head = document.createElement('header');
         head.innerHTML =
           `<input type="checkbox" ${stage.enabled ? 'checked' : ''}/>` +
@@ -158,18 +117,17 @@
         card.appendChild(head);
 
         for (const [key, spec] of Object.entries(f.vars)) {
-          const row = document.createElement('div'); row.className = 'row';
+          if (spec.type !== 'number' && spec.type !== 'integer' && spec.type !== 'boolean') continue;
+          const row = dom.createElement('div', { class: 'row', appendTo: card });
           if (spec.type === 'boolean') {
             row.innerHTML = `<label>${key}</label><input type="checkbox" ${stage.options[key] ? 'checked' : ''}/><span class="val"></span>`;
             row.querySelector('input').onchange = e => { pipe.set(index, { [key]: e.target.checked }); render(); };
-          } else if (spec.type === 'number' || spec.type === 'integer') {
+          } else {
             row.innerHTML = `<label>${key}</label><input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${stage.options[key]}"/><span class="val">${stage.options[key]}</span>`;
             const out = row.querySelector('.val');
             row.querySelector('input').oninput = e => { pipe.set(index, { [key]: Number(e.target.value) }); out.textContent = e.target.value; render(); };
-          } else { continue; }
-          card.appendChild(row);
+          }
         }
-        stackEl.appendChild(card);
       });
       render();
     }

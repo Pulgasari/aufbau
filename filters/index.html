@@ -5,54 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters</title>
-  <link rel='stylesheet' href='https://code.pulgasari.dev/aufbau/css/aufbau.css' />
-  <style>
-    /*
-    :root {
-      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
-      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--fg);
-      font: 14px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
-      display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
-    }
-    aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
-    aside h1 { font-size: 14px; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
-    aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
-    aufbau-icon { color: var(--accent); font-size: 18px; }
-    nav button {
-      display: block; width: 100%; text-align: left; background: none; border: 0;
-      color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
-    }
-    nav button:hover { background: var(--panel); }
-    nav button[aria-current="true"] { background: var(--accent); color: #fff; }
-    main { padding: 24px; display: grid; gap: 20px; align-content: start; max-width: 900px; }
-    .stage {
-      display: grid; place-items: center; min-height: 260px; border: 1px solid var(--line);
-      border-radius: 12px; background:
-        radial-gradient(120% 120% at 20% 0%, #2b2f6b 0%, transparent 55%),
-        radial-gradient(120% 120% at 100% 100%, #6b2b53 0%, transparent 55%), #0a0b0f;
-      overflow: hidden;
-    }
-    .subject { font-weight: 800; font-size: clamp(40px, 10vw, 96px); letter-spacing: -.04em; color: #fff; user-select: none; }
-    .subject svg { width: min(60vw, 440px); height: auto; display: block; }
-    h2 { margin: 0; font-size: 16px; }
-    .controls { display: grid; gap: 12px; }
-    .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
-    .row label { color: var(--muted); }
-    input[type="range"] { width: 100%; accent-color: var(--accent); }
-    .val { text-align: right; color: var(--fg); }
-    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
-      border-radius: 6px; padding: 6px 8px; font: inherit; grid-column: 2 / 4; }
-    .panels { display: grid; gap: 12px; }
-    pre { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px;
-      padding: 14px; overflow: auto; font-size: 12px; color: #cfd3df; }
-    .tag { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
-    a { color: var(--accent); }
-    */
-  </style>
+  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css"/>
 </head>
 <body>
   <aside>
@@ -67,14 +20,9 @@
     <h2 id="title"></h2>
     <div class="controls" id="controls"></div>
     <div class="panels">
-      <aufbau-code id='svg' lang='svg'></aufbau-code>
-      <aufbau-code id='css' lang='css'></aufbau-code>
-      <aufbau-code id='js'  lang='js'></aufbau-code>
-      <!--
-      <div><div class="tag">generated &lt;filter&gt; (baked)</div><pre id="svg"></pre></div>
-      <div><div class="tag">css usage</div><pre id="css"></pre></div>
-      <div><div class="tag">js usage</div><pre id="js"></pre></div>
-      -->
+      <aufbau-code id="svg" lang="svg"></aufbau-code>
+      <aufbau-code id="css" lang="css"></aufbau-code>
+      <aufbau-code id="js"  lang="js"></aufbau-code>
     </div>
   </main>
 
@@ -83,51 +31,31 @@
 
   <script type="module">
     // the filters api is imported locally (this is the package under test); everything
-    // else — dom helpers, asset import, custom elements — comes from the aufbau runtime.
+    // else — dom helpers, asset import, custom elements, css — comes from the aufbau stack.
     import { list, filterSvg, filterCss } from './index.js';
     import aufbau, { dom } from '@aufbau/runtime';
 
     await aufbau.init({ mode: 'auto' });
 
+    // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
+    const $nav      = dom.element('#nav');
+    const $subject  = dom.element('#subject');
+    const $title    = dom.element('#title');
+    const $controls = dom.element('#controls');
+    const $svg      = dom.element('#svg');
+    const $css      = dom.element('#css');
+    const $js       = dom.element('#js');
+    const defs      = dom.getElement('#defs');
+
     // use the real aufbau logo as the preview subject; fall back to the text on failure.
     try {
       const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
-      dom.element('#subject').setHTML(logo);
+      $subject.setHTML(logo);
     } catch { /* keep the text fallback */ }
 
     // this page previews on a dom element, so only css/svg filters. canvas-only ones
     // (pixelate, dither, …) live in canvas.html.
     const catalogue = list().filter(f => f.backends.svg || f.backends.css);
-    const nav     = document.getElementById('nav');
-    const defs    = document.getElementById('defs');
-    const subject = document.getElementById('subject');
-    const els     = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
-    for (const key in els) els[key] = document.getElementById(els[key]);
-
-    /*
-    const // attempt 2
-    $controls = dom.getElement('#controls'),
-    $css      = dom.getElement('#css'),
-    $defs     = dom.getElement('#defs'),
-    $js       = dom.getElement('#js'),
-    $nav      = dom.getElement('#nav'),
-    $subject  = dom.getElement('#subject'),
-    $svg      = dom.getElement('#svg'),
-    $title    = dom.getElement('#title');
-    */
-
-    const // attempt 3
-    $controls = dom.element('#controls'),
-    $css      = dom.element('#css'),
-    $defs     = dom.element('#defs'),
-    $js       = dom.element('#js'),
-    $nav      = dom.element('#nav'),
-    $subject  = dom.element('#subject'),
-    $svg      = dom.element('#svg'),
-    $title    = dom.element('#title');
-
-    // attempt 4
-    //const { controls, css, defs, js, nav, subject, svg, title } = dom.get;   
 
     let current = catalogue[0];
     let options = {};
@@ -135,65 +63,54 @@
 
     for (const filter of catalogue) {
       dom.createElement('button', {
-        appendTo : nav,
-        data     : { id: filter.id },
-        onclick  : () => select(filter),
+        appendTo    : $nav.node,
+        data        : { id: filter.id },
+        onclick     : () => select(filter),
         textContent : filter.name,
       });
-      /*
-      const button = document.createElement('button');
-      button.textContent = filter.name;
-      button.onclick     = () => select(filter);
-      button.dataset.id  = filter.id;
-      nav.appendChild(button);
-      */
     }
 
     function select (filter) {
       current = filter;
       options = {};
       for (const [key, spec] of Object.entries(filter.vars)) options[key] = spec.default;
-      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === filter.id));
+      for (const button of $nav.node.children) {
+        button.setAttribute('aria-current', String(button.dataset.id === filter.id));
+      }
       buildControls();
       render();
     }
 
     function buildControls () {
       const backends = ['svg', current.backends.css && 'css'].filter(Boolean).join(' + ');
-      els.title.textContent = `${current.name}  ·  ${current.id}  ·  ${backends}`;
-      els.controls.replaceChildren();
+      $title.setText(`${current.name}  ·  ${current.id}  ·  ${backends}`);
+      $controls.empty();
       for (const [key, spec] of Object.entries(current.vars)) {
-        const row = document.createElement('div');
-        row.className = 'row';
+        const row = dom.createElement('div', { class: 'row', appendTo: $controls.node });
         const numeric = spec.type === 'number' || spec.type === 'integer';
         if (spec.type === 'boolean') {
           row.innerHTML = `<label>${key}</label>
-            <input type="checkbox" ${spec.default ? 'checked' : ''}/>
-            <span class="val">${spec.default}</span>`;
+            <input type="checkbox" ${spec.default ? 'checked' : ''}/><span class="val">${spec.default}</span>`;
           const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
           input.onchange = () => { options[key] = input.checked; out.textContent = input.checked; render(); };
-        }
-        else if (numeric) {
+        } else if (numeric) {
           row.innerHTML = `<label>${key}</label>
-            <input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/>
-            <span class="val">${spec.default}</span>`;
+            <input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${spec.default}"/><span class="val">${spec.default}</span>`;
           const [input, out] = [row.querySelector('input'), row.querySelector('.val')];
           input.oninput = () => { options[key] = Number(input.value); out.textContent = input.value; render(); };
-        }
-        else {
+        } else {
           row.innerHTML = `<label>${key}</label><input type="text" value="${spec.default}"/>`;
           const input = row.querySelector('input');
           input.oninput = () => { options[key] = input.value; render(); };
         }
-        els.controls.appendChild(row);
       }
     }
 
     function render () {
-      const cssValue = filterCss (current.id, options); // css backend, or null
+      const cssValue = filterCss(current.id, options); // css backend, or null
 
       if (cssValue) {
-        subject.style.filter = cssValue;               // preview through the native css backend
+        $subject.node.style.filter = cssValue;         // preview through the native css backend
       } else {
         // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
         const uid    = `preview-${current.id}-${counter++}`;
@@ -202,19 +119,19 @@
           `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml'
         ).querySelector('filter');
         defs.replaceChildren(node);
-        subject.style.filter = `url(#${uid})`;
+        $subject.node.style.filter = `url(#${uid})`;
       }
 
-      els.svg.textContent = filterSvg(current.id, options);
-      els.css.textContent = cssValue
+      // <aufbau-code> reads its content from the `code` attribute (setAttr re-highlights).
+      $svg.setAttr('code', filterSvg(current.id, options));
+      $css.setAttr('code', cssValue
         ? `#logo { filter: ${cssValue}; }  /* css backend */`
-        : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`;
+        : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`);
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
-      //$js.update('');
-      els.js.textContent =
+      $js.setAttr('code',
         `import ${camel(current.id)} from '@aufbau/filters/${current.id}';\n` +
         `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
-        `applyFilter('#logo', '${current.id}', ${opts});`;
+        `applyFilter('#logo', '${current.id}', ${opts});`);
     }
 
     const camel = s => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
