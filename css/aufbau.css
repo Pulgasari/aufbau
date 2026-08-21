@@ -76,6 +76,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-weight : 700;
+  line-height : 1.25;
+  text-wrap   : balance;
+}
+
 p {
   hyphens: auto;
   hyphenate-limit-chars: 6 3 3;
@@ -84,12 +90,6 @@ p {
   overflow-wrap : break-word;
   text-align    : justify; 
   text-wrap     : pretty;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight : 700;
-  line-height : 1.25;
-  text-wrap   : balance;
 }
 
 /*//////////////////// TRAIT CLASSES ///////////////////*/
