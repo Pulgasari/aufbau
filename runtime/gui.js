@@ -116,33 +116,46 @@ const prunedWithFallbacks = (obj, defaults = {}) => {
   return { ...defaults, ...cleanObj };
 };
 
-const CONTROL_TYPES2 = {
-  boolean : { tag: 'aufbau-toggle', attrs: { value: 'true' } },
-  integer : { tag: 'aufbau-slider', attrs: { type: 'number' } },
-  number  : { tag: 'aufbau-slider', attrs: { type: 'number' } },
-  angle   : { tag: 'aufbau-slider', attrs: { type: 'number', min: 0, max: 360, step: 1, unit: 'deg' } },
-  color   : { tag: 'aufbau-input',  attrs: { type: 'color', look: 'swatch' } },
-};
 
 function toControl4 (key, spec, value = spec.default) {
   const { values, type, label, default: _, ...rest } = spec;
 
-  if (values) {
-    return { tag: 'aufbau-picker', attrs: { name: key, value }, options: values };
-  }
+  const { attrs, tag } = {
+    boolean : { tag: 'aufbau-toggle' , attrs: { value: 'true', checked: value ? '' : null  } },
+    enum    : { tag: 'aufbau-picker' , attrs: { name: key }, options: values },
+    
+    integer : { tag: 'aufbau-slider' , attrs: { type: 'number' } },
+    number  : { tag: 'aufbau-slider' , attrs: { type: 'number' } },
+    angle   : { tag: 'aufbau-slider' , attrs: { type: 'number', min: 0, max: 360, step: 1, unit: 'deg' } },
+    color   : { tag: 'aufbau-input'  , attrs: { type: 'color', look: 'swatch' } },
+    //default : { tag: 'aufbau-input'  , attrs: { type: 'text'   } },
+  }[type];
 
-  // Fallback to standard input with the given type (e.g. 'time', 'text')
-  const { attrs, tag } = CONTROL_TYPES2[type] ?? { tag: 'aufbau-input', attrs: { type: type ?? 'text' } };
 
-  const base = {
-    name: key,
-    ...(type === 'boolean' ? { checked: value ? '' : null } : { value }),
-    ...rest,
-  };
-
-  return { tag, attrs: pruned(base, attrs) };
+  return { tag, attrs: pruned(rest, { ...attrs, name: key }) };
 }
 
+
+
+
+
+
+function toControl5 (key, spec, value) {
+  value ??= spec.default;
+  const attrs = { name: key };
+  const { max, min, step, type, unit, values } = spec;
+
+  if (values) return { tag: 'aufbau-picker', attrs: { ...attrs, value }, options: spec.values };
+
+  switch (type) {
+    case 'boolean' : return { tag: 'aufbau-toggle', attrs: pruned(attrs, { value: 'true', checked: value ? '' : null }) };
+    case 'integer' :
+    case 'number'  : return { tag: 'aufbau-slider', attrs: pruned(attrs, { type: 'number' }) };
+    case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned(attrs, { type: 'number', min: 0, max: 360, step: 1, unit: 'deg' }) };    
+    case 'color'   : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'color', look: 'swatch' } };
+    default        : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'text' }) }; // time, text, anything else
+  }
+}
 
 
 
