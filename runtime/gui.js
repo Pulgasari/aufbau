@@ -74,11 +74,13 @@ function toControl2 (key, spec, value = spec.default) {
 
 // Central registry for control tags, attribute defaults, and static overrides
 const CONTROL_TYPES = {
+  angle:   { tag: 'aufbau-slider', inputType: 'number', defaults: { min: 0, max: 360, step: 1, unit: 'deg' } },
   boolean: { tag: 'aufbau-toggle', inputType: null, staticAttrs: { value: 'true' } },
+  color:   { tag: 'aufbau-input',  inputType: 'color',  staticAttrs: { look: 'swatch' } },
   integer: { tag: 'aufbau-slider', inputType: 'number' },
   number:  { tag: 'aufbau-slider', inputType: 'number' },
-  angle:   { tag: 'aufbau-slider', inputType: 'number', defaults: { min: 0, max: 360, step: 1, unit: 'deg' } },
-  color:   { tag: 'aufbau-input',  inputType: 'color',  staticAttrs: { look: 'swatch' } },
+  
+  
 };
 
 function toControl3 (key, spec, value = spec.default) {
@@ -103,6 +105,43 @@ function toControl3 (key, spec, value = spec.default) {
   return { tag: config.tag, attrs: pruned(baseAttrs, config.defaults) };
 }
 
+
+
+
+
+
+// strips null/undefined from obj and applies fallback defaults
+const prunedWithFallbacks = (obj, defaults = {}) => {
+  const cleanObj = Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
+  return { ...defaults, ...cleanObj };
+};
+
+const CONTROL_TYPES2 = {
+  boolean : { tag: 'aufbau-toggle', attrs: { value: 'true' } },
+  integer : { tag: 'aufbau-slider', attrs: { type: 'number' } },
+  number  : { tag: 'aufbau-slider', attrs: { type: 'number' } },
+  angle   : { tag: 'aufbau-slider', attrs: { type: 'number', min: 0, max: 360, step: 1, unit: 'deg' } },
+  color   : { tag: 'aufbau-input',  attrs: { type: 'color', look: 'swatch' } },
+};
+
+function toControl4 (key, spec, value = spec.default) {
+  const { values, type, label, default: _, ...rest } = spec;
+
+  if (values) {
+    return { tag: 'aufbau-picker', attrs: { name: key, value }, options: values };
+  }
+
+  // Fallback to standard input with the given type (e.g. 'time', 'text')
+  const { attrs, tag } = CONTROL_TYPES2[type] ?? { tag: 'aufbau-input', attrs: { type: type ?? 'text' } };
+
+  const base = {
+    name: key,
+    ...(type === 'boolean' ? { checked: value ? '' : null } : { value }),
+    ...rest,
+  };
+
+  return { tag, attrs: pruned(base, attrs) };
+}
 
 
 
