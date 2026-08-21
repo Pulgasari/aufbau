@@ -16,7 +16,7 @@ const DEFAULTS     = Symbol('defaults');
 const RESERVED     = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
 const RUNTIME      = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
 const sources      = new Map; // one source map per <aufbau-config> element, merged in connect order
-const newSource    = () => new CanonicalMap;
+const newSource    = ()      => new CanonicalMap;
 const toValue      = (value) => value == null ? null : String(value);
 
 // { code: { theme: 'nord' } } -> 'code-theme'. the store normalizes each path itself
@@ -72,11 +72,8 @@ export function commitConfig () {
 
 // :::::: PUBLIC API :::::::::::::::::::::::::::::::::::::::::::
 
-/**
- * the store's canonical key form. the change list emitted with CONFIG_EVENT is
- * canonical, so anything comparing against it has to normalize the same way.
- */
-export const canonicalKey = (key) => AufbauConfigStore.key(key);
+const canonicalKey   = (key)      => AufbauConfigStore.key(key);
+const onConfigChange = (listener) => dom.onEvent (window, CONFIG_EVENT, listener);
 
 /** key accepts any case form, 'codeTheme' and 'code-theme' resolve alike */
 export function getConfig (key, fallback) {
@@ -122,9 +119,7 @@ export function resolveConfig (tag, name, keys = true) {
   return undefined;
 }
 
-export function onConfigChange (listener) {
-  return dom.onEvent (window, CONFIG_EVENT, listener);
-}
+
 
 // :::::: ELEMENT ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -188,6 +183,8 @@ if (typeof window !== 'undefined' && !customElements.get('aufbau-config')) {
 export {
   AufbauConfigStore,
   CONFIG_EVENT,
+  canonicalKey,
+  onConfigChange,
 }
 
 export default AufbauConfig;
