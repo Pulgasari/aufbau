@@ -3,13 +3,27 @@ body {
   color            : var(--aufbau-fg);
 }
 
+button {
+  align-items     : center;
+  cursor          : pointer; 
+  display         : inline-flex;
+  flex-direction  : row;
+  justify-content : center;
+}
+
 div { min-height: 0; }
 
+img { /*display: inline-block;*/
+  max-width      : 100%;
+  object-fit     : cover;
+  vertical-align : bottom
+}
 
-/* TYPO */
+svg { max-width : 100%; }
+
+/*//////////////////////// TYPO ////////////////////////*/
 
 body {
-  /* enhanced font rendering */
   text-rendering: optimizeLegibility;
    -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -19,24 +33,27 @@ body {
 p {
   line-height: 1.25;
   
-  /* Language handling and word breaking */
   hyphens: auto;
-  hyphenate-limit-chars: 6 3 3; /* Min word length: 6, min chars before break: 3, min chars after break: 3 */   
+  hyphenate-limit-chars: 6 3 3;
   overflow-wrap: break-word;
-  /*word-break: overflow-wrap*/
   
-  /* Modern text layout rules */
-  text-wrap: pretty;
+  text-align : justify; 
+  text-wrap  : pretty;
 }
 
 /* Heading optimization */
 h1, h2, h3, h4 {
-  line-height: 1.25;
-  font-weight: 700;
-  text-wrap: balance;
+  line-height : 1.25;
+  font-weight : 700;
+  text-wrap   : balance;
 }
 
 /* Tabular figures for numbers */
 .numeric-data {
   font-variant-numeric: tabular-nums;
 }
+
+
+
+
+
