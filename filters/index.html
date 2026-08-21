@@ -67,9 +67,14 @@
     <h2 id="title"></h2>
     <div class="controls" id="controls"></div>
     <div class="panels">
+      <aufbau-code id='svg' lang='svg'></aufbau-code>
+      <aufbau-code id='css' lang='css'></aufbau-code>
+      <aufbau-code id='js'  lang='js'></aufbau-code>
+      <!--
       <div><div class="tag">generated &lt;filter&gt; (baked)</div><pre id="svg"></pre></div>
       <div><div class="tag">css usage</div><pre id="css"></pre></div>
       <div><div class="tag">js usage</div><pre id="js"></pre></div>
+      -->
     </div>
   </main>
 
@@ -97,18 +102,26 @@
     const defs    = document.getElementById('defs');
     const subject = document.getElementById('subject');
     const els     = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
-    for (const k in els) els[k] = document.getElementById(els[k]);
+    for (const key in els) els[key] = document.getElementById(els[key]);
 
     let current = catalogue[0];
     let options = {};
     let counter = 0;
 
     for (const filter of catalogue) {
+      dom.createElement('button', {
+        appendTo : nav,
+        data     : { id: filter.id },
+        onclick  : () => select(filter),
+        text     : filter.name,
+      });
+      /*
       const button = document.createElement('button');
       button.textContent = filter.name;
-      button.onclick = () => select(filter);
-      button.dataset.id = filter.id;
+      button.onclick     = () => select(filter);
+      button.dataset.id  = filter.id;
       nav.appendChild(button);
+      */
     }
 
     function select (filter) {
@@ -150,7 +163,7 @@
     }
 
     function render () {
-      const cssValue = filterCss(current.id, options); // css backend, or null
+      const cssValue = filterCss (current.id, options); // css backend, or null
 
       if (cssValue) {
         subject.style.filter = cssValue;               // preview through the native css backend
