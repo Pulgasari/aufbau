@@ -5,44 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters · canvas</title>
-  <style>
-    :root {
-      --bg: #0e0f13; --panel: #16181f; --line: #262a35; --fg: #e7e9ee;
-      --muted: #8b90a0; --accent: #5865f2; --code: #11131a;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--fg);
-      font: 14px/1.5 ui-monospace, "JetBrains Mono", Menlo, monospace;
-      display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
-    }
-    aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
-    aside h1 { font-size: 14px; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
-    aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
-    aufbau-icon { color: var(--accent); font-size: 18px; }
-    nav button {
-      display: block; width: 100%; text-align: left; background: none; border: 0;
-      color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
-    }
-    nav button:hover { background: var(--panel); }
-    nav button[aria-current="true"] { background: var(--accent); color: #fff; }
-    main { padding: 24px; display: grid; gap: 20px; align-content: start; max-width: 900px; }
-    .stage { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0a0b0f; }
-    canvas { display: block; width: 100%; height: auto; }
-    h2 { margin: 0; font-size: 16px; }
-    .controls { display: grid; gap: 12px; }
-    .row { display: grid; grid-template-columns: 90px 1fr 64px; align-items: center; gap: 12px; }
-    .row label { color: var(--muted); }
-    input[type="range"] { width: 100%; accent-color: var(--accent); }
-    input[type="text"] { background: var(--code); border: 1px solid var(--line); color: var(--fg);
-      border-radius: 6px; padding: 6px 8px; font: inherit; grid-column: 2 / 4; }
-    .val { text-align: right; color: var(--fg); }
-    .panels { display: grid; gap: 12px; }
-    pre { margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px;
-      padding: 14px; overflow: auto; font-size: 12px; color: #cfd3df; }
-    .tag { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
-    a { color: var(--accent); }
-  </style>
+  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css"/>
 </head>
 <body>
   <aside>
@@ -58,16 +21,24 @@
     <h2 id="title"></h2>
     <div class="controls" id="controls"></div>
     <div class="panels">
-      <div><div class="tag">backend</div><pre id="backend"></pre></div>
-      <div><div class="tag">js usage</div><pre id="js"></pre></div>
+      <p id="backend"></p>
+      <aufbau-code id="js" lang="js"></aufbau-code>
     </div>
   </main>
 
   <script type="module">
     import { list, filterCanvas } from './index.js';
-    import aufbau from '@aufbau/runtime';
+    import aufbau, { dom } from '@aufbau/runtime';
 
     await aufbau.init({ mode: 'auto' });
+
+    const $nav      = dom.element('#nav');
+    const $title    = dom.element('#title');
+    const $controls = dom.element('#controls');
+    const $backend  = dom.element('#backend');
+    const $js       = dom.element('#js');
+    const canvas    = dom.getElement('#stage');
+    const ctx       = canvas.getContext('2d', { willReadFrequently: true });
 
     // load the aufbau logo once, recoloured white, as an <img> we can draw onto the canvas.
     // going through aufbau.import (string) → data-uri keeps the canvas untainted, so the
@@ -82,12 +53,6 @@
     } catch { logo = null; }
 
     const catalogue = list(); // every filter is canvas-capable (imageData, bridge or webgl)
-    const nav    = document.getElementById('nav');
-    const canvas = document.getElementById('stage');
-    const ctx    = canvas.getContext('2d', { willReadFrequently: true });
-    const els    = { title: 'title', controls: 'controls', backend: 'backend', js: 'js' };
-    for (const k in els) els[k] = document.getElementById(els[k]);
-
     let current = catalogue[0];
     let options = {};
 
@@ -114,28 +79,30 @@
     }
 
     for (const f of catalogue) {
-      const button = document.createElement('button');
-      button.textContent = f.name;
-      button.onclick = () => select(f);
-      button.dataset.id = f.id;
-      nav.appendChild(button);
+      dom.createElement('button', {
+        appendTo    : $nav.node,
+        data        : { id: f.id },
+        onclick     : () => select(f),
+        textContent : f.name,
+      });
     }
 
     function select (f) {
       current = f;
       options = {};
       for (const [key, spec] of Object.entries(f.vars)) options[key] = spec.default;
-      for (const b of nav.children) b.setAttribute('aria-current', String(b.dataset.id === f.id));
+      for (const button of $nav.node.children) {
+        button.setAttribute('aria-current', String(button.dataset.id === f.id));
+      }
       buildControls();
       render();
     }
 
     function buildControls () {
-      els.title.textContent = `${current.name}  ·  ${current.id}`;
-      els.controls.replaceChildren();
+      $title.setText(`${current.name}  ·  ${current.id}`);
+      $controls.empty();
       for (const [key, spec] of Object.entries(current.vars)) {
-        const row = document.createElement('div');
-        row.className = 'row';
+        const row = dom.createElement('div', { class: 'row', appendTo: $controls.node });
         const numeric = spec.type === 'number' || spec.type === 'integer';
         if (spec.type === 'boolean') {
           row.innerHTML = `<label>${key}</label><input type="checkbox" ${spec.default ? 'checked' : ''}/><span class="val">${spec.default}</span>`;
@@ -150,25 +117,24 @@
           const input = row.querySelector('input');
           input.oninput = () => { options[key] = input.value; render(); };
         }
-        els.controls.appendChild(row);
       }
     }
 
     function render () {
       drawScene();
       try { filterCanvas(canvas, current.id, options); }
-      catch (e) { els.backend.textContent = String(e.message); return; }
+      catch (e) { $backend.setText(String(e.message)); return; }
 
       const b = current.backends;
-      els.backend.textContent =
+      $backend.setText(
         b.webgl              ? 'webgl — fragment shader on the gpu (svg/canvas cannot do it).'
         : (!b.svg && !b.css) ? 'imageData — the filter walks the pixels directly.'
         : b.css              ? 'bridge — ctx.filter = css string.'
-        :                      'bridge — ctx.filter = url(#baked-svg-filter).';
+        :                      'bridge — ctx.filter = url(#baked-svg-filter).');
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
-      els.js.textContent =
+      $js.setAttr('code',
         `import { filterCanvas } from '@aufbau/filters';\n\n` +
-        `filterCanvas(canvas, '${current.id}', ${opts});`;
+        `filterCanvas(canvas, '${current.id}', ${opts});`);
     }
 
     select(current);
