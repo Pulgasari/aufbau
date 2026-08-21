@@ -208,7 +208,7 @@
         ? `#logo { filter: ${cssValue}; }  /* css backend */`
         : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`;
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
-      $js.update('');
+      //$js.update('');
       els.js.textContent =
         `import ${camel(current.id)} from '@aufbau/filters/${current.id}';\n` +
         `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
