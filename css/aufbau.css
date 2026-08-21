@@ -94,13 +94,15 @@ p {
 
 /*//////////////////// TRAIT CLASSES ///////////////////*/
 
+.hidden  { display: none; }
 .numeric { font-variant-numeric: tabular-nums; }
 
-
-
-
-
-
+.flow-y {
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  justify-content : center;
+}
   
 
 
