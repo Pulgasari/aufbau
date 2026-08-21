@@ -13,6 +13,7 @@ import * as aufbauStylesheet    from '@aufbau/stylesheet';
 import * as aufbauUtils         from '@aufbau/js';
 
 import * as aufbauClient from './client.js';
+import * as aufbauGui    from './gui.js';
 import * as aufbauWorker from './worker.js';
 
 //const fileURL = new URL("./configs.json5", import.meta.url);
@@ -94,6 +95,9 @@ const aufbau = {
   
   //
   dom, domina, str,
+
+  // gui: builds aufbau form controls from a spec object (see gui.js)
+  gui : aufbauGui,
 
   // packages
   elements   : aufbauElements,

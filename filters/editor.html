@@ -116,18 +116,11 @@
         head.querySelector('[data-a="rm"]').onclick   = () => { pipe.remove(index); rebuild(); };
         card.appendChild(head);
 
-        for (const [key, spec] of Object.entries(f.vars)) {
-          if (spec.type !== 'number' && spec.type !== 'integer' && spec.type !== 'boolean') continue;
-          const row = dom.createElement('div', { class: 'row', appendTo: card });
-          if (spec.type === 'boolean') {
-            row.innerHTML = `<label>${key}</label><input type="checkbox" ${stage.options[key] ? 'checked' : ''}/><span class="val"></span>`;
-            row.querySelector('input').onchange = e => { pipe.set(index, { [key]: e.target.checked }); render(); };
-          } else {
-            row.innerHTML = `<label>${key}</label><input type="range" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${stage.options[key]}"/><span class="val">${stage.options[key]}</span>`;
-            const out = row.querySelector('.val');
-            row.querySelector('input').oninput = e => { pipe.set(index, { [key]: Number(e.target.value) }); out.textContent = e.target.value; render(); };
-          }
-        }
+        // per-stage controls, built from the filter's vars by aufbau.gui.
+        card.appendChild(aufbau.gui.controls(f.vars, {
+          values   : stage.options,
+          onChange : values => { pipe.set(index, values); render(); },
+        }));
       });
       render();
     }
