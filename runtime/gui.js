@@ -24,6 +24,90 @@ function toControl (key, spec, value) {
   }
 }
 
+
+
+
+
+
+const TAG_MAP = {
+  boolean: 'aufbau-toggle',
+  integer: 'aufbau-slider',
+  number:  'aufbau-slider',
+  angle:   'aufbau-slider',
+  color:   'aufbau-input',
+};
+
+const TYPE_DEFAULTS = {
+  angle: { min: 0, max: 360, step: 1, unit: 'deg' },
+  boolean: { value: 'true' },
+};
+
+function toControl2 (key, spec, value = spec.default) {
+  const { values, type, label, default: _, ...rest } = spec;
+
+  if (values) {
+    return { tag: 'aufbau-picker', attrs: { name: key, value }, options: values };
+  }
+
+  const tag = TAG_MAP[type] ?? 'aufbau-input';
+  const defaults = TYPE_DEFAULTS[type] ?? {};
+  
+  const baseAttrs = {
+    name: key,
+    value,
+    type: (type === 'integer' || type === 'angle') ? 'number' : (type ?? 'text'),
+    ...rest,
+  };
+
+  // Special handling for boolean checked state
+  if (type === 'boolean') {
+    delete baseAttrs.type;
+    baseAttrs.checked = value ? '' : null;
+  } else if (type === 'color') {
+    baseAttrs.look = 'swatch';
+  }
+
+  return { tag, attrs: pruned(baseAttrs, defaults) };
+}
+
+
+
+// Central registry for control tags, attribute defaults, and static overrides
+const CONTROL_TYPES = {
+  boolean: { tag: 'aufbau-toggle', inputType: null, staticAttrs: { value: 'true' } },
+  integer: { tag: 'aufbau-slider', inputType: 'number' },
+  number:  { tag: 'aufbau-slider', inputType: 'number' },
+  angle:   { tag: 'aufbau-slider', inputType: 'number', defaults: { min: 0, max: 360, step: 1, unit: 'deg' } },
+  color:   { tag: 'aufbau-input',  inputType: 'color',  staticAttrs: { look: 'swatch' } },
+};
+
+function toControl3 (key, spec, value = spec.default) {
+  const { values, type, label, default: _, ...rest } = spec;
+
+  if (values) {
+    return { tag: 'aufbau-picker', attrs: { name: key, value }, options: values };
+  }
+
+  const config = CONTROL_TYPES[type] ?? { tag: 'aufbau-input', inputType: type ?? 'text' };
+  const inputType = config.inputType ?? (type ?? 'text');
+
+  const baseAttrs = {
+    name: key,
+    value,
+    ...(inputType ? { type: inputType } : {}),
+    ...(type === 'boolean' ? { checked: value ? '' : null } : {}),
+    ...config.staticAttrs,
+    ...rest,
+  };
+
+  return { tag: config.tag, attrs: pruned(baseAttrs, config.defaults) };
+}
+
+
+
+
+
+
 const normalizeOption = option => (Array.isArray(option) ? option : [option, option]); // [value, label]
 
 // :::::: ELEMENT OUTPUT :::::::::::::::::::::::::::::::::::::::::
