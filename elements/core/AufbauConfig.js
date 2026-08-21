@@ -88,8 +88,8 @@ export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
   const entries = sources.get(owner) ?? newSource();
   sources.set(owner, entries);
 
-  if (isKey) entries.set(keyOrMap, toValue(valueOrOptions));
-  else entries.merge(flatten(keyOrMap));
+  isKey ? entries.set(keyOrMap, toValue(valueOrOptions))
+        : entries.merge(flatten(keyOrMap));
 
   commitConfig();
   return AufbauConfigStore;
