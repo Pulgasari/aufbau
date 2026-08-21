@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters · editor</title>
   <style>
     :root {
@@ -17,7 +18,8 @@
     }
     aside, .stack { border-right: 1px solid var(--line); padding: 14px; height: 100vh; overflow: auto; position: sticky; top: 0; }
     .stack { border-right: 0; border-left: 1px solid var(--line); }
-    h1 { font-size: 13px; margin: 0 0 4px; }
+    h1 { font-size: 13px; margin: 0 0 4px; display: flex; align-items: center; gap: 6px; }
+    aufbau-icon { color: var(--accent); font-size: 16px; }
     aside p { color: var(--muted); margin: 0 0 14px; font-size: 11px; }
     aside a { color: var(--accent); }
     nav button {
@@ -47,7 +49,7 @@
 </head>
 <body>
   <aside>
-    <h1>add filter</h1>
+    <h1><aufbau-icon icon="lucide:wand-2"></aufbau-icon> add filter</h1>
     <p>a non-destructive stack — every stage runs through the pipeline over one source.
       <br/><a href="canvas.html">← canvas</a> · <a href="index.html">dom</a></p>
     <nav id="palette"></nav>
@@ -65,6 +67,9 @@
 
   <script type="module">
     import { list, createPipeline } from './index.js';
+    import aufbau from '@aufbau/runtime';
+
+    await aufbau.init({ mode: 'auto' });
 
     const catalogue = list();
     const byId      = Object.fromEntries(catalogue.map(f => [f.id, f]));
@@ -76,6 +81,18 @@
     // the source scene, drawn once onto an offscreen canvas the pipeline reads from.
     const source = document.createElement('canvas');
     source.width = 760; source.height = 300;
+
+    // load the aufbau logo (recoloured white) via aufbau.import → data-uri, so the source
+    // canvas stays untainted for the imageData stages.
+    let logo = null;
+    try {
+      const svg = (await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' }))
+        .replace(/currentcolor/gi, '#ffffff');
+      logo = new Image();
+      logo.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
+      await logo.decode();
+    } catch { logo = null; }
+
     (function drawScene () {
       const ctx = source.getContext('2d');
       const { width: w, height: h } = source;
@@ -87,27 +104,30 @@
       }
       ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
       for (let x = 0; x < w; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 40, h); ctx.stroke(); }
-      ctx.fillStyle = '#fff'; ctx.font = '800 120px ui-monospace, monospace';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('aufbau', w / 2, h / 2 + 6);
+      if (logo) {
+        const lw = Math.min(560, w * 0.72), lh = lw * logo.height / logo.width;
+        ctx.drawImage(logo, (w - lw) / 2, (h - lh) / 2, lw, lh);
+      } else {
+        ctx.fillStyle = '#fff'; ctx.font = '800 120px ui-monospace, monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('aufbau', w / 2, h / 2 + 6);
+      }
     })();
 
     const pipe = createPipeline(source);
 
-    function backendOf (f) {
+    const backendOf = f => {
       const b = f.backends;
       return b.webgl ? 'webgl' : (!b.svg && !b.css) ? 'imageData' : 'bridge';
-    }
+    };
+    const defaults = f => Object.fromEntries(Object.entries(f.vars).map(([k, s]) => [k, s.default]));
 
-    // palette
     for (const f of catalogue) {
       const button = document.createElement('button');
       button.textContent = f.name;
       button.onclick = () => { pipe.add(f.id, defaults(f)); rebuild(); };
       palette.appendChild(button);
     }
-
-    const defaults = f => Object.fromEntries(Object.entries(f.vars).map(([k, s]) => [k, s.default]));
 
     function render () {
       pipe.render(preview);
@@ -116,7 +136,6 @@
         : 'empty pipeline — add a filter from the left. stages of any backend mix freely.';
     }
 
-    // right-hand stack ui
     function rebuild () {
       stackEl.replaceChildren();
       if (pipe.stages.length === 0) {

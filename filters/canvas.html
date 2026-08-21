@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters · canvas</title>
   <style>
     :root {
@@ -16,8 +17,9 @@
       display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
     }
     aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
-    aside h1 { font-size: 14px; margin: 0 0 4px; }
+    aside h1 { font-size: 14px; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
     aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
+    aufbau-icon { color: var(--accent); font-size: 18px; }
     nav button {
       display: block; width: 100%; text-align: left; background: none; border: 0;
       color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
@@ -44,9 +46,10 @@
 </head>
 <body>
   <aside>
-    <h1>@aufbau/filters · canvas</h1>
+    <h1><aufbau-icon icon="lucide:layers"></aufbau-icon> @aufbau/filters</h1>
     <p>every filter on a &lt;canvas&gt; via filterCanvas — imageData where the filter has
-      it, else the ctx.filter bridge.<br/><a href="index.html">← dom backend</a></p>
+      it, the ctx.filter bridge for css/svg, or the webgl backend.<br/>
+      <a href="index.html">← dom</a> · <a href="editor.html">editor →</a></p>
     <nav id="nav"></nav>
   </aside>
 
@@ -62,19 +65,34 @@
 
   <script type="module">
     import { list, filterCanvas } from './index.js';
+    import aufbau from '@aufbau/runtime';
 
-    const catalogue = list(); // every filter is canvas-capable (imageData or bridge)
+    await aufbau.init({ mode: 'auto' });
+
+    // load the aufbau logo once, recoloured white, as an <img> we can draw onto the canvas.
+    // going through aufbau.import (string) → data-uri keeps the canvas untainted, so the
+    // imageData filters can still read pixels back.
+    let logo = null;
+    try {
+      const svg = (await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' }))
+        .replace(/currentcolor/gi, '#ffffff');
+      logo = new Image();
+      logo.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
+      await logo.decode();
+    } catch { logo = null; }
+
+    const catalogue = list(); // every filter is canvas-capable (imageData, bridge or webgl)
     const nav    = document.getElementById('nav');
     const canvas = document.getElementById('stage');
-    const ctx    = canvas.getContext('2d');
+    const ctx    = canvas.getContext('2d', { willReadFrequently: true });
     const els    = { title: 'title', controls: 'controls', backend: 'backend', js: 'js' };
     for (const k in els) els[k] = document.getElementById(els[k]);
 
     let current = catalogue[0];
     let options = {};
 
-    // a busy test scene: gradient, discs, stripes and big text — enough high-frequency
-    // detail that pixelate/dither/threshold read clearly.
+    // a busy scene: gradient, discs, stripes and the logo — enough high-frequency detail
+    // that pixelate/dither/dot-screen read clearly.
     function drawScene () {
       const { width: w, height: h } = canvas;
       const grad = ctx.createLinearGradient(0, 0, w, h);
@@ -85,9 +103,14 @@
       }
       ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
       for (let x = 0; x < w; x += 18) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 40, h); ctx.stroke(); }
-      ctx.fillStyle = '#fff'; ctx.font = '800 120px ui-monospace, monospace';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('aufbau', w / 2, h / 2 + 6);
+      if (logo) {
+        const lw = Math.min(560, w * 0.72), lh = lw * logo.height / logo.width;
+        ctx.drawImage(logo, (w - lw) / 2, (h - lh) / 2, lw, lh);
+      } else {
+        ctx.fillStyle = '#fff'; ctx.font = '800 120px ui-monospace, monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('aufbau', w / 2, h / 2 + 6);
+      }
     }
 
     for (const f of catalogue) {
@@ -134,14 +157,14 @@
     function render () {
       drawScene();
       try { filterCanvas(canvas, current.id, options); }
-      catch (e) { els.backend.textContent = String(e.message); }
+      catch (e) { els.backend.textContent = String(e.message); return; }
 
       const b = current.backends;
       els.backend.textContent =
-        b.webgl                 ? 'webgl — fragment shader on the gpu (svg/canvas cannot do it).'
-        : (!b.svg && !b.css)    ? 'imageData — the filter walks the pixels directly.'
-        : b.css                 ? 'bridge — ctx.filter = css string.'
-        :                         'bridge — ctx.filter = url(#baked-svg-filter).';
+        b.webgl              ? 'webgl — fragment shader on the gpu (svg/canvas cannot do it).'
+        : (!b.svg && !b.css) ? 'imageData — the filter walks the pixels directly.'
+        : b.css              ? 'bridge — ctx.filter = css string.'
+        :                      'bridge — ctx.filter = url(#baked-svg-filter).';
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
       els.js.textContent =
         `import { filterCanvas } from '@aufbau/filters';\n\n` +
