@@ -104,6 +104,31 @@
     const els     = { title: 'title', controls: 'controls', svg: 'svg', css: 'css', js: 'js' };
     for (const key in els) els[key] = document.getElementById(els[key]);
 
+    /*
+    const // attempt 2
+    $controls = dom.getElement('#controls'),
+    $css      = dom.getElement('#css'),
+    $defs     = dom.getElement('#defs'),
+    $js       = dom.getElement('#js'),
+    $nav      = dom.getElement('#nav'),
+    $subject  = dom.getElement('#subject'),
+    $svg      = dom.getElement('#svg'),
+    $title    = dom.getElement('#title');
+    */
+
+    const // attempt 3
+    $controls = dom.element('#controls'),
+    $css      = dom.element('#css'),
+    $defs     = dom.element('#defs'),
+    $js       = dom.element('#js'),
+    $nav      = dom.element('#nav'),
+    $subject  = dom.element('#subject'),
+    $svg      = dom.element('#svg'),
+    $title    = dom.element('#title');
+
+    // attempt 4
+    //const { controls, css, defs, js, nav, subject, svg, title } = dom.get;   
+
     let current = catalogue[0];
     let options = {};
     let counter = 0;
@@ -183,6 +208,7 @@
         ? `#logo { filter: ${cssValue}; }  /* css backend */`
         : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`;
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
+      $js.update('');
       els.js.textContent =
         `import ${camel(current.id)} from '@aufbau/filters/${current.id}';\n` +
         `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
