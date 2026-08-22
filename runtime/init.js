@@ -23,6 +23,16 @@ function setConfig (options = {}) {
 
 // :::::: INIT
 
+const initAppearance () {
+  const { css, font, layout, look, skin, theme } = configs;
+
+  // load + apply font-files
+
+  // load + apply css-files
+  let url = 'https://code.pulgasari.dev/css';
+  //if (theme) 
+}
+
 const initElements = async ({ mode = 'auto' }) => {
        if (mode === 'auto')      elements.autoloader();
   else if (mode === 'all') await elements.registerAll();
