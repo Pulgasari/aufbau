@@ -1,6 +1,8 @@
 // init.js
 
+import * as aufbauElements      from '@aufbau/elements';
 import * as aufbauUtils         from '@aufbau/js';
+
 import configs from './configs.js';
 
 const { deepMerge, isPlainObject } = aufbauUtils;
