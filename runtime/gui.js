@@ -2,9 +2,17 @@
 
 import * as dom from '@domina/core';
 
+// :::::: HELPERS
+// (vermutlich unnötig, weil innerhalb von @domina bereits gehandlet)
+
+const escAttr = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const escText = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const attrStr = attrs => Object.entries(attrs).map(([k, v]) => (v === '' ? ` ${k}` : ` ${k}="${escAttr(v)}"`)).join('');
+
 // :::::: MAPPING ::::::::::::::::::::::::::::::::::::::::::::::::
 
 const pruned = obj => Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
+const prunedWithFallbacks = (obj = {}, defaults = {}) => ({ ...defaults, ...pruned(obj) });
 
 // a spec entry -> { tag, attrs, options? } describing one aufbau control.
 function toControl (key, spec, value) {
@@ -24,100 +32,7 @@ function toControl (key, spec, value) {
   }
 }
 
-
-
-
-
-
-const TAG_MAP = {
-  boolean: 'aufbau-toggle',
-  integer: 'aufbau-slider',
-  number:  'aufbau-slider',
-  angle:   'aufbau-slider',
-  color:   'aufbau-input',
-};
-
-const TYPE_DEFAULTS = {
-  angle: { min: 0, max: 360, step: 1, unit: 'deg' },
-  boolean: { value: 'true' },
-};
-
 function toControl2 (key, spec, value = spec.default) {
-  const { values, type, label, default: _, ...rest } = spec;
-
-  if (values) {
-    return { tag: 'aufbau-picker', attrs: { name: key, value }, options: values };
-  }
-
-  const tag = TAG_MAP[type] ?? 'aufbau-input';
-  const defaults = TYPE_DEFAULTS[type] ?? {};
-  
-  const baseAttrs = {
-    name: key,
-    value,
-    type: (type === 'integer' || type === 'angle') ? 'number' : (type ?? 'text'),
-    ...rest,
-  };
-
-  // Special handling for boolean checked state
-  if (type === 'boolean') {
-    delete baseAttrs.type;
-    baseAttrs.checked = value ? '' : null;
-  } else if (type === 'color') {
-    baseAttrs.look = 'swatch';
-  }
-
-  return { tag, attrs: pruned(baseAttrs, defaults) };
-}
-
-
-
-// Central registry for control tags, attribute defaults, and static overrides
-const CONTROL_TYPES = {
-  angle:   { tag: 'aufbau-slider', inputType: 'number', defaults: { min: 0, max: 360, step: 1, unit: 'deg' } },
-  boolean: { tag: 'aufbau-toggle', inputType: null, staticAttrs: { value: 'true' } },
-  color:   { tag: 'aufbau-input',  inputType: 'color',  staticAttrs: { look: 'swatch' } },
-  integer: { tag: 'aufbau-slider', inputType: 'number' },
-  number:  { tag: 'aufbau-slider', inputType: 'number' },
-  
-  
-};
-
-function toControl3 (key, spec, value = spec.default) {
-  const { values, type, label, default: _, ...rest } = spec;
-
-  if (values) {
-    return { tag: 'aufbau-picker', attrs: { name: key, value }, options: values };
-  }
-
-  const config = CONTROL_TYPES[type] ?? { tag: 'aufbau-input', inputType: type ?? 'text' };
-  const inputType = config.inputType ?? (type ?? 'text');
-
-  const baseAttrs = {
-    name: key,
-    value,
-    ...(inputType ? { type: inputType } : {}),
-    ...(type === 'boolean' ? { checked: value ? '' : null } : {}),
-    ...config.staticAttrs,
-    ...rest,
-  };
-
-  return { tag: config.tag, attrs: pruned(baseAttrs, config.defaults) };
-}
-
-
-
-
-
-
-// strips null/undefined from obj and applies fallback defaults
-const prunedWithFallbacks = (obj, defaults = {}) => {
-  const cleanObj = Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
-  return { ...defaults, ...cleanObj };
-};
-
-
-function toControl4 (key, spec, value = spec.default) {
   const { values, type, label, default: _, ...rest } = spec;
 
   const { attrs, tag } = {
@@ -130,35 +45,9 @@ function toControl4 (key, spec, value = spec.default) {
     color   : { tag: 'aufbau-input'  , attrs: { type: 'color', look: 'swatch' } },
     //default : { tag: 'aufbau-input'  , attrs: { type: 'text'   } },
   }[type];
-
-
-  return { tag, attrs: pruned(rest, { ...attrs, name: key }) };
+  
+  return { tag, attrs: prunedWithFallbacks(rest, { ...attrs, name: key }) };
 }
-
-
-
-
-
-
-function toControl5 (key, spec, value) {
-  value ??= spec.default;
-  const attrs = { name: key };
-  const { max, min, step, type, unit, values } = spec;
-
-  if (values) return { tag: 'aufbau-picker', attrs: { ...attrs, value }, options: spec.values };
-
-  switch (type) {
-    case 'boolean' : return { tag: 'aufbau-toggle', attrs: pruned(attrs, { value: 'true', checked: value ? '' : null }) };
-    case 'integer' :
-    case 'number'  : return { tag: 'aufbau-slider', attrs: pruned(attrs, { type: 'number' }) };
-    case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned(attrs, { type: 'number', min: 0, max: 360, step: 1, unit: 'deg' }) };    
-    case 'color'   : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'color', look: 'swatch' }) };
-    default        : return { tag: 'aufbau-input',  attrs: pruned(attrs, { type: 'text' }) }; // time, text, anything else
-  }
-}
-
-
-
 
 const normalizeOption = option => (Array.isArray(option) ? option : [option, option]); // [value, label]
 
@@ -184,10 +73,6 @@ function fieldElement (key, spec, value) {
 
 // :::::: HTML OUTPUT ::::::::::::::::::::::::::::::::::::::::::::
 
-const escAttr = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-const escText = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const attrStr = attrs => Object.entries(attrs).map(([k, v]) => (v === '' ? ` ${k}` : ` ${k}="${escAttr(v)}"`)).join('');
-
 function fieldHTML (key, spec, value) {
   const { tag, attrs, options } = toControl(key, spec, value);
   const inner = options ? options.map(opt => { const [val, label] = normalizeOption(opt); return `<aufbau-option value="${escAttr(val)}">${escText(label)}</aufbau-option>`; }).join('') : '';
@@ -207,7 +92,7 @@ function coerce (spec, element) {
 }
 
 /** reads a built controls container back into a typed values object, keyed by spec. */
-function readValues (container, spec) {
+function getValues (container, spec) {
   const out = {};
   for (const [key, s] of Object.entries(spec)) {
     const element = container.querySelector?.(`[name="${key}"]`);
@@ -224,7 +109,7 @@ function field (key, spec, value, { format = 'element' } = {}) {
   return format === 'html' ? fieldHTML(key, spec, value) : fieldElement(key, spec, value);
 }
 
-function controls (spec, opts = {}) {
+function render (spec, opts = {}) {
   const {
     format = 'element', 
     values = {}, 
@@ -256,6 +141,12 @@ function controls (spec, opts = {}) {
     return container;
   }
 }
+
+// :::::: EXPORTS
+
+const // temp alias (deprecated)
+controls   = render,
+readValues = getValues;
 
 export         { controls, field, readValues };
 export default { controls, field, readValues };
