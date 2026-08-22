@@ -41,7 +41,7 @@ const initElements = async ({ mode = 'auto' }) => {
 const initStylesheet = (bool) => bool && client.observeStylesheets();
 
 // boots the aufbau runtime in the browser
-async function init (options = {}) {
+async function boot (options = {}) {
   setConfig(options);
 
   if (typeof window !== 'undefined' && !isBooted) {
@@ -55,4 +55,6 @@ async function init (options = {}) {
 
 // :::::: EXPORTS
 
-export { init, setConfig };
+const init = boot;
+
+export { boot, init, setConfig };
