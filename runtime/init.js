@@ -1,7 +1,8 @@
 // init.js
 
-import * as aufbauElements      from '@aufbau/elements';
-import * as aufbauUtils         from '@aufbau/js';
+import * as aufbauElements from '@aufbau/elements';
+import * as aufbauUtils    from '@aufbau/js';
+import * as aufbauClient   from './client.js';
 
 import configs from './configs.js';
 
