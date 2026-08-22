@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters</title>
+  <!--
   <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css"/>
+  -->
   <style>
     body      { display: flex; flex-direction: column; gap: 1rem; }
     main      { display: flex; flex-direction: column; gap: 1rem; }
@@ -61,7 +63,7 @@
     import aufbau, { dom, str } from '@aufbau/runtime';
 
     await aufbau.init({ mode: 'auto' });
-    dom.adoptStylesheet('./../css/themes/zombie.css');
+    //dom.adoptStylesheet('./../css/themes/zombie.css');
 
     // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
     const { defs, $controls, $css, $js, $nav, $subject, $svg, $title } = dom.get;
