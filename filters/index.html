@@ -13,7 +13,7 @@
     
     body { padding: 1rem; }
     
-    
+    #defs { position: absolute; width: 0; height: 0; }
   </style>
   <!--
   <script type='stylescript'>
@@ -39,11 +39,11 @@
 
     <nav id="nav"></nav>
     
-    <div id='stage' class="stage"><div class="subject" id="subject">aufbau</div></div>
+    <div id='stage'><div id='subject'>aufbau</div></div>
     
     <h2 id="title"></h2>
     
-    <div class="controls" id="controls"></div>
+    <div class='controls'></div>
     
     <div class="panels">
       <aufbau-code id="svg" lang="svg"></aufbau-code>
@@ -54,11 +54,9 @@
   </main>
 
   <!-- shared host the previewed <filter> lives in -->
-  <svg id="defs" aria-hidden="true" style="position:absolute;width:0;height:0"></svg>
+  <svg id="defs" aria-hidden="true"></svg>
 
   <script type="module">
-    // the filters api is imported locally (this is the package under test); everything
-    // else — dom helpers, asset import, custom elements, css — comes from the aufbau stack.
     import { list, filterSvg, filterCss } from './index.js';
     import aufbau, { dom } from '@aufbau/runtime';
 
@@ -74,14 +72,9 @@
     const $js       = dom.element('#js');
     const defs      = dom.getElement('#defs');
 
-    // use the real aufbau logo as the preview subject; fall back to the text on failure.
-    try {
-      const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
-      $subject.setHTML(logo);
-    } catch { /* keep the text fallback */ }
+    const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
+    $subject.setHTML(logo);
 
-    // this page previews on a dom element, so only css/svg filters. canvas-only ones
-    // (pixelate, dither, …) live in canvas.html.
     const catalogue = list().filter(f => f.backends.svg || f.backends.css);
 
     let current = catalogue[0];
@@ -101,9 +94,7 @@
       current = filter;
       options = {};
       for (const [key, spec] of Object.entries(filter.vars)) options[key] = spec.default;
-      for (const button of $nav.node.children) {
-        button.setAttribute('aria-current', String(button.dataset.id === filter.id));
-      }
+      for (const button of $nav.node.children) button.setAttribute('aria-current', String(button.dataset.id === filter.id));    
       buildControls();
       render();
     }
@@ -111,11 +102,8 @@
     function buildControls () {
       const backends = ['svg', current.backends.css && 'css'].filter(Boolean).join(' + ');
       $title.setText(`${current.name}  ·  ${current.id}  ·  ${backends}`);
-      // aufbau.gui builds the aufbau form controls from the filter's vars spec.
-      $controls.node.replaceChildren(aufbau.gui.controls(current.vars, {
-        values   : options,
-        onChange : values => { options = values; render(); },
-      }));
+      const $gui = aufbau.gui.controls (current.vars, { values: options, onChange: values => { options = values; render(); } })
+      $controls.node.replaceChildren($gui);
     }
 
     function render () {
@@ -127,9 +115,7 @@
         // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
         const uid    = `preview-${current.id}-${counter++}`;
         const markup = filterSvg(current.id, { ...options, svgId: uid });
-        const node   = new DOMParser().parseFromString(
-          `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml'
-        ).querySelector('filter');
+        const node   = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml').querySelector('filter');
         defs.replaceChildren(node);
         $subject.node.style.filter = `url(#${uid})`;
       }
@@ -145,8 +131,6 @@
         `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
         `applyFilter('#logo', '${current.id}', ${opts});`);
     }
-
-    const camel = s => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
     select(current);
   </script>
