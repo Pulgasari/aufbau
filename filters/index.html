@@ -63,6 +63,8 @@
     await aufbau.init({ mode: 'auto' });
 
     // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
+    const { defs, $controls, $css, $js, $nav, $subject, $svg, $title } = dom.get;
+    /*
     const $nav      = dom.element('#nav');
     const $subject  = dom.element('#subject');
     const $title    = dom.element('#title');
@@ -71,6 +73,7 @@
     const $css      = dom.element('#css');
     const $js       = dom.element('#js');
     const defs      = dom.getElement('#defs');
+    */
 
     const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
     $subject.setHTML(logo);
