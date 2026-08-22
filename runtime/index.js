@@ -4,26 +4,19 @@
 
 // ::: AUFBAU
 
-import * as aufbauElements      from '@aufbau/elements';
-import * as aufbauFilters       from '@aufbau/filters';
-import      aufbauImport        from '@aufbau/import';
-import * as aufbauPatterns      from '@aufbau/patterns';
-import * as aufbauStore         from './store.js';
-import * as aufbauStylesheet    from '@aufbau/stylesheet';
-import * as aufbauUtils         from '@aufbau/js';
+import * as aufbauElements   from '@aufbau/elements';
+import * as aufbauFilters    from '@aufbau/filters';
+import      aufbauImport     from '@aufbau/import';
+import * as aufbauPatterns   from '@aufbau/patterns';
+import * as aufbauStylesheet from '@aufbau/stylesheet';
+import * as aufbauUtils      from '@aufbau/js';
 
+import { boot, setConfig } from './boot.js';
 import * as aufbauClient from './client.js';
+import      config       from './config.js';
 import * as aufbauGui    from './gui.js';
+import * as aufbauStore  from './store.js';
 import * as aufbauWorker from './worker.js';
-
-import { boot, init, setConfig } from './boot.js';
-
-//const fileURL = new URL("./configs.json5", import.meta.url);
-//const configs = await aufbauImport(fileURL);
-import configs from './configs.js';
-
-//const { deepMerge, isPlainObject } = aufbauUtils;
-//console.log('[runtime] configs:', configs);
 
 // ::: VENDORS
 
@@ -31,49 +24,42 @@ import * as bunker from '@bunker/kit';
 import * as domina from '@domina/core';
 import      str    from '@pulgasari/str';
 
-// :::::: MISC ::::::::::::::::::::::::::::::::::::::::::::::::
-
-//const RESERVED_ELEMENT_KEYS = new Set(['mode']);
-//const normalizeElements = value => value ?? null;
-
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
 const dom = domina;
 
 const aufbau = {
-  // config + runtime
-  setConfig, configs,
-  init, //interceptFetch,
+  // deprecated
+  configs: config,
+  init: boot,
   
-  //
-  dom, domina, str,
-
-  // gui: builds aufbau form controls from a spec object (see gui.js)
+  // runtime
+  boot, //interceptFetch,
+  config, setConfig,
   gui : aufbauGui,
-
+  
   // packages
   elements   : aufbauElements,
   filters    : aufbauFilters,
   import     : aufbauImport,
   patterns   : aufbauPatterns,
+  store      : aufbauStore,
   stylesheet : aufbauStylesheet,
   utils      : aufbauUtils,
-
-  // storage engine. the aufbau presets above sit on this, but it is exposed raw
-  // too, so an app can open its own database or cache without a second dependency.
-  // aufbau.cache used to be a second cache layer of its own; it is bunker.cache now.
-  bunker,
 
   // adapters
   plugins : {
     client : aufbauClient,
     worker : aufbauWorker
   },
+
+  // vendors
+  bunker, dom, domina, str,
 };
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { aufbau, dom, domina, str };
+export { aufbau, bunker, dom, domina, str };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
