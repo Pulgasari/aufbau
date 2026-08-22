@@ -25,7 +25,7 @@ function setConfig (options = {}) {
 
 // :::::: INIT
 
-const initAppearance () {
+const initAppearance = () => {
   const { css, font, layout, look, skin, theme } = configs;
 
   // load + apply font-files
