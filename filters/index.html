@@ -124,6 +124,8 @@
       }
 
       // <aufbau-code> reads its content from the `code` attribute (setAttr re-highlights).
+      //$css.attr.code = `#logo { filter: ${cssValue ?? url(#aufbau-filter-${current.id}) }; }`
+      //$svg.attr.code = filterSvg(current.id, options);
       $svg.setAttr('code', filterSvg(current.id, options));
       $css.setAttr('code', cssValue
         ? `#logo { filter: ${cssValue}; }  /* css backend */`
