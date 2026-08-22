@@ -4,19 +4,19 @@
 
 // ::: AUFBAU
 
-import * as aufbauElements   from '@aufbau/elements';
-import * as aufbauFilters    from '@aufbau/filters';
-import      aufbauImport     from '@aufbau/import';
-import * as aufbauPatterns   from '@aufbau/patterns';
-import * as aufbauStylesheet from '@aufbau/stylesheet';
-import * as aufbauUtils      from '@aufbau/js';
+import * as elements   from '@aufbau/elements';
+import * as filters    from '@aufbau/filters';
+import      importFile from '@aufbau/import';
+import * as patterns   from '@aufbau/patterns';
+import * as stylesheet from '@aufbau/stylesheet';
+import * as utils      from '@aufbau/js';
 
 import { boot, setConfig } from './boot.js';
-import * as aufbauClient from './client.js';
-import      config       from './config.js';
-import * as aufbauGui    from './gui.js';
-import * as aufbauStore  from './store.js';
-import * as aufbauWorker from './worker.js';
+import * as client from './client.js';
+import      config from './config.js';
+import * as gui    from './gui.js';
+import * as store  from './store.js';
+import * as worker from './worker.js';
 
 // ::: VENDORS
 
@@ -36,21 +36,21 @@ const aufbau = {
   // runtime
   boot, //interceptFetch,
   config, setConfig,
-  gui : aufbauGui,
+  gui,
+  store,
   
   // packages
-  elements   : aufbauElements,
-  filters    : aufbauFilters,
-  import     : aufbauImport,
-  patterns   : aufbauPatterns,
-  store      : aufbauStore,
-  stylesheet : aufbauStylesheet,
-  utils      : aufbauUtils,
+  elements,
+  filters,
+  import: importFile,
+  patterns,
+  stylesheet,
+  utils,
 
   // adapters
   plugins : {
-    client : aufbauClient,
-    worker : aufbauWorker
+    client,
+    worker,
   },
 
   // vendors
