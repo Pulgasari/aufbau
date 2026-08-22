@@ -69,10 +69,10 @@ table {
 
 /*/////////////////////// COLORS ///////////////////////*/
 
-root {
+:root {
 	--aufbau-error   : red;
-    --aufbau-success : green;
-    --aufbau-warn    : yellow;
+  --aufbau-success : green;
+  --aufbau-warn    : yellow;
 }
 
 body {
