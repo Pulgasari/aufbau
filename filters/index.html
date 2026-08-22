@@ -61,6 +61,7 @@
     import aufbau, { dom, str } from '@aufbau/runtime';
 
     await aufbau.init({ mode: 'auto' });
+    dom.adoptStylesheet('./../css/themes/zombie.css');
 
     // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
     const { defs, $controls, $css, $js, $nav, $subject, $svg, $title } = dom.get;
