@@ -15,20 +15,15 @@ console.log('[runtime] configs:', configs);
 
 // :::::: CONFIG
 
-function config (options = {}) {
-  const { elements, stylesheet, ...rest } = options;
-
-  elements ??= null;
-  if (elements)   deepMerge(configs.elements, elements);
-  if (stylesheet) configs.stylesheet = stylesheet;
-  
+function setConfig (options = {}) {
+  deepMerge(configs, options);
   elements.setConfig(configs.elements, { layer: 'defaults' });
   return configs;
 }
 
 // :::::: INIT
 
-async function initElements ({ mode = 'auto' }) {
+const initElements = async ({ mode = 'auto' }) => {
        if (mode === 'auto')      elements.autoloader();
   else if (mode === 'all') await elements.registerAll();
 }
@@ -37,7 +32,7 @@ const initStylesheet = (bool) => bool && client.observeStylesheets();
 
 // boots the aufbau runtime in the browser
 async function init (options = {}) {
-  config(options);
+  setConfig(options);
 
   if (typeof window !== 'undefined' && !isBooted) {
     initElements   (configs.elements);
@@ -50,4 +45,4 @@ async function init (options = {}) {
 
 // :::::: EXPORTS
 
-export { config, init };
+export { init, setConfig };
