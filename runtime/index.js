@@ -33,8 +33,8 @@ import      str    from '@pulgasari/str';
 
 // :::::: MISC ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const RESERVED_ELEMENT_KEYS = new Set(['mode']);
-const normalizeElements = value => value ?? null;
+//const RESERVED_ELEMENT_KEYS = new Set(['mode']);
+//const normalizeElements = value => value ?? null;
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
