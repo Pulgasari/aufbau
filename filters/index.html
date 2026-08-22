@@ -63,8 +63,8 @@
     //dom.adoptStylesheet('./../css/themes/zombie.css');
 
     // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
-    const { defs, $controls, $css, $js, $nav, $subject, $svg, $title } = dom.get;
-    /*
+    //const { defs, $controls, $css, $js, $nav, $subject, $svg, $title } = dom.get;
+    
     const $controls = dom.element('#controls');
     const $css      = dom.element('#css');
     const defs      = dom.getElement('#defs');
@@ -72,8 +72,7 @@
     const $nav      = dom.element('#nav');
     const $subject  = dom.element('#subject');
     const $svg      = dom.element('#svg');
-    const $title    = dom.element('#title');    
-    */
+    const $title    = dom.element('#title');
 
     const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
     $subject.setHTML(logo);
