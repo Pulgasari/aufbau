@@ -43,9 +43,9 @@
     
     <h2 id="title"></h2>
     
-    <div class='controls'></div>
+    <div id='controls'></div>
     
-    <div class="panels">
+    <div id="panels">
       <aufbau-code id="svg" lang="svg"></aufbau-code>
       <aufbau-code id="css" lang="css"></aufbau-code>
       <aufbau-code id="js"  lang="js"></aufbau-code>
@@ -119,6 +119,7 @@
         const uid    = `preview-${current.id}-${counter++}`;
         const markup = filterSvg(current.id, { ...options, svgId: uid });
         const node   = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml').querySelector('filter');
+        //const node2  = dom.createSVG(markup).find('filter');
         defs.replaceChildren(node);
         $subject.node.style.filter = `url(#${uid})`;
       }
