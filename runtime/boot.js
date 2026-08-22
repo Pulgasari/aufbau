@@ -26,12 +26,13 @@ function setConfig (options = {}) {
 // :::::: INIT
 
 const initAppearance = () => {
-  const { css, font, layout, look, skin, theme } = configs;
+  const { css, font } = configs;
+  const { layout, look, reset, skin, theme } = css;
 
   // load + apply font-files
 
   // load + apply css-files
-  if (css)    dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
+  if (reset)  dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
   if (layout) dom.adoptStylesheet(`${cssPath}/layouts/${layout}.css`);
   if (look)   dom.adoptStylesheet(`${cssPath}/looks/${look}.css`);
   if (skin)   dom.adoptStylesheet(`${cssPath}/skins/${skin}.css`);
