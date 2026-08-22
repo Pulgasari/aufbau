@@ -1,11 +1,13 @@
 // init.js
 
 import * as client   from './client.js';
+import * as dom      from '@domina/core';
 import * as elements from '@aufbau/elements';
 import * as utils    from '@aufbau/js';
 import configs       from './configs.js';
 
 const { deepMerge, isPlainObject } = utils;
+const cssPath = 'https://code.pulgasari.dev/aufbau/css';
 
 let isBooted = false;
 
@@ -29,10 +31,11 @@ const initAppearance () {
   // load + apply font-files
 
   // load + apply css-files
-  let url = 'https://code.pulgasari.dev/aufbau/css';
-  if (look)  dom.adoptStylesheet(`${url}/looks/${look}.css`);
-  if (skin)  dom.adoptStylesheet(`${url}/skins/${skin}.css`);
-  if (theme) dom.adoptStylesheet(`${url}/themes/${theme}.css`);
+  if (css)    dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
+  if (layout) dom.adoptStylesheet(`${cssPath}/layouts/${layout}.css`);
+  if (look)   dom.adoptStylesheet(`${cssPath}/looks/${look}.css`);
+  if (skin)   dom.adoptStylesheet(`${cssPath}/skins/${skin}.css`);
+  if (theme)  dom.adoptStylesheet(`${cssPath}/themes/${theme}.css`);
 }
 
 const initElements = async ({ mode = 'auto' }) => {
