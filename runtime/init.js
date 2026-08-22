@@ -40,7 +40,7 @@ async function init (options = {}) {
     isBooted = true;
   }
   
-  return true;
+  return isBooted;
 }
 
 // :::::: EXPORTS
