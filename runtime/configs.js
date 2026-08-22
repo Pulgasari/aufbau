@@ -16,10 +16,12 @@ export default {
   },
 
   // appearance
-  css  : ['aufbau'],
   font : ['Manrope'],
-
-  look  : 'flat',
-  skin  : 'monochrome',
-  theme : 'zombie',
+  css : {
+    reset  : true,
+    layout : false,
+    look   : 'flat',
+    skin   : 'monochrome',
+    theme  : 'zombie',
+  }
 };
