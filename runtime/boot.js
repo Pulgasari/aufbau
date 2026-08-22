@@ -29,8 +29,10 @@ const initAppearance () {
   // load + apply font-files
 
   // load + apply css-files
-  let url = 'https://code.pulgasari.dev/css';
-  //if (theme) 
+  let url = 'https://code.pulgasari.dev/aufbau/css';
+  if (look)  dom.adoptStylesheet(`${url}/looks/${look}.css`);
+  if (skin)  dom.adoptStylesheet(`${url}/skins/${skin}.css`);
+  if (theme) dom.adoptStylesheet(`${url}/themes/${theme}.css`);
 }
 
 const initElements = async ({ mode = 'auto' }) => {
