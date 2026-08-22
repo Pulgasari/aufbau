@@ -8,6 +8,9 @@ import configs from './configs.js';
 const { deepMerge, isPlainObject } = aufbauUtils;
 console.log('[runtime] configs:', configs);
 
+const RESERVED_ELEMENT_KEYS = new Set(['mode']);
+const normalizeElements = value => value ?? null;
+
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // pushes element config into the AufbauConfigStore as the lowest layer
