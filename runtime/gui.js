@@ -232,21 +232,29 @@ function controls (spec, opts = {}) {
     onChange,
   } = opts;
 
+  // render as html-string
   if (format === 'html') {
     const body = Object.entries(spec).map(([key, s]) => fieldHTML(key, s, values[key])).join('');
     return wrap ? `<${wrap}>${body}</${wrap}>` : body;
   }
 
-  const container = wrap ? dom.createElement(wrap) : dom.createFragment();
-  for (const [key, s] of Object.entries(spec)) container.appendChild(fieldElement(key, s, values[key]));
-
-  if (onChange) {
-    const handler = event => onChange(readValues(container, spec), event.target?.getAttribute?.('name') ?? null, event);
-    //container.addEventListener('input', handler);   // sliders/inputs: live while dragging/typing
-    //container.addEventListener('change', handler);   // toggles/pickers: on commit
-    dom.onEvent(container, ['change', 'input'], handler);
+  // render as dom-elements
+  else {
+    const container = wrap ? dom.createElement(wrap) : dom.createFragment();
+    for (const [key, s] of Object.entries(spec)) {
+      const value   = values[key];
+      const element = fieldElement(key, s, value);
+      container.append(element);
+    }
+  
+    if (onChange) {
+      const handler = event => onChange(readValues(container, spec), event.target?.getAttribute?.('name') ?? null, event);
+      //container.addEventListener('input', handler);   // sliders/inputs: live while dragging/typing
+      //container.addEventListener('change', handler);   // toggles/pickers: on commit
+      dom.onEvent(container, ['change', 'input'], handler);
+    }
+    return container;
   }
-  return container;
 }
 
 export         { controls, field, readValues };
