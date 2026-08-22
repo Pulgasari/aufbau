@@ -1,4 +1,4 @@
-// @aufbau/kits/aufbau.js
+// @aufbau/runtime
 
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -16,7 +16,7 @@ import * as aufbauClient from './client.js';
 import * as aufbauGui    from './gui.js';
 import * as aufbauWorker from './worker.js';
 
-import { config, init } from './init.js';
+import { setConfig, init } from './init.js';
 
 //const fileURL = new URL("./configs.json5", import.meta.url);
 //const configs = await aufbauImport(fileURL);
@@ -42,7 +42,7 @@ const dom = domina;
 
 const aufbau = {
   // config + runtime
-  config, configs,
+  setConfig, configs,
   init, //interceptFetch,
   
   //
