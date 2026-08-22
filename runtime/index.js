@@ -16,7 +16,7 @@ import * as aufbauClient from './client.js';
 import * as aufbauGui    from './gui.js';
 import * as aufbauWorker from './worker.js';
 
-import { setConfig, init } from './init.js';
+import { boot, init, setConfig } from './boot.js';
 
 //const fileURL = new URL("./configs.json5", import.meta.url);
 //const configs = await aufbauImport(fileURL);
