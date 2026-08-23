@@ -253,34 +253,38 @@ function transformCSSResult (code, mode) {
 
 // :::::: FORMAT HANDLERS :::::::::::::::::::::::::::::::::::::::
 
-export async function importCSS (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  return transformCSSResult(text, resolveMode('css', options));
+function createImporter(type, parseFn) {
+  return async (path, options = {}) => {
+    const opts = toOptions(options);
+    const mode = resolveMode(type, opts);
+    const text = await fetchText(path, opts);
+
+    if (mode === 'raw') return text;
+    return parseFn(text, { path, options: opts, mode });
+  };
 }
 
-export async function importCSV (path, options = {}) {
-  options = toOptions(options);
-  const mode = resolveMode('csv', options);
-  const text = await fetchText(path, options);
-  if (mode === 'raw') return text;
+export const 
+importCSS   = createImporter ('css'   , (text, { mode }) => transformCSSResult(text, mode)),
+importJSON  = createImporter ('json'  , (text) => JSON.parse(text)),
+importJSONL = createImporter ('jsonl' , (text) => text.split('\n').filter(line => line.trim()).map(JSON.parse) );
 
-  const PAPA      = (await vendor('papaparse')).default;
+export const
+importJSX = async (path, options = {}) => transpile(path, 'jsx', toOptions(options));
+
+export const importCSV = createImporter('csv', async (text, { path, options, mode }) => {
+  const PAPA = (await vendor('papaparse')).default;
   const extension = extensionOf(path);
 
   return PAPA.parse(text, {
-    header        : mode === 'records',
-    delimiter     : extension === 'tsv' ? '\t' : undefined,
-    dynamicTyping : true,
+    header: mode === 'records',
+    delimiter: extension === 'tsv' ? '\t' : undefined,
+    dynamicTyping: true,
     ...options.parserOptions
   }).data;
-}
+});
 
-export async function importENV (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('env', options) === 'raw') return text;
-
+export const importENV = createImporter('env', (text) => {
   const result = {};
   for (const line of text.split(/\r?\n/)) {
     const trimmed = line.trim().replace(/^export\s+/, '');
@@ -292,26 +296,17 @@ export async function importENV (path, options = {}) {
     result[trimmed.slice(0, split).trim()] = unquote(trimmed.slice(split + 1).trim());
   }
   return result;
-}
+});
 
-export async function importHTML (path, options = {}) {
-  options = toOptions(options);
-  const mode = resolveMode('html', options);
-  const text = await fetchText(path, options);
-
+export const importHTML = createImporter('html', (text, { mode }) => {
   if (mode === 'document') return new DOMParser().parseFromString(text, 'text/html');
-  if (mode === 'element')  return createElement('div', { innerHTML: text });
-
+  if (mode === 'element') return createElement('div', { innerHTML: text });
   return text;
-}
+});
 
-export async function importINI (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('ini', options) === 'raw') return text;
-
-  const result  = {};
-  let   section = result;
+export const importINI = createImporter('ini', (text) => {
+  const result = {};
+  let section = result;
 
   for (const line of text.split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -326,7 +321,7 @@ export async function importINI (path, options = {}) {
     section[trimmed.slice(0, split).trim()] = unquote(trimmed.slice(split + 1).trim());
   }
   return result;
-}
+});
 
 export async function importJS (path, options = {}) {
   options = toOptions(options);
@@ -334,64 +329,6 @@ export async function importJS (path, options = {}) {
   return import(/* @vite-ignore */ path);
 }
 
-export async function importJSON (path, options = {}) {
-  options = toOptions(options);
-  const mode = resolveMode('json', options);
-  const text = await fetchText(path, options);
-  if (mode === 'raw') return text;
-  return JSON.parse(text);
-}
-
-export async function importJSON5 (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('json5', options) === 'raw') return text;
-
-  const JSON5 = (await vendor('json5')).default;
-  return JSON5.parse(text);
-}
-
-export async function importJSONC (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('jsonc', options) === 'raw') return text;
-
-  // strips comments while leaving string literals and escaped quotes intact
-  const stripped = text.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (match, comment) => (comment ? '' : match));
-  return JSON.parse(stripped);
-}
-
-export async function importJSONL (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('jsonl', options) === 'raw') return text;
-
-  const records = [];
-  for (const line of text.split('\n')) {
-    if (line.trim()) records.push(JSON.parse(line));
-  }
-  return records;
-}
-
-export async function importJSX (path, options = {}) {
-  return transpile(path, 'jsx', toOptions(options));
-}
-
-export async function importLESS (path, options = {}) {
-  options = toOptions(options);
-  const mode = resolveMode('less', options);
-  const text = await fetchText(path, options);
-  if (mode === 'raw') return text;
-
-  const css = options.compiler
-    ? await options.compiler(text, path)
-    : (await (await vendor('less')).default.render(text)).css;
-
-  return transformCSSResult(css, mode);
-}
-
-
-export const importJSON = createImporter('json', (text) => JSON.parse(text));
 
 export const importJSON5 = createImporter('json5', async (text) => {
   const JSON5 = (await vendor('json5')).default;
@@ -407,13 +344,6 @@ export const importJSONC = createImporter('jsonc', (text) => {
   return JSON.parse(stripped);
 });
 
-export const importJSONL = createImporter('jsonl', (text) =>
-  text.split('\n').filter(line => line.trim()).map(JSON.parse)
-);
-
-export async function importJSX(path, options = {}) {
-  return transpile(path, 'jsx', toOptions(options));
-}
 
 export const importLESS = createImporter('less', async (text, { path, options, mode }) => {
   const css = options.compiler
@@ -455,36 +385,28 @@ export async function importSCSS (path, options = {}) {
   return compileSass(path, 'scss', 'scss', toOptions(options));
 }
 
-export async function importSVG (path, options = {}) {
-  options = toOptions(options);
-  const mode = resolveMode('svg', options);
-  const text = await fetchText(path, options);
-  if (mode === 'raw') return text;
-
-  // strip xml declaration and doctype headers for clean html5 inlining
+export const importSVG = createImporter('svg', async (text, { mode }) => {
+  // Strip XML declaration and DOCTYPE headers for clean HTML5 inlining
   const clean = text.replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
   if (mode === 'string') return clean;
 
-  const doc     = new DOMParser().parseFromString(clean, 'image/svg+xml');
+  const doc = new DOMParser().parseFromString(clean, 'image/svg+xml');
   const element = doc.querySelector('svg') || doc.documentElement;
   if (mode === 'element') return element;
 
   const { SVG } = await vendor('svgjs');
-  return SVG(element); // adopts the live node, no re-parse
-}
+  return SVG(element); // Adopts the live node, no re-parse
+});
 
 export async function importText (path, options = {}) {
   return fetchText(path, toOptions(options));
 }
 
-export async function importTOML (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('toml', options) === 'raw') return text;
 
+export const importTOML = createImporter('toml', async (text) => {
   const { parse } = await vendor('smolToml');
   return parse(text);
-}
+});
 
 export async function importTS (path, options = {}) {
   return transpile(path, 'ts', toOptions(options));
@@ -506,28 +428,19 @@ export async function importWASM (path, options = {}) {
   return instance.exports;
 }
 
-export async function importXML (path, options = {}) {
-  options = toOptions(options);
-  const mode = resolveMode('xml', options);
-  const text = await fetchText(path, options);
-
-  if (mode === 'raw')      return text;
+export const importXML = createImporter('xml', async (text, { options, mode }) => {
   if (mode === 'document') return new DOMParser().parseFromString(text, 'text/xml');
 
   const { XMLParser } = await vendor('fastXmlParser');
   const parsed = new XMLParser(options.parserOptions || {}).parse(text);
 
   return mode === 'json' ? JSON.stringify(parsed) : parsed;
-}
+});
 
-export async function importYAML (path, options = {}) {
-  options = toOptions(options);
-  const text = await fetchText(path, options);
-  if (resolveMode('yaml', options) === 'raw') return text;
-
+export const importYAML = createImporter('yaml', async (text) => {
   const YAML = (await vendor('yaml')).default;
   return YAML.parse(text);
-}
+});
 
 // :::::: SHARED IMPLEMENTATIONS ::::::::::::::::::::::::::::::::
 
