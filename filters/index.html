@@ -59,7 +59,7 @@
     import { list, filterSvg, filterCss } from './index.js';
     import aufbau, { dom, str } from '@aufbau/runtime';
 
-    await aufbau.init({ mode: 'auto' });
+    await aufbau.init({ elements: { mode: 'auto' }});
     //dom.adoptStylesheet('./../css/themes/zombie.css');
 
     // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
