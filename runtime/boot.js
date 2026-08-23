@@ -43,7 +43,7 @@ const initWebfonts = (fontConfig) => {
 
   // set primary font family as CSS variable on root
   const primaryFont = isPlainObject(list[0]) ? list[0].family : list[0];
-  if (primaryFont && dom.root) dom.root.style.setProperty('--aufbau-font-family', `'${primaryFont}', sans-serif`);    
+  if (primaryFont && dom.root) dom.root.style.setProperty('--aufbau-font', `'${primaryFont}', sans-serif`);    
 }
 
 const initAppearance = () => {
