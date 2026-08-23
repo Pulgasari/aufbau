@@ -65,8 +65,29 @@ weight  : ['400', '100 900'];
 /*
 https://developer.mozilla.org/de/docs/Web/API/CSS_Font_Loading_API
 https://developer.mozilla.org/de/docs/Web/API/FontFace
+https://developer.mozilla.org/de/docs/Web/API/FontFaceSet
 */
 
+/*
+FontFaceSet.ready
+FontFaceSet.size
+FontFaceSet.status
+
+FontFaceSet.add()
+FontFaceSet.check()
+FontFaceSet.clear()
+FontFaceSet.delete()
+FontFaceSet.entries()
+FontFaceSet.forEach()
+FontFaceSet.has()
+FontFaceSet.keys()
+FontFaceSet.load()
+FontFaceSet.values()
+
+loading
+loadingdone
+loadingerror
+*/
 
 
 
