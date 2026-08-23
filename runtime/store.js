@@ -8,7 +8,8 @@ import { createStorage } from '@bunker/storage';
 const namespace = 'aufbau';
 const version   = 1;
 
-export const store   = createStorage({ area: 'local',   namespace, version });
-export const session = createStorage({ area: 'session', namespace, version });
+export const 
+store   = createStorage({ area: 'local',   namespace, version }),
+session = createStorage({ area: 'session', namespace, version });
 
 export default store;
