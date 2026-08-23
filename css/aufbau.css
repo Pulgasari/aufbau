@@ -73,8 +73,6 @@ table {
   --aufbau-error   : red;
   --aufbau-success : green;
   --aufbau-warn    : yellow;
-
-  --aufbau-font : sans;
 }
 
 body {
@@ -84,6 +82,11 @@ body {
 
 /*//////////////////////// TYPO ////////////////////////*/
 
+:root {
+  --aufbau-font           : sans;
+  --aufbau-font-monospace : monospace;
+}
+	 
 body { 
   font-family : var(--aufbau-font);
   line-height : 1;
