@@ -1,23 +1,36 @@
 // @aufbau/import
 // @ts-self-types="./index.d.ts"
+// 21.8 kb
+
+// :::::: HELPERS
+
+const isFn = v => typeof v === 'function';
+
+const createElement = (tag = 'div', obj 0 {}) => Object.assign(document.createElement(tag), obj);
+const unquote = (value) => value.replace(/^(['"])(.*)\1$/, '$2');
+
+const domFromString = (code, mimeType) => new DOMParser().parseFromString(code, mimeType);
 
 // :::::: CACHE :::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//import { createPolicy }      from '@bunker/policy';
-//import { BunkerDB, createDb } from '@bunker/db';
-
-import { createPolicy }      from 'https://code.pulgasari.dev/bunker/policy/index.js';
 import { BunkerDB, createDb } from 'https://code.pulgasari.dev/bunker/db/index.js';
+import { createPolicy }       from 'https://code.pulgasari.dev/bunker/policy/index.js';
 
 const namespace = 'aufbau';
 const version   = 1;
 const onError   = ({ error, key, operation }) => console.warn(`could not ${operation} "${key}":`, error);
+const driver    = BunkerDB.isSupported() ? createDb(namespace).driver('kv') : undefined; // if idb not supported -> fallback to in-memory L1       
+const cache     = createPolicy({ driver, onError, max: 256, maxEntries: 512, namespace, version });
+const CACHE_VERSION = 2; // bumped whenever the key layout changes, so stale entries fall out on their own
 
-// without indexeddb every driver call rejects and onError warns once per import.
-// leaving the driver off degrades to the in-memory l1 instead, which is what node,
-// a worker without idb and safari's private mode actually want.
-const driver = BunkerDB.isSupported() ? createDb(namespace).driver('kv') : undefined;
-const cache  = createPolicy({ driver, onError, max: 256, maxEntries: 512, namespace, version });
+// checks whether a value can be serialized for indexeddb storage
+function isCacheable (value) {
+  if (!value || typeof value !== 'object') return typeof value !== 'function';
+  if (typeof Node !== 'undefined' && value instanceof Node) return false;
+  if (typeof CSSStyleSheet !== 'undefined' && value instanceof CSSStyleSheet) return false;
+  // exclude module namespaces or objects carrying function members
+  return !Object.values(value).some(member => typeof member === 'function');
+}
 
 // :::::: VENDOR RESOLUTION ::::::::::::::::::::::::::::::::::::::
 
@@ -57,7 +70,7 @@ export function configure ({ cdn: url, modules, ttl } = {}) {
 // never sees a literal http url.
 function locate (name) {
   const override = overrides.get(name);
-  if (typeof override === 'string') return override;
+  if (isString(override)) return override;
 
   const specifier = registry[name];
   if (!specifier) throw new Error(`[@aufbau/import] no vendor registered under "${name}".`);
@@ -118,13 +131,17 @@ const textModes = {
 
 const outputs = {
   css   : cssModes,
-  csv   : { records  : ['object', 'objects', 'rows', 'json'],
-            array    : ['arrays', 'matrix', 'tuples'],
-            raw      : ['source', 'string', 'text'] },
+  csv   : {
+    records : ['object', 'objects', 'rows', 'json'],
+    array   : ['arrays', 'matrix', 'tuples'],
+    raw     : ['source', 'string', 'text']
+  },
   env   : dataModes,
-  html  : { string   : ['html', 'markup', 'raw', 'source', 'text'],
-            document : ['doc', 'dom'],
-            element  : ['div', 'documentfragment', 'fragment', 'node'] },
+  html  : {
+    string   : ['html', 'markup', 'raw', 'source', 'text'],
+    document : ['doc', 'dom'],
+    element  : ['div', 'documentfragment', 'fragment', 'node']
+  },
   ini   : dataModes,
   js    : moduleModes,
   json  : dataModes,
@@ -158,7 +175,7 @@ const outputs = {
 
 // flattens { canonical: [aliases] } into an o(1) lookup, done once at load
 function buildModeIndex (spec) {
-  const lookup = new Map();
+  const lookup = new Map;
   for (const [canonical, aliases] of Object.entries(spec)) {
     lookup.set(canonical.toLowerCase(), canonical);
     for (const alias of aliases) lookup.set(alias.toLowerCase(), canonical);
@@ -169,22 +186,20 @@ function buildModeIndex (spec) {
 const modeIndex = {};
 for (const [format, spec] of Object.entries(outputs)) modeIndex[format] = buildModeIndex(spec);
 
-// accepts strings and native constructors alike, mirroring `static attr` in @aufbau/elements
-const token = (as) => (typeof as === 'function' ? as.name : String(as)).toLowerCase();
+// accepts strings and native constructors alike
+const token = (as) => (isFn(as) ? as.name : String(as)).toLowerCase();
 
 export function resolveMode (format, options = {}) {
   const index = modeIndex[format];
   if (!index) return null;
 
-  const as = (typeof options === 'string' || typeof options === 'function') ? options : options.as;
+  const as = (isString(options) || isFn(options)) ? options : options.as;
   if (as == null) return index.fallback;
 
   const canonical = index.lookup.get(token(as));
   if (!canonical) {
-    const label = typeof as === 'function' ? as.name : as;
-    throw new TypeError(
-      `[@aufbau/import] unknown mode "${label}" for .${format} — expected one of: ${index.list.join(', ')}`
-    );
+    const label = isFn(as) ? as.name : as;
+    throw new TypeError(`[@aufbau/import] unknown mode "${label}" for .${format} — expected one of: ${index.list.join(', ')}`);
   }
   return canonical;
 }
@@ -194,25 +209,14 @@ export function resolveMode (format, options = {}) {
 // normalizes the shorthand forms importFile(path, 'raw') and importFile(path, String)
 function toOptions (input) {
   if (input == null) return {};
-  if (typeof input === 'string' || typeof input === 'function') return { as: input };
+  if (isString(input) || isFn(input)) return { as: input };
   return input;
 }
 
 async function fetchText (path, options = {}) {
   const response = await fetch(path, options.fetchOptions);
-  if (!response.ok) {
-    throw new Error(`[@aufbau/import] error loading "${path}": ${response.status} ${response.statusText}`);
-  }
+  if (!response.ok) throw new Error(`[@aufbau/import] error loading "${path}": ${response.status} ${response.statusText}`);
   return response.text();
-}
-
-// checks whether a value can be serialized for indexeddb storage
-function isCacheable (value) {
-  if (!value || typeof value !== 'object') return typeof value !== 'function';
-  if (typeof Node !== 'undefined' && value instanceof Node) return false;
-  if (typeof CSSStyleSheet !== 'undefined' && value instanceof CSSStyleSheet) return false;
-  // exclude module namespaces or objects carrying function members
-  return !Object.values(value).some(member => typeof member === 'function');
 }
 
 // stable option fingerprint. keys are sorted so property order never changes the
@@ -239,17 +243,13 @@ function serializeOptions (options) {
 }
 
 function transformCSSResult (code, mode) {
-  if (mode === 'raw') return code;
-  if (mode === 'styleElement') {
-    return Object.assign(document.createElement('style'), { textContent: code });
-  }
+  if (mode === 'raw')          return code;
+  if (mode === 'styleElement') return createElement('style', { textContent: code });
+  
   const sheet = new CSSStyleSheet;
   sheet.replaceSync(code);
   return sheet;
 }
-
-// strips surrounding single or double quotes from a config value
-const unquote = (value) => value.replace(/^(['"])(.*)\1$/, '$2');
 
 // :::::: FORMAT HANDLERS :::::::::::::::::::::::::::::::::::::::
 
@@ -300,7 +300,7 @@ export async function importHTML (path, options = {}) {
   const text = await fetchText(path, options);
 
   if (mode === 'document') return new DOMParser().parseFromString(text, 'text/html');
-  if (mode === 'element')  return Object.assign(document.createElement('div'), { innerHTML: text });
+  if (mode === 'element')  return createElement('div', { innerHTML: text });
 
   return text;
 }
@@ -336,8 +336,9 @@ export async function importJS (path, options = {}) {
 
 export async function importJSON (path, options = {}) {
   options = toOptions(options);
+  const mode = resolveMode('json', options);
   const text = await fetchText(path, options);
-  if (resolveMode('json', options) === 'raw') return text;
+  if (mode === 'raw') return text;
   return JSON.parse(text);
 }
 
@@ -403,7 +404,7 @@ export async function renderMD (text, options = {}) {
     ? await options.compiler(text, options.path)
     : await (await vendor('marked')).marked.parse(text);
 
-  if (mode === 'element') return Object.assign(document.createElement('div'), { innerHTML: html });
+  if (mode === 'element') return createElement('div', { innerHTML: html });
   return html;
 }
 
@@ -463,9 +464,7 @@ export async function importWASM (path, options = {}) {
   const mode = resolveMode('wasm', options);
 
   const response = await fetch(path, options.fetchOptions);
-  if (!response.ok) {
-    throw new Error(`[@aufbau/import] error loading wasm "${path}": ${response.status} ${response.statusText}`);
-  }
+  if (!response.ok) throw new Error(`[@aufbau/import] error loading wasm "${path}": ${response.status} ${response.statusText}`);
 
   if (mode === 'buffer') return response.arrayBuffer();
   if (mode === 'module') return WebAssembly.compileStreaming(response);
@@ -588,13 +587,12 @@ export function register (extension, handler, modes) {
 // splits off query and hash before reading the extension, so cache-busted
 // urls like '/data.csv?v=2' still resolve to the csv handler
 function extensionOf (path) {
-  const url = typeof path === 'string' ? path : (path?.href ?? String(path));
+  const url = isString(path) ? path : (path?.href ?? String(path));
   return url.split(/[?#]/)[0].split('.').pop().toLowerCase();
 }
 
 
-// bumped whenever the key layout changes, so stale entries fall out on their own
-const CACHE_VERSION = 2;
+
 
 /**
  * a relative path is not an identity. the cache is shared per origin, so two
