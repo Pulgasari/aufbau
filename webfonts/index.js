@@ -1,9 +1,8 @@
 // @aufbau/webfonts/index.js
 
-import data       from './data.js';
-import importFile from '@aufbau/import';
-import * as js    from '@aufbau/js';
-import * as dom   from '@domina/core';
+import data     from './data.js';
+import * as js  from '@aufbau/js';
+import * as dom from '@domina/core';
 
 const { deepMerge, isPlainObject } = js;
 const arrayfied = v => Array.isArray(v) ? v : [v];
