@@ -55,6 +55,12 @@ const initWebfonts = (fontConfig) => {
 }
 
 
+/*
+display : ['swap', 'optional', 'block']; // Rendering-Verhalten beim Laden (FOUT vs. FOIT)        
+stretch : ['normal', 'condensed', '75% 125%'];
+style   : ['normal', 'italic', 'oblique'];
+weight  : ['400', '100 900'];
+*/
 
 
 
