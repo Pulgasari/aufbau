@@ -1,13 +1,6 @@
 // @aufbau/js
 
-// the barrel stays collision-free on purpose: bare predicate names (string, even, map, set …)
-// are NOT re-exported here, they would clash with the data ops and with each other.
-// import them directly when you need them:
-//   import { even, filled } from '@aufbau/utils/fp/predicates.js';
-
-//export * from './core.js';   // and, compose, constant, curry, identity, not, once, or, pipe, tap
-//export * from './match.js';  // ifElse, match, unless, when
-//export * from './is.js';     // is, test, isArray … isZero
+// :::::: LOCAL
 
 export * from './CanonicalMap.js';
 export * from './coerce.js';
@@ -25,7 +18,7 @@ export * from './object.js';
 // maybe to domina
 export * from './html.js';
 
-// :::::: by vendor
+// :::::: VENDORS
 
 // named, not a star: this barrel must stay collision-free, and utils carries
 // generic names (hash, lru) that a star export would silently make ambiguous.
