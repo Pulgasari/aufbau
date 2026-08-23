@@ -7,7 +7,8 @@ import * as utils    from '@aufbau/js';
 import config        from './config.js';
 
 const { deepMerge, isPlainObject } = utils;
-const cssPath = 'https://code.pulgasari.dev/aufbau/css';
+const  cssPath = 'https://code.pulgasari.dev/aufbau/css';
+const fontPath = 'https://code.pulgasari.dev/aufbau/webfonts/ttf';
 
 let isBooted = false;
 
