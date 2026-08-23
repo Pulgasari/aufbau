@@ -51,6 +51,7 @@ async function boot (options = {}) {
   setConfig(options);
 
   if (typeof window !== 'undefined' && !isBooted) {
+    initAppearance ();
     initElements   (config.elements);
     initStylesheet (config.stylesheet);
     isBooted = true;
