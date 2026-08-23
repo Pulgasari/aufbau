@@ -1,7 +1,6 @@
 // @aufbau/runtime/store.js
-//
-// the runtime bundle's own aufbau-namespaced storage presets over @bunker/storage.
-// exposed on the bundle as `aufbau.store`.
+// the runtime bundle's own aufbau-namespaced storage presets
+// over @bunker/storage. exposed on the bundle as `aufbau.store`.
 
 import { createStorage } from '@bunker/storage';
 
