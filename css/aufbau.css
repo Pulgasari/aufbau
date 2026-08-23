@@ -70,9 +70,11 @@ table {
 /*/////////////////////// COLORS ///////////////////////*/
 
 :root {
-	--aufbau-error   : red;
+  --aufbau-error   : red;
   --aufbau-success : green;
   --aufbau-warn    : yellow;
+
+  --aufbau-font : sans;
 }
 
 body {
@@ -83,7 +85,8 @@ body {
 /*//////////////////////// TYPO ////////////////////////*/
 
 body { 
-  line-height: 1;
+  font-family : var(--aufbau-font);
+  line-height : 1;
   
   text-rendering: optimizeLegibility;
    -webkit-font-smoothing: antialiased;
