@@ -13,7 +13,7 @@ let isBooted = false;
 
 // :::::: DEBUG
 
-console.log('[runtime] configs:', configs);
+console.log('[@aufbau/runtime] config:', config);
 
 // :::::: CONFIG
 
