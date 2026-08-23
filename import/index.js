@@ -390,6 +390,39 @@ export async function importLESS (path, options = {}) {
   return transformCSSResult(css, mode);
 }
 
+
+export const importJSON = createImporter('json', (text) => JSON.parse(text));
+
+export const importJSON5 = createImporter('json5', async (text) => {
+  const JSON5 = (await vendor('json5')).default;
+  return JSON5.parse(text);
+});
+
+export const importJSONC = createImporter('jsonc', (text) => {
+  // Strip comments while leaving string literals and escaped quotes intact
+  const stripped = text.replace(
+    /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g,
+    (match, comment) => (comment ? '' : match)
+  );
+  return JSON.parse(stripped);
+});
+
+export const importJSONL = createImporter('jsonl', (text) =>
+  text.split('\n').filter(line => line.trim()).map(JSON.parse)
+);
+
+export async function importJSX(path, options = {}) {
+  return transpile(path, 'jsx', toOptions(options));
+}
+
+export const importLESS = createImporter('less', async (text, { path, options, mode }) => {
+  const css = options.compiler
+    ? await options.compiler(text, path)
+    : (await (await vendor('less')).default.render(text)).css;
+
+  return transformCSSResult(css, mode);
+});
+
 /**
  * markdown source string -> html. split out of importMD so callers that already
  * hold the text go through the same configured compiler instead of pulling in a
