@@ -62,6 +62,11 @@ style   : ['normal', 'italic', 'oblique'];
 weight  : ['400', '100 900'];
 */
 
+/*
+https://developer.mozilla.org/de/docs/Web/API/CSS_Font_Loading_API
+https://developer.mozilla.org/de/docs/Web/API/FontFace
+*/
+
 
 
 
@@ -80,3 +85,11 @@ await manrope.load();
 
 // register in the document context
 document.fonts.add(manrope);
+
+
+
+const createFontFace
+
+
+
+
