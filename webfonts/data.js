@@ -64,3 +64,5 @@ const fonts = [
 
 ]; // end: fonts
 
+export         { fonts };
+export default { fonts };
