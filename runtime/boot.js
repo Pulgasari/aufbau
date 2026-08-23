@@ -4,7 +4,7 @@ import * as client   from './client.js';
 import * as dom      from '@domina/core';
 import * as elements from '@aufbau/elements';
 import * as utils    from '@aufbau/js';
-import configs       from './configs.js';
+import config        from './config.js';
 
 const { deepMerge, isPlainObject } = utils;
 const cssPath = 'https://code.pulgasari.dev/aufbau/css';
@@ -18,15 +18,15 @@ console.log('[runtime] configs:', configs);
 // :::::: CONFIG
 
 function setConfig (options = {}) {
-  deepMerge(configs, options);
-  elements.setConfig(configs.elements, { layer: 'defaults' });
-  return configs;
+  deepMerge(config, options);
+  elements.setConfig(config.elements, { layer: 'defaults' });
+  return config;
 }
 
 // :::::: INIT
 
 const initAppearance = () => {
-  const { css, font } = configs;
+  const { css, font } = config;
   const { layout, look, reset, skin, theme } = css;
 
   // load + apply font-files
@@ -51,8 +51,8 @@ async function boot (options = {}) {
   setConfig(options);
 
   if (typeof window !== 'undefined' && !isBooted) {
-    initElements   (configs.elements);
-    initStylesheet (configs.stylesheet);
+    initElements   (config.elements);
+    initStylesheet (config.stylesheet);
     isBooted = true;
   }
   
