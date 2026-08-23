@@ -1,3 +1,5 @@
+// @aufbau/runtime/config.js
+
 export default {
   
   elements : { 
