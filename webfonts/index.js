@@ -53,3 +53,24 @@ const initWebfonts = (fontConfig) => {
   // todo: this sucks lol
   applyFont (list[0]);
 }
+
+
+
+
+
+
+// create a FontFace object in memory
+const manrope = new FontFace(
+  'Manrope', 
+  'url(/webfonts/ttf/manrope.ttf)', 
+  {
+    weight: '100 900', // variable font weight range
+    display: 'swap'
+  }
+);
+
+// start fetching the font file programmatically
+await manrope.load();
+
+// register in the document context
+document.fonts.add(manrope);
