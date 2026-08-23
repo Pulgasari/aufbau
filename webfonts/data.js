@@ -1,8 +1,8 @@
-// @aufbau/webfonts/fonts.json5
-//
+// @aufbau/webfonts/data.js
+
 // single source of truth for the collection.
 // consumed by the preview page, the per-font css generator and (later) the js api.
-//
+// ------------
 // license values must be verified per font before publishing.
 // commercial: false means the font may be shown here but not shipped in a paid product.
 
