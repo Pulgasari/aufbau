@@ -25,11 +25,36 @@ function setConfig (options = {}) {
 
 // :::::: INIT
 
+const initWebfonts = (fontConfig) => {
+  if (!fontConfig) return;
+  
+  const list = Array.isArray(fontConfig) ? fontConfig : [fontConfig];
+
+    list.forEach(entry => {
+      const isObj = isPlainObject(entry);
+      const family = isObj ? entry.family : entry;
+      const src = isObj ? entry.src : `${fontPath}/${family.toLowerCase()}.ttf`;
+      const descriptors = isObj ? entry.descriptors : { display: 'swap' };
+
+      // Register font face and trigger dynamic load via @domina/core font sugar
+      dom.font(family)
+        .add(src, descriptors)
+        .load();
+    });
+
+    // Set primary font family as CSS variable on root
+    const primaryFont = isPlainObject(list[0]) ? list[0].family : list[0];
+    if (primaryFont && dom.root) {
+      dom.root.style.setProperty('--aufbau-font-family', `'${primaryFont}', sans-serif`);
+    }
+  }
+}
+
 const initAppearance = () => {
-  const { css, font } = config;
-  const { layout, look, reset, skin, theme } = css;
+  const { layout, look, reset, skin, theme } = config.css;
 
   // load + apply font-files
+  initWebfonts(config.font);
 
   // load + apply css-files
   if (reset)  dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
