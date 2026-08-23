@@ -16,11 +16,21 @@ console.log('[@aufbau/webfonts] fontPath:', fontPath);
 
 // :::::: INIT
 
-function loadFont (entry) {
+function normalizeFont (entry) {
   const isObj = isPlainObject(entry);
   const family      = isObj ? entry.family      : entry;
   const src         = isObj ? entry.src         : `${fontPath}/${family.toLowerCase()}.ttf`;
   const descriptors = isObj ? entry.descriptors : { display: 'swap' };
+
+  return {
+    descriptors,
+    family,
+    src,
+  }
+}
+
+function loadFont (entry) {
+  const { descriptors, family, src } = normalizeFont(entry);
 
   // register font face and trigger dynamic load via @domina/core font sugar
   dom.font(family).add(src, descriptors).load();
