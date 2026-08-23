@@ -30,24 +30,19 @@ const initWebfonts = (fontConfig) => {
   
   const list = Array.isArray(fontConfig) ? fontConfig : [fontConfig];
 
-    list.forEach(entry => {
-      const isObj = isPlainObject(entry);
-      const family = isObj ? entry.family : entry;
-      const src = isObj ? entry.src : `${fontPath}/${family.toLowerCase()}.ttf`;
-      const descriptors = isObj ? entry.descriptors : { display: 'swap' };
+  list.forEach(entry => {
+    const isObj = isPlainObject(entry);
+    const family      = isObj ? entry.family      : entry;
+    const src         = isObj ? entry.src         : `${fontPath}/${family.toLowerCase()}.ttf`;
+    const descriptors = isObj ? entry.descriptors : { display: 'swap' };
 
-      // Register font face and trigger dynamic load via @domina/core font sugar
-      dom.font(family)
-        .add(src, descriptors)
-        .load();
-    });
+    // register font face and trigger dynamic load via @domina/core font sugar
+    dom.font(family).add(src, descriptors).load();
+  });
 
-    // Set primary font family as CSS variable on root
-    const primaryFont = isPlainObject(list[0]) ? list[0].family : list[0];
-    if (primaryFont && dom.root) {
-      dom.root.style.setProperty('--aufbau-font-family', `'${primaryFont}', sans-serif`);
-    }
-  }
+  // set primary font family as CSS variable on root
+  const primaryFont = isPlainObject(list[0]) ? list[0].family : list[0];
+  if (primaryFont && dom.root) dom.root.style.setProperty('--aufbau-font-family', `'${primaryFont}', sans-serif`);    
 }
 
 const initAppearance = () => {
