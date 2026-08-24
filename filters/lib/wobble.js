@@ -7,7 +7,7 @@ export const vars = {
   animate   : { type: 'boolean', default: true },
   amount    : { type: 'number', default: 8, min: 0, max: 40, step: 1 },
   frequency : { type: 'number', default: 0.02, min: 0.005, max: 0.1, step: 0.005 },
-  speed     : { type: 'time', default: '3s', bake: true },
+  speed     : { type: 'duration', default: '3s', bake: true },
 };
 
 // a soft wavy warp; animating the turbulence frequency makes the whole thing wobble.

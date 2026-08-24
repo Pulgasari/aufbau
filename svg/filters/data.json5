@@ -19,7 +19,7 @@
         "step": 1
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "2s",
         "bake": true
       }
@@ -427,7 +427,7 @@
         "bake": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "1.5s",
         "bake": true
       }
@@ -448,7 +448,7 @@
         "default": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "2s",
         "bake": true
       }
@@ -685,7 +685,7 @@
         "step": 0.05
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "0.6s",
         "bake": true
       }
@@ -793,7 +793,7 @@
         "step": 1
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "4s",
         "bake": true
       }
@@ -842,7 +842,7 @@
         "bake": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "0.4s",
         "bake": true
       }
@@ -978,7 +978,7 @@
         "default": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "3s",
         "bake": true
       }
@@ -1071,7 +1071,7 @@
         "bake": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "4s",
         "bake": true
       }
@@ -1119,7 +1119,7 @@
         "bake": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "0.4s",
         "bake": true
       }
@@ -1175,7 +1175,7 @@
         "bake": true
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "0.5s",
         "bake": true
       }
@@ -1377,7 +1377,7 @@
         "step": 0.005
       },
       "speed": {
-        "type": "time",
+        "type": "duration",
         "default": "3s",
         "bake": true
       }

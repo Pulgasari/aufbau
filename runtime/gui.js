@@ -14,6 +14,11 @@ const attrStr = attrs => Object.entries(attrs).map(([k, v]) => (v === '' ? ` ${k
 const pruned = obj => Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
 const prunedWithFallbacks = (obj = {}, defaults = {}) => ({ ...defaults, ...pruned(obj) });
 
+// "0.5s" -> 0.5, "16px" -> 16, 5 -> 5, undefined -> null. strips a unit off a value so
+// it can be handed to a plain-number slider attribute (min/max/step live in axis units)
+const NUMBER_PATTERN = /^\s*(-?\d*\.?\d+)/;
+const numberOf       = value => { if (value == null) return null; const m = NUMBER_PATTERN.exec(String(value)); return m ? Number(m[1]) : null; };
+
 // a spec entry -> { tag, attrs, options? } describing one aufbau control.
 function toControl (key, spec, value) {
   value ??= spec.default;
@@ -23,13 +28,24 @@ function toControl (key, spec, value) {
   if (values) return { tag: 'aufbau-picker', attrs: { ...attrs, value }, options: spec.values };
 
   switch (type) {
-    case 'boolean' : return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: value ? '' : null }) };
-    case 'integer' :
-    case 'number'  : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min, max, step, unit, value }) };
-    case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };    
-    case 'color'   : return { tag: 'aufbau-input', attrs: { ...attrs, type: 'color', look: 'swatch', value } };
-    default        : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'text', value }) }; // time, text, anything else
+    case 'boolean'  : return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: value ? '' : null }) };
+    case 'integer'  :
+    case 'number'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min, max, step, unit, value }) };
+    case 'angle'    : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };
+    // the duration value type carries its own unit ("2s"), so the readout already shows
+    // it — no separate unit label. min/max ride through as-is (the domain parses them);
+    // the slider `step` is a plain number in the axis unit, so strip any unit off it
+    case 'duration' : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'duration', min, max, step: numberOf(step), value }) };
+    // a year is discrete and usually typed, so a number stepper beats a 200-wide slider
+    case 'year'     : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'year', look: 'stepper', min, max, step, value }) };
+    case 'color'    : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'color', look: 'swatch', value }) };
   }
+
+  // date, datetime, time (wall-clock), email, password, phone, text and url are all
+  // native aufbau-input fields. passing the value-type name straight through gives each
+  // the right native input, icon and parsing; aufbau-input validates the type itself
+  // and falls back to text for anything it does not know (and for an absent type)
+  return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type, value }) };
 }
 
 function toControl2 (key, spec, value = spec.default) {
@@ -83,11 +99,16 @@ function fieldHTML (key, spec, value) {
 
 function coerce (spec, element) {
   switch (spec.type) {
-    case 'boolean' : return !!(element.checked ?? element.hasAttribute?.('checked'));
-    case 'integer' : return Math.round(Number(element.value));
-    case 'number'  :
-    case 'angle'   : return Number(element.value);
-    default        : return element.value ?? element.getAttribute?.('value') ?? '';
+    case 'boolean'  : return !!(element.checked ?? element.hasAttribute?.('checked'));
+    case 'integer'  :
+    case 'year'     : return Math.round(Number(element.value));
+    case 'number'   :
+    case 'angle'    : return Number(element.value);
+    // the slider's numeric `value` is the bare amount; typedValue re-attaches the unit,
+    // so a duration reads back self-describing as "2s"/"500ms"
+    case 'duration' : return element.typedValue ?? element.value;
+    // date, datetime, time (wall-clock), color, email, phone, url, password, text
+    default         : return element.value ?? element.getAttribute?.('value') ?? '';
   }
 }
 

@@ -9,7 +9,7 @@ export const name = 'Bad TV';
 export const vars = {
   animate    : { type: 'boolean', default: true },
   distortion : { type: 'number', default: 8, min: 0, max: 40, step: 1 },
-  speed      : { type: 'time', default: '2s', bake: true },
+  speed      : { type: 'duration', default: '2s', bake: true },
 };
 
 export default function badTv (options = {}) {

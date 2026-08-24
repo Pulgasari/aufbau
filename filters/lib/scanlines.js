@@ -10,7 +10,7 @@ export const vars = {
   gap       : { type: 'number', default: 4, min: 2, max: 20, step: 1, bake: true },
   thickness : { type: 'number', default: 1, min: 0.5, max: 6, step: 0.5, bake: true },
   opacity   : { type: 'number', default: 0.35, min: 0, max: 1, step: 0.05, bake: true },
-  speed     : { type: 'time', default: '4s', bake: true },
+  speed     : { type: 'duration', default: '4s', bake: true },
 };
 
 export default function scanlines (options = {}) {

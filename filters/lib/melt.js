@@ -6,7 +6,7 @@ export const name = 'Melt';
 export const vars = {
   animate : { type: 'boolean', default: true },
   amount  : { type: 'number', default: 15, min: 0, max: 60, step: 1 },
-  speed   : { type: 'time', default: '4s', bake: true },
+  speed   : { type: 'duration', default: '4s', bake: true },
 };
 
 // vertically biased displacement (x reads the flat alpha channel, y the noise), so
