@@ -6,7 +6,7 @@
 
 const isFn = v => typeof v === 'function';
 
-const createElement = (tag = 'div', obj 0 {}) => Object.assign(document.createElement(tag), obj);
+const createElement = (tag = 'div', obj = {}) => Object.assign(document.createElement(tag), obj);
 const unquote = (value) => value.replace(/^(['"])(.*)\1$/, '$2');
 
 const domFromString = (code, mimeType) => new DOMParser().parseFromString(code, mimeType);
