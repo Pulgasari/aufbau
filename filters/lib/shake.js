@@ -8,7 +8,7 @@ export const name = 'Shake';
 export const vars = {
   animate : { type: 'boolean', default: true },
   amount  : { type: 'number', default: 5, min: 0, max: 40, step: 1, bake: true },
-  speed   : { type: 'time', default: '0.4s', bake: true },
+  speed   : { type: 'duration', default: '0.4s', bake: true },
 };
 
 export default function shake (options = {}) {

@@ -7,7 +7,7 @@ export const vars = {
   animate   : { type: 'boolean', default: true },
   frequency : { type: 'text'  , default: '0.0 0.95', bake: true },
   scale     : { type: 'number', default: 40, min: 0, max: 120, step: 5, bake: true },
-  speed     : { type: 'time'  , default: '1.5s', bake: true },
+  speed     : { type: 'duration', default: '1.5s', bake: true },
 };
 
 // stacks an animated turbulence displacement under an rgb channel split for a heavy,

@@ -8,7 +8,7 @@ export const name = 'Night Vision';
 export const vars = {
   animate : { type: 'boolean', default: true },
   noise   : { type: 'number', default: 0.5, min: 0, max: 1, step: 0.05, bake: true },
-  speed   : { type: 'time', default: '0.4s', bake: true },
+  speed   : { type: 'duration', default: '0.4s', bake: true },
 };
 
 export default function nightVision (options = {}) {

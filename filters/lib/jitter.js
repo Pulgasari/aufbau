@@ -7,7 +7,7 @@ export const vars = {
   animate   : { type: 'boolean', default: true },
   amount    : { type: 'number', default: 5, min: 0, max: 40, step: 1 },
   frequency : { type: 'number', default: 0.5, min: 0.05, max: 2, step: 0.05 },
-  speed     : { type: 'time', default: '0.6s', bake: true },
+  speed     : { type: 'duration', default: '0.6s', bake: true },
 };
 
 // jumps the source around on a discrete turbulence seed for a nervous, jittery feel.

@@ -10,7 +10,7 @@ export const vars = {
   animate : { type: 'boolean', default: false },
   amount  : { type: 'number', default: 20, min: 0, max: 80, step: 1 },
   count   : { type: 'number', default: 8, min: 2, max: 40, step: 1, bake: true },
-  speed   : { type: 'time', default: '0.5s', bake: true },
+  speed   : { type: 'duration', default: '0.5s', bake: true },
 };
 
 export default function slices (options = {}) {

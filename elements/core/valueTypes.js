@@ -98,6 +98,17 @@ const formatStamp = (ms) => {
        + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
+// :::::: DURATION :::::::::::::::::::::::::::::::::::::::::::::::
+
+// a duration is an amount plus a unit ("2s", "500ms", "5min", "1h"). unlike `time`,
+// which is an instant on the wall clock, a duration is a length. the slider rides the
+// bare amount and the unit is fixed per control, recovered from the previous value the
+// same way a color keeps its saturation while the hue moves. no cross-unit conversion:
+// within one control every value shares the unit of its default. `s` is the fallback
+const DURATION_PATTERN = /^\s*(-?\d*\.?\d+)\s*([a-z]*)\s*$/i;
+const durationAmount   = (raw) => { const match = DURATION_PATTERN.exec(String(raw ?? '')); return match ? Number(match[1]) : null; };
+const durationUnit     = (raw) => { const match = DURATION_PATTERN.exec(String(raw ?? '')); return match && match[2] ? match[2] : 's'; };
+
 // :::::: TABLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
 /*
@@ -161,6 +172,20 @@ export const VALUE_TYPES = {
     bounds     : null,
   },
 
+  // amount + unit. the axis is the bare amount; fromNumber re-attaches the unit from
+  // the previous value, so "2s" stays seconds while the handle moves. no native input,
+  // the slider is the real ui and `text` is the fallback field
+  duration : {
+    ...text,
+    icon       : 'lucide:timer',
+    parse      : durationAmount,
+    format     : (value) => value == null ? '' : String(value),
+    toNumber   : (value) => value ?? 0,
+    fromNumber : (value, previous) => `${value}${durationUnit(previous)}`,
+    step       : 0.1,
+    bounds     : [0, 10],
+  },
+
   email : {
     ...text,
     input : 'email',
@@ -209,6 +234,19 @@ export const VALUE_TYPES = {
     input : 'url',
     icon  : 'lucide:link',
   },
+
+  // a calendar year, a plain integer on its own axis (no month/day, unlike `date`)
+  year : {
+    ...text,
+    input      : 'number',
+    icon       : 'lucide:calendar',
+    parse      : (raw) => { const value = parseInt(raw, 10); return Number.isNaN(value) ? null : value; },
+    format     : (value) => value == null ? '' : String(value),
+    toNumber   : (value) => value ?? 0,
+    fromNumber : (value) => Math.round(value),
+    step       : 1,
+    bounds     : [1900, 2100],
+  },
 };
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
@@ -217,7 +255,7 @@ export const VALUE_TYPES = {
 export const TYPE_NAMES = Object.keys(VALUE_TYPES);
 
 /** the subset that maps onto a numeric axis, so a slider can carry it */
-export const AXIS_TYPES = ['color', 'date', 'datetime', 'number', 'time'];
+export const AXIS_TYPES = ['color', 'date', 'datetime', 'duration', 'number', 'time', 'year'];
 
 export const valueType = (name) => VALUE_TYPES[name] ?? VALUE_TYPES.text;
 

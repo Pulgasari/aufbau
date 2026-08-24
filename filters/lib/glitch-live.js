@@ -5,7 +5,7 @@ export const id   = 'glitch-live';
 export const name = 'Live Glitch';
 export const vars = {
   animate : { type: 'boolean', default: true },
-  speed   : { type: 'time', default: '2s', bake: true },
+  speed   : { type: 'duration', default: '2s', bake: true },
 };
 
 // animated variant of glitch-rgb: the red and blue channels jitter horizontally on

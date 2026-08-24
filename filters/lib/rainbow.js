@@ -7,7 +7,7 @@ export const name = 'Rainbow';
 // source hue (identity) — set it live and drive --aufbau-filter-hue for a static tint.
 export const vars = {
   animate : { type: 'boolean', default: true },
-  speed   : { type: 'time', default: '3s', bake: true },
+  speed   : { type: 'duration', default: '3s', bake: true },
 };
 
 export default function rainbow (options = {}) {
