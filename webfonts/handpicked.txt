@@ -19,6 +19,7 @@ Lexend
 Manrope
 Manufacturing Consent
 Montserrat
+MuseoModerno
 Noto Sans
 Quicksand
 Roboto Condensed
