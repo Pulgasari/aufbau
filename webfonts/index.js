@@ -1,27 +1,73 @@
 // @aufbau/webfonts/index.js
 
+// :::::: IMPORTS
+
 import { fonts } from './data.js';
 import { isElement, isString } from '@pulgasari/is';
 
-let baseFontUrl = 'https://code.pulgasari.dev/aufbau/webfonts';
+// :::::: META
+
+const baseFontUrl = 'https://code.pulgasari.dev/aufbau/webfonts';
 const loadedFonts = new Set();
 
-const CATEGORY_VARS = {
+const VARS = {
   body    : '--aufbau-font',
   code    : '--aufbau-font-mono',
   heading : '--aufbau-font-heading',
   mono    : '--aufbau-font-mono',
   sans    : '--aufbau-font-sans',
   serif   : '--aufbau-font-serif',
-  
-  
-  
-  
 };
 
-export const configure = (options = {}) => {
-  if (options.baseUrl) baseFontUrl = options.baseUrl.replace(/\/$/, '');
+// :::::: HELPERS
+
+const isScopeValue = (val) => {
+  if (!val) return false;
+  if (isElement(val)) return true;
+  if (isString(val)) {
+    if (val.startsWith('--') || val in VARS) return false;
+    if (val.startsWith('#')  || val.startsWith('.') || val.startsWith('[') || val.startsWith(':')) return true;
+    try   { return document.querySelector(val) !== null; }
+    catch { return false; }
+  }
+  return false;
 };
+
+const normalizeApplyInput = (fontInput, arg2, arg3) => {
+  let name = fontInput;
+  let target;
+  let scope;
+
+  if (typeof fontInput === 'object' && fontInput !== null && !Array.isArray(fontInput)) {
+    name   = fontInput.name   || fontInput.id  || fontInput.font;
+    target = fontInput.target || fontInput.var || fontInput.category;
+    scope  = fontInput.scope  || fontInput.element;
+  } else {
+    if (isScopeValue(arg2)) {
+      scope  = arg2;
+      target = arg3;
+    } else {
+      target = arg2;
+      scope  = arg3;
+    }
+  }
+
+  return { name, target, scope };
+};
+
+const resolveCssVar = (target = 'body') => {
+  if (target.startsWith('--')) return target;
+  const key = target.toLowerCase();
+  return CATEGORY_VARS[key] || `--aufbau-font-${key}`;
+};
+
+const resolveScope = (scope) => {
+  if (isElement (scope)) return scope;
+  if (isString  (scope)) return document.querySelector(scope) || document.documentElement;
+  return document.documentElement;
+};
+
+// :::::: API
 
 // find font entry in catalog by ID or Name
 export const findFont = (id) => id ? fonts.find(f => f.id === id || f.name === id) : null;
@@ -63,65 +109,6 @@ export const load = async (identifier) => {
   return success;
 };
 
-// resolve target CSS variable name from category shortcut or custom property
-const resolveCssVar = (target = 'body') => {
-  if (target.startsWith('--')) return target;
-  const key = target.toLowerCase();
-  return CATEGORY_VARS[key] || `--aufbau-font-${key}`;
-};
-
-/**
- * Resolve DOM scope element from selector string, HTMLElement, or default to root
- */
-const resolveScope = (scope) => {
-  if (isElement (scope)) return scope;
-  if (isString  (scope)) return document.querySelector(scope) || document.documentElement;
-  return document.documentElement;
-};
-
-/**
- * Safely check if a value is a DOM Element or a valid CSS selector targeting a node
- */
-const isScopeValue = (val) => {
-  if (!val) return false;
-  if (isElement(val)) return true;
-  if (isString(val)) {
-    if (val.startsWith('--') || val in CATEGORY_VARS) return false;
-    if (val.startsWith('#')  || val.startsWith('.') || val.startsWith('[') || val.startsWith(':')) return true;
-    try   { return document.querySelector(val) !== null; }
-    catch { return false; }
-  }
-  return false;
-};
-
-/**
- * Normalize flexible input arguments for apply()
- */
-const normalizeApplyInput = (fontInput, arg2, arg3) => {
-  let name = fontInput;
-  let target;
-  let scope;
-
-  if (typeof fontInput === 'object' && fontInput !== null && !Array.isArray(fontInput)) {
-    name   = fontInput.name   || fontInput.id  || fontInput.font;
-    target = fontInput.target || fontInput.var || fontInput.category;
-    scope  = fontInput.scope  || fontInput.element;
-  } else {
-    if (isScopeValue(arg2)) {
-      scope  = arg2;
-      target = arg3;
-    } else {
-      target = arg2;
-      scope  = arg3;
-    }
-  }
-
-  return { name, target, scope };
-};
-
-/**
- * Apply CSS variable for font-family flexibly
- */
 export const apply = (fontInput, arg2, arg3) => {
   const { name, target, scope } = normalizeApplyInput(fontInput, arg2, arg3);
   if (!name) return;
@@ -151,7 +138,7 @@ export const init = async (config) => {
   );
 
   // Apply CSS variables for each item
-  items.forEach(item => apply(item));
+  items.forEach(apply);
 };
 
 export { fonts };
