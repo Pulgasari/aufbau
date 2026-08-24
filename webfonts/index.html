@@ -485,7 +485,7 @@ function App () {
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 try {
-  const data = await aufbau.import(MANIFEST.href);
+  const data = await import(MANIFEST.href);
   fonts.value  = data.fonts ?? [];
   status.value = 'ready';
 } catch (err) {
