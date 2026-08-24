@@ -4,9 +4,10 @@ import * as client   from './client.js';
 import * as dom      from '@domina/core';
 import * as elements from '@aufbau/elements';
 import * as utils    from '@aufbau/js';
+import * as webfonts from '@aufbau/webfonts';
 import config        from './config.js';
 
-const { deepMerge, isPlainObject } = utils;
+const { arrayfied, deepMerge, isPlainObject } = utils;
 const  cssPath = 'https://code.pulgasari.dev/aufbau/css';
 const fontPath = 'https://code.pulgasari.dev/aufbau/webfonts/ttf';
 
@@ -46,11 +47,13 @@ const initWebfonts = (fontConfig) => {
   if (primaryFont && dom.root) dom.root.style.setProperty('--aufbau-font', `'${primaryFont}', sans-serif`);    
 }
 
+const initWebfonts2 = async (fontConfig) => webfonts.loadAndApply(fontConfig);
+
 const initAppearance = () => {
   const { layout, look, reset, skin, theme } = config.css;
 
   // load + apply font-files
-  initWebfonts(config.font);
+  initWebfonts2(config.font);
 
   // load + apply css-files
   if (reset)  dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
