@@ -291,10 +291,6 @@ importSCSS = async (path, options = {}) => compileSass (path, 'scss', 'scss',   
 importText = async (path, options = {}) => fetchText   (path,                     toOptions(options)),
 importTS   = async (path, options = {}) => transpile   (path, 'ts',               toOptions(options));
 
-
-
-
-
 export const importCSV = _import('csv', async (text, { path, options, mode }) => {
   const PAPA = (await vendor('papaparse')).default;
   const extension = extensionOf(path);
@@ -352,9 +348,6 @@ export async function importJS (path, options = {}) {
   return import(/* @vite-ignore */ path);
 }
 
-
-
-
 export const importJSONC = _import('jsonc', (text) => {
   // Strip comments while leaving string literals and escaped quotes intact
   const stripped = text.replace(
@@ -396,9 +389,6 @@ export async function importMD (path, options = {}) {
   const text = await fetchText(path, options);
   return renderMD(text, { ...options, path });
 }
-
-
-
 
 export const importSVG = _import('svg', async (text, { mode }) => {
   // Strip XML declaration and DOCTYPE headers for clean HTML5 inlining
@@ -538,14 +528,6 @@ function extensionOf (path) {
   return url.split(/[?#]/)[0].split('.').pop().toLowerCase();
 }
 
-
-
-
-/**
- * a relative path is not an identity. the cache is shared per origin, so two
- * pages in different directories importing '../readme.md' would otherwise hit
- * the same entry and get each other's file.
- */
 function cacheIdentity (path) {
   if (typeof document === 'undefined') return path;
   try   { return new URL(path, document.baseURI).href; }
@@ -580,10 +562,7 @@ export async function importFile (path, options) {
   // skip dom nodes, stylesheets and anything carrying functions
   if (useCache && isCacheable(result)) {
     try {
-      // the third argument is an overrides object, not a number: passing the ttl
-      // bare left entries with no expiry at all, since a Number has no .ttl
       await cache.set(cacheKey, result, { ttl: options.ttl ?? defaultTTL });
-      // opportunistic sweep of expired siblings, deliberately not awaited
       cache.prune(prefix).catch(() => {});
     } catch (e) {
       console.warn(`[@aufbau/import] could not cache "${path}":`, e);
