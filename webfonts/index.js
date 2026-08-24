@@ -8,7 +8,7 @@ let baseFontUrl = 'https://code.pulgasari.dev/aufbau/webfonts';
 /**
  * Configure global settings like asset base URL
  */
-export const configureWebfonts = (options = {}) => {
+export const configure = (options = {}) => {
   if (options.baseUrl) {
     baseFontUrl = options.baseUrl.replace(/\/$/, '');
   }
@@ -24,7 +24,7 @@ export const findFont = (identifier) => {
 /**
  * Load a single font entry from catalog using FontFace API
  */
-export const loadFont = async (identifier) => {
+export const load = async (identifier) => {
   const fontData = findFont(identifier);
   if (!fontData) {
     console.warn(`[@aufbau/webfonts] Font "${identifier}" not found in catalog.`);
@@ -58,11 +58,11 @@ export const loadFont = async (identifier) => {
 /**
  * Apply CSS variable for font-family
  */
-export const applyFont = (fontName, scope = document.documentElement, varName = '--aufbau-font') => {
+export const apply = (fontName, scope = document.documentElement, varName = '--aufbau-font') => {
   if (!fontName || !scope) return;
-  const font = findFont(fontName);
+  const font       = findFont(fontName);
   const familyName = font ? font.name : fontName;
-  const fallback = font?.fallback ? `, ${font.fallback}` : ', sans-serif';
+  const fallback   = font?.fallback ? `, ${font.fallback}` : ', sans-serif';
 
   scope.style.setProperty(varName, `'${familyName}'${fallback}`);
 };
@@ -70,7 +70,7 @@ export const applyFont = (fontName, scope = document.documentElement, varName = 
 /**
  * Main initialization helper
  */
-export const initWebfonts = async (config) => {
+export const init = async (config) => {
   if (!config) return;
 
   const fontList = Array.isArray(config) ? config : [config];
@@ -78,15 +78,13 @@ export const initWebfonts = async (config) => {
   // Load all specified fonts in parallel
   await Promise.all(fontList.map(item => {
     const id = typeof item === 'string' ? item : item.id || item.name;
-    return loadFont(id);
+    return load(id);
   }));
 
   // Apply primary font to root element
   const primary = fontList[0];
   const primaryName = typeof primary === 'string' ? primary : primary.id || primary.name;
-  if (primaryName) {
-    applyFont(primaryName);
-  }
+  if (primaryName) apply(primaryName);
 };
 
 export { fonts };
