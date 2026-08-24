@@ -266,7 +266,7 @@ function transformCSSResult (code, mode) {
 
 // :::::: FORMAT HANDLERS :::::::::::::::::::::::::::::::::::::::
 
-function createImporter(type, parseFn) {
+function _import (type, parseFn) {
   return async (path, options = {}) => {
     const opts = toOptions(options);
     const mode = resolveMode(type, opts);
@@ -278,11 +278,11 @@ function createImporter(type, parseFn) {
 }
 
 export const 
-importCSS   = createImporter ('css'   ,       (text, { mode }) => transformCSSResult(text, mode)),
-importJSON  = createImporter ('json'  ,       (text) => JSON.parse(text)),
-importJSONL = createImporter ('jsonl' ,       (text) => text.split('\n').filter(line => line.trim()).map(JSON.parse) ),
-importJSON5 = createImporter ('json5' , async (text) => (await vendor('json5')).default.parse(text));
-importTOML  = createImporter ('toml'  , async (text) => (await vendor('smolToml')).parse(text));
+importCSS   = _import ('css'   ,       (text, { mode }) => transformCSSResult(text, mode)),
+importJSON  = _import ('json'  ,       (text) => JSON.parse(text)),
+importJSONL = _import ('jsonl' ,       (text) => text.split('\n').filter(line => line.trim()).map(JSON.parse) ),
+importJSON5 = _import ('json5' , async (text) => (await vendor('json5')).default.parse(text));
+importTOML  = _import ('toml'  , async (text) => (await vendor('smolToml')).parse(text));
 
 export const
 importJSX  = async (path, options = {}) => transpile   (path, 'jsx',              toOptions(options)),
@@ -295,7 +295,7 @@ importTS   = async (path, options = {}) => transpile   (path, 'ts',             
 
 
 
-export const importCSV = createImporter('csv', async (text, { path, options, mode }) => {
+export const importCSV = _import('csv', async (text, { path, options, mode }) => {
   const PAPA = (await vendor('papaparse')).default;
   const extension = extensionOf(path);
 
@@ -307,7 +307,7 @@ export const importCSV = createImporter('csv', async (text, { path, options, mod
   }).data;
 });
 
-export const importENV = createImporter('env', (text) => {
+export const importENV = _import('env', (text) => {
   const result = {};
   for (const line of text.split(/\r?\n/)) {
     const trimmed = line.trim().replace(/^export\s+/, '');
@@ -321,13 +321,13 @@ export const importENV = createImporter('env', (text) => {
   return result;
 });
 
-export const importHTML = createImporter('html', (text, { mode }) => {
+export const importHTML = _import('html', (text, { mode }) => {
   if (mode === 'document') return new DOMParser().parseFromString(text, 'text/html');
   if (mode === 'element') return createElement('div', { innerHTML: text });
   return text;
 });
 
-export const importINI = createImporter('ini', (text) => {
+export const importINI = _import('ini', (text) => {
   const result = {};
   let section = result;
 
@@ -355,7 +355,7 @@ export async function importJS (path, options = {}) {
 
 
 
-export const importJSONC = createImporter('jsonc', (text) => {
+export const importJSONC = _import('jsonc', (text) => {
   // Strip comments while leaving string literals and escaped quotes intact
   const stripped = text.replace(
     /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g,
@@ -365,7 +365,7 @@ export const importJSONC = createImporter('jsonc', (text) => {
 });
 
 
-export const importLESS = createImporter('less', async (text, { path, options, mode }) => {
+export const importLESS = _import('less', async (text, { path, options, mode }) => {
   const css = options.compiler
     ? await options.compiler(text, path)
     : (await (await vendor('less')).default.render(text)).css;
@@ -400,7 +400,7 @@ export async function importMD (path, options = {}) {
 
 
 
-export const importSVG = createImporter('svg', async (text, { mode }) => {
+export const importSVG = _import('svg', async (text, { mode }) => {
   // Strip XML declaration and DOCTYPE headers for clean HTML5 inlining
   const clean = text.replace(/<\?xml[\s\S]*?\?>/gi, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').trim();
   if (mode === 'string') return clean;
@@ -429,7 +429,7 @@ export async function importWASM (path, options = {}) {
   return instance.exports;
 }
 
-export const importXML = createImporter('xml', async (text, { options, mode }) => {
+export const importXML = _import('xml', async (text, { options, mode }) => {
   if (mode === 'document') return new DOMParser().parseFromString(text, 'text/xml');
 
   const { XMLParser } = await vendor('fastXmlParser');
