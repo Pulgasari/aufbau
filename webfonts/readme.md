@@ -14,17 +14,17 @@ webfonts.use('Manrope');
 
 ```javascript
 // 1. Handpicked fonts from main entry
-import { initWebfonts, applyFont } from '@aufbau/webfonts';
+import webfonts from '@aufbau/webfonts';
 
-await initWebfonts(['manrope', 'jetbrains-mono']);
-applyFont('manrope');
+await webfonts.load(['manrope', 'jetbrains-mono']);
+webfonts.apply('manrope');
 ```
 
 ```javascript
 // 2. Google fonts as submodule (isolated import)
-import { loadGoogleFont } from '@aufbau/webfonts/google';
+import googleFonts from '@aufbau/webfonts/google';
 
-loadGoogleFont({
+googleFonts.load({
   family: 'Roboto',
   weights: [300, 400, 700]
 });
@@ -39,21 +39,17 @@ loadGoogleFont({
 ​Das Laden von Handpicked-Fonts und Google Fonts direkt beim Anwendungsstart:
 
 ```javascript
-import { configureWebfonts, initWebfonts } from '@aufbau/webfonts';
-import { initGoogleFonts } from '@aufbau/webfonts/google';
+import webfonts    from '@aufbau/webfonts';
+import googleFonts from '@aufbau/webfonts/google';
 
 async function setupApp() {
-  // 1. Configure custom CDN path for self-hosted font files
-  configureWebfonts({
-    baseUrl: 'https://cdn.my-domain.com/fonts'
-  });
 
   // 2. Load primary catalog fonts (loads Manrope and JetBrains Mono)
   // First array item becomes the default primary font on :root
-  await initWebfonts(['manrope', 'jetbrains-mono']);
+  await webfonts.init(['manrope', 'jetbrains-mono']);
 
   // 3. Load supplementary Google Fonts
-  initGoogleFonts([
+  googleFonts.init([
     { family: 'Playfair Display', weights: [400, 700] },
     { family: 'Fira Code', weights: [400] }
   ]);
@@ -67,7 +63,7 @@ setupApp();
 ​Schalten der Schriftart zur Laufzeit via Button-Click oder Design-Token-Picker:
 
 ```javascript
-import { applyFont, loadFont } from '@aufbau/webfonts';
+import webfonts from '@aufbau/webfonts';
 
 const fontSelect = document.querySelector('#font-picker');
 
@@ -80,7 +76,23 @@ fontSelect.addEventListener('change', async (event) => {
   // Apply to root CSS variable --aufbau-font
   applyFont(selectedFont);
 });
+```
 
+or in case one uses `@aufbau/runtime` (pure or as a kit):
+
+```javascript
+import aufbau, { dom } from '@aufbau/runtime';
+
+dom.get('#font-picker').on('change', async (event) => {
+  const selectedFont = event.target.value;
+
+  // Ensure the font file is loaded before applying
+  await aufbau.webfonts.load(selectedFont);
+
+  // Apply to root CSS variable --aufbau-font
+  aufbau.webfonts.apply(selectedFont);
+
+});
 ```
 
 ### 3. Scoped Font Application (Schriften auf bestimmte Elemente begrenzen)
@@ -128,7 +140,7 @@ loadGoogleFont({
 
 ### 5. Progressive Loading / Skeleton State Handling
 
-​Warten auf den Ladevorgang, um FOUT (Flash of Unstyled Text) zu vermeiden oder Loading-Spinner auszublenden:
+​Warten auf den Ladevorgang, um FOUT (Flash of Unstyled Text) zu vermeiden oder Loading-Spinner  auszublenden:
 
 ```javascript
 import { loadFont, applyFont } from '@aufbau/webfonts';
