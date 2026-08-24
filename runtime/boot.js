@@ -53,7 +53,7 @@ const initAppearance = () => {
   const { layout, look, reset, skin, theme } = config.css;
 
   // load + apply font-files
-  webfonts.init(fontConfig)
+  webfonts.init(config.font)
 
   // load + apply css-files
   if (reset)  dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
