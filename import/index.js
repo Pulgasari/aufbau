@@ -4,7 +4,8 @@
 
 // :::::: HELPERS
 
-const isFn = v => typeof v === 'function';
+const isFn     = v => typeof v === 'function';
+const isString = v => typeof v === 'string';
 
 const createElement = (tag = 'div', obj = {}) => Object.assign(document.createElement(tag), obj);
 const unquote = (value) => value.replace(/^(['"])(.*)\1$/, '$2');
