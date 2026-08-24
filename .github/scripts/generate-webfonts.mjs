@@ -2,7 +2,7 @@
 // single source of truth is webfonts/handpicked.txt: one google fonts family name
 // per line. this script resolves each family in the google/fonts repo, parses its
 // METADATA.pb, rebuilds webfonts/data.js and (by default) downloads the font files
-// into webfonts/files/<id>/. run it after editing handpicked.txt:
+// into webfonts/files/. run it after editing handpicked.txt:
 //   npm run generate:webfonts            # download files into the repo
 //   npm run generate:webfonts -- --remote  # no download, link jsdelivr urls instead
 //
@@ -134,7 +134,7 @@ function toFaces (meta) {
   const variable = fonts.filter(font => String(font.filename).includes('['));
 
   if (variable.length && wght) {
-    const range = `${intOf(wght.min_value)} ${intOf(wght.max_value)}`;
+    const range = `${intOf(wght.min_value)}${intOf(wght.max_value)}`;
     return { variable: true, faces: variable.map(font => ({ weight: range, style: font.style || 'normal', srcFile: font.filename })) };
   }
 
@@ -145,7 +145,7 @@ function toFaces (meta) {
 
 async function download (dir, srcFile, destPath) {
   const response = await fetch(RAW(`${dir}/${encodeURIComponent(srcFile)}`));
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  if (!response.ok) throw new Error(`${response.status}${response.statusText}`);
   await mkdir(dirname(destPath), { recursive: true });
   await writeFile(destPath, Buffer.from(await response.arrayBuffer()));
   return response.headers.get('content-length');
@@ -166,7 +166,8 @@ async function buildEntry (name, keepFeatures) {
     if (remote) {
       file = JSDELIVR(`${dir}/${encodeURIComponent(face.srcFile)}`);
     } else {
-      const rel  = `files/${id}/${localName(id, face, variable)}`;
+      // Save directly into files/ without font-specific subfolders
+      const rel  = `files/${localName(id, face, variable)}`;
       const size = await download(dir, face.srcFile, resolve(WEBFONTS, rel));
       console.log(`    ↓ ${rel}${size ? ` (${Math.round(size / 1024)} KB)` : ''}`);
       file = rel;
@@ -190,10 +191,10 @@ async function buildEntry (name, keepFeatures) {
 
 // :::::: SERIALIZE ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const section = (label) => `// ::: ${label} ${':'.repeat(Math.max(4, 50 - label.length))}`;
+const section = (label) => `// ::: ${label}${':'.repeat(Math.max(4, 50 - label.length))}`;
 
 function serializeFace (face) {
-  return `    { weight: ${typeof face.weight === 'number' ? face.weight : q(face.weight)}, style: ${q(face.style)}, file: ${q(face.file)} },`;
+  return `    { weight: ${typeof face.weight === 'number' ? face.weight : q(face.weight)}, style: ${q(face.style)}, file:${q(face.file)} },`;
 }
 
 function serializeEntry (font) {
