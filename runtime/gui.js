@@ -34,24 +34,34 @@ function toControl (key, spec, value) {
     case 'integer' :
     case 'number'  : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min, max, step, unit, value }) };
     case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };
-    // durations arrive unit-bearing ("2s"). the slider rides the numeric part on a
-    // plain number axis (its own `time` type is wall-clock, not a duration) and shows
-    // the unit only as a label. bounds default to a 0–10s window when unspecified
-    case 'time'    : {
-      const parsed = splitUnit(value);
-      return { tag: 'aufbau-slider', attrs: pruned({
-        ...attrs,
-        type  : 'number',
-        min   : numberOf(min) ?? 0,
-        max   : numberOf(max) ?? 10,
-        step  : step ?? 0.1,
-        unit  : unit ?? (parsed.unit || splitUnit(spec.default).unit || 's'),
-        value : parsed.number,
-      }) };
-    }
-    case 'color'   : return { tag: 'aufbau-input', attrs: { ...attrs, type: 'color', look: 'swatch', value } };
-    default        : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'text', value }) }; // text, date, datetime, anything else
+
+    // `time` is overloaded: a scalar/unit default ("2s", 0.5) is a duration and rides
+    // a numeric slider — the value type's own `time` is wall-clock, not a duration, so
+    // it stays on a plain number axis with the unit only as a label. a clock default
+    // ("14:30") is real time and drops through to the native picker below
+    case 'time'    :
+      if (splitUnit(spec.default).number != null) {
+        const parsed = splitUnit(value);
+        return { tag: 'aufbau-slider', attrs: pruned({
+          ...attrs,
+          type  : 'number',
+          min   : numberOf(min) ?? 0,
+          max   : numberOf(max) ?? 10,
+          step  : step ?? 0.1,
+          unit  : unit ?? (parsed.unit || splitUnit(spec.default).unit || 's'),
+          value : parsed.number,
+        }) };
+      }
+      break;
+
+    case 'color'   : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'color', look: 'swatch', value }) };
   }
+
+  // date, datetime, email, password, phone, text, url and wall-clock time are all
+  // native aufbau-input fields. passing the value-type name straight through gives each
+  // the right native input, icon and parsing; aufbau-input validates the type itself
+  // and falls back to text for anything it does not know (and for an absent type)
+  return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type, value }) };
 }
 
 function toControl2 (key, spec, value = spec.default) {
@@ -108,10 +118,12 @@ function coerce (spec, element) {
     case 'boolean' : return !!(element.checked ?? element.hasAttribute?.('checked'));
     case 'integer' : return Math.round(Number(element.value));
     case 'number'  :
-    case 'angle'   :
-    // a bare number, the unit stays presentational. a unitless SMIL/css duration is
-    // read as seconds, so `dur="2"` == 2s and the filter needs no unit round-trip
-    case 'time'    : return Number(element.value);
+    case 'angle'   : return Number(element.value);
+    // mirror toControl: a duration `time` comes back as a slider number (the unit stays
+    // presentational; a unitless css/smil duration reads as seconds, so "2" == 2s), a
+    // wall-clock `time` as the "HH:MM" string the native picker holds
+    case 'time'    : return splitUnit(spec.default).number != null ? Number(element.value) : (element.value ?? '');
+    // date, datetime, color, email, phone, url, password, text: the field string as-is
     default        : return element.value ?? element.getAttribute?.('value') ?? '';
   }
 }
