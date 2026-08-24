@@ -20,6 +20,7 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 - [@aufbau/filters](filters/)
 - [@aufbau/import](import/)
 - [@aufbau/patterns](patterns/)
+- [@aufbau/runtime](runtime/)
 - [@aufbau/stylescript](stylescript/) *(experimental)*
 - [@aufbau/stylesheet](stylesheet/) *(experimental)*
 - [@aufbau/webfonts](webfonts/)
