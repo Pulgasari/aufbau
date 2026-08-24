@@ -15,16 +15,26 @@ console.log('[@aufbau/webfonts] fontPath:', fontPath);
 
 // :::::: API
 
+const createFontFace (family, url, descriptor) {
+  const ff = new FontFace (family, `url(${url})`, descriptor);
+  return ff;
+}
+
+// ::: aufbau fonts
+
 const apply = (name, obj, target) => {
 
 };
 
 const load = (name) => {
-  const fontObj = data.fonts[name];
-  const fontFace = createFontFace(family, src, descriptor);
-  
-  await fontFace.load(); // load
-  document.fonts.add(fontFace); // register
+  const font = findByAnyCriteria(data.fonts, { name, id: name });
+
+  for (const ff of font.faces){
+    const { src, ...descriptor } = ff;
+    const fontFace = createFontFace(family, src, descriptor);
+    await fontFace.load(); // load
+    document.fonts.add(fontFace); // register
+  }
 };
 
 // :::::: INIT
@@ -123,19 +133,21 @@ document.fonts.add(manrope);
 
 
 
-const createFontFace (family, url, descriptor) {
-  const ff = new FontFace (family, `url(${url})`, descriptor);
-  return ff;
-}
 
-// interface: aufbau fonts
 
-const 
+
+
+ 
 
 // interface: google fonts
 
 
 
 
+const   findByCriteria = (array, criteria) => array.find   (item => item && Object.entries(criteria).every(([key, value]) => item[key] === value));        
+const filterByCriteria = (array, criteria) => array.filter (item => item && Object.entries(criteria).every(([key, value]) => item[key] === value));
+
+const   findByAnyCriteria = (array, criteria) => array.find   (item => item && Object.entries(criteria).some(([key, value]) => item[key] === value));
+const filterByAnyCriteria = (array, criteria) => array.filter (item => item && Object.entries(criteria).some(([key, value]) => item[key] === value));
 
 
