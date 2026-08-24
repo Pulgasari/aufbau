@@ -11,18 +11,17 @@ const fonts = [
 // ::: sans ::::::::::::::::::::::::::::::::::::::::::::::
 
 {
-  id         : 'inter',
-  name       : 'Inter',
-  designer   : 'Rasmus Andersson',
-  source     : 'https://www.github.com/rsms/inter',
+  id         : 'lexend',
+  name       : 'Lexend',
+  designer   : 'Bonnie Shaver-Troup, Thomas Jockin, Santiago Orozco, Héctor Gómez, Superunion',
+  source     : 'https://github.com/googlefonts/lexend',
   license    : 'OFL-1.1',
   commercial : true,
   category   : 'sans',
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/inter/inter-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/inter/inter-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/lexend/lexend-variable.ttf' },
   ],
 },
 
@@ -41,25 +40,198 @@ const fonts = [
   ],
 },
 
+{
+  id         : 'montserrat',
+  name       : 'Montserrat',
+  designer   : 'Julieta Ulanovsky, Sol Matas, Juan Pablo del Peral, Jacques Le Bailly',
+  source     : 'https://github.com/JulietaUla/Montserrat',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/montserrat/montserrat-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/montserrat/montserrat-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'noto-sans',
+  name       : 'Noto Sans',
+  designer   : 'Google',
+  source     : 'https://github.com/notofonts/latin-greek-cyrillic',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/noto-sans/noto-sans-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/noto-sans/noto-sans-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'quicksand',
+  name       : 'Quicksand',
+  designer   : 'Andrew Paglinawan',
+  source     : 'https://github.com/ThomasJockin/QuicksandFamily',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '300 700', style: 'normal', file: 'files/quicksand/quicksand-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'roboto-condensed',
+  name       : 'Roboto Condensed',
+  designer   : 'Christian Robertson',
+  source     : 'https://github.com/googlefonts/roboto-classic',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/roboto-condensed/roboto-condensed-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/roboto-condensed/roboto-condensed-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'roboto-flex',
+  name       : 'Roboto Flex',
+  designer   : 'Font Bureau, David Berlow, Santiago Orozco, Irene Vlachou, Ilya Ruderman, Yury Ostromentsky, Mikhail Strukov',
+  source     : 'https://github.com/googlefonts/Roboto-Flex',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 1000', style: 'normal', file: 'files/roboto-flex/roboto-flex-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'rubik',
+  name       : 'Rubik',
+  designer   : 'Hubert and Fischer, Meir Sadan, Cyreal, Daniel Grumer, Omaima Dajani',
+  source     : 'https://github.com/googlefonts/rubik',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '300 900', style: 'normal', file: 'files/rubik/rubik-variable.ttf' },
+    { weight: '300 900', style: 'italic', file: 'files/rubik/rubik-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'sour-gummy',
+  name       : 'Sour Gummy',
+  designer   : 'Stefie Justprince',
+  source     : 'https://github.com/eifetx/Sour-Gummy-Fonts',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'sans',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/sour-gummy/sour-gummy-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/sour-gummy/sour-gummy-italic-variable.ttf' },
+  ],
+},
+
 // ::: serif :::::::::::::::::::::::::::::::::::::::::::::
 
 {
-  id         : 'vollkorn',
-  name       : 'Vollkorn',
-  designer   : 'Friedrich Althausen',
-  source     : 'https://github.com/FAlthausen/Vollkorn-Typeface',
+  id         : 'grenze',
+  name       : 'Grenze',
+  designer   : 'Omnibus-Type',
+  source     : 'https://github.com/Omnibus-Type/Grenze',
   license    : 'OFL-1.1',
   commercial : true,
   category   : 'serif',
   fallback   : 'serif',
-  features   : ['liga', 'onum'],
+  features   : [],
   faces      : [
-    { weight: '400 900', style: 'normal', file: 'files/vollkorn/vollkorn-variable.ttf' },
-    { weight: '400 900', style: 'italic', file: 'files/vollkorn/vollkorn-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/grenze/grenze-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/grenze/grenze-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'roboto-serif',
+  name       : 'Roboto Serif',
+  designer   : 'Commercial Type, Greg Gazdowicz',
+  source     : 'https://github.com/googlefonts/roboto-serif',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'serif',
+  fallback   : 'serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/roboto-serif/roboto-serif-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/roboto-serif/roboto-serif-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'roboto-slab',
+  name       : 'Roboto Slab',
+  designer   : 'Christian Robertson',
+  source     : 'https://github.com/googlefonts/robotoslab',
+  license    : 'Apache-2.0',
+  commercial : true,
+  category   : 'serif',
+  fallback   : 'serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/roboto-slab/roboto-slab-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'texturina',
+  name       : 'Texturina',
+  designer   : 'Guillermo Torres, Omnibus-Type',
+  source     : 'https://github.com/Omnibus-Type/Texturina',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'serif',
+  fallback   : 'serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/texturina/texturina-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/texturina/texturina-italic-variable.ttf' },
   ],
 },
 
 // ::: mono ::::::::::::::::::::::::::::::::::::::::::::::
+
+{
+  id         : 'geist-mono',
+  name       : 'Geist Mono',
+  designer   : 'Andrés Briganti, Mateo Zaragoza, Guillermo Rauch, Evil Rabbit, José Rago, Facundo Santana',
+  source     : 'https://github.com/vercel/geist-font',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'mono',
+  fallback   : 'monospace',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/geist-mono/geist-mono-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/geist-mono/geist-mono-italic-variable.ttf' },
+  ],
+},
 
 {
   id         : 'jetbrains-mono',
@@ -74,6 +246,206 @@ const fonts = [
   faces      : [
     { weight: '100 800', style: 'normal', file: 'files/jetbrains-mono/jetbrains-mono-variable.ttf' },
     { weight: '100 800', style: 'italic', file: 'files/jetbrains-mono/jetbrains-mono-italic-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'roboto-mono',
+  name       : 'Roboto Mono',
+  designer   : 'Christian Robertson',
+  source     : 'https://github.com/googlefonts/RobotoMono',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'mono',
+  fallback   : 'monospace',
+  features   : [],
+  faces      : [
+    { weight: '100 700', style: 'normal', file: 'files/roboto-mono/roboto-mono-variable.ttf' },
+    { weight: '100 700', style: 'italic', file: 'files/roboto-mono/roboto-mono-italic-variable.ttf' },
+  ],
+},
+
+// ::: display :::::::::::::::::::::::::::::::::::::::::::
+
+{
+  id         : 'alkatra',
+  name       : 'Alkatra',
+  designer   : 'Suman Bhandary',
+  source     : 'https://github.com/suman51284/Alkatra',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '400 700', style: 'normal', file: 'files/alkatra/alkatra-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'germania-one',
+  name       : 'Germania One',
+  designer   : 'John Vargas Beltrán',
+  source     : 'https://github.com/googlefonts/germaniaone',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/germania-one/germania-one-400.ttf' },
+  ],
+},
+
+{
+  id         : 'gluten',
+  name       : 'Gluten',
+  designer   : 'Tyler Finck, ETC',
+  source     : 'https://github.com/Etcetera-Type-Co/Gluten',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/gluten/gluten-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'grenze-gotisch',
+  name       : 'Grenze Gotisch',
+  designer   : 'Omnibus-Type',
+  source     : 'https://github.com/Omnibus-Type/Grenze-Gotisch',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/grenze-gotisch/grenze-gotisch-variable.ttf' },
+  ],
+},
+
+{
+  id         : 'manufacturing-consent',
+  name       : 'Manufacturing Consent',
+  designer   : 'Fredrick Brennan',
+  source     : 'https://github.com/googlefonts/manufacturing-consent-font',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/manufacturing-consent/manufacturing-consent-400.ttf' },
+  ],
+},
+
+{
+  id         : 'nova-cut',
+  name       : 'Nova Cut',
+  designer   : 'Wojciech Kalinowski',
+  source     : 'https://github.com/googlefonts/googlefontdirectory-hg',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/nova-cut/nova-cut-400.ttf' },
+  ],
+},
+
+{
+  id         : 'nova-flat',
+  name       : 'Nova Flat',
+  designer   : 'Wojciech Kalinowski',
+  source     : 'https://github.com/googlefonts/googlefontdirectory-hg',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/nova-flat/nova-flat-400.ttf' },
+  ],
+},
+
+{
+  id         : 'nova-oval',
+  name       : 'Nova Oval',
+  designer   : 'Wojciech Kalinowski',
+  source     : 'https://github.com/googlefonts/googlefontdirectory-hg',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/nova-oval/nova-oval-400.ttf' },
+  ],
+},
+
+{
+  id         : 'nova-round',
+  name       : 'Nova Round',
+  designer   : 'Wojciech Kalinowski',
+  source     : 'https://github.com/googlefonts/googlefontdirectory-hg',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/nova-round/nova-round-400.ttf' },
+  ],
+},
+
+{
+  id         : 'unifrakturcook',
+  name       : 'UnifrakturCook',
+  designer   : 'j. \\\'mach\\\' wust',
+  source     : 'https://github.com/googlefonts/googlefontdirectory-hg',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 700, style: 'normal', file: 'files/unifrakturcook/unifrakturcook-700.ttf' },
+  ],
+},
+
+{
+  id         : 'unifrakturmaguntia',
+  name       : 'UnifrakturMaguntia',
+  designer   : 'j. \\\'mach\\\' wust',
+  source     : 'https://github.com/googlefonts/googlefontdirectory-hg',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: 400, style: 'normal', file: 'files/unifrakturmaguntia/unifrakturmaguntia-400.ttf' },
+  ],
+},
+
+// ::: handwriting :::::::::::::::::::::::::::::::::::::::
+
+{
+  id         : 'caveat',
+  name       : 'Caveat',
+  designer   : 'Impallari Type',
+  source     : 'https://github.com/googlefonts/caveat',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'handwriting',
+  fallback   : 'cursive',
+  features   : [],
+  faces      : [
+    { weight: '400 700', style: 'normal', file: 'files/caveat/caveat-variable.ttf' },
   ],
 },
 

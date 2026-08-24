@@ -263,14 +263,14 @@ await aufbau.init();
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const MANIFEST = new URL('./fonts.json5', import.meta.url);
+const MANIFEST = new URL('./data.js', import.meta.url);
 
 // pangram exercises umlauts and eszett - relevant for the german/blackletter part of the collection
 const SPECIMEN_LINE  = 'Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.';
 const SPECIMEN_BLOCK = 'Der Buchdruck kam aus Mainz, die Schwabacher aus Nürnberg, und beide '
                      + 'überlebten fünfhundert Jahre Papier. 0123456789 – ÄÖÜ äöüß & @ %';
 
-const CATEGORIES = ['all', 'fraktur', 'serif', 'sans', 'mono'];
+const CATEGORIES = ['all', 'sans', 'serif', 'mono', 'display', 'handwriting'];
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -448,7 +448,7 @@ function Toolbar () {
 
 function App () {
   if (status.value === 'loading') return html`<p class="state">Sammlung wird geladen…</p>`;
-  if (status.value === 'error')   return html`<p class="state">fonts.json5 ist nicht erreichbar.</p>`;
+  if (status.value === 'error')   return html`<p class="state">data.js ist nicht erreichbar.</p>`;
 
   return html`
     <header class="masthead">
