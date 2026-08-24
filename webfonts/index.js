@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 import { fonts } from './data.js';
-import { isElement, isString } from '@pulgasari/is';
+import { isElement, isObject, isString } from '@pulgasari/is';
 
 // :::::: META
 
@@ -38,7 +38,7 @@ const normalizeApplyInput = (fontInput, arg2, arg3) => {
   let target;
   let scope;
 
-  if (typeof fontInput === 'object' && fontInput !== null && !Array.isArray(fontInput)) {
+  if (isObject(fontInput)) {
     name   = fontInput.name   || fontInput.id  || fontInput.font;
     target = fontInput.target || fontInput.var || fontInput.category;
     scope  = fontInput.scope  || fontInput.element;
@@ -122,9 +122,6 @@ const apply = (fontInput, arg2, arg3) => {
   targetEl.style.setProperty(cssVar, `'${familyName}'${fallback}`);
 };
 
-/**
- * Main initialization helper accepting strings, objects, or mixed arrays
- */
 const init = async (config) => {
   if (!config) return;
   const items = Array.isArray(config) ? config : [config];
