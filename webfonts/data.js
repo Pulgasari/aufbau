@@ -21,7 +21,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/lexend/lexend-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/lexend-variable.ttf' },
   ],
 },
 
@@ -36,7 +36,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '200 800', style: 'normal', file: 'files/manrope/manrope-variable.ttf' },
+    { weight: '200 800', style: 'normal', file: 'files/manrope-variable.ttf' },
   ],
 },
 
@@ -51,8 +51,8 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/montserrat/montserrat-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/montserrat/montserrat-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/montserrat-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/montserrat-italic-variable.ttf' },
   ],
 },
 
@@ -67,8 +67,8 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/noto-sans/noto-sans-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/noto-sans/noto-sans-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/noto-sans-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/noto-sans-italic-variable.ttf' },
   ],
 },
 
@@ -83,7 +83,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '300 700', style: 'normal', file: 'files/quicksand/quicksand-variable.ttf' },
+    { weight: '300 700', style: 'normal', file: 'files/quicksand-variable.ttf' },
   ],
 },
 
@@ -98,8 +98,8 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/roboto-condensed/roboto-condensed-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/roboto-condensed/roboto-condensed-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/roboto-condensed-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/roboto-condensed-italic-variable.ttf' },
   ],
 },
 
@@ -114,7 +114,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 1000', style: 'normal', file: 'files/roboto-flex/roboto-flex-variable.ttf' },
+    { weight: '100 1000', style: 'normal', file: 'files/roboto-flex-variable.ttf' },
   ],
 },
 
@@ -129,8 +129,8 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '300 900', style: 'normal', file: 'files/rubik/rubik-variable.ttf' },
-    { weight: '300 900', style: 'italic', file: 'files/rubik/rubik-italic-variable.ttf' },
+    { weight: '300 900', style: 'normal', file: 'files/rubik-variable.ttf' },
+    { weight: '300 900', style: 'italic', file: 'files/rubik-italic-variable.ttf' },
   ],
 },
 
@@ -145,8 +145,8 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/sour-gummy/sour-gummy-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/sour-gummy/sour-gummy-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/sour-gummy-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/sour-gummy-italic-variable.ttf' },
   ],
 },
 
@@ -163,8 +163,8 @@ const fonts = [
   fallback   : 'serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/grenze/grenze-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/grenze/grenze-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/grenze-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/grenze-italic-variable.ttf' },
   ],
 },
 
@@ -179,8 +179,8 @@ const fonts = [
   fallback   : 'serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/roboto-serif/roboto-serif-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/roboto-serif/roboto-serif-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/roboto-serif-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/roboto-serif-italic-variable.ttf' },
   ],
 },
 
@@ -195,7 +195,7 @@ const fonts = [
   fallback   : 'serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/roboto-slab/roboto-slab-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/roboto-slab-variable.ttf' },
   ],
 },
 
@@ -210,8 +210,8 @@ const fonts = [
   fallback   : 'serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/texturina/texturina-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/texturina/texturina-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/texturina-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/texturina-italic-variable.ttf' },
   ],
 },
 
@@ -228,8 +228,8 @@ const fonts = [
   fallback   : 'monospace',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/geist-mono/geist-mono-variable.ttf' },
-    { weight: '100 900', style: 'italic', file: 'files/geist-mono/geist-mono-italic-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/geist-mono-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/geist-mono-italic-variable.ttf' },
   ],
 },
 
@@ -244,8 +244,8 @@ const fonts = [
   fallback   : 'monospace',
   features   : ['calt'],
   faces      : [
-    { weight: '100 800', style: 'normal', file: 'files/jetbrains-mono/jetbrains-mono-variable.ttf' },
-    { weight: '100 800', style: 'italic', file: 'files/jetbrains-mono/jetbrains-mono-italic-variable.ttf' },
+    { weight: '100 800', style: 'normal', file: 'files/jetbrains-mono-variable.ttf' },
+    { weight: '100 800', style: 'italic', file: 'files/jetbrains-mono-italic-variable.ttf' },
   ],
 },
 
@@ -260,8 +260,8 @@ const fonts = [
   fallback   : 'monospace',
   features   : [],
   faces      : [
-    { weight: '100 700', style: 'normal', file: 'files/roboto-mono/roboto-mono-variable.ttf' },
-    { weight: '100 700', style: 'italic', file: 'files/roboto-mono/roboto-mono-italic-variable.ttf' },
+    { weight: '100 700', style: 'normal', file: 'files/roboto-mono-variable.ttf' },
+    { weight: '100 700', style: 'italic', file: 'files/roboto-mono-italic-variable.ttf' },
   ],
 },
 
@@ -278,7 +278,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '400 700', style: 'normal', file: 'files/alkatra/alkatra-variable.ttf' },
+    { weight: '400 700', style: 'normal', file: 'files/alkatra-variable.ttf' },
   ],
 },
 
@@ -293,7 +293,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/germania-one/germania-one-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/germania-one-400.ttf' },
   ],
 },
 
@@ -308,7 +308,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/gluten/gluten-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/gluten-variable.ttf' },
   ],
 },
 
@@ -323,7 +323,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: '100 900', style: 'normal', file: 'files/grenze-gotisch/grenze-gotisch-variable.ttf' },
+    { weight: '100 900', style: 'normal', file: 'files/grenze-gotisch-variable.ttf' },
   ],
 },
 
@@ -338,7 +338,23 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/manufacturing-consent/manufacturing-consent-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/manufacturing-consent-400.ttf' },
+  ],
+},
+
+{
+  id         : 'museomoderno',
+  name       : 'MuseoModerno',
+  designer   : 'Omnibus-Type',
+  source     : 'https://github.com/Omnibus-Type/MuseoModerno',
+  license    : 'OFL-1.1',
+  commercial : true,
+  category   : 'display',
+  fallback   : 'sans-serif',
+  features   : [],
+  faces      : [
+    { weight: '100 900', style: 'normal', file: 'files/museomoderno-variable.ttf' },
+    { weight: '100 900', style: 'italic', file: 'files/museomoderno-italic-variable.ttf' },
   ],
 },
 
@@ -353,7 +369,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/nova-cut/nova-cut-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/nova-cut-400.ttf' },
   ],
 },
 
@@ -368,7 +384,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/nova-flat/nova-flat-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/nova-flat-400.ttf' },
   ],
 },
 
@@ -383,7 +399,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/nova-oval/nova-oval-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/nova-oval-400.ttf' },
   ],
 },
 
@@ -398,7 +414,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/nova-round/nova-round-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/nova-round-400.ttf' },
   ],
 },
 
@@ -413,7 +429,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 700, style: 'normal', file: 'files/unifrakturcook/unifrakturcook-700.ttf' },
+    { weight: 700, style: 'normal', file: 'files/unifrakturcook-700.ttf' },
   ],
 },
 
@@ -428,7 +444,7 @@ const fonts = [
   fallback   : 'sans-serif',
   features   : [],
   faces      : [
-    { weight: 400, style: 'normal', file: 'files/unifrakturmaguntia/unifrakturmaguntia-400.ttf' },
+    { weight: 400, style: 'normal', file: 'files/unifrakturmaguntia-400.ttf' },
   ],
 },
 
@@ -445,7 +461,7 @@ const fonts = [
   fallback   : 'cursive',
   features   : [],
   faces      : [
-    { weight: '400 700', style: 'normal', file: 'files/caveat/caveat-variable.ttf' },
+    { weight: '400 700', style: 'normal', file: 'files/caveat-variable.ttf' },
   ],
 },
 
