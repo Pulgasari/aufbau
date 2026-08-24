@@ -13,6 +13,20 @@ const fontPath  = 'https://code.pulgasari.dev/aufbau/webfonts/ttf';
 console.log('[@aufbau/webfonts] data:', data);
 console.log('[@aufbau/webfonts] fontPath:', fontPath);
 
+// :::::: API
+
+const apply = (name, obj, target) => {
+
+};
+
+const load = (name) => {
+  const fontObj = data.fonts[name];
+  const fontFace = createFontFace(family, src, descriptor);
+  
+  await fontFace.load(); // load
+  document.fonts.add(fontFace); // register
+};
+
 // :::::: INIT
 
 function normalizeFont (entry) {
@@ -109,7 +123,18 @@ document.fonts.add(manrope);
 
 
 
-const createFontFace
+const createFontFace (family, url, descriptor) {
+  const ff = new FontFace (family, `url(${url})`, descriptor);
+  return ff;
+}
+
+// interface: aufbau fonts
+
+const 
+
+// interface: google fonts
+
+
 
 
 
