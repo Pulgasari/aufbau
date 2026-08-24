@@ -134,7 +134,7 @@ function toFaces (meta) {
   const variable = fonts.filter(font => String(font.filename).includes('['));
 
   if (variable.length && wght) {
-    const range = `${intOf(wght.min_value)}${intOf(wght.max_value)}`;
+    const range = `${intOf(wght.min_value)} ${intOf(wght.max_value)}`;
     return { variable: true, faces: variable.map(font => ({ weight: range, style: font.style || 'normal', srcFile: font.filename })) };
   }
 
@@ -145,7 +145,7 @@ function toFaces (meta) {
 
 async function download (dir, srcFile, destPath) {
   const response = await fetch(RAW(`${dir}/${encodeURIComponent(srcFile)}`));
-  if (!response.ok) throw new Error(`${response.status}${response.statusText}`);
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
   await mkdir(dirname(destPath), { recursive: true });
   await writeFile(destPath, Buffer.from(await response.arrayBuffer()));
   return response.headers.get('content-length');
@@ -191,10 +191,10 @@ async function buildEntry (name, keepFeatures) {
 
 // :::::: SERIALIZE ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const section = (label) => `// ::: ${label}${':'.repeat(Math.max(4, 50 - label.length))}`;
+const section = (label) => `// ::: ${label} ${':'.repeat(Math.max(4, 50 - label.length))}`;
 
 function serializeFace (face) {
-  return `    { weight: ${typeof face.weight === 'number' ? face.weight : q(face.weight)}, style: ${q(face.style)}, file:${q(face.file)} },`;
+  return `    { weight: ${typeof face.weight === 'number' ? face.weight : q(face.weight)}, style: ${q(face.style)}, file: ${q(face.file)} },`;
 }
 
 function serializeEntry (font) {
