@@ -152,3 +152,29 @@ async function loadHeroFont() {
 loadHeroFont();
 ```
 
+###
+
+```javascript
+import { init, apply } from '@aufbau/webfonts';
+
+// 1. Single string (sets '--aufbau-font' on :root)
+await init('manrope');
+
+// 2. Single object with shortcut target
+await init({ name: 'jetbrains-mono', target: 'mono' }); 
+// Sets '--aufbau-font-mono' on :root
+
+// 3. Mixed Array in init()
+await init([
+  'manrope',                                                    // default font on :root
+  { name: 'jetbrains-mono', target: 'mono' },                   // --aufbau-font-mono on :root
+  { name: 'vollkorn', target: 'serif', scope: '.article' },      // --aufbau-font-serif on .article
+  { name: 'manrope', target: '--custom-header-font', scope: '#header' } // --custom-header-font on #header
+]);
+
+// 4. Flexible apply() calls
+apply('jetbrains-mono', 'mono');                    // --aufbau-font-mono on :root
+apply('jetbrains-mono', '--code-font');             // --code-font on :root
+apply('jetbrains-mono', '#editor', 'code');         // --aufbau-font-mono on #editor
+apply('jetbrains-mono', document.body, '--editor'); // --editor on <body>
+```
