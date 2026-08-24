@@ -22,12 +22,12 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 - [@aufbau/patterns](patterns/)
 - [@aufbau/stylescript](stylescript/) *(experimental)*
 - [@aufbau/stylesheet](stylesheet/) *(experimental)*
+- [@aufbau/webfonts](webfonts/)
 
 #### resources
 
 - [@aufbau/css](#aufbau-css)
 - [@aufbau/svg](#aufbau-svg)
-- [@aufbau/webfonts](#aufbau-webfonts) (handpicked collection of free webfonts looking great in webdev projects)
 
 #### test
 
