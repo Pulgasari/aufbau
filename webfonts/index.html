@@ -263,14 +263,14 @@ await aufbau.init();
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-const MANIFEST = new URL('./fonts.json5', import.meta.url);
+const MANIFEST = new URL('./data.js', import.meta.url);
 
 // pangram exercises umlauts and eszett - relevant for the german/blackletter part of the collection
 const SPECIMEN_LINE  = 'Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.';
 const SPECIMEN_BLOCK = 'Der Buchdruck kam aus Mainz, die Schwabacher aus Nürnberg, und beide '
                      + 'überlebten fünfhundert Jahre Papier. 0123456789 – ÄÖÜ äöüß & @ %';
 
-const CATEGORIES = ['all', 'fraktur', 'serif', 'sans', 'mono'];
+const CATEGORIES = ['all', 'sans', 'serif', 'mono', 'display', 'handwriting'];
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -308,6 +308,15 @@ const groups = computed(() => {
 
 const registry = new Map(); // font.id -> Promise, prevents duplicate FontFace registration
 
+// css font `format()` hint by file extension; unknown extensions omit the hint
+const FONT_FORMATS = { otf: 'opentype', ttf: 'truetype', woff: 'woff', woff2: 'woff2' };
+const faceSource = (file) => {
+  // face.file is repo-relative (resolved against data.js) or an absolute url
+  const url    = new URL(file, MANIFEST).href;
+  const format = FONT_FORMATS[file.split('.').pop().toLowerCase()];
+  return format ? `url("${url}") format("${format}")` : `url("${url}")`;
+};
+
 /**
  * loads every face of a font via the FontFace api and registers it on the document.
  * @param {object} font - manifest entry
@@ -317,9 +326,8 @@ function loadFont (font) {
   if (registry.has(font.id)) return registry.get(font.id);
 
   const task = Promise.all(font.faces.map(async face => {
-    //const url    = new URL(`./${face.file}`, MANIFEST).href;
-    const data = await aufbau.import(MANIFEST.href);
-    const loaded = await new FontFace(font.name, `url("${url}") format("woff2")`, {
+    // weight may be a variable range like "100 800", which the descriptor accepts
+    const loaded = await new FontFace(font.name, faceSource(face.file), {
       weight  : String(face.weight),
       style   : face.style,
       display : 'swap'
@@ -448,7 +456,7 @@ function Toolbar () {
 
 function App () {
   if (status.value === 'loading') return html`<p class="state">Sammlung wird geladen…</p>`;
-  if (status.value === 'error')   return html`<p class="state">fonts.json5 ist nicht erreichbar.</p>`;
+  if (status.value === 'error')   return html`<p class="state">data.js ist nicht erreichbar.</p>`;
 
   return html`
     <header class="masthead">

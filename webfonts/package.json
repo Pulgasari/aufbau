@@ -2,7 +2,7 @@
   "name": "@aufbau/webfonts",
   "type": "module",
   "exports": {
-    "."        : "./src/index.js",
-    "./google" : "./src/google.js"
+    "."        : "./index.js",
+    "./google" : "./google.js"
   }
 }

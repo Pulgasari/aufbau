@@ -85,7 +85,9 @@ const load = async (identifier) => {
 
   const loadedFaces = await Promise.all(
     fontData.faces.map(async (face) => {
-      const fullUrl = `${baseFontUrl}/${face.file}`;
+      // face.file is a repo-relative path (downloaded fonts) or an absolute url
+      // (generator run with --remote), used as-is in that case
+      const fullUrl = /^https?:\/\//.test(face.file) ? face.file : `${baseFontUrl}/${face.file}`;
       const descriptors = {
         style   : face.style || 'normal',
         weight  : String(face.weight || '400'),

@@ -6,6 +6,7 @@
   "private"     : true,
   "scripts": {
     "generate": "node .github/scripts/generate-assets.mjs",
+    "generate:webfonts": "node .github/scripts/generate-webfonts.mjs",
     "graph": "node test/graph.mjs",
     "test:flicker": "node test/flicker.test.mjs",
     "test:splash": "node test/splash.test.mjs"

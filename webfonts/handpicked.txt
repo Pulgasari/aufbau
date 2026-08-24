@@ -1,0 +1,45 @@
+# @aufbau/webfonts — handpicked collection
+#
+# one google fonts family name per line. this is the single source of truth:
+# `npm run generate:webfonts` fetches each family's metadata from the google/fonts
+# repo, rebuilds data.js, and downloads the font files into files/<id>/.
+#
+# blank lines and lines starting with # are ignored. case/spacing are normalized, so
+# "roboto flex" resolves the same as "Roboto Flex".
+
+Alkatra
+Caveat
+Geist Mono
+Gluten
+Google Sans Flex
+Grenze
+Grenze Gotisch
+JetBrains Mono
+Lexend
+Manrope
+Manufacturing Consent
+Montserrat
+Noto Sans
+Quicksand
+Roboto Condensed
+Roboto Flex
+Roboto Mono
+Roboto Serif
+Roboto Slab
+Rubik
+Sour Gummy
+Texturina
+
+# ::: not variable (still google fonts, static faces) :::
+Germania One
+Nova Cut
+Nova Flat
+Nova Oval
+Nova Round
+UnifrakturCook
+UnifrakturMaguntia
+
+# ::: not on google fonts — handled separately (peter-wiegel.de fraktur) :::
+# Alte Schwabacher
+# Berthold Mainzer Fraktur
+# Deutsche Zierschrift
