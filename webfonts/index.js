@@ -58,7 +58,7 @@ const normalizeApplyInput = (fontInput, arg2, arg3) => {
 const resolveCssVar = (target = 'body') => {
   if (target.startsWith('--')) return target;
   const key = target.toLowerCase();
-  return CATEGORY_VARS[key] || `--aufbau-font-${key}`;
+  return VARS[key] || `--aufbau-font-${key}`;
 };
 
 const resolveScope = (scope) => {
@@ -70,10 +70,10 @@ const resolveScope = (scope) => {
 // :::::: API
 
 // find font entry in catalog by ID or Name
-export const findFont = (id) => id ? fonts.find(f => f.id === id || f.name === id) : null;
+const findFont = (id) => id ? fonts.find(f => f.id === id || f.name === id) : null;
 
 // load a single font entry from catalog using FontFace API
-export const load = async (identifier) => {
+const load = async (identifier) => {
   const fontData = findFont(identifier);
   if (!fontData) {
     console.warn(`[@aufbau/webfonts] Font "${identifier}" not found in catalog.`);
@@ -109,7 +109,7 @@ export const load = async (identifier) => {
   return success;
 };
 
-export const apply = (fontInput, arg2, arg3) => {
+const apply = (fontInput, arg2, arg3) => {
   const { name, target, scope } = normalizeApplyInput(fontInput, arg2, arg3);
   if (!name) return;
 
@@ -125,7 +125,7 @@ export const apply = (fontInput, arg2, arg3) => {
 /**
  * Main initialization helper accepting strings, objects, or mixed arrays
  */
-export const init = async (config) => {
+const init = async (config) => {
   if (!config) return;
   const items = Array.isArray(config) ? config : [config];
 
@@ -141,4 +141,12 @@ export const init = async (config) => {
   items.forEach(apply);
 };
 
-export { fonts };
+// :::::: EXPORTS
+
+export { 
+  fonts,
+  apply,
+  findFont,
+  init,
+  load,
+};
