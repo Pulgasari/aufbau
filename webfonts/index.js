@@ -33,26 +33,22 @@ const isScopeValue = (val) => {
   return false;
 };
 
-const normalizeApplyInput = (fontInput, arg2, arg3) => {
-  let name = fontInput;
-  let target;
-  let scope;
+const normalizeApplyInput = (input) => {
+  if (!input) return {};
 
-  if (isObject(fontInput)) {
-    name   = fontInput.name   || fontInput.id  || fontInput.font;
-    target = fontInput.target || fontInput.var || fontInput.category;
-    scope  = fontInput.scope  || fontInput.element;
-  } else {
-    if (isScopeValue(arg2)) {
-      scope  = arg2;
-      target = arg3;
-    } else {
-      target = arg2;
-      scope  = arg3;
-    }
+  // Single options object format with flexible aliases
+  if (isObject(input)) {
+    return {
+      name   : input.name   || input.id      || input.font,
+      target : input.target || input.var     || input.category,
+      scope  : input.scope  || input.element || input.el,
+    };
   }
 
-  return { name, target, scope };
+  // String shorthand format: apply('Manrope')
+  if (isString(input)) return { name: input };
+
+  return {};
 };
 
 const resolveCssVar = (target = 'body') => {
@@ -111,8 +107,8 @@ const load = async (identifier) => {
   return success;
 };
 
-const apply = (fontInput, arg2, arg3) => {
-  const { name, target, scope } = normalizeApplyInput(fontInput, arg2, arg3);
+const apply = (fontInput) => {
+  const { name, target, scope } = normalizeApplyInput(fontInput);
   if (!name) return;
 
   const font       = findFont(name);
