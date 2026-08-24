@@ -103,30 +103,33 @@ function vendor (name) {
 // only strings are listed here: referencing globals like CSSStyleSheet at module
 // load would throw in deno, node or a worker without dom.
 
+const _ELEMENT = ['dom', 'node', 'tag'];
+const _RAW     = ['code', 'plain', 'source', 'string', 'text'];
+
 const cssModes = {
   stylesheet   : ['sheet', 'cssstylesheet', 'adopted'],
   styleElement : ['style', 'tag', 'htmlstyleelement'],
-  raw          : ['code', 'css', 'string', 'text', 'source']
+  raw          : _RAW,
 };
 
 const dataModes = {
   value : ['object', 'parsed', 'json', 'js'],
-  raw   : ['string', 'text', 'source']
+  raw   : _RAW,
 };
 
 const moduleModes = {
   module : ['exports', 'namespace'],
-  raw    : ['code', 'source', 'string', 'text']
+  raw    : _RAW,
 };
 
 const transpileModes = {
   module : ['exports', 'namespace'],
   code   : ['js', 'javascript', 'compiled'],
-  raw    : ['source', 'string', 'text']
+  raw    : _RAW,
 };
 
 const textModes = {
-  raw : ['code', 'source', 'string', 'text']
+  raw : _RAW,
 };
 
 const outputs = {
@@ -134,42 +137,52 @@ const outputs = {
   csv   : {
     records : ['object', 'objects', 'rows', 'json'],
     array   : ['arrays', 'matrix', 'tuples'],
-    raw     : ['source', 'string', 'text']
+    raw     : _RAW,
   },
   env   : dataModes,
   html  : {
     string   : ['html', 'markup', 'raw', 'source', 'text'],
     document : ['doc', 'dom'],
-    element  : ['div', 'documentfragment', 'fragment', 'node']
+    element  : _ELEMENT
   },
   ini   : dataModes,
   js    : moduleModes,
   json  : dataModes,
   json5 : dataModes,
   jsonc : dataModes,
-  jsonl : { records  : ['array', 'arrays', 'objects', 'rows'],
-            raw      : ['source', 'string', 'text'] },
+  jsonl : { 
+    records  : ['array', 'arrays', 'objects', 'rows'],
+    raw      : _RAW
+  },
   jsx   : transpileModes,
   less  : cssModes,
-  md    : { html     : ['markup', 'string'],
-            element  : ['dom', 'fragment', 'node'],
-            raw      : ['markdown', 'source', 'text'] },
+  md    : {
+    html    : ['markup', 'string'],
+    element : ['dom', 'fragment', 'node'],
+    raw     : ['markdown', 'source', 'text']
+  },
   sass  : cssModes,
   scss  : cssModes,
-  svg   : { string   : ['markup', 'text'],
-            element  : ['dom', 'node', 'svgelement'],
-            svgjs    : ['svgdotjs', 'wrapped'],
-            raw      : ['original', 'source'] },
+  svg   : { 
+    string  : ['markup', 'text'],
+    element : _ELEMENT,
+    svgjs   : ['svgdotjs', 'wrapped'],
+    raw     : ['original', 'source'] 
+  },
   text  : textModes,
   toml  : dataModes,
   ts    : transpileModes,
-  wasm  : { instance : ['exports', 'webassemblyinstance'],
-            module   : ['compiled', 'webassemblymodule'],
-            buffer   : ['arraybuffer', 'binary', 'bytes', 'raw'] },
-  xml   : { object   : ['js', 'parsed', 'value'],
-            json     : ['jsonstring', 'stringify'],
-            document : ['doc', 'dom'],
-            raw      : ['source', 'string', 'text', 'xml'] },
+  wasm  : { 
+    instance : ['exports'],
+    module   : ['compiled'],
+    buffer   : ['arraybuffer', 'binary', 'bytes', 'raw']
+  },
+  xml   : {
+    object   : ['js', 'parsed', 'value'],
+    json     : ['jsonstring', 'stringify'],
+    document : ['doc', 'dom'],
+    raw      : ['source', 'string', 'text', 'xml'] 
+  },
   yaml  : dataModes
 };
 
@@ -265,12 +278,22 @@ function createImporter(type, parseFn) {
 }
 
 export const 
-importCSS   = createImporter ('css'   , (text, { mode }) => transformCSSResult(text, mode)),
-importJSON  = createImporter ('json'  , (text) => JSON.parse(text)),
-importJSONL = createImporter ('jsonl' , (text) => text.split('\n').filter(line => line.trim()).map(JSON.parse) );
+importCSS   = createImporter ('css'   ,       (text, { mode }) => transformCSSResult(text, mode)),
+importJSON  = createImporter ('json'  ,       (text) => JSON.parse(text)),
+importJSONL = createImporter ('jsonl' ,       (text) => text.split('\n').filter(line => line.trim()).map(JSON.parse) ),
+importJSON5 = createImporter ('json5' , async (text) => (await vendor('json5')).default.parse(text));
+importTOML  = createImporter ('toml'  , async (text) => (await vendor('smolToml')).parse(text));
 
 export const
-importJSX = async (path, options = {}) => transpile(path, 'jsx', toOptions(options));
+importJSX  = async (path, options = {}) => transpile   (path, 'jsx',              toOptions(options)),
+importSASS = async (path, options = {}) => compileSass (path, 'sass', 'indented', toOptions(options)),
+importSCSS = async (path, options = {}) => compileSass (path, 'scss', 'scss',     toOptions(options)),
+importText = async (path, options = {}) => fetchText   (path,                     toOptions(options)),
+importTS   = async (path, options = {}) => transpile   (path, 'ts',               toOptions(options));
+
+
+
+
 
 export const importCSV = createImporter('csv', async (text, { path, options, mode }) => {
   const PAPA = (await vendor('papaparse')).default;
@@ -330,10 +353,7 @@ export async function importJS (path, options = {}) {
 }
 
 
-export const importJSON5 = createImporter('json5', async (text) => {
-  const JSON5 = (await vendor('json5')).default;
-  return JSON5.parse(text);
-});
+
 
 export const importJSONC = createImporter('jsonc', (text) => {
   // Strip comments while leaving string literals and escaped quotes intact
@@ -377,13 +397,8 @@ export async function importMD (path, options = {}) {
   return renderMD(text, { ...options, path });
 }
 
-export async function importSASS (path, options = {}) {
-  return compileSass(path, 'sass', 'indented', toOptions(options));
-}
 
-export async function importSCSS (path, options = {}) {
-  return compileSass(path, 'scss', 'scss', toOptions(options));
-}
+
 
 export const importSVG = createImporter('svg', async (text, { mode }) => {
   // Strip XML declaration and DOCTYPE headers for clean HTML5 inlining
@@ -397,20 +412,6 @@ export const importSVG = createImporter('svg', async (text, { mode }) => {
   const { SVG } = await vendor('svgjs');
   return SVG(element); // Adopts the live node, no re-parse
 });
-
-export async function importText (path, options = {}) {
-  return fetchText(path, toOptions(options));
-}
-
-
-export const importTOML = createImporter('toml', async (text) => {
-  const { parse } = await vendor('smolToml');
-  return parse(text);
-});
-
-export async function importTS (path, options = {}) {
-  return transpile(path, 'ts', toOptions(options));
-}
 
 export const importTSX = importTS;
 
