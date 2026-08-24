@@ -14,6 +14,13 @@ const attrStr = attrs => Object.entries(attrs).map(([k, v]) => (v === '' ? ` ${k
 const pruned = obj => Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
 const prunedWithFallbacks = (obj = {}, defaults = {}) => ({ ...defaults, ...pruned(obj) });
 
+// "2s" -> { number: 2, unit: 's' }, "16px" -> { number: 16, unit: 'px' }, 5 -> { number: 5, unit: '' }.
+// splits a unit-bearing value into the numeric part a slider rides on and the unit
+// it only shows as a label. non-numeric input yields { number: null, unit: '' }.
+const UNIT_PATTERN = /^\s*(-?\d*\.?\d+)\s*([a-z%]*)\s*$/i;
+const splitUnit    = value => { const m = UNIT_PATTERN.exec(String(value ?? '')); return m ? { number: Number(m[1]), unit: m[2] } : { number: null, unit: '' }; };
+const numberOf     = value => value == null ? null : splitUnit(value).number;
+
 // a spec entry -> { tag, attrs, options? } describing one aufbau control.
 function toControl (key, spec, value) {
   value ??= spec.default;
@@ -26,9 +33,24 @@ function toControl (key, spec, value) {
     case 'boolean' : return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: value ? '' : null }) };
     case 'integer' :
     case 'number'  : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min, max, step, unit, value }) };
-    case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };    
+    case 'angle'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };
+    // durations arrive unit-bearing ("2s"). the slider rides the numeric part on a
+    // plain number axis (its own `time` type is wall-clock, not a duration) and shows
+    // the unit only as a label. bounds default to a 0–10s window when unspecified
+    case 'time'    : {
+      const parsed = splitUnit(value);
+      return { tag: 'aufbau-slider', attrs: pruned({
+        ...attrs,
+        type  : 'number',
+        min   : numberOf(min) ?? 0,
+        max   : numberOf(max) ?? 10,
+        step  : step ?? 0.1,
+        unit  : unit ?? (parsed.unit || splitUnit(spec.default).unit || 's'),
+        value : parsed.number,
+      }) };
+    }
     case 'color'   : return { tag: 'aufbau-input', attrs: { ...attrs, type: 'color', look: 'swatch', value } };
-    default        : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'text', value }) }; // time, text, anything else
+    default        : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'text', value }) }; // text, date, datetime, anything else
   }
 }
 
@@ -86,7 +108,10 @@ function coerce (spec, element) {
     case 'boolean' : return !!(element.checked ?? element.hasAttribute?.('checked'));
     case 'integer' : return Math.round(Number(element.value));
     case 'number'  :
-    case 'angle'   : return Number(element.value);
+    case 'angle'   :
+    // a bare number, the unit stays presentational. a unitless SMIL/css duration is
+    // read as seconds, so `dur="2"` == 2s and the filter needs no unit round-trip
+    case 'time'    : return Number(element.value);
     default        : return element.value ?? element.getAttribute?.('value') ?? '';
   }
 }

@@ -66,6 +66,12 @@ const FALLBACK_THEMES = ['dracula', 'github', 'github-dark'];
 // folder already attached, the map only covers the short names used above
 const THEME_PATHS = { dracula: 'base16/dracula' };
 
+// a default theme ships with the element, so highlighting paints out of the box.
+// without it sync() finds no theme, never adopts a token sheet, and hljs tokens
+// stay uncolored. the defaults layer is the lowest config layer, so a page still
+// overrides it with `theme="…"` or <aufbau-config code-theme="…"> without any api call
+setConfig({ 'code-theme': 'github-dark' }, { layer: 'defaults' });
+
 /**
  * loads and scopes a theme sheet. domina handles fetch, scoping, dedup and
  * adoption; adopted sheets cascade after author styles, so a page level hljs
