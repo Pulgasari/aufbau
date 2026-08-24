@@ -1,0 +1,18 @@
+# @aufbau/webfonts — handpicked collection
+#
+# one google fonts family name per line. this is the single source of truth:
+# `npm run generate:webfonts` fetches each family's metadata from the google/fonts
+# repo, rebuilds data.js, and downloads the font files into files/<id>/.
+#
+# blank lines and lines starting with # are ignored. mostly variable fonts, but a
+# static face is fine too — the generator handles both.
+
+JetBrains Mono
+Manrope
+Inter
+Vollkorn
+
+# ::: not on google fonts — handled separately (peter-wiegel.de fraktur) :::
+# Alte Schwabacher
+# Berthold Mainzer Fraktur
+# Deutsche Zierschrift
