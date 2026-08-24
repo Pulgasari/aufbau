@@ -1,34 +1,32 @@
 // @aufbau/webfonts/index.js
 
 import { fonts } from './data.js';
+import { isElement, isString } from '@pulgasari/is';
 
 let baseFontUrl = 'https://code.pulgasari.dev/aufbau/webfonts';
 const loadedFonts = new Set();
 
 const CATEGORY_VARS = {
-  sans:    '--aufbau-font-sans',
-  serif:   '--aufbau-font-serif',
-  mono:    '--aufbau-font-mono',
-  code:    '--aufbau-font-mono',
-  heading: '--aufbau-font-heading',
-  body:    '--aufbau-font',
+  body    : '--aufbau-font',
+  code    : '--aufbau-font-mono',
+  heading : '--aufbau-font-heading',
+  mono    : '--aufbau-font-mono',
+  sans    : '--aufbau-font-sans',
+  serif   : '--aufbau-font-serif',
+  
+  
+  
+  
 };
 
-/**
- * Configure global settings like asset base URL
- */
 export const configure = (options = {}) => {
   if (options.baseUrl) baseFontUrl = options.baseUrl.replace(/\/$/, '');
 };
 
-/**
- * Find font entry in catalog by ID or Name
- */
+// find font entry in catalog by ID or Name
 export const findFont = (id) => id ? fonts.find(f => f.id === id || f.name === id) : null;
 
-/**
- * Load a single font entry from catalog using FontFace API
- */
+// load a single font entry from catalog using FontFace API
 export const load = async (identifier) => {
   const fontData = findFont(identifier);
   if (!fontData) {
@@ -43,14 +41,14 @@ export const load = async (identifier) => {
     fontData.faces.map(async (face) => {
       const fullUrl = `${baseFontUrl}/${face.file}`;
       const descriptors = {
-        style: face.style || 'normal',
-        weight: String(face.weight || '400'),
-        display: face.display || 'swap',
+        style   : face.style || 'normal',
+        weight  : String(face.weight || '400'),
+        display : face.display || 'swap',
       };
 
       try {
         const fontFace = new FontFace(fontData.name, `url(${fullUrl})`, descriptors);
-        const loaded = await fontFace.load();
+        const loaded   = await fontFace.load();
         document.fonts.add(loaded);
         return loaded;
       } catch (err) {
@@ -65,9 +63,7 @@ export const load = async (identifier) => {
   return success;
 };
 
-/**
- * Resolve target CSS variable name from category shortcut or custom property
- */
+// resolve target CSS variable name from category shortcut or custom property
 const resolveCssVar = (target = 'body') => {
   if (target.startsWith('--')) return target;
   const key = target.toLowerCase();
@@ -78,8 +74,8 @@ const resolveCssVar = (target = 'body') => {
  * Resolve DOM scope element from selector string, HTMLElement, or default to root
  */
 const resolveScope = (scope) => {
-  if (typeof Element !== 'undefined' && scope instanceof Element) return scope;
-  if (typeof scope === 'string') return document.querySelector(scope) || document.documentElement;
+  if (isElement (scope)) return scope;
+  if (isString  (scope)) return document.querySelector(scope) || document.documentElement;
   return document.documentElement;
 };
 
@@ -88,15 +84,12 @@ const resolveScope = (scope) => {
  */
 const isScopeValue = (val) => {
   if (!val) return false;
-  if (typeof Element !== 'undefined' && val instanceof Element) return true;
-  if (typeof val === 'string') {
+  if (isElement(val)) return true;
+  if (isString(val)) {
     if (val.startsWith('--') || val in CATEGORY_VARS) return false;
-    if (val.startsWith('#') || val.startsWith('.') || val.startsWith('[') || val.startsWith(':')) return true;
-    try {
-      return document.querySelector(val) !== null;
-    } catch {
-      return false;
-    }
+    if (val.startsWith('#')  || val.startsWith('.') || val.startsWith('[') || val.startsWith(':')) return true;
+    try   { return document.querySelector(val) !== null; }
+    catch { return false; }
   }
   return false;
 };
@@ -110,16 +103,16 @@ const normalizeApplyInput = (fontInput, arg2, arg3) => {
   let scope;
 
   if (typeof fontInput === 'object' && fontInput !== null && !Array.isArray(fontInput)) {
-    name = fontInput.name || fontInput.id || fontInput.font;
+    name   = fontInput.name   || fontInput.id  || fontInput.font;
     target = fontInput.target || fontInput.var || fontInput.category;
-    scope = fontInput.scope || fontInput.element;
+    scope  = fontInput.scope  || fontInput.element;
   } else {
     if (isScopeValue(arg2)) {
-      scope = arg2;
+      scope  = arg2;
       target = arg3;
     } else {
       target = arg2;
-      scope = arg3;
+      scope  = arg3;
     }
   }
 
@@ -133,12 +126,11 @@ export const apply = (fontInput, arg2, arg3) => {
   const { name, target, scope } = normalizeApplyInput(fontInput, arg2, arg3);
   if (!name) return;
 
-  const font = findFont(name);
+  const font       = findFont(name);
   const familyName = font ? font.name : name;
-  const fallback = font?.fallback ? `, ${font.fallback}` : ', sans-serif';
-
-  const targetEl = resolveScope(scope);
-  const cssVar = resolveCssVar(target);
+  const fallback   = font?.fallback ? `, ${font.fallback}` : ', sans-serif';
+  const targetEl   = resolveScope(scope);
+  const cssVar     = resolveCssVar(target);
 
   targetEl.style.setProperty(cssVar, `'${familyName}'${fallback}`);
 };
@@ -153,7 +145,7 @@ export const init = async (config) => {
   // Load all unique fonts in parallel
   await Promise.all(
     items.map(item => {
-      const id = typeof item === 'string' ? item : item.name || item.id || item.font;
+      const id = isString(item) ? item : item.name || item.id || item.font;
       return load(id);
     })
   );
