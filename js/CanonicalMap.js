@@ -2,20 +2,12 @@
 
 import str from '@pulgasari/str';
 
-const {
-  toCamelCase, 
-  toConstantCase,
-  toKebabCase, 
-  toPascalCase, 
-  toSnakeCase
-} = str;
-
 const FORMS = {
-  camel    : toCamelCase,    // userProfileStatus
-  constant : toConstantCase, // USER_PROFILE_STATUS
-  kebab    : toKebabCase,    // user-profile-status
-  pascal   : toPascalCase,   // UserProfileStatus
-  snake    : toSnakeCase,    // user_profile_status
+  camel    : str.toCamelCase,    // userProfileStatus
+  constant : str.toConstantCase, // USER_PROFILE_STATUS
+  kebab    : str.toKebabCase,    // user-profile-status
+  pascal   : str.toPascalCase,   // UserProfileStatus
+  snake    : str.toSnakeCase,    // user_profile_status
 };
 
 const toConverter = (form) => typeof form === 'function' ? form : FORMS[form];
@@ -98,3 +90,13 @@ export class CanonicalMap extends Map {
 }
 
 export default CanonicalMap;
+
+/*
+const {
+  toCamelCase, 
+  toConstantCase,
+  toKebabCase, 
+  toPascalCase, 
+  toSnakeCase
+} = str;
+*/
