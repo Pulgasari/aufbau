@@ -40,12 +40,16 @@
   
   	//import nightVision from '@aufbau/filters/night-vision';
   	import { applyFilter } from '@aufbau/filters';
-  
-    applyFilter('body', 'night-vision', {
-      animate: true,
-      noise: 0.5,
-      speed: "0.4s"
-    });
+
+    const filtersMap = {
+      'glitch-heavy-cyber' : { animate: true, frequency: "0.0 0.95", scale: 40, speed: "1.5s" },
+      'glitch-live'        : { animate: true, speed: "2s" },
+      'night-vision'       : { animate: true, noise: 0.5, speed: "0.4s" },
+    };
+
+    const F = 'glitch-heavy-cyber';
+    const V = filtersMap[F];
+    applyFilter('body', F, V);
     
     function Test () {
       return html`<div>moin!</div>`;
