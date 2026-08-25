@@ -36,7 +36,16 @@
 
   <script type="module">
     import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-	const { define, update, signal, effect } = preact;
+  	const { define, update, signal, effect } = preact;
+  
+  	//import nightVision from '@aufbau/filters/night-vision';
+  	import { applyFilter } from '@aufbau/filters';
+  
+    applyFilter('body', 'night-vision', {
+      animate: true,
+      noise: 0.5,
+      speed: "0.4s"
+    });
     
     function Test () {
       return html`<div>moin!</div>`;
