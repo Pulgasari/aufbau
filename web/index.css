@@ -1,6 +1,6 @@
 @import url("https://cdn.ratcode.dev/css/reset.css");
 @import url("https://cdn.ratcode.dev/css/default.css");
-@import url("./css/animations.css");
+@import url("./../css/animations.css");
 
 :root { --bg: white; --fg: black; }
     * { font-family: "Hubot Sans"; line-height: 1; }
