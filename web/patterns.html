@@ -17,12 +17,12 @@
       display: grid; grid-template-columns: 220px 1fr; min-height: 100vh;
     }
     */
-    aside { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
+    aside    { border-right: 1px solid var(--line); padding: 16px; position: sticky; top: 0; overflow: auto; }
     aside h1 { font-size: 14px; margin: 0 0 4px; }
-    aside p { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
+    aside p  { color: var(--muted); margin: 0 0 16px; font-size: 12px; }
     nav button {
       display: block; width: 100%; text-align: left; background: none; border: 0;
-      color: var(--fg); padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit;
+      color: var(--fg); padding: 7px 10px; border-radius: 6px;
     }
     nav button:hover { background: var(--panel); }
     nav button[aria-current="true"] { background: var(--accent); color: #fff; }
