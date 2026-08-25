@@ -38,11 +38,16 @@
   
   	//aufbau.init();
 
-	  function getRandomEntry (map) {
+	function getRandomEntry (map) {
       const keys = Object.keys(map);
       const randomKey = keys[Math.floor(Math.random() * keys.length)];
       return { key: randomKey, value: map[randomKey] };
     }
+
+	function getRandomItem (arr) {
+  	  if (!arr || arr.length === 0) return undefined;
+  	  return arr[Math.floor(Math.random() * arr.length)];
+	}
     
     const filtersMap = {
       'glitch-heavy-cyber' : { animate: true, frequency: "0.0 0.95", scale: 40, speed: "1.5s" },
@@ -52,6 +57,9 @@
 
     const { key, value } = getRandomEntry(filtersMap);
     applyFilter('body', key, value);
+
+	  const theme = getRandomItem(aufbau.data.css.themes);
+    aufbau.init({ css: { theme }});
     
     const Test = () => html`<div>moin!</div>`;
     aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
