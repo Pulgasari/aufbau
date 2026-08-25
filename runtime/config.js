@@ -27,3 +27,10 @@ export default {
     theme  : 'zombie',
   }
 };
+
+/*
+filters
+patterns
+stylescript
+webfonts
+*/
