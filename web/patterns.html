@@ -62,7 +62,10 @@
   </main>
 
   <script type="module">
+    import aufbau from '@aufbau/runtime';
     import { list, patternImage, patternSvg } from '@aufbau/patterns';
+
+    aufbau.init();
 
     const catalogue = list();
     const nav   = document.getElementById('nav');
