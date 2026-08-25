@@ -14,6 +14,7 @@ import * as utils      from '@aufbau/js';
 import { boot, setConfig } from './boot.js';
 import * as client from './client.js';
 import      config from './config.js';
+import      data   from './data.js';
 import * as gui    from './gui.js';
 import * as store  from './store.js';
 import * as worker from './worker.js';
@@ -36,6 +37,7 @@ const aufbau = {
   // runtime
   boot, //interceptFetch,
   config, setConfig,
+  data,
   gui,
   store,
   
