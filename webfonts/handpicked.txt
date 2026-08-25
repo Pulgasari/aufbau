@@ -14,6 +14,7 @@ Gluten
 Google Sans Flex
 Grenze
 Grenze Gotisch
+Hubot Sans
 JetBrains Mono
 Lexend
 Manrope
