@@ -5,8 +5,8 @@
 // relative on purpose: a service worker has no import map, so a bare specifier
 // never resolves here. the path holds in the published layout too, where aufbau/
 // and bunker/ sit side by side under the site root.
-import { createCache } from './../../bunker/cache/index.js'; // from '@bunker/cache'
-import transformACSS   from './../stylesheet/index.js';
+import { createCache } from './../../../bunker/cache/index.js'; // from '@bunker/cache'
+import transformACSS   from './../../stylesheet/index.js';
 
 const cssCache = createCache({ name: 'aufbau-docs-css' });
 const  jsCache = createCache({ name: 'aufbau-docs-js' });
