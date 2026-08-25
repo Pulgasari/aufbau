@@ -1,6 +1,8 @@
 {
   "rewrites": [
     {
+      "cleanUrls": true,
+      "trailingSlash": true,
       "source": "/:path*",
       "destination": "https://code.pulgasari.dev/aufbau/test/:path*"
     }
