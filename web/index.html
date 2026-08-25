@@ -35,8 +35,8 @@
   </footer>
 
   <script type="module">
-    import aufbau, { dom, html, preact } from './kit/index.js';
-	  const { define, update, signal, effect } = preact;
+    import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
+	const { define, update, signal, effect } = preact;
     
     function Test () {
       return html`<div>moin!</div>`;
