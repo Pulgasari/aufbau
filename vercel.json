@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/:path*",
-      "destination": "https://code.pulgasari.dev/aufbau/web/:path*"
+      "destination": "https://code.pulgasari.dev/aufbau/test/:path*"
     }
   ]
 }
