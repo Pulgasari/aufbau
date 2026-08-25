@@ -11,7 +11,6 @@ export * from './log.js';
 export * from './dom/events.js';
 
 // maybe to dingsbums
-export * from './array.js';
 export * from './number.js';
 export * from './object.js';
 
@@ -25,6 +24,7 @@ export * from './html.js';
 export { lazy, lru, memoize } from '@bunker/utils';
 
 export * as dom from '@domina/core';      // https://code.pulgasari.dev/domina/core/index.js
+export *        from '@pulgasari/array';  // https://code.pulgasari.dev/js/array.js
 export *        from '@pulgasari/is';     // https://code.pulgasari.dev/js/is.js
 export *        from '@pulgasari/logger'; // https://code.pulgasari.dev/js/logger.js
 export *        from '@pulgasari/str';    // https://code.pulgasari.dev/js/str.js
