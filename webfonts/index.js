@@ -2,7 +2,7 @@
 
 // :::::: IMPORTS
 
-import { fonts } from './data.js';
+import data, { fonts } from './data.js';
 import { isElement, isObject, isString } from '@pulgasari/is';
 
 // :::::: META
@@ -138,10 +138,11 @@ const init = async (config) => {
 
 // :::::: EXPORTS
 
-export { 
+export {
+  data,
   fonts,
   apply,
   findFont,
   init,
   load,
-};
+}; 
