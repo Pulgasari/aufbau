@@ -37,17 +37,21 @@
   	const { effect, signal  } = preact;
   
   	//aufbau.init();
-  	
 
+	  function getRandomEntry (map) {
+      const keys = Object.keys(map);
+      const randomKey = keys[Math.floor(Math.random() * keys.length)];
+      return { key: randomKey, value: map[randomKey] };
+    }
+    
     const filtersMap = {
       'glitch-heavy-cyber' : { animate: true, frequency: "0.0 0.95", scale: 40, speed: "1.5s" },
       'glitch-live'        : { animate: true, speed: "2s" },
       'night-vision'       : { animate: true, noise: 0.5, speed: "0.4s" },
     };
 
-    const F = 'glitch-heavy-cyber';
-    const V = filtersMap[F];
-    applyFilter('body', F, V);
+    const { key, value } = getRandomEntry(filtersMap);
+    applyFilter('body', key, value);
     
     const Test = () => html`<div>moin!</div>`;
     aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
