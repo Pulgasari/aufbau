@@ -32,11 +32,12 @@
   </footer>
 
   <script type="module">
+    import { applyFilter } from '@aufbau/filters';
     import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-  	const { define, update, signal, effect } = preact;
+  	const { effect, signal  } = preact;
   
-  	//import nightVision from '@aufbau/filters/night-vision';
-  	import { applyFilter } from '@aufbau/filters';
+  	//aufbau.init();
+  	
 
     const filtersMap = {
       'glitch-heavy-cyber' : { animate: true, frequency: "0.0 0.95", scale: 40, speed: "1.5s" },
@@ -48,37 +49,26 @@
     const V = filtersMap[F];
     applyFilter('body', F, V);
     
-    function Test () {
-      return html`<div>moin!</div>`;
-    }
+    const Test = () => html`<div>moin!</div>`;
     aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
     
 
     // Register custom CSS custom properties
-    define({ key: 'bg', type: 'property' });
-    define({ key: 'fg', type: 'property' });
+    //define({ key: 'bg', type: 'property' });
+    //define({ key: 'fg', type: 'property' });
 
-    const colors = [
-      { bg: 'white', fg: 'black' },
-      { bg: 'red',   fg: 'black' },
-      { bg: 'red',   fg: 'white' },
-      { bg: 'black', fg: 'white' },
-      { bg: 'black', fg: 'red'   },
-      { bg: 'white', fg: 'red'   },
-    ];
-
-    const indexSignal = signal(0);
+    //const indexSignal = signal(0);
 
     // Reactively update theme variables via signal effect
+    /*
     effect(() => {
       const { bg, fg } = colors[indexSignal.value];
       update({ key: 'bg', value: bg });
       update({ key: 'fg', value: fg });
     });
+    */
 
-    setInterval(() => {
-      indexSignal.value = (indexSignal.value + 1) % colors.length;
-    }, 1000);
+    //setInterval(() => { indexSignal.value = (indexSignal.value + 1) % colors.length; }, 1000);
   </script>
 
 </body>
