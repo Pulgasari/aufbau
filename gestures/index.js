@@ -8,10 +8,6 @@
 //   // later: handle.destroy();
 
 export {
-  composer
-} from './composer.js';
-
-export {
   // recognizers
   adjustable,
   holdable,
@@ -24,11 +20,6 @@ export {
   wheelable,
 } from './core/index.js';
 
-export {
-  angle,
-  clamp,
-  distance,
-  midpoint,
-  snap
-} from './utils.js';
+export * from './composer.js';
+export * from './utils.js';
 
