@@ -3,7 +3,7 @@
 // single-pointer drag. the gesture only starts once the pointer leaves the
 // `tolerance` radius, then reports total delta (from start) and per-move step.
 
-export function pannable ({ onPanStart, onPan, onPanEnd, tolerance = 8 } = {}) {
+function pannable ({ onPanStart, onPan, onPanEnd, tolerance = 8 } = {}) {
   let id     = null;
   let active = false;
   let x      = 0;
@@ -58,3 +58,6 @@ export function pannable ({ onPanStart, onPan, onPanEnd, tolerance = 8 } = {}) {
     destroy     : () => { id = null; active = false; }
   };
 }
+
+export       { pannable };
+export default pannable;
