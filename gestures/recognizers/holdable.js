@@ -3,7 +3,13 @@
 // fires onHold(count) once on press, then repeatedly while held: after `delay`,
 // every `speed` ms. the classic press-and-repeat button (e.g. a stepper).
 
-function holdable ({ onHold, delay = 500, speed = 100 } = {}) {
+import { NO_SELECT } from './../utils.js';
+
+function holdable ({ 
+  onHold,
+  delay = 500,
+  speed = 100,
+} = {}) {
   let timer    = null;
   let interval = null;
   let id       = null;
