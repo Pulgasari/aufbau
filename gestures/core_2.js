@@ -472,9 +472,9 @@ export function pinchable ({ onPinchStart, onPinch, onPinchEnd } = {}) {
   };
 }
 
-// two-finger rotation in degrees, accumulated over the gesture (so it passes
-// through ±180 cleanly), with the focal point it turns around.
-export function rotatable ({ onRotateStart, onRotate, onRotateEnd } = {}) {
+// two-finger rotation in degrees, accumulated over the gesture
+// (so it passes through ±180 cleanly), with the focal point it turns around.
+export function rotatable ({ onRotate, onRotateEnd, onRotateStart } = {}) {
   let prev  = 0;   // last raw finger-pair angle
   let total = 0;   // accumulated rotation
 
@@ -493,8 +493,8 @@ export function rotatable ({ onRotateStart, onRotate, onRotateEnd } = {}) {
       prev  = angle(pair[0], pair[1]);
       onRotateStart?.({ rotation: 0, deltaRotation: 0, focal: midpoint(pair[0], pair[1]), event });
     },
-    onMove: (pair, event) => fire(onRotate, pair, event),
-    onEnd: (pair, event) => fire(onRotateEnd, pair, event)
+    onMove : (pair, event) => fire(onRotate, pair, event),
+    onEnd  : (pair, event) => fire(onRotateEnd, pair, event)
   });
 
   return {
@@ -611,15 +611,15 @@ export function transformable ({
 // :::::: COMPOSE
 
 const FACTORIES = [
-  ['pressable',     pressable,     o => o.onClick || o.onDoubleClick || o.onLongClick],
+  ['adjustable',    adjustable,    o => o.onAdjust],
   ['holdable',      holdable,      o => o.onHold],
-  ['swipeable',     swipeable,     o => o.onSwipe || o.onSwipeUp || o.onSwipeDown || o.onSwipeLeft || o.onSwipeRight],
   ['pannable',      pannable,      o => o.onPan || o.onPanStart || o.onPanEnd],
   ['pinchable',     pinchable,     o => o.onPinch || o.onPinchStart || o.onPinchEnd],
+  ['pressable',     pressable,     o => o.onClick || o.onDoubleClick || o.onLongClick],
   ['rotatable',     rotatable,     o => o.onRotate || o.onRotateStart || o.onRotateEnd],
+  ['swipeable',     swipeable,     o => o.onSwipe || o.onSwipeUp || o.onSwipeDown || o.onSwipeLeft || o.onSwipeRight],
+  ['transformable', transformable, o => o.onTransform || o.onTransformStart || o.onTransformEnd],
   ['wheelable',     wheelable,     o => o.onWheel],
-  ['adjustable',    adjustable,    o => o.onAdjust],
-  ['transformable', transformable, o => o.onTransform || o.onTransformStart || o.onTransformEnd]
 ];
 
 // most-restrictive wins when several recognizers want different touch-actions,
