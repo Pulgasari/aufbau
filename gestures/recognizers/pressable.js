@@ -6,7 +6,16 @@
 // without it, onClick fires immediately (no added latency).
 // movement past tolerance, or a hold past threshold, cancels the click.
 
-function pressable ({ onClick, onDoubleClick, onLongClick, threshold = 500, tolerance = 8, doubleWithin = 300 } = {}) {
+import { NO_SELECT } from './../utils.js';
+
+function pressable ({
+  onClick,
+  onDoubleClick,
+  onLongClick,
+  threshold    = 500,
+  tolerance    = 8,
+  doubleWithin = 300,
+} = {}) {
   let timer   = null;
   let single  = null;
   let id      = null;
