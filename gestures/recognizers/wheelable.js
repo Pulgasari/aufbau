@@ -1,5 +1,7 @@
 // recognizers/wheelable.js
 
+import { normalizeWheel } from './../utils.js';
+
 // normalized wheel. deltas are converted to pixels (see normalizeWheel); pass
 // modifier: 'ctrl' | 'meta' | 'shift' | 'alt' to only react while it's held
 // (e.g. the ctrl-wheel zoom convention). a plain building block reused by zoom.
