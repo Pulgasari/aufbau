@@ -5,7 +5,9 @@
 // standalone, composed through gestures(), or behind a framework adapter (see
 // adapters/). the composer is the only part that touches the dom.
 
-// :::::: HELPERS
+// :::::: IMPORT
+
+import { angle, angleDelta, clamp, distance, midpoint, snap } from './utils.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
