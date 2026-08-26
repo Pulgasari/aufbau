@@ -81,10 +81,13 @@ angleDelta = (from, to) => { let d = (to - from) % 360; return d > 180 ? d - 360
 // ::::::
 
 export {
+  NO_SELECT,
+  
   mDecompose,
   mIdentityParts,
   mMultiply,
   mScaleRotate,
   mTranslate,
+  
   normalizeWheel,
 };
