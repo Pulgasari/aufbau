@@ -1,5 +1,7 @@
 // core/adjustable.js
 
+import { clamp, snap } from './utils.js';
+
 // two-finger resize mapped to a single clamped scalar (a cell/element size).
 // the finger pair's orientation picks the axis — side by side -> 'x', stacked ->
 // 'y', diagonal -> 'both'; lock it with axis: 'x' | 'y' | 'both'. ctrl/cmd + wheel
@@ -15,7 +17,7 @@ function adjustable ({
   wheelStep = 16,
   wheel     = true
 } = {}) {
-  const points  = new Map();
+  const points  = new Map;
   let   current = value;
   let   start   = null;
 
