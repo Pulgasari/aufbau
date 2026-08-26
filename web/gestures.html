@@ -62,9 +62,35 @@
 <div class="grid">
 
   <div class="card">
+    <strong>adjustable</strong> <span class="hint">two-finger resize · ctrl/⌘+wheel</span>
+    <div class="gallery" id="gallery"></div>
+    <div class="read" id="gallery-read">size 64px</div>
+  </div>
+
+  <div class="card">
+    <strong>holdable</strong>
+    <div class="pad" id="hold">hold me</div>
+    <div class="read" id="hold-read">0</div>
+  </div>
+
+  <div class="card">
+    <strong>pannable</strong>
+    <div class="pad" id="pan" style="position: relative; overflow: hidden;">
+      <div class="follow" id="follow"></div>
+    </div>
+    <div class="read" id="pan-read">Δ 0, 0</div>
+  </div>
+
+  <div class="card">
     <strong>pinchable</strong>
     <div class="pad" id="pinch">pinch me</div>
     <div class="read" id="pinch-read">scale 1.00</div>
+  </div>
+
+  <div class="card">
+    <strong>pressable</strong>
+    <div class="pad" id="press">tap · double-tap · long-press</div>
+    <div class="read" id="press-read">click 0 · double 0 · long 0</div>
   </div>
 
   <div class="card">
@@ -80,35 +106,9 @@
   </div>
 
   <div class="card">
-    <strong>pannable</strong>
-    <div class="pad" id="pan" style="position: relative; overflow: hidden;">
-      <div class="follow" id="follow"></div>
-    </div>
-    <div class="read" id="pan-read">Δ 0, 0</div>
-  </div>
-
-  <div class="card">
-    <strong>pressable</strong>
-    <div class="pad" id="press">tap · double-tap · long-press</div>
-    <div class="read" id="press-read">click 0 · double 0 · long 0</div>
-  </div>
-
-  <div class="card">
-    <strong>holdable</strong>
-    <div class="pad" id="hold">hold me</div>
-    <div class="read" id="hold-read">0</div>
-  </div>
-
-  <div class="card">
     <strong>wheelable</strong>
     <div class="pad" id="wheel">scroll / trackpad here</div>
     <div class="read" id="wheel-read">Δ 0, 0</div>
-  </div>
-
-  <div class="card">
-    <strong>adjustable</strong> <span class="hint">two-finger resize · ctrl/⌘+wheel</span>
-    <div class="gallery" id="gallery"></div>
-    <div class="read" id="gallery-read">size 64px</div>
   </div>
 
 </div>
