@@ -8,9 +8,10 @@
 //   // later: handle.destroy();
 
 export {
-  // composer
-  gestures,
-  
+  composer
+} from './composer.js';
+
+export {
   // recognizers
   adjustable,
   holdable,
@@ -21,12 +22,13 @@ export {
   swipeable,
   transformable,
   wheelable,
+} from './core/index.js';
 
-  
-  // math helpers
+export {
   angle,
   clamp,
   distance,
   midpoint,
   snap
-} from './core.js';
+} from './utils.js';
+
