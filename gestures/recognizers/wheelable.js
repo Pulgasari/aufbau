@@ -1,4 +1,4 @@
-// core/wheelable.js
+// recognizers/wheelable.js
 
 // normalized wheel. deltas are converted to pixels (see normalizeWheel); pass
 // modifier: 'ctrl' | 'meta' | 'shift' | 'alt' to only react while it's held
