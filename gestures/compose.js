@@ -1,6 +1,6 @@
 // compose.js
 
-// :::::: IMPORTS
+// :::::: IMPORT
 
 import { 
   angle, 
