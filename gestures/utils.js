@@ -85,4 +85,5 @@ export {
   mIdentityParts,
   mMultiply,
   mScaleRotate,
+  mTranslate,
 };
