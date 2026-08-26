@@ -1,6 +1,6 @@
 a { color: currentcolor; }
 
-html, body { font-size: 14px; }
+html, body { height: 100dvh; }
 
 body  { z-index: 1; }
 #logo { z-index: 2; }
