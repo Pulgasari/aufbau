@@ -1,6 +1,10 @@
-// core/transformable.js
+// recognizers/transformable.js
 
-import { angle, angleDelta, distance, midpoint, snap } from './utils.js';
+import { 
+  angle, angleDelta, distance, midpoint, snap,
+  mDecompose, mIdentityParts, mMultiply, mScaleRotate, mTranslate,
+  normalizeWheel,
+} from './../utils.js';
 
 // the flagship: free move + scale + rotate of an object, one or two pointers,
 // plus wheel zoom. it accumulates a 2d matrix by composing the frame-to-frame
