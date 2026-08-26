@@ -3,7 +3,6 @@
 import { AufbauElement }           from './core/index.js';
 import { parseLook, resolveShape } from './core/look.js';
 
-const setVar  = (el, name, value) => value ? el.style.setProperty(name, value) : el.style.removeProperty(name);      
 const parsePx = value => { const n = parseFloat(value); return Number.isFinite(n) ? n : null; };
 
 export default class AufbauIndex extends AufbauElement {
@@ -86,12 +85,12 @@ export default class AufbauIndex extends AufbauElement {
 
     const start = this._resizeValue ?? parsePx(this.getAttr('itemSize')) ?? (min + max) / 2;
     this._resizeValue = gestures.clamp(start, min, max);
-    setVar(this, '--aufbau-item-size', `${this._resizeValue}px`);
+    this.setVar('--aufbau-item-size', `${this._resizeValue}px`);
 
     this._resize = gestures.compose(this, {
       onAdjust : size => {
         this._resizeValue = Math.round(size);
-        setVar(this, '--aufbau-item-size', `${this._resizeValue}px`);
+        this.setVar('--aufbau-item-size', `${this._resizeValue}px`);
       },
       value : this._resizeValue,
       min,
@@ -104,16 +103,11 @@ export default class AufbauIndex extends AufbauElement {
     const look = parseLook(itemLook);
     const size = this._resizeValue != null ? `${this._resizeValue}px` : (itemSize || look.size);
 
-    setVar(this, '--aufbau-item-size',  size);
-    setVar(this, '--aufbau-item-shape', resolveShape(itemShape || look.shape));
-    setVar(this, '--aufbau-gap',        gap);
-    /*
     this.setVars({
-      '--item-size'  : size,
-      '--item-shape' : resolveShape(itemShape || look.shape),
-      '--gap         : gap,
+      '--aufbau-item-size'  : size,
+      '--aufbau-item-shape' : resolveShape(itemShape || look.shape),
+      '--aufbau-gap'        : gap,
     });
-    */
   }
 }
 
