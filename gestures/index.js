@@ -8,6 +8,9 @@
 //   // later: handle.destroy();
 
 export {
+  // composer
+  gestures,
+  
   // recognizers
   adjustable,
   holdable,
@@ -18,8 +21,8 @@ export {
   swipeable,
   transformable,
   wheelable,
-  // composer
-  gestures,
+
+  
   // math helpers
   angle,
   clamp,
