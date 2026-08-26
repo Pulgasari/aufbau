@@ -137,12 +137,14 @@ export function gestures (element, options = {}) {
 
 export { angle, clamp, distance, midpoint, snap };
 
-export adjustable    from './adjustable.js';
-export holdable      from './holdable.js';
-export pannable      from './pannable.js';
-export pinchable     from './pinchable.js';
-export pressable     from './pressable.js';
-export rotatable     from './rotatable.js';
-export swipeable     from './swipeable.js';
-export transformable from './transformable.js';
-export wheelable     from './wheelable.js';
+export {
+  adjustable,
+  holdable,
+  pannable,
+  pinchable,
+  pressable,
+  rotatable,
+  swipeable,
+  transformable,
+  wheelable,
+};
