@@ -5,8 +5,12 @@ import { angle, angleDelta, midpoint } from './../utils.js';
 // two-finger rotation in degrees, accumulated over the gesture (so it passes
 // through ±180 cleanly), with the focal point it turns around.
 
-function rotatable ({ onRotateStart, onRotate, onRotateEnd } = {}) {
-  const points = new Map();
+function rotatable ({
+  onRotate,
+  onRotateEnd,
+  onRotateStart,
+} = {}) {
+  const points = new Map;
   let active = false;
   let prev   = 0;   // last raw finger-pair angle
   let total  = 0;   // accumulated rotation
@@ -47,7 +51,12 @@ function rotatable ({ onRotateStart, onRotate, onRotateEnd } = {}) {
   };
 
   return {
-    handlers    : { pointerdown: down, pointermove: move, pointerup: up, pointercancel: up },
+    handlers    : { 
+      pointerdown   : down, 
+      pointermove   : move, 
+      pointerup     : up,
+      pointercancel : up
+    },
     touchAction : 'none',
     destroy     : () => { points.clear(); active = false; }
   };
