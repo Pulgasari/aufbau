@@ -1,34 +1,9 @@
 // <aufbau-index>
 
-// a layout container for a set of items — a media grid, a gallery rail, a plain
-// list. it is pure layout: it never renders markup, so its children (usually
-// <aufbau-item>, but any element works) stay exactly as authored. the viewmode
-// is driven entirely by css attribute selectors; the js only reflects the size,
-// gap and shape knobs onto css variables the stylesheet reads.
-//
-//   <aufbau-index viewmode="grid" item-look="180px rounded" gap="1.5rem">
-//     <aufbau-item>…</aufbau-item>
-//     <aufbau-item shape="circle">…</aufbau-item>
-//   </aufbau-index>
-//
-// give it item-size-min + item-size-max (px) and a two-finger resize is wired up
-// (@aufbau/gestures adjustable, plus ctrl/⌘ + wheel on the desktop) so the viewer
-// can scale the items live between those bounds:
-//
-//   <aufbau-index item-size-min="120px" item-size-max="320px"> … </aufbau-index>
-//
-// gestures follow the core `gestures` config (default 'auto') — set it to 'false'
-// on the element, per tag, or globally (<aufbau-config gestures="false">) to opt
-// out. the gesture code itself is only imported when a resize actually activates.
-
 import { AufbauElement }           from './core/index.js';
 import { parseLook, resolveShape } from './core/look.js';
-// @aufbau/gestures is loaded lazily, only when an index actually resizes (below)
 
-const setVar = (el, name, value) =>
-  value ? el.style.setProperty(name, value) : el.style.removeProperty(name);
-
-// a css length's leading number, e.g. "180px" -> 180; null when it isn't numeric
+const setVar  = (el, name, value) => value ? el.style.setProperty(name, value) : el.style.removeProperty(name);      
 const parsePx = value => { const n = parseFloat(value); return Number.isFinite(n) ? n : null; };
 
 export default class AufbauIndex extends AufbauElement {
@@ -94,11 +69,7 @@ export default class AufbauIndex extends AufbauElement {
     // an explicit size from the author takes over from a live resize
     else if (name === 'item-size' || name === 'item-look') this._resizeValue = null;
   }
-
-  // (re)wire the two-finger resize when both bounds are present and gestures are
-  // not switched off, tear it down otherwise. @aufbau/gestures is imported lazily
-  // here, so an index that never resizes never pays for it. a token guards the
-  // async gap against overlapping calls (rapid attribute changes) and unmount.
+  
   async syncResize () {
     this._resize?.destroy();
     this._resize = null;
@@ -131,8 +102,6 @@ export default class AufbauIndex extends AufbauElement {
   sync () {
     const { itemSize, itemShape, itemLook, gap } = this.getAttr();
     const look = parseLook(itemLook);
-
-    // a live resize wins; otherwise the explicit attribute, then the shorthand
     const size = this._resizeValue != null ? `${this._resizeValue}px` : (itemSize || look.size);
 
     setVar(this, '--aufbau-item-size',  size);
