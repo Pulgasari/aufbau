@@ -77,3 +77,12 @@ angle    = (a, b) => Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI,
 
 // signed shortest difference between two angles in degrees, in (-180, 180].
 angleDelta = (from, to) => { let d = (to - from) % 360; return d > 180 ? d - 360 : d <= -180 ? d + 360 : d; };
+
+// ::::::
+
+export {
+  mDecompose,
+  mIdentityParts,
+  mMultiply,
+  mScaleRotate,
+};
