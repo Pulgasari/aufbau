@@ -107,6 +107,13 @@ export default class AufbauIndex extends AufbauElement {
     setVar(this, '--aufbau-item-size',  size);
     setVar(this, '--aufbau-item-shape', resolveShape(itemShape || look.shape));
     setVar(this, '--aufbau-gap',        gap);
+    /*
+    this.setVars({
+      '--item-size'  : size,
+      '--item-shape' : resolveShape(itemShape || look.shape),
+      '--gap         : gap,
+    });
+    */
   }
 }
 
