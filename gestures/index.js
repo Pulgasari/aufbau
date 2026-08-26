@@ -7,19 +7,7 @@
 //   const handle = gestures(el, { onSwipeLeft: … , onTransform: … });
 //   // later: handle.destroy();
 
-export {
-  // recognizers
-  adjustable,
-  holdable,
-  pannable,
-  pinchable,
-  pressable,
-  rotatable,
-  swipeable,
-  transformable,
-  wheelable,
-} from './core/index.js';
-
 export * from './composer.js';
+export * from './recognizers/index.js';
 export * from './utils.js';
 
