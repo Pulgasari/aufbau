@@ -572,4 +572,8 @@ export function gestures (element, options = {}) {
   };
 }
 
+// :::::: EXPORT
+
 export { angle, clamp, distance, midpoint, snap };
+
+export swipeable from './swipeable.js';
