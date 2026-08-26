@@ -1,0 +1,14 @@
+{
+  "name": "@aufbau/gestures",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./core": "./core.js",
+    "./preact": "./adapters/preact.js"
+  },
+  "license": "MIT"
+}

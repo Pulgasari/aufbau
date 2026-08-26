@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>@aufbau/gestures — demo</title>
+
+  <style>
+    :root { --line: #e2e2e6; --accent: #5b5bd6; --ink: #1a1a1e; --muted: #6b6b74; }
+    * { box-sizing: border-box; }
+    body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 1rem 1rem 4rem; max-width: 56rem; margin-inline: auto; color: var(--ink); }
+    h1 { font-size: 1.8rem; margin: 0 0 .25rem; }
+    h2 { font-size: 1.15rem; margin: 2.25rem 0 .5rem; }
+    p.lead { color: var(--muted); margin: 0 0 1rem; }
+    .hint { color: var(--muted); font-size: .85rem; margin: .25rem 0 .75rem; }
+    code { font: 13px/1.4 ui-monospace, monospace; background: #f3f3f7; padding: .05rem .3rem; border-radius: .3rem; }
+    .card { border: 1px solid var(--line); border-radius: .6rem; padding: 1rem; }
+    .read { font: 12px/1.5 ui-monospace, monospace; color: var(--muted); white-space: pre-wrap; margin-top: .5rem; }
+    button { font: inherit; padding: .4rem .8rem; border: 1px solid var(--line); border-radius: .4rem; background: #fff; cursor: pointer; }
+    button:hover { border-color: var(--accent); }
+
+    /* transformable */
+    .stage { position: relative; height: 62vh; min-height: 320px; overflow: hidden; border: 1px solid var(--line);
+             border-radius: .6rem; background: repeating-conic-gradient(#f6f6fa 0 25%, #fff 0 50%) 0 0 / 32px 32px; touch-action: none; }
+    .object { position: absolute; top: 0; left: 0; width: 200px; height: 260px; transform-origin: 0 0;
+              display: grid; place-items: center; text-align: center; color: #fff; font-weight: 700;
+              border-radius: .8rem; box-shadow: 0 12px 40px rgb(0 0 0 / .25);
+              background: linear-gradient(140deg, #5b5bd6, #d65b9a); user-select: none; }
+    .toolbar { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; flex-wrap: wrap; }
+
+    /* smaller demos */
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .pad { height: 150px; border-radius: .5rem; display: grid; place-items: center; color: #fff; font-weight: 600;
+           background: #3a3a44; touch-action: none; user-select: none; text-align: center; padding: .5rem; }
+    .follow { width: 64px; height: 64px; border-radius: .5rem; background: var(--accent); }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--size, 64px), 1fr)); gap: .4rem; touch-action: pan-x pan-y; }
+    .gallery > div { aspect-ratio: 1; border-radius: .4rem; background: linear-gradient(135deg, #5b5bd6, #7ab8ff); }
+  </style>
+</head>
+
+<body>
+
+<h1>@aufbau/gestures</h1>
+<p class="lead">pointer-driven gestures — best opened on a touch device. drag, pinch, rotate, swipe, hold.</p>
+
+<h2>transformable <span class="hint">(the flagship)</span></h2>
+<div class="toolbar">
+  <button id="reset">reset</button>
+  <label><input type="checkbox" id="rotate" checked /> rotate</label>
+  <label><input type="checkbox" id="zoom" checked /> zoom</label>
+</div>
+<p class="hint">one finger pans · two fingers pan + pinch-zoom + rotate around the midpoint · wheel zooms toward the cursor</p>
+<div class="stage" id="stage">
+  <div class="object" id="object">drag<br/>pinch<br/>rotate</div>
+</div>
+<div class="read" id="tf-read">x 0 · y 0 · scale 1.00 · rotation 0°</div>
+
+<h2>the pieces</h2>
+<div class="grid">
+
+  <div class="card">
+    <strong>pinchable</strong>
+    <div class="pad" id="pinch">pinch me</div>
+    <div class="read" id="pinch-read">scale 1.00</div>
+  </div>
+
+  <div class="card">
+    <strong>rotatable</strong>
+    <div class="pad" id="rotate-pad">rotate me</div>
+    <div class="read" id="rotate-read">0°</div>
+  </div>
+
+  <div class="card">
+    <strong>swipeable</strong>
+    <div class="pad" id="swipe">swipe me</div>
+    <div class="read" id="swipe-read">—</div>
+  </div>
+
+  <div class="card">
+    <strong>pannable</strong>
+    <div class="pad" id="pan" style="position: relative; overflow: hidden;">
+      <div class="follow" id="follow"></div>
+    </div>
+    <div class="read" id="pan-read">Δ 0, 0</div>
+  </div>
+
+  <div class="card">
+    <strong>pressable</strong>
+    <div class="pad" id="press">tap · double-tap · long-press</div>
+    <div class="read" id="press-read">click 0 · double 0 · long 0</div>
+  </div>
+
+  <div class="card">
+    <strong>holdable</strong>
+    <div class="pad" id="hold">hold me</div>
+    <div class="read" id="hold-read">0</div>
+  </div>
+
+  <div class="card">
+    <strong>wheelable</strong>
+    <div class="pad" id="wheel">scroll / trackpad here</div>
+    <div class="read" id="wheel-read">Δ 0, 0</div>
+  </div>
+
+  <div class="card">
+    <strong>adjustable</strong> <span class="hint">two-finger resize · ctrl/⌘+wheel</span>
+    <div class="gallery" id="gallery"></div>
+    <div class="read" id="gallery-read">size 64px</div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { gestures } from './../gestures/core.js';
+
+  const $ = id => document.getElementById(id);
+
+  // ── transformable ─────────────────────────────────────────────────────────
+  const object = $('object');
+  const render = t => {
+    object.style.transform = `translate(${t.x}px, ${t.y}px) rotate(${t.rotation}deg) scale(${t.scale})`;
+    $('tf-read').textContent = `x ${t.x.toFixed(0)} · y ${t.y.toFixed(0)} · scale ${t.scale.toFixed(2)} · rotation ${t.rotation.toFixed(0)}°`;
+  };
+  // options are read once at attach, so a toggle rebuilds the gesture — the
+  // current transform is carried over as the new initial via get() + set().
+  let tf = null, handle = null;
+  const build = () => {
+    const prev = tf ? tf.get() : { x: 0, y: 0, scale: 1, rotation: 0 };
+    handle?.destroy();
+    handle = gestures($('stage'), {
+      onTransform : render,
+      minScale    : 0.2,
+      maxScale    : 8,
+      rotate      : $('rotate').checked,
+      zoom        : $('zoom').checked,
+      ...prev,
+    });
+    tf = handle.parts.find(p => p.get);
+    render(tf.get());
+  };
+  build();
+  $('reset').onclick   = () => { tf.set({ x: 0, y: 0, scale: 1, rotation: 0 }); render(tf.get()); };
+  $('rotate').onchange = build;
+  $('zoom').onchange   = build;
+
+  // ── pinchable ─────────────────────────────────────────────────────────────
+  gestures($('pinch'), { onPinch: p => $('pinch-read').textContent = `scale ${p.scale.toFixed(2)}` });
+
+  // ── rotatable ─────────────────────────────────────────────────────────────
+  gestures($('rotate-pad'), { onRotate: r => $('rotate-read').textContent = `${r.rotation.toFixed(0)}°` });
+
+  // ── swipeable ─────────────────────────────────────────────────────────────
+  gestures($('swipe'), { onSwipe: s => $('swipe-read').textContent = `${s.direction}  (Δ ${s.deltaX.toFixed(0)}, ${s.deltaY.toFixed(0)})` });
+
+  // ── pannable ──────────────────────────────────────────────────────────────
+  const follow = $('follow');
+  gestures($('pan'), {
+    onPan : p => {
+      follow.style.transform = `translate(${p.deltaX}px, ${p.deltaY}px)`;
+      $('pan-read').textContent = `Δ ${p.deltaX.toFixed(0)}, ${p.deltaY.toFixed(0)}`;
+    },
+    onPanEnd : () => { follow.style.transform = ''; },
+  });
+
+  // ── pressable ─────────────────────────────────────────────────────────────
+  let clicks = 0, doubles = 0, longs = 0;
+  const pressRead = () => $('press-read').textContent = `click ${clicks} · double ${doubles} · long ${longs}`;
+  gestures($('press'), {
+    onClick       : () => { clicks++;  pressRead(); },
+    onDoubleClick : () => { doubles++; pressRead(); },
+    onLongClick   : () => { longs++;   pressRead(); },
+  });
+
+  // ── holdable ──────────────────────────────────────────────────────────────
+  gestures($('hold'), { onHold: n => $('hold-read').textContent = String(n) });
+
+  // ── wheelable ─────────────────────────────────────────────────────────────
+  gestures($('wheel'), { onWheel: w => $('wheel-read').textContent = `Δ ${w.deltaX.toFixed(0)}, ${w.deltaY.toFixed(0)}` });
+
+  // ── adjustable ────────────────────────────────────────────────────────────
+  const gallery = $('gallery');
+  for (let i = 0; i < 24; i++) gallery.appendChild(document.createElement('div'));
+  gestures(gallery, {
+    onAdjust : (size, meta) => {
+      gallery.style.setProperty('--size', `${size.toFixed(0)}px`);
+      $('gallery-read').textContent = `size ${size.toFixed(0)}px${meta.final ? ' (snapped)' : ''}`;
+    },
+    value : 64, min : 40, max : 160,
+  });
+</script>
+
+</body>
+</html>
