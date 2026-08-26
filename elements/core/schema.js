@@ -5,7 +5,7 @@ import { isArray, isFn, isPlainObject, toArray, toKebabCase } from '@aufbau/js';
 const cache = new WeakMap;
 
 // every entry normalizes to this shape, so consumers never have to null-check a key
-export const BASE = Object.freeze({ type: String, fallback: undefined, values: null, fn: null, config: null });
+export const BASE = Object.freeze({ type: String, fallback: undefined, values: null, fn: null, config: null, var: null });
 
 // infers the type constructor from a default value when `type` is omitted
 const TYPES  = { number: Number, boolean: Boolean, string: String };
@@ -25,6 +25,8 @@ export const parseSchemaEntry = (entry) => {
     fn       : isFn(entry.fn) ? entry.fn : null,
     // true -> auto namespaced key, string|string[] -> explicit keys
     config   : entry.config === true ? true : (entry.config ? toArray(entry.config) : null),
+    // true -> var named after the attribute, string -> explicit var name
+    var      : entry.var === true ? true : (entry.var ? String(entry.var) : null),
   };
 
   // shorthand, bare default value: `volume: 50`

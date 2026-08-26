@@ -64,8 +64,6 @@ const disposer = () => {
 
 
 
-const cssVar = name => name.startsWith('--') ? name : `--${name}`;
-
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
 
@@ -164,6 +162,7 @@ return class extends BaseClass {
       }
     }
 
+    this.applyVars();
     this.sync();
     if (rebuilt) this.onRender();
 
@@ -302,29 +301,50 @@ return class extends BaseClass {
 
   // :::::: STYLE VARS :::::::::::::::::::::::::::::::::::::::::::
   // css custom properties on the element, the getAttr/setAttr counterpart.
-  // a bare name is prefixed with `--`. get reads the resolved value.
+  // names are managed: a leading `--` is optional and the `varPrefix` config
+  // (default 'aufbau') is inserted, so `item-size` -> `--aufbau-item-size`.
+  // get reads the resolved value.
+
+  // '' when disabled, else the prefix segment ('aufbau' by default)
+  varPrefix () {
+    const raw = this.getConfig('varPrefix', 'aufbau', [...configKeys(this.tag, 'varPrefix'), 'var-prefix']);
+    return raw === false || raw === 'false' ? '' : raw === true || raw === 'true' ? 'aufbau' : String(raw);
+  }
+
+  cssVar (name) {
+    const base   = name.startsWith('--') ? name.slice(2) : name;
+    const prefix = this.varPrefix();
+    return `--${prefix && base !== prefix && !base.startsWith(`${prefix}-`) ? `${prefix}-${base}` : base}`;
+  }
 
   getVar (name, fallback) {
-    const value = getComputedStyle(this).getPropertyValue(cssVar(name)).trim();
+    const value = getComputedStyle(this).getPropertyValue(this.cssVar(name)).trim();
     return value || fallback;
   }
 
   getVars (names = []) {
     const style = getComputedStyle(this);
     const out   = {};
-    for (const name of names) out[name] = style.getPropertyValue(cssVar(name)).trim() || undefined;
+    for (const name of names) out[name] = style.getPropertyValue(this.cssVar(name)).trim() || undefined;
     return out;
   }
 
   setVar (name, value) {
-    if (value == null || value === false || value === '') this.style.removeProperty(cssVar(name));
-    else this.style.setProperty(cssVar(name), String(value));
+    if (value == null || value === false || value === '') this.style.removeProperty(this.cssVar(name));
+    else this.style.setProperty(this.cssVar(name), String(value));
     return this;
   }
 
   setVars (map) {
     for (const name in map) this.setVar(name, map[name]);
     return this;
+  }
+
+  // reflect every `var`-flagged attribute onto its css custom property
+  applyVars () {
+    for (const [name, entry] of Object.entries(this.schema)) {
+      if (entry.var) this.setVar(entry.var === true ? name : entry.var, this.getAttr(name));
+    }
   }
   
 

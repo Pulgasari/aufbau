@@ -13,7 +13,7 @@ export default class AufbauIndex extends AufbauElement {
     itemSizeMax : String,   // upper bound for the resize (px)
     itemShape   : String,   // default shape for items without their own
     itemLook    : String,   // shorthand: "180px rounded"
-    gap         : String,   // gap between items
+    gap         : { type: String, var: true },   // -> --aufbau-gap, handled automatically
   };
 
   static styles = `
@@ -85,12 +85,12 @@ export default class AufbauIndex extends AufbauElement {
 
     const start = this._resizeValue ?? parsePx(this.getAttr('itemSize')) ?? (min + max) / 2;
     this._resizeValue = gestures.clamp(start, min, max);
-    this.setVar('--aufbau-item-size', `${this._resizeValue}px`);
+    this.setVar('item-size', `${this._resizeValue}px`);
 
     this._resize = gestures.compose(this, {
       onAdjust : size => {
         this._resizeValue = Math.round(size);
-        this.setVar('--aufbau-item-size', `${this._resizeValue}px`);
+        this.setVar('item-size', `${this._resizeValue}px`);
       },
       value : this._resizeValue,
       min,
@@ -99,14 +99,13 @@ export default class AufbauIndex extends AufbauElement {
   }
 
   sync () {
-    const { itemSize, itemShape, itemLook, gap } = this.getAttr();
+    const { itemSize, itemShape, itemLook } = this.getAttr();   // gap is handled via `var`
     const look = parseLook(itemLook);
     const size = this._resizeValue != null ? `${this._resizeValue}px` : (itemSize || look.size);
 
     this.setVars({
-      '--aufbau-item-size'  : size,
-      '--aufbau-item-shape' : resolveShape(itemShape || look.shape),
-      '--aufbau-gap'        : gap,
+      'item-size'  : size,
+      'item-shape' : resolveShape(itemShape || look.shape),
     });
   }
 }
