@@ -77,19 +77,7 @@ const mDecompose = m => ({
 
 
 
-// normalized wheel. deltas are converted to pixels (see normalizeWheel); pass
-// modifier: 'ctrl' | 'meta' | 'shift' | 'alt' to only react while it's held
-// (e.g. the ctrl-wheel zoom convention). a plain building block reused by zoom.
-export function wheelable ({ onWheel, modifier = null } = {}) {
-  const key = modifier ? MODIFIER[modifier] : null;
-  const handler = event => {
-    if (key && !event[key]) return;
-    event.preventDefault();
-    const { deltaX, deltaY } = normalizeWheel(event);
-    onWheel?.({ deltaX, deltaY, event });
-  };
-  return { handlers: { wheel: handler } };
-}
+
 
 // two-finger pinch reported as a scale factor relative to the gesture start
 // (start = 1), with the focal point (the finger midpoint) it pivots around.
@@ -306,3 +294,4 @@ export pannable   from './pannable.js';
 export pressable  from './pressable.js';
 export rotatable  from './rotatable.js';
 export swipeable  from './swipeable.js';
+export wheelable  from './wheelable.js';
