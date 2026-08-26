@@ -6,12 +6,12 @@
 // standalone, composed through gestures(), or behind a framework adapter (see
 // adapters/). the composer is the only part that touches the dom.
 
-export adjustable    from './adjustable.js';
-export holdable      from './holdable.js';
-export pannable      from './pannable.js';
-export pinchable     from './pinchable.js';
-export pressable     from './pressable.js';
-export rotatable     from './rotatable.js';
-export swipeable     from './swipeable.js';
-export transformable from './transformable.js';
-export wheelable     from './wheelable.js';
+export * from './adjustable.js';
+export * from './holdable.js';
+export * from './pannable.js';
+export * from './pinchable.js';
+export * from './pressable.js';
+export * from './rotatable.js';
+export * from './swipeable.js';
+export * from './transformable.js';
+export * from './wheelable.js';
