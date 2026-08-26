@@ -2,7 +2,14 @@
 
 // :::::: IMPORTS
 
-import { angle, angleDelta, clamp, distance, midpoint, snap } from './../utils.js';
+import { 
+  angle, 
+  angleDelta, 
+  clamp, 
+  distance,
+  midpoint, 
+  snap
+} from './utils.js';
 
 import {
   adjustable,
