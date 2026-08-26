@@ -1,4 +1,5 @@
 // <aufbau-index>
+
 // a layout container for a set of items — a media grid, a gallery rail, a plain
 // list. it is pure layout: it never renders markup, so its children (usually
 // <aufbau-item>, but any element works) stay exactly as authored. the viewmode
@@ -84,10 +85,8 @@ export default class AufbauIndex extends AufbauElement {
     aufbau-index[item-shape="square"] > aufbau-item { aspect-ratio: 1 / 1; }
   `;
 
-  render () { return null; }
-
-  onMount () { this.syncResize(); }
-
+  render    () { return null; }
+  onMount   () { this.syncResize(); }
   onUnmount () { this._resize?.destroy(); this._resize = null; }
 
   onAttributeChange (name) {
@@ -111,14 +110,14 @@ export default class AufbauIndex extends AufbauElement {
 
     if (!active) { this._resizeValue = null; return; }
 
-    const { gestures, clamp } = await import('./../gestures/core.js');
+    const gestures = await import('@aufbau/gestures');
     if (token !== this._resizeToken || !this._mounted) return;   // superseded or unmounted
 
     const start = this._resizeValue ?? parsePx(this.getAttr('itemSize')) ?? (min + max) / 2;
-    this._resizeValue = clamp(start, min, max);
+    this._resizeValue = gestures.clamp(start, min, max);
     setVar(this, '--aufbau-item-size', `${this._resizeValue}px`);
 
-    this._resize = gestures(this, {
+    this._resize = gestures.compose(this, {
       onAdjust : size => {
         this._resizeValue = Math.round(size);
         setVar(this, '--aufbau-item-size', `${this._resizeValue}px`);
