@@ -1,4 +1,4 @@
-// core/adjustable.js
+// recognizers/adjustable.js
 
 import { clamp, snap } from './../utils.js';
 
