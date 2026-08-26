@@ -4,15 +4,17 @@
 
 import { angle, angleDelta, clamp, distance, midpoint, snap } from './../utils.js';
 
-import adjustable    from './adjustable.js';
-import holdable      from './holdable.js';
-import pannable      from './pannable.js';
-import pinchable     from './pinchable.js';
-import pressable     from './pressable.js';
-import rotatable     from './rotatable.js';
-import swipeable     from './swipeable.js';
-import transformable from './transformable.js';
-import wheelable     from './wheelable.js';
+import {
+  adjustable,
+  holdable,
+  pannable,
+  pinchable,
+  pressable,
+  rotatable,
+  swipeable,
+  transformable,
+  wheelable,
+} from './recognizers/index.js';
 
 // ::::::
 
