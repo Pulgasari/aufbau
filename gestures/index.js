@@ -7,7 +7,7 @@
 //   const handle = gestures(el, { onSwipeLeft: … , onTransform: … });
 //   // later: handle.destroy();
 
-export * from './composer.js';
+export * from './compose.js';
 export * from './recognizers/index.js';
 export * from './utils.js';
 
