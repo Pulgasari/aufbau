@@ -9,20 +9,7 @@
 
 import { angle, angleDelta, clamp, distance, midpoint, snap } from './utils.js';
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-
-// nearest of a fixed set, or nearest multiple of a step, or the value untouched.
-const snap = (value, steps) =>
-    !steps               ? value
-  : Array.isArray(steps) ? steps.reduce((prev, next) => Math.abs(next - value) < Math.abs(prev - value) ? next : prev)
-  : Math.round(value / steps) * steps;
-
-const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const midpoint = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-const angle    = (a, b) => Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-
-// signed shortest difference between two angles in degrees, in (-180, 180].
-const angleDelta = (from, to) => { let d = (to - from) % 360; return d > 180 ? d - 360 : d <= -180 ? d + 360 : d; };
+// :::::: 
 
 // wheel deltas normalized to pixels regardless of deltaMode (line/page), so
 // zoom feels the same across browsers and input devices.
@@ -83,10 +70,11 @@ const mDecompose = m => ({
 
 // :::::: RECOGNIZERS
 
-// tap, double-tap and long-press on a single pointer. when onDoubleClick is set
-// the single click is deferred by doubleWithin so the two can be told apart —
-// without it, onClick fires immediately (no added latency). movement past
-// tolerance, or a hold past threshold, cancels the click.
+// tap, double-tap and long-press on a single pointer. 
+// when onDoubleClick is set the single click is deferred by doubleWithin 
+// so the two can be told apart —
+// without it, onClick fires immediately (no added latency).
+// movement past tolerance, or a hold past threshold, cancels the click.
 export function pressable ({ onClick, onDoubleClick, onLongClick, threshold = 500, tolerance = 8, doubleWithin = 300 } = {}) {
   let timer   = null;
   let single  = null;
@@ -175,64 +163,6 @@ export function holdable ({ onHold, delay = 500, speed = 100 } = {}) {
     },
     style   : NO_SELECT,
     destroy : stop
-  };
-}
-
-// directional flick. resolves to one of up/down/left/right past `threshold`,
-// optionally only when the gesture was quick enough (`holdTime`). set
-// preventScroll to lock the axis while swiping.
-export function swipeable ({
-  onSwipe, onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight,
-  threshold     = 50,
-  holdTime      = 0,
-  preventScroll = false
-} = {}) {
-  let id = null;
-  let x  = 0;
-  let y  = 0;
-  let t  = 0;
-
-  const down = event => {
-    if (!event.isPrimary || id !== null) return;
-    id = event.pointerId; x = event.clientX; y = event.clientY; t = Date.now();
-  };
-
-  const move = event => {
-    if (event.pointerId === id && preventScroll && event.cancelable) event.preventDefault();
-  };
-
-  const up = event => {
-    if (event.pointerId !== id) return;
-    id = null;
-
-    const deltaX   = event.clientX - x;
-    const deltaY   = event.clientY - y;
-    const duration = Date.now() - t;
-    if (holdTime > 0 && duration < holdTime) return;
-
-    const absX = Math.abs(deltaX);
-    const absY = Math.abs(deltaY);
-    if (Math.max(absX, absY) < threshold) return;
-
-    const direction = absX > absY
-      ? deltaX > 0 ? 'right' : 'left'
-      : deltaY > 0 ? 'down'  : 'up';
-
-    const payload = { direction, deltaX, deltaY, duration, event };
-    onSwipe?.(payload);
-    ({ up: onSwipeUp, down: onSwipeDown, left: onSwipeLeft, right: onSwipeRight })[direction]?.(payload);
-  };
-
-  return {
-    handlers : {
-      pointerdown   : down,
-      pointermove   : move,
-      pointerup     : up,
-      pointercancel : () => { id = null; },
-      pointerleave  : up
-    },
-    touchAction : preventScroll ? 'none' : undefined,
-    destroy     : () => { id = null; }
   };
 }
 
