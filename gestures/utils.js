@@ -86,4 +86,5 @@ export {
   mMultiply,
   mScaleRotate,
   mTranslate,
+  normalizeWheel,
 };
