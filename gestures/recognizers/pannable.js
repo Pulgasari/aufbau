@@ -3,6 +3,8 @@
 // single-pointer drag. the gesture only starts once the pointer leaves the
 // `tolerance` radius, then reports total delta (from start) and per-move step.
 
+import { NO_SELECT } from './../utils.js';
+
 function pannable ({ onPanStart, onPan, onPanEnd, tolerance = 8 } = {}) {
   let id     = null;
   let active = false;
