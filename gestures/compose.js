@@ -1,15 +1,31 @@
 // compose.js
 
+// :::::: IMPORTS
+
+import { angle, angleDelta, clamp, distance, midpoint, snap } from './../utils.js';
+
+import adjustable    from './adjustable.js';
+import holdable      from './holdable.js';
+import pannable      from './pannable.js';
+import pinchable     from './pinchable.js';
+import pressable     from './pressable.js';
+import rotatable     from './rotatable.js';
+import swipeable     from './swipeable.js';
+import transformable from './transformable.js';
+import wheelable     from './wheelable.js';
+
+// ::::::
+
 const FACTORIES = [
-  ['pressable',     pressable,     o => o.onClick || o.onDoubleClick || o.onLongClick],
+  ['adjustable',    adjustable,    o => o.onAdjust],
   ['holdable',      holdable,      o => o.onHold],
-  ['swipeable',     swipeable,     o => o.onSwipe || o.onSwipeUp || o.onSwipeDown || o.onSwipeLeft || o.onSwipeRight],
   ['pannable',      pannable,      o => o.onPan || o.onPanStart || o.onPanEnd],
   ['pinchable',     pinchable,     o => o.onPinch || o.onPinchStart || o.onPinchEnd],
+  ['pressable',     pressable,     o => o.onClick || o.onDoubleClick || o.onLongClick],
   ['rotatable',     rotatable,     o => o.onRotate || o.onRotateStart || o.onRotateEnd],
+  ['swipeable',     swipeable,     o => o.onSwipe || o.onSwipeUp || o.onSwipeDown || o.onSwipeLeft || o.onSwipeRight],     
+  ['transformable', transformable, o => o.onTransform || o.onTransformStart || o.onTransformEnd],
   ['wheelable',     wheelable,     o => o.onWheel],
-  ['adjustable',    adjustable,    o => o.onAdjust],
-  ['transformable', transformable, o => o.onTransform || o.onTransformStart || o.onTransformEnd]
 ];
 
 // most-restrictive wins when several recognizers want different touch-actions,
@@ -50,6 +66,8 @@ function compose (element, options = {}) {
     }
   };
 }
+
+// :::::: EXPORT
 
 export       { compose };
 export default compose;
