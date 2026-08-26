@@ -4,7 +4,7 @@
 // optionally only when the gesture was quick enough (`holdTime`). set
 // preventScroll to lock the axis while swiping.
 
-export function swipeable ({
+function swipeable ({
   onSwipe, onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight,
   threshold     = 50,
   holdTime      = 0,
@@ -58,3 +58,6 @@ export function swipeable ({
     destroy     : () => { id = null; }
   };
 }
+
+export       { swipeable };
+export default swipeable;
