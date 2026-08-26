@@ -1,4 +1,4 @@
-// core/holdable.js
+// recognizers/holdable.js
 
 // fires onHold(count) once on press, then repeatedly while held: after `delay`,
 // every `speed` ms. the classic press-and-repeat button (e.g. a stepper).
