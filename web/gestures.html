@@ -30,7 +30,7 @@
     .toolbar { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; flex-wrap: wrap; }
 
     /* smaller demos */
-    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
     .pad { height: 150px; border-radius: .5rem; display: grid; place-items: center; color: #fff; font-weight: 600;
            background: #3a3a44; touch-action: none; user-select: none; text-align: center; padding: .5rem; }
     .follow { width: 64px; height: 64px; border-radius: .5rem; background: var(--accent); }
@@ -116,6 +116,7 @@
 
   const $ = id => document.getElementById(id);
 
+  /*
   // ── transformable ─────────────────────────────────────────────────────────
   const object = $('object');
   const render = t => {
@@ -143,6 +144,7 @@
   $('reset').onclick   = () => { tf.set({ x: 0, y: 0, scale: 1, rotation: 0 }); render(tf.get()); };
   $('rotate').onchange = build;
   $('zoom').onchange   = build;
+  */
 
   // ── pinchable ─────────────────────────────────────────────────────────────
   gestures($('pinch'), { onPinch: p => $('pinch-read').textContent = `scale ${p.scale.toFixed(2)}` });
