@@ -114,7 +114,7 @@
 </div>
 
 <script type="module">
-  import { gestures } from '@aufbau/gestures';
+  import * as gestures from '@aufbau/gestures';
 
   const $ = id => document.getElementById(id);
 
@@ -149,17 +149,17 @@
   */
 
   // ── pinchable ─────────────────────────────────────────────────────────────
-  gestures($('pinch'), { onPinch: p => $('pinch-read').textContent = `scale ${p.scale.toFixed(2)}` });
+  gestures.compose($('pinch'), { onPinch: p => $('pinch-read').textContent = `scale ${p.scale.toFixed(2)}` });
 
   // ── rotatable ─────────────────────────────────────────────────────────────
-  gestures($('rotate-pad'), { onRotate: r => $('rotate-read').textContent = `${r.rotation.toFixed(0)}°` });
+  gestures.compose($('rotate-pad'), { onRotate: r => $('rotate-read').textContent = `${r.rotation.toFixed(0)}°` });
 
   // ── swipeable ─────────────────────────────────────────────────────────────
-  gestures($('swipe'), { onSwipe: s => $('swipe-read').textContent = `${s.direction}  (Δ ${s.deltaX.toFixed(0)}, ${s.deltaY.toFixed(0)})` });
+  gestures.compose($('swipe'), { onSwipe: s => $('swipe-read').textContent = `${s.direction}  (Δ ${s.deltaX.toFixed(0)}, ${s.deltaY.toFixed(0)})` });
 
   // ── pannable ──────────────────────────────────────────────────────────────
   const follow = $('follow');
-  gestures($('pan'), {
+  gestures.compose($('pan'), {
     onPan : p => {
       follow.style.transform = `translate(${p.deltaX}px, ${p.deltaY}px)`;
       $('pan-read').textContent = `Δ ${p.deltaX.toFixed(0)}, ${p.deltaY.toFixed(0)}`;
@@ -170,22 +170,22 @@
   // ── pressable ─────────────────────────────────────────────────────────────
   let clicks = 0, doubles = 0, longs = 0;
   const pressRead = () => $('press-read').textContent = `click ${clicks} · double ${doubles} · long ${longs}`;
-  gestures($('press'), {
+  gestures.compose($('press'), {
     onClick       : () => { clicks++;  pressRead(); },
     onDoubleClick : () => { doubles++; pressRead(); },
     onLongClick   : () => { longs++;   pressRead(); },
   });
 
   // ── holdable ──────────────────────────────────────────────────────────────
-  gestures($('hold'), { onHold: n => $('hold-read').textContent = String(n) });
+  gestures.compose($('hold'), { onHold: n => $('hold-read').textContent = String(n) });
 
   // ── wheelable ─────────────────────────────────────────────────────────────
-  gestures($('wheel'), { onWheel: w => $('wheel-read').textContent = `Δ ${w.deltaX.toFixed(0)}, ${w.deltaY.toFixed(0)}` });
+  gestures.compose($('wheel'), { onWheel: w => $('wheel-read').textContent = `Δ ${w.deltaX.toFixed(0)}, ${w.deltaY.toFixed(0)}` });
 
   // ── adjustable ────────────────────────────────────────────────────────────
   const gallery = $('gallery');
   for (let i = 0; i < 24; i++) gallery.appendChild(document.createElement('div'));
-  gestures(gallery, {
+  gestures.compose(gallery, {
     onAdjust : (size, meta) => {
       gallery.style.setProperty('--size', `${size.toFixed(0)}px`);
       $('gallery-read').textContent = `size ${size.toFixed(0)}px${meta.final ? ' (snapped)' : ''}`;
