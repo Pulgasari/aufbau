@@ -1,4 +1,4 @@
-// core/pannable.js
+// recognizers/pannable.js
 
 // single-pointer drag. the gesture only starts once the pointer leaves the
 // `tolerance` radius, then reports total delta (from start) and per-move step.
