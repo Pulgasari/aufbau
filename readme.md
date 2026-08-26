@@ -18,6 +18,7 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 
 - [@aufbau/elements](elements/)
 - [@aufbau/filters](filters/)
+- [@aufbau/gestures](gestures/)
 - [@aufbau/import](import/)
 - [@aufbau/patterns](patterns/)
 - [@aufbau/runtime](runtime/)

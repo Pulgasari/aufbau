@@ -1,0 +1,9 @@
+{
+  "name": "@aufbau/gestures",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./index.js",
+    "./core": "./core.js",
+    "./preact": "./adapters/preact.js"
+  }
+}
