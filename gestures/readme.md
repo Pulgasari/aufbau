@@ -43,15 +43,44 @@ gestures(el, { onClick, onSwipe, pressable: { threshold: 700 } });
 
 ## Recognizers
 
-| recognizer   | callbacks                                              | notes |
-|--------------|--------------------------------------------------------|-------|
-| `pressable`  | `onClick` · `onDoubleClick` · `onLongClick`            | double-click defers the single by `doubleWithin` to disambiguate; without it `onClick` is immediate |
-| `holdable`   | `onHold(count)`                                        | press-and-repeat: once on press, then every `speed` ms after `delay` |
-| `swipeable`  | `onSwipe` · `onSwipe{Up,Down,Left,Right}`              | directional flick past `threshold`; `preventScroll` locks the axis |
-| `pannable`   | `onPanStart` · `onPan` · `onPanEnd`                    | single-pointer drag; reports total delta + per-move step |
-| `adjustable` | `onAdjust(value, meta)`                                | two-finger resize → one clamped scalar; axis auto/x/y/both; ctrl/cmd + wheel fallback |
+| recognizer      | callbacks                                              | notes |
+|-----------------|--------------------------------------------------------|-------|
+| `pressable`     | `onClick` · `onDoubleClick` · `onLongClick`            | double-click defers the single by `doubleWithin` to disambiguate; without it `onClick` is immediate |
+| `holdable`      | `onHold(count)`                                        | press-and-repeat: once on press, then every `speed` ms after `delay` |
+| `swipeable`     | `onSwipe` · `onSwipe{Up,Down,Left,Right}`              | directional flick past `threshold`; `preventScroll` locks the axis |
+| `pannable`      | `onPanStart` · `onPan` · `onPanEnd`                    | single-pointer drag; reports total delta + per-move step |
+| `pinchable`     | `onPinchStart` · `onPinch` · `onPinchEnd`              | two-finger scale factor (start = 1) + focal point |
+| `rotatable`     | `onRotateStart` · `onRotate` · `onRotateEnd`          | two-finger rotation in degrees, accumulated + focal point |
+| `wheelable`     | `onWheel({ deltaX, deltaY })`                         | wheel normalized to pixels across `deltaMode`; optional `modifier` |
+| `adjustable`    | `onAdjust(value, meta)`                                | two-finger resize → one clamped scalar; axis auto/x/y/both; ctrl/cmd + wheel fallback |
+| `transformable` | `onTransformStart` · `onTransform` · `onTransformEnd` | free move + scale + rotate (1–2 pointers) + wheel zoom — see below |
 
 See `index.d.ts` for the full option and payload shapes.
+
+### transformable — the flagship
+
+Free manipulation of an object: one pointer pans, two pointers pan + scale +
+rotate around the finger midpoint, and the wheel zooms toward the cursor. It
+accumulates a 2D matrix (composed from the frame-to-frame similarity transform)
+and every callback gets both the decomposed values and the raw matrix:
+
+```javascript
+gestures(el, {
+  onTransform ({ x, y, scale, rotation, matrix }) {
+    el.style.transform = `matrix(${matrix.join(',')})`;   // element needs transform-origin: 0 0
+  },
+});
+```
+
+Toggle parts with `pan` / `zoom` / `rotate` (all default on), bound the zoom with
+`minScale` / `maxScale`, and tune the wheel with `wheelIntensity` /
+`wheelModifier`. `set({ x, y, scale, rotation })` and `get()` drive the transform
+imperatively. Rotation is reported in **degrees**; scaling and rotation are always
+focal-correct, so the point under the fingers/cursor stays put.
+
+For a viewport-style pan+zoom without rotation, pass `rotate: false`. The atomic
+`pinchable` / `rotatable` / `pannable` / `wheelable` recognizers are there when you
+want to wire the pieces up yourself instead.
 
 ## Adapters
 
@@ -70,7 +99,7 @@ once at attach time — remount via `key` to change them.
 
 ## Status
 
-Ported from the earlier `js/dom/gestures.js` sketch and promoted to a package.
-The recognizers above are stable. Still open (see the repo TODO): a real
-zoom+pan primitive (`pinchable`/`zoomable` with a focal point), `rotatable`, and
-adapters for the other kits (react, svelte).
+Ported from the earlier `js/dom/gestures.js` sketch and promoted to a package,
+then extended with the multi-touch set (`pinchable`, `rotatable`, `wheelable`)
+and the `transformable` flagship. Still open: adapters for the other kits (react,
+svelte), and a keyboard/a11y layer for the transform gestures.

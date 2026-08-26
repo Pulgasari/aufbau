@@ -4,7 +4,7 @@
 // imported on their own, e.g. `import { useGesture } from '@aufbau/gestures/preact'`.
 //
 //   import { gestures } from '@aufbau/gestures';
-//   const handle = gestures(el, { onSwipeLeft: … , onAdjust: … });
+//   const handle = gestures(el, { onSwipeLeft: … , onTransform: … });
 //   // later: handle.destroy();
 
 export {
@@ -12,11 +12,16 @@ export {
   adjustable,
   holdable,
   pannable,
+  pinchable,
   pressable,
+  rotatable,
   swipeable,
+  transformable,
+  wheelable,
   // composer
   gestures,
   // math helpers
+  angle,
   clamp,
   distance,
   midpoint,

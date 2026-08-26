@@ -79,15 +79,79 @@ export interface AdjustableOptions {
 }
 export function adjustable (options?: AdjustableOptions): RecognizerPart & { set: (value: number) => void };
 
+export type Modifier = 'ctrl' | 'meta' | 'shift' | 'alt';
+
+export interface WheelPayload { deltaX: number; deltaY: number; event: WheelEvent; }
+export interface WheelableOptions {
+  onWheel?: (payload: WheelPayload) => void;
+  modifier?: Modifier | null;   // only react while this key is held (default null)
+}
+export function wheelable (options?: WheelableOptions): RecognizerPart;
+
+export interface PinchPayload {
+  scale: number;        // relative to the gesture start (start = 1)
+  deltaScale: number;   // ratio since the previous event
+  focal: Point;         // finger midpoint (client coords)
+  event: PointerEvent;
+}
+export interface PinchableOptions {
+  onPinchStart?: (payload: PinchPayload) => void;
+  onPinch?: (payload: PinchPayload) => void;
+  onPinchEnd?: (payload: PinchPayload) => void;
+}
+export function pinchable (options?: PinchableOptions): RecognizerPart;
+
+export interface RotatePayload {
+  rotation: number;        // accumulated degrees over the gesture
+  deltaRotation: number;   // degrees since the previous event
+  focal: Point;
+  event: PointerEvent;
+}
+export interface RotatableOptions {
+  onRotateStart?: (payload: RotatePayload) => void;
+  onRotate?: (payload: RotatePayload) => void;
+  onRotateEnd?: (payload: RotatePayload) => void;
+}
+export function rotatable (options?: RotatableOptions): RecognizerPart;
+
+export interface Transform { x: number; y: number; scale: number; rotation: number; }
+export interface TransformPayload extends Transform {
+  matrix: [number, number, number, number, number, number];   // matrix(a,b,c,d,e,f)
+  focal: Point;
+  event: PointerEvent | WheelEvent;
+}
+export interface TransformableOptions extends Partial<Transform> {
+  onTransformStart?: (payload: TransformPayload) => void;
+  onTransform?: (payload: TransformPayload) => void;
+  onTransformEnd?: (payload: TransformPayload) => void;
+  minScale?: number;         // default 0.05
+  maxScale?: number;         // default 40
+  pan?: boolean;             // single-pointer + midpoint translation (default true)
+  zoom?: boolean;            // default true
+  rotate?: boolean;          // default true
+  wheel?: boolean;           // wheel zoom (default true)
+  wheelIntensity?: number;   // zoom per normalized wheel pixel (default 0.0015)
+  wheelModifier?: Modifier | null;
+}
+export function transformable (options?: TransformableOptions): RecognizerPart & {
+  set: (transform: Partial<Transform>) => void;
+  get: () => Transform;
+};
+
 // ── compose ──────────────────────────────────────────────────────────────
 
 export type GestureOptions =
-  PressableOptions & HoldableOptions & SwipeableOptions & PannableOptions & AdjustableOptions & {
+  PressableOptions & HoldableOptions & SwipeableOptions & PannableOptions &
+  PinchableOptions & RotatableOptions & WheelableOptions & AdjustableOptions & TransformableOptions & {
     pressable?: PressableOptions;
     holdable?: HoldableOptions;
     swipeable?: SwipeableOptions;
     pannable?: PannableOptions;
+    pinchable?: PinchableOptions;
+    rotatable?: RotatableOptions;
+    wheelable?: WheelableOptions;
     adjustable?: AdjustableOptions;
+    transformable?: TransformableOptions;
   };
 
 export interface GestureHandle {
@@ -98,6 +162,7 @@ export function gestures (element: Element, options?: GestureOptions): GestureHa
 
 // ── math helpers ─────────────────────────────────────────────────────────
 
+export function angle (a: Point, b: Point): number;   // degrees
 export function clamp (value: number, min: number, max: number): number;
 export function distance (a: Point, b: Point): number;
 export function midpoint (a: Point, b: Point): Point;
