@@ -1,4 +1,4 @@
-// core/pressable.js
+// recognizers/pressable.js
 
 // tap, double-tap and long-press on a single pointer. 
 // when onDoubleClick is set the single click is deferred by doubleWithin 
