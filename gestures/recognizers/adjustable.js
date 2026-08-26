@@ -1,6 +1,6 @@
 // core/adjustable.js
 
-import { clamp, snap } from './utils.js';
+import { clamp, snap } from './../utils.js';
 
 // two-finger resize mapped to a single clamped scalar (a cell/element size).
 // the finger pair's orientation picks the axis — side by side -> 'x', stacked ->
