@@ -15,10 +15,14 @@
 // can scale the items live between those bounds:
 //
 //   <aufbau-index item-size-min="120px" item-size-max="320px"> … </aufbau-index>
+//
+// gestures follow the core `gestures` config (default 'auto') — set it to 'false'
+// on the element, per tag, or globally (<aufbau-config gestures="false">) to opt
+// out. the gesture code itself is only imported when a resize actually activates.
 
 import { AufbauElement }           from './core/index.js';
 import { parseLook, resolveShape } from './core/look.js';
-import { gestures, clamp }         from './../gestures/core.js';
+// @aufbau/gestures is loaded lazily, only when an index actually resizes (below)
 
 const setVar = (el, name, value) =>
   value ? el.style.setProperty(name, value) : el.style.removeProperty(name);
@@ -92,18 +96,27 @@ export default class AufbauIndex extends AufbauElement {
     else if (name === 'item-size' || name === 'item-look') this._resizeValue = null;
   }
 
-  // (re)wire the two-finger resize when both bounds are present, tear it down
-  // otherwise. the live value is kept across a re-wire so nothing jumps.
-  syncResize () {
+  // (re)wire the two-finger resize when both bounds are present and gestures are
+  // not switched off, tear it down otherwise. @aufbau/gestures is imported lazily
+  // here, so an index that never resizes never pays for it. a token guards the
+  // async gap against overlapping calls (rapid attribute changes) and unmount.
+  async syncResize () {
     this._resize?.destroy();
     this._resize = null;
 
-    const min = parsePx(this.getAttr('itemSizeMin'));
-    const max = parsePx(this.getAttr('itemSizeMax'));
-    if (min == null || max == null || max <= min) { this._resizeValue = null; return; }
+    const min    = parsePx(this.getAttr('itemSizeMin'));
+    const max    = parsePx(this.getAttr('itemSizeMax'));
+    const active = this.gesturesMode() !== 'false' && min != null && max != null && max > min;
+    const token  = this._resizeToken = (this._resizeToken ?? 0) + 1;
+
+    if (!active) { this._resizeValue = null; return; }
+
+    const { gestures, clamp } = await import('./../gestures/core.js');
+    if (token !== this._resizeToken || !this._mounted) return;   // superseded or unmounted
 
     const start = this._resizeValue ?? parsePx(this.getAttr('itemSize')) ?? (min + max) / 2;
     this._resizeValue = clamp(start, min, max);
+    setVar(this, '--aufbau-item-size', `${this._resizeValue}px`);
 
     this._resize = gestures(this, {
       onAdjust : size => {

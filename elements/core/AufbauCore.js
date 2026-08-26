@@ -208,6 +208,15 @@ return class extends BaseClass {
     //return this.getAttr(name) ?? resolveConfig(this.tag, name) ?? fallback;
   }
 
+  // resolved gesture mode for this element — 'auto' | 'true' | 'false'.
+  // precedence: the element's own `gestures` attribute, then a tag-scoped config
+  // (`<tag>-gestures`), then the global `gestures` config, then 'auto'. elements
+  // that carry gesture behaviour consult this, so a page can switch every gesture
+  // off with a single `<aufbau-config gestures="false">` (or per element / tag).
+  gesturesMode () {
+    return String(this.getConfig('gestures', 'auto', [...configKeys(this.tag, 'gestures'), 'gestures']));
+  }
+
   // :::::: EVENTS ::::::::::::::::::::::::::::::::::::::::::::::
 
   on (...args) {
