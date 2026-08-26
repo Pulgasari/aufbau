@@ -1,4 +1,4 @@
-// gestures/core/swipeable.js
+// recognizers/swipeable.js
 
 // directional flick. resolves to one of up/down/left/right past `threshold`,
 // optionally only when the gesture was quick enough (`holdTime`). set
