@@ -1,6 +1,6 @@
-// core/rotatable.js
+// recognizers/rotatable.js
 
-import { angle, angleDelta, midpoint } from './utils.js';
+import { angle, angleDelta, midpoint } from './../utils.js';
 
 // two-finger rotation in degrees, accumulated over the gesture (so it passes
 // through ±180 cleanly), with the focal point it turns around.
