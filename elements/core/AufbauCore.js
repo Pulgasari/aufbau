@@ -64,6 +64,8 @@ const disposer = () => {
 
 
 
+const cssVar = name => name.startsWith('--') ? name : `--${name}`;
+
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
 
@@ -296,6 +298,33 @@ return class extends BaseClass {
       ownKeys : () => names.map(toCamelCase),
       getOwnPropertyDescriptor: () => ({ configurable: true, enumerable: true }),
     });
+  }
+
+  // :::::: STYLE VARS :::::::::::::::::::::::::::::::::::::::::::
+  // css custom properties on the element, the getAttr/setAttr counterpart.
+  // a bare name is prefixed with `--`. get reads the resolved value.
+
+  getVar (name, fallback) {
+    const value = getComputedStyle(this).getPropertyValue(cssVar(name)).trim();
+    return value || fallback;
+  }
+
+  getVars (names = []) {
+    const style = getComputedStyle(this);
+    const out   = {};
+    for (const name of names) out[name] = style.getPropertyValue(cssVar(name)).trim() || undefined;
+    return out;
+  }
+
+  setVar (name, value) {
+    if (value == null || value === false || value === '') this.style.removeProperty(cssVar(name));
+    else this.style.setProperty(cssVar(name), String(value));
+    return this;
+  }
+
+  setVars (map) {
+    for (const name in map) this.setVar(name, map[name]);
+    return this;
   }
   
 
