@@ -1,6 +1,6 @@
-// core/pinchable.js
+// recognizers/pinchable.js
 
-import { distance, midpoint } from './utils.js';
+import { distance, midpoint } from './../utils.js';
 
 // two-finger pinch reported as a scale factor relative to the gesture start
 // (start = 1), with the focal point (the finger midpoint) it pivots around.
