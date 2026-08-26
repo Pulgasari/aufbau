@@ -1,5 +1,7 @@
 // core/transformable.js
 
+import { angle, angleDelta, distance, midpoint, snap } from './utils.js';
+
 // the flagship: free move + scale + rotate of an object, one or two pointers,
 // plus wheel zoom. it accumulates a 2d matrix by composing the frame-to-frame
 // similarity transform between the pointers, so scaling and rotation happen
@@ -8,16 +10,24 @@
 // `transform: matrix(...)` on an element whose transform-origin is 0 0.
 
 function transformable ({
-  onTransformStart, onTransform, onTransformEnd,
-  x = 0, y = 0, scale = 1, rotation = 0,
-  minScale = 0.05, maxScale = 40,
+  onTransform,
+  onTransformStart,
+  onTransformEnd,
+  x = 0, 
+  y = 0, 
+  rotation = 0,
+  scale = 1, 
+  minScale = 0.05, 
+  maxScale = 40,
   pan = true, zoom = true, rotate = true,
-  wheel = true, wheelIntensity = 0.0015, wheelModifier = null
+  wheel = true,
+  wheelIntensity = 0.0015,
+  wheelModifier  = null
 } = {}) {
-  let matrix = mIdentityParts(x, y, scale, rotation);
-  const points = new Map();
-  let prev = null;   // previous-frame point snapshot
-  let live = false;
+  let matrix   = mIdentityParts(x, y, scale, rotation);
+  const points = new Map;
+  let prev     = null;   // previous-frame point snapshot
+  let live     = false;
 
   const snapshot = () => [...points.values()].map(p => ({ x: p.x, y: p.y }));
 
