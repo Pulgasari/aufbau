@@ -8,7 +8,7 @@ export * from './hash.js';
 export * from './log.js';
 
 // dom
-export * from './dom/events.js';
+//export * from './dom/events.js';
 
 // maybe to dingsbums
 export * from './number.js';
