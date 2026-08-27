@@ -25,7 +25,9 @@ function toControl (key, spec, value) {
   const attrs = { name: key };
   const { max, min, step, type, unit, values } = spec;
 
-  if (values) return { tag: 'aufbau-picker', attrs: { ...attrs, value }, options: spec.values };
+  // `look` (e.g. 'combobox' for a long list, 'segments'/'radio' for a short one)
+  // rides through when the spec sets it; pruned drops it when it doesn't
+  if (values) return { tag: 'aufbau-picker', attrs: pruned({ ...attrs, value, look: spec.look }), options: spec.values };
 
   switch (type) {
     case 'boolean'  : return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: value ? '' : null }) };
