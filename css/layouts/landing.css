@@ -1,11 +1,11 @@
 a { color: currentcolor; }
 
-html, body { height: 100dvh; }
+html, body, #app { height: 100dvh; }
 
 body  { z-index: 1; }
 #logo { z-index: 2; }
 
-body {
+#app {
   padding         : 1rem;
   display         : flex;
   flex-flow       : column nowrap;
