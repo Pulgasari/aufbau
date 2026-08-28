@@ -47,6 +47,8 @@ nav {
    .sub  { font-size: 1rem; font-style: italic; opacity: 0.50; display: none; }
 }
 
+#defs, script { display: none!important; }
+
 
 /*
 nav {
