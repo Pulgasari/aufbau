@@ -201,10 +201,9 @@ the first paint, so a warm visit is styled while the module graph still loads:
 
 #
 
-## css value types
+## css data value types
 
 ```css
-Data types
 <angle-percentage>
 <angle>
 <attr-name>
