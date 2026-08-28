@@ -67,7 +67,7 @@ export default aufbau;
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
 
 // no framework, elements only
-import aufbau from '@aufbau/kits/aufbau';
+import aufbau from '@aufbau/runtime';
 await aufbau.init();
 
 // with a framework
