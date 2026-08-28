@@ -6,28 +6,49 @@ body  { z-index: 1; }
 #logo { z-index: 2; }
 
 body {
-  padding: 1rem;
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  justify-content: space-between;
-  transition: background-color 0.25s, color 0.25s;
+  padding         : 1rem;
+  display         : flex;
+  flex-flow       : column nowrap;
+  align-items     : center;
+  justify-content : space-between;
+  transition      : background-color 0.25s, color 0.25s;
 
   > header { font-weight: 700; }
+  > main   { padding: 2rem; }
   > footer { letter-spacing: 2px; }
+
+  > * {
+    display         : flex;
+  }
   
   > header, 
   > footer {
-    display: flex;
-    align-items: center;
-    align-self: center; 
-    justify-content: space-between;
-     
-    text-transform: uppercase;
+    
+    align-items     : center;
+    align-self      : center; 
+    justify-content : space-between;
+    text-transform  : uppercase;
   }
 }
 
+nav {
+   display: flex;
+   gap: 1.25rem;
+}
+#logo {
+   display: flex;
+   flex-flow: column nowrap;
+   align-items: center;
+   justify-content: center;
+   gap: 1rem;
+   max-width: 480px;
+   
+   .name { font-size: 5rem; font-weight: 900; }
+   .sub  { font-size: 1rem; font-style: italic; opacity: 0.50; display: none; }
+}
 
+
+/*
 nav {
    display: flex;
    gap: 1.25rem;
@@ -46,3 +67,4 @@ nav {
    .name { font-size: 5rem; font-weight: 900; }
    .sub  { font-size: 1rem; font-style: italic; opacity: 0.50; display: none; }
 }
+*/
