@@ -196,3 +196,40 @@ the first paint, so a warm visit is styled while the module graph still loads:
 ```html
 <script src="/aufbau/stylescript/boot.js"></script>
 ```
+
+---
+
+#
+
+## css value types
+
+```css
+Data types
+<angle-percentage>
+<angle>
+<attr-name>
+<attr-type>
+<calc-keyword> (e, pi, infinity, NaN)
+<calc-size-basis>
+<calc-sum>
+<custom-ident>
+<dashed-ident>
+<dimension>
+<easing-function>
+<ident>
+<integer>
+<length-percentage>
+<length>
+<number>
+<percentage>
+<position>
+<ratio>
+<resolution>
+<rounding-strategy> (down, up, to-zero)
+<string>
+<syntax>
+<time-percentage>
+<time>
+<url>
+<url-modifier>
+```
