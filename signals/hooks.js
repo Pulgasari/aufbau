@@ -1,5 +1,10 @@
-// ====== hooks =====================================================
-// component-scoped equivalents — created once, kept across renders
+// @aufbau/signals/hooks.js
+
+// :::::: IMPORT
+
+import { useRef } from 'preact/hooks';
+
+// ::::::
 
 export let useBetterSignal = input => {
   let ref = useRef(null);
