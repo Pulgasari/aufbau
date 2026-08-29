@@ -9,6 +9,7 @@ import { createStorage } from '@bunker/storage';
 import { isBool, isFn, isNumber } from '@pulgasari/is';
 
 import { makeMap, makeSet } from './make.js';
+import obj from './obj.js';
 
 // TODO: should `values` also apply to leaves inside a deep object?
 //       e.g. deep: { size: ['s','m','l'] } — structure carrying both. undecided.
@@ -17,27 +18,6 @@ import { makeMap, makeSet } from './make.js';
 
 // :::::: obj (objekt helfer util in the making, wie ich bereits 'str' habe)
 
-const obj = {};
-
-obj.resolvePath = (object, dotKey) => {
-  const parts  = dotKey.split('.');
-  const key    = parts.pop();
-  const target = parts.reduce((node, part) => node[part], object);
-  const value  = target[key];
-
-  return { target, key, value };
-};
-obj.getValueByPath = (object, dotKey) => {
-  return obj.resolvePath(object, dotKey).value;
-};
-obj.toggleByPath = (object, dotKey) => {
-  const { target, key, value } = obj.resolvePath(object, dotKey);
-
-  target[key] = isBool(value) ? !value
-    : value === 'on'  ? 'off'
-    : value === 'off' ? 'on'
-    : value;
-};
 
 
 // :::::: HELPERS
