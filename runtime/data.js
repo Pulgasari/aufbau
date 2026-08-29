@@ -1,5 +1,7 @@
 // @aufbau/runtime/data.js
 
+import { fonts } from '@aufbau/webfonts/data.js';
+
 /*
 filters
 patterns
@@ -16,5 +18,5 @@ const css = {
 
 
 
-export         { css };
-export default { css };
+export         { css, fonts };
+export default { css, fonts };
