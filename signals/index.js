@@ -329,3 +329,46 @@ function removeFromSignalObjectListByCriteria (signal, criteria) {
   );
 }
 */
+
+/*
+let createTarget = ({ type, deep, value, values }) => {
+  if (type === Map) {
+    let target = makeMap(value);
+    return {
+      target,
+      read: () => target.toObject(),
+      write: saved => target.replace(saved),
+    };
+  }
+
+  if (type === Set) {
+    let target = makeSet(value);
+    return {
+      target,
+      read: () => target.toArray(),
+      write: saved => target.replace(saved),
+    };
+  }
+
+  if (deep) {
+    let target = _makeNode(value ?? {}, deep);
+    return {
+      target,
+      read: () => target.$signal.value,
+      write: saved => _merge(target, saved),
+    };
+  }
+
+  let target = new XSignal(value, values);
+
+  return {
+    target,
+    read: () => target.value,
+    write: saved => {
+      target.$values = null;
+      target.value = saved;
+      target.$values = values ?? null;
+    },
+  };
+};
+*/
