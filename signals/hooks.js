@@ -2,18 +2,20 @@
 
 // :::::: IMPORT
 
-import { useRef } from 'preact/hooks';
+import betterSignal from './betterSignal.js';
+import querySignal  from './querySignal.js';
+import { useRef }   from 'preact/hooks';
 
 // ::::::
 
-export let useBetterSignal = input => {
+export function useBetterSignal (input) {
   let ref = useRef(null);
   if (ref.current === null) ref.current = betterSignal(input);
   return ref.current;
 };
 
-export let useQuerySignal = (fetcher, options) => {
+export function useQuerySignal (fetcher, options) {
   let ref = useRef(null);
-  if (ref.current === null) ref.current = querySignal(fetcher, options);
+  if (ref.current === null) ref.current = querySignal(fetcher, options);    
   return ref.current;
 };
