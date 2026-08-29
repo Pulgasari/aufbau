@@ -406,3 +406,26 @@ const createTarget = ({ type, deep, value, values }) => {
                     return createScalarTarget (value, values);
 };
 */
+/*
+const attachPersistence = (target, store, key) => {
+  let live  = false;
+  let saved = store.get(key);
+
+  const apply = value => {
+    if (value !== undefined) target.write(value);
+  };
+
+  const ready = isPromiseLike (saved)
+    ? saved.then (value => { apply(value); live = true; })
+    : (() => { apply(saved); live = true; return Promise.resolve(); })();
+
+  effect(() => {
+    target.read();
+    if (live) store.set(key, target.read());
+  });
+
+  store.subscribe?.(key, apply);
+
+  target.setReady(ready);
+};
+*/
