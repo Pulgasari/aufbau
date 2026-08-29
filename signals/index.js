@@ -8,6 +8,8 @@ import { createStorage } from '@bunker/storage';
 
 import { isFn, isNumber } from '@pulgasari/is';
 
+import { makeMap, makeSet } from './make.js';
+
 // TODO: should `values` also apply to leaves inside a deep object?
 //       e.g. deep: { size: ['s','m','l'] } — structure carrying both. undecided.
 // TODO: back this with @bunker/db — the interface already allows an async get(), so
@@ -133,10 +135,7 @@ let _makeNode = (object, spec = true) => {
         case '$peek'  : return () => _raw(meta, false);
         case '$raw'   : return _raw(meta, true);
         case '$ready' : return meta.ready;
-        case '$signal': {
-          if (!meta.sig) meta.sig = computed(() => _raw(meta, true)); // lazy — only pay when needed
-          return meta.sig;
-        }
+        case '$signal': return meta.sig ??= computed(() => _raw(meta, true));
         case '$update': return patch => {
           for (let [k, v] of Object.entries(patch))
             isPlainObject(v) && isNode(children.get(k)) ? proxy[k].$update(v) : proxy[k] = v;
@@ -204,62 +203,6 @@ let _merge = (proxy, object) => {
   }
   if (changedKeys) syncKeys(); // Trigger signal exactly once
 };
-  
-  
-  
-
-
-// ====== map / set collections =====================================
-
-
-let makeMap = (init = []) => {
-  let sig    = signal(new Map(Array.isArray(init) ? init : Object.entries(init)));
-  let mutate = fn => { let next = new Map(sig.peek()); fn(next); sig.value = next; };
-
-  return {
-    get $ready  () { return null; },
-    get $signal () { return sig; },
-    get size    () { return sig.value.size; },
-    
-    clear    : ()           => sig.value = new Map,
-    delete   : key          => mutate(map => map.delete(key)),
-    entries  : ()           => sig.value.entries(),
-    forEach  : callback     => sig.value.forEach(callback),
-    get      : key          => sig.value.get(key),
-    has      : key          => sig.value.has(key),
-    keys     : ()           => sig.value.keys(),
-    replace  : source       => sig.value = new Map(Array.isArray(source) ? source : Object.entries(source)),
-    set      : (key, value) => mutate(map => map.set(key, value)),
-    toArray  : ()           => [...sig.value.entries()],
-    toObject : ()           => Object.fromEntries(sig.value),
-    values   : ()           => sig.value.values(),
-    
-    [Symbol.iterator] () { return sig.value[Symbol.iterator](); },
-  };
-};
-
-let makeSet = (init = []) => {
-  let sig    = signal(new Set(init));
-  let mutate = fn => { let next = new Set(sig.peek()); fn(next); sig.value = next; };
-
-  return {
-    get $ready  () { return null; },
-    get $signal () { return sig; },
-    get size    () { return sig.value.size; },
-    
-    add      : value    => mutate(set => set.add(value)),
-    clear    : ()       => sig.value = new Set,
-    delete   : value    => mutate(set => set.delete(value)),
-    forEach  : callback => sig.value.forEach(callback),
-    has      : value    => sig.value.has(value),
-    replace  : source   => sig.value = new Set(source),
-    toArray  : ()       => [...sig.value],
-    toggle   : value    => mutate(set => set.has(value) ? set.delete(value) : set.add(value)),
-    values   : ()       => sig.value.values(),
-    
-    [Symbol.iterator] () { return sig.value[Symbol.iterator](); },
-  };
-};
 
 
 // ====== scalar signal with allowed values =========================
@@ -326,10 +269,13 @@ export let betterSignal = input => {
 
 // :::::: EXPORT
 
-export * from './hooks.js';
 export * from './fetchers.js';
+export * from './hooks.js';
+export * from './make.js';
 
 export * from './querySignal.js';
+
+
 
 
 
