@@ -1,4 +1,5 @@
-// @aufbau/signals/utils.js (internal helpers)
+// @aufbau/signals/shared.js 
+// (internal helpers + vendors)
 
 // :::::: HELPERS
 
