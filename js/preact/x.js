@@ -197,21 +197,21 @@ let makeMap = (init = []) => {
   let mutate = fn => { let next = new Map(sig.peek()); fn(next); sig.value = next; };
 
   return {
-    get $ready () { return null; },
+    get $ready  () { return null; },
     get $signal () { return sig; },
     get size    () { return sig.value.size; },
-    clear    : ()      => sig.value = new Map,
-    delete   : key     => mutate(map => map.delete(key)),
-    entries  : ()      => sig.value.entries(),
-    forEach  : callback => sig.value.forEach(callback),
-    get      : key     => sig.value.get(key),
-    has      : key     => sig.value.has(key),
-    keys     : ()      => sig.value.keys(),
-    replace  : source  => sig.value = new Map(Array.isArray(source) ? source : Object.entries(source)),
+    clear    : ()           => sig.value = new Map,
+    delete   : key          => mutate(map => map.delete(key)),
+    entries  : ()           => sig.value.entries(),
+    forEach  : callback     => sig.value.forEach(callback),
+    get      : key          => sig.value.get(key),
+    has      : key          => sig.value.has(key),
+    keys     : ()           => sig.value.keys(),
+    replace  : source       => sig.value = new Map(Array.isArray(source) ? source : Object.entries(source)),
     set      : (key, value) => mutate(map => map.set(key, value)),
-    toArray  : ()      => [...sig.value.entries()],
-    toObject : ()      => Object.fromEntries(sig.value),
-    values   : ()      => sig.value.values(),
+    toArray  : ()           => [...sig.value.entries()],
+    toObject : ()           => Object.fromEntries(sig.value),
+    values   : ()           => sig.value.values(),
     [Symbol.iterator] () { return sig.value[Symbol.iterator](); },
   };
 };
@@ -471,3 +471,45 @@ export let useQuerySignal = (fetcher, options) => {
   if (ref.current === null) ref.current = querySignal(fetcher, options);
   return ref.current;
 };
+
+
+
+/*
+function deleteKeyFromSignalObject(signal, key) {
+  const { [key]: _, ...rest } = signal.value;  // destructuring + rest
+  signal.value = rest;
+}
+
+// oder explizit mit delete (wie im Original)
+function deleteKeyFromSignalObject(signal, key) {
+  const copy = { ...signal.value };
+  delete copy[key];
+  signal.value = copy;
+}
+
+function setSignalObject(signal, key, value) {
+  signal.value = { ...signal.value, [key]: value };
+}
+
+// Verwendung:
+setSignalObject(this._perms, id, 'granted');
+setSignalObject(this._scanning, id, true);
+
+function removeFromSignalObjectListByPredicate(signal, predicate) {
+  signal.value = signal.value.filter(item => !predicate(item));
+}
+
+// Entfernt Elemente, bei denen ALLE Kriterien erfüllt sind (AND)
+function removeFromSignalObjectListByCriteria(signal, criteria) {
+  signal.value = signal.value.filter(item =>
+    !Object.keys(criteria).every(key => item[key] === criteria[key])
+  );
+}
+
+// Entfernt Elemente, bei denen MINDESTENS EIN Kriterium erfüllt ist (OR)
+function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
+  signal.value = signal.value.filter(item =>
+    !Object.keys(criteria).some(key => item[key] === criteria[key])
+  );
+}
+*/
