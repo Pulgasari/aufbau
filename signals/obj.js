@@ -1,7 +1,7 @@
 // obj.js
 
-let isObject      = value => value !== null && typeof value === 'object';
-let isPlainObject = value => isObject(value) && (value.constructor === Object || !value.constructor);     
+const isObject      = value => value !== null && typeof value === 'object';
+const isPlainObject = value => isObject(value) && (value.constructor === Object || !value.constructor);     
 
 const obj = {};
 
@@ -65,6 +65,34 @@ obj.toggleByPath = (object, path) => {
 
   return object;
 };
+
+const createChain = object => new Proxy({}, {
+  get (_, prop) {
+    if (prop in methods)
+      return (...args) => methods[prop](object, ...args);
+
+    return object[prop];
+  }
+});
+
+  const createChain = object => new Proxy({}, {
+  get (_, method) {
+    if (!(method in methods))
+      return undefined;
+
+    return (...args) => methods[method](object, ...args);
+  }
+});
+
+
+const obj = Object.assign(
+  function obj(object) {
+    return createChain(object);
+  },
+  methods
+);
+
+// :::::: EXPORT
 
 export { obj };
 export default obj;
