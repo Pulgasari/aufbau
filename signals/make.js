@@ -1,10 +1,6 @@
 // @aufbau
 
-import { signal } from '@preact/signals';
-
-function toEntries (sth) {
-  return Array.isArray(sth) ? sth : Object.entries(sth);
-}
+import { signal, toEntries } from './shared.js';
 
 export let makeMap = (init = []) => {
   let entries = toEntries(init);
