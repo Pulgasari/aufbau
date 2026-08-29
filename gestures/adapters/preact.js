@@ -11,7 +11,7 @@
 // at runtime, remount the node via `key`.
 
 import { useMemo, useRef } from 'preact/hooks';
-import { gestures }        from './../core.js';
+import { compose }         from './../index.js';
 
 const IS_CALLBACK = /^on[A-Z]/;
 
@@ -32,8 +32,8 @@ export function useGesture (options) {
         ? (...args) => latest.current[key]?.(...args)
         : value;
     }
-    instance.current = gestures(node, forwarded);
+    instance.current = compose(node, forwarded);
   }, []);
 }
 
-export { gestures } from './../core.js';
+export { compose } from './../index.js';
