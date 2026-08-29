@@ -352,4 +352,15 @@ function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
     !Object.keys(criteria).some(key => item[key] === criteria[key])
   );
 }
+
+function removeFromSignalObjectListByCriteria (signal, criteria) {
+  signal.value = signal.value.filter(item =>
+    !Object.keys(criteria).every(key => {
+      const criterion = criteria[key];
+      return typeof criterion === 'function'
+        ? criterion(item[key])
+        : item[key] === criterion;
+    })
+  );
+}
 */
