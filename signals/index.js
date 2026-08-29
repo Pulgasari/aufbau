@@ -19,23 +19,26 @@ import { makeMap, makeSet } from './make.js';
 
 const obj = {};
 
-obj.getValueByDotKey = (object, dotKey) => {
-  let parts  = dotKey.split('.');
-  let last   = parts.pop(); // mutates parts -> prefix path, last -> leaf key
-  let target = parts.reduce((node, k) => node[k], object);
-  return target[last];
-}
-obj.toggleByDotKey   = (object, dotKey) => {
-  let parts  = dotKey.split('.');
-  let last   = parts.pop(); // mutates parts -> prefix path, last -> leaf key
-  let target = parts.reduce((node, k) => node[k], object);
-  let value  = target[last];
-          
-  target[last] = isBool(value)   ? !value
-               : value === 'on'  ? 'off'
-               : value === 'off' ? 'on' 
-               : value;
+obj.resolvePath = (object, dotKey) => {
+  const parts  = dotKey.split('.');
+  const key    = parts.pop();
+  const target = parts.reduce((node, part) => node[part], object);
+  const value  = target[key];
+
+  return { target, key, value };
 };
+obj.getValueByPath = (object, dotKey) => {
+  return obj.resolvePath(object, dotKey).value;
+};
+obj.toggleByPath = (object, dotKey) => {
+  const { target, key, value } = obj.resolvePath(object, dotKey);
+
+  target[key] = isBool(value) ? !value
+    : value === 'on'  ? 'off'
+    : value === 'off' ? 'on'
+    : value;
+};
+
 
 // :::::: HELPERS
 
