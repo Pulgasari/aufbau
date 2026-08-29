@@ -1,5 +1,8 @@
 // @aufbau/signals/betterSignal.js
 
+import { ScalarSignal } from './scalarSignal.js';
+import { effect, isPlainObject, isPromise } from './shared.js';
+
 // ====== betterSignal ==============================================
 // a plain object argument is ALWAYS config — wrap real object values in { value }
 
@@ -29,7 +32,7 @@ export let betterSignal = input => {
   effect(() => { let snapshot = target.read(); if (live) store.set(key, snapshot); });
   store.subscribe?.(key, loaded => apply(loaded));
 
-  if (target.target instanceof XSignal) target.target.$ready = ready;
+  if (target.target instanceof ScalarSignal) target.target.$ready = ready;
   else if (_meta.has(target.target))    _meta.get(target.target).ready = ready;
   else                                  Object.defineProperty(target.target, '$ready', { get: () => ready });
 
