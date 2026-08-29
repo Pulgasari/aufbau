@@ -6,7 +6,7 @@ import { useEffect, useRef }                           from 'preact/hooks';
 import { computed, effect, signal, Signal, useSignal } from '@preact/signals';
 import { createStorage } from '@bunker/storage';
 
-import { isFn, isNumber } from '@pulgasari/is';
+import { isBool, isFn, isNumber } from '@pulgasari/is';
 
 import { makeMap, makeSet } from './make.js';
 
@@ -15,6 +15,27 @@ import { makeMap, makeSet } from './make.js';
 // TODO: back this with @bunker/db — the interface already allows an async get(), so
 //       it can be added without touching anything else here.
 
+// ::::::
+
+const obj = {};
+
+obj.getValueByDotKey = (object, dotKey) => {
+  let parts  = dotKey.split('.');
+  let last   = parts.pop(); // mutates parts -> prefix path, last -> leaf key
+  let target = parts.reduce((node, k) => node[k], object);
+  return target[last];
+}
+obj.toggleByDotKey   = (object, dotKey) => {
+  let parts  = dotKey.split('.');
+  let last   = parts.pop(); // mutates parts -> prefix path, last -> leaf key
+  let target = parts.reduce((node, k) => node[k], object);
+  let value  = target[last];
+          
+  target[last] = isBool(value)   ? !value
+               : value === 'on'  ? 'off'
+               : value === 'off' ? 'on' 
+               : value;
+};
 
 // :::::: HELPERS
 
@@ -131,24 +152,17 @@ let _makeNode = (object, spec = true) => {
       if (typeof key === 'symbol') return undefined;
 
       switch (key) {
-        case '$keys'  : return keysSignal.value;
-        case '$peek'  : return () => _raw(meta, false);
-        case '$raw'   : return _raw(meta, true);
-        case '$ready' : return meta.ready;
-        case '$signal': return meta.sig ??= computed(() => _raw(meta, true));
-        case '$update': return patch => {
+        case '$keys'   : return keysSignal.value;
+        case '$peek'   : return () => _raw(meta, false);
+        case '$raw'    : return _raw(meta, true);
+        case '$ready'  : return meta.ready;
+        case '$signal' : return meta.sig ??= computed(() => _raw(meta, true));
+        case '$toggle' : return (dotKey) => obj.toggleByDotKey(proxy, dotKey);
+        case '$update' : return patch => {
           for (let [k, v] of Object.entries(patch))
             isPlainObject(v) && isNode(children.get(k)) ? proxy[k].$update(v) : proxy[k] = v;
         };
-        case '$toggle': return dotKey => {
-          let parts  = dotKey.split('.');
-          let last   = parts.pop(); // mutates parts -> prefix path, last -> leaf key
-          let target = parts.reduce((node, k) => node[k], proxy);
-          let value  = target[last];
-          target[last] = typeof value === 'boolean' ? !value
-                       : value === 'on'             ? 'off'
-                       : value === 'off'            ? 'on' : value;
-        };
+        
       }
 
       let child = children.get(key);
