@@ -38,3 +38,89 @@ export let betterSignal = input => {
 
   return target.target;
 };
+
+/*
+let createTarget = ({ type, deep, value, values }) => {
+  if (type === Map) {
+    let target = makeMap(value);
+    return {
+      target,
+      read: () => target.toObject(),
+      write: saved => target.replace(saved),
+    };
+  }
+
+  if (type === Set) {
+    let target = makeSet(value);
+    return {
+      target,
+      read: () => target.toArray(),
+      write: saved => target.replace(saved),
+    };
+  }
+
+  if (deep) {
+    let target = _makeNode(value ?? {}, deep);
+    return {
+      target,
+      read: () => target.$signal.value,
+      write: saved => _merge(target, saved),
+    };
+  }
+
+  let target = new XSignal(value, values);
+
+  return {
+    target,
+    read: () => target.value,
+    write: saved => {
+      target.$values = null;
+      target.value = saved;
+      target.$values = values ?? null;
+    },
+  };
+};
+*/
+
+/*
+export const betterSignal = input => {
+  const config = isPlainObject(input) ? input : { value: input };
+  const target = createTarget(config);
+  const store  = resolveStore(config.store);
+
+  if (config.key == null) return target.value;
+
+  attachPersistence (target, store, config.key);
+  return target.value;
+};
+
+const createTarget = ({ type, deep, value, values }) => {
+  if (type === Map) return createMapTarget    (value);
+  if (type === Set) return createSetTarget    (value);
+  if (deep)         return createDeepTarget   (value, deep);
+                    return createScalarTarget (value, values);
+};
+*/
+/*
+const attachPersistence = (target, store, key) => {
+  let live  = false;
+  let saved = store.get(key);
+
+  const apply = value => {
+    if (value !== undefined) target.write(value);
+  };
+
+  const ready = isPromiseLike (saved)
+    ? saved.then (value => { apply(value); live = true; })
+    : (() => { apply(saved); live = true; return Promise.resolve(); })();
+
+  effect(() => {
+    target.read();
+    if (live) store.set(key, target.read());
+  });
+
+  store.subscribe?.(key, apply);
+
+  target.setReady(ready);
+};
+*/
