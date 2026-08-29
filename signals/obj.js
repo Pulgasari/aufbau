@@ -76,6 +76,8 @@ obj.dropByKey = (object, ...keys) => {
   return result;
 };
 
+
+
 // transform
 
 obj.transformKeys   = (object, ...fns) => {};
@@ -117,3 +119,20 @@ const obj = Object.assign(
 
 export { obj };
 export default obj;
+
+
+
+
+// arr.js
+
+const arr = {};
+
+// drop
+
+arr.dropByCriteria    = (array, criteria = {}) => {};
+arr.dropByAnyCriteria = (array, criteria = {}) => {};
+
+// 
+
+arr.transformValues = (array, ...fns) => {};
+
