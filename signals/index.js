@@ -19,6 +19,14 @@ import { isFn, isNumber } from '@pulgasari/is';
 let isAbort       = error => error?.name === 'AbortError';
 let isPlainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 let isPromise     = value => value !== null && typeof value?.then === 'function';
+//let isNode        = value => value !== null && typeof value === 'object' && _meta.has(value);
+
+/*
+let isObject      = value => value !== null && typeof value === 'object';
+let isPlainObject = value => isObject(value) && (value.constructor === Object || !value.constructor);
+let isPromise     = value => isObject(value) && typeof value.then === 'function';
+let isNode        = value => isObject(value) && _meta.has(value);
+*/
 
 let decode = raw   => { try { return JSON.parse(raw); } catch { return undefined; }};
 let encode = value => JSON.stringify(value);
@@ -108,7 +116,10 @@ let _raw = ({ children, keysSignal }, reactive) => {
 let _makeNode = (object, spec = true) => {
   let children   = new Map;
   let keysSignal = signal(Object.keys(object));
-  let meta       = { children, keysSignal, ready: null, sig: null, spec };
+  let syncKeys   = () => { keysSignal.value = [...children.keys()]; };
+  let meta       = { children, keysSignal, syncKeys, ready: null, sig: null, spec };
+
+  
 
   for (let key of keysSignal.peek())
     children.set(key, _spawn(object[key], descend(spec, key)));
@@ -158,15 +169,12 @@ let _makeNode = (object, spec = true) => {
       }
 
       children.set(key, _spawn(value, descend(spec, key)));
-      if (child === undefined) keysSignal.value = [...keysSignal.peek(), key];
+      if (child === undefined) syncKeys();
       return true;
     },
 
     deleteProperty (_, key) {
-      if (children.has(key)) {
-        children.delete(key);
-        keysSignal.value = keysSignal.peek().filter(k => k !== key);
-      }
+      if (children.delete(key)) syncKeys();
       return true;
     },
 
@@ -184,14 +192,25 @@ let _makeNode = (object, spec = true) => {
 };
 
 let _merge = (proxy, object) => {
-  let { children } = _meta.get(proxy);
+  let changedKeys = false;
+  let { children, syncKeys } = _meta.get(proxy);
   let keys = new Set(Object.keys(object));
-  for (let key of keys)            proxy[key] = object[key];
-  for (let key of children.keys()) if (!keys.has(key)) delete proxy[key];
+  for (let key of keys) proxy[key] = object[key];
+  for (let key of children.keys()) {
+    if (!keys.has(key)) {
+      children.delete(key);
+      changedKeys = true;
+    }
+  }
+  if (changedKeys) syncKeys(); // Trigger signal exactly once
 };
+  
+  
+  
 
 
 // ====== map / set collections =====================================
+
 
 let makeMap = (init = []) => {
   let sig    = signal(new Map(Array.isArray(init) ? init : Object.entries(init)));
