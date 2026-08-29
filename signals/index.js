@@ -15,7 +15,7 @@ import { makeMap, makeSet } from './make.js';
 // TODO: back this with @bunker/db — the interface already allows an async get(), so
 //       it can be added without touching anything else here.
 
-// ::::::
+// :::::: obj (objekt helfer util in the making, wie ich bereits 'str' habe)
 
 const obj = {};
 
