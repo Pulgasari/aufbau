@@ -66,6 +66,20 @@ obj.toggleByPath = (object, path) => {
   return object;
 };
 
+obj.dropByKey = (object, ...keys) => {
+  const result = { ...object };
+
+  for (const key of keys) delete result[key];
+
+  return result;
+};
+
+// conversion
+
+obj.toEntries = object => Object.entries (object);
+obj.toKeys    = object => Object.keys    (object);
+obj.toValues  = object => Object.values  (object);
+
 const createChain = object => new Proxy({}, {
   get (_, prop) {
     if (prop in methods)
