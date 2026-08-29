@@ -1,5 +1,8 @@
 // obj.js
 
+let isObject      = value => value !== null && typeof value === 'object';
+let isPlainObject = value => isObject(value) && (value.constructor === Object || !value.constructor);     
+
 const obj = {};
 
 obj.resolvePath = (object, dotKey) => {
