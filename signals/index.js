@@ -17,23 +17,15 @@ import { makeMap, makeSet } from './make.js';
 // TODO: back this with @bunker/db — the interface already allows an async get(), so
 //       it can be added without touching anything else here.
 
-// :::::: HELPERS
-
-let isAbort       = error => error?.name === 'AbortError';
-let isPlainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
-let isPromise     = value => value !== null && typeof value?.then === 'function';
-//let isNode        = value => value !== null && typeof value === 'object' && _meta.has(value);
-
-/*
-let isObject      = value => value !== null && typeof value === 'object';
-let isPlainObject = value => isObject(value) && (value.constructor === Object || !value.constructor);
-let isPromise     = value => isObject(value) && typeof value.then === 'function';
-let isNode        = value => isObject(value) && _meta.has(value);
-*/
 
 
 
+// :::::: EXPORT
+// re-export @preact/signals + this packages extension
 
+export * from '@preact/signals';
+export * from './signal.js';
+export * from './querySignal.js';
 
 
 
