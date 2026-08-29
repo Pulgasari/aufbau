@@ -386,3 +386,23 @@ let createTarget = ({ type, deep, value, values }) => {
   };
 };
 */
+
+/*
+export const betterSignal = input => {
+  const config = isPlainObject(input) ? input : { value: input };
+  const target = createTarget(config);
+  const store  = resolveStore(config.store);
+
+  if (config.key == null) return target.value;
+
+  attachPersistence (target, store, config.key);
+  return target.value;
+};
+
+const createTarget = ({ type, deep, value, values }) => {
+  if (type === Map) return createMapTarget    (value);
+  if (type === Set) return createSetTarget    (value);
+  if (deep)         return createDeepTarget   (value, deep);
+                    return createScalarTarget (value, values);
+};
+*/
