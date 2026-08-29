@@ -3,6 +3,8 @@
 const isObject      = value => value !== null && typeof value === 'object';
 const isPlainObject = value => isObject(value) && (value.constructor === Object || !value.constructor);     
 
+// :::::: THE CORE
+
 const obj = {};
 
 obj.resolvePath = (object, dotKey) => {
@@ -73,6 +75,11 @@ obj.dropByKey = (object, ...keys) => {
 
   return result;
 };
+
+// transform
+
+obj.transformKeys   = (object, ...fns) => {};
+obj.transformValues = (object, ...fns) => {};
 
 // conversion
 
