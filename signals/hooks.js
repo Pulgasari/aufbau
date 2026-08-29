@@ -8,7 +8,7 @@ import { useRef }   from 'preact/hooks';
 
 // ::::::
 
-export function useBetterSignal (input) {
+export function useSignal (input) {
   let ref = useRef(null);
   if (ref.current === null) ref.current = betterSignal(input);
   return ref.current;
