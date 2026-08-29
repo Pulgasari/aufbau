@@ -132,7 +132,15 @@ const arr = {};
 arr.dropByCriteria    = (array, criteria = {}) => {};
 arr.dropByAnyCriteria = (array, criteria = {}) => {};
 
-// 
+//
 
-arr.transformValues = (array, ...fns) => {};
+arr.sortBy = (array, sth) => {};
+
+/*
+arr.sortBy(tracks, 'sourceId'); // default: asc
+arr.sortBy(tracks, 'sourceId', 'title'); // multiple asc
+arr.sortBy(tracks, { sourceId: 'desc' });
+arr.sortBy(tracks, { sourceId: 'asc', rating: 'desc', title: 'asc' });
+*/
+
 
