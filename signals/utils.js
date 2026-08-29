@@ -5,7 +5,7 @@
 export const
 isAbort       = error => error?.name === 'AbortError',
 isPlainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value),
-isPromise     = value => value !== null && typeof value?.then === 'function',
+isPromise     = value => value !== null && typeof value?.then === 'function';
 //isNode        = value => value !== null && typeof value === 'object' && _meta.has(value);
 
 // ::: by vendors 
