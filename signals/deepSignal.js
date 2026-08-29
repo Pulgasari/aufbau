@@ -1,4 +1,11 @@
-// @aufbau/signals/deepSignals.js
+// @aufbau/signals/deepSignal.js
+
+import { ScalarSignal } from './scalarSignal.js';
+import { 
+    signal,
+    isLeaf, isNode, isNumber, isPlainObject,
+    toEntries
+} from './shared.js';
 
 // :::::: DEEP SIGNALS
 // each leaf property is an independent signal — mutations stay scoped
