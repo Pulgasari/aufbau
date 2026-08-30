@@ -19,10 +19,10 @@ export const MOTIONS = {
   up         : { x:  0, y: -1 },
   left       : { x: -1, y:  0 },
   right      : { x:  1, y:  0 },
-  'down-right': { x:  1, y:  1 },
-  'down-left' : { x: -1, y:  1 },
-  'up-right'  : { x:  1, y: -1 },
-  'up-left'   : { x: -1, y: -1 },
+  'down-right' : { x:  1, y:  1 },
+  'down-left'  : { x: -1, y:  1 },
+  'up-right'   : { x:  1, y: -1 },
+  'up-left'    : { x: -1, y: -1 },
 };
 
 // accept "move-down" / "down" / "downwards" and land on a MOTIONS key
