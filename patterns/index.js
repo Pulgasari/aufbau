@@ -59,7 +59,7 @@ function ensurePattern (id, options = {}) {
 
 // applies a pattern to one or more targets.
 // @param {'datauri'|'defs'} [options.mode='datauri']
-function applyPattern (target, id, options = {}) {
+function apply (target, id, options = {}) {
   const { mode = 'datauri', ...userVars } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
@@ -86,7 +86,7 @@ function applyPattern (target, id, options = {}) {
 
 // removes a previously applied pattern and its inline custom properties
 // (and any motion attached to it).
-function removePattern (target) {
+function remove (target) {
   stopMotion(target);
   for (const el of toElements(target)) {
     el.style.removeProperty('background-image');
@@ -95,7 +95,7 @@ function removePattern (target) {
   }
 }
 
-function animatePattern (target, id, options = {}) {
+function animate (target, id, options = {}) {
   const meta = metaFor(id);
   const size = options.size ?? meta.vars.size?.default ?? 20;
   applyPattern(target, id, options);
@@ -104,25 +104,28 @@ function animatePattern (target, id, options = {}) {
 
 // binds one pattern + option set into a small handle for stylescript and component
 // code: `const dots = usePattern('dots', { fg: '#f00' })`.
-function usePattern (id, options = {}) {
+function use (id, options = {}) {
   return {
     id,
-    animate : (target, opts = options) => animatePattern(target, id, opts),
-    apply   : (target, opts = options) => applyPattern(target, id, opts),
-    image   : (opts = options) => patternImage(id, opts),
+    animate : (target, opts = options) => animate (target, id, opts),
+    apply   : (target, opts = options) => apply   (target, id, opts),
+    image   : (opts = options) => patternImage (id, opts),
+    svg     : (opts = options) => patternSvg   (id, opts),
     css     : (opts = options) => `background-image: ${patternImage(id, opts)};`,
     ensure  : () => ensurePattern(id, options),
-    remove  : target => removePattern(target),
-    svg     : (opts = options) => patternSvg(id, opts),
+    remove  : target => remove(target),
   };
 }
 
 const data = list();
 
 export {
+  animate,
+  apply,
+  remove,
+  use,
+  
   MOTIONS,
-  animatePattern,
-  applyPattern,
   applyMotion,
   ensurePattern,
   list,
@@ -131,9 +134,7 @@ export {
   patternImage,
   patternSvg,
   patterns,
-  removePattern,
   stopMotion,
-  usePattern,
 };
 
 export default {
