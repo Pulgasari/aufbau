@@ -1,11 +1,23 @@
 {
   "name": "@aufbau/patterns",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "exports": {
     ".": "./index.js",
     "./core": "./core.js",
+    "./motion": "./motion.js",
+    "./bricks": "./lib/bricks.js",
+    "./checks": "./lib/checks.js",
+    "./chevron": "./lib/chevron.js",
+    "./crosses": "./lib/crosses.js",
+    "./crosshatch": "./lib/crosshatch.js",
+    "./diagonal": "./lib/diagonal.js",
+    "./diamonds": "./lib/diamonds.js",
     "./dots": "./lib/dots.js",
     "./grid": "./lib/grid.js",
-    "./stripes": "./lib/stripes.js"
+    "./rings": "./lib/rings.js",
+    "./squares": "./lib/squares.js",
+    "./stripes": "./lib/stripes.js",
+    "./triangles": "./lib/triangles.js",
+    "./waves": "./lib/waves.js"
   }
 }

@@ -4,6 +4,296 @@
 
 [
   {
+    "id": "bricks",
+    "name": "Bricks",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 6,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 1,
+        "min": 0.5,
+        "max": 8,
+        "step": 0.5,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "checks",
+    "name": "Checkerboard",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 20,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "chevron",
+    "name": "Chevron",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 4,
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "crosses",
+    "name": "Crosses",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 6,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "thickness": {
+        "type": "number",
+        "default": 4,
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "crosshatch",
+    "name": "Crosshatch",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 20,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 1,
+        "min": 0.5,
+        "max": 8,
+        "step": 0.5,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "diagonal",
+    "name": "Diagonal",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 20,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 4,
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "diamonds",
+    "name": "Diamonds",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
     "id": "dots",
     "name": "Dots",
     "vars": {
@@ -91,6 +381,94 @@
     ]
   },
   {
+    "id": "rings",
+    "name": "Rings",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 6,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 2,
+        "min": 0.5,
+        "max": 12,
+        "step": 0.5,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "squares",
+    "name": "Squares",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 20,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 2,
+        "min": 0.5,
+        "max": 12,
+        "step": 0.5,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
     "id": "stripes",
     "name": "Stripes",
     "vars": {
@@ -125,6 +503,85 @@
         "min": 1,
         "max": 20,
         "step": 1,
+        "bake": true,
+        "unit": "px"
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "triangles",
+    "name": "Triangles",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      }
+    },
+    "modes": [
+      "datauri",
+      "defs"
+    ]
+  },
+  {
+    "id": "waves",
+    "name": "Waves",
+    "vars": {
+      "bg": {
+        "type": "color",
+        "default": "transparent"
+      },
+      "fg": {
+        "type": "color",
+        "default": "#000000"
+      },
+      "rotate": {
+        "type": "angle",
+        "default": 0,
+        "min": 0,
+        "max": 360,
+        "step": 1,
+        "unit": "deg",
+        "bake": true
+      },
+      "size": {
+        "type": "number",
+        "default": 24,
+        "min": 6,
+        "max": 100,
+        "step": 1,
+        "bake": true
+      },
+      "width": {
+        "type": "number",
+        "default": 2,
+        "min": 0.5,
+        "max": 12,
+        "step": 0.5,
         "bake": true,
         "unit": "px"
       }

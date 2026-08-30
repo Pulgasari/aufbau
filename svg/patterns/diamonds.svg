@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+  <defs>
+    <pattern id="aufbau-pattern-diamonds" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
+      <rect width="24" height="24" fill="var(--aufbau-pattern-bg, transparent)"/>
+      <path d="M12,0 L24,12 L12,24 L0,12 Z" fill="var(--aufbau-pattern-fg, #000000)"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#aufbau-pattern-diamonds)"/>
+</svg>
