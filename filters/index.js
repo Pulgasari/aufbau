@@ -13,20 +13,19 @@ import { filterToCanvas } from './canvas.js';
 import { filterToWebgl, filterChainWebgl } from './webgl.js';
 import { createPipeline } from './pipeline.js';
 
-// non-destructive filter stack for editor-style use — see pipeline.js.
-export { createPipeline };
+
 
 // runs several webgl filters as one gpu-resident chain (no 2d round-trip between them).
-export const filterWebglChain = filterChainWebgl;
+const filterWebglChain = filterChainWebgl;
 
 // applies a filter to a <canvas> in place — imageData backend when the filter has one,
 // the ctx.filter bridge (css string, or a baked svg <filter>) for css/svg filters, or
 // the webgl backend for filters that only have one. the universal canvas entry point.
-export const filterCanvas = filterToCanvas;
+const filterCanvas = filterToCanvas;
 
-// runs a filter's webgl backend on a canvas in place (fisheye, mirror, kaleidoscope,
-// zoom-blur). filterCanvas delegates here for webgl-only filters.
-export const filterWebgl = filterToWebgl;
+// runs a filter's webgl backend on a canvas in place (fisheye, mirror, kaleidoscope, zoom-blur).
+// filterCanvas delegates here for webgl-only filters.
+const filterWebgl = filterToWebgl;
 
 // :::::: CATALOGUE ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -38,18 +37,20 @@ function metaFor (id) {
 
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
 // want markup go through filterSvg (or import the module directly).
-export function list () {
+function list () {
   return Object.values(filters).map(meta => ({
     id: meta.id, name: meta.name, vars: meta.vars, backends: backendsOf(meta),
   }));
 }
+
+const data = list();
 
 // :::::: SVG BUILDING :::::::::::::::::::::::::::::::::::::::::::
 
 // the <filter> markup for an id (svg backend). baked by default; pass { live: true }
 // for the var()-driven form used by defs injection and the static assets. throws for
 // canvas-only filters (pixelate, dither, …), which have no svg representation.
-export function filterSvg (id, options = {}) {
+function filterSvg (id, options = {}) {
   const render = metaFor(id).render;
   if (!render) throw new Error(`[@aufbau/filters] "${id}" has no svg backend (canvas-only)`);
   return render(options);
@@ -57,14 +58,14 @@ export function filterSvg (id, options = {}) {
 
 // the native css <filter-function> for an id (css backend), or null when the filter
 // has no css equivalent. e.g. filterCss('blur', { amount: 4 }) -> "blur(4px)".
-export function filterCss (id, options = {}) {
+function filterCss (id, options = {}) {
   const fn = metaFor(id).css;
   return fn ? fn(options) : null;
 }
 
 // which backends a filter can be realised through. `canvas` is true for a dedicated
 // imageData backend or any bridge-able filter (svg/css). webgl lands here later.
-export function supports (id) {
+function supports (id) {
   return backendsOf(metaFor(id));
 }
 
@@ -87,7 +88,7 @@ function variantId (id, meta, options) {
 // target. the stylesheet skill calls this so a compiled `filter: url(#id)` has its
 // definition present. defaults to the live form so custom properties stay in play;
 // non-default structural options get their own variant element.
-export async function ensureFilter (id, options = {}) {
+async function ensureFilter (id, options = {}) {
   const host      = defsHost();
   const elementId = options.svgId ?? variantId(id, metaFor(id), options);
   if (host.querySelector(`#${CSS.escape(elementId)}`)) return elementId;
@@ -108,7 +109,7 @@ export async function ensureFilter (id, options = {}) {
 //   'svg'            — force the svg path even when css is available.
 // for the svg path, only the options a caller passes are written as inherited custom
 // properties; the rest fall back to the defaults baked into the injected <filter>.
-export function applyFilter (target, id, options = {}) {
+function applyFilter (target, id, options = {}) {
   const { backend = 'auto', ...opts } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
@@ -139,7 +140,7 @@ export function applyFilter (target, id, options = {}) {
 }
 
 // removes a previously applied filter and its inline custom properties.
-export function removeFilter (target) {
+function removeFilter (target) {
   for (const el of toElements(target)) {
     el.style.removeProperty('filter');
     for (const prop of [...el.style].filter(p => p.startsWith(PREFIX))) el.style.removeProperty(prop);
@@ -149,7 +150,7 @@ export function removeFilter (target) {
 
 // binds one filter + option set into a small, backend-aware handle, handy for
 // stylescript and component code: `const glitch = useFilter('glitch-rgb', { offsetX: 6 })`.
-export function useFilter (id, options = {}) {
+function useFilter (id, options = {}) {
   return {
     id,
     url      : `url(#${svgId(id)})`,                    // the svg reference
@@ -162,9 +163,36 @@ export function useFilter (id, options = {}) {
   };
 }
 
-export { filters };
+export {
+  applyFilter,
+  createPipeline, // non-destructive filter stack for editor-style use — see pipeline.js.
+  data,
+  ensureFilter,
+  filters,
+  filterCanvas,
+  filterCss,
+  filterSvg,
+  filterWebgl,
+  filterWebglChain,
+  list,
+  removeFilter,
+  supports,
+  useFilter,
+};
 
 export default {
-  applyFilter, createPipeline, ensureFilter, filterCanvas, filterCss, filterSvg, filterWebgl,
-  filterWebglChain, filters, list, removeFilter, supports, useFilter,
+  applyFilter,
+  createPipeline,
+  data,
+  ensureFilter,
+  filters,
+  filterCanvas,
+  filterCss, 
+  filterSvg, 
+  filterWebgl,
+  filterWebglChain, 
+  list, 
+  removeFilter,
+  supports,
+  useFilter,
 };
