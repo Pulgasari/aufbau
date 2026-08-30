@@ -59,7 +59,7 @@ function ensurePattern (id, options = {}) {
 
 // applies a pattern to one or more targets.
 // @param {'datauri'|'defs'} [options.mode='datauri']
-function apply (target, id, options = {}) {
+function applyPattern (target, id, options = {}) {
   const { mode = 'datauri', ...userVars } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
@@ -86,7 +86,7 @@ function apply (target, id, options = {}) {
 
 // removes a previously applied pattern and its inline custom properties
 // (and any motion attached to it).
-function remove (target) {
+function removePattern (target) {
   stopMotion(target);
   for (const el of toElements(target)) {
     el.style.removeProperty('background-image');
@@ -95,7 +95,7 @@ function remove (target) {
   }
 }
 
-function animate (target, id, options = {}) {
+function animatePattern (target, id, options = {}) {
   const meta = metaFor(id);
   const size = options.size ?? meta.vars.size?.default ?? 20;
   applyPattern(target, id, options);
@@ -104,7 +104,7 @@ function animate (target, id, options = {}) {
 
 // binds one pattern + option set into a small handle for stylescript and component
 // code: `const dots = usePattern('dots', { fg: '#f00' })`.
-function use (id, options = {}) {
+function usePattern (id, options = {}) {
   return {
     id,
     animate : (target, opts = options) => animate (target, id, opts),
@@ -119,14 +119,16 @@ function use (id, options = {}) {
 
 const data = list();
 
+const animate = animatePattern;
+const apply   = applyPattern;
+const remove  = removePattern;
+const use     = usePattern;
+
 export {
-  animate,
-  apply,
-  remove,
-  use,
-  
   MOTIONS,
+  animate, animatePattern,
   applyMotion,
+  apply, applyPattern,
   ensurePattern,
   list,
   motionCss, 
@@ -134,13 +136,15 @@ export {
   patternImage,
   patternSvg,
   patterns,
+  remove, removePattern,
   stopMotion,
+  use, usePattern,
 };
 
 export default {
-  animatePattern, 
+  animate, animatePattern, 
   applyMotion, 
-  applyPattern,
+  apply, applyPattern,
   ensurePattern, 
   list, 
   motionCss, 
@@ -148,7 +152,7 @@ export default {
   patternImage,
   patternSvg,
   patterns,
-  removePattern,
+  remove, removePattern,
   stopMotion,
-  usePattern,
+  use, usePattern,
 };
