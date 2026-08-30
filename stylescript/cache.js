@@ -28,7 +28,7 @@ pageKey   = (path = pathname()) => PAGES_PREFIX  + path,
 sheetKey  = (name)              => SHEETS_PREFIX + name,
 readSheet = (name) => storage()?.getItem(sheetKey(name)) ?? null;
 
-export function readManifest (path = pathname()) {
+function readManifest (path = pathname()) {
   const store = storage(); if (!store) return [];
   try   { return JSON.parse(store.getItem(pageKey(path)) ?? '[]'); } 
   catch { return []; }
@@ -36,7 +36,7 @@ export function readManifest (path = pathname()) {
 
 // writes the compiled css and records [name, hash] in the page manifest, in adopt
 // order, so a future boot.js can replay every sheet the page uses in cascade order.
-export function writeSheet (name, hash, css) {
+function writeSheet (name, hash, css) {
   const store = storage();
   if (!store) return;
 
@@ -60,6 +60,7 @@ export {
   sheetKey,
   readManifest,
   readSheet,
+  writeSheet,
 }
 
 export const cache = { pageKey, readManifest, readSheet, sheetKey, writeSheet };
