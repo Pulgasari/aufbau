@@ -12,6 +12,9 @@
 
 import { PREFIX, defsHost, encodeSvg, resolve, svgId, toElements } from './core.js';
 import { patterns } from './lib/index.js';
+import { applyMotion, stopMotion, MOTIONS, motionCss, motionKeyframes } from './motion.js';
+
+export { applyMotion, stopMotion, MOTIONS, motionCss, motionKeyframes };
 
 // :::::: CATALOGUE ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -85,13 +88,27 @@ export function applyPattern (target, id, options = {}) {
   }
 }
 
-// removes a previously applied pattern and its inline custom properties.
+// removes a previously applied pattern and its inline custom properties (and any
+// motion attached to it).
 export function removePattern (target) {
+  stopMotion(target);
   for (const el of toElements(target)) {
     el.style.removeProperty('background-image');
     for (const prop of [...el.style].filter(p => p.startsWith(PREFIX))) el.style.removeProperty(prop);
     delete el.dataset.aufbauPattern;
   }
+}
+
+// paints a pattern and scrolls the whole tiling in a direction — the animation is
+// independent of the pattern's own content, so a static or a self-animated tile
+// drifts just the same. options add { motion, speed, timing } on top of the paint
+// options; the scroll distance is the tile size, so the loop is seamless.
+// @param {'down'|'up'|'left'|'right'|'down-right'|'down-left'|'up-right'|'up-left'|string} [options.motion='down']
+export function animatePattern (target, id, options = {}) {
+  const meta = metaFor(id);
+  const size = options.size ?? meta.vars.size?.default ?? 20;
+  applyPattern(target, id, options);
+  applyMotion(target, options.motion ?? 'down', { size, speed: options.speed, timing: options.timing });
 }
 
 // binds one pattern + option set into a small handle for stylescript and component
@@ -102,14 +119,16 @@ export function usePattern (id, options = {}) {
     image  : (opts = options) => patternImage(id, opts),
     css    : (opts = options) => `background-image: ${patternImage(id, opts)};`,
     ensure : () => ensurePattern(id, options),
-    apply  : (target, opts = options) => applyPattern(target, id, opts),
-    remove : target => removePattern(target),
-    svg    : (opts = options) => patternSvg(id, opts),
+    apply   : (target, opts = options) => applyPattern(target, id, opts),
+    animate : (target, opts = options) => animatePattern(target, id, opts),
+    remove  : target => removePattern(target),
+    svg     : (opts = options) => patternSvg(id, opts),
   };
 }
 
 export { patterns };
 
 export default {
-  applyPattern, ensurePattern, list, patternImage, patternSvg, patterns, removePattern, usePattern,
+  animatePattern, applyMotion, applyPattern, ensurePattern, list, motionCss, motionKeyframes,
+  patternImage, patternSvg, patterns, removePattern, stopMotion, usePattern,
 };

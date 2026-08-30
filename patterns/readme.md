@@ -59,3 +59,40 @@ pre-pass (colour tokens resolve like `aufbau-icon`):
 ```css
 .box { aufbau-pattern: dots bg(transparent) fg(#FF0000) rotate(90); }
 ```
+
+## the catalogue
+
+`bricks`, `checks`, `chevron`, `crosses`, `crosshatch`, `diagonal`, `diamonds`,
+`dots`, `grid`, `rings`, `squares`, `stripes`, `triangles`, `waves`. every tile is
+seamless, so it repeats without a visible seam in any direction.
+
+## motion
+
+motion is a layer *on top* of a pattern: it scrolls the whole tiling and does not
+care what the tile contains or whether the tile animates itself. it animates
+`background-position` by exactly one tile, so the loop is seamless.
+
+```javascript
+import { animatePattern, stopMotion } from '@aufbau/patterns';
+
+animatePattern('.hero', 'grid', { motion: 'down', speed: '12s', fg: '#334' });
+animatePattern('.hero', 'dots', { motion: 'up-right' });   // any diagonal too
+stopMotion('.hero');
+```
+
+directions: `down`, `up`, `left`, `right`, `down-right`, `down-left`, `up-right`,
+`up-left` (`move-down` / `downwards` are accepted and normalised).
+
+for a css-only background (no js on the element), bake the rule with `motionCss`:
+
+```javascript
+import { patternImage } from '@aufbau/patterns';
+import { motionCss }    from '@aufbau/patterns/motion';
+
+const { keyframes, animation } = motionCss('down', { size: 40, speed: '12s' });
+// inject `keyframes` into a <style>, then on the element:
+//   background-image: <patternImage('grid', { size: 40 })>;
+//   animation: <animation>;
+```
+
+`usePattern(id, opts).animate(target)` is the handle form.

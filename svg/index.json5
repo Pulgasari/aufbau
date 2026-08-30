@@ -566,6 +566,34 @@
   ],
   "patterns": [
     {
+      "id": "bricks",
+      "name": "Bricks"
+    },
+    {
+      "id": "checks",
+      "name": "Checkerboard"
+    },
+    {
+      "id": "chevron",
+      "name": "Chevron"
+    },
+    {
+      "id": "crosses",
+      "name": "Crosses"
+    },
+    {
+      "id": "crosshatch",
+      "name": "Crosshatch"
+    },
+    {
+      "id": "diagonal",
+      "name": "Diagonal"
+    },
+    {
+      "id": "diamonds",
+      "name": "Diamonds"
+    },
+    {
       "id": "dots",
       "name": "Dots"
     },
@@ -574,8 +602,24 @@
       "name": "Grid"
     },
     {
+      "id": "rings",
+      "name": "Rings"
+    },
+    {
+      "id": "squares",
+      "name": "Squares"
+    },
+    {
       "id": "stripes",
       "name": "Stripes"
+    },
+    {
+      "id": "triangles",
+      "name": "Triangles"
+    },
+    {
+      "id": "waves",
+      "name": "Waves"
     }
   ]
 }

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+  <defs>
+    <pattern id="aufbau-pattern-waves" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
+      <rect width="24" height="24" fill="var(--aufbau-pattern-bg, transparent)"/>
+      <path d="M0,12 Q 6,0 12,12 T 24,12"
+        fill="none" stroke="var(--aufbau-pattern-fg, #000000)" stroke-width="2"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#aufbau-pattern-waves)"/>
+  </svg>
