@@ -11,42 +11,27 @@
 //   boot style : <style id="<name>" data-aufbau-script="<name>" data-aufbau-hash="<hash>">
 //                (id = name so the runtime <style> upsert reconciles it in place)
 
-const VERSION = 'v1';
-
-export const PAGES_PREFIX  = `aufbau:stylescript:pages:${VERSION}:`;
-export const SHEETS_PREFIX = `aufbau:stylescript:sheets:${VERSION}:`;
+const VERSION       = 'v1';
+const PAGES_PREFIX  = `aufbau:stylescript:pages:${VERSION}:`;
+const SHEETS_PREFIX = `aufbau:stylescript:sheets:${VERSION}:`;
 
 // localStorage is absent under node/deno/bun/ssr and can throw in private-mode
 // browsers, so every access is guarded and the core simply no-ops outside it.
 function storage () {
-  try {
-    return typeof localStorage !== 'undefined' ? localStorage : null;
-  } catch {
-    return null;
-  }
+  try   { return typeof localStorage !== 'undefined' ? localStorage : null; }
+  catch { return null; }
 }
 
-function pathname () {
-  return typeof location !== 'undefined' ? location.pathname : '/';
-}
-
-export function pageKey  (path = pathname()) { return PAGES_PREFIX  + path; }
-export function sheetKey (name)              { return SHEETS_PREFIX + name; }
-
-export function readSheet (name) {
-  const store = storage();
-  return store ? store.getItem(sheetKey(name)) : null;
-}
+const 
+pathname  = () => typeof location !== 'undefined' ? location.pathname : '/',
+pageKey   = (path = pathname()) => PAGES_PREFIX  + path,
+sheetKey  = (name)              => SHEETS_PREFIX + name,
+readSheet = (name) => storage()?.getItem(sheetKey(name)) ?? null;
 
 export function readManifest (path = pathname()) {
-  const store = storage();
-  if (!store) return [];
-
-  try {
-    return JSON.parse(store.getItem(pageKey(path)) ?? '[]');
-  } catch {
-    return [];
-  }
+  const store = storage(); if (!store) return [];
+  try   { return JSON.parse(store.getItem(pageKey(path)) ?? '[]'); } 
+  catch { return []; }
 }
 
 // writes the compiled css and records [name, hash] in the page manifest, in adopt
@@ -66,6 +51,16 @@ export function writeSheet (name, hash, css) {
   store.setItem(pageKey(), JSON.stringify(manifest));
 }
 
-export const cache = { pageKey, readManifest, readSheet, sheetKey, writeSheet };
+// :::::: EXPORT
 
+export {
+  PAGES_PREFIX,
+  SHEETS_PREFIX,
+  pageKey,
+  sheetKey,
+  readManifest,
+  readSheet,
+}
+
+export const cache = { pageKey, readManifest, readSheet, sheetKey, writeSheet };
 export default cache;
