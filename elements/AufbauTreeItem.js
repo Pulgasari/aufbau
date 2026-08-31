@@ -7,7 +7,8 @@ export default class AufbauTreeItem extends AufbauElement {
     expanded : Boolean,
     icon     : String,
     label    : 'Item',
-    selected : Boolean
+    selected : Boolean,
+    value    : String
   };
 
   onMount () {
@@ -26,6 +27,7 @@ export default class AufbauTreeItem extends AufbauElement {
   toggleExpand () {
     const { expanded } = this.getAttr();
     this.setAttr({ expanded: !expanded });
+    this.emit('aufbau-tree-toggle', { value: this.getAttr('value'), label: this.getAttr('label'), expanded: !expanded, element: this });
   }
 
   select () {
@@ -34,7 +36,7 @@ export default class AufbauTreeItem extends AufbauElement {
       .forEach(item => item.removeAttribute('selected'));
 
     this.setAttr({ selected: true });
-    this.emit('aufbau-tree-select', { label: this.getAttr('label'), element: this });
+    this.emit('aufbau-tree-select', { label: this.getAttr('label'), value: this.getAttr('value'), element: this });
   }
 
   update () {
