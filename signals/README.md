@@ -66,5 +66,13 @@ icons.refetch();
 
 # TODO
 
+- [ ] `BetterSignal.js` in saubere Klasse überführen
 - [ ] `DeepSignal.js` in saubere Klasse überführen
+- [ ] `QuerySignal.js` in saubere Klasse überführen
 - [ ] imports/exports prüfen und korrigieren
+
+Hinweise:
+
+1. Als utils nutzen wir `pulgasari/js/is.js` (`@pulgasari/is`) und `pulgasari/js/obj.js` (`@pulgasari/obj`), wobei wir das genutzte Zeug am Ende vllt direkt in die `shared.js` kopieren.
+
+2. Intern lassen wir alle Deps und Utils über `shared.js` laufen zwecks Übersichtlichkeit.
