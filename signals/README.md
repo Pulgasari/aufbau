@@ -61,3 +61,10 @@ icons.refetch();
 ```
 
 ## scalarSignal
+
+---
+
+# TODO
+
+- [ ] `DeepSignal.js` in saubere Klasse überführen
+- [ ] imports/exports prüfen und korrigieren
