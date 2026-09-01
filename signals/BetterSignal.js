@@ -1,6 +1,6 @@
 // @aufbau/signals/betterSignal.js
 
-import { ScalarSignal } from './scalarSignal.js';
+import { ScalarSignal } from './ScalarSignal.js';
 import { effect, isPlainObject, isPromise } from './shared.js';
 
 // ====== betterSignal ==============================================
