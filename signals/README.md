@@ -4,6 +4,10 @@ a customized/extended version of the `@preact/signals` library.
 
 ## signal
 
+Eigentlich hätte ich hierfür evtl. gern einen eigenständigen Namen, aber mir fällt kein guter ein. Interner Arbeitstitel ist `betterSignal` aber ist halt auch dumm.
+
+Vielleicht passt `signal` ja auch, weil es die ursprüngliche Methodik der originalen signals weiterhinkinn und alles neue/zusätzliche letztlich ja vereint?
+
 ```javascript
 import { signal } from '@aufbau/signals';
 
@@ -16,19 +20,6 @@ let plain = signal('blubb');
 mode.cycle();        // on -> off -> on
 mode.value = 'xl';   // ignoriert + console.warn
 await theme.$ready;  // erst nach Hydration
-```
-
-## querySignal
-
-```javascript
-let icons = querySignal(fakeFetcher({ delay: 400, fail: 0.1, total: 250 }), {
-  infinite: true, prefetch: true, limit: 20,
-  deps: () => [query.value],
-  enabled: () => query.value.length > 1,
-});
-icons.value.data;          // flach, egal ob infinite
-icons.fetchNextPage();
-icons.refetch();
 ```
 
 ## deepSignal
@@ -55,3 +46,18 @@ state.onEffects ({
   font : (value) => aufbau.webfonts.init({ name: value, target: '--font' }),
 });
 ```
+
+## querySignal
+
+```javascript
+let icons = querySignal(fakeFetcher({ delay: 400, fail: 0.1, total: 250 }), {
+  infinite: true, prefetch: true, limit: 20,
+  deps: () => [query.value],
+  enabled: () => query.value.length > 1,
+});
+icons.value.data;          // flach, egal ob infinite
+icons.fetchNextPage();
+icons.refetch();
+```
+
+## scalarSignal
