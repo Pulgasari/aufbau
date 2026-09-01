@@ -1,126 +1,56 @@
-// @aufbau/signals/betterSignal.js
+// @aufbau/signals/BetterSignal.js
+// the extended factory. a plain object argument is ALWAYS config — wrap a real object
+// value in { value } to store it. picks a carrier from the config (scalar / Map / Set /
+// deep) and, when a `key` is given, wires hydration + persistence onto it.
+// note: the public name is still open — index re-exports this as `signal`.
 
-import { ScalarSignal } from './ScalarSignal.js';
+import { ScalarSignal }             from './ScalarSignal.js';
+import { deepSignal }               from './DeepSignal.js';
+import { makeMap, makeSet }         from './make.js';
+import { resolveStore }             from './persistence.js';
 import { effect, isPlainObject, isPromise } from './shared.js';
 
-// ====== betterSignal ==============================================
-// a plain object argument is ALWAYS config — wrap real object values in { value }
+// carrier = the live value plus a uniform read/write pair the persistence layer uses.
+// read() must subscribe (it runs inside an effect), write() must not re-validate.
+let createCarrier = ({ deep, type, value, values }) => {
+  if (type === Map) { let target = makeMap(value); return { target, read: () => target.toObject(), write: saved => target.replace(saved) }; }
+  if (type === Set) { let target = makeSet(value); return { target, read: () => target.toArray(),  write: saved => target.replace(saved) }; }
+  if (deep)         { let target = deepSignal(value ?? {}, deep); return { target, read: () => target.$signal.value, write: saved => target.$replace(saved) }; }
 
-export let betterSignal = input => {
-  let config = isPlainObject(input) ? input : { value: input };
-  let { deep = false, key, type, value, values } = config;
-  let store  = resolveStore(config.store);
+  let target = new ScalarSignal(value, values);
+  return {
+    target,
+    read  : () => target.value,
+    // bypass the allow-list while restoring: a stored value is authoritative
+    write : saved => { target.$values = null; target.value = saved; target.$values = values ?? null; },
+  };
+};
 
-  // pick the carrier and expose a uniform read/write pair for persistence
-  let target =
-      type === Map ? (target => ({ target, read: () => target.toObject(),    write: saved => target.replace(saved) }))(makeMap(value))
-    : type === Set ? (target => ({ target, read: () => target.toArray(),     write: saved => target.replace(saved) }))(makeSet(value))
-    : deep         ? (target => ({ target, read: () => target.$signal.value, write: saved => _merge(target, saved) }))(_makeNode(value ?? {}, deep))
-    :                (target => ({ target, read: () => target.value,         write: saved => { target.$values = null; target.value = saved; target.$values = values ?? null; } }))(new XSignal(value, values));
-
-  if (!key) return target.target;
-
-  // hydrate first, persist afterwards — never write the initial value back over stored data
+// hydrate first, persist afterwards — never write the initial value back over stored data.
+// returns the readiness promise, resolved once hydration (sync or async) has applied.
+let attachPersistence = (carrier, store, key) => {
   let live  = false;
   let saved = store.get(key);
-  let apply = loaded => { if (loaded !== undefined) target.write(loaded); };
+  let apply = loaded => { if (loaded !== undefined) carrier.write(loaded); };
 
   let ready = isPromise(saved)
     ? saved.then(loaded => { apply(loaded); live = true; })
     : (apply(saved), live = true, Promise.resolve());
 
-  effect(() => { let snapshot = target.read(); if (live) store.set(key, snapshot); });
-  store.subscribe?.(key, loaded => apply(loaded));
-
-  if (target.target instanceof ScalarSignal) target.target.$ready = ready;
-  else if (_meta.has(target.target))    _meta.get(target.target).ready = ready;
-  else                                  Object.defineProperty(target.target, '$ready', { get: () => ready });
-
-  return target.target;
-};
-
-/*
-let createTarget = ({ type, deep, value, values }) => {
-  if (type === Map) {
-    let target = makeMap(value);
-    return {
-      target,
-      read: () => target.toObject(),
-      write: saved => target.replace(saved),
-    };
-  }
-
-  if (type === Set) {
-    let target = makeSet(value);
-    return {
-      target,
-      read: () => target.toArray(),
-      write: saved => target.replace(saved),
-    };
-  }
-
-  if (deep) {
-    let target = _makeNode(value ?? {}, deep);
-    return {
-      target,
-      read: () => target.$signal.value,
-      write: saved => _merge(target, saved),
-    };
-  }
-
-  let target = new XSignal(value, values);
-
-  return {
-    target,
-    read: () => target.value,
-    write: saved => {
-      target.$values = null;
-      target.value = saved;
-      target.$values = values ?? null;
-    },
-  };
-};
-*/
-
-/*
-export const betterSignal = input => {
-  const config = isPlainObject(input) ? input : { value: input };
-  const target = createTarget(config);
-  const store  = resolveStore(config.store);
-
-  if (config.key == null) return target.value;
-
-  attachPersistence (target, store, config.key);
-  return target.value;
-};
-
-const createTarget = ({ type, deep, value, values }) => {
-  if (type === Map) return createMapTarget    (value);
-  if (type === Set) return createSetTarget    (value);
-  if (deep)         return createDeepTarget   (value, deep);
-                    return createScalarTarget (value, values);
-};
-*/
-/*
-const attachPersistence = (target, store, key) => {
-  let live  = false;
-  let saved = store.get(key);
-
-  const apply = value => {
-    if (value !== undefined) target.write(value);
-  };
-
-  const ready = isPromiseLike (saved)
-    ? saved.then (value => { apply(value); live = true; })
-    : (() => { apply(saved); live = true; return Promise.resolve(); })();
-
-  effect(() => {
-    target.read();
-    if (live) store.set(key, target.read());
-  });
-
+  effect(() => { let snapshot = carrier.read(); if (live) store.set(key, snapshot); });
   store.subscribe?.(key, apply);
 
-  target.setReady(ready);
+  return ready;
 };
-*/
+
+export let betterSignal = input => {
+  let config  = isPlainObject(input) ? input : { value: input };
+  let carrier = createCarrier(config);
+
+  if (!config.key) return carrier.target;
+
+  carrier.target.$ready = attachPersistence(carrier, resolveStore(config.store), config.key);
+  return carrier.target;
+};
+
+export default betterSignal;

@@ -1,97 +1,33 @@
 // @aufbau/signals
-
-// :::::: IMPORT
-
-import { useEffect, useRef }                           from 'preact/hooks';
-import { computed, effect, signal, Signal, useSignal } from '@preact/signals';
-import { createStorage } from '@bunker/storage';
-
-import { isBool, isFn, isNumber } from '@pulgasari/is';
-import obj from '@pulgasari/obj';
-
-import { makeMap, makeSet } from './make.js';
-
+// a customized/extended layer over @preact/signals. re-exports the preact primitives
+// (raw signal/Signal renamed to preactSignal/PreactSignal) alongside this package's
+// carriers: the extended `signal` factory, ScalarSignal, deepSignal and querySignal.
 
 // TODO: should `values` also apply to leaves inside a deep object?
 //       e.g. deep: { size: ['s','m','l'] } — structure carrying both. undecided.
-// TODO: back this with @bunker/db — the interface already allows an async get(), so
-//       it can be added without touching anything else here.
+// TODO: back persistence with @bunker/db — the store interface already allows an async
+//       get(), so it can be added without touching the factory.
+// TODO: naming — the extended factory is exported as both `signal` and `betterSignal`
+//       while the public name is still open.
 
+// :::::: PREACT PRIMITIVES
 
+export { batch, computed, effect, untracked } from './shared.js';
+export { signal as preactSignal, Signal as PreactSignal } from './shared.js';
 
+// :::::: CARRIERS
 
-// :::::: EXPORT
-// re-export @preact/signals + this packages extension
+export { betterSignal, betterSignal as signal } from './BetterSignal.js';
+export { ScalarSignal, scalarSignal }           from './ScalarSignal.js';
+export { deepSignal, isDeep }                    from './DeepSignal.js';
+export { querySignal }                           from './QuerySignal.js';
+export { makeMap, makeSet }                      from './make.js';
 
-export * from '@preact/signals';
-export * from './signal.js';
-export * from './querySignal.js';
+// :::::: STORES
 
+export { cookie, local, none, session, signalStore } from './persistence.js';
 
+// :::::: FETCHERS + HOOKS
 
-
-
-
-// :::::: EXPORT
-
-export * from './fetchers.js';
-export * from './hooks.js';
-export * from './make.js';
-
-export * from './querySignal.js';
-
-
-
-
-
-/*
-function deleteKeyFromSignalObject(signal, key) {
-  const { [key]: _, ...rest } = signal.value;  // destructuring + rest
-  signal.value = rest;
-}
-
-// oder explizit mit delete (wie im Original)
-function deleteKeyFromSignalObject(signal, key) {
-  const copy = { ...signal.value };
-  delete copy[key];
-  signal.value = copy;
-}
-
-function setSignalObject(signal, key, value) {
-  signal.value = { ...signal.value, [key]: value };
-}
-
-// Verwendung:
-setSignalObject(this._perms, id, 'granted');
-setSignalObject(this._scanning, id, true);
-
-function removeFromSignalObjectListByPredicate(signal, predicate) {
-  signal.value = signal.value.filter(item => !predicate(item));
-}
-
-// Entfernt Elemente, bei denen ALLE Kriterien erfüllt sind (AND)
-function removeFromSignalObjectListByCriteria(signal, criteria) {
-  signal.value = signal.value.filter(item =>
-    !Object.keys(criteria).every(key => item[key] === criteria[key])
-  );
-}
-
-// Entfernt Elemente, bei denen MINDESTENS EIN Kriterium erfüllt ist (OR)
-function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
-  signal.value = signal.value.filter(item =>
-    !Object.keys(criteria).some(key => item[key] === criteria[key])
-  );
-}
-
-function removeFromSignalObjectListByCriteria (signal, criteria) {
-  signal.value = signal.value.filter(item =>
-    !Object.keys(criteria).every(key => {
-      const criterion = criteria[key];
-      return typeof criterion === 'function'
-        ? criterion(item[key])
-        : item[key] === criterion;
-    })
-  );
-}
-*/
-
+export { dummyFetcher, fakeFetcher }  from './fetchers.js';
+export { useQuerySignal, useSignal }  from './hooks.js';

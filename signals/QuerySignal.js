@@ -1,9 +1,9 @@
-// @aufbau/signals/querySignal.js
+// @aufbau/signals/QuerySignal.js
+// async query carrier — a plain signal holding fetch state (data, paging, flags),
+// re-run when its `deps` change. stays a closure: it wraps a preact signal and hangs
+// fetchNextPage/refetch off it, there is no separate object to model as a class.
 
-import { useRef } from 'preact/hooks';
-import { effect, signal } from '@preact/signals';
-import { isFn } from '@pulgasari/is';
-import obj from '@pulgasari/obj';
+import { effect, isAbort, signal } from './shared.js';
 
 let emptyState = (pending, fetching) => ({
   data               : null,
