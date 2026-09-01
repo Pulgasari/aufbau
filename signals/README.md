@@ -74,7 +74,7 @@ icons.refetch();
 
 Hinweise:
 
-1. Als utils nutzen wir `pulgasari/js/is.js` (`@pulgasari/is`) und `pulgasari/js/obj.js` (`@pulgasari/obj`), wobei wir das genutzte Zeug am Ende vllt direkt in die `shared.js` kopieren.
+1. Als utils nutzen wir `pulgasari.github.io/js/is.js` (`@pulgasari/is`) und `pulgasari.github.io/js/obj.js` (`@pulgasari/obj`) und `pulgasari.github.io/js/arr.js` (`@pulgasari/arr`), wobei wir das genutzte Zeug am Ende vllt direkt in die `shared.js` kopieren? Und `obj` und `arr` befinden sich selbst noch in der Entstehung. Also sollten wir da Lücken, Fehler usw. finden, können wir das direkt als Nebentask mit korrigieren/erweitern usw.
 
 2. Intern lassen wir alle Deps und Utils über `shared.js` laufen zwecks Übersichtlichkeit.
 
