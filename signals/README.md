@@ -30,3 +30,28 @@ icons.value.data;          // flach, egal ob infinite
 icons.fetchNextPage();
 icons.refetch();
 ```
+
+## deepSignal
+
+```javascript
+import { deepSignal } from '@aufbau/signals';
+
+const state = deepSignal({
+  dir    : 'ltr',
+  dialog : null,
+  route  : null,
+  font   : 'Manrope',
+});
+
+// :::::: EFFECTS
+
+// variant 1 (regular)
+effect(() => document.documentElement.setAttribute('dir', state.dir));
+effect(() => aufbau.webfonts.init({ name: state.font, target: '--font' }));
+
+// variant 2
+state.onEffects ({
+  dir  : (value) => $root?.setAttribute('dir', value),
+  font : (value) => aufbau.webfonts.init({ name: value, target: '--font' }),
+});
+```
