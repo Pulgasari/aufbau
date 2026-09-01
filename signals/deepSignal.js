@@ -1,5 +1,7 @@
 // @aufbau/signals/deepSignal.js
 
+// :::::: IMPORT
+
 import { ScalarSignal } from './scalarSignal.js';
 import { 
     signal,
@@ -64,9 +66,25 @@ let _makeNode = (object, spec = true) => {
         case '$ready'  : return meta.ready;
         case '$signal' : return meta.sig ??= computed(() => _raw(meta, true));
         case '$toggle' : return (dotKey) => obj.toggleByDotKey(proxy, dotKey);
-        case '$update' : return patch => {
-          for (let [k, v] of Object.entries(patch))
-            isPlainObject(v) && isNode(children.get(k)) ? proxy[k].$update(v) : proxy[k] = v;
+        case '$update' : return patch => { for (let [k,v] of Object.entries(patch)) isPlainObject(v) && isNode(children.get(k)) ? proxy[k].$update(v) : proxy[k] = v; };      
+        case '$onEffect' : return (targetKey, callback) => {
+          return effect(() => {
+            // Touch keysSignal to re-evaluate if targetKey is added dynamically later
+            void keysSignal.value;
+            if (!(targetKey in proxy)) return;
+
+            const value = proxy[targetKey];
+            // Prevent callback internal signal reads from leaking into this effect
+            untracked(() => callback(value));
+          });
+        };
+        case '$onEffects' : return (listeners) => {
+          const disposers = [];
+          for (let [k, cb] of Object.entries(listeners)) {
+            disposers.push(proxy.$onEffect(k, cb));
+          }
+          // Return a cleanup function for all created effects
+          return () => disposers.forEach(dispose => dispose?.());
         };
         
       }
@@ -123,3 +141,12 @@ let _merge = (proxy, object) => {
   }
   if (changedKeys) syncKeys(); // Trigger signal exactly once
 };
+
+function deepSignal (...args) {
+  return new DeepSignal (...args);
+}
+
+// :::::: EXPORT
+
+export       { deepSignal, DeepSignal };
+export default deepSignal;
