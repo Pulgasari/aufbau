@@ -4,6 +4,7 @@
 // deep) and, when a `key` is given, wires hydration + persistence onto it.
 // note: the public name is still open — index re-exports this as `signal`.
 
+import { BoolSignal }               from './BoolSignal.js';
 import { ScalarSignal }             from './ScalarSignal.js';
 import { deepSignal }               from './DeepSignal.js';
 import { makeMap, makeSet }         from './make.js';
@@ -13,9 +14,10 @@ import { effect, isPlainObject, isPromise } from './shared.js';
 // carrier = the live value plus a uniform read/write pair the persistence layer uses.
 // read() must subscribe (it runs inside an effect), write() must not re-validate.
 let createCarrier = ({ deep, type, value, values }) => {
-  if (type === Map) { let target = makeMap(value); return { target, read: () => target.toObject(), write: saved => target.replace(saved) }; }
-  if (type === Set) { let target = makeSet(value); return { target, read: () => target.toArray(),  write: saved => target.replace(saved) }; }
-  if (deep)         { let target = deepSignal(value ?? {}, deep); return { target, read: () => target.$signal.value, write: saved => target.$replace(saved) }; }
+  if (type === Boolean) { let target = new BoolSignal(value); return { target, read: () => target.value,     write: saved => { target.value = saved; } }; }
+  if (type === Map)     { let target = makeMap(value);        return { target, read: () => target.toObject(), write: saved => target.replace(saved) }; }
+  if (type === Set)     { let target = makeSet(value);        return { target, read: () => target.toArray(),  write: saved => target.replace(saved) }; }
+  if (deep)             { let target = deepSignal(value ?? {}, deep); return { target, read: () => target.$signal.value, write: saved => target.$replace(saved) }; }
 
   let target = new ScalarSignal(value, values);
   return {

@@ -18,6 +18,7 @@ export { signal as preactSignal, Signal as PreactSignal } from './shared.js';
 // :::::: CARRIERS
 
 export { betterSignal, betterSignal as signal } from './BetterSignal.js';
+export { BoolSignal, boolSignal }               from './BoolSignal.js';
 export { ScalarSignal, scalarSignal }           from './ScalarSignal.js';
 export { deepSignal, isDeep }                    from './DeepSignal.js';
 export { querySignal }                           from './QuerySignal.js';

@@ -62,6 +62,20 @@ icons.refetch();
 
 ## scalarSignal
 
+## boolSignal
+
+```javascript
+import { boolSignal, signal } from '@aufbau/signals';
+
+let open = boolSignal(false);
+open.toggle();   // true
+open.off();      // false
+open.value = 1;  // coerced -> true
+
+// persisted via the factory
+let dark = signal({ type: Boolean, value: true, key: 'dark', store: local });
+```
+
 ---
 
 # TODO
@@ -69,7 +83,7 @@ icons.refetch();
 - [x] `BetterSignal.js` aufgeräumt: carrier-builder + persistence getrennt, toter/auskommentierter code raus. keine echte klasse — es ist ein factory, kein typ (nur `betterSignal`, kein `BetterSignal`).
 - [x] `DeepSignal.js` aufgeräumt. bleibt bewusst Proxy-basiert (per-leaf-signal identity braucht das), also keine ES-klasse. `deepSignal` ist die ganze surface, `isDeep` der brand-check. `$replace` ergänzt, `$toggle` auf die echte `obj.toggleByPath` gezogen, `$ready` jetzt schreibbar.
 - [x] `QuerySignal.js` aufgeräumt/imports gefixt. bleibt eine closure (reichert ein preact-signal an, kein separates objekt zum klassifizieren).
-- [ ] evtl. noch `BoolSignal` schaffen. erstmal zurückgestellt. ist mit ScalarSignal (`values: [true,false]` + `cycle()`) abgedeckt.
+- [x] `BoolSignal` gebaut. Class + factory (`boolSignal`), coerct jeden write auf boolean, `toggle()`/`on()`/`off()`. übers factory via `type: Boolean`.
 - [x] imports/exports geprüft/korrigiert. alle vendor-deps laufen jetzt ausschließlich über `shared.js`; `index.js` exportiert die volle surface inkl. stores.
 
 Offen:
