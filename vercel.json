@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": false,
+    "ignoreCommand": "exit 0"
+  },
+  "trailingSlash": true,
   "rewrites": [
     {
       "source": "/:path*",
