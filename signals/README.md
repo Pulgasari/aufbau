@@ -62,15 +62,34 @@ icons.refetch();
 
 ## scalarSignal
 
+## boolSignal
+
+```javascript
+import { boolSignal, signal } from '@aufbau/signals';
+
+let open = boolSignal(false);
+open.toggle();   // true
+open.off();      // false
+open.value = 1;  // coerced -> true
+
+// persisted via the factory
+let dark = signal({ type: Boolean, value: true, key: 'dark', store: local });
+```
+
 ---
 
 # TODO
 
-- [ ] `BetterSignal.js` in saubere Klasse überführen und eventuell leserlicher bauen (wie unten im auskommentierten Code teils angedeutet)
-- [ ] `DeepSignal.js` in saubere Klasse überführen
-- [ ] `QuerySignal.js` in saubere Klasse überführen
-- [ ] evtl. noch `BoolSignal` schaffen. ist zwar mit ScalarSignal irgendwie abgedeckt, aber vielleicht doch eigentlich sinnvoll?
-- [ ] imports/exports prüfen und korrigieren
+- [x] `BetterSignal.js` aufgeräumt: carrier-builder + persistence getrennt, toter/auskommentierter code raus. keine echte klasse — es ist ein factory, kein typ (nur `betterSignal`, kein `BetterSignal`).
+- [x] `DeepSignal.js` aufgeräumt. bleibt bewusst Proxy-basiert (per-leaf-signal identity braucht das), also keine ES-klasse. `deepSignal` ist die ganze surface, `isDeep` der brand-check. `$replace` ergänzt, `$toggle` auf die echte `obj.toggleByPath` gezogen, `$ready` jetzt schreibbar.
+- [x] `QuerySignal.js` aufgeräumt/imports gefixt. bleibt eine closure (reichert ein preact-signal an, kein separates objekt zum klassifizieren).
+- [x] `BoolSignal` gebaut. Class + factory (`boolSignal`), coerct jeden write auf boolean, `toggle()`/`on()`/`off()`. übers factory via `type: Boolean`.
+- [x] imports/exports geprüft/korrigiert. alle vendor-deps laufen jetzt ausschließlich über `shared.js`; `index.js` exportiert die volle surface inkl. stores.
+
+Offen:
+
+- **naming.** das erweiterte factory wird aktuell als `signal` UND `betterSignal` exportiert. preacts rohes `signal`/`Signal` läuft als `preactSignal`/`PreactSignal`. name am ende nochmal final festzurren.
+- `shared.js` re-exportiert nur das tatsächlich genutzte. `arr` (`@pulgasari/arr`) ist hier raus — wird nicht gebraucht, und die upstream-datei hat aktuell einen syntax-fehler (`.[mode]`) plus doppelte `export const`. separat zu fixen.
 
 Hinweise:
 
