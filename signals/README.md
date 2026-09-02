@@ -24,7 +24,7 @@ import { signal } from '@aufbau/signals';
 export function createState (config = {}) {
   const state = signal({
     key   : 'zugriff:' + config.id + ':',
-    store : localStorage,
+    store : 'local-nested',
     value : {
       color    : config.color,
       dir      : config.dir,
