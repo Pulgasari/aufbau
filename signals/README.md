@@ -18,6 +18,29 @@ mode.value = 'xl';   // ignoriert + console.warn
 await theme.$ready;  // erst nach Hydration
 ```
 
+## signal — nested persistence
+
+a deep signal whose every leaf persists under its own `key + leafName`, instead of the
+whole object as one blob. `key` is the shared prefix, `nested: true` selects per-leaf
+storage (and implies a deep carrier). writes stay granular (only the changed leaf's key
+is rewritten) and hydration merges — a leaf missing from storage keeps its seed, so a
+later change to a code default still wins. `persist` optionally allow-lists the leaves.
+
+```javascript
+import { signal, local } from '@aufbau/signals';
+
+const state = signal({
+  key    : 'zugriff:notes:',   // per-leaf keys: zugriff:notes:font, zugriff:notes:dir, ...
+  store  : local,
+  nested : true,
+  // persist : ['font', 'dir'], // optional allow-list; omitted persists every leaf
+  value  : { font: 'Manrope', dir: 'ltr', dialog: null, route: null },
+});
+
+state.$onEffects({ font: value => {/* ... */} });
+state.dialog = 'settings';     // writes only zugriff:notes:dialog
+```
+
 ## deepSignal
 
 ```javascript
