@@ -15,6 +15,12 @@ export default class AufbauReader extends AufbauElement {
     src    : String,
   };
 
+  // optional consumer hook: (root, ctx) => void | Promise, run over the parsed
+  // markup before it is committed. declared as a field so it exists on the element
+  // instance — a framework (e.g. preact) only forwards a function-valued prop when
+  // the property is already present, otherwise it would drop it silently.
+  transform = null;
+
   // authored inline content stays in the light dom and serves as the fallback source
   get renderTarget () { return this.shell('aufbau-reader-ui'); }
 
@@ -40,9 +46,14 @@ export default class AufbauReader extends AufbauElement {
     try {
       // one pipeline for both paths: importFile dispatches on the extension,
       // renderMD reuses the very same configured markdown compiler
-      this._html = src            ? await importFile(src)
-                 : format === 'html' ? source
-                 :                     await renderMD(source);
+      const markup = src            ? await importFile(src)
+                   : format === 'html' ? source
+                   :                     await renderMD(source);
+
+      // optional consumer hook — rewrite the parsed markup before it is committed
+      // (resolve folder-relative assets, tag links). kept generic so an app reading
+      // local files injects its own resolution without re-implementing rendering.
+      this._html = await this.applyTransform(markup);
       this.finish('ready');
     } catch (error) {
       console.warn(`[aufbau-reader] could not render ${src ? `"${src}"` : 'inline content'}:`, error);
@@ -51,6 +62,19 @@ export default class AufbauReader extends AufbauElement {
     }
 
     return this;
+  }
+
+  // runs a consumer-set `transform(root, ctx)` over a detached copy of the parsed
+  // markup and returns the (possibly rewritten) html string. no transform -> the
+  // markup passes through untouched, so existing usage is unaffected. the update()
+  // above awaits renderMD first, so the property is set by the time this runs even
+  // when the framework assigns `transform` and `raw` in the same commit.
+  async applyTransform (markup) {
+    if (typeof this.transform !== 'function' || typeof document === 'undefined') return markup;
+    const root = document.createElement('div');
+    root.innerHTML = markup;
+    await this.transform(root, { src: this.getAttr('src'), format: this.getAttr('format') });
+    return root.innerHTML;
   }
 
   finish (state) {
