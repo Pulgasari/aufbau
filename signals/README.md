@@ -18,42 +18,6 @@ mode.value = 'xl';   // ignoriert + console.warn
 await theme.$ready;  // erst nach Hydration
 ```
 
-```javascript
-import { signal } from '@aufbau/signals';
-
-export function createState (config = {}) {
-  const state = signal({
-    key   : 'zugriff:' + config.id + ':',
-    store : 'local-nested',
-    value : {
-      color    : config.color,
-      dir      : config.dir,
-      font     : config.font  ?? 'Manrope',
-      lang     : config.lang,
-      theme    : config.theme ?? 'dracula',
-      title    : config.name  ?? null,
-      viewport : config.viewport,
-  
-      // ui-frame state every app shares
-      dialog : null,
-      route  : null,
-    }
-  });
-
-  // :::::: EFFECTS
-
-  state.$onEffects({
-    dir   : value => { if ($root && value) { $root.setAttribute('dir', value); writeJSON(DIR_KEY, value); } },
-    font  : value => { if (value) { aufbau.webfonts?.init?.({ name: value, target: '--font' }); writeJSON(FONT_KEY, value); } },
-    lang  : value => { if ($root && value) $root.lang = value; },
-    theme : value => applyTheme(value),
-    title : value => { if ($doc && value) $doc.title = value; },
-  });
-
-  return state;
-}
-```
-
 ## deepSignal
 
 ```javascript
