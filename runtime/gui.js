@@ -156,7 +156,10 @@ function render (spec, opts = {}) {
     }
   
     if (onChange) {
-      const handler = event => onChange(readValues(container, spec), event.target?.getAttribute?.('name') ?? null, event);
+      // resolve the field name off the nearest named control, not the raw target:
+      // composite controls (e.g. aufbau-picker) bubble change/input from an inner
+      // element that carries no name, which would otherwise read back as null
+      const handler = event => onChange(readValues(container, spec), event.target?.closest?.('[name]')?.getAttribute('name') ?? null, event);
       //container.addEventListener('input', handler);   // sliders/inputs: live while dragging/typing
       //container.addEventListener('change', handler);   // toggles/pickers: on commit
       dom.onEvent(container, ['change', 'input'], handler);
