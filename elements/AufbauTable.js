@@ -2,7 +2,7 @@
 
 import { AufbauElement } from './core/index.js';
 import { importFile }    from '@aufbau/import';
-import * as dom from '@domina/core';
+import { sortElements } from '@domina/methods/sortElements.js';
 import { html }      from './core/html.js';
 import { arrayfied } from './core/utils.js';
 import { isArray }   from '@pulgasari/is';
@@ -30,7 +30,7 @@ export default class AufbauTable extends AufbauElement {
     this._sortKey = key;
     this._sortDir = desc ? 'desc' : 'asc';
 
-    dom.sortElements({
+    sortElements({
       container  : this.$('tbody'),
       item       : 'tr',
       indicators : [[`[data-key="${key}"]`, `auto-${this._sortDir}`]]

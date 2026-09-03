@@ -1,7 +1,7 @@
 // @aufbau/elements/core/styles.js
 
 import { isFn }      from '@pulgasari/is';
-import * as dom      from '@domina/core';
+import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { arrayfied } from './utils.js';
 
 export const BASE_LAYER = 'aufbau.elements';
@@ -36,7 +36,7 @@ export function adoptClassStyles (Cls, target = document) {
   ensureLayerOrder(target);
 
   for (const owner of styleOwners(Cls)) {
-    dom.adoptStylesheet(toCss(owner.styles, owner), {
+    adoptStylesheet(toCss(owner.styles, owner), {
       target,
       layer : owner.styleLayer ?? BASE_LAYER,
       key   : `aufbau:styles:${owner.name}`,
@@ -45,7 +45,7 @@ export function adoptClassStyles (Cls, target = document) {
 }
 
 export const adoptBaseStyles = (key, css) =>
-  dom.adoptStylesheet(css, { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
+  adoptStylesheet(css, { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
 
 /*
 

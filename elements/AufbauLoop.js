@@ -1,7 +1,7 @@
 // <aufbau-loop>
 
 import { AufbauElement } from './core/index.js';
-import * as dom from '@domina/core';
+import { onVisible } from '@domina/observer';
 import { html } from './core/html.js';
 
 export default class AufbauLoop extends AufbauElement {
@@ -24,7 +24,7 @@ export default class AufbauLoop extends AufbauElement {
     this.on('pointerleave', () => this._paused = false);
 
     // a carousel in a background tab or off screen does not need to tick
-    this.track(dom.onVisible(this, (el, entry) => {
+    this.track(onVisible(this, (el, entry) => {
       this._offscreen = !entry.isIntersecting;
     }));
 

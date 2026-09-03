@@ -1,7 +1,7 @@
 // <aufbau-filter>
 
 import { AufbauElement } from './core/index.js';
-import * as dom from '@domina/core';
+import { filterElements } from '@domina/methods/filterElements.js';
 import { html } from './core/html.js';
 
 export default class AufbauFilter extends AufbauElement {
@@ -38,7 +38,7 @@ export default class AufbauFilter extends AufbauElement {
 
     // container defaults to the closest shared ancestor of the targets, document
     // is the safe fallback when none is configured
-    const result = dom.filterElements({
+    const result = filterElements({
       container : container || document,
       item      : target,
       filters   : [['', query, mode]],

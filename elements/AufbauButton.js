@@ -2,7 +2,7 @@
 
 import { AufbauElement } from './core/index.js';
 import { html, raw as rawHtml } from './core/html.js';
-import * as dom from '@domina/core';
+import { setAttr } from '@domina/methods/setAttr.js';
 
 export default class AufbauButton extends AufbauElement {
   static attr = {
@@ -53,7 +53,7 @@ export default class AufbauButton extends AufbauElement {
 
   // kept out of render() so toggling disabled does not rebuild the markup
   sync () {
-    dom.setAttr(this.$('.aufbau-btn'), { disabled: this.getAttr('disabled') });
+    setAttr(this.$('.aufbau-btn'), { disabled: this.getAttr('disabled') });
   }
 }
 

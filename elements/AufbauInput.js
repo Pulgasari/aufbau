@@ -4,7 +4,8 @@
 
 import { AufbauControl, TYPE_NAMES, valueType } from './core/index.js';
 import { attrs, html } from './core/html.js';
-import * as dom from '@domina/core';
+import { setAttr } from '@domina/methods/setAttr.js';
+import { setValue } from '@domina/methods/setValue.js';
 
 // value domains that <aufbau-input> deliberately does not carry
 const MOVED = { file: 'aufbau-upload', range: 'aufbau-slider' };
@@ -181,10 +182,10 @@ export default class AufbauInput extends AufbauControl {
 
     // list is an attribute rather than a template hole, interpolating markup
     // into html`` would escape the quotes
-    dom.setAttr(input, { list: list || false, readOnly: readonly });
+    setAttr(input, { list: list || false, readOnly: readonly });
 
     // never write back into the field while the user is typing in it
-    if (input !== document.activeElement) dom.setValue(input, value);
+    if (input !== document.activeElement) setValue(input, value);
 
     const swatch = this.$('.input-swatch');
     if (swatch) swatch.style.background = this.valueType.format(value);

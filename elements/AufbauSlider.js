@@ -5,7 +5,7 @@
 
 import { AufbauControl, AXIS_TYPES, valueType } from './core/index.js';
 import { attrs, html } from './core/html.js';
-import * as dom from '@domina/core';
+import { setValue } from '@domina/methods/setValue.js';
 
 export default class AufbauSlider extends AufbauControl {
   static attr = {
@@ -273,7 +273,7 @@ export default class AufbauSlider extends AufbauControl {
       // never write back into the field the user is currently in
       if (input === document.activeElement) continue;
 
-      dom.setValue(input, input.classList.contains('slider-track')
+      setValue(input, input.classList.contains('slider-track')
         ? (numbers[index] ?? numbers[0])
         : shown(index));
     }

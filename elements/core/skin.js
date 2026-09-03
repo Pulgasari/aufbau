@@ -6,7 +6,8 @@
 // a sub layer sorts after its parent, so the skin wins against structure while
 // any unlayered page rule still beats both.
 
-import * as dom from '@domina/core';
+import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
+import { releaseStylesheet } from '@domina/methods/releaseStylesheet.js';
 import { getConfig, onConfigChange, setConfig } from './AufbauConfig.js';
 import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
 
@@ -45,8 +46,8 @@ function applySkin (skin = getConfig(CONFIG_KEY, DEFAULT_SKIN)) {
   ensureLayerOrder();
 
   // replace keeps the sheet's position in the cascade stable across a switch
-  if (next)     return dom.adoptStylesheet(skinUrl(next), { key: SKIN_KEY, layer: SKIN_LAYER, replace: previous != null });
-  if (previous) return dom.releaseStylesheet(SKIN_KEY);
+  if (next)     return adoptStylesheet(skinUrl(next), { key: SKIN_KEY, layer: SKIN_LAYER, replace: previous != null });
+  if (previous) return releaseStylesheet(SKIN_KEY);
 }
 
 // switches the skin at runtime. `null`, 'none' and 'off' remove it
