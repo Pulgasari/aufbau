@@ -2,7 +2,7 @@
 
 import initDefaultStylesheet from './ss.js';
 import aufbau, { dom, html, preact, signalStore as aufbauStore, str } from '@aufbau/kits/preact-htm';
-import { isArray, isFn, isString } from '@aufbau/js';
+import { isArray, isFn, isString } from '@pulgasari/is';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
 const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax

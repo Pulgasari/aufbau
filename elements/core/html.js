@@ -1,4 +1,6 @@
-// @aufbau/js/html.js
+// @aufbau/elements/core/html.js
+// internal html tagged-template helper. was @aufbau/js/html.js before the
+// js grab-bag was dissolved; lives here now because only elements use it.
 
 const RAW = Symbol.for('aufbau.raw');
 

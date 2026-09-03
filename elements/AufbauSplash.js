@@ -12,7 +12,8 @@
 // and after the upgrade and makes the handover a literal no-op.
 
 import { AufbauElement } from './core/index.js';
-import { ready, sleep }  from '@aufbau/js';
+import { ready } from '@pulgasari/ready';
+import { sleep } from '@pulgasari/timing';
 
 // removal is idempotent, so the backstop only has to be generously longer than
 // the dismiss animation, not exact

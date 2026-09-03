@@ -1,7 +1,7 @@
 // <aufbau-flag>
 
 import { AufbauElement } from './core/index.js';
-import { html } from '@aufbau/js';
+import { html } from './core/html.js';
 
 // circle-flags ships 1:1 art, flagpack ships 4:3
 const ICON_SETS = { circle: 'circle-flags', square: 'flagpack', '4x3': 'flagpack' };

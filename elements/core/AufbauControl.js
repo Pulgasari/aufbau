@@ -9,12 +9,12 @@
 // shared state (disabled, aria, form value, validity) is applied.
 
 import AufbauCore         from './AufbauCore.js';
-import { createLogger }   from '@aufbau/js';
+import { Logger }         from '@pulgasari/logger';
 import { resolvePersist } from './persist.js';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
 
-const log = createLogger('aufbau-control');
+const log = new Logger({ prefix: 'aufbau-control' });
 
 export class AufbauControl extends AufbauCore (HTMLElement) {
 

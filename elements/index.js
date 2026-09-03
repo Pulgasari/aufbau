@@ -7,10 +7,8 @@ or registerAll() to get everything at once.
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
-// only toPascalCase is needed here. import the leaf directly instead of the
-// @aufbau/js barrel: that barrel export-*'s @domina/core, @bunker/utils and the
-// pulgasari utils, so pulling it just to resolve one string helper would drag
-// the whole vendor graph onto the loader's critical path. keeps the entry lean.
+// only toPascalCase is needed here, imported straight from its leaf so the
+// loader stays lean and pulls nothing else onto its critical path.
 import { toPascalCase } from '@pulgasari/str';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::

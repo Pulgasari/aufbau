@@ -3,7 +3,7 @@
 // replaces the three near identical normalize() copies that used to live in
 // AufbauCombobox, AufbauSwitch and AufbauDatalist.
 
-import { isArray, isPlainObject } from '@aufbau/js';
+import { isArray, isPlainObject } from '@pulgasari/is';
 
 // wrapped payloads are common enough that unwrapping them is worth doing here
 const unwrap = (data) =>

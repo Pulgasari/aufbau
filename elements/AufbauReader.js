@@ -6,7 +6,7 @@
 
 import { AufbauElement } from './core/index.js';
 import { importFile, renderMD } from '@aufbau/import';
-import { html, raw as rawHtml } from '@aufbau/js';
+import { html, raw as rawHtml } from './core/html.js';
 
 export default class AufbauReader extends AufbauElement {
   static attr = {

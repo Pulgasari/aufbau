@@ -14,7 +14,7 @@
     "@aufbau/import"     : "jsr:@aufbau/import@^1.0.0",
     "@aufbau/patterns"   : "jsr:@aufbau/patterns@^1.0.0",
     "@aufbau/stylesheet" : "jsr:@aufbau/stylesheet@^1.0.0",
-    "@aufbau/utils"      : "jsr:@aufbau/utils@^1.0.0",
+    "@aufbau/signals"    : "jsr:@aufbau/signals@^1.0.0",
     "htm"                : "npm:htm@^3.1.1",
     "preact"             : "npm:preact@^10.22.0",
     "preact/hooks"       : "npm:preact@^10.22.0/hooks",

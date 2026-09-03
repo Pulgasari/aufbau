@@ -3,7 +3,7 @@
 
 import { AufbauDatalistElement, normalizeOptions } from './core/index.js';
 import { importFile } from '@aufbau/import';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 
 export default class AufbauDatalist extends AufbauDatalistElement {
   static attr = {

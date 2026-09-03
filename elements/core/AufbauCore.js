@@ -7,14 +7,13 @@ import { applySkin }        from './skin.js';
 import { adoptClassStyles } from './styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-import {
-  dom, //delegate, disposer, emitEvent, offEvent, onEvent
-  coerce, createLogger, 
-  isArray, isFn, isPlainObject, isString,
-  toBoolean, toCamelCase, toKebabCase,
-} from '@aufbau/js';
+import * as dom from '@domina/core';
+import { coerce, toBoolean } from '@pulgasari/coerce';
+import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
+import { toCamelCase, toKebabCase } from '@pulgasari/str';
+import { Logger } from '@pulgasari/logger';
 
-const log = createLogger('aufbau-core');
+const log = new Logger({ prefix: 'aufbau-core' });
 
 // :::::: DECORATION
 

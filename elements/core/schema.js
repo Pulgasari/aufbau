@@ -1,6 +1,8 @@
 // @aufbau/elements/core/schema.js
 
-import { isArray, isFn, isPlainObject, toArray, toKebabCase } from '@aufbau/js';
+import { isArray, isFn, isPlainObject } from '@pulgasari/is';
+import { toArray }     from '@pulgasari/coerce';
+import { toKebabCase } from '@pulgasari/str';
 
 const cache = new WeakMap;
 

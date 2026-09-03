@@ -12,7 +12,6 @@ import * as gestures   from '@aufbau/gestures';
 import      importFile from '@aufbau/import';
 import * as patterns   from '@aufbau/patterns';
 import * as stylesheet from '@aufbau/stylesheet';
-import * as utils      from '@aufbau/js';
 import * as webfonts   from '@aufbau/webfonts';
 
 import { boot, setConfig } from './boot.js';
@@ -61,7 +60,6 @@ const aufbau = {
   import: importFile,
   patterns,
   stylesheet,
-  utils,
   webfonts,
 
   // adapters

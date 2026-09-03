@@ -12,7 +12,7 @@ import htm from 'htm';
 import * as preactCore    from 'preact';
 import * as preactHooks   from 'preact/hooks';
 import * as preactSignals from '@preact/signals';
-import { betterSignal, signalStore } from './../js/preact/x.js';
+import { betterSignal, signalStore } from '@aufbau/signals';
 
 // :::::: BUNDLE ::::::::::::::::::::::::::::::::::::::::::::::::
 

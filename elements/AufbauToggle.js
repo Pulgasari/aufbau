@@ -2,7 +2,7 @@
 // a boolean. one-of-n belongs to <aufbau-picker>, not here.
 
 import { AufbauControl } from './core/index.js';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 
 let toggleUID = 0;
 
