@@ -3,7 +3,7 @@
 // a superset: it takes mimetypes ("image/*") as well as extensions (".pdf").
 
 import { AufbauControl } from './core/index.js';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 

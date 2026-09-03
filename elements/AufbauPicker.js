@@ -5,7 +5,8 @@
 
 import { AufbauControl, normalizeOptions, observeOptions, readOptions } from './core/index.js';
 import { importFile } from '@aufbau/import';
-import { attrs, html, isArray } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
+import { isArray }     from '@pulgasari/is';
 import * as dom from '@domina/core';
 
 export default class AufbauPicker extends AufbauControl {

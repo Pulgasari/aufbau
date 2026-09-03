@@ -4,11 +4,10 @@ import * as client   from './client.js';
 import * as dom      from '@domina/core';
 import { autoloader, registerAll }      from '@aufbau/elements';
 import { setConfig as setElementsConfig } from '@aufbau/elements/core/AufbauConfig.js';
-import * as utils    from '@aufbau/js';
+import { deepMerge } from '@pulgasari/obj';
 import * as webfonts from '@aufbau/webfonts';
 import config        from './config.js';
 
-const { arrayfied, deepMerge, isPlainObject } = utils;
 const  cssPath = 'https://code.pulgasari.dev/aufbau/css';
 const fontPath = 'https://code.pulgasari.dev/aufbau/webfonts/ttf';
 

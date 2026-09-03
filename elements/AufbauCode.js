@@ -3,7 +3,8 @@
 import { AufbauElement } from './core/index.js';
 import { getConfig, setConfig } from './core/AufbauConfig.js';
 import * as dom from '@domina/core';
-import { attrs, html, isFn } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
+import { isFn }        from '@pulgasari/is';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;

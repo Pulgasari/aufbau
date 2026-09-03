@@ -5,7 +5,7 @@
 // (look="markdown"), the value api below stays the same either way.
 
 import { AufbauControl } from './core/index.js';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 import * as dom from '@domina/core';
 
 export default class AufbauWriter extends AufbauControl {

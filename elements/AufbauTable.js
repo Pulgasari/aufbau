@@ -3,7 +3,9 @@
 import { AufbauElement } from './core/index.js';
 import { importFile }    from '@aufbau/import';
 import * as dom from '@domina/core';
-import { arrayfied, isArray, html } from '@aufbau/js';
+import { html }      from './core/html.js';
+import { arrayfied } from './core/utils.js';
+import { isArray }   from '@pulgasari/is';
 
 export default class AufbauTable extends AufbauElement {
   static attr = {

@@ -1,7 +1,6 @@
 // @aufbau/elements/core/utils.js
 
-import { dom } from '@aufbau/js';
-//import { emitEvent, offEvent, onEvent } from '@aufbau/js';
+import * as dom from '@domina/core';
 export { dom };
 
 export const arrayfied = value => Array.isArray(value) ? value : [value];

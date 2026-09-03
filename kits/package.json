@@ -16,7 +16,7 @@
     "@aufbau/import"     : "workspace:*",
     "@aufbau/patterns"   : "workspace:*",
     "@aufbau/stylesheet" : "workspace:*",
-    "@aufbau/utils"      : "workspace:*",
+    "@aufbau/signals"    : "workspace:*",
     "@bunker/kit"        : "^0.1.0"
   },
   "peerDependencies": {

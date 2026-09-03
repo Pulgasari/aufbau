@@ -1,7 +1,8 @@
 // <aufbau-toc>
 
 import { AufbauElement } from './core/index.js';
-import { html, toSlug } from '@aufbau/js';
+import { html }    from './core/html.js';
+import { toSlug }  from '@pulgasari/str';
 import * as dom from '@domina/core';
 
 export default class AufbauToc extends AufbauElement {

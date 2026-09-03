@@ -1,7 +1,7 @@
 // <aufbau-button>
 
 import { AufbauElement } from './core/index.js';
-import { html, raw as rawHtml } from '@aufbau/js';
+import { html, raw as rawHtml } from './core/html.js';
 import * as dom from '@domina/core';
 
 export default class AufbauButton extends AufbauElement {

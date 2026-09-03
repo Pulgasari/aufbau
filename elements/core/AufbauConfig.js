@@ -4,12 +4,17 @@
 
 // :::::: IMPORTS
 
-import { CanonicalMap, createLogger, dom, isArray, isPlainObject, isString, toJson, str } from '@aufbau/js';
+import { CanonicalMap } from '@pulgasari/canonicalmap';
+import { Logger }       from '@pulgasari/logger';
+import { isArray, isPlainObject, isString } from '@pulgasari/is';
+import { toJson }       from '@pulgasari/coerce';
+import { str }          from '@pulgasari/str';
+import * as dom         from '@domina/core';
 const { toKebabCase } = str;
 
 // ::::::
 
-const log = createLogger('aufbau-config');
+const log = new Logger({ prefix: 'aufbau-config' });
 const AufbauConfigStore = new CanonicalMap; // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
 const DEFAULTS     = Symbol('defaults');

@@ -3,7 +3,7 @@
 // type="range" lives in <aufbau-slider>, type="file" in <aufbau-upload>.
 
 import { AufbauControl, TYPE_NAMES, valueType } from './core/index.js';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 import * as dom from '@domina/core';
 
 // value domains that <aufbau-input> deliberately does not carry

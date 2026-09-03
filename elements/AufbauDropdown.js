@@ -4,7 +4,7 @@
 // <aufbau-picker look="combobox">.
 
 import { AufbauElement } from './core/index.js';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 import * as dom from '@domina/core';
 
 export default class AufbauDropdown extends AufbauElement {

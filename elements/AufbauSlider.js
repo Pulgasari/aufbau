@@ -4,7 +4,7 @@
 // implementation. `range` turns it into a two handle span.
 
 import { AufbauControl, AXIS_TYPES, valueType } from './core/index.js';
-import { attrs, html } from '@aufbau/js';
+import { attrs, html } from './core/html.js';
 import * as dom from '@domina/core';
 
 export default class AufbauSlider extends AufbauControl {
