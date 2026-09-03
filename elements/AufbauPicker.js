@@ -7,7 +7,9 @@ import { AufbauControl, normalizeOptions, observeOptions, readOptions } from './
 import { importFile } from '@aufbau/import';
 import { attrs, html } from './core/html.js';
 import { isArray }     from '@pulgasari/is';
-import * as dom from '@domina/core';
+import { filterElements } from '@domina/methods/filterElements.js';
+import { setAttr } from '@domina/methods/setAttr.js';
+import { setValue } from '@domina/methods/setValue.js';
 
 export default class AufbauPicker extends AufbauControl {
   static attr = {
@@ -281,18 +283,18 @@ export default class AufbauPicker extends AufbauControl {
       if (list.showPopover && !list.matches(':popover-open')) {
         list.showPopover();
       } else {
-        dom.setAttr(list, { hidden: false });
+        setAttr(list, { hidden: false });
       }
       this.updatePlacement();
     } else {
       if (list.hidePopover && list.matches(':popover-open')) {
         list.hidePopover();
       } else {
-        dom.setAttr(list, { hidden: true });
+        setAttr(list, { hidden: true });
       }
     }
 
-    dom.setAttr(this.$('.picker-field'), { ariaExpanded: String(open) });
+    setAttr(this.$('.picker-field'), { ariaExpanded: String(open) });
     this.classList.toggle('is-open', open);
   }
 
@@ -328,7 +330,7 @@ export default class AufbauPicker extends AufbauControl {
   }
 
   filter (query) {
-    dom.filterElements({
+    filterElements({
       container     : this.$('.picker-list'),
       item          : '.picker-option',
       filters       : [['', query, 'contains']],
@@ -427,7 +429,7 @@ export default class AufbauPicker extends AufbauControl {
     const input = this.$('.picker-input');
     if (input && input !== document.activeElement) {
       const labels = this.options.filter(entry => selected.has(entry.value)).map(entry => entry.label);
-      dom.setValue(input, labels.join(', '));
+      setValue(input, labels.join(', '));
     }
   }
 }

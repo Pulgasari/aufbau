@@ -3,7 +3,9 @@
 import { AufbauElement } from './core/index.js';
 import { html }    from './core/html.js';
 import { toSlug }  from '@pulgasari/str';
-import * as dom from '@domina/core';
+import { getElement }  from '@domina/methods/getElement.js';
+import { getElements } from '@domina/methods/getElements.js';
+import { observe }     from '@domina/observer';
 
 export default class AufbauToc extends AufbauElement {
   static attr = {
@@ -26,12 +28,12 @@ export default class AufbauToc extends AufbauElement {
     this._stopWatching = null;
 
     const { target, selector } = this.getAttr();
-    const container = target ? dom.getElement(target) : null;
+    const container = target ? getElement(target) : null;
     if (!container) return;
 
     const rescan = () => this.invalidate().update();
 
-    this._stopWatching = this.track(dom.observe(selector, {
+    this._stopWatching = this.track(observe(selector, {
       within    : container,
       onInit    : rescan,
       onAdded   : rescan,
@@ -42,10 +44,10 @@ export default class AufbauToc extends AufbauElement {
   /** headings need stable ids to be linkable, so they get one if missing */
   collect () {
     const { target, selector } = this.getAttr();
-    const container = target ? dom.getElement(target) : null;
+    const container = target ? getElement(target) : null;
     if (!container) return [];
 
-    return dom.getElements(selector, container).map((el, index) => {
+    return getElements(selector, container).map((el, index) => {
       const text  = el.textContent?.trim() || '';
       const level = Number(/^H([1-6])$/i.exec(el.tagName)?.[1] ?? el.dataset.level ?? 1);
 

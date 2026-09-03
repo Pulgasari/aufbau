@@ -9,7 +9,8 @@ import { Logger }       from '@pulgasari/logger';
 import { isArray, isPlainObject, isString } from '@pulgasari/is';
 import { toJson }       from '@pulgasari/coerce';
 import { str }          from '@pulgasari/str';
-import * as dom         from '@domina/core';
+import { emitEvent } from '@domina/methods/emitEvent.js';
+import { onEvent } from '@domina/methods/onEvent.js';
 const { toKebabCase } = str;
 
 // ::::::
@@ -69,7 +70,7 @@ export function commitConfig () {
   AufbauConfigStore.merge(next);
 
   if (typeof window !== 'undefined') {
-    dom.emitEvent (window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
+    emitEvent (window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
   }
 
   return changed;
@@ -78,7 +79,7 @@ export function commitConfig () {
 // :::::: PUBLIC API :::::::::::::::::::::::::::::::::::::::::::
 
 const canonicalKey   = (key)      => AufbauConfigStore.key(key);
-const onConfigChange = (listener) => dom.onEvent (window, CONFIG_EVENT, listener);
+const onConfigChange = (listener) => onEvent (window, CONFIG_EVENT, listener);
 const setConfig      = (a,b,c)    => isString(a) ? setConfigValue(a,b,c) : setConfigObject(a,b);
 
 /** key accepts any case form, 'codeTheme' and 'code-theme' resolve alike */

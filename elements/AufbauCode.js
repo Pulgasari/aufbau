@@ -2,7 +2,7 @@
 
 import { AufbauElement } from './core/index.js';
 import { getConfig, setConfig } from './core/AufbauConfig.js';
-import * as dom from '@domina/core';
+import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { attrs, html } from './core/html.js';
 import { isFn }        from '@pulgasari/is';
 
@@ -78,7 +78,7 @@ setConfig({ 'code-theme': 'github-dark' }, { layer: 'defaults' });
  * adoption; adopted sheets cascade after author styles, so a page level hljs
  * <link> is overridden without !important.
  */
-const loadTheme = (theme) => dom.adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
+const loadTheme = (theme) => adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
   scope : `aufbau-code[${THEME_ATTR}="${theme}"]`,
   key   : `hljs:${theme}`,
 });

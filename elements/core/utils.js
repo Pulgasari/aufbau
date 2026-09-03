@@ -1,7 +1,7 @@
 // @aufbau/elements/core/utils.js
 
-import * as dom from '@domina/core';
-export { dom };
+import { offEvent } from '@domina/methods/offEvent.js';
+import { onEvent }  from '@domina/methods/onEvent.js';
 
 export const arrayfied = value => Array.isArray(value) ? value : [value];
 
@@ -23,8 +23,8 @@ export function decorate (target) {
   decorated.add(target);
 
   return define(target, {
-    on  (...args) { return dom.onEvent  (this, ...args); },
-    off (...args) { return dom.offEvent (this, ...args); }
+    on  (...args) { return onEvent  (this, ...args); },
+    off (...args) { return offEvent (this, ...args); }
   });
 }
 

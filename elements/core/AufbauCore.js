@@ -7,7 +7,15 @@ import { applySkin }        from './skin.js';
 import { adoptClassStyles } from './styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-import * as dom from '@domina/core';
+import { delegateEvent } from '@domina/methods/delegateEvent.js';
+import { emitEvent } from '@domina/methods/emitEvent.js';
+import { getElement } from '@domina/methods/getElement.js';
+import { getElementById } from '@domina/methods/getElementById.js';
+import { getElements } from '@domina/methods/getElements.js';
+import { hasAttr } from '@domina/methods/hasAttr.js';
+import { offEvent } from '@domina/methods/offEvent.js';
+import { onEvent } from '@domina/methods/onEvent.js';
+import { setAttr } from '@domina/methods/setAttr.js';
 import { coerce, toBoolean } from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
 import { toCamelCase, toKebabCase } from '@pulgasari/str';
@@ -32,8 +40,8 @@ function decorate (target) {
   decorated.add(target);
 
   return define(target, {
-    on  (...args) { return dom.onEvent  (this, ...args); },
-    off (...args) { return dom.offEvent (this, ...args); }
+    on  (...args) { return onEvent  (this, ...args); },
+    off (...args) { return offEvent (this, ...args); }
   });
 }
 
@@ -225,21 +233,21 @@ return class extends BaseClass {
     // delegated: type first, selector second. dom.delegate takes
     // (container, types, selector, fn), so the order carries straight through
     if (isString(first) && isString(second) && isFn(third)) {
-      return this.track(dom.delegateEvent(this, first, second, third, fourth));
+      return this.track(delegateEvent(this, first, second, third, fourth));
     }
 
     // the element itself
     if (isString(first) && isFn(second)) {
-      return this.track(dom.onEvent(this, first, second, third));
+      return this.track(onEvent(this, first, second, third));
     }
 
     // any external event target or iterable of targets
     if (!first) return () => {};
-    return this.track(dom.onEvent(first, second, third, fourth));
+    return this.track(onEvent(first, second, third, fourth));
   }
 
-  off  (...args) { dom.offEvent(this, ...args); return this; }
-  emit (...args) { return dom.emitEvent(this, ...args); }
+  off  (...args) { offEvent(this, ...args); return this; }
+  emit (...args) { return emitEvent(this, ...args); }
 
   onOutside (handler, { type = 'pointerdown' } = {}) {
     return this.on(document, type, (event) => {
@@ -252,8 +260,8 @@ return class extends BaseClass {
 
   // :::::: ATTRIBUTES ::::::::::::::::::::::::::::::::::::::::::
 
-  hasAttr (name) { return dom.hasAttr(this, name); }
-  setAttr (map)  { dom.setAttr(this, map); return this; }
+  hasAttr (name) { return hasAttr(this, name); }
+  setAttr (map)  { setAttr(this, map); return this; }
 
   getAttr (nameOrType, type, fallback) {
     if (!isString(nameOrType)) return this._attrProxy(isFn(nameOrType) ? nameOrType : null);
@@ -351,20 +359,20 @@ return class extends BaseClass {
 
   get $ () {
     const root    = this.root;
-    const findOne = spec => decorate(dom.getElement(spec, root));
+    const findOne = spec => decorate(getElement(spec, root));
   
     return new Proxy(findOne, {
       apply: (target, thisArg, args) => findOne(...args),
       get (target, prop) {
         if (prop in target)  return target[prop];
         if (!isString(prop)) return undefined;
-        return decorate(dom.getElementById(toKebabCase(prop), root) ?? dom.getElementById(prop, root));
+        return decorate(getElementById(toKebabCase(prop), root) ?? getElementById(prop, root));
       }
     });
   }
   
   get $$ () {
-    return spec => decorateAll(dom.getElements(spec, this.root));
+    return spec => decorateAll(getElements(spec, this.root));
   }
 
 };};

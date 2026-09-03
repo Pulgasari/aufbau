@@ -6,7 +6,8 @@
 
 import { AufbauControl } from './core/index.js';
 import { attrs, html } from './core/html.js';
-import * as dom from '@domina/core';
+import { setAttr } from '@domina/methods/setAttr.js';
+import { setValue } from '@domina/methods/setValue.js';
 
 export default class AufbauWriter extends AufbauControl {
   static attr = {
@@ -121,11 +122,11 @@ export default class AufbauWriter extends AufbauControl {
 
     // never write back into the field while the user is typing in it
     if (field !== document.activeElement) {
-      dom.setValue(field, value);
+      setValue(field, value);
       this.grow(field);
     }
 
-    dom.setAttr(field, { readOnly: this.getAttr('readonly') });
+    setAttr(field, { readOnly: this.getAttr('readonly') });
 
     const counter = this.$('.writer-counter');
     if (counter) {

@@ -5,7 +5,7 @@
 
 import { AufbauElement } from './core/index.js';
 import { attrs, html } from './core/html.js';
-import * as dom from '@domina/core';
+import { setAttr } from '@domina/methods/setAttr.js';
 
 export default class AufbauDropdown extends AufbauElement {
   static attr = {
@@ -125,7 +125,7 @@ export default class AufbauDropdown extends AufbauElement {
   sync () {
     const { disabled, open, placement } = this.getAttr();
 
-    dom.setAttr(this.$('.dropdown-trigger'), { ariaExpanded: String(open), disabled });
+    setAttr(this.$('.dropdown-trigger'), { ariaExpanded: String(open), disabled });
     this.classList.toggle('is-open', open);
     this.dataset.placement = placement;
 
@@ -137,7 +137,7 @@ export default class AufbauDropdown extends AufbauElement {
       menu.append(child);
     }
 
-    dom.setAttr(menu, { hidden: !open });
+    setAttr(menu, { hidden: !open });
   }
 }
 
