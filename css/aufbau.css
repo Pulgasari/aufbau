@@ -45,8 +45,11 @@ button {
   flex-direction  : row;
   justify-content : center;
 
+  text-box: trim-both cap alphabetic;
+  /*
   text-box-edge: text text;
   text-box-trim: trim-both;
+  */
 }
 
 div { min-height: 0; }
