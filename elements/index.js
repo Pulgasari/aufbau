@@ -7,9 +7,11 @@ or registerAll() to get everything at once.
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
-//import { dom, gate, quiescent, toPascalCase } from '@aufbau/js';
-import { dom, str } from '@aufbau/js';
-const { toPascalCase } = str;
+// only toPascalCase is needed here. import the leaf directly instead of the
+// @aufbau/js barrel: that barrel export-*'s @domina/core, @bunker/utils and the
+// pulgasari utils, so pulling it just to resolve one string helper would drag
+// the whole vendor graph onto the loader's critical path. keeps the entry lean.
+import { toPascalCase } from '@pulgasari/str';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -82,8 +84,14 @@ function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export * from './core/index.js';
-export * from './core/AufbauConfig.js';
+// the entry stays a lean, lazy loader and does NOT re-export the core
+// foundation. re-exporting it (export * from './core/index.js') made a bare
+// `import { autoloader }` eagerly fetch and evaluate AufbauCore/Control/skin/
+// styles/persist, and through them @domina/core and @bunker/storage, before
+// autoloader() could even run its dom scan. consumers that need the base
+// classes or the config api import them from the subpath directly:
+//   import { AufbauElement }        from '@aufbau/elements/core/index.js';
+//   import { setConfig, getConfig } from '@aufbau/elements/core/AufbauConfig.js';
 
 export {
   autoloader,

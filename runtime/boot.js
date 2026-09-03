@@ -2,7 +2,8 @@
 
 import * as client   from './client.js';
 import * as dom      from '@domina/core';
-import * as elements from '@aufbau/elements';
+import { autoloader, registerAll }      from '@aufbau/elements';
+import { setConfig as setElementsConfig } from '@aufbau/elements/core/AufbauConfig.js';
 import * as utils    from '@aufbau/js';
 import * as webfonts from '@aufbau/webfonts';
 import config        from './config.js';
@@ -21,7 +22,7 @@ console.log('[@aufbau/runtime] config:', config);
 
 function setConfig (options = {}) {
   deepMerge(config, options);
-  elements.setConfig(config.elements, { layer: 'defaults' });
+  setElementsConfig(config.elements, { layer: 'defaults' });
   return config;
 }
 
@@ -42,8 +43,8 @@ const initAppearance = () => {
 }
 
 const initElements = async ({ mode = 'auto' }) => {
-       if (mode === 'auto')      elements.autoloader();
-  else if (mode === 'all') await elements.registerAll();
+       if (mode === 'auto')      autoloader();
+  else if (mode === 'all') await registerAll();
 }
 
 const initStylesheet = (bool) => bool && client.observeStylesheets();
