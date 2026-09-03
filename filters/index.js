@@ -84,9 +84,9 @@ function variantId (id, meta, options) {
   return `${svgId(id)}-${suffix}`;
 }
 
-// injects a filter's <filter> into the shared host once, without touching any
-// target. the stylesheet skill calls this so a compiled `filter: url(#id)` has its
-// definition present. defaults to the live form so custom properties stay in play;
+// injects a filter's <filter> into the shared host once, without touching any target. 
+// the stylesheet skill calls this so a compiled `filter: url(#id)` has its definition present.
+// defaults to the live form so custom properties stay in play;
 // non-default structural options get their own variant element.
 async function ensureFilter (id, options = {}) {
   const host      = defsHost();
@@ -148,8 +148,9 @@ function removeFilter (target) {
   }
 }
 
-// binds one filter + option set into a small, backend-aware handle, handy for
-// stylescript and component code: `const glitch = useFilter('glitch-rgb', { offsetX: 6 })`.
+// binds one filter + option set into a small, backend-aware handle, 
+// handy for stylescript and component code: 
+// const glitch = useFilter('glitch-rgb', { offsetX: 6 })
 function useFilter (id, options = {}) {
   return {
     id,
@@ -162,6 +163,19 @@ function useFilter (id, options = {}) {
     remove   : target => removeFilter(target),
   };
 }
+
+/*
+--- besser wäre:
+CanvasFilter
+CSSFilter
+SVGFilter
+WebGLFilter
+
+apply
+load / ensure
+remove
+use
+*/
 
 export {
   applyFilter,
