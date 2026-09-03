@@ -44,6 +44,9 @@ button {
   display         : inline-flex;
   flex-direction  : row;
   justify-content : center;
+
+  text-box-edge: text text;
+  text-box-trim: trim-both;
 }
 
 div { min-height: 0; }
