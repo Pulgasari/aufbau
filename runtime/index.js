@@ -4,7 +4,9 @@
 
 // ::: AUFBAU
 
-import * as elements   from '@aufbau/elements';
+import * as elementsLoader from '@aufbau/elements';
+import * as elementsCore    from '@aufbau/elements/core/index.js';
+import * as elementsConfig  from '@aufbau/elements/core/AufbauConfig.js';
 import * as filters    from '@aufbau/filters';
 import * as gestures   from '@aufbau/gestures';
 import      importFile from '@aufbau/import';
@@ -30,6 +32,15 @@ import      str    from '@pulgasari/str';
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
 const dom = domina;
+
+// the @aufbau/elements entry is now a lean lazy loader and no longer re-exports
+// the core foundation. this bundle is the heavy "everything" entry, so it
+// reconstructs the historical elements surface (loader api + core classes +
+// config) from the subpaths. `export *` never forwards a default, so the config
+// default (the AufbauConfig class, already present as a named export) is
+// stripped to reproduce the old namespace shape exactly.
+const { default: _aufbauConfigDefault, ...elementsConfigExports } = elementsConfig;
+const elements = { ...elementsCore, ...elementsConfigExports, ...elementsLoader };
 
 const aufbau = {
   // deprecated
