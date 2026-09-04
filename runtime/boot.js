@@ -3,7 +3,7 @@
 import * as client from './client.js';
 import      config from './config.js';
 
-import { autoloader, registerAll }        from '@aufbau/elements';
+import * as elements                      from '@aufbau/elements';
 import { setConfig as setElementsConfig } from '@aufbau/elements/core/AufbauConfig.js';
 import * as webfonts                      from '@aufbau/webfonts';
 
@@ -45,8 +45,8 @@ const initAppearance = () => {
 }
 
 const initElements = async ({ mode = 'auto' }) => {
-       if (mode === 'auto')      autoloader();
-  else if (mode === 'all') await registerAll();
+       if (mode === 'auto')      elements.autoloader();
+  else if (mode === 'all') await elements.registerAll();
 }
 
 const initStylesheet = (bool) => bool && client.observeStylesheets();
