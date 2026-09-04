@@ -9,8 +9,8 @@
 // shared state (disabled, aria, form value, validity) is applied.
 
 import AufbauCore         from './AufbauCore.js';
-import { Logger }         from '@pulgasari/logger';
 import { resolvePersist } from './persist.js';
+import { Logger }         from '@pulgasari/logger';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
 
@@ -58,13 +58,8 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   }
 
   connectedCallback () {
-    // strictly before readPersisted(), otherwise a restored value would become
-    // the state form.reset() goes back to
-    this.captureDefaults();
-
-    // before super, so the very first update() already sees the restored state
-    this.readPersisted();
-
+    this.captureDefaults(); // strictly before readPersisted(), otherwise a restored value would become the state form.reset() goes back to      
+    this.readPersisted(); // before super, so the very first update() already sees the restored state    
     super.connectedCallback();
   }
 
@@ -121,14 +116,14 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
 
   // :::::: FORM ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  get form              () { return this._internals?.form ?? null; }
-  get labels            () { return this._internals?.labels ?? []; }
-  get validity          () { return this._internals?.validity ?? null; }
-  get validationMessage () { return this._internals?.validationMessage ?? ''; }
-  get willValidate      () { return this._internals?.willValidate ?? false; }
+  get form              () { return this._internals?.form              ?? null;  }
+  get labels            () { return this._internals?.labels            ?? [];    }
+  get validity          () { return this._internals?.validity          ?? null;  }
+  get validationMessage () { return this._internals?.validationMessage ?? '';    }
+  get willValidate      () { return this._internals?.willValidate      ?? false; }
 
-  checkValidity   () { return this._internals?.checkValidity()   ?? true; }
-  reportValidity  () { return this._internals?.reportValidity()  ?? true; }
+  checkValidity   () { return this._internals?.checkValidity()  ?? true; }
+  reportValidity  () { return this._internals?.reportValidity() ?? true; }
 
   setCustomValidity (message) {
     this._customError = message || '';
@@ -149,10 +144,8 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
    * then narrowing with their own setValidity() call.
    */
   validate () {
-    const internals = this._internals;
-    if (!internals) return this;
-
-    const anchor = this.focusTarget ?? this;
+    const internals = this._internals; if (!internals) return this;
+    const anchor    = this.focusTarget ?? this;
 
     if (this._customError) internals.setValidity({ customError: true }, this._customError, anchor);
     else if (this.getAttr('required') && this.formValue == null) {
@@ -164,7 +157,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   }
 
   formResetCallback        ()         { this.commit(this.defaultValue, { notify: false }); }
-  formStateRestoreCallback (state)    { this.commit(state, { notify: false }); }
+  formStateRestoreCallback (state)    { this.commit(state,             { notify: false }); }
   formDisabledCallback     (disabled) { this._formDisabled = disabled; this.update(); }
 
   // :::::: PERSISTENCE :::::::::::::::::::::::::::::::::::::::::::
@@ -199,9 +192,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   restorePersisted (state) { this.formStateRestoreCallback(state); }
 
   readPersisted () {
-    const target = this.persistTarget;
-    if (!target) return this;
-
+    const target = this.persistTarget; if (!target) return this;
     const stored = target.store.getSync(target.key);
     if (stored !== null) {
       this._persistedLast = stored;
@@ -212,10 +203,8 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   }
 
   savePersisted () {
-    const target = this.persistTarget;
-    if (!target) return this;
-
-    const state = this.persistedState;
+    const target = this.persistTarget; if (!target) return this;
+    const state  = this.persistedState;
     if (state === this._persistedLast) return this;
 
     // an empty control that was never stored has nothing worth writing. without
@@ -236,9 +225,8 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   get focusTarget () { return this.$(FOCUSABLE); }
 
   focus (options) {
-    const target = this.focusTarget;
-    if (target) target.focus(options);
-    else HTMLElement.prototype.focus.call(this, options);
+    this.focusTarget?.focus(options)
+    ?? HTMLElement.prototype.focus.call(this, options);
   }
 
   blur () { (this.focusTarget ?? this).blur(); }
@@ -261,7 +249,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
 
     // a disabled control must drop out of the tab order entirely
     if (disabled) this.setAttribute('tabindex', '-1');
-    else this.removeAttribute('tabindex');
+    else          this.removeAttribute('tabindex');
 
     // only ever undo what WE disabled. an option that carries its own disabled
     // attribute must survive the host being re-enabled
