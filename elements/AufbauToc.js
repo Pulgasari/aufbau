@@ -1,8 +1,9 @@
 // <aufbau-toc>
 
 import { AufbauElement } from './core/index.js';
-import { html }    from './core/html.js';
-import { toSlug }  from '@pulgasari/str';
+import { html }          from './core/html.js';
+
+import { toSlug }      from '@pulgasari/str';
 import { getElement }  from '@domina/methods/getElement.js';
 import { getElements } from '@domina/methods/getElements.js';
 import { observe }     from '@domina/observer';
@@ -67,7 +68,9 @@ export default class AufbauToc extends AufbauElement {
         <h4>${title}</h4>
         <ul>
           ${items.map(item => html`
-            <li class="toc-level-${item.level}"><a href="#${item.id}">${item.text}</a></li>
+            <li class="toc-level-${item.level}">
+              <a href="#${item.id}">${item.text}</a>
+            </li>
           `)}
         </ul>
       </nav>
