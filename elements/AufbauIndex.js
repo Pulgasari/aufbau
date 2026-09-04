@@ -64,9 +64,8 @@ export default class AufbauIndex extends AufbauElement {
   onUnmount () { this._resize?.destroy(); this._resize = null; }
 
   onAttributeChange (name) {
-    if (name === 'item-size-min' || name === 'item-size-max') this.syncResize();
-    // an explicit size from the author takes over from a live resize
-    else if (name === 'item-size' || name === 'item-look') this._resizeValue = null;
+         if (name === 'item-size-min' || name === 'item-size-max') this.syncResize();
+    else if (name === 'item-size'     || name === 'item-look')     this._resizeValue = null;
   }
   
   async syncResize () {
