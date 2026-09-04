@@ -128,12 +128,7 @@ export function initWorker() {
       event.respondWith(
         caches.open(CACHE_NAME).then(async (cache) => {
           const cachedResponse = await cache.match(event.request);
-          
-          // Return cached response if compiled CSS exists, otherwise fetch original
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          return fetch(event.request);
+          return cachedResponse ?? fetch(event.request);
         })
       );
     }
