@@ -1,8 +1,8 @@
 // @aufbau/elements/core/schema.js
 
 import { isArray, isFn, isPlainObject } from '@pulgasari/is';
-import { toArray }     from '@pulgasari/coerce';
-import { toKebabCase } from '@pulgasari/str';
+import { toArray }                      from '@pulgasari/coerce';
+import { toKebabCase }                  from '@pulgasari/str';
 
 const cache = new WeakMap;
 
@@ -52,8 +52,8 @@ const attrOwners = (Class) => {
 
 // both the array shorthand (`['src', 'alt']`) and the object form normalize to entries
 const entriesOf = (attr) =>
-    isArray(attr)       ? attr.map(name => [name, String])
-  : isPlainObject(attr) ? Object.entries(attr)
+    isArray       (attr) ? attr.map(name => [name, String])
+  : isPlainObject (attr) ? Object.entries(attr)
   : [];
 
 /**
