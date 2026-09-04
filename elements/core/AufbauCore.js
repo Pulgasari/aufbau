@@ -7,19 +7,20 @@ import { applySkin }        from './skin.js';
 import { adoptClassStyles } from './styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-import { delegateEvent } from '@domina/methods/delegateEvent.js';
-import { emitEvent } from '@domina/methods/emitEvent.js';
-import { getElement } from '@domina/methods/getElement.js';
+import { delegateEvent }  from '@domina/methods/delegateEvent.js';
+import { emitEvent }      from '@domina/methods/emitEvent.js';
+import { getElement }     from '@domina/methods/getElement.js';
 import { getElementById } from '@domina/methods/getElementById.js';
-import { getElements } from '@domina/methods/getElements.js';
-import { hasAttr } from '@domina/methods/hasAttr.js';
-import { offEvent } from '@domina/methods/offEvent.js';
-import { onEvent } from '@domina/methods/onEvent.js';
-import { setAttr } from '@domina/methods/setAttr.js';
-import { coerce, toBoolean } from '@pulgasari/coerce';
+import { getElements }    from '@domina/methods/getElements.js';
+import { hasAttr }        from '@domina/methods/hasAttr.js';
+import { offEvent }       from '@domina/methods/offEvent.js';
+import { onEvent }        from '@domina/methods/onEvent.js';
+import { setAttr }        from '@domina/methods/setAttr.js';
+
+import { coerce, toBoolean }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
-import { toCamelCase, toKebabCase } from '@pulgasari/str';
-import { Logger } from '@pulgasari/logger';
+import { toCamelCase, toKebabCase }               from '@pulgasari/str';
+import { Logger }                                 from '@pulgasari/logger';
 
 const log = new Logger({ prefix: 'aufbau-core' });
 
