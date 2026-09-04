@@ -6,7 +6,7 @@
 // a sub layer sorts after its parent, so the skin wins against structure while
 // any unlayered page rule still beats both.
 
-import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
+import { adoptStylesheet }   from '@domina/methods/adoptStylesheet.js';
 import { releaseStylesheet } from '@domina/methods/releaseStylesheet.js';
 import { getConfig, onConfigChange, setConfig } from './AufbauConfig.js';
 import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
