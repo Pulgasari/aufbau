@@ -9,6 +9,7 @@ export default {
   // observe <link>/<style> and transform aufbau stylesheets client-side
   stylesheet : true,
 
+  /*
   // data
   data : {
     layouts : ['mobile'],
@@ -16,6 +17,7 @@ export default {
     skins   : ['monochrome'],
     themes  : ['classic', 'oled', 'rainbow', 'zombie'],
   },
+  */
 
   // appearance
   font : ['Manrope'],
