@@ -1,18 +1,17 @@
 // <aufbau-code>
 
-import { AufbauElement } from './core/index.js';
+import { attrs, html }          from './core/html.js';
+import { AufbauElement }        from './core/index.js';
 import { getConfig, setConfig } from './core/AufbauConfig.js';
+
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
-import { attrs, html } from './core/html.js';
-import { isFn }        from '@pulgasari/is';
+import { isFn }            from '@pulgasari/is';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
 const HLJS_STYLES  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/styles/`;
-const HLJS_INDEX   = `https://data.jsdelivr.com/v1/packages/npm/highlight.js@${HLJS_VERSION}?structure=flat`;
-
-// separate from [data-theme], which belongs to @aufbau/css themes
-const THEME_ATTR = 'data-hljs-theme';
+const HLJS_INDEX   = `https://data.jsdelivr.com/v1/packages/npm/highlight.js@${HLJS_VERSION}?structure=flat`;      
+const THEME_ATTR   = 'data-hljs-theme'; // separate from [data-theme], which belongs to @aufbau/css themes
 
 let hljsPromise   = null;
 let themesPromise = null;
@@ -22,9 +21,11 @@ let themesPromise = null;
  * self hosted build gets that one instance everywhere. the pinned cdn url is
  * only the fallback for pages without the aufbau import map.
  */
-const getHljs = () => (hljsPromise ??= import('hljs')
+const getHljs = () => (
+  hljsPromise ??= import('hljs')
   .catch(() => import(HLJS_MODULE))
-  .then(m => m.default));
+  .then(m => m.default)
+);
 
 // ::: languages
 
@@ -44,7 +45,7 @@ const resolved = new Map;
 
 function useLanguage (hljs, name) {
   if (!name || hljs.getLanguage(name)) return Promise.resolve();
-  if (resolved.has(name)) return resolved.get(name);
+  if (resolved.has(name))              return resolved.get(name);
 
   const source = languageSource(name);
   if (!source) return Promise.resolve();
