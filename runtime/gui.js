@@ -1,6 +1,8 @@
 // @aufbau/runtime/gui.js
 
-import * as dom from '@domina/core';
+import createElement  from '@domina/methods/createElement.js';
+import createFragment from '@domina/methods/createFragment.js';
+import onEvent        from '@domina/methods/onEvent.js';
 
 // :::::: HELPERS
 // (vermutlich unnötig, weil innerhalb von @domina bereits gehandlet)
@@ -73,16 +75,16 @@ const normalizeOption = option => (Array.isArray(option) ? option : [option, opt
 
 function fieldElement (key, spec, value) {
   const { tag, attrs, options } = toControl(key, spec, value);
-  const $control = dom.createElement(tag, attrs);
+  const $control = createElement(tag, attrs);
   
   if (options) for (const option of options) {
     const [value, textContent] = normalizeOption(option);
-    const $option = dom.createElement('aufbau-option', { value, textContent });
+    const $option = createElement('aufbau-option', { value, textContent });
     $control.append($option);
   }
   
-  const $field = dom.createElement('label');
-  const $span  = dom.createElement('span', { textContent: spec.label ?? key });
+  const $field = createElement('label');
+  const $span  = createElement('span', { textContent: spec.label ?? key });
   
   $field.append($span, $control);
   
@@ -148,7 +150,7 @@ function render (spec, opts = {}) {
 
   // render as dom-elements
   else {
-    const container = wrap ? dom.createElement(wrap) : dom.createFragment();
+    const container = wrap ? createElement(wrap) : createFragment();
     for (const [key, s] of Object.entries(spec)) {
       const value   = values[key];
       const element = fieldElement(key, s, value);
@@ -162,7 +164,7 @@ function render (spec, opts = {}) {
       const handler = event => onChange(readValues(container, spec), event.target?.closest?.('[name]')?.getAttribute('name') ?? null, event);
       //container.addEventListener('input', handler);   // sliders/inputs: live while dragging/typing
       //container.addEventListener('change', handler);   // toggles/pickers: on commit
-      dom.onEvent(container, ['change', 'input'], handler);
+      onEvent(container, ['change', 'input'], handler);
     }
     return container;
   }
