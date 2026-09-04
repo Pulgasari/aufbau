@@ -7,6 +7,12 @@ import { applySkin }        from './skin.js';
 import { adoptClassStyles } from './styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
+// extra ones
+import { createElement }  from '@domina/methods/createElement.js';
+import { getStyleToken }  from '@domina/methods/getStyleToken.js';
+import { setStyleToken }  from '@domina/methods/setStyleToken.js';
+
+//
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';
 import { emitEvent }      from '@domina/methods/emitEvent.js';
 import { getElement }     from '@domina/methods/getElement.js';
@@ -98,6 +104,7 @@ return class extends BaseClass {
   shell (className, { prepend = false } = {}) {
     if (this._shell?.isConnected) return this._shell;
 
+    //this.$shell = this.$(`:scope > .${className}`) ?? createElement('div', { className });
     this._shell = this.querySelector(`:scope > .${className}`);
     if (!this._shell) {
       this._shell = document.createElement('div');
