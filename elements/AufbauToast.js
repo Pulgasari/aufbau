@@ -51,9 +51,9 @@ export default class AufbauToast extends AufbauElement {
       gap: var(--aufbau-control-gap, 0.5em);
     }
 
-    aufbau-toast .toast-icon { flex: none; line-height: 1.4; }
+    aufbau-toast .toast-icon    { flex: none; line-height: 1.4; }
     aufbau-toast .toast-content { flex: 1 1 auto; min-inline-size: 0; }
-    aufbau-toast .toast-title { font-weight: 600; }
+    aufbau-toast .toast-title   { font-weight: 600; }
     aufbau-toast .toast-message { overflow-wrap: anywhere; }
 
     aufbau-toast .toast-close {
@@ -100,7 +100,11 @@ export default class AufbauToast extends AufbauElement {
   update () {
     const { type, title, dismissible, icon: customIcon } = this.getAttr();
     const message = this.getAttr('message') || this.innerHTML.trim();
-    const icon = customIcon || TOAST_ICONS[type] || TOAST_ICONS.info;
+    const icon    = customIcon || TOAST_ICONS[type] || TOAST_ICONS.info;
+
+    //const { dismissible, icon, message, title, type } = this.getAttr();
+    //message ||= this.innerHTML.trim();
+    //icon    ||= TOAST_ICONS[type] || TOAST_ICONS.info;
 
     this.innerHTML = `
       <div class="aufbau-toast-wrapper type-${type}">
@@ -108,7 +112,7 @@ export default class AufbauToast extends AufbauElement {
           <aufbau-icon icon="${icon}"></aufbau-icon>
         </div>
         <div class="toast-content">
-          ${title ? `<div class="toast-title">${title}</div>` : ''}
+          ${title   ? `<div class="toast-title">${title}</div>`     : ''}
           ${message ? `<div class="toast-message">${message}</div>` : ''}
         </div>
         ${dismissible ? `
@@ -134,8 +138,8 @@ export default class AufbauToast extends AufbauElement {
     if (options.message)                toast.setAttribute('message', options.message);
     if (options.duration !== undefined) toast.setAttribute('duration', options.duration.toString());
     if (options.dismissible !== false)  toast.setAttribute('dismissible', '');
-
     container.appendChild(toast);
+    
     return toast;
   }
 }
