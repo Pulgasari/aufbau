@@ -1,12 +1,15 @@
 // init.js
 
-import * as client   from './client.js';
-import * as dom      from '@domina/core';
-import { autoloader, registerAll }      from '@aufbau/elements';
+import * as client from './client.js';
+import      config from './config.js';
+
+import * as elements                      from '@aufbau/elements';
 import { setConfig as setElementsConfig } from '@aufbau/elements/core/AufbauConfig.js';
-import { deepMerge } from '@pulgasari/obj';
-import * as webfonts from '@aufbau/webfonts';
-import config        from './config.js';
+import * as webfonts                      from '@aufbau/webfonts';
+
+import { adoptStylesheet } from '@domina/methods';
+import { deepMerge }       from '@pulgasari/obj';
+
 
 const  cssPath = 'https://code.pulgasari.dev/aufbau/css';
 const fontPath = 'https://code.pulgasari.dev/aufbau/webfonts/ttf';
@@ -42,8 +45,8 @@ const initAppearance = () => {
 }
 
 const initElements = async ({ mode = 'auto' }) => {
-       if (mode === 'auto')      autoloader();
-  else if (mode === 'all') await registerAll();
+       if (mode === 'auto')      elements.autoloader();
+  else if (mode === 'all') await elements.registerAll();
 }
 
 const initStylesheet = (bool) => bool && client.observeStylesheets();
