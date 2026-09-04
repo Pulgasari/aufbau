@@ -209,10 +209,10 @@ export default class AufbauCode extends AufbauElement {
 
     this.on('click', '.copy-btn', (e, btn) => this.copyToClipboard(this.source, btn));
 
-    // typing must NOT write back into the code attribute: it is observed, would
-    // trigger update(), rebuild the markup and drop the caret. the edit is held
-    // aside and only re-highlighted once the field is left. focusout instead of
-    // blur, blur does not bubble and could not be delegated
+    // typing must NOT write back into the code attribute:
+    // it is observed, would trigger update(), rebuild the markup and drop the caret. 
+    // the edit is held aside and only re-highlighted once the field is left. 
+    // focusout instead of blur, blur does not bubble and could not be delegated
     this.on('input', 'code[contenteditable]', (event, node) => {
       this._editedCode = node.textContent;
       this.emit('input', { code: this._editedCode });
@@ -269,11 +269,11 @@ export default class AufbauCode extends AufbauElement {
       const hljs = await getHljs();
       await useLanguage(hljs, this.lang);
 
-      const codeEl = this.$('code');
+      const $code = this.$('code');
       // the node may already be gone or stale again after the await
-      if (!codeEl || !this.isConnected || this.source !== source) return;
+      if (!$code || !this.isConnected || this.source !== source) return;
 
-      hljs.highlightElement(codeEl);
+      hljs.highlightElement($code);
       this._highlighted = source;
     } catch (error) {
       console.warn('[aufbau-code] failed to lazy load highlight.js:', error);
@@ -297,7 +297,9 @@ export default class AufbauCode extends AufbauElement {
       await navigator.clipboard.writeText(text);
 
       const icon = btn.querySelector('aufbau-icon');
+      //const icon = this.$('aufbau-icon');
       icon?.setAttribute('icon', 'lucide:check');
+      //const $icon;
 
       this.emit('aufbau-code-copy', { code: text });
 
