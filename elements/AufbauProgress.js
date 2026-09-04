@@ -89,9 +89,9 @@ export default class AufbauProgress extends AufbauElement {
       this._scrollTarget = null;
     }
   }
-
+  
   _onScroll () {
-    const { type } = this.getAttr();
+    const { type } = this.getAttr(); 
     if (type !== 'scroll') return;
 
     let percentage = 0;
@@ -100,14 +100,15 @@ export default class AufbauProgress extends AufbauElement {
       const docEl       = document.documentElement;
       const totalScroll = docEl.scrollHeight - docEl.clientHeight;
       percentage = totalScroll > 0 ? (window.scrollY / totalScroll) * 100 : 0;
-    } else if (this._scrollTarget instanceof HTMLElement) {
+    } 
+    else if (this._scrollTarget instanceof HTMLElement) {
       const el          = this._scrollTarget;
       const totalScroll = el.scrollHeight - el.clientHeight;
       percentage = totalScroll > 0 ? (el.scrollTop / totalScroll) * 100 : 0;
     }
 
-    const val = Math.min(100, Math.max(0, percentage)).toFixed(1);
-    this.setAttr({ value: val });
+    const value = Math.min(100, Math.max(0, percentage)).toFixed(1);
+    this.setAttr({ value });
   }
 
   /**
@@ -130,7 +131,7 @@ export default class AufbauProgress extends AufbauElement {
     const { value, max, type, unit } = this.getAttr();
 
     const isIndeterminate = (value === undefined) && type !== 'scroll';
-    const percentage = isIndeterminate ? 0 : Math.min(100, Math.max(0, ((value ?? 0) / max) * 100));
+    const percentage      = isIndeterminate ? 0 : Math.min(100, Math.max(0, ((value ?? 0) / max) * 100));
 
     const wrapper = this.$('.aufbau-progress-wrapper');
     const bar     = this.$('.progress-bar');
