@@ -106,9 +106,9 @@
       }));
     }
 
-    function render () {
+    async function render () {
       drawScene();
-      try { filterCanvas(canvas, current.id, options); }
+      try { await filterCanvas(canvas, current.id, options); }
       catch (e) { $backend.setText(String(e.message)); return; }
 
       const b = current.backends;

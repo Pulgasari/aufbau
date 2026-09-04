@@ -1,14 +1,21 @@
 // @aufbau/filters
 // filters are js functions that generate svg. each one is importable on its own
-// (`import blur from '@aufbau/filters/blur'`); this barrel adds the catalogue plus
+// (`import blur from '@aufbau/filters/blur.js'`); this barrel adds the catalogue plus
 // the dom api that @aufbau/stylesheet and @aufbau/stylescript build on.
+//
+// the catalogue is lazy: metadata (id, name, vars, backends) comes from
+// ./manifest.js, a single cheap file, while each filter's render/css/canvas/webgl
+// implementation loads on demand from ./lib/<id>.js the first time it is used. so
+// importing this barrel, listing the catalogue or probing backends no longer pulls
+// in every implementation — but the render path (filterSvg/filterCss/applyFilter/
+// filterCanvas/…) is therefore async.
 //
 // filters, unlike patterns, are inherently defs-based: css `filter: url(#id)` only
 // resolves against a <filter> living in the document. there is no data-uri
 // equivalent that filters the host element, so there is no data-uri mode here.
 
 import { PREFIX, defsHost, resolve, svgId, toElements } from './core.js';
-import { filters, backendsOf } from './lib/index.js';
+import { manifest, metaOf, load, backendsOf } from './lib/registry.js';
 import { filterToCanvas } from './canvas.js';
 import { filterToWebgl, filterChainWebgl } from './webgl.js';
 import { createPipeline } from './pipeline.js';
@@ -29,16 +36,11 @@ const filterWebgl = filterToWebgl;
 
 // :::::: CATALOGUE ::::::::::::::::::::::::::::::::::::::::::::::
 
-function metaFor (id) {
-  const meta = filters[id];
-  if (!meta) throw new Error(`[@aufbau/filters] unknown filter "${id}"`);
-  return meta;
-}
-
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
-// want markup go through filterSvg (or import the module directly).
+// want markup go through filterSvg (or import the module directly). synchronous —
+// reads the static manifest, no implementation loaded.
 function list () {
-  return Object.values(filters).map(meta => ({
+  return Object.values(manifest).map(meta => ({
     id: meta.id, name: meta.name, vars: meta.vars, backends: backendsOf(meta),
   }));
 }
@@ -50,23 +52,24 @@ const data = list();
 // the <filter> markup for an id (svg backend). baked by default; pass { live: true }
 // for the var()-driven form used by defs injection and the static assets. throws for
 // canvas-only filters (pixelate, dither, …), which have no svg representation.
-function filterSvg (id, options = {}) {
-  const render = metaFor(id).render;
+async function filterSvg (id, options = {}) {
+  const { render } = await load(id);
   if (!render) throw new Error(`[@aufbau/filters] "${id}" has no svg backend (canvas-only)`);
   return render(options);
 }
 
 // the native css <filter-function> for an id (css backend), or null when the filter
 // has no css equivalent. e.g. filterCss('blur', { amount: 4 }) -> "blur(4px)".
-function filterCss (id, options = {}) {
-  const fn = metaFor(id).css;
-  return fn ? fn(options) : null;
+async function filterCss (id, options = {}) {
+  const { css } = await load(id);
+  return css ? css(options) : null;
 }
 
 // which backends a filter can be realised through. `canvas` is true for a dedicated
 // imageData backend or any bridge-able filter (svg/css). webgl lands here later.
+// synchronous — from the static manifest.
 function supports (id) {
-  return backendsOf(metaFor(id));
+  return backendsOf(metaOf(id));
 }
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
@@ -74,7 +77,8 @@ function supports (id) {
 // structural options — baked geometry or a boolean like `animate` — change the
 // markup's topology, so they cannot ride on a live custom property; each distinct
 // combination needs its own injected element. builds a stable id suffix for the
-// non-default ones so variants coexist in the host.
+// non-default ones so variants coexist in the host. vars are static, so this stays
+// synchronous (fed the manifest entry).
 function variantId (id, meta, options) {
   const structural = Object.entries(meta.vars).filter(([key, spec]) =>
     (spec.bake || spec.type === 'boolean') && options[key] != null && String(options[key]) !== String(spec.default)
@@ -90,10 +94,10 @@ function variantId (id, meta, options) {
 // non-default structural options get their own variant element.
 async function ensureFilter (id, options = {}) {
   const host      = defsHost();
-  const elementId = options.svgId ?? variantId(id, metaFor(id), options);
+  const elementId = options.svgId ?? variantId(id, metaOf(id), options);
   if (host.querySelector(`#${CSS.escape(elementId)}`)) return elementId;
 
-  const markup = filterSvg(id, { live: true, ...options, svgId: elementId });
+  const markup = await filterSvg(id, { live: true, ...options, svgId: elementId });
   const doc    = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml');
   const node   = doc.querySelector('filter');
   if (node) host.appendChild(node);
@@ -109,11 +113,11 @@ async function ensureFilter (id, options = {}) {
 //   'svg'            — force the svg path even when css is available.
 // for the svg path, only the options a caller passes are written as inherited custom
 // properties; the rest fall back to the defaults baked into the injected <filter>.
-function applyFilter (target, id, options = {}) {
+async function applyFilter (target, id, options = {}) {
   const { backend = 'auto', ...opts } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
-  const meta = metaFor(id);
+  const meta = await load(id);
 
   if (meta.css && (backend === 'css' || backend === 'auto')) {
     const value = meta.css(opts);
@@ -125,7 +129,7 @@ function applyFilter (target, id, options = {}) {
   if (backend === 'css') return; // explicitly asked for css, but this filter has none
 
   const elementId = variantId(id, meta, opts);
-  ensureFilter(id, { ...opts, svgId: elementId });
+  await ensureFilter(id, { ...opts, svgId: elementId });
   const url = `url(#${elementId})`;
   for (const el of elements) {
     for (const key in meta.vars) {
@@ -139,7 +143,8 @@ function applyFilter (target, id, options = {}) {
   }
 }
 
-// removes a previously applied filter and its inline custom properties.
+// removes a previously applied filter and its inline custom properties. synchronous —
+// no implementation needed.
 function removeFilter (target) {
   for (const el of toElements(target)) {
     el.style.removeProperty('filter');
@@ -148,6 +153,9 @@ function removeFilter (target) {
   }
 }
 
+// binds one filter + option set into a small, backend-aware handle, handy for
+// stylescript and component code: `const glitch = useFilter('glitch-rgb', { offsetX: 6 })`.
+// the render-producing methods (css/svg/ensure/apply) are async, matching the lazy catalogue.
 // binds one filter + option set into a small, backend-aware handle, 
 // handy for stylescript and component code: 
 // const glitch = useFilter('glitch-rgb', { offsetX: 6 })
@@ -182,7 +190,7 @@ export {
   createPipeline, // non-destructive filter stack for editor-style use — see pipeline.js.
   data,
   ensureFilter,
-  filters,
+  manifest,
   filterCanvas,
   filterCss,
   filterSvg,
@@ -199,13 +207,13 @@ export default {
   createPipeline,
   data,
   ensureFilter,
-  filters,
+  manifest,
   filterCanvas,
-  filterCss, 
-  filterSvg, 
+  filterCss,
+  filterSvg,
   filterWebgl,
-  filterWebglChain, 
-  list, 
+  filterWebglChain,
+  list,
   removeFilter,
   supports,
   useFilter,

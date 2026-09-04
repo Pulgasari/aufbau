@@ -14,7 +14,7 @@
 // next filter, and only the final pass touches the screen. dom/gl is only used at call time
 // (node-safe import). the gl canvas, program cache and targets are reused across calls.
 
-import { filters } from './lib/index.js';
+import { load } from './lib/registry.js';
 
 const VERTEX = `attribute vec2 aPos; varying vec2 vUv;
 void main () { vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }`;
@@ -118,8 +118,11 @@ const passList = meta => meta.webgl.passes ?? [{ fragment: meta.webgl.fragment, 
  * @param {HTMLCanvasElement} canvas
  * @param {{id:string, options?:object}[]} stages — filters with a webgl backend
  */
-export function filterChainWebgl (canvas, stages) {
-  const chain = stages.filter(s => filters[s.id]?.webgl);
+export async function filterChainWebgl (canvas, stages) {
+  // resolve each stage's implementation first (lazy load), then run the gl loop
+  // synchronously — no awaits inside the render passes.
+  const resolved = await Promise.all(stages.map(async s => ({ ...s, meta: await load(s.id) })));
+  const chain = resolved.filter(s => s.meta?.webgl);
   if (chain.length === 0) return;
 
   const { width, height } = canvas;
@@ -130,7 +133,7 @@ export function filterChainWebgl (canvas, stages) {
   let inputTex = source, inputRt = -1; // inputRt = -1 means the input is the uploaded source
 
   for (let k = 0; k < chain.length; k++) {
-    const meta    = filters[chain[k].id];
+    const meta    = chain[k].meta;
     const passes  = passList(meta);
     const options = chain[k].options || {};
     const time    = options.time ?? 0;
@@ -173,11 +176,10 @@ export function filterChainWebgl (canvas, stages) {
 }
 
 /** runs a single filter's webgl backend on a 2d canvas in place. */
-export function filterToWebgl (canvas, id, options = {}) {
-  const meta = filters[id];
-  if (!meta) throw new Error(`[@aufbau/filters] unknown filter "${id}"`);
+export async function filterToWebgl (canvas, id, options = {}) {
+  const meta = await load(id);
   if (!meta.webgl) throw new Error(`[@aufbau/filters] "${id}" has no webgl backend`);
-  filterChainWebgl(canvas, [{ id, options }]);
+  return filterChainWebgl(canvas, [{ id, options }]);
 }
 
 // feature probe, used by supports()/resolvers without forcing context creation on import.

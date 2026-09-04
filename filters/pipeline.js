@@ -11,13 +11,14 @@
 
 import { filterToCanvas } from './canvas.js';
 import { filterChainWebgl } from './webgl.js';
-import { filters } from './lib/index.js';
+import { manifest } from './lib/registry.js';
 
 // a stage runs on the gpu exactly when filterToCanvas would delegate to webgl: it has a
-// webgl backend and no imageData/css/svg backend to take precedence.
+// webgl backend and no imageData/css/svg backend to take precedence. read from the
+// static manifest, so coalescing needs no implementation loaded.
 function isWebgl (id) {
-  const m = filters[id];
-  return !!(m && m.webgl && !m.canvas && !m.css && !m.render);
+  const b = manifest[id]?.backends;
+  return !!(b && b.webgl && !b.canvas && !b.css && !b.svg);
 }
 
 function sourceSize (source) {
@@ -47,7 +48,7 @@ export function createPipeline (source) {
     clear () { stages.length = 0; return api; },
 
     /** applies the whole stack onto `target` (defaults to an internal canvas) and returns it. */
-    render (target = document.createElement('canvas')) {
+    async render (target = document.createElement('canvas')) {
       const { width, height } = sourceSize(source);
       work.width = width; work.height = height;
       wctx.clearRect(0, 0, width, height);
@@ -58,10 +59,10 @@ export function createPipeline (source) {
       for (let i = 0; i < active.length;) {
         if (isWebgl(active[i].id)) {
           let j = i; while (j < active.length && isWebgl(active[j].id)) j++;
-          filterChainWebgl(work, active.slice(i, j).map(s => ({ id: s.id, options: s.options })));
+          await filterChainWebgl(work, active.slice(i, j).map(s => ({ id: s.id, options: s.options })));
           i = j;
         } else {
-          filterToCanvas(work, active[i].id, active[i].options);
+          await filterToCanvas(work, active[i].id, active[i].options);
           i++;
         }
       }

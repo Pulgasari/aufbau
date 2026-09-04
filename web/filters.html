@@ -105,15 +105,15 @@
       $controls.node.replaceChildren($gui);
     }
 
-    function render () {
-      const cssValue = filterCss(current.id, options); // css backend, or null
+    async function render () {
+      const cssValue = await filterCss(current.id, options); // css backend, or null
 
       if (cssValue) {
         $subject.node.style.filter = cssValue;         // preview through the native css backend
       } else {
         // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
         const uid    = `preview-${current.id}-${counter++}`;
-        const markup = filterSvg(current.id, { ...options, svgId: uid });
+        const markup = await filterSvg(current.id, { ...options, svgId: uid });
         const node   = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml').querySelector('filter');
         //const node2  = dom.createSVG(markup).find('filter');
         defs.replaceChildren(node);
@@ -123,7 +123,7 @@
       // <aufbau-code> reads its content from the `code` attribute (setAttr re-highlights).
       //$css.attr.code = `#logo { filter: ${cssValue ?? url(#aufbau-filter-${current.id}) }; }`
       //$svg.attr.code = filterSvg(current.id, options);
-      $svg.setAttr('code', filterSvg(current.id, options));
+      $svg.setAttr('code', await filterSvg(current.id, options));
       $css.setAttr('code', cssValue
         ? `#logo { filter: ${cssValue}; }  /* css backend */`
         : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`);

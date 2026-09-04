@@ -7,14 +7,8 @@
 // dom is only touched at call time, so this stays safe to import in node.
 
 import { defsHost, svgId } from './core.js';
-import { filters } from './lib/index.js';
+import { load } from './lib/registry.js';
 import { filterToWebgl } from './webgl.js';
-
-function metaFor (id) {
-  const meta = filters[id];
-  if (!meta) throw new Error(`[@aufbau/filters] unknown filter "${id}"`);
-  return meta;
-}
 
 // djb2, base36 — a short stable key per option set.
 function hash (str) {
@@ -44,9 +38,9 @@ function bakedFilterId (id, meta, options) {
  *   'imagedata' — force the imageData backend (throws if the filter has none)
  *   'bridge'    — force the ctx.filter bridge (css/svg)
  */
-export function filterToCanvas (canvas, id, options = {}) {
+export async function filterToCanvas (canvas, id, options = {}) {
   const { backend = 'auto', ...opts } = options;
-  const meta = metaFor(id);
+  const meta = await load(id);
   const ctx  = canvas.getContext('2d');
   const { width, height } = canvas;
 

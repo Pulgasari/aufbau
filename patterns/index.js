@@ -1,7 +1,13 @@
 // @aufbau/patterns
 // patterns are js functions that generate svg. each one is importable on its own
-// (`import dots from '@aufbau/patterns/dots'`); this barrel adds the catalogue plus
+// (`import dots from '@aufbau/patterns/dots.js'`); this barrel adds the catalogue plus
 // the dom api that @aufbau/stylesheet and @aufbau/stylescript build on.
+//
+// the catalogue is lazy: metadata (id, name, vars) comes from ./manifest.js, a
+// single cheap file, while each pattern's render implementation loads on demand
+// from ./lib/<id>.js the first time it is applied. so importing this barrel — or
+// listing the catalogue — no longer pulls in every implementation. the render
+// path (patternSvg/patternImage/applyPattern/…) is therefore async.
 //
 // two application modes:
 //   datauri (default) — bakes options in and paints `background-image: url("data:…")`.
@@ -11,49 +17,61 @@
 //                        keeping paint options (bg/fg) live via custom properties.
 
 import { PREFIX, defsHost, encodeSvg, resolve, svgId, toElements } from './core.js';
-import { patterns } from './lib/index.js';
+import { manifest } from './manifest.js';
 import { applyMotion, stopMotion, MOTIONS, motionCss, motionKeyframes } from './motion.js';
 
 export { applyMotion, stopMotion, MOTIONS, motionCss, motionKeyframes };
 
 // :::::: CATALOGUE ::::::::::::::::::::::::::::::::::::::::::::::
 
-function metaFor (id) {
-  const meta = patterns[id];
+// static metadata (id, name, vars). synchronous, no implementation loaded.
+function metaOf (id) {
+  const meta = manifest[id];
   if (!meta) throw new Error(`[@aufbau/patterns] unknown pattern "${id}"`);
   return meta;
 }
 
+// the render implementation for one pattern, loaded once and cached. returns
+// { id, name, vars, render } — render(options) -> the <svg> tile markup.
+const loaded = new Map();
+function load (id) {
+  metaOf(id); // validate before importing
+  if (!loaded.has(id)) {
+    loaded.set(id, import(`./lib/${id}.js`).then(m => ({ id, name: m.name, vars: m.vars, render: m.default })));
+  }
+  return loaded.get(id);
+}
+
 // parsed catalogue for preview pages and tooling. render is dropped; callers that
-// want markup go through patternSvg (or import the module directly).
+// want markup go through patternSvg (or import the module directly). synchronous.
 export function list () {
-  return Object.values(patterns).map(({ id, name, vars }) => ({ id, name, vars }));
+  return Object.values(manifest).map(({ id, name, vars }) => ({ id, name, vars }));
 }
 
 // :::::: SVG BUILDING :::::::::::::::::::::::::::::::::::::::::::
 
 // the full <svg> tile for an id. baked by default; pass { live: true } for the
 // var()-driven form used by defs injection and the static assets.
-export function patternSvg (id, options = {}) {
-  return metaFor(id).render(options);
+export async function patternSvg (id, options = {}) {
+  return (await load(id)).render(options);
 }
 
 // the finished url("data:…") string for a pattern, options resolved in. no dom.
 // the shared core: setPattern paints an element with it, the stylesheet skill emits
 // it as a background-image value.
-export function patternImage (id, options = {}) {
-  return `url("${encodeSvg(patternSvg(id, options))}")`;
+export async function patternImage (id, options = {}) {
+  return `url("${encodeSvg(await patternSvg(id, options))}")`;
 }
 
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
 
 // parses the live tile, lifts its <pattern> into the shared host once per id.
-export function ensurePattern (id, options = {}) {
+export async function ensurePattern (id, options = {}) {
   const host      = defsHost();
   const elementId = options.svgId ?? svgId(id);
   if (host.querySelector(`#${CSS.escape(elementId)}`)) return elementId;
 
-  const markup = patternSvg(id, { live: true, ...options, svgId: elementId });
+  const markup = await patternSvg(id, { live: true, ...options, svgId: elementId });
   const node   = new DOMParser().parseFromString(markup, 'image/svg+xml').querySelector('pattern');
   if (node) host.appendChild(node);
   return elementId;
@@ -63,14 +81,14 @@ export function ensurePattern (id, options = {}) {
 
 // applies a pattern to one or more targets.
 // @param {'datauri'|'defs'} [options.mode='datauri']
-export function applyPattern (target, id, options = {}) {
+export async function applyPattern (target, id, options = {}) {
   const { mode = 'datauri', ...userVars } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
-  const meta = metaFor(id);
+  const meta = metaOf(id); // vars are static, no implementation needed for defs mode
 
   if (mode === 'defs') {
-    ensurePattern(id);
+    await ensurePattern(id);
     for (const el of elements) {
       for (const key in meta.vars) {
         if (userVars[key] != null) el.style.setProperty(`${PREFIX}${key}`, String(userVars[key]));
@@ -81,7 +99,7 @@ export function applyPattern (target, id, options = {}) {
     return;
   }
 
-  const image = patternImage(id, userVars);
+  const image = await patternImage(id, userVars);
   for (const el of elements) {
     el.style.backgroundImage = image;
     el.dataset.aufbauPattern = id;
@@ -89,7 +107,7 @@ export function applyPattern (target, id, options = {}) {
 }
 
 // removes a previously applied pattern and its inline custom properties (and any
-// motion attached to it).
+// motion attached to it). synchronous — no implementation needed.
 export function removePattern (target) {
   stopMotion(target);
   for (const el of toElements(target)) {
@@ -104,20 +122,21 @@ export function removePattern (target) {
 // drifts just the same. options add { motion, speed, timing } on top of the paint
 // options; the scroll distance is the tile size, so the loop is seamless.
 // @param {'down'|'up'|'left'|'right'|'down-right'|'down-left'|'up-right'|'up-left'|string} [options.motion='down']
-export function animatePattern (target, id, options = {}) {
-  const meta = metaFor(id);
+export async function animatePattern (target, id, options = {}) {
+  const meta = metaOf(id);
   const size = options.size ?? meta.vars.size?.default ?? 20;
-  applyPattern(target, id, options);
+  await applyPattern(target, id, options);
   applyMotion(target, options.motion ?? 'down', { size, speed: options.speed, timing: options.timing });
 }
 
 // binds one pattern + option set into a small handle for stylescript and component
-// code: `const dots = usePattern('dots', { fg: '#f00' })`.
+// code: `const dots = usePattern('dots', { fg: '#f00' })`. the render-producing
+// methods (image/css/svg) are async, matching the lazy catalogue.
 export function usePattern (id, options = {}) {
   return {
     id,
     image  : (opts = options) => patternImage(id, opts),
-    css    : (opts = options) => `background-image: ${patternImage(id, opts)};`,
+    css    : async (opts = options) => `background-image: ${await patternImage(id, opts)};`,
     ensure : () => ensurePattern(id, options),
     apply   : (target, opts = options) => applyPattern(target, id, opts),
     animate : (target, opts = options) => animatePattern(target, id, opts),
@@ -126,9 +145,9 @@ export function usePattern (id, options = {}) {
   };
 }
 
-export { patterns };
+export { manifest };
 
 export default {
-  animatePattern, applyMotion, applyPattern, ensurePattern, list, motionCss, motionKeyframes,
-  patternImage, patternSvg, patterns, removePattern, stopMotion, usePattern,
+  animatePattern, applyMotion, applyPattern, ensurePattern, list, manifest, motionCss, motionKeyframes,
+  patternImage, patternSvg, removePattern, stopMotion, usePattern,
 };
