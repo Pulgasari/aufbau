@@ -90,8 +90,8 @@
       });
     }
 
-    function render () {
-      pipe.render(preview);
+    async function render () {
+      await pipe.render(preview);
       $hint.setText(pipe.stages.length
         ? `${pipe.stages.filter(s => s.enabled).length} active stage(s) · source is never mutated — reorder/toggle/tweak re-runs the whole stack`
         : 'empty pipeline — add a filter from the left. stages of any backend mix freely.');

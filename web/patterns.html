@@ -128,10 +128,11 @@
       }
     }
 
-    function render () {
-      stage.style.backgroundImage = patternImage(current.id, options);
-      els.svg.textContent = patternSvg(current.id, options);
-      els.css.textContent = `.box {\n  background-image: ${patternImage(current.id, options)};\n  background-repeat: repeat;\n}`;
+    async function render () {
+      const image = await patternImage(current.id, options);
+      stage.style.backgroundImage = image;
+      els.svg.textContent = await patternSvg(current.id, options);
+      els.css.textContent = `.box {\n  background-image: ${image};\n  background-repeat: repeat;\n}`;
       const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
       els.js.textContent =
         `import ${current.id} from '@aufbau/patterns/${current.id}';\n` +
