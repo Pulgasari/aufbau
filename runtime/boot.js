@@ -37,11 +37,11 @@ const initAppearance = () => {
   webfonts.init(config.font)
 
   // load + apply css-files
-  if (reset)  dom.adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
-  if (layout) dom.adoptStylesheet(`${cssPath}/layouts/${layout}.css`);
-  if (look)   dom.adoptStylesheet(`${cssPath}/looks/${look}.css`);
-  if (skin)   dom.adoptStylesheet(`${cssPath}/skins/${skin}.css`);
-  if (theme)  dom.adoptStylesheet(`${cssPath}/themes/${theme}.css`);
+  if (reset)  adoptStylesheet(`${cssPath}/aufbau.css`); // needs to be improved   
+  if (layout) adoptStylesheet(`${cssPath}/layouts/${layout}.css`);
+  if (look)   adoptStylesheet(`${cssPath}/looks/${look}.css`);
+  if (skin)   adoptStylesheet(`${cssPath}/skins/${skin}.css`);
+  if (theme)  adoptStylesheet(`${cssPath}/themes/${theme}.css`);
 }
 
 const initElements = async ({ mode = 'auto' }) => {
