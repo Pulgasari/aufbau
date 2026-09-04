@@ -22,7 +22,9 @@ import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
 import { toCamelCase, toKebabCase }               from '@pulgasari/str';
 import { Logger }                                 from '@pulgasari/logger';
 
-const log = new Logger({ prefix: 'aufbau-core' });
+const isBlank   = sth => sth === undefined || sth === null || sth === false || stz === '';
+const isDefined = sth => sth !== undefined;
+const log       = new Logger({ prefix: 'aufbau-core' });
 
 // :::::: DECORATION
 
@@ -74,6 +76,15 @@ const disposer = () => {
 
 export const AufbauCore = (BaseClass = HTMLElement) => {
 return class extends BaseClass {
+  /*
+  #isMounted = false;
+  #tag       = this.localName;
+  #logger    = new Logger({ prefix: this.#tag });
+  */
+  //#error  = (...args) => this.#logger.error (...args);
+  //#info   = (...args) => this.#logger.info  (...args);
+  //#log    = (...args) => this.#logger.log   (...args);
+  //#warn   = (...args) => this.#logger.warn  (...args);
 
   constructor () {
     super();
@@ -218,10 +229,12 @@ return class extends BaseClass {
   }
 
   // resolved gesture mode for this element — 'auto' | 'true' | 'false'.
-  // precedence: the element's own `gestures` attribute, then a tag-scoped config
-  // (`<tag>-gestures`), then the global `gestures` config, then 'auto'. elements
-  // that carry gesture behaviour consult this, so a page can switch every gesture
-  // off with a single `<aufbau-config gestures="false">` (or per element / tag).
+  // precedence: the element's own `gestures` attribute,
+  // then a tag-scoped config (`<tag>-gestures`), 
+  // then the global `gestures` config, 
+  // then 'auto'. elements that carry gesture behaviour consult this,
+  // so a page can switch every gesture off 
+  // with a single `<aufbau-config gestures="false">` (or per element / tag).
   gesturesMode () {
     return String(this.getConfig('gestures', 'auto', [...configKeys(this.tag, 'gestures'), 'gestures']));
   }
@@ -270,8 +283,8 @@ return class extends BaseClass {
     const kebab  = toKebabCase(nameOrType);
     const parsed = this.schema[kebab] ?? BASE;
 
-    const finalType     = isFn(type) ? type : parsed.type;
-    const finalFallback = fallback !== undefined ? fallback : parsed.fallback;
+    const finalType     = isFn(type)          ? type     : parsed.type;
+    const finalFallback = isDefined(fallback) ? fallback : parsed.fallback;
     const fromConfig    = () => parsed.config ? resolveConfig(this.tag, kebab, parsed.config) : undefined;
 
     // booleans: attribute presence first, then config, then fallback
@@ -328,17 +341,19 @@ return class extends BaseClass {
   getVar (name, fallback) {
     const value = getComputedStyle(this).getPropertyValue(this.cssVar(name)).trim();
     return value || fallback;
+    //return getStyleToken(name, this) || fallback;
   }
 
   getVars (names = []) {
     const style = getComputedStyle(this);
     const out   = {};
     for (const name of names) out[name] = style.getPropertyValue(this.cssVar(name)).trim() || undefined;
+    //for (const name of names) out[name] = this.getVar(name);
     return out;
   }
 
   setVar (name, value) {
-    if (value == null || value === false || value === '') this.style.removeProperty(this.cssVar(name));
+    if (isBlank(value)) this.style.removeProperty(this.cssVar(name));
     else this.style.setProperty(this.cssVar(name), String(value));
     return this;
   }
@@ -351,7 +366,8 @@ return class extends BaseClass {
   // reflect every `var`-flagged attribute onto its css custom property
   applyVars () {
     for (const [name, entry] of Object.entries(this.schema)) {
-      if (entry.var) this.setVar(entry.var === true ? name : entry.var, this.getAttr(name));
+      const key = entry.var === true ? name : entry.var;
+      if (entry.var) this.setVar(key, this.getAttr(name));
     }
   }
   
@@ -367,7 +383,8 @@ return class extends BaseClass {
       get (target, prop) {
         if (prop in target)  return target[prop];
         if (!isString(prop)) return undefined;
-        return decorate(getElementById(toKebabCase(prop), root) ?? getElementById(prop, root));
+        const element = getElementById(toKebabCase(prop), root) ?? getElementById(prop, root);
+        return decorate(element);
       }
     });
   }
