@@ -8,21 +8,12 @@ const REGEX_TARGET_EXT    = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.repl
 const REGEX_FONT_EXT      = /\.(woff2?|otf|ttf)$/i;
 const REGEX_AUFBAU_MODULE = /(\/@aufbau\/|github\.io\/aufbau\/|\/kits\/|\/elements\/.*\.js$)/;
 const MODULE_CACHE_NAME   = 'aufbau-modules-v1';
+const STYLESHEET_PATTERN  = new URLPattern({ pathname: '*\\.aufbau\\.css' });
+const TTL_FONT            = 30 * 24 * 60 * 60 * 1000;
+const TTL_STYLESHEET      = 60 * 1000;
 
-// a service worker answering this request from cache is the only arrangement in
-// which the <link> stays an ordinary render-blocking link and still resolves
-// instantly. no javascript on the critical path, so nothing can flash.
-const stylesheetCache = createCache({ name: 'aufbau-stylesheets' });
 const       fontCache = createCache({ name: 'aufbau-fonts' });
-
-// how long a cached sheet is served without even asking. beyond it the cached copy still goes out immediately, with a conditional revalidation behind it.
-// fonts are content-addressed by url in practice — a rebuild ships a new filename — so there is nothing to gain from asking about them often.    
-const TTL_FONT       = 30 * 24 * 60 * 60 * 1000;
-const TTL_STYLESHEET = 60 * 1000;
-
-// Pre-compiled pattern outside the fetch loop
-const STYLESHEET_PATTERN = new URLPattern({ pathname: '*\\.aufbau\\.css' });
-
+const stylesheetCache = createCache({ name: 'aufbau-stylesheets' });
 
 /**
  * Service Worker fetch handler for intercepting .aufbau.css / .ass network requests.
@@ -101,7 +92,7 @@ async function interceptFetchModule ({ request }) {
 // :::::: HELPERS
 
 function errorLog (message, error) {
-  console.error(`[@aufbau/plugins/worker] ${message}:`, error);
+  console.error(`[@aufbau/worker] ${message}:`, error);
 }
 
 // :::::: EXPORTS
