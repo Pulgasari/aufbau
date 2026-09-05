@@ -13,18 +13,20 @@ export * from './compose.js';
 export * from './recognizers/index.js';
 export * from './utils.js';
 
+
+
+const api = {
+  
+};
+
+
+/*
 async function loadModule (spec, module) {
   const resolved = vendorsMap[spec] || spec;
   const imported = await import(resolved);
   return module ? imported[module] : (imported.default ?? imported);
 }
 
-const api = {
-
-};
-
-
-/*
 export * from './adjustable.js';
 export * from './holdable.js';
 export * from './pannable.js';
