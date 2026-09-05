@@ -6,9 +6,21 @@ framework-agnostic (`core.js`); framework bindings live under `adapters/` and ar
 imported on their own.
 
 ```javascript
-import { gestures } from '@aufbau/gestures';
+import { compose } from '@aufbau/gestures';
 
-const handle = gestures(el, {
+const handle = compose(el, {
+  onDoubleClick : () => zoom(),
+  onSwipeLeft   : () => next(),
+  onAdjust      : size => card.style.setProperty('--size', size + 'px'),
+});
+// later
+handle.destroy();
+```
+
+```javascript
+import api from '@aufbau/gestures';
+
+const handle = api.compose(el, {
   onDoubleClick : () => zoom(),
   onSwipeLeft   : () => next(),
   onAdjust      : size => card.style.setProperty('--size', size + 'px'),
