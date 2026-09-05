@@ -15,7 +15,7 @@ import { compose }         from './../index.js';
 
 const IS_CALLBACK = /^on[A-Z]/;
 
-export function useGesture (options) {
+function useGesture (options) {
   const latest   = useRef(options);
   const instance = useRef(null);
   latest.current = options;
@@ -36,4 +36,4 @@ export function useGesture (options) {
   }, []);
 }
 
-export { compose } from './../index.js';
+export { compose, useGesture };
