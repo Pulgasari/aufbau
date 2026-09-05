@@ -13,3 +13,29 @@ export * from './compose.js';
 export * from './recognizers/index.js';
 export * from './utils.js';
 
+async function loadModule (spec, module) {
+  const resolved = vendorsMap[spec] || spec;
+  const imported = await import(resolved);
+  return module ? imported[module] : (imported.default ?? imported);
+}
+
+const api = {
+
+};
+
+
+/*
+export * from './adjustable.js';
+export * from './holdable.js';
+export * from './pannable.js';
+export * from './pinchable.js';
+export * from './pressable.js';
+export * from './rotatable.js';
+export * from './swipeable.js';
+export * from './transformable.js';
+export * from './wheelable.js';
+
+import gesturesAPI from '@aufbau/gestures';
+const adjustable = await gesturesAPI.load('adjustable');
+const adjustable = await gesturesAPI.apply('adjustable');
+*/
