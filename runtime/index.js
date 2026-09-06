@@ -4,10 +4,10 @@
 
 // ::: AUFBAU
 
-//import * as elementsLoader  from '@aufbau/elements';
-//import * as elementsCore    from '@aufbau/elements/core/index.js';
-//import * as elementsConfig  from '@aufbau/elements/core/AufbauConfig.js';
-import * as elements   from '@aufbau/elements';
+import * as elementsLoader  from '@aufbau/elements';
+import * as elementsCore    from '@aufbau/elements/core/index.js';
+import * as elementsConfig  from '@aufbau/elements/core/AufbauConfig.js';
+//import * as elements   from '@aufbau/elements';
 import * as filters    from '@aufbau/filters';
 import * as gestures   from '@aufbau/gestures';
 import      importFile from '@aufbau/import';
