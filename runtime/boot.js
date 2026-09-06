@@ -7,7 +7,7 @@ import * as elements                      from '@aufbau/elements';
 import { setConfig as setElementsConfig } from '@aufbau/elements/core/AufbauConfig.js';
 import * as webfonts                      from '@aufbau/webfonts';
 
-import { adoptStylesheet } from '@domina/methods';
+import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { deepMerge }       from '@pulgasari/obj';
 
 
