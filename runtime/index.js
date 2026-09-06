@@ -24,9 +24,9 @@ import * as worker from './worker.js';
 
 // ::: VENDORS
 
-import * as bunker from '@bunker/kit';
-import * as domina from '@domina/core';
+//import * as bunker from '@bunker/kit';
 import      str    from '@pulgasari/str';
+//import * as domina from '@domina/core';
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -69,12 +69,14 @@ const aufbau = {
   },
 
   // vendors
-  bunker, dom, domina, str,
+  str,
+  //bunker, dom, domina,
 };
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { aufbau, bunker, dom, domina, str };
+//export { aufbau, bunker, dom, domina, str };
+export { aufbau, str };
 export default aufbau;
 
 /* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
