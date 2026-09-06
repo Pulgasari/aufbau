@@ -146,3 +146,12 @@ export {
   init,
   load,
 }; 
+
+export default {
+  data,
+  fonts,
+  apply,
+  findFont,
+  init,
+  load,
+};
