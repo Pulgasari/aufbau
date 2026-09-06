@@ -4,9 +4,10 @@
 
 // ::: AUFBAU
 
-import * as elementsLoader from '@aufbau/elements';
-import * as elementsCore    from '@aufbau/elements/core/index.js';
-import * as elementsConfig  from '@aufbau/elements/core/AufbauConfig.js';
+//import * as elementsLoader  from '@aufbau/elements';
+//import * as elementsCore    from '@aufbau/elements/core/index.js';
+//import * as elementsConfig  from '@aufbau/elements/core/AufbauConfig.js';
+import * as elements   from '@aufbau/elements';
 import * as filters    from '@aufbau/filters';
 import * as gestures   from '@aufbau/gestures';
 import      importFile from '@aufbau/import';
@@ -30,7 +31,7 @@ import      str    from '@pulgasari/str';
 
 // :::::: BUNDLE :::::::::::::::::::::::::::::::::::::::::::::::::
 
-const dom = domina;
+//const dom = domina;
 
 // the @aufbau/elements entry is now a lean lazy loader and no longer re-exports
 // the core foundation. this bundle is the heavy "everything" entry, so it
