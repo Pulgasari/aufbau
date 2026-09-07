@@ -97,6 +97,37 @@ let dark = signal({ type: Boolean, value: true, key: 'dark', store: local });
 
 ## scalarSignal
 
+## typedSignal (variant / spike)
+
+a `.value`-free store of TYPED leaves — the join `deepSignal`'s TODO left open (typed
+leaves inside a `.value`-free tree). own module, touches neither `deepSignal` nor
+`betterSignal`.
+
+```javascript
+import { typedSignal, oneOf, bool, number, text, ref, list, derived, local } from '@aufbau/signals';
+
+const ui = typedSignal({
+  view  : oneOf(['grid','list'], 'grid'),      // enum — off-list writes are ignored
+  dark  : bool(false),                          // coerced to boolean
+  size  : number(12),
+  query : text(''),
+  open  : ref(null),                            // opaque object, held by identity (not wrapped)
+  tags  : list([]),                             // array leaf, by value
+  label : derived(s => s.view.toUpperCase()),   // computed from other leaves (read-only)
+  panel : { collapsed: bool(false) },           // nested sub-store
+}, { key: 'app:ui', store: local });            // optional persistence (one blob per store)
+
+ui.view          // 'grid'   — reactive in render, no `.value`
+ui.view = 'list' // validated against the enum
+ui.$snapshot     // plain-object view of the writable leaves
+```
+
+leaf reads inside render subscribe (getter reads the signal); writes validate/coerce per
+type. `$signal` is the reactive whole-store view, `$apply(obj)` bulk-writes, `$ready` is
+the hydration promise. note: a persisted store serialises its `ref`/`list` leaves too, so
+keep non-serialisable refs out of a persisted store (a per-leaf `{ persist:false }` is a
+possible next step).
+
 ---
 
 # TODO
