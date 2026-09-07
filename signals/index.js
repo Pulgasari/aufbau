@@ -24,6 +24,9 @@ export { deepSignal, isDeep }                    from './DeepSignal.js';
 export { querySignal }                           from './QuerySignal.js';
 export { makeMap, makeSet }                      from './make.js';
 
+// typedSignal — a `.value`-free store of typed leaves (variant, spike). see TypedSignal.js
+export { typedSignal, text, number, bool, oneOf, ref, list, derived } from './TypedSignal.js';
+
 // :::::: STORES
 
 export { cookie, local, none, session, signalStore } from './persistence.js';
