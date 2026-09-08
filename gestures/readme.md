@@ -115,3 +115,31 @@ Ported from the earlier `js/dom/gestures.js` sketch and promoted to a package,
 then extended with the multi-touch set (`pinchable`, `rotatable`, `wheelable`)
 and the `transformable` flagship. Still open: adapters for the other kits (react,
 svelte), and a keyboard/a11y layer for the transform gestures.
+
+##
+
+```
+onAdjust
+onClick
+onDoubleClick
+onLongClick
+onHold
+onPan
+onPanEnd
+onPanStart
+onPinch
+onPinchEnd
+onPinchStart
+onRotate
+onRotateEnd
+onRotateStart
+onSwipe
+onSwipeDown
+onSwipeLeft
+onSwipeRight
+onSwipeUp
+onTransform
+onTransformEnd
+onTransformStart
+onWheel
+```
