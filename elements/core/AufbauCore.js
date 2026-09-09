@@ -28,7 +28,7 @@ import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
 import { toCamelCase, toKebabCase }               from '@pulgasari/str';
 import { Logger }                                 from '@pulgasari/logger';
 
-const isBlank   = sth => sth === undefined || sth === null || sth === false || stz === '';
+const isBlank   = sth => sth === undefined || sth === null || sth === false || sth === '';
 const isDefined = sth => sth !== undefined;
 const log       = new Logger({ prefix: 'aufbau-core' });
 
