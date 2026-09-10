@@ -1,0 +1,13 @@
+
+
+@function --dashed-border(--color: red) {
+  result: 2px dashed var(--color);
+}
+
+.argument {
+  border: --dashed-border(blue);
+}
+
+.default {
+  border: --dashed-border();
+}
