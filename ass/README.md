@@ -68,12 +68,28 @@ body {
 ## `@default`
 
 ```css
-@default gap {
+@default gap, margin, padding {
   tiny   : 0.25rem;
   small  : 0.50rem;
   normal : 1.00rem;
   big    : 2.00rem;
   huge   : 3.00rem;
+}
+
+@default color {
+  brand: #008800;
+}
+```
+
+```css
+.example {
+  gap: small;
+}
+```
+
+```css
+.example {
+  gap: 0.50rem;
 }
 ```
 
