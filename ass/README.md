@@ -1,14 +1,9 @@
 # @aufbau/ass (Aufbau Style Sheets)
 
-Aufbau Stylesheets are an enhancement of CSS.
+**Aufbau Style Sheets (ASS)** is a superset of CSS. It basically adds a little bit of sugar and integration of aufbau-packages related to the appearance of a website/webapp.
 
 ## overview
 
----
-
-[aufbau-props](#aufbau-props) —
-[@aufbau](#aufbau) —
-[usage](#usage)
 
 ---
 
@@ -16,13 +11,117 @@ Aufbau Stylesheets are an enhancement of CSS.
 
 ## we do love css, but ...
 
+... when working with it, it soons becomes kinda redundant and messy.
+
 ## the 3-way-relationship
 
-...
+every rule is in the end a 3 way relationship: 
+element/scope/target -> property -> value
 
-## `@value`
+```css
+div { color: red; }
+```
 
+---
 
+# additional at-rules
+
+[@default](#)
+[@mixin](#)
+[@prop](#)
+[@value](#)
+
+## `@default`
+
+```css
+@default gap, margin, padding {
+  tiny   : 0.25rem;
+  small  : 0.50rem;
+  normal : 1.00rem;
+  big    : 2.00rem;
+  huge   : 3.00rem;
+}
+
+@default color {
+  brand: #008800;
+}
+```
+
+```css
+.example {
+  gap: small;
+}
+```
+
+```css
+.example {
+  gap: 0.50rem;
+}
+```
+
+## `@mixin`
+
+```css
+@mixin vert { 
+  display   : flex; 
+  flex-flow : column;
+
+  > * { flex: 1 0 auto; }
+}
+
+body { use: .vert; }
+#app { use: .vert; }
+```
+
+however any class-block could be used as a mixin as well:
+
+```css
+.vert { 
+  display   : flex; 
+  flex-flow : column;
+
+  > * { flex: 1 0 auto; }
+}
+
+body { use: .vert; }
+#app { use: .vert; }
+```
+
+## `@prop` and `@value`
+
+because we are inside a selector 
+
+the `@value` prefix tells the engine that the left side is a value which should be applied to the props on the rights side.
+
+```css
+.clean-button {
+  @value #FFFF00 : background-color;
+  @value red     : border-color color;
+  @value unset   : margin padding;
+}
+```
+
+```css
+.clean-button {
+  background-color : #FFFF00;
+  border-color     : red;
+  color            : red;
+  margin           : unset;
+  padding          : unset;
+}
+```
+
+now let's have a look on `@prop`:
+
+```css
+@prop font-size {
+  header : 20px;
+  main   : 16px;
+  footer : 12px;
+}
+```
+
+---
 
 # aufbau-props
 
@@ -59,77 +158,9 @@ body {
 
 ---
 
-# additional at-rules
 
-[@default](#)
-[@trait](#) [@use](#)
-[@prop](#) [@value](#)
 
-## `@default`
 
-```css
-@default gap, margin, padding {
-  tiny   : 0.25rem;
-  small  : 0.50rem;
-  normal : 1.00rem;
-  big    : 2.00rem;
-  huge   : 3.00rem;
-}
-
-@default color {
-  brand: #008800;
-}
-```
-
-```css
-.example {
-  gap: small;
-}
-```
-
-```css
-.example {
-  gap: 0.50rem;
-}
-```
-
-## `@trait` and `@use`
-
-```css
-@trait .vert { 
-  display   : flex; 
-  flex-flow : column;
-
-  > * { flex: 1 0 auto; }
-}
-
-body { use: .vert; }
-#app { use: .vert; }
-```
-
-## `@prop` and `@value`
-
-because we are inside a selector 
-
-the `@value` prefix tells the engine that the left side is a value which should be applied to the props on the rights side.
-
-```css
-.clean-button {
-  @value #FFFF00 : background-color;
-  @value red     : border-color color;
-  @value unset   : margin padding;
-}
-```
-
-```css
-.clean-button {
-  background-color : #FFFF00;
-  border-color     : red;
-  color            : red;
-  margin           : unset;
-  padding          : unset;
-}
-```
 
 
 
