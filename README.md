@@ -4,36 +4,6 @@ Aufbau Stylesheets are an enhancement of CSS.
 
 ## overview
 
-```css
-@aufbau-config
-
-@prop / @val
-@trait / @use
-
-
-
-aufbau-filter
-aufbau-icon
-aufbau-pattern
-aufbau-webfont
-
-aufbau-colors
-aufbau-dirty
-aufbau-flex
-aufbau-grid
-
-aufbau-unset
-aufbau-use
-
-
-@aufbau <property>
-@aufbau colors
-
-@aufbau-config
-@aufbau-media
-@aufbau-trait
-```
-
 ---
 
 [aufbau-props](#aufbau-props) —
@@ -44,7 +14,11 @@ aufbau-use
 
 # philosophy
 
+## we do love css, but ...
+
 ## the 3-way-relationship
+
+...
 
 ## `@value`
 
@@ -60,7 +34,81 @@ the `@value` prefix tells the engine that the left side is a value which should 
 
 # aufbau-props
 
-ASS provides several additional properties mostly for nice shorthands.
+ASS provides several additional properties with an `aufbau-` prefix to make use of several aufbau packages.
+
+[aufbau-filter](#aufbau-filter)
+[aufbau-icon](#aufbau-icon)
+[aufbau-pattern](#aufbau-pattern)
+[aufbau-webfont](#aufbau-webfont)
+
+## aufbau-filter
+
+## aufbau-icon
+
+```css
+.search-btn {
+  aufbau-icon : 'bx:search' size(1.5rem) color(brand-d30);
+}
+
+.close-btn {
+  aufbau-icon : 'lucide:x';
+}
+```
+
+## aufbau-pattern
+
+## aufbau-webfont
+
+```css
+body {
+  aufbau-webfont: "JetBrains Mono";
+}
+```
+
+---
+
+# additional at-rules
+
+[@default](#)
+[@trait](#) [@use](#)
+[@prop](#) [@value](#)
+
+## `@default`
+
+```css
+@default gap {
+  tiny   : 0.25rem;
+  small  : 0.50rem;
+  normal : 1.00rem;
+  big    : 2.00rem;
+  huge   : 3.00rem;
+}
+```
+
+## `@trait` and `@use`
+
+```css
+@trait .vert { 
+  display   : flex; 
+  flex-flow : column;
+
+  > * { flex: 1 0 auto; }
+}
+
+body { use: .vert; }
+#app { use: .vert; }
+```
+
+## `@prop` and `@value`
+
+
+
+
+
+
+
+
+
 
 ## aufbau-colors
 
@@ -95,65 +143,11 @@ shade engine:
 }
 ```
 
-## aufbau-dirty
-
-## aufbau-flex
-
-## aufbau-grid
-
-## aufbau-icon
-
-```css
-.search-btn {
-  aufbau-icon : 'bx:search' size(1.5rem) color(brand-d30);
-}
-
-.close-btn {
-  aufbau-icon : 'lucide:x';
-}
-```
-
-## aufbau-pattern
-
-## aufbau-unset
-
-unset multiple properties at once.
-
-
-
-## aufbau-use
-
-Look at: [@aufbau-trait](#aufbau-trait)
-
-## aufbau-webfont
-
-```css
-body {
-  aufbau-webfont: "JetBrains Mono";
-}
-```
-
 ---
 
 # @aufbau
 
-## default values
 
-```css
-@aufbau gap {
-  tiny   : 0.25rem;
-  small  : 0.50rem;
-  normal : 1.00rem;
-  big    : 2.00rem;
-  huge   : 3.00rem;
-}
-
-@aufbau-media breakpoints {
-  mobile  : 480px;
-  tablet  : 768px;
-  desktop : 1024px;
-}
-```
 
 ## @aufbau-config
 
@@ -200,19 +194,7 @@ body {
 }
 ```
 
-## @aufbaut-trait
 
-```css
-@aufbaut-trait .vert { 
-  display   : flex; 
-  flex-flow : column;
-
-  > * { flex: 1 0 auto; }
-}
-
-body { aufbau-use: .vert; }
-#app { aufbau-use: .vert; }
-```
 
 ---
 
