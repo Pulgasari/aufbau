@@ -34,6 +34,8 @@ div { color: red; }
 ## `@default`
 
 ```css
+/* :::::::::: DEFINE :::::::::: */
+
 @default gap, margin, padding {
   tiny   : 0.25rem;
   small  : 0.50rem;
@@ -45,17 +47,19 @@ div { color: red; }
 @default color {
   brand: #008800;
 }
-```
 
-```css
+/* :::::::::: USAGE :::::::::: */
+
 .example {
+  color: brand;
   gap: small;
 }
 ```
 
 ```css
 .example {
-  gap: 0.50rem;
+  color : #008800;
+  gap   : 0.50rem;
 }
 ```
 
