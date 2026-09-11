@@ -22,15 +22,7 @@ Aufbau Stylesheets are an enhancement of CSS.
 
 ## `@value`
 
-because we are inside a selector 
 
-the `@value` prefix tells the engine that the left side is a value which should be applied to the props on the rights side.
-
-```css
-.clean-button {
-  @value unset: margin padding border background color;
-}
-```
 
 # aufbau-props
 
@@ -101,7 +93,27 @@ body { use: .vert; }
 
 ## `@prop` and `@value`
 
+because we are inside a selector 
 
+the `@value` prefix tells the engine that the left side is a value which should be applied to the props on the rights side.
+
+```css
+.clean-button {
+  @value #FFFF00 : background-color;
+  @value red     : border-color color;
+  @value unset   : margin padding;
+}
+```
+
+```css
+.clean-button {
+  background-color : #FFFF00;
+  border-color     : red;
+  color            : red;
+  margin           : unset;
+  padding          : unset;
+}
+```
 
 
 
