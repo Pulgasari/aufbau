@@ -33,8 +33,11 @@ div { color: red; }
 
 ## `@default`
 
+(or maybe: `@def` `@define` `@preset`)
+
 ```css
 /* :::::::::: DEFINE :::::::::: */
+/* these become also available on 'padding-left' etc. */
 
 @default gap, margin, padding {
   tiny   : 0.25rem;
@@ -138,6 +141,12 @@ ASS provides several additional properties with an `aufbau-` prefix to make use 
 
 ## aufbau-filter
 
+```css
+div {
+  aufbau-filter: glitch;
+}
+```
+
 ## aufbau-icon
 
 ```css
@@ -151,6 +160,12 @@ ASS provides several additional properties with an `aufbau-` prefix to make use 
 ```
 
 ## aufbau-pattern
+
+```css
+div {
+  aufbau-pattern: grid;
+}
+```
 
 ## aufbau-webfont
 
@@ -270,12 +285,12 @@ shade engine:
 <html>
 <head>
   <script type="module">
-    import { initBrowser } from './node_modules/@aufbau/stylesheet/src/index.js';
-    initBrowser({ useWorker: true, workerPath: '/sw.js' });
+    import { assWorker } from '@aufbau/ass/worker';
+    // ...
   </script>
 
   <style type="text/aufbau">
-    @aufbau gap {
+    @default gap {
       small : 0.5rem;
       big   : 2.0rem;
     }
@@ -363,76 +378,25 @@ late swap reflows a page the reader is already looking at, which is usually wors
 than the wait it saves. `configure({ swap: 'immediate' })` on
 `@aufbau/plugins/client` opts into swapping in place.
 
-## 3. the loading screen
-
-The two paths above close the window in which a page is shown *unstyled*. They do
-nothing about the one in which it is shown *empty* — the module graph still has to
-arrive, and without a bundler that is by far the longest wait on the page.
-
-`<aufbau-splash>` covers that one. It is the same trick one layer up: a blocking
-classic script puts the overlay on the page before anything else can, and the
-component only decides when it goes away.
-
-```html
-<script src="https://code.pulgasari.dev/aufbau/boot.js" data-splash></script>
-...
-<aufbau-splash role="status" aria-live="polite">lädt…</aufbau-splash>
-```
-
-It reveals after a short delay, so a boot that beats the delay never shows it at
-all, and it clears itself from pure CSS if the module graph never lands. See
-[`@aufbau/elements`](../elements/readme.md#aufbau-splash).
-
 ## fonts
 
-Storage is only half of it. The rest is CSS: `font-display: optional` avoids the swap
-flash outright, `<link rel=preload as=font crossorigin>` starts the download earlier,
-and `size-adjust` / `ascent-override` on the fallback face stop the metric jump when
-the real font arrives.
+Storage is only half of it. The rest is CSS: `font-display: optional` avoids the swap flash outright, `<link rel=preload as=font crossorigin>` starts the download earlier, and `size-adjust` / `ascent-override` on the fallback face stop the metric jump when the real font arrives.
 
 ---
 
-**Aufbau Stylesheets** (`.ass` or `.aufbau.css`)
+# install
 
-```
-deno install jsr:@aufbau/stylesheet
-```
+## esm / browser
 
-it provides a bunch of pseudo-css-properties and mechanisms to handle css files better. (it's not really like scss.)
+### classic script
 
-```css
-/* aufbau-webfont :: use a google webfont */
-body { aufbau-webfont: "JetBrains Mono"; }
-
-/* aufbau-icon :: use any icon provided by iconify */
-.close-btn  { aufbau-icon: 'lucide:x'; }
-.search-btn { aufbau-icon: 'bx:search' size(24px) color(#008800); }
+```javascript
+import 'https://esm.sh/jsr/@aufbau/ass/run.js';
 ```
 
-```css
-/* @aufbau :: define and use value aliases */
-
-/* works for any css property */
-/* these become also available on 'padding-left' etc. */
-@aufbau gap, margin, padding {
-  tiny   : 0.25rem;
-  small  : 0.50rem;
-  normal : 1.00rem;
-  big    : 2.00rem;
-  huge   : 3.00rem;
-}
-body     { gap: normal; padding: normal; }
-body > * { padding: small; }
-
-/* become available on background-color, color, fill etc. */
-@aufbau color {
-  almostblack : #000001;
-  brand       : #5865f2;
-}
-.card { background: almostblack; color: brand; }
-.card {
-  background-color : brand-a20; /* +20% transparency */
-  border-color     : brand-d15; /* +15% black */
-  color            : brand-l10; /* +10% white */
-}
+deno
 ```
+deno install jsr:@aufbau/ass
+```
+
+
