@@ -28,14 +28,29 @@ test('@default also resolves on longhands of a shorthand', () => {
   has(css, 'padding-left: 0.5rem;');
 });
 
-test('@prop resolves names scoped to a single property', () => {
+test('@prop is property-led: distributes one property across target selectors', () => {
   const css = compile(`
-    @prop font-size { header: 20px; main: 16px; footer: 12px; }
-    h1 { font-size: header; }
-    p  { font-size: main; }
+    @prop font-size {
+      header : 20px;
+      main   : 16px;
+      footer : 12px;
+    }
   `);
+  has(css, 'header { font-size: 20px; }');
+  has(css, 'main { font-size: 16px; }');
+  has(css, 'footer { font-size: 12px; }');
+  assert.ok(!css.includes('@prop'), 'the @prop definition must not leak into output');
+});
+
+test('@prop nested in a selector combines targets with the parent', () => {
+  const css = compile(`main { @prop font-size { h1: 20px; p: 16px; } }`);
+  has(css, 'main h1 { font-size: 20px; }');
+  has(css, 'main p { font-size: 16px; }');
+});
+
+test('@prop resolves its values through @default tokens', () => {
+  const css = compile(`@default font-size { big: 20px; } @prop font-size { h1: big; }`);
   has(css, 'h1 { font-size: 20px; }');
-  has(css, 'p { font-size: 16px; }');
 });
 
 test('@value expands a reversed declaration to each listed prop', () => {
