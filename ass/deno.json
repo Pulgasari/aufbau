@@ -1,0 +1,18 @@
+{
+  "name": "@aufbau/ass",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./index.js",
+    "./run": "./run.js",
+    "./parse": "./parse.js",
+    "./transform": "./transform.js",
+    "./serialize": "./serialize.js"
+  },
+  "publish": {
+    "exclude": [
+      "**/*.test.js",
+      "test"
+    ]
+  }
+}
