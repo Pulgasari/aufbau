@@ -7,9 +7,12 @@ import { parse }     from './parse.js';
 import { serialize } from './serialize.js';
 import { transform } from './transform.js';
 
-export function compile (source, options = {}) {
-  return serialize(transform(parse(source)), options);
+export function compile (code, options = {}) {
+  code = parse     (code);
+  code = transform (code);
+  code = serialize (code, options);
+  return code;
 }
 
-export { parse, serialize, transform };
+export { compile, parse, serialize, transform };
 export default compile;
