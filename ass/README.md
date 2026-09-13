@@ -4,6 +4,30 @@
 
 ## overview
 
+status: **v0.1** implements the four core constructs — `@default`, `@prop`,
+`@value`, `@mixin` (incl. `use:` and class-as-mixin). everything below beyond
+those (aufbau-props, `@aufbau-config`, `@aufbau-media`, themes, shade engine, the
+service-worker/boot no-flash paths) is still spec, not built.
+
+the engine is `parse -> transform -> serialize`, hand written and
+zero-dependency. the core entry is environment-agnostic (string in, css string
+out), so the same code runs in a build step and in a browser worker.
+
+```javascript
+import { compile } from '@aufbau/ass';
+const css = compile(assSource);
+```
+
+value resolution is lookup-then-passthrough: any ordinary css that defines no
+token is emitted unchanged, so ass is a strict superset. nesting is flattened
+against the parent selector rather than emitted as native css nesting.
+
+### offline / android apps
+
+no network, no runtime dependency. for the capacitor apps the recommended path
+is precompiling `.ass` to `.css` at build time (no runtime cost, no flash) and
+shipping the plain css in `www/`. `@aufbau/ass/run` can also compile inline
+`<style type="text/ass">` blocks at runtime for dev.
 
 ---
 

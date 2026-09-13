@@ -1,0 +1,45 @@
+{
+  "name": "@aufbau/ass",
+  "version": "0.1.0",
+  "description": "Aufbau Style Sheets: a small css superset (@default, @mixin, @prop, @value) that compiles to plain css. zero-dependency, runs in a build step or in the browser.",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    },
+    "./run": "./run.js",
+    "./parse": "./parse.js",
+    "./transform": "./transform.js",
+    "./serialize": "./serialize.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "longhands.js",
+    "parse.js",
+    "run.js",
+    "serialize.js",
+    "transform.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "aufbau",
+    "ass",
+    "css",
+    "esm",
+    "preprocessor"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "ass"
+  }
+}
