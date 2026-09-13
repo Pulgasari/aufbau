@@ -3,7 +3,7 @@
 import { AufbauElement } from './core/index.js';
 import { html }          from './core/html.js';
 
-import { toSlug }      from '@pulgasari/str';
+import { toSlugCase }  from '@pulgasari/str';
 import { getElement }  from '@domina/methods/getElement.js';
 import { getElements } from '@domina/methods/getElements.js';
 import { observe }     from '@domina/observer';
@@ -52,7 +52,7 @@ export default class AufbauToc extends AufbauElement {
       const text  = el.textContent?.trim() || '';
       const level = Number(/^H([1-6])$/i.exec(el.tagName)?.[1] ?? el.dataset.level ?? 1);
 
-      if (!el.id) el.id = toSlug(text) || `heading-${index}`;
+      if (!el.id) el.id = toSlugCase(text) || `heading-${index}`;
 
       return { id: el.id, text, level };
     });
