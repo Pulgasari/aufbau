@@ -4,12 +4,15 @@
 // serializer to flatten). value resolution is lookup-then-passthrough, so any
 // ordinary css that defines no token is emitted unchanged (ass is a superset).
 //
-// constructs:
-//   @default <props> { name: value }   named values, scoped to props (+ longhands)
-//   @prop    <prop>  { name: value }    named values, scoped to a single prop
-//   @mixin   <name>  { ... }            reusable block; also any ".name" rule
-//   use: .name                          inlines a mixin's body in place
-//   @value <value> : <props>            reversed declaration
+// every css rule is a target -> property -> value triple. the constructs are:
+//   @default <props> { name: value }   definition of named values (tokens),
+//                                       scoped to those props (+ their longhands)
+//   @prop    <prop>  { target: value }  property-led: fixes the property, spreads
+//                                       it over targets -> emits `target { prop: value }`
+//   @value   <value> : <props>          value-led: fixes the value, spreads it
+//                                       over props, inside the enclosing target
+//   @mixin   <name>  { ... }            reusable block (also any ".name" rule);
+//                                       `use: .name` inlines its body in place
 
 import { LONGHANDS } from './longhands.js';
 
@@ -43,12 +46,12 @@ function registerMixin (mixins, rawName, nodes) {
 }
 
 // definitions are file scoped: the whole tree is collected before anything is
-// applied, so declaration order relative to usage does not matter.
+// applied, so declaration order relative to usage does not matter. only
+// @default (tokens) and @mixin are definitions; @prop and @value emit css.
 function collect (nodes, ctx) {
   for (const node of nodes) {
     if (node.type === 'atrule') {
            if (node.name === '@default') define(ctx.registry, expandProps(splitList(node.params)), node.nodes);
-      else if (node.name === '@prop')    define(ctx.registry, splitList(node.params), node.nodes);
       else if (node.name === '@mixin')   registerMixin(ctx.mixins, node.params.trim(), node.nodes);
     } else if (node.type === 'rule') {
       const name = classMixinName(node.selector);
@@ -66,7 +69,19 @@ function resolveValue (prop, value, registry) {
 
 const resolveDecl = (node, registry) => ({ type: 'decl', prop: node.prop, value: resolveValue(node.prop, node.value, registry) });
 
+// @value <value> : <props> -> one declaration per prop, value spread across them
 const expandValue = (node, registry) => node.props.map(prop => ({ type: 'decl', prop, value: resolveValue(prop, node.value, registry) }));
+
+// @prop <prop> { target: value } -> one rule per target, property spread across
+// them. emitted as rule nodes, so a nested @prop flattens against its parent.
+function expandProp (node, registry) {
+  const prop = node.params.trim();
+  const out  = [];
+  for (const child of node.nodes) {
+    if (child.type === 'decl') out.push({ type: 'rule', selector: child.prop, nodes: [{ type: 'decl', prop, value: resolveValue(prop, child.value, registry) }] });
+  }
+  return out;
+}
 
 function useMixins (value, ctx) {
   const out = [];
@@ -81,15 +96,19 @@ function useMixins (value, ctx) {
   return out;
 }
 
-// body of a rule: declarations, @value expansions, use-inlining, nested rules
+// body of a rule: declarations, @value / @prop expansions, use-inlining, nested rules
 function applyBody (nodes, ctx) {
   const out = [];
   for (const node of nodes) {
     switch (node.type) {
-      case 'decl'   : node.prop === 'use' ? out.push(...useMixins(node.value, ctx)) : out.push(resolveDecl(node, ctx.registry)); break;
-      case 'value'  : out.push(...expandValue(node, ctx.registry)); break;
-      case 'rule'   : out.push({ type: 'rule', selector: node.selector, nodes: applyBody(node.nodes, ctx) }); break;
-      case 'atrule' : out.push(node.nodes ? { ...node, nodes: applyBody(node.nodes, ctx) } : node); break;
+      case 'decl'  : node.prop === 'use' ? out.push(...useMixins(node.value, ctx)) : out.push(resolveDecl(node, ctx.registry)); break;
+      case 'value' : out.push(...expandValue(node, ctx.registry)); break;
+      case 'rule'  : out.push({ type: 'rule', selector: node.selector, nodes: applyBody(node.nodes, ctx) }); break;
+      case 'atrule':
+             if (node.name === '@default' || node.name === '@mixin') break;         // definitions emit nothing
+        else if (node.name === '@prop') out.push(...expandProp(node, ctx.registry)); // property-led rules, flattened by the serializer
+        else out.push(node.nodes ? { ...node, nodes: applyBody(node.nodes, ctx) } : node);
+        break;
     }
   }
   return out;
@@ -99,8 +118,8 @@ function apply (nodes, ctx) {
   const out = [];
   for (const node of nodes) {
     if (node.type === 'atrule') {
-      // definition at-rules emit nothing; everything else passes through
-      if (node.name === '@default' || node.name === '@prop' || node.name === '@mixin') continue;
+      if (node.name === '@default' || node.name === '@mixin') continue;             // definitions emit nothing
+      if (node.name === '@prop') { out.push(...expandProp(node, ctx.registry)); continue; }
       out.push(node.nodes ? { ...node, nodes: apply(node.nodes, ctx) } : node);
     } else if (node.type === 'rule') {
       out.push({ type: 'rule', selector: node.selector, nodes: applyBody(node.nodes, ctx) });

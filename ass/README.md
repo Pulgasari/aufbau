@@ -9,6 +9,13 @@ status: **v0.1** implements the four core constructs — `@default`, `@prop`,
 those (aufbau-props, `@aufbau-config`, `@aufbau-media`, themes, shade engine, the
 service-worker/boot no-flash paths) is still spec, not built.
 
+the constructs restructure the `target -> property -> value` triple:
+`@default` defines named values (tokens) scoped to properties (+ longhands);
+`@prop` is property-led (fixes the property, spreads it over targets ->
+`target { prop: value }`); `@value` is value-led (fixes the value, spreads it
+over props inside the enclosing target); `@mixin` + `use:` inline a reusable
+block.
+
 the engine is `parse -> transform -> serialize`, hand written and
 zero-dependency. the core entry is environment-agnostic (string in, css string
 out), so the same code runs in a build step and in a browser worker.
