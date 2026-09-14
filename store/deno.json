@@ -1,0 +1,19 @@
+{
+  "name": "@aufbau/store",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./index.js",
+    "./gui": "./gui.js",
+    "./reactive": "./reactive.js"
+  },
+  "imports": {
+    "@aufbau/gui": "jsr:@aufbau/gui@^0.1.0"
+  },
+  "publish": {
+    "exclude": [
+      "**/*.test.js",
+      "test"
+    ]
+  }
+}

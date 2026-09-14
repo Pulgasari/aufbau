@@ -1,0 +1,50 @@
+{
+  "name": "@aufbau/store",
+  "version": "0.1.0",
+  "description": "Reactive, typed, multi-key store: bare value access, string-keyed verbs, per-type methods, per-key persistence. Zero-dependency reactive core.",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    },
+    "./gui": "./gui.js",
+    "./reactive": "./reactive.js"
+  },
+  "peerDependencies": {
+    "@aufbau/gui": "^0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@aufbau/gui": { "optional": true }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "carrier.js",
+    "gui.js",
+    "persist.js",
+    "reactive.js",
+    "types.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "aufbau",
+    "store",
+    "state",
+    "reactive",
+    "signals",
+    "esm"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "store"
+  }
+}
