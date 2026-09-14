@@ -1,8 +1,6 @@
 # @aufbau/store
 
-a reactive, typed, multi-key store. built for the case plain signals handle
-badly: state that is many keys of different types at once. zero-dependency —
-its own small reactive core, no preact.
+a reactive, typed, multi-key store. built for state that is many keys of different types at once.
 
 ## the shape
 
