@@ -1,0 +1,50 @@
+{
+  "name": "@aufbau/gui",
+  "version": "0.1.0",
+  "description": "Spec-driven ui controls: render aufbau-* form controls from a field spec, as dom or html, and read typed values back.",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    },
+    "./control": "./control.js",
+    "./element": "./element.js",
+    "./html": "./html.js",
+    "./read": "./read.js"
+  },
+  "dependencies": {
+    "@domina/methods": "^0.1.0"
+  },
+  "peerDependencies": {
+    "@aufbau/elements": "^1.0.0"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "control.js",
+    "element.js",
+    "html.js",
+    "read.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "aufbau",
+    "gui",
+    "controls",
+    "forms",
+    "esm"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "gui"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@aufbau/gui",
+  "version": "0.1.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./index.js",
+    "./control": "./control.js",
+    "./element": "./element.js",
+    "./html": "./html.js",
+    "./read": "./read.js"
+  },
+  "imports": {
+    "@domina/methods": "jsr:@domina/methods@^0.1.0"
+  },
+  "publish": {
+    "exclude": [
+      "**/*.test.js",
+      "test"
+    ]
+  }
+}
