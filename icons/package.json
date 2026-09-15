@@ -1,0 +1,9 @@
+{
+  "name": "@aufbau/icons",
+  "type": "module",
+  "exports": {
+    "."        : "./index.js",
+    "./data"   : "./data/index.js",
+    "./data/*" : "./data/*"
+  }
+}
