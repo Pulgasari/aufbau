@@ -30,6 +30,10 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 - [@aufbau/stylescript](stylescript/) *(experimental)*
 - [@aufbau/stylesheet](stylesheet/) *(experimental)*
 
+#### side-projects
+- [@bunker](https://github.com/pulgasari/bunker/)
+- [@domina](https://github.com/pulgasari/domina/)
+
 #### resources
 
 - [@aufbau/css](#aufbau-css)
