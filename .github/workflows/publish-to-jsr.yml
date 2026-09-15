@@ -1,0 +1,40 @@
+name: Publish Package to JSR
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to publish"
+        required: true
+        type: choice
+        options:
+          - ass
+          - elements
+          - filters
+          - gestures
+          - gui
+          - import
+          - patterns
+          - signals
+          - store
+          - stylescript
+          - webfonts
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write # OIDC token JSR uses for auth + provenance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Publish package
+        working-directory: ${{ inputs.package }}
+        run: deno publish
