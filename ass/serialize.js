@@ -49,9 +49,17 @@ function emitRule (node, parentSelector, chunks, indent) {
 function emitAtrule (node, chunks, indent) {
   if (!node.nodes) { chunks.push(node.params ? `${node.name} ${node.params};` : `${node.name};`); return; }
 
-  const inner = [];
-  for (const child of node.nodes) emitTop(child, inner, indent);
-  const body = inner.join('\n\n').split('\n').map(line => (line ? indent + line : line)).join('\n');
+  // an at-rule body is either declarations (@font-face, @page) or nested rules /
+  // at-rules (@media, @supports, @keyframes frames) — handle both, decls first.
+  const decls = node.nodes.filter(n => n.type === 'decl');
+  const rest  = node.nodes.filter(n => n.type !== 'decl');
+  const parts = [];
+  if (decls.length) parts.push(decls.map(d => `${d.prop}: ${d.value};`).join('\n'));
+  const nested = [];
+  for (const child of rest) emitTop(child, nested, indent);
+  if (nested.length) parts.push(nested.join('\n\n'));
+
+  const body = parts.join('\n\n').split('\n').map(line => (line ? indent + line : line)).join('\n');
   chunks.push(`${node.name}${node.params ? ' ' + node.params : ''} {\n${body}\n}`);
 }
 

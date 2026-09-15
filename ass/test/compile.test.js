@@ -115,3 +115,30 @@ test('& in a nested selector is substituted with the parent', () => {
   has(css, '.card { color: red; }');
   has(css, '.card:hover { color: blue; }');
 });
+
+test('@font-face keeps its declarations (declaration-only at-rule)', () => {
+  const css = compile(`
+    @font-face {
+      font-family: 'Manrope';
+      font-weight: 400 700;
+      src: url('m.woff2') format('woff2');
+    }
+  `);
+  has(css, '@font-face {');
+  has(css, `font-family: 'Manrope';`);
+  has(css, 'font-weight: 400 700;');
+  has(css, `src: url('m.woff2') format('woff2');`);
+});
+
+test('@media still wraps nested rules, not flattened', () => {
+  const css = compile(`@media (min-width: 600px) { .a { color: red; } }`);
+  has(css, '@media (min-width: 600px) {');
+  has(css, '.a { color: red; }');
+});
+
+test('@keyframes frames are emitted as-is inside the at-rule', () => {
+  const css = compile(`@keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }`);
+  has(css, '@keyframes spin {');
+  has(css, 'from { transform: rotate(0); }');
+  has(css, 'to { transform: rotate(360deg); }');
+});
