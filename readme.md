@@ -8,14 +8,7 @@
 
 *read the fucking [docs](https://code.pulgasari.dev/aufbau/docs/)! >.<*
 
-#### kits
-
-a **kit** is a *batteries-included* bundle containing all **aufbau**-packages combined with other frameworks/libraries ready to use in the browser.
-
-[@aufbau/kits](#aufbau-kits)
-
 #### packages
-
 - [@aufbau/ass](ass/)
 - [@aufbau/elements](elements/)
 - [@aufbau/filters](filters/)
@@ -35,12 +28,10 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 - [@domina](https://github.com/pulgasari/domina/)
 
 #### resources
-
 - [@aufbau/css](#aufbau-css)
 - [@aufbau/svg](#aufbau-svg)
 
 #### test
-
 - [elements](https://code.pulgasari.dev/aufbau/elements/)
 - [filters](https://code.pulgasari.dev/aufbau/filters/)
 - [test](https://code.pulgasari.dev/aufbau/test/index.html)
