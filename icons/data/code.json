@@ -1,0 +1,12 @@
+{
+  "backspace"           : "mdi:backspace",
+  "blockindent"         : "material-symbols:keyboard-tab",
+  "blockoutdent"        : "material-symbols:keyboard-tab-rtl",
+  "copy-lines-down"     : "material-symbols:move-down",
+  "copy-lines-up"       : "material-symbols:move-up",
+  "join-lines"          : "material-symbols:join-outline",
+  "move-lines-down"     : "material-symbols:text-select-move-down",
+  "move-lines-up"       : "material-symbols:text-select-move-up",
+  "move-selection-down" : "material-symbols:move-selection-down",
+  "move-selection-up"   : "material-symbols:move-selection-up"
+}
