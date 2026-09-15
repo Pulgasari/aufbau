@@ -16,15 +16,19 @@ a **kit** is a *batteries-included* bundle containing all **aufbau**-packages co
 
 #### packages
 
+- [@aufbau/ass](ass/)
 - [@aufbau/elements](elements/)
 - [@aufbau/filters](filters/)
 - [@aufbau/gestures](gestures/)
+- [@aufbau/gui](gui/)
 - [@aufbau/import](import/)
 - [@aufbau/patterns](patterns/)
-- [@aufbau/runtime](runtime/)
+- [@aufbau/store](store/)
+- [@aufbau/webfonts](webfonts/)
+
+#### packages (experimental)
 - [@aufbau/stylescript](stylescript/) *(experimental)*
 - [@aufbau/stylesheet](stylesheet/) *(experimental)*
-- [@aufbau/webfonts](webfonts/)
 
 #### resources
 
