@@ -1,10 +1,12 @@
 {
+  "amazon"            : "cib:amazon",
   "android"           : "mdi:android",
   "angular"           : "mdi:angular",
   "apple"             : "mdi:apple",
   "aws"               : "mdi:aws",
   "bitbucket"         : "mdi:bitbucket",
   "codepen"           : "mdi:codepen",
+  "discogs"           : "thesvg:discogs",
   "discord"           : "mdi:discord",
   "docker"            : "mdi:docker",
   "figma"             : "mdi:figma",
@@ -24,10 +26,12 @@
   "reddit"            : "mdi:reddit",
   "slack"             : "mdi:slack",
   "stack-overflow"    : "mdi:stack-overflow",
+  "suno"              : "thesvg:suno",
   "tailwind"          : "mdi:tailwind",
   "twitter"           : "mdi:twitter",
   "typescript"        : "mdi:language-typescript",
   "vue"               : "mdi:vuejs",
   "windows"           : "mdi:microsoft-windows",
+  "yandex"            : "thesvg:yandex",
   "youtube"           : "mdi:youtube"
 }
