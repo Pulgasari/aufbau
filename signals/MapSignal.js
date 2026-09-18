@@ -1,6 +1,4 @@
 // @aufbau/signals/MapSignal.js
-// a Map behind a signal. every mutator copies before it writes, so each change
-// publishes a fresh reference — a Map mutated in place would never notify.
 
 // :::::: IMPORT
 
