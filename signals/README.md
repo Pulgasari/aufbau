@@ -2,7 +2,11 @@
 
 a customized/extended version of the `@preact/signals` library.
 
-## signal
+## signal (legacy factory)
+
+`betterSignal`, exported as `signal`. still here while call sites move to
+`signalStore` — mind that a plain object argument is read as **config**, not as a
+value, which is the trap `signalStore` exists to close.
 
 ```javascript
 import { signal } from '@aufbau/signals';
@@ -81,55 +85,107 @@ icons.refetch();
 
 
 
-## boolSignal
+## signal types
+
+each type stands alone: a class and a lowercase factory, taking the value itself —
+there is no config object to confuse a value with. `signalStore` below is what adds
+naming, validation and persistence on top.
+
+| type | holds | beyond `.value` |
+| --- | --- | --- |
+| `ScalarSignal` | anything, as given | — |
+| `StringSignal` | a string, coerced | `length`, `clear()` |
+| `BoolSignal`   | a boolean, coerced | `on()`, `off()`, `toggle()` |
+| `EnumSignal`   | a value out of a list | `cycle()`, `$values` |
+| `MapSignal`    | a `Map` | `get/set/delete/has/clear/replace`, `size`, `toObject()`, `toArray()` |
+| `SetSignal`    | a `Set` | `add/delete/toggle/has/clear/replace`, `size`, `toArray()` |
+| `RecordSignal` | a plain object | `get/set/patch/delete/has/clear/replace`, `keys()`, `size` |
 
 ```javascript
-import { boolSignal, signal } from '@aufbau/signals';
+import { boolSignal, enumSignal, recordSignal, setSignal } from '@aufbau/signals';
 
-let open = boolSignal(false);
-open.toggle();   // true
-open.off();      // false
-open.value = 1;  // coerced -> true
+const open = boolSignal(false);
+open.toggle();                       // true
+open.value = 1;                      // coerced -> true
 
-// persisted via the factory
-let dark = signal({ type: Boolean, value: true, key: 'dark', store: local });
+const view = enumSignal('grid', ['grid', 'list']);
+view.cycle();                        // 'list'
+view.value = 'xl';                   // ignored + console.warn
+
+const tags = setSignal(['a']);
+tags.toggle('b');                    // true
+
+const pan = recordSignal({ x: 0, y: 0 });
+pan.set('x', 5);                     // copy-on-write, publishes a fresh object
 ```
 
-## scalarSignal
+the collection types copy before they write, so every change publishes a new
+reference — a `Map` mutated in place would never notify.
 
-## typedSignal (variant / spike)
+### RecordSignal vs deepSignal
 
-a `.value`-free store of TYPED leaves — the join `deepSignal`'s TODO left open (typed
-leaves inside a `.value`-free tree). own module, touches neither `deepSignal` nor
-`betterSignal`.
+both hold an object. `RecordSignal` holds it in **one** signal, so any change wakes
+every reader of the record; `deepSignal` gives **each leaf** its own, so a change wakes
+only the readers of the leaf that moved. take the record when the object is small and
+read as a whole (a position, a pair of bounds, a draft), the deep signal when its
+leaves are read apart from each other.
+
+## signalStore
+
+a store of named, typed leaves behind a `.value`-free facade. **every leaf declares its
+type** — as a lowercase name, as the native constructor where one fits, or as the signal
+class itself.
 
 ```javascript
-import { typedSignal, oneOf, bool, number, text, ref, list, derived, local } from '@aufbau/signals';
+import { signalStore, local, StringSignal } from '@aufbau/signals';
 
-const ui = typedSignal({
-  view  : oneOf(['grid','list'], 'grid'),      // enum — off-list writes are ignored
-  dark  : bool(false),                          // coerced to boolean
-  size  : number(12),
-  query : text(''),
-  open  : ref(null),                            // opaque object, held by identity (not wrapped)
-  tags  : list([]),                             // array leaf, by value
-  label : derived(s => s.view.toUpperCase()),   // computed from other leaves (read-only)
-  panel : { collapsed: bool(false) },           // nested sub-store
-}, { key: 'app:ui', store: local });            // optional persistence (one blob per store)
+const ui = signalStore({
+  view  : { type: 'enum',       values: ['grid', 'list'], value: 'grid' },
+  dark  : { type: Boolean,      value: false },
+  title : { type: StringSignal, value: '' },
+  tags  : { type: Set,          value: [] },
+  pan   : { type: 'record',     value: { x: 0, y: 0 } },
+}, { key: 'app:ui:', store: local });
 
-ui.view          // 'grid'   — reactive in render, no `.value`
-ui.view = 'list' // validated against the enum
-ui.$snapshot     // plain-object view of the writable leaves
+ui.view           // 'grid'  — reactive in render, no `.value`
+ui.view = 'list'  // validated against the enum
+ui.pan.x          // 0
+
+ui.$signals.view.cycle();    // the carrier itself, for its own methods
+ui.$signals.tags.add('x');
 ```
 
-leaf reads inside render subscribe (getter reads the signal); writes validate/coerce per
-type. `$signal` is the reactive whole-store view, `$apply(obj)` bulk-writes, `$ready` is
-the hydration promise. note: a persisted store serialises its `ref`/`list` leaves too, so
-keep non-serialisable refs out of a persisted store (a per-leaf `{ persist:false }` is a
-possible next step).
+| spelling | example |
+| --- | --- |
+| lowercase name | `'bool'`, `'enum'`, `'map'`, `'record'`, `'scalar'`, `'set'`, `'string'` |
+| native constructor | `Boolean`, `String`, `Map`, `Set`, `Object` |
+| the class | `BoolSignal`, `EnumSignal`, `MapSignal`, … |
+
+a leaf without a type, or with one that resolves to nothing, throws at construction.
+that is the point: the older factory reads a plain object as **config**, so
+`signal({ x: 0, y: 0 })` quietly hands back an empty scalar rather than the record it
+looks like. here a leaf's shape is stated, not guessed.
+
+`$signals` are the carriers, `$snapshot` a plain-object view, `$signal` the whole store
+as one reactive value, `$update(patch)` a bulk write, `$keys` the declared names and
+`$ready` the hydration promise.
+
+### signalStore — persistence
+
+`key` is a **prefix**: every leaf persists under `key + leafName`, never as one blob. a
+write rewrites only the leaf that moved, and a leaf missing from storage keeps its
+declared default, so a later change to that default still wins. `persist` optionally
+allow-lists which leaves are stored. `Map` and `Set` leaves are stored as an object and
+an array respectively, since neither survives JSON.
+
+```javascript
+const ui = signalStore({ … }, { key: 'app:ui:', store: local, persist: ['view', 'dark'] });
+await ui.$ready;
+```
 
 ---
 
 # TODO
 
-- **naming.** das erweiterte factory wird aktuell als `signal` UND `betterSignal` exportiert. preacts rohes `signal`/`Signal` läuft als `preactSignal`/`PreactSignal`. name am ende nochmal final festzurren.
+- **naming.** das erweiterte factory wird aktuell als `signal` UND `betterSignal` exportiert. preacts rohes `signal`/`Signal` läuft als `preactSignal`/`PreactSignal`. name am ende nochmal final festzurren — `signalStore` ist der weg dahin.
+- **`EnumSignal.$restore`** schreibt an der liste vorbei, weil ein gespeicherter wert autoritativ ist. damit überlebt aber auch ein wert, den die liste inzwischen nicht mehr kennt. alternative: beim hydrieren verwerfen und den default behalten.

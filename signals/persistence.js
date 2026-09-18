@@ -1,5 +1,5 @@
 // @aufbau/signals/persistence.js
-// stores for `signal({ key, store })`. every store is `(options?) => { get, set, subscribe? }`.
+// stores for `signalStore({ … }, { key, store })` and `signal({ key, store })`. every store is `(options?) => { get, set, subscribe? }`.
 // get() may return a value or a promise — hydration handles both. a miss must read as
 // `undefined`: that is the one value the factory treats as "nothing stored", so the
 // declared default survives.
@@ -47,7 +47,7 @@ export let none    = ()      => ({ get: () => undefined, set: () => {} });
 let aufbauStorage = createStorage({ area: 'local', namespace: 'aufbau', version: 1 });
 let MISS          = Symbol('miss');
 
-export let signalStore = () => ({
+export let aufbauStore = () => ({
   get : key        => { let value = aufbauStorage.getSync(key, MISS); return value === MISS ? undefined : value; },
   set : (key, val) => aufbauStorage.setSync(key, val),
 });

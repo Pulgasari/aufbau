@@ -9,7 +9,7 @@ isAbort       = error => error?.name === 'AbortError',
 isPlainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value),
 isPromise     = value => value !== null && typeof value?.then === 'function';
 
-// arrays pass through, objects are read as their entries — the shape makeMap/makeSet want
+// arrays pass through, objects are read as their entries — the shape MapSignal wants
 export function toEntries (source) {
   return Array.isArray(source) ? source : Object.entries(source);
 }
