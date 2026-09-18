@@ -5,9 +5,11 @@
 // note: the public name is still open — index re-exports this as `signal`.
 
 import { BoolSignal }               from './BoolSignal.js';
+import { EnumSignal }               from './EnumSignal.js';
+import { MapSignal }                from './MapSignal.js';
 import { ScalarSignal }             from './ScalarSignal.js';
+import { SetSignal }                from './SetSignal.js';
 import { deepSignal }               from './DeepSignal.js';
-import { makeMap, makeSet }         from './make.js';
 import { resolveStore }             from './persistence.js';
 import { effect, isPlainObject, isPromise } from './shared.js';
 
@@ -16,18 +18,19 @@ import { effect, isPlainObject, isPromise } from './shared.js';
 // `nested` implies a deep carrier (nested persistence is per-leaf, see betterSignal).
 let createCarrier = ({ deep, nested, type, value, values }) => {
   if (type === Boolean) { let target = new BoolSignal(value); return { target, read: () => target.value,     write: saved => { target.value = saved; } }; }
-  if (type === Map)     { let target = makeMap(value);        return { target, read: () => target.toObject(), write: saved => target.replace(saved) }; }
-  if (type === Set)     { let target = makeSet(value);        return { target, read: () => target.toArray(),  write: saved => target.replace(saved) }; }
+  if (type === Map)     { let target = new MapSignal(value); return { target, read: () => target.toObject(), write: saved => target.replace(saved) }; }
+  if (type === Set)     { let target = new SetSignal(value);  return { target, read: () => target.toArray(),  write: saved => target.replace(saved) }; }
 
   let depth = deep ?? (nested ? true : false);
   if (depth) { let target = deepSignal(value ?? {}, depth); return { target, read: () => target.$signal.value, write: saved => target.$replace(saved) }; }
 
-  let target = new ScalarSignal(value, values);
+  // an allow-list makes it an enum; $restore is how that type takes a stored value
+  // past its own validation, so the persistence layer never pokes at internals.
+  let target = values ? new EnumSignal(value, values) : new ScalarSignal(value);
   return {
     target,
     read  : () => target.value,
-    // bypass the allow-list while restoring: a stored value is authoritative
-    write : saved => { target.$values = null; target.value = saved; target.$values = values ?? null; },
+    write : saved => target.$restore ? target.$restore(saved) : (target.value = saved),
   };
 };
 
