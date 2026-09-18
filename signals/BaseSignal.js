@@ -37,7 +37,11 @@ class BaseSignal extends Signal {
 
 }
 
+// a signal type is callable without `new`, so BoolSignal(false) and new BoolSignal(false)
+// are the same thing. instanceof keeps working: the proxy forwards getPrototypeOf.
+const callable = Type => new Proxy(Type, { apply: (target, _self, args) => new target(...args) });
+
 // :::::: EXPORT
 
-export { BaseSignal };
+export { BaseSignal, callable };
 export default BaseSignal;

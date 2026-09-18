@@ -3,7 +3,7 @@
 // :::::: IMPORT
 
 import { isPlainObject } from './shared.js';
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -43,9 +43,11 @@ class RecordSignal extends BaseSignal {
 
 }
 
-const recordSignal = (...args) => new RecordSignal (...args);
+const recordSignal = (...args) => new RecordSignal(...args);
 
 // :::::: EXPORT
 
-export { RecordSignal, recordSignal };
-export default RecordSignal;
+const Callable = callable(RecordSignal);
+
+export { Callable as RecordSignal, recordSignal };
+export default Callable;

@@ -2,7 +2,7 @@
 
 // :::::: IMPORT
 
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -50,9 +50,11 @@ class SetSignal extends BaseSignal {
 
 }
 
-const setSignal = (...args) => new SetSignal (...args);
+const setSignal = (...args) => new SetSignal(...args);
 
 // :::::: EXPORT
 
-export { SetSignal, setSignal };
-export default SetSignal;
+const Callable = callable(SetSignal);
+
+export { Callable as SetSignal, setSignal };
+export default Callable;

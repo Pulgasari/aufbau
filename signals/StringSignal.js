@@ -2,7 +2,7 @@
 
 // :::::: IMPORT
 
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -25,9 +25,11 @@ class StringSignal extends BaseSignal {
 
 }
 
-const stringSignal = (...args) => new StringSignal (...args);
+const stringSignal = (...args) => new StringSignal(...args);
 
 // :::::: EXPORT
 
-export { StringSignal, stringSignal };
-export default StringSignal;
+const Callable = callable(StringSignal);
+
+export { Callable as StringSignal, stringSignal };
+export default Callable;

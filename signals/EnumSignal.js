@@ -2,7 +2,7 @@
 
 // :::::: IMPORT
 
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: MAIN
 
@@ -34,9 +34,11 @@ class EnumSignal extends BaseSignal {
 
 }
 
-const enumSignal = (...args) => new EnumSignal (...args);
+const enumSignal = (...args) => new EnumSignal(...args);
 
 // :::::: EXPORT
 
-export { EnumSignal, enumSignal };
-export default EnumSignal;
+const Callable = callable(EnumSignal);
+
+export { Callable as EnumSignal, enumSignal };
+export default Callable;
