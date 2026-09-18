@@ -93,13 +93,13 @@ naming, validation and persistence on top.
 
 | type | holds | beyond `.value` |
 | --- | --- | --- |
-| `ScalarSignal` | anything, as given | — |
-| `StringSignal` | a string, coerced | `length`, `clear()` |
 | `BoolSignal`   | a boolean, coerced | `on()`, `off()`, `toggle()` |
 | `EnumSignal`   | a value out of a list | `cycle()`, `$values` |
 | `MapSignal`    | a `Map` | `get/set/delete/has/clear/replace`, `size`, `toObject()`, `toArray()` |
-| `SetSignal`    | a `Set` | `add/delete/toggle/has/clear/replace`, `size`, `toArray()` |
 | `RecordSignal` | a plain object | `get/set/patch/delete/has/clear/replace`, `keys()`, `size` |
+| `ScalarSignal` | anything, as given | — |
+| `SetSignal`    | a `Set` | `add/delete/toggle/has/clear/replace`, `size`, `toArray()` |
+| `StringSignal` | a string, coerced | `length`, `clear()` |
 
 ```javascript
 import { boolSignal, enumSignal, recordSignal, setSignal } from '@aufbau/signals';
