@@ -136,6 +136,14 @@ a plain object behind ONE signal, replaced on every write. the flat counterpart 
 
 the constructor takes the object itself — there is no config shape to confuse it with, so `new RecordSignal({ x: 0, y: 0 })` stores exactly that.
 
+### SetSignal
+
+a Set behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Set mutated in place would never notify.
+
+### StringSignal
+
+a string, coerced on every write. null and undefined read as '' rather than leaking into the dom as the words "null" and "undefined".
+
 ### toNode
 
 every type shares `BaseSignal`, which carries `$ready`, `$restore()` and a live text
