@@ -2,7 +2,7 @@
 
 // :::::: IMPORT
 
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: MAIN
 
@@ -21,9 +21,11 @@ class BoolSignal extends BaseSignal {
 
 }
 
-const boolSignal = (...args) => new BoolSignal (...args);
+const boolSignal = (...args) => new BoolSignal(...args);
 
 // :::::: EXPORT
 
-export { BoolSignal, boolSignal };
-export default BoolSignal;
+const Callable = callable(BoolSignal);
+
+export { Callable as BoolSignal, boolSignal };
+export default Callable;

@@ -4,16 +4,18 @@
 
 // :::::: IMPORT
 
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: MAIN
 
 // nothing to override: the value is held exactly as given, which is the whole type.
 class ScalarSignal extends BaseSignal {}
 
-const scalarSignal = (...args) => new ScalarSignal (...args);
+const scalarSignal = (...args) => new ScalarSignal(...args);
 
 // :::::: EXPORT
 
-export { ScalarSignal, scalarSignal };
-export default ScalarSignal;
+const Callable = callable(ScalarSignal);
+
+export { Callable as ScalarSignal, scalarSignal };
+export default Callable;

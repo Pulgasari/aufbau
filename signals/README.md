@@ -209,10 +209,49 @@ replaced wholesale. writes to a name the schema does not carry are ignored.
 values, `$signal` the whole store as one reactive value, `$keys` the declared names and
 `$ready` the hydration promise.
 
+### growing a store
+
+a store is not sealed at construction. `$extend` takes the same schema shape, and
+assigning a **signal** declares a leaf in one line:
+
+```javascript
+ui.$extend({
+  busy  : { type: String, value: '' },
+  route : { type: 'record', value: {} },
+});
+
+ui.busy = StringSignal('');      // the same thing, one leaf
+ui.dark = BoolSignal(false);
+```
+
+every type is callable without `new`, so `BoolSignal(false)` and
+`new BoolSignal(false)` are the same thing and `instanceof` works either way.
+
+assigning a **value** to a name the store does not carry is still ignored — that is
+what keeps the schema the shape. `delete ui.busy` removes a leaf.
+
+`$keys` is reactive, so anything reading it re-runs when a leaf arrives or goes.
+
+### effects
+
+```javascript
+const stop = state.$onEffects({
+  theme : value => applyTheme(value),
+  font  : value => webfonts.init({ name: value }),
+});
+
+state.$onEffect('title', value => document.title = value);
+```
+
+each runs once with the current value and again on every write. an effect declared
+for a leaf that does not exist yet waits and starts when the leaf arrives, which is
+what makes it safe to wire effects before an app has extended the store. the callback's
+own reads are untracked, so they do not become dependencies of the effect.
+
 ### reserved names
 
-the store answers to `get`, `set`, `$signals`, `$snapshot`, `$signal`, `$keys` and
-`$ready` itself. a leaf called `get` or `set` is shadowed by the method; one called
+the store answers to `get`, `set`, `$extend`, `$onEffect`, `$onEffects`, `$signals`,
+`$snapshot`, `$signal`, `$keys` and `$ready` itself. a leaf called `get` or `set` is shadowed by the method; one called
 `keys`, `ready`, `signal`, `signals` or `snapshot` loses only its `$` shorthand. both
 are warned about at construction, and the leaf stays reachable:
 
@@ -228,6 +267,10 @@ write rewrites only the leaf that moved, and a leaf missing from storage keeps i
 declared default, so a later change to that default still wins. `persist` optionally
 allow-lists which leaves are stored. `Map` and `Set` leaves are stored as an object and
 an array respectively, since neither survives JSON.
+
+a leaf added **after** construction does not persist unless it asks to
+(`{ type, value, persist: true }`): most of what an app hangs on a store afterwards is
+working state that has no business in storage.
 
 ```javascript
 const ui = signalStore({ … }, { key: 'app:ui:', store: local, persist: ['view', 'dark'] });

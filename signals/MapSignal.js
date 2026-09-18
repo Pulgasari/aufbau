@@ -5,7 +5,7 @@
 // :::::: IMPORT
 
 import { toEntries } from './shared.js';
-import { BaseSignal } from './BaseSignal.js';
+import { BaseSignal, callable } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -56,9 +56,11 @@ class MapSignal extends BaseSignal {
 
 }
 
-const mapSignal = (...args) => new MapSignal (...args);
+const mapSignal = (...args) => new MapSignal(...args);
 
 // :::::: EXPORT
 
-export { MapSignal, mapSignal };
-export default MapSignal;
+const Callable = callable(MapSignal);
+
+export { Callable as MapSignal, mapSignal };
+export default Callable;
