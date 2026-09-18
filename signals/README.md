@@ -104,13 +104,8 @@ naming, validation and persistence on top.
 ```javascript
 import { boolSignal, enumSignal, recordSignal, setSignal } from '@aufbau/signals';
 
-const open = boolSignal(false);
-open.toggle();                       // true
-open.value = 1;                      // coerced -> true
 
-const view = enumSignal('grid', ['grid', 'list']);
-view.cycle();                        // 'list'
-view.value = 'xl';                   // ignored + console.warn
+
 
 const tags = setSignal(['a']);
 tags.toggle('b');                    // true
@@ -122,9 +117,23 @@ pan.set('x', 5);                     // copy-on-write, publishes a fresh object
 the collection types copy before they write, so every change publishes a new
 reference — a `Map` mutated in place would never notify.
 
+### BoolSignal
+
+```javascript
+const isOpen = boolSignal(false);
+isOpen.toggle();  // true
+isOpen.value = 1; // coerced -> true
+```
+
 ### EnumSignal
 
 a value out of a fixed list. a write outside it is ignored and warned about rather than thrown, so one bad value cannot take a render down with it.
+
+```javascript
+const viewmode = enumSignal('grid', ['grid', 'list']);
+viewmode.cycle();      // 'list'
+viewmode.value = 'xl'; // ignored + console.warn
+```
 
 ### MapSignal
 
