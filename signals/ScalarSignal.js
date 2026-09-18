@@ -4,21 +4,12 @@
 
 // :::::: IMPORT
 
-import { Signal } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: MAIN
 
-class ScalarSignal extends Signal {
-
-  constructor (value) {
-    super(value);
-    this.$ready = null;
-  }
-
-  get value ()     { return super.value; }
-  set value (next) { super.value = next; }
-
-}
+// nothing to override: the value is held exactly as given, which is the whole type.
+class ScalarSignal extends BaseSignal {}
 
 const scalarSignal = (...args) => new ScalarSignal (...args);
 

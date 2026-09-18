@@ -10,7 +10,8 @@
 
 // :::::: IMPORT
 
-import { Signal, isPlainObject } from './shared.js';
+import { isPlainObject } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -18,11 +19,10 @@ const asRecord = source => isPlainObject(source) ? { ...source } : {};
 
 // :::::: MAIN
 
-class RecordSignal extends Signal {
+class RecordSignal extends BaseSignal {
 
   constructor (init = {}) {
     super(asRecord(init));
-    this.$ready = null;
   }
 
   get value ()     { return super.value; }
@@ -43,6 +43,9 @@ class RecordSignal extends Signal {
   delete (key)     { const next = { ...this.peek() }; delete next[key]; super.value = next; }
   clear ()         { super.value = {}; }
   replace (source) { super.value = asRecord(source); }
+
+  // a bare String() of this would read as [object Object]
+  toText () { return JSON.stringify(this.value); }
 
   [Symbol.iterator] () { return Object.entries(this.value)[Symbol.iterator](); }
 

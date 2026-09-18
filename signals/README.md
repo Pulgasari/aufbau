@@ -122,6 +122,23 @@ pan.set('x', 5);                     // copy-on-write, publishes a fresh object
 the collection types copy before they write, so every change publishes a new
 reference — a `Map` mutated in place would never notify.
 
+### toNode
+
+every type shares `BaseSignal`, which carries `$ready`, `$restore()` and a live text
+node:
+
+```javascript
+const title = stringSignal('hello');
+element.append(title.toNode());   // follows the signal from here on
+
+node.$dispose();                  // stops following
+```
+
+nothing can tell when a detached node is collected, so the effect is handed back on
+the node as `$dispose()` — call it when the node goes for good, or it keeps the signal
+subscribed. `toText()` is what gets rendered; the collection types override it so a
+node reads as JSON rather than `[object Map]`.
+
 ### RecordSignal vs deepSignal
 
 both hold an object. `RecordSignal` holds it in **one** signal, so any change wakes
@@ -132,9 +149,8 @@ leaves are read apart from each other.
 
 ## signalStore
 
-a store of named, typed leaves behind a `.value`-free facade. **every leaf declares its
-type** — as a lowercase name, as the native constructor where one fits, or as the signal
-class itself.
+a store of named, typed leaves. **every leaf declares its type** — as a lowercase name,
+as the native constructor where one fits, or as the signal class itself.
 
 ```javascript
 import { signalStore, local, StringSignal } from '@aufbau/signals';
@@ -146,13 +162,6 @@ const ui = signalStore({
   tags  : { type: Set,          value: [] },
   pan   : { type: 'record',     value: { x: 0, y: 0 } },
 }, { key: 'app:ui:', store: local });
-
-ui.view           // 'grid'  — reactive in render, no `.value`
-ui.view = 'list'  // validated against the enum
-ui.pan.x          // 0
-
-ui.$signals.view.cycle();    // the carrier itself, for its own methods
-ui.$signals.tags.add('x');
 ```
 
 | spelling | example |
@@ -166,11 +175,53 @@ that is the point: the older factory reads a plain object as **config**, so
 `signal({ x: 0, y: 0 })` quietly hands back an empty scalar rather than the record it
 looks like. here a leaf's shape is stated, not guessed.
 
-`$signals` are the carriers, `$snapshot` a plain-object view, `$signal` the whole store
-as one reactive value, `$update(patch)` a bulk write, `$keys` the declared names and
+### reading and writing
+
+a leaf reads as the **signal itself**, so its own methods are right there:
+
+```javascript
+ui.view              // the EnumSignal
+ui.view.value        // 'grid'
+ui.view.cycle();     // 'list'
+ui.dark.toggle();
+ui.tags.add('x');
+```
+
+`$name` is the same leaf's **value**, without the `.value`:
+
+```javascript
+ui.$view             // 'grid'   — reactive in render
+ui.$view = 'list';   // writes it, validated by the leaf's type
+```
+
+and `get` / `set` do it by name, one leaf or several:
+
+```javascript
+ui.get('view');                        // 'grid'
+ui.set('view', 'list');
+ui.set({ view: 'list', dark: true });
+```
+
+assigning the bare name (`ui.view = 'list'`) writes the value too — a leaf is never
+replaced wholesale. writes to a name the schema does not carry are ignored.
+
+`$signals` are the carriers as a plain object, `$snapshot` a plain-object view of the
+values, `$signal` the whole store as one reactive value, `$keys` the declared names and
 `$ready` the hydration promise.
 
-### signalStore — persistence
+### reserved names
+
+the store answers to `get`, `set`, `$signals`, `$snapshot`, `$signal`, `$keys` and
+`$ready` itself. a leaf called `get` or `set` is shadowed by the method; one called
+`keys`, `ready`, `signal`, `signals` or `snapshot` loses only its `$` shorthand. both
+are warned about at construction, and the leaf stays reachable:
+
+```javascript
+ui.get('keys');   // always works
+ui.keys.value;    // and so does the carrier
+```
+
+### persistence
 
 `key` is a **prefix**: every leaf persists under `key + leafName`, never as one blob. a
 write rewrites only the leaf that moved, and a leaf missing from storage keeps its
@@ -182,6 +233,9 @@ an array respectively, since neither survives JSON.
 const ui = signalStore({ … }, { key: 'app:ui:', store: local, persist: ['view', 'dark'] });
 await ui.$ready;
 ```
+
+hydration goes through `$restore`, which writes past a leaf's own validation — a stored
+value is authoritative, even one an enum's list no longer knows.
 
 ---
 

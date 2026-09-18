@@ -4,15 +4,14 @@
 
 // :::::: IMPORT
 
-import { Signal } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: MAIN
 
-class EnumSignal extends Signal {
+class EnumSignal extends BaseSignal {
 
   constructor (value, values = []) {
     super(values.includes(value) ? value : values[0]);
-    this.$ready  = null;
     this.$values = [...values];
   }
 

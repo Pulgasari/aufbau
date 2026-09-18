@@ -4,7 +4,7 @@
 
 // :::::: IMPORT
 
-import { Signal } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -12,11 +12,10 @@ const asText = value => value == null ? '' : String(value);
 
 // :::::: MAIN
 
-class StringSignal extends Signal {
+class StringSignal extends BaseSignal {
 
   constructor (value = '') {
     super(asText(value));
-    this.$ready = null;
   }
 
   get value ()     { return super.value; }
