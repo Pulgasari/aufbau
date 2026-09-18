@@ -11,6 +11,23 @@ import { makeMap, makeSet }         from './make.js';
 import { resolveStore }             from './persistence.js';
 import { effect, isPlainObject, isPromise } from './shared.js';
 
+/*
+die konstruktion sollte simpler sein
+
+1. jeder signal-type existiert auch einzeln:
+- BoolSignal
+- ScalarSignal
+- MapSignal
+- SetSignal
+- EnumSignal
+- StringSignal
+- RecordSignal
+usw.
+
+2. 
+
+*/
+
 // carrier = the live value plus a uniform read/write pair the persistence layer uses.
 // read() must subscribe (it runs inside an effect), write() must not re-validate.
 // `nested` implies a deep carrier (nested persistence is per-leaf, see betterSignal).
