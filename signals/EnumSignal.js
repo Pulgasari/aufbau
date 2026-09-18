@@ -1,6 +1,4 @@
 // @aufbau/signals/EnumSignal.js
-// a value out of a fixed list. a write outside it is ignored and warned about
-// rather than thrown, so one bad value cannot take a render down with it.
 
 // :::::: IMPORT
 
