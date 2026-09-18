@@ -1,6 +1,4 @@
 // @aufbau/signals/StringSignal.js
-// a string, coerced on every write. null and undefined read as '' rather than
-// leaking into the dom as the words "null" and "undefined".
 
 // :::::: IMPORT
 
