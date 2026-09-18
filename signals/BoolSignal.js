@@ -2,15 +2,14 @@
 
 // :::::: IMPORT
 
-import { Signal } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: MAIN
 
-class BoolSignal extends Signal {
+class BoolSignal extends BaseSignal {
 
   constructor (value = false) {
     super(Boolean(value));
-    this.$ready = null;
   }
 
   get value ()     { return super.value; }

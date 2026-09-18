@@ -1,16 +1,20 @@
 // @aufbau/signals/SignalStore.js
-// a store of named, typed leaves behind a `.value`-free facade.
+// a store of named, typed leaves.
 //
 //   const ui = signalStore({
 //     view : { type: 'enum', values: ['grid', 'list'], value: 'grid' },
 //     dark : { type: Boolean, value: false },
-//     tags : { type: Set,     value: [] },
-//     pan  : { type: 'record', value: { x: 0, y: 0 } },
 //   }, { key: 'app:ui:', store: local });
 //
-//   ui.view              // 'grid'  — reactive in render, no .value
-//   ui.view = 'list'     // validated against the enum, off-list writes are ignored
-//   ui.$signals.view     // the EnumSignal itself, for cycle() / toggle() / add()
+//   ui.view              // the EnumSignal itself
+//   ui.view.value        // 'grid'
+//   ui.view.cycle()      // its own methods, where the type has them
+//   ui.$view             // 'grid'   — the value, no .value
+//   ui.$view = 'list'    // and writes it
+//
+//   ui.get('view')                        // 'grid'
+//   ui.set('view', 'list')                // one leaf
+//   ui.set({ view: 'list', dark: true })  // several
 //
 // every leaf declares its type. that is the whole point of the mandatory `type`:
 // the old factory read a plain object as config, so `signal({ x: 0, y: 0 })` quietly
@@ -60,6 +64,20 @@ const resolveType = type =>
 
 const NAMES = Object.keys(BY_NAME).join(', ');
 
+// :::::: RESERVED
+// the store answers to these itself, so a leaf of the same name is reachable only
+// through get()/set(). warned about at construction rather than shadowed in silence.
+
+const METHODS   = ['get', 'set'];                                       // ui.get  — shadows a leaf outright
+const SHORTHAND = ['signals', 'snapshot', 'signal', 'keys', 'ready'];   // ui.$keys — shadows the $ form only
+
+const warnReserved = (keys) => {
+  for (const key of keys) {
+    if (METHODS.includes(key))   console.warn(`[signalStore] leaf "${key}" is shadowed by the store's own ${key}() — reach it with get('${key}')`);
+    if (SHORTHAND.includes(key)) console.warn(`[signalStore] leaf "${key}" has no $${key} shorthand ($${key} is the store's own) — read it as .${key}.value`);
+  }
+};
+
 // :::::: LEAVES
 
 const createLeaf = (key, spec) => {
@@ -71,10 +89,6 @@ const createLeaf = (key, spec) => {
 
   return Type === EnumSignal ? new EnumSignal(spec.value, spec.values) : new Type(spec.value);
 };
-
-// hydration is authoritative, so it writes past a leaf's own validation where the
-// leaf says so (see EnumSignal.$restore)
-const restore = (leaf, value) => leaf.$restore ? leaf.$restore(value) : (leaf.value = value);
 
 // :::::: PERSISTENCE
 // one entry per leaf under `key + leafName`, never one blob: a write rewrites only
@@ -95,7 +109,9 @@ const attachPersistence = (signals, store, prefix, only) => {
   }
 
   const wire = () => {
-    for (const [key, value] of Object.entries(loaded)) restore(signals.get(key), value);
+    // $restore, not .value: hydration is authoritative and writes past a leaf's
+    // own validation where the type says so (see EnumSignal)
+    for (const [key, value] of Object.entries(loaded)) signals.get(key).$restore(value);
 
     for (const key of keys) {
       const leaf = signals.get(key);
@@ -105,7 +121,7 @@ const attachPersistence = (signals, store, prefix, only) => {
         if (first) { first = false; return; }   // the hydrated/declared value is already stored, or intentionally not
         store.set(prefix + key, snapshotOf(leaf, value));
       });
-      store.subscribe?.(prefix + key, value => { if (value !== undefined) restore(leaf, value); });
+      store.subscribe?.(prefix + key, value => { if (value !== undefined) leaf.$restore(value); });
     }
   };
 
@@ -125,18 +141,19 @@ export function signalStore (schema, options = {}) {
   for (const [key, spec] of Object.entries(schema)) signals.set(key, createLeaf(key, spec));
 
   const keys      = [...signals.keys()];
+  warnReserved(keys);
   const instances = Object.fromEntries(signals);
 
   // a plain-object view of every leaf's value, and the same as one reactive signal
   const snapshot = () => Object.fromEntries(keys.map(key => [key, signals.get(key).value]));
   const snapSignal = computed(snapshot);
 
-  const update = patch => {
-    if (!isPlainObject(patch)) return;
-    for (const [key, value] of Object.entries(patch)) {
-      const leaf = signals.get(key);
-      if (leaf) leaf.value = value;
-    }
+  // one leaf by name, or several at once
+  const read  = key => signals.get(key)?.value;
+  const write = (key, value) => {
+    if (isPlainObject(key)) { for (const [k, v] of Object.entries(key)) write(k, v); return; }
+    const leaf = signals.get(key);
+    if (leaf) leaf.value = value;           // unknown keys are ignored: the schema is the shape
   };
 
   let ready = null;
@@ -144,21 +161,28 @@ export function signalStore (schema, options = {}) {
   const store = new Proxy({}, {
     get (_, key) {
       if (typeof key === 'symbol') return undefined;
+
+      // the store's own surface wins over a leaf of the same name
       switch (key) {
-        case '$signals'  : return instances;     // the carriers, for cycle() / toggle() / add()
+        case 'get'       : return read;
+        case 'set'       : return write;
+        case '$signals'  : return instances;
         case '$snapshot' : return snapshot();
-        case '$signal'   : return snapSignal;    // the whole store as one reactive value
-        case '$update'   : return update;
+        case '$signal'   : return snapSignal;   // the whole store as one reactive value
         case '$keys'     : return keys;
         case '$ready'    : return ready;
       }
-      return signals.get(key)?.value;
+
+      // $name is the leaf's value, name is the leaf itself
+      return key[0] === '$' ? read(key.slice(1)) : signals.get(key);
     },
+
+    // assigning either form writes the value — a leaf is never replaced wholesale
     set (_, key, value) {
-      const leaf = signals.get(key);
-      if (leaf) leaf.value = value;              // unknown keys are ignored: the schema is the shape
+      write(key[0] === '$' ? key.slice(1) : key, value);
       return true;
     },
+
     has     (_, key) { return signals.has(key); },
     ownKeys ()       { return keys; },
     getOwnPropertyDescriptor () { return { configurable: true, enumerable: true, writable: true }; },

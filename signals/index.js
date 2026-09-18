@@ -14,8 +14,10 @@ export { batch, computed, effect, untracked } from './shared.js';
 export { signal as preactSignal, Signal as PreactSignal } from './shared.js';
 
 // :::::: SIGNAL TYPES
-// each one stands alone: a class plus a lowercase factory, no config object.
+// each one stands alone: a class plus a lowercase factory, no config object. they
+// share BaseSignal, which carries $ready, $restore() and toNode().
 
+export { BaseSignal }                 from './BaseSignal.js';
 export { BoolSignal,   boolSignal }   from './BoolSignal.js';
 export { EnumSignal,   enumSignal }   from './EnumSignal.js';
 export { MapSignal,    mapSignal }    from './MapSignal.js';

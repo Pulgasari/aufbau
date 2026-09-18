@@ -4,7 +4,8 @@
 
 // :::::: IMPORT
 
-import { Signal, toEntries } from './shared.js';
+import { toEntries } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -12,11 +13,10 @@ const asMap = source => source instanceof Map ? source : new Map(toEntries(sourc
 
 // :::::: MAIN
 
-class MapSignal extends Signal {
+class MapSignal extends BaseSignal {
 
   constructor (init = []) {
     super(asMap(init));
-    this.$ready = null;
   }
 
   get value ()     { return super.value; }
@@ -48,6 +48,9 @@ class MapSignal extends Signal {
   // ::: serialization
   toArray  () { return [...this.value.entries()]; }
   toObject () { return Object.fromEntries(this.value); }
+
+  // a bare String() of this would read as [object Object]
+  toText () { return JSON.stringify(this.toObject()); }
 
   [Symbol.iterator] () { return this.value[Symbol.iterator](); }
 

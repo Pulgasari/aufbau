@@ -4,7 +4,7 @@
 
 // :::::: IMPORT
 
-import { Signal } from './shared.js';
+import { BaseSignal } from './BaseSignal.js';
 
 // :::::: HELPERS
 
@@ -12,11 +12,10 @@ const asSet = source => source instanceof Set ? source : new Set(source ?? []);
 
 // :::::: MAIN
 
-class SetSignal extends Signal {
+class SetSignal extends BaseSignal {
 
   constructor (init = []) {
     super(asSet(init));
-    this.$ready = null;
   }
 
   get value ()     { return super.value; }
@@ -45,6 +44,9 @@ class SetSignal extends Signal {
 
   // ::: serialization
   toArray () { return [...this.value]; }
+
+  // a bare String() of this would read as [object Object]
+  toText () { return JSON.stringify(this.toArray()); }
 
   [Symbol.iterator] () { return this.value[Symbol.iterator](); }
 
