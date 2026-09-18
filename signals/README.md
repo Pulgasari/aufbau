@@ -122,6 +122,20 @@ pan.set('x', 5);                     // copy-on-write, publishes a fresh object
 the collection types copy before they write, so every change publishes a new
 reference — a `Map` mutated in place would never notify.
 
+### EnumSignal
+
+a value out of a fixed list. a write outside it is ignored and warned about rather than thrown, so one bad value cannot take a render down with it.
+
+### MapSignal
+
+a Map behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Map mutated in place would never notify.
+
+### RecordSignal
+
+a plain object behind ONE signal, replaced on every write. the flat counterpart to deepSignal: a change here wakes every reader of the record, where a deep signal wakes only the readers of the leaf that moved. reach for this when the object is small and read as a whole (a position, a pair of bounds, a form's draft), and for deepSignal when its leaves are read apart from each other.
+
+the constructor takes the object itself — there is no config shape to confuse it with, so `new RecordSignal({ x: 0, y: 0 })` stores exactly that.
+
 ### toNode
 
 every type shares `BaseSignal`, which carries `$ready`, `$restore()` and a live text
