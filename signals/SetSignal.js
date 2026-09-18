@@ -1,6 +1,4 @@
 // @aufbau/signals/SetSignal.js
-// a Set behind a signal. every mutator copies before it writes, so each change
-// publishes a fresh reference — a Set mutated in place would never notify.
 
 // :::::: IMPORT
 
