@@ -1,12 +1,4 @@
 // @aufbau/signals/RecordSignal.js
-// a plain object behind ONE signal, replaced on every write. the flat counterpart
-// to deepSignal: a change here wakes every reader of the record, where a deep
-// signal wakes only the readers of the leaf that moved. reach for this when the
-// object is small and read as a whole (a position, a pair of bounds, a form's
-// draft), and for deepSignal when its leaves are read apart from each other.
-//
-// the constructor takes the object itself — there is no config shape to confuse
-// it with, so `new RecordSignal({ x: 0, y: 0 })` stores exactly that.
 
 // :::::: IMPORT
 
