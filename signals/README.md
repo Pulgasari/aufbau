@@ -2,6 +2,73 @@
 
 a customized/extended version of the `@preact/signals` library.
 
+---
+
+# signal types
+
+each type stands alone: a class and a lowercase factory, taking the value itself — there is no config object to confuse a value with. `signalStore` below is what adds naming, validation and persistence on top.
+
+## BoolSignal
+
+```javascript
+const isOpen = boolSignal(false);
+isOpen.toggle();  // true
+isOpen.value = 1; // coerced -> true
+```
+
+## EnumSignal
+
+a value out of a fixed list. a write outside it is ignored and warned about rather than thrown, so one bad value cannot take a render down with it.
+
+```javascript
+const viewmode = enumSignal('grid', ['grid', 'list']);
+viewmode.cycle();      // 'list'
+viewmode.value = 'xl'; // ignored + console.warn
+```
+
+## MapSignal
+
+a Map behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Map mutated in place would never notify.
+
+## RecordSignal
+
+a plain object behind ONE signal, replaced on every write. the flat counterpart to deepSignal: a change here wakes every reader of the record, where a deep signal wakes only the readers of the leaf that moved. reach for this when the object is small and read as a whole (a position, a pair of bounds, a form's draft), and for deepSignal when its leaves are read apart from each other.
+
+the constructor takes the object itself — there is no config shape to confuse it with, so `new RecordSignal({ x: 0, y: 0 })` stores exactly that.
+
+## SetSignal
+
+a Set behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Set mutated in place would never notify.
+
+## StringSignal
+
+a string, coerced on every write. null and undefined read as '' rather than leaking into the dom as the words "null" and "undefined".
+
+---
+
+# SignalStore
+
+a store of named, typed leaves. **every leaf declares its type** 
+- as a lowercase name,
+- as the native constructor where one fits,
+- or as the signal class itself.
+
+```javascript
+import { signalStore, local, StringSignal } from '@aufbau/signals';
+
+const ui = signalStore({
+  view  : { type: 'enum',       values: ['grid', 'list'], value: 'grid' },
+  dark  : { type: Boolean,      value: false },
+  title : { type: StringSignal, value: '' },
+  tags  : { type: Set,          value: [] },
+  pan   : { type: 'record',     value: { x: 0, y: 0 } },
+}, { key: 'app:ui:', store: local });
+```
+
+---
+---
+---
+
 ## signal (legacy factory)
 
 `betterSignal`, exported as `signal`. still here while call sites move to
@@ -85,11 +152,7 @@ icons.refetch();
 
 
 
-## signal types
 
-each type stands alone: a class and a lowercase factory, taking the value itself —
-there is no config object to confuse a value with. `signalStore` below is what adds
-naming, validation and persistence on top.
 
 | type | holds | beyond `.value` |
 | --- | --- | --- |
@@ -117,41 +180,6 @@ pan.set('x', 5);                     // copy-on-write, publishes a fresh object
 the collection types copy before they write, so every change publishes a new
 reference — a `Map` mutated in place would never notify.
 
-### BoolSignal
-
-```javascript
-const isOpen = boolSignal(false);
-isOpen.toggle();  // true
-isOpen.value = 1; // coerced -> true
-```
-
-### EnumSignal
-
-a value out of a fixed list. a write outside it is ignored and warned about rather than thrown, so one bad value cannot take a render down with it.
-
-```javascript
-const viewmode = enumSignal('grid', ['grid', 'list']);
-viewmode.cycle();      // 'list'
-viewmode.value = 'xl'; // ignored + console.warn
-```
-
-### MapSignal
-
-a Map behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Map mutated in place would never notify.
-
-### RecordSignal
-
-a plain object behind ONE signal, replaced on every write. the flat counterpart to deepSignal: a change here wakes every reader of the record, where a deep signal wakes only the readers of the leaf that moved. reach for this when the object is small and read as a whole (a position, a pair of bounds, a form's draft), and for deepSignal when its leaves are read apart from each other.
-
-the constructor takes the object itself — there is no config shape to confuse it with, so `new RecordSignal({ x: 0, y: 0 })` stores exactly that.
-
-### SetSignal
-
-a Set behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Set mutated in place would never notify.
-
-### StringSignal
-
-a string, coerced on every write. null and undefined read as '' rather than leaking into the dom as the words "null" and "undefined".
 
 ### toNode
 
@@ -178,22 +206,7 @@ only the readers of the leaf that moved. take the record when the object is smal
 read as a whole (a position, a pair of bounds, a draft), the deep signal when its
 leaves are read apart from each other.
 
-## signalStore
 
-a store of named, typed leaves. **every leaf declares its type** — as a lowercase name,
-as the native constructor where one fits, or as the signal class itself.
-
-```javascript
-import { signalStore, local, StringSignal } from '@aufbau/signals';
-
-const ui = signalStore({
-  view  : { type: 'enum',       values: ['grid', 'list'], value: 'grid' },
-  dark  : { type: Boolean,      value: false },
-  title : { type: StringSignal, value: '' },
-  tags  : { type: Set,          value: [] },
-  pan   : { type: 'record',     value: { x: 0, y: 0 } },
-}, { key: 'app:ui:', store: local });
-```
 
 | spelling | example |
 | --- | --- |
