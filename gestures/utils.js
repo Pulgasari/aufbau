@@ -16,8 +16,9 @@ const MODIFIER = { ctrl: 'ctrlKey', meta: 'metaKey', shift: 'shiftKey', alt: 'al
 
 const NO_SELECT = {
   userSelect         : 'none',
-  webkitUserSelect   : 'none',
-  webkitTouchCallout : 'none'
+  webkitTouchCallout : 'none',
+  webkitUserDrag     : 'none',
+  webkitUserSelect   : 'none'
 };
 
 // :::::: MATRIX

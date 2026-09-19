@@ -59,7 +59,7 @@ gestures(el, { onClick, onSwipe, pressable: { threshold: 700 } });
 |-----------------|--------------------------------------------------------|-------|
 | `pressable`     | `onClick` · `onDoubleClick` · `onLongClick`            | double-click defers the single by `doubleWithin` to disambiguate; without it `onClick` is immediate |
 | `holdable`      | `onHold(count)`                                        | press-and-repeat: once on press, then every `speed` ms after `delay` |
-| `swipeable`     | `onSwipe` · `onSwipe{Up,Down,Left,Right}`              | directional flick past `threshold`; `preventScroll` locks the axis |
+| `swipeable`     | `onSwipe` · `onSwipe{Up,Down,Left,Right}`              | directional flick past `threshold`; derives `touch-action` from the directions it listens on — see below |
 | `pannable`      | `onPanStart` · `onPan` · `onPanEnd`                    | single-pointer drag; reports total delta + per-move step |
 | `pinchable`     | `onPinchStart` · `onPinch` · `onPinchEnd`              | two-finger scale factor (start = 1) + focal point |
 | `rotatable`     | `onRotateStart` · `onRotate` · `onRotateEnd`          | two-finger rotation in degrees, accumulated + focal point |
@@ -68,6 +68,24 @@ gestures(el, { onClick, onSwipe, pressable: { threshold: 700 } });
 | `transformable` | `onTransformStart` · `onTransform` · `onTransformEnd` | free move + scale + rotate (1–2 pointers) + wheel zoom — see below |
 
 See `index.d.ts` for the full option and payload shapes.
+
+### swipeable and touch-action
+
+A touch gesture only reaches a listener if the element's `touch-action` tells the
+browser to keep its hands off that axis — otherwise the browser claims the pointer
+for scrolling and fires `pointercancel`, and the swipe never resolves. `swipeable`
+therefore derives the value from the directions it is given:
+
+| callbacks                              | `touch-action` | effect |
+|----------------------------------------|----------------|--------|
+| `onSwipeLeft` / `onSwipeRight` only    | `pan-y`        | horizontal swipes fire, vertical scrolling stays with the browser |
+| `onSwipeUp` / `onSwipeDown` only       | `pan-x`        | the other way round |
+| both axes, or the generic `onSwipe`    | `none`         | all four directions fire, **native scrolling on the element is off** |
+
+`preventScroll: true` forces `none`; `touchAction: '<value>'` overrides the
+derivation entirely. Composing a swipe with a recognizer that needs `none`
+(`pannable`, `pinchable`, …) also resolves to `none` — the most restrictive value
+wins.
 
 ### transformable — the flagship
 

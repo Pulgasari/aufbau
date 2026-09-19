@@ -47,7 +47,8 @@ export interface SwipeableOptions {
   onSwipeRight?: (payload: SwipePayload) => void;
   threshold?: number;       // px before a swipe registers (default 50)
   holdTime?: number;        // ms; ignore swipes slower than this (default 0 = off)
-  preventScroll?: boolean;  // lock native scrolling while swiping (default false)
+  preventScroll?: boolean;  // force touch-action 'none' (default false)
+  touchAction?: string;     // override the axis-derived touch-action (default null)
 }
 export function swipeable (options?: SwipeableOptions): RecognizerPart;
 
