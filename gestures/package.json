@@ -8,7 +8,10 @@
   "exports": {
     ".": "./index.js",
     "./core": "./core.js",
-    "./preact": "./adapters/preact.js"
+    "./preact": {
+      "types": "./adapters/preact.d.ts",
+      "default": "./adapters/preact.js"
+    }
   },
   "license": "MIT"
 }

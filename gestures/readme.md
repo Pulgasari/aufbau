@@ -43,14 +43,14 @@ Every recognizer is a **factory** that returns a part — it binds nothing itsel
 - `destroy` — tear-down
 - `set` — imperative value setter (only `adjustable`)
 
-`gestures(element, options)` binds every recognizer whose callbacks are present,
+`compose(element, options)` binds every recognizer whose callbacks are present,
 merges their handlers per event type, applies their styles, and resolves
 `touch-action` to the **most restrictive** of the parts (so combining a pan with
 an adjust never re-enables native scrolling under the drag). Shared option names
 can be scoped per recognizer:
 
 ```javascript
-gestures(el, { onClick, onSwipe, pressable: { threshold: 700 } });
+compose(el, { onClick, onSwipe, pressable: { threshold: 700 } });
 ```
 
 ## Recognizers
@@ -95,7 +95,7 @@ accumulates a 2D matrix (composed from the frame-to-frame similarity transform)
 and every callback gets both the decomposed values and the raw matrix:
 
 ```javascript
-gestures(el, {
+compose(el, {
   onTransform ({ x, y, scale, rotation, matrix }) {
     el.style.transform = `matrix(${matrix.join(',')})`;   // element needs transform-origin: 0 0
   },
@@ -123,9 +123,31 @@ const ref = useGesture({ onDoubleClick, onSwipeLeft, onAdjust });
 return html`<div ref=${ref} />`;
 ```
 
-Callbacks are read live through a ref, so inline arrows are fine and nothing
-rebinds on re-render. Scalar options and *which* recognizers are active are read
-once at attach time — remount via `key` to change them.
+`useGesture` returns a **ref callback**, not a ref object — the gestures are
+imperative on the dom node (non-passive listeners, a merged `touch-action`, one
+dispatch group per event type), so the binding needs the element itself, which the
+`ref` slot is the only render-time access to.
+
+It must land on a dom element. Preact hands a function component its own instance
+instead of a node, so `<${SomeComponent} ref=${ref} />` cannot work — the adapter
+throws a named error rather than failing deep inside `compose`.
+
+Callbacks are read live, so inline arrows are fine and nothing rebinds on
+re-render; that holds for callbacks inside a per-recognizer namespace too. Scalar
+options and *which* recognizers are active are read once at attach time — remount
+via `key` to change them.
+
+The returned callback doubles as a ref object, so one `ref` slot serves two
+consumers and a recognizer's imperative api stays reachable:
+
+```javascript
+const ref = useGesture({ onAdjust: size => setSize(size) });
+
+useEffect(() => {
+  console.log(ref.current);                       // the node
+  ref.handle.parts.find(p => p.set)?.set(64);     // push an external value back in
+});
+```
 
 ## Status
 

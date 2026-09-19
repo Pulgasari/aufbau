@@ -155,11 +155,13 @@ export type GestureOptions =
     transformable?: TransformableOptions;
   };
 
+export const RECOGNIZERS: readonly string[];
+
 export interface GestureHandle {
   parts: RecognizerPart[];
   destroy (): void;
 }
-export function gestures (element: Element, options?: GestureOptions): GestureHandle;
+export function compose (element: Element, options?: GestureOptions): GestureHandle;
 
 // ── math helpers ─────────────────────────────────────────────────────────
 
