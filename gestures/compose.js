@@ -37,6 +37,10 @@ const FACTORIES = [
   ['wheelable',     wheelable,     o => o.onWheel],
 ];
 
+// the namespace keys a caller may scope options under, e.g. `pressable: { … }`.
+// the preact adapter needs them to tell a namespace from a plain option value.
+const RECOGNIZERS = FACTORIES.map(([name]) => name);
+
 // most-restrictive wins when several recognizers want different touch-actions,
 // so composing e.g. a pan (needs 'none') with an adjust ('pan-x pan-y') doesn't
 // let the looser one re-enable native scrolling under the drag.
@@ -78,5 +82,5 @@ function compose (element, options = {}) {
 
 // :::::: EXPORT
 
-export       { compose };
+export       { compose, RECOGNIZERS };
 export default compose;

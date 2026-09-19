@@ -53,7 +53,8 @@ function pannable ({ onPanStart, onPan, onPanEnd, tolerance = 8 } = {}) {
       pointerdown   : down,
       pointermove   : move,
       pointerup     : up,
-      pointercancel : up
+      pointercancel : up,
+      dragstart     : event => event.preventDefault()   // a native image/link drag would cancel the pointer
     },
     style       : NO_SELECT,
     touchAction : 'none',

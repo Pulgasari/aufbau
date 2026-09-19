@@ -1,11 +1,11 @@
 /* @aufbau/gestures
 
 pointer-driven gestures for the browser. the recognizers and the composer are
-framework-agnostic (core.js); framework bindings live under adapters/ and are
-imported on their own, e.g. `import { useGesture } from '@aufbau/gestures/preact'`.
+framework-agnostic; framework bindings live under adapters/ and are imported on
+their own, e.g. `import { useGesture } from '@aufbau/gestures/preact'`.
 
-import { gestures } from '@aufbau/gestures';
-const handle = gestures(el, { onSwipeLeft: … , onTransform: … });
+import { compose } from '@aufbau/gestures';
+const handle = compose(el, { onSwipeLeft: … , onTransform: … });
 later: handle.destroy();
 */
 
