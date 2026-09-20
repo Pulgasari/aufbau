@@ -39,15 +39,32 @@ viewmode.value = 'xl'; // ignored + console.warn
 a Map behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Map mutated in place would never notify.
 
 ### methods
-- `get()`
-- `has()`
-- `set()`
+- `clear`
+- `delete`
+- `get`
+- `has`
+- `replace`
+- `set`
+- `size`
+- `toArray`
+- `toObject`
 
 ## RecordSignal
 
 a plain object behind ONE signal, replaced on every write. the flat counterpart to deepSignal: a change here wakes every reader of the record, where a deep signal wakes only the readers of the leaf that moved. reach for this when the object is small and read as a whole (a position, a pair of bounds, a form's draft), and for deepSignal when its leaves are read apart from each other.
 
 the constructor takes the object itself — there is no config shape to confuse it with, so `new RecordSignal({ x: 0, y: 0 })` stores exactly that.
+
+### methods
+- `clear`
+- `delete`
+- `get`
+- `has`
+- `keys`
+- `patch`
+- `replace`
+- `set`
+- `size`
 
 ## SetSignal
 
@@ -184,8 +201,8 @@ icons.refetch();
 | --- | --- | --- |
 | `BoolSignal`   | a boolean, coerced | `on()`, `off()`, `toggle()` |
 | `EnumSignal`   | a value out of a list | `cycle()`, `$values` |
-| `MapSignal`    | a `Map` | `get/set/delete/has/clear/replace`, `size`, `toObject()`, `toArray()` |
-| `RecordSignal` | a plain object | `get/set/patch/delete/has/clear/replace`, `keys()`, `size` |
+| `MapSignal`    | a `Map` | 
+
 | `ScalarSignal` | anything, as given | — |
 | `SetSignal`    | a `Set` | `add/delete/toggle/has/clear/replace`, `size`, `toArray()` |
 | `StringSignal` | a string, coerced | `length`, `clear()` |
