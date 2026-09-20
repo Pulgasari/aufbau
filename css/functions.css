@@ -24,6 +24,19 @@ if no color is provided, defaults to currentColor.
   result: color-mix(in var(--mode), var(--color), black var(--amount));
 }
 
+/* 
+  function: --lighter
+  lightens a color by mixing it with white.
+  if no color is provided, defaults to currentColor.
+*/
+@function --lighter (
+  --color  <color>      : currentColor, 
+  --amount <percentage> : 10%,
+  --mode                : oklch
+){
+  result: color-mix(in var(--mode), var(--color), white var(--amount));
+}
+
 
 
 
