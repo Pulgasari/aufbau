@@ -1,0 +1,53 @@
+@property --theme {
+  syntax: "classic | oled | soviet";
+  inherits: false;
+  initial-value: classic;
+}
+
+:root {
+  --theme-bg: if(
+    style(--theme: classic) : white;
+    style(--theme: oled)    : black;
+    style(--theme: soviet)  : red;
+    else: purple
+  );
+  --theme-fg: if(
+    style(--theme: classic) : black;
+    style(--theme: oled)    : white;
+    style(--theme: soviet)  : yellow;
+    else: green
+  );
+}
+
+
+#devtools, .Dock > * {
+  --theme: soviet;
+  
+  background : var(--theme-bg);
+  color      : var(--theme-fg);
+}
+
+
+
+
+
+@property --dv {
+  syntax: "soviet | <color>";
+  inherits: false;
+  initial-value: soviet;
+}
+
+
+#devtools, .Dock > * {
+  --dv: soviet;
+  --dv-bg: if(
+    style(--dv: soviet): red;
+    else: var(--dv)
+  );
+  --dv-fg: if(
+    style(--dv: soviet): yellow;
+    else: var(--dv)
+  );
+  background : var(--dv-bg);
+  color      : var(--dv-fg);
+}
