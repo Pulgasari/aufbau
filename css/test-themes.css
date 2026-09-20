@@ -1,3 +1,95 @@
+/* VARIANTE 1 */
+
+@property --theme {
+  syntax: "classic | oled | soviet";
+  inherits: false;
+  initial-value: classic;
+}
+
+@property --theme-bg {
+  syntax: "<color>";
+  inherits: false;
+}
+
+@property --theme-fg {
+  syntax: "<color>";
+  inherits: false;
+}
+
+:root {
+  --theme: oled;
+  --theme-bg: if(
+    style(--theme: classic) : white;
+    style(--theme: oled)    : black;
+    style(--theme: soviet)  : red;
+    else: purple
+  );
+  --theme-fg: if(
+    style(--theme: classic) : black;
+    style(--theme: oled)    : white;
+    style(--theme: soviet)  : yellow;
+    else: green
+  );
+}
+
+#devtools, .Dock > * {
+  background : var(--theme-bg);
+  color      : var(--theme-fg);
+}
+
+
+
+/* VARIANTE 2: dynamischer */
+
+@property --theme {
+  syntax: "classic | oled | soviet";
+  inherits: true;
+  initial-value: classic;
+}
+
+@property --theme-bg {
+  syntax: "<color>";
+  inherits: false;
+}
+
+@property --theme-fg {
+  syntax: "<color>";
+  inherits: false;
+}
+
+:root {
+  --theme: oled;
+}
+* {
+  --theme-bg: if(
+    style(--theme: classic) : white;
+    style(--theme: oled)    : black;
+    style(--theme: soviet)  : red;
+    else: purple
+  );
+  --theme-fg: if(
+    style(--theme: classic) : black;
+    style(--theme: oled)    : white;
+    style(--theme: soviet)  : yellow;
+    else: green
+  );
+}
+
+#app {
+  --theme: soviet;
+}
+#devtools, .Dock > * {
+  background : var(--theme-bg);
+  color      : var(--theme-fg);
+}
+
+
+
+
+
+
+
+
 @property --theme {
   syntax: "classic | oled | soviet";
   inherits: false;
