@@ -1,3 +1,12 @@
+/*
+NAME     BG       FG
+--------------------------
+classic  white    black
+oled     black    white
+soviet   red      yełlow
+zombie   #282a36  #f8f8f2
+*/
+
 /* VARIANTE 1 */
 
 @property --theme {
