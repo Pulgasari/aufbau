@@ -1,4 +1,33 @@
+/* 
+function: --alpha
+applies transparency to a color.
+if no color is provided, defaults to currentColor.
+*/
+@function --alpha (
+  --color   <color>      : currentColor,
+  --opacity <percentage> : 50%,
+  --mode                 : oklch
+){
+  result: color-mix(in var(--mode), var(--color) var(--opacity), transparent);
+}
 
+/* 
+  function: --darker
+  darkens a color by mixing it with black.
+  if no color is provided, defaults to currentColor.
+*/
+@function --darker (
+  --color  <color>      : currentColor, 
+  --amount <percentage> : 10%,
+  --mode                : oklch
+){
+  result: color-mix(in var(--mode), var(--color), black var(--amount));
+}
+
+
+
+
+/* trash */
 
 @function --dashed-border(--color: red) {
   result: 2px dashed var(--color);
