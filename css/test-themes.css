@@ -1,9 +1,9 @@
 /* VARIANTE 1 */
 
 @property --theme {
-  syntax: "classic | oled | soviet";
+  syntax: "classic | oled | soviet | zombie";
   inherits: false;
-  initial-value: classic;
+  initial-value: zombie;
 }
 
 @property --theme-bg {
@@ -22,13 +22,13 @@
     style(--theme: classic) : white;
     style(--theme: oled)    : black;
     style(--theme: soviet)  : red;
-    else: purple
+    style(--theme: zombie)  : #282a36;
   );
   --theme-fg: if(
     style(--theme: classic) : black;
     style(--theme: oled)    : white;
     style(--theme: soviet)  : yellow;
-    else: green
+    style(--theme: zombie)  : #f8f8f2;
   );
 }
 
@@ -42,9 +42,9 @@
 /* VARIANTE 2: dynamischer */
 
 @property --theme {
-  syntax: "classic | oled | soviet";
+  syntax: "classic | oled | soviet | zombie";
   inherits: true;
-  initial-value: classic;
+  initial-value: zombie;
 }
 
 @property --theme-bg {
@@ -65,13 +65,13 @@
     style(--theme: classic) : white;
     style(--theme: oled)    : black;
     style(--theme: soviet)  : red;
-    else: purple
+    style(--theme: zombie)  : #282a36;
   );
   --theme-fg: if(
     style(--theme: classic) : black;
     style(--theme: oled)    : white;
     style(--theme: soviet)  : yellow;
-    else: green
+    style(--theme: zombie)  : #f8f8f2;
   );
 }
 
@@ -85,7 +85,18 @@
 
 
 
+/* @aufbau/css/themes/zombie.css */
 
+:root, :root[data-theme="zombie"] {
+   --aufbau-bg     : #282a36;
+   --aufbau-fg     : #f8f8f2;
+   --aufbau-blue   : #8be9fd;
+   --aufbau-green  : #50fa7b;
+   --aufbau-orange : #ffb86c;
+   --aufbau-red    : #ff79c6;
+   --aufbau-purple : #bd93f9;
+   --aufbau-yellow : #f1fa8c;
+}
 
 
 
