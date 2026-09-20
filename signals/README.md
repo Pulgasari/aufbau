@@ -144,6 +144,41 @@ const ui = signalStore({
 ```
 
 ---
+
+# Examples
+
+```javascript
+// componets/Picker.js
+
+function Option (value) {
+  return html`<option value=${value}>${value}</option>`;
+}
+
+function Picker ({ signal, ...rest }) {
+  return html`
+    <select ...${rest}>
+      ${signal.values.map(Option)}
+    </select>
+  `;
+}
+
+return default Picker;
+```
+
+```javascript
+import Picker from 'components/Picker.js';
+
+const sorting  = enumSignal('newest', ['newest', 'oldest', 'random']);
+const viewmode = enumSignal(['grid', 'list']); // defaults to first value in list
+
+function Panel () {
+  return html`
+    <${Picker} signal=${sorting} />
+    <${Picker} signal=${viewmode} />
+  `;
+}
+```
+
 ---
 ---
 
