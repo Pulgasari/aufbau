@@ -88,7 +88,7 @@ const ui = signalStore({
   title : { type: StringSignal, value: '' },
   tags  : { type: Set,          value: [] },
   pan   : { type: 'record',     value: { x: 0, y: 0 } },
-}, { key: 'app:ui:', store: local });
+}, { key: 'app:ui:', store: localStorage });
 ```
 
 ---
