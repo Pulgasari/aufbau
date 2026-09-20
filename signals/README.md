@@ -2,19 +2,24 @@
 
 a customized/extended version of the `@preact/signals` library.
 
+it provides specialized [types of signals](#signal-types) (incl. helper methods and value validation) and a [store interface](#signalstore).
+
 ---
 
 # signal types
 
-each type stands alone: a class and a lowercase factory, taking the value itself — there is no config object to confuse a value with. `signalStore` below is what adds naming, validation and persistence on top.
+each type stands alone: a class and a lowercase factory. 
 
 ## BoolSignal
 
 ```javascript
-const isOpen = boolSignal(false);
+const isOpen = boolSignal(false); // or: new BoolSignal
 isOpen.toggle();  // true
 isOpen.value = 1; // coerced -> true
 ```
+
+### methods
+- `toggle()`
 
 ## EnumSignal
 
@@ -26,9 +31,17 @@ viewmode.cycle();      // 'list'
 viewmode.value = 'xl'; // ignored + console.warn
 ```
 
+### methods
+- `cycle()`
+
 ## MapSignal
 
 a Map behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Map mutated in place would never notify.
+
+### methods
+- `get()`
+- `has()`
+- `set()`
 
 ## RecordSignal
 
@@ -40,9 +53,22 @@ the constructor takes the object itself — there is no config shape to confuse 
 
 a Set behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Set mutated in place would never notify.
 
+### methods
+- `add()`
+
 ## StringSignal
 
 a string, coerced on every write. null and undefined read as '' rather than leaking into the dom as the words "null" and "undefined".
+
+### methods
+- `prefix` / `unprefix`
+- `suffix` / `unsuffix`
+- `toCase`
+- `toCamelCase`
+- `toLowerCase`
+- `toPascalCase`
+- `toSlugCase`
+- `toUpperCase`
 
 ---
 
