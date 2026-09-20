@@ -143,23 +143,20 @@ zombie   #282a36  #f8f8f2
 
 
 
-@property --dv {
-  syntax: "soviet | <color>";
+@property --color {
+  syntax: "geowirot | <color>";
   inherits: false;
-  initial-value: soviet;
+  initial-value: geowirot;
 }
 
+* {
+  --color: if(
+    style(--fg: geowirot): #ff0055;
+    else: var(--fg)
+  );
+  color: var(--color);
+}
 
-#devtools, .Dock > * {
-  --dv: soviet;
-  --dv-bg: if(
-    style(--dv: soviet): red;
-    else: var(--dv)
-  );
-  --dv-fg: if(
-    style(--dv: soviet): yellow;
-    else: var(--dv)
-  );
-  background : var(--dv-bg);
-  color      : var(--dv-fg);
+div {
+  --fg: geowirot; /* oder jegliche reguläre from von css-farbangabe */ 
 }
