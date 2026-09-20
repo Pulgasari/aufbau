@@ -19,7 +19,9 @@ isOpen.value = 1; // coerced -> true
 ```
 
 ### methods
-- `toggle()`
+- `asElement`
+- `asNode`
+- `toggle`
 
 ## EnumSignal
 
@@ -39,6 +41,8 @@ viewmode.value = 'xl'; // ignored + console.warn
 a Map behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Map mutated in place would never notify.
 
 ### methods
+- `asElement`
+- `asNode`
 - `clear`
 - `delete`
 - `get`
@@ -71,13 +75,23 @@ the constructor takes the object itself — there is no config shape to confuse 
 a Set behind a signal. every mutator copies before it writes, so each change publishes a fresh reference — a Set mutated in place would never notify.
 
 ### methods
-- `add()`
+- `add`
+- `clear`
+- `delete`
+- `has`
+- `replace`
+- `size`
+- `toArray`
 
 ## StringSignal
 
 a string, coerced on every write. null and undefined read as '' rather than leaking into the dom as the words "null" and "undefined".
 
 ### methods
+- `asElement`
+- `asNode`
+- `clear`
+- `length`
 - `prefix` / `unprefix`
 - `suffix` / `unsuffix`
 - `toCase`
@@ -200,12 +214,10 @@ icons.refetch();
 | type | holds | beyond `.value` |
 | --- | --- | --- |
 | `BoolSignal`   | a boolean, coerced | `on()`, `off()`, `toggle()` |
-| `EnumSignal`   | a value out of a list | `cycle()`, `$values` |
-| `MapSignal`    | a `Map` | 
 
 | `ScalarSignal` | anything, as given | — |
-| `SetSignal`    | a `Set` | `add/delete/toggle/has/clear/replace`, `size`, `toArray()` |
-| `StringSignal` | a string, coerced | `length`, `clear()` |
+
+
 
 ```javascript
 import { boolSignal, enumSignal, recordSignal, setSignal } from '@aufbau/signals';
