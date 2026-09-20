@@ -128,7 +128,7 @@ const ui = signalStore({ // or: new SignalStore
   title : { type: 'string', value: '' },
   tags  : { type: 'set',    value: [] },
   pan   : { type: 'record', value: { x: 0, y: 0 } },
-}, { key: 'app:ui:', store: localStorage });
+}, { key: 'app:ui:', storage: localStorage });
 ```
 
 ```javascript
@@ -140,7 +140,7 @@ const ui = signalStore({
   title : { type: StringSignal, value: '' },
   tags  : { type: Set,          value: [] },
   pan   : { type: 'record',     value: { x: 0, y: 0 } },
-}, { key: 'app:ui:', store: localStorage });
+}, { key: 'app:ui:', storage: localStorage });
 ```
 
 ---
