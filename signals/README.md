@@ -123,7 +123,7 @@ a store of named, typed leaves. **every leaf declares its type**
 import { signalStore } from '@aufbau/signals';
 
 const ui = signalStore({ // or: new SignalStore
-  view  : { type: 'enum',   values: ['grid', 'list'], value: 'grid' },
+  view  : { type: 'enum',   value: 'grid', values: ['grid', 'list'] },
   dark  : { type: 'bool',   value: false },
   title : { type: 'string', value: '' },
   tags  : { type: 'set',    value: [] },
