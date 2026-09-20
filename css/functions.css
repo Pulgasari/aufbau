@@ -1,3 +1,5 @@
+/*//////////// COLOR FUNCTIONS ////////////*/
+
 /* 
 function: --alpha
 applies transparency to a color.
@@ -35,6 +37,25 @@ if no color is provided, defaults to currentColor.
   --mode                : oklch
 ){
   result: color-mix(in var(--mode), var(--color), white var(--amount));
+}
+
+/*//////////// MISC FUNCTIONS ////////////*/
+
+/* 
+  Function: --space
+  Maps predefined size keywords (small, normal, large) to rem values.
+  Defaults to 'normal' if no argument is passed.
+*/
+@function --space (
+  --size <custom-ident> : normal
+){
+  result: if(
+    style(--size: tiny)  : 0.25rem;
+    style(--size: small) : 0.50rem;
+    style(--size: large) : 1.50rem;
+    style(--size: huge)  : 2.50rem;
+    else: 1rem
+  );
 }
 
 
