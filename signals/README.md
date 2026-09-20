@@ -52,6 +52,9 @@ a Map behind a signal. every mutator copies before it writes, so each change pub
 - `size`
 - `toArray`
 - `toObject`
+- `toEntries`
+- `toKeys`
+- `toValues`
 
 ## RecordSignal
 
@@ -65,10 +68,16 @@ the constructor takes the object itself — there is no config shape to confuse 
 - `get`
 - `has`
 - `keys`
+- `map`
+- `mapKeys`
+- `mapValues`
 - `patch`
 - `replace`
 - `set`
 - `size`
+- `toEntries`
+- `toKeys`
+- `toValues`
 
 ## SetSignal
 
