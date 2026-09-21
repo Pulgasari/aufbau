@@ -98,7 +98,6 @@ customElements.define('aufbau-flag', AufbauFlag);
 <aufbau-gui>
 <aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
 <aufbau-include>
-<aufbau-keyboard>
 <aufbau-media> (allrounder?)
 <aufbau-menu>
 <aufbau-modal>
@@ -128,6 +127,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-flag>`](#aufbau-flag) ·
 [`<aufbau-icon>`](#aufbau-icon) ·
 [`<aufbau-input>`](#aufbau-input) ·
+[`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-option>`](#aufbau-option) ·
 [`<aufbau-picker>`](#aufbau-picker) ·
@@ -322,6 +322,35 @@ für `type="range"` gibt es [`<aufbau-slider>`](#aufbau-slider), für `type="fil
 ```html
 <aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
 ```
+
+## aufbau-keyboard
+
+eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
+sie tippt in das, was fokus hat, oder in `target`, indem sie die
+keyboard-events schickt, die eine echte taste schicken würde. wo der browser
+die VirtualKeyboard-api hat, hält sie die native tastatur unten.
+
+```html
+<aufbau-keyboard></aufbau-keyboard>
+<aufbau-keyboard layout="en" target="#editor textarea"></aufbau-keyboard>
+<aufbau-keyboard rows="keys" native-keyboard="keep"></aufbau-keyboard>
+```
+
+`rows` sagt, welche blöcke in welcher reihenfolge gerendert werden
+(`"symbols keys"` ist der default). `layout` ist `de` oder `en`, eigene kommen
+über `AufbauKeyboard.layouts.fr = { regular, shift, symbols }` dazu: eine reihe
+ist ein string aus zeichen, ein leerzeichen darin ist eine lücke.
+
+`shift`, `caps`, `ctrl` und `alt` stehen als attribute am element, sind also
+les- und stylebar; shift, ctrl und alt sind einmalig und fallen mit der taste
+weg, die sie modifiziert haben. jede taste meldet sich als
+`aufbau-keyboard-key`, und `press(key)` / `toggle(name)` gehen auch ohne klick.
+
+zwei dinge, die sie von der vorlage aus `apps/code` unterscheiden: eine taste,
+die ein editor selbst behandelt (`preventDefault` auf dem keydown), wird nicht
+noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
+wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
+hat und sonst gar nichts passieren würde.
 
 ## aufbau-loop
 
