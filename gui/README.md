@@ -1,10 +1,12 @@
 # @aufbau/gui
 
-spec-driven ui controls. a **spec** maps field keys to descriptors; `render()`
-emits the matching `aufbau-*` controls as dom elements or an html string, and
-`readValues()` reads typed values back out of a rendered container.
+spec-driven ui-controls. 
 
-extracted from `@aufbau/runtime/gui.js` (the runtime package is being dissolved).
+a **spec** maps field keys to descriptors.
+
+`render()` emits the matching `aufbau-*` controls as dom-elements or an html-string.
+
+`readValues()` reads typed values back out of a rendered container.
 
 ## install
 
