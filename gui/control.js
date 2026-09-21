@@ -36,9 +36,8 @@ function toControl (key, spec, value) {
     // duration carries its own unit ("2s") so the readout is self-describing;
     // min/max ride through (the domain parses them), step is a bare axis number
     case 'duration' : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'duration', min, max, step: numberOf(step), value }) };
-    // a year is discrete and usually typed, so a stepper beats a wide slider
-    case 'year'     : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'year', look: 'stepper', min, max, step, value }) };
-    case 'color'    : return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type: 'color', look: 'swatch', value }) };
+    case 'year'     : return { tag: 'aufbau-input',  attrs: pruned({ ...attrs, type: 'year', look: 'stepper', min, max, step, value }) };
+    case 'color'    : return { tag: 'aufbau-input',  attrs: pruned({ ...attrs, type: 'color', look: 'swatch', value }) };
   }
 
   // date, datetime, time, email, password, phone, text, url -> native aufbau-input
