@@ -1,7 +1,7 @@
 // @aufbau/elements/core/schema.js
 
-import { isArray, isFn, isPlainObject } from '@pulgasari/is';
 import { toArray }                      from '@pulgasari/coerce';
+import { isArray, isFn, isPlainObject } from '@pulgasari/is';
 import { toKebabCase }                  from '@pulgasari/str';
 
 const cache = new WeakMap;
@@ -23,12 +23,12 @@ export const parseSchemaEntry = (entry) => {
     ...BASE,
     type     : entry.type ?? typeOf(entry.default),
     fallback : entry.default,
-    values   : isArray(entry.values) ? entry.values : null,
-    fn       : isFn(entry.fn) ? entry.fn : null,
-    // true -> auto namespaced key, string|string[] -> explicit keys
-    config   : entry.config === true ? true : (entry.config ? toArray(entry.config) : null),
-    // true -> var named after the attribute, string -> explicit var name
-    var      : entry.var === true ? true : (entry.var ? String(entry.var) : null),
+    values   : isArray (entry.values) ? entry.values : null,
+    fn       : isFn    (entry.fn)     ? entry.fn     : null,
+    // config :: true -> auto namespaced key, string|string[] -> explicit keys
+    // var :: true -> var named after the attribute, string -> explicit var name
+    config : entry.config === true ? true : (entry.config ? toArray (entry.config) : null),
+    var    : entry.var    === true ? true : (entry.var    ? String  (entry.var)    : null),
   };
 
   // shorthand, bare default value: `volume: 50`
