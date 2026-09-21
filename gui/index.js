@@ -18,5 +18,5 @@ function render (spec, options = {}) {
     : renderElement (spec, options);
 }
 
-export { field, readValues, render };
+export         { field, readValues, render };
 export default { field, readValues, render };
