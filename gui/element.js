@@ -1,6 +1,7 @@
 // @aufbau/gui/element.js
-// dom renderer. builds real nodes via @domina/methods; the aufbau-* controls it
-// emits must be registered by the consumer (@aufbau/elements is a peer).
+
+// dom renderer. builds real nodes via @domina/methods; 
+// the aufbau-* controls it emits must be registered by the consumer.
 
 import createElement  from '@domina/methods/createElement.js';
 import createFragment from '@domina/methods/createFragment.js';
@@ -10,23 +11,26 @@ import { normalizeOption, toControl } from './control.js';
 import { readValues }                 from './read.js';
 
 // one field as dom: <label><span>label</span><aufbau-control/></label>
-export function fieldElement (key, spec, value) {
+function fieldElement (key, spec, value) {
   const { tag, attrs, options } = toControl(key, spec, value);
   const control = createElement(tag, attrs);
 
   if (options) for (const option of options) {
     const [value, textContent] = normalizeOption(option);
-    control.append(createElement('aufbau-option', { value, textContent }));
+    const $option = createElement('aufbau-option', { value, textContent });
+    control.append($option);
   }
 
   const field = createElement('label');
-  field.append(createElement('span', { textContent: spec.label ?? key }), control);
+  const $span = createElement('span', { textContent: spec.label ?? key });
+  
+  field.append($span, control);
   return field;
 }
 
 // a whole spec as a dom container (or fragment when wrap is false). onChange
 // fires on change/input with (values, name, event).
-export function renderElement (spec, { values = {}, wrap = 'div', onChange } = {}) {
+function renderElement (spec, { values = {}, wrap = 'div', onChange } = {}) {
   const container = wrap ? createElement(wrap) : createFragment();
   for (const [key, s] of Object.entries(spec)) container.append(fieldElement(key, s, values[key]));
 
@@ -34,8 +38,11 @@ export function renderElement (spec, { values = {}, wrap = 'div', onChange } = {
     // resolve the field name off the nearest named control, not the raw target:
     // composite controls (aufbau-picker) bubble change/input from an inner
     // element that carries no name, which would otherwise read back as null
-    const handler = event => onChange(readValues(container, spec), event.target?.closest?.('[name]')?.getAttribute('name') ?? null, event);
+    const $target = event.target?.closest?.('[name]')?.getAttribute('name') ?? null;
+    const handler = event => onChange(readValues(container, spec), $target, event);
     onEvent(container, ['change', 'input'], handler);
   }
   return container;
 }
+
+export { fieldElement, renderElement };
