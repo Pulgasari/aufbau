@@ -2,12 +2,41 @@
 
 // :::::: IMPORT
 
-import config        from './config.js';
 import elements      from '@aufbau/elements';
 import webfonts      from '@aufbau/webfonts';
 import { deepMerge } from '@pulgasari/obj';
 
 import { setConfig as setElementsConfig } from '@aufbau/elements/core/AufbauConfig.js';
+
+// :::::: CONFIG
+
+const config = {
+
+  // @aufbau/elements
+  elements : { 
+    mode: 'auto', // 'all' | 'auto' | false
+  },
+  
+  /*
+  // data
+  data : {
+    layouts : ['mobile'],
+    looks   : ['flat', 'rounded'],
+    skins   : ['monochrome'],
+    themes  : ['classic', 'oled', 'rainbow', 'zombie'],
+  },
+  */
+
+  // appearance
+  font : ['Manrope'],
+  css : {
+    reset  : true,
+    layout : false,
+    look   : 'flat',
+    skin   : 'monochrome',
+    theme  : 'zombie',
+  }
+};
 
 // :::::: 
 
@@ -32,6 +61,7 @@ const lazyDomina = (method) => lazy(() => import(`@domina/methods/${method}.js`)
 // :::::: 
 
 class AufbauAPI {
+  config = config;
   #isBooted = false;
   
   set theme(value) {
@@ -58,9 +88,9 @@ class AufbauAPI {
     this.setConfig(options);
   
     if (typeof window !== 'undefined' && !this.#isBooted) {
-      webfonts.init(config.font); // load + apply font-files
-      this.initStyleSheets(config.css);
-      this.initElements   (config.elements);
+      webfonts.init(this.config.font); // load + apply font-files
+      this.initStyleSheets(this.config.css);
+      this.initElements   (this.config.elements);
       this.#isBooted = true;
     }
     
@@ -68,9 +98,9 @@ class AufbauAPI {
   }
 
   setConfig = (options = {}) => {
-    deepMerge(config, options);
-    setElementsConfig(config.elements, { layer: 'defaults' });
-    return config;
+    deepMerge(this.config, options);
+    setElementsConfig(this.config.elements, { layer: 'defaults' });
+    return this.config;
   }
 
 
