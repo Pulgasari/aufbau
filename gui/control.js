@@ -1,6 +1,6 @@
 // @aufbau/gui/control.js
-// maps a spec entry to a control descriptor { tag, attrs, options? }. pure, no
-// dom, no deps: the same mapping feeds both the html and the element renderer.
+// maps a spec entry to a control descriptor { tag, attrs, options? }.
+// pure, no dom, no deps: the same mapping feeds both the html and the element renderer.
 
 const pruned = obj => Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null));
 
