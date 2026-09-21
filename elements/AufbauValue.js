@@ -9,6 +9,7 @@
 - optional wird der wert mit icon davor angezeigt
 - optional mit copy-icon dahinter ums zum clipboard zu kopieren
 - types, die mir auf anhieb einfallen: date, time, datetime aber später kommen bestimmt noch mehr hinzu
+- für date, time, datetime ist evtl die neue temporal api nützlich??
 */
 
 /*
