@@ -1,25 +1,11 @@
 // <aufbau-value>
-//
-// a value that is only ever read: the <span class="date"> you would otherwise
-// build by hand, with the coercion that goes with it. whatever goes in — an
-// epoch number, an iso string, whatever the api handed you — comes out in one
-// shape.
-//
-// `type` is the vocabulary the controls already speak (core/valueTypes.js), so
-// the same value is written with <aufbau-input type="date"> and shown with
-// <aufbau-value type="date">, and every type the controls learn is a type this
-// can show. the icon per type comes from that same table.
-//
-//   <aufbau-value type="date">1776556800000</aufbau-value>
-//   <aufbau-value type="date" format="relative" value="2026-04-20"></aufbau-value>
-//   <aufbau-value type="time" icon>14:30</aufbau-value>
-//   <aufbau-value type="url" icon copy>https://example.com</aufbau-value>
-//
-// on Temporal: nothing here needs it yet. parsing one instant and printing it is
-// what Date and Intl are for, and Temporal is not in every browser. it would
-// earn its place the day this does calendar arithmetic (add a month, a plain
-// date with no zone attached) — the parse/print pairs are one table per type, so
-// that is a swap rather than a rewrite.
+
+/*
+<aufbau-value type="date">1776556800000</aufbau-value>
+<aufbau-value type="date" format="relative" value="2026-04-20"></aufbau-value>
+<aufbau-value type="time" icon>14:30</aufbau-value>
+<aufbau-value type="url" icon copy>https://example.com</aufbau-value>
+*/
 
 // :::::: IMPORTS
 
@@ -31,23 +17,10 @@ import { configKeys }  from './core/AufbauConfig.js';
 
 const TAG           = 'aufbau-value';
 const COPY_FEEDBACK = 2000;
-
-// types that are an instant rather than a string, so they render as <time>
-const TIME_TYPES = new Set(['date', 'datetime', 'time']);
-
-// an attribute is always a string, and a timestamp arrives as one. for the types
-// that store a number, a bare integer IS that number — milliseconds since the
-// epoch for `date` and `datetime`, since midnight for `time`. never seconds:
-// guessing the unit from how many digits it has is the kind of help that is
-// wrong once and then wrong in production
-const NUMERIC = /^-?\d+$/;
-
-// Intl's four date/time presets. anything else falls through to the machine form
-const STYLES = ['short', 'medium', 'long', 'full'];
-
-// a bare clock carries no date and no zone, so `long` and `full` — which print
-// one — are read as `medium`
-const CLOCK = { short: 'short', medium: 'medium', long: 'medium', full: 'medium' };
+const TIME_TYPES    = new Set(['date', 'datetime', 'time']); // types that are an instant rather than a string, so they render as <time>       
+const NUMERIC       = /^-?\d+$/;
+const STYLES        = ['short', 'medium', 'long', 'full']; // Intl's four date/time presets. anything else falls through to the machine form     
+const CLOCK         = { short: 'short', medium: 'medium', long: 'medium', full: 'medium' };
 
 const INTL_OPTIONS = {
   date     : (style) => ({ dateStyle: style }),
@@ -55,8 +28,6 @@ const INTL_OPTIONS = {
   time     : (style) => ({ timeStyle: CLOCK[style] }),
 };
 
-// largest first: a distance is named in the biggest unit it fills, which is the
-// unit a person would use for it
 const UNITS = [
   ['year'  , 31_536_000_000],
   ['month' ,  2_592_000_000],
@@ -97,7 +68,7 @@ function relative (date, locale) {
 
 /** the value as the matching control would carry it — what `datetime` and copy want */
 function machineText (type, value) {
-  if (value == null) return '';
+  if (value == null)       return '';
   if (type === 'date')     return isoDate (new Date(value));
   if (type === 'datetime') return isoStamp(new Date(value));
   if (type === 'time')     return isoTime (instantOf('time', value));
@@ -108,34 +79,25 @@ function machineText (type, value) {
 function displayText (type, value, format, locale) {
   if (value == null) return '';
 
-  if (INTL_OPTIONS[type] && format === 'relative' && type !== 'time')
-    return relative(instantOf(type, value), locale);
-
-  if (INTL_OPTIONS[type] && STYLES.includes(format))
-    return new Intl.DateTimeFormat(locale, INTL_OPTIONS[type](format)).format(instantOf(type, value));
-
-  if (type === 'number' && format === 'locale')
-    return new Intl.NumberFormat(locale).format(value);
-
-  return machineText(type, value);
+  return (INTL_OPTIONS[type] && format === 'relative' && type !== 'time')
+       ? relative(instantOf(type, value), locale)
+       : (INTL_OPTIONS[type] && STYLES.includes(format))
+       ? new Intl.DateTimeFormat(locale, INTL_OPTIONS[type](format)).format(instantOf(type, value))
+       : (type === 'number' && format === 'locale')
+       ? new Intl.NumberFormat(locale).format(value)
+       : machineText(type, value);
 }
 
 // :::::: MAIN
 
 export default class AufbauValue extends AufbauElement {
   static attr = {
-    // the value. absent, the authored text content becomes it (see onMount)
-    value  : String,
-    type   : { type: String, default: 'text', values: TYPE_NAMES },
-
-    // how it is written out. per type through the config too, so a page can say
-    // <aufbau-config value-date-format="medium"> once (see formatName)
     format : String,
     locale : { type: String, config: true },
-
-    // present and empty takes the type's own icon, a value names another one
-    icon   : String,
+    type   : { type: String, default: 'text', values: TYPE_NAMES },
+    value  : String, // the value. absent, the authored text content becomes it (see onMount)
     copy   : Boolean,
+    icon   : String,
   };
 
   // the watchlist is otherwise built from the schema, which cannot know the
@@ -149,30 +111,35 @@ export default class AufbauValue extends AufbauElement {
 
   static styles = `
     aufbau-value {
-      display: inline-flex;
-      align-items: baseline;
-      gap: var(--value-gap, 0.35em);
-    }
+      align-items : baseline;
+      display     : inline-flex;
+      gap         : var(--value-gap, 0.25rem);
 
-    aufbau-value:not([value]) { display: none; }
+      &:not([value]) { display: none; }
+
+      &[type="date"], 
+      &[type="datetime"],
+      &[type="number"],
+      &[type="time"],
+      &[type="year"] {
+        .value-text { font-variant-numeric: tabular-nums; }
+      }
+    }
 
     aufbau-value > .value-icon { align-self: center; }
-
-    aufbau-value:is([type="date"], [type="datetime"], [type="time"], [type="number"], [type="year"]) > .value-text {
-      font-variant-numeric: tabular-nums;
-    }
-
+    
     aufbau-value > .value-copy {
-      align-self: center;
-      display: inline-flex;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      line-height: 0;
-      cursor: pointer;
+      align-self : center;
+      background : none;
+      color      : inherit;
+      cursor     : pointer;
+      display    : inline-flex;
+      font       : inherit;
+
+      border      : 0;
+      line-height : 0;
+      margin      : 0;
+      padding     : 0;
     }
   `;
 
@@ -239,8 +206,6 @@ export default class AufbauValue extends AufbauElement {
       this.setAttr({ value: inline });
     }
 
-    // a re-connected element still holds the markup of its last life, which
-    // update() would compare against and then skip
     this.invalidate();
 
     this.on('click', '.value-copy', (event, button) => this.copy(button));
