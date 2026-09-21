@@ -14,11 +14,6 @@ a **spec** maps field keys to descriptors.
 deno add jsr:@aufbau/gui
 ```
 
-zero network, zero heavy deps. the only import dependency is a few
-`@domina/methods` functions; the `aufbau-*` controls themselves are a **peer**
-(`@aufbau/elements` must be registered by the consumer). suited for offline use
-in the capacitor apps.
-
 ## spec
 
 ```javascript
