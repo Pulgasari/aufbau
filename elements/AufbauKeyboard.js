@@ -1,14 +1,9 @@
 // <aufbau-keyboard>
-//
-// an on-screen keyboard, for the phone and for anywhere a real one is in the
-// way. it types into whatever is focused — or into `target` — by dispatching
-// the keyboard events a hardware key would, and where the browser has the
-// VirtualKeyboard api it keeps the native one out of the way.
-//
+
 //   <aufbau-keyboard></aufbau-keyboard>
 //   <aufbau-keyboard layout="en" target="#editor textarea"></aufbau-keyboard>
 //   <aufbau-keyboard rows="keys" native-keyboard="keep"></aufbau-keyboard>
-//
+
 // grown out of apps/code, where it sits under a code editor. two things it does
 // differently: a key an editor handled itself is not typed a second time (see
 // send), and a plain <input>/<textarea> is actually edited, because a synthetic
@@ -20,12 +15,6 @@ import { AufbauElement } from './core/index.js';
 import { attrs, html }   from './core/html.js';
 
 // :::::: LAYOUTS
-// a row is a string of characters, one key each, and a space is a half-width
-// gap — a space is never a key in these rows, it has its own one on the bottom,
-// which is what makes it safe as the gap marker. a dash is NOT: the symbol pad
-// has to be able to carry a minus, and it did not while `-` meant a gap.
-// `shift` is the same grid in its shifted state, so a layout reads as a block.
-// add one with AufbauKeyboard.layouts.fr = { … }.
 
 const GAP = ' ';
 
@@ -56,7 +45,6 @@ const SPECIALS = {
   enter     : { icon : 'enter',       key : 'Enter',      code : 13 },
   space     : { icon : 'space',       key : ' ',          code : 32 },
   tab       : { icon : 'tab',         key : 'Tab',        code :  9 },
-  // the backwards tab is shift+tab, which is what its icon has always promised
   'tab-rtl' : { icon : 'tab-rtl',     key : 'Tab',        code :  9, shift : true },
 
   down      : { icon : 'arrow-down',  key : 'ArrowDown',  code : 40 },
@@ -68,14 +56,9 @@ const SPECIALS = {
 // what sits at either end of each alpha row, and the row under them
 const EDGES  = [['tab', 'tab-rtl'], ['capslock', 'backspace'], ['shift', 'enter']];
 const BOTTOM = ['ctrl', 'alt', 'space', 'up', 'down', 'left', 'right'];
-
-// the sticky modifiers, and which of them survive the key they modified
 const STICKY = ['shift', 'ctrl', 'alt'];
 
 // :::::: NATIVE KEYBOARD
-// where the VirtualKeyboard api exists, fields are marked manual and the os
-// keyboard stays down, so this is the only keyboard on screen. refcounted at
-// module level: two keyboards on one page must not undo each other.
 
 const FIELDS = 'input, textarea, [contenteditable]';
 
@@ -190,9 +173,7 @@ export default class AufbauKeyboard extends AufbauElement {
 
   // :::::: STATE
 
-  get layout () { return AufbauKeyboard.layouts[this.getAttr('layout')] ?? AufbauKeyboard.layouts.de; }
-
-  /** letters are upper case while either of the two is on */
+  get layout    () { return AufbauKeyboard.layouts[this.getAttr('layout')] ?? AufbauKeyboard.layouts.de; }         
   get isShifted () { return this.getAttr('shift') || this.getAttr('caps'); }
 
   /** what is being typed into: the named target, else whatever has focus */
