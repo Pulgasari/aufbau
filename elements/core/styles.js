@@ -1,8 +1,8 @@
 // @aufbau/elements/core/styles.js
 
-import { isFn }      from '@pulgasari/is';
-import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
-import { arrayfied } from './utils.js';
+import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
+import { isFn }        from '@pulgasari/is';
+import { arrayfied }   from './utils.js';
 
 export const BASE_LAYER = 'aufbau.elements';
 export const SKIN_LAYER = 'aufbau.skin';
