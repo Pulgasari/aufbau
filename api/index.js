@@ -9,7 +9,7 @@ import setStyleToken from '@domina/methods/setStyleToken.js';
 setStyleToken('theme', 'oled');
 */
 
-class AufbauController {
+class AufbauAPI {
   set theme (value) { setTheme(value); }
 
   getTheme = async ()   => this.getStyleToken('theme');
@@ -22,7 +22,7 @@ class AufbauController {
   }
 }
 
-const api = new AufbauController;
+const api = new AufbauAPI;
 
 export default api;
 
