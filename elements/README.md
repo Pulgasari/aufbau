@@ -98,7 +98,6 @@ customElements.define('aufbau-flag', AufbauFlag);
 <aufbau-gui>
 <aufbau-image> (kann zb gifs nicht automatisch abspielen usw>
 <aufbau-include>
-<aufbau-keyboard>
 <aufbau-media> (allrounder?)
 <aufbau-menu>
 <aufbau-modal>
@@ -128,6 +127,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-flag>`](#aufbau-flag) ·
 [`<aufbau-icon>`](#aufbau-icon) ·
 [`<aufbau-input>`](#aufbau-input) ·
+[`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-option>`](#aufbau-option) ·
 [`<aufbau-picker>`](#aufbau-picker) ·
@@ -141,6 +141,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-tree>`](#aufbau-tree) ·
 [`<aufbau-tree-item>`](#aufbau-tree-item) ·
 [`<aufbau-upload>`](#aufbau-upload) ·
+[`<aufbau-value>`](#aufbau-value) ·
 [`<aufbau-video>`](#aufbau-video) ·
 [`<aufbau-waveform>`](#aufbau-waveform) ·
 [`<aufbau-writer>`](#aufbau-writer) ·
@@ -321,6 +322,35 @@ für `type="range"` gibt es [`<aufbau-slider>`](#aufbau-slider), für `type="fil
 ```html
 <aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
 ```
+
+## aufbau-keyboard
+
+eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
+sie tippt in das, was fokus hat, oder in `target`, indem sie die
+keyboard-events schickt, die eine echte taste schicken würde. wo der browser
+die VirtualKeyboard-api hat, hält sie die native tastatur unten.
+
+```html
+<aufbau-keyboard></aufbau-keyboard>
+<aufbau-keyboard layout="en" target="#editor textarea"></aufbau-keyboard>
+<aufbau-keyboard rows="keys" native-keyboard="keep"></aufbau-keyboard>
+```
+
+`rows` sagt, welche blöcke in welcher reihenfolge gerendert werden
+(`"symbols keys"` ist der default). `layout` ist `de` oder `en`, eigene kommen
+über `AufbauKeyboard.layouts.fr = { regular, shift, symbols }` dazu: eine reihe
+ist ein string aus zeichen, ein leerzeichen darin ist eine lücke.
+
+`shift`, `caps`, `ctrl` und `alt` stehen als attribute am element, sind also
+les- und stylebar; shift, ctrl und alt sind einmalig und fallen mit der taste
+weg, die sie modifiziert haben. jede taste meldet sich als
+`aufbau-keyboard-key`, und `press(key)` / `toggle(name)` gehen auch ohne klick.
+
+zwei dinge, die sie von der vorlage aus `apps/code` unterscheiden: eine taste,
+die ein editor selbst behandelt (`preventDefault` auf dem keydown), wird nicht
+noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
+wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
+hat und sonst gar nichts passieren würde.
 
 ## aufbau-loop
 
@@ -596,6 +626,42 @@ ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
 
 abgelehnte dateien (falscher typ, zu gross) kommen als
 `aufbau-upload-rejected`-event und setzen die validity des elements.
+
+## aufbau-value
+
+ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
+selbst baut, mitsamt der coercion. `type` ist dasselbe vokabular wie bei den
+controls (`core/valueTypes.js`): derselbe wert wird mit `<aufbau-input
+type="date">` bearbeitet und mit `<aufbau-value type="date">` angezeigt, und
+jeder typ, den die controls lernen, ist einer, den das hier anzeigen kann. das
+icon pro typ kommt aus derselben tabelle.
+
+der wert steht im `value`-attribut oder als textinhalt drin (der wird beim mount
+ins attribut übernommen). eine blanke zahl ist die numerische form des typs:
+millisekunden seit epoch bei `date`/`datetime`, seit mitternacht bei `time` —
+nie sekunden.
+
+```html
+<aufbau-value type="date">1776643200000</aufbau-value>
+<aufbau-value type="date" format="relative" value="2026-04-20"></aufbau-value>
+<aufbau-value type="datetime" format="medium" locale="en-GB" value="2026-04-20T14:30"></aufbau-value>
+<aufbau-value type="time" icon>14:30</aufbau-value>
+<aufbau-value type="url" icon copy>https://example.com</aufbau-value>
+```
+
+`format` ohne angabe ist die maschinenform (`2026-04-20`, `14:30`), lokale
+wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) und
+`relative` (»gestern«, »in 3 monaten«) für `date` und `datetime`, `locale` für
+`number`. pro typ auch global setzbar:
+
+```html
+<aufbau-config value-date-format="medium" value-locale="de-DE"></aufbau-config>
+```
+
+`date`, `datetime` und `time` rendern als `<time datetime="…">` — die
+maschinenform bleibt also erhalten, auch wenn »gestern« dasteht. `copy` legt die
+maschinenform in die zwischenablage, nicht das, was auf dem schirm steht, und
+meldet sie als `aufbau-value-copy`.
 
 ## aufbau-video
 
