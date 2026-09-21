@@ -4,15 +4,16 @@ export const
 applyFilter = (await import('@aufbau/filter')).apply;
 
   
-
+/*
 import setStyleToken from '@domina/methods/setStyleToken.js';
 setStyleToken('theme', 'oled');
+*/
 
 class AufbauController {
-  set theme (value) { setStyleToken('theme', value); }
   set theme (value) { setTheme(value); }
 
-  setTheme = async (id) => this.setStyleToken('theme', 'id');    
+  getTheme = async ()   => this.getStyleToken('theme');
+  setTheme = async (id) => this.setStyleToken('theme', 'id');
 
   // lazy bridge to @domina
   dom = {
@@ -21,3 +22,14 @@ class AufbauController {
   }
 }
 
+const api = new AufbauController;
+
+export default api;
+
+/* :::::: USAGE
+
+import aufbau from '@aufbau/api';
+
+aufbau.setTheme('oled');
+
+*/
