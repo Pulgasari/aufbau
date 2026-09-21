@@ -1,9 +1,4 @@
 // <aufbau-item>
-// a cell inside <aufbau-index>. a layout element, not a control: it never
-// renders markup of its own, it only carries its authored content and reflects
-// its `shape` (or the shape half of a `look` shorthand) onto a css variable the
-// stylesheet reads. keeping render() null means its light-dom children — an
-// <img>, a card, whatever — are never wiped.
 
 import { AufbauElement }           from './core/index.js';
 import { parseLook, resolveShape } from './core/look.js';
@@ -13,29 +8,32 @@ const setVar = (el, name, value) =>
 
 export default class AufbauItem extends AufbauElement {
   static attr = {
-    shape : String,   // circle | square | rounded | squircle | any radius value
-    look  : String,   // shorthand, only the shape half is read here
+    look  : String, // shorthand, only the shape half is read here
+    shape : String, // circle | square | rounded | squircle | any radius value
   };
 
   static styles = `
     aufbau-item {
+      border-radius : var(--aufbau-current-shape, var(--aufbau-item-shape, 0px));     
       display       : block;
       box-sizing    : border-box;
       overflow      : hidden;
-      /* an item's own shape wins; otherwise it inherits the index default */
-      border-radius : var(--aufbau-current-shape, var(--aufbau-item-shape, 0px));
-    }
+      
+    /*contain-intrinsic-height : auto 170px;*/
+      content-visibility       : auto;
+      transition-behavior      : allow-discrete;
 
-    /* circle and square are meant to be equal-sided */
-    aufbau-item[shape="circle"],
-    aufbau-item[shape="square"] { aspect-ratio: 1 / 1; }
+      &[shape="circle"],
+      &[shape="square"] { aspect-ratio: 1 / 1; }
+    }
   `;
 
   render () { return null; }
 
   sync () {
     const { shape, look } = this.getAttr();
-    const resolved = resolveShape(shape || parseLook(look).shape);
+    const parsed   = shape || parseLook(look).shape;
+    const resolved = resolveShape();
     setVar(this, '--aufbau-current-shape', resolved);
   }
 }
