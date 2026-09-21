@@ -100,11 +100,6 @@ const formatStamp = (ms) => {
 
 // :::::: DURATION :::::::::::::::::::::::::::::::::::::::::::::::
 
-// a duration is an amount plus a unit ("2s", "500ms", "5min", "1h"). unlike `time`,
-// which is an instant on the wall clock, a duration is a length. the slider rides the
-// bare amount and the unit is fixed per control, recovered from the previous value the
-// same way a color keeps its saturation while the hue moves. no cross-unit conversion:
-// within one control every value shares the unit of its default. `s` is the fallback
 const DURATION_PATTERN = /^\s*(-?\d*\.?\d+)\s*([a-z]*)\s*$/i;
 const durationAmount   = (raw) => { const match = DURATION_PATTERN.exec(String(raw ?? '')); return match ? Number(match[1]) : null; };
 const durationUnit     = (raw) => { const match = DURATION_PATTERN.exec(String(raw ?? '')); return match && match[2] ? match[2] : 's'; };
@@ -126,21 +121,21 @@ const identity = (value) => value;
 const text = {
   input      : 'text',
   icon       : null,
-  parse      : (raw) => raw == null ? '' : String(raw),
-  format     : (value) => value == null ? '' : String(value),
-  toNumber   : (value) => Number(value) || 0,
+  format     : (value) => value == null ? '' : String (value),
+  parse      : (raw)   => raw   == null ? '' : String (raw),
   fromNumber : (value) => String(value),
+  toNumber   : (value) => Number(value) || 0,
   step       : 1,
   bounds     : [0, 100],
 };
 
-export const VALUE_TYPES = {
+const VALUE_TYPES = {
 
   color : {
     ...text,
     input      : 'color',
     icon       : 'lucide:palette',
-    parse      : (raw) => toHex(raw) ?? '#000000',
+    parse      : (raw)   => toHex(raw)   ?? '#000000',
     format     : (value) => toHex(value) ?? '#000000',
     toNumber   : hueOf,
     fromNumber : fromHue,
@@ -251,12 +246,12 @@ export const VALUE_TYPES = {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-/** every value type, for `values:` in an attribute schema */
-export const TYPE_NAMES = Object.keys(VALUE_TYPES);
+export const
+TYPE_NAMES = Object.keys(VALUE_TYPES), // every value type, for `values:` in an attribute schem
+AXIS_TYPES = ['color', 'date', 'datetime', 'duration', 'number', 'time', 'year'], // the subset that maps onto a numeric axis, so a slider can carry it        
+valueType  = (name) => VALUE_TYPES[name] ?? VALUE_TYPES.text;
 
-/** the subset that maps onto a numeric axis, so a slider can carry it */
-export const AXIS_TYPES = ['color', 'date', 'datetime', 'duration', 'number', 'time', 'year'];
-
-export const valueType = (name) => VALUE_TYPES[name] ?? VALUE_TYPES.text;
-
-export { DAY, MINUTE, fromHsl, fromHue, hslOf, hueOf, toHex };
+export {
+  DAY, MINUTE, VALUE_TYPES, 
+  fromHsl, fromHue, hslOf, hueOf, toHex
+};
