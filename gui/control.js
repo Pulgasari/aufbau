@@ -14,12 +14,12 @@ const numberOf = value => {
 };
 
 // [value, label] from either a bare option or an explicit pair
-export const normalizeOption = option => (Array.isArray(option) ? option : [option, option]);
+const normalizeOption = option => (Array.isArray(option) ? option : [option, option]);
 
 // a spec entry -> one aufbau control. `values` makes it a picker; otherwise
 // `type` selects the widget, defaulting to aufbau-input (which validates the
 // type itself and falls back to text for anything it does not know).
-export function toControl (key, spec, value) {
+function toControl (key, spec, value) {
   value ??= spec.default;
   const attrs = { name: key };
   const { max, min, step, type, unit, values } = spec;
@@ -45,4 +45,5 @@ export function toControl (key, spec, value) {
   return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type, value }) };
 }
 
+export { normalizeOption, toControl };
 export default toControl;
