@@ -28,6 +28,7 @@
     "./AufbauTree"     : "./AufbauTree.js",
     "./AufbauTreeItem" : "./AufbauTreeItem.js",
     "./AufbauUpload"   : "./AufbauUpload.js",
+    "./AufbauValue"    : "./AufbauValue.js",
     "./AufbauVideo"    : "./AufbauVideo.js",
     "./AufbauWaveform" : "./AufbauWaveform.js",
     "./AufbauWriter"   : "./AufbauWriter.js"

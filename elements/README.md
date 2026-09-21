@@ -141,6 +141,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-tree>`](#aufbau-tree) ·
 [`<aufbau-tree-item>`](#aufbau-tree-item) ·
 [`<aufbau-upload>`](#aufbau-upload) ·
+[`<aufbau-value>`](#aufbau-value) ·
 [`<aufbau-video>`](#aufbau-video) ·
 [`<aufbau-waveform>`](#aufbau-waveform) ·
 [`<aufbau-writer>`](#aufbau-writer) ·
@@ -596,6 +597,42 @@ ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
 
 abgelehnte dateien (falscher typ, zu gross) kommen als
 `aufbau-upload-rejected`-event und setzen die validity des elements.
+
+## aufbau-value
+
+ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
+selbst baut, mitsamt der coercion. `type` ist dasselbe vokabular wie bei den
+controls (`core/valueTypes.js`): derselbe wert wird mit `<aufbau-input
+type="date">` bearbeitet und mit `<aufbau-value type="date">` angezeigt, und
+jeder typ, den die controls lernen, ist einer, den das hier anzeigen kann. das
+icon pro typ kommt aus derselben tabelle.
+
+der wert steht im `value`-attribut oder als textinhalt drin (der wird beim mount
+ins attribut übernommen). eine blanke zahl ist die numerische form des typs:
+millisekunden seit epoch bei `date`/`datetime`, seit mitternacht bei `time` —
+nie sekunden.
+
+```html
+<aufbau-value type="date">1776643200000</aufbau-value>
+<aufbau-value type="date" format="relative" value="2026-04-20"></aufbau-value>
+<aufbau-value type="datetime" format="medium" locale="en-GB" value="2026-04-20T14:30"></aufbau-value>
+<aufbau-value type="time" icon>14:30</aufbau-value>
+<aufbau-value type="url" icon copy>https://example.com</aufbau-value>
+```
+
+`format` ohne angabe ist die maschinenform (`2026-04-20`, `14:30`), lokale
+wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) und
+`relative` (»gestern«, »in 3 monaten«) für `date` und `datetime`, `locale` für
+`number`. pro typ auch global setzbar:
+
+```html
+<aufbau-config value-date-format="medium" value-locale="de-DE"></aufbau-config>
+```
+
+`date`, `datetime` und `time` rendern als `<time datetime="…">` — die
+maschinenform bleibt also erhalten, auch wenn »gestern« dasteht. `copy` legt die
+maschinenform in die zwischenablage, nicht das, was auf dem schirm steht, und
+meldet sie als `aufbau-value-copy`.
 
 ## aufbau-video
 
