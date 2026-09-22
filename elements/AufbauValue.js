@@ -2,7 +2,7 @@
 
 /*
 <aufbau-value type="date">1776556800000</aufbau-value>
-<aufbau-value type="date" format="relative" value="2026-04-20"></aufbau-value>
+<aufbau-value type="date" format="medium" value="2026-04-20"></aufbau-value>
 <aufbau-value type="time" icon>14:30</aufbau-value>
 <aufbau-value type="url" icon copy>https://example.com</aufbau-value>
 */
@@ -28,16 +28,6 @@ const INTL_OPTIONS = {
   time     : (style) => ({ timeStyle: CLOCK[style] }),
 };
 
-const UNITS = [
-  ['year'  , 31_536_000_000],
-  ['month' ,  2_592_000_000],
-  ['week'  ,    604_800_000],
-  ['day'   ,     86_400_000],
-  ['hour'  ,      3_600_000],
-  ['minute',         60_000],
-  ['second',          1_000],
-];
-
 // :::::: TIME
 
 const pad = (value, length = 2) => String(value).padStart(length, '0');
@@ -56,14 +46,6 @@ const instantOf = (type, value) => type === 'time'
   ? new Date(1970, 0, 1, 0, 0, 0, value)
   : new Date(value);
 
-function relative (date, locale) {
-  const diff = date.getTime() - Date.now();
-  const size = Math.abs(diff);
-  const [unit, span] = UNITS.find(([, ms]) => size >= ms) ?? UNITS.at(-1);
-  // numeric:'auto' is what turns "1 day ago" into "yesterday"
-  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(Math.round(diff / span), unit);
-}
-
 // :::::: FORMAT
 
 /** the value as the matching control would carry it — what `datetime` and copy want */
@@ -75,13 +57,11 @@ function machineText (type, value) {
   return valueType(type).format(value);
 }
 
-/** the value as it is shown. `format` names a style, the machine form is the default */
+/** the value as it is shown: `format` names a notation, the machine form is the default */
 function displayText (type, value, format, locale) {
   if (value == null) return '';
 
-  return (INTL_OPTIONS[type] && format === 'relative' && type !== 'time')
-       ? relative(instantOf(type, value), locale)
-       : (INTL_OPTIONS[type] && STYLES.includes(format))
+  return (INTL_OPTIONS[type] && STYLES.includes(format))
        ? new Intl.DateTimeFormat(locale, INTL_OPTIONS[type](format)).format(instantOf(type, value))
        : (type === 'number' && format === 'locale')
        ? new Intl.NumberFormat(locale).format(value)
@@ -222,13 +202,10 @@ export default class AufbauValue extends AufbauElement {
 
     const icon = this.iconName();
 
-    // <time> is what an instant is in html, and `datetime` carries the value
-    // itself — the one thing a relative or styled rendering throws away
+    // <time> is what an instant is in html, and `datetime` carries the machine
+    // form whatever notation the page is reading
     const body = TIME_TYPES.has(type)
-      ? html`<time class="value-text" ${attrs({
-          datetime : this.machine,
-          title    : this.formatName() === 'relative' ? this.machine : false,
-        })}>${text}</time>`
+      ? html`<time class="value-text" ${attrs({ datetime: this.machine })}>${text}</time>`
       : html`<span class="value-text">${text}</span>`;
 
     return html`
@@ -243,13 +220,9 @@ export default class AufbauValue extends AufbauElement {
 
   // :::::: CLIPBOARD
 
-  /**
-   * the machine form goes to the clipboard, not what is on screen: a date shown
-   * as "yesterday" is worth nothing pasted anywhere else, and for every type
-   * whose rendering loses nothing the two are the same string.
-   */
+  /** what is on screen is what is copied; the value behind it is `el.machine` */
   async copy (button) {
-    const text = this.machine;
+    const text = this.text;
 
     try {
       await navigator.clipboard.writeText(text);
