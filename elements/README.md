@@ -643,25 +643,29 @@ nie sekunden.
 
 ```html
 <aufbau-value type="date">1776643200000</aufbau-value>
-<aufbau-value type="date" format="relative" value="2026-04-20"></aufbau-value>
+<aufbau-value type="date" format="medium" value="2026-04-20"></aufbau-value>
 <aufbau-value type="datetime" format="medium" locale="en-GB" value="2026-04-20T14:30"></aufbau-value>
 <aufbau-value type="time" icon>14:30</aufbau-value>
 <aufbau-value type="url" icon copy>https://example.com</aufbau-value>
 ```
 
+es formatiert, es erzählt nicht: ein datum ist ein datum, nie »gestern«. die
+einzige wahl ist die schreibweise.
+
 `format` ohne angabe ist die maschinenform (`2026-04-20`, `14:30`), lokale
-wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) und
-`relative` (»gestern«, »in 3 monaten«) für `date` und `datetime`, `locale` für
-`number`. pro typ auch global setzbar:
+wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) für
+`date`, `datetime` und `time`, sowie `locale` für `number`. pro typ auch global
+setzbar — attribut schlägt config, typ-key schlägt allgemeinen key:
 
 ```html
 <aufbau-config value-date-format="medium" value-locale="de-DE"></aufbau-config>
 ```
 
-`date`, `datetime` und `time` rendern als `<time datetime="…">` — die
-maschinenform bleibt also erhalten, auch wenn »gestern« dasteht. `copy` legt die
-maschinenform in die zwischenablage, nicht das, was auf dem schirm steht, und
-meldet sie als `aufbau-value-copy`.
+`date`, `datetime` und `time` rendern als `<time datetime="…">`, die
+maschinenform bleibt also für maschinen erhalten, egal in welcher schreibweise
+die seite sie liest. `copy` legt das in die zwischenablage, was auf dem schirm
+steht, und meldet es als `aufbau-value-copy`; der wert dahinter ist
+`el.machine`.
 
 ## aufbau-video
 
