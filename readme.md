@@ -1,8 +1,6 @@
 ![Logo](/logo.svg)
 
-**aufbau** is a browser-focused JS toolkit, library and framework. It's made for being used without any offline build-steps.
-
-***Note:** It's also working with deno, node, vite etc. but working 100% client-side is the main focus.*
+**aufbau** is a browser-focused JavaScript toolkit of modular libraries.
 
 #### docs
 
@@ -26,6 +24,7 @@
 #### side-projects
 - [@bunker](https://github.com/pulgasari/bunker/)
 - [@domina](https://github.com/pulgasari/domina/)
+- [@htx](https://github.com/js-packages/htx/)
 
 #### resources
 - [@aufbau/css](#aufbau-css)
