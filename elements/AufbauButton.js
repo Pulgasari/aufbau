@@ -14,24 +14,24 @@ export default class AufbauButton extends AufbauElement {
     variant  : 'default',
   };
 
-  static styles = `
-    aufbau-button { display: inline-block; }
+  static styles = `aufbau-button { 
+    display: inline-block;
 
-    aufbau-button .aufbau-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      inline-size: 100%;
-      margin: 0;
-      color: inherit;
-      font: inherit;
-      cursor: pointer;
+    .aufbau-btn {
+      align-items     : center;
+      justify-content : center;
+      inline-size     : 100%;
+      color   : inherit;
+      cursor  : pointer;
+      display : inline-flex;
+      font    : inherit;
+      gap     : 0.5rem;
+      margin  : 0;
     }
 
-    aufbau-button .aufbau-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-    aufbau-button .btn-content { line-height: 1.2; }
-  `;
+    .aufbau-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .btn-content         { line-height: 1.2; }
+  }`;
 
   onMount () {
     // authored children are the label when no explicit one was given.
