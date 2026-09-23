@@ -1,15 +1,20 @@
 // <aufbau-picker>
-// one-of-n (or n-of-n with `multiple`). the look attribute only changes the
-// presentation, never the markup contract: the same <aufbau-option> children
-// work as combobox, radio group or segmented control.
+
+/*
+one-of-n (or n-of-n with `multiple`).
+the look attribute only changes the presentation, never the markup contract:
+the same <aufbau-option> children work as combobox, radio group or segmented control.
+*/
+
+import { importFile } from '@aufbau/import';
+import { isArray }    from '@pulgasari/is';
+
+import filterElements from '@domina/methods/filterElements.js';
+import setAttr        from '@domina/methods/setAttr.js';
+import setValue       from '@domina/methods/setValue.js';
 
 import { AufbauControl, normalizeOptions, observeOptions, readOptions } from './core/index.js';
-import { importFile } from '@aufbau/import';
 import { attrs, html } from './core/html.js';
-import { isArray }     from '@pulgasari/is';
-import { filterElements } from '@domina/methods/filterElements.js';
-import { setAttr } from '@domina/methods/setAttr.js';
-import { setValue } from '@domina/methods/setValue.js';
 
 export default class AufbauPicker extends AufbauControl {
   static attr = {
@@ -36,27 +41,26 @@ export default class AufbauPicker extends AufbauControl {
 
   // the list overlays the page instead of pushing it apart, so the ui shell is
   // the positioning context. everything decorative lives in the skin
-  static styles = `
-    aufbau-picker { 
-      position: relative;
+  static styles = `aufbau-picker { 
+    position: relative;
 
-      .aufbau-picker-ui {
-        position: relative;
-        display: block;
-        inline-size: 100%;
-      }
-    } 
-
-    aufbau-picker .picker-field {
-      display: flex;
-      align-items: center;
+    .aufbau-picker-ui {
+      position    : relative;
+      display     : block;
+      inline-size : 100%;
+    }
+    
+    .picker-field {
+      
+      align-items : center;
+      display     : flex;
       gap: var(--aufbau-control-gap, 0.5em);
       inline-size: 100%;
       min-inline-size: 0;
       cursor: pointer;
     }
 
-    aufbau-picker .picker-input {
+    .picker-input {
       flex: 1 1 auto;
       min-inline-size: 0;
       margin: 0;
@@ -69,17 +73,17 @@ export default class AufbauPicker extends AufbauControl {
       text-overflow: ellipsis;
     }
 
-    aufbau-picker .picker-input:focus { outline: none; }
+    .picker-input:focus { outline: none; }
 
-    aufbau-picker .picker-caret {
+    .picker-caret {
       flex: none;
       transition: rotate 0.15s ease;
     }
 
-    aufbau-picker.is-open .picker-caret { rotate: 180deg; }
+    &.is-open .picker-caret { rotate: 180deg; }
 
     /* top-layer overlay setup via fixed positioning */
-    aufbau-picker .picker-list {
+    .picker-list {
       position: fixed;
       z-index: var(--aufbau-overlay-z, 20);
       max-block-size: var(--picker-list-size, 15em);
@@ -95,7 +99,7 @@ export default class AufbauPicker extends AufbauControl {
       &:popover-open { display: block; }
     }
 
-    aufbau-picker .picker-option {
+    .picker-option {
       display: flex;
       align-items: center;
       gap: var(--aufbau-control-gap, 0.5em);
@@ -112,7 +116,7 @@ export default class AufbauPicker extends AufbauControl {
       &:disabled { cursor: not-allowed; opacity: 0.5; }
     }
 
-    aufbau-picker .picker-label {
+    .picker-label {
       flex: 1 1 auto;
       min-inline-size: 0;
       overflow: hidden;
@@ -120,22 +124,32 @@ export default class AufbauPicker extends AufbauControl {
       white-space: nowrap;
     }
 
-    aufbau-picker .picker-group {
+    .picker-group {
       display: flex;
       gap: var(--aufbau-control-gap, 0.5em);
       flex-wrap: wrap;
     }
 
     /* radio stacks and keeps its marks, segments sit in one seamless row */
-    aufbau-picker .picker-radio { flex-direction: column; }
+    .picker-radio { 
+      flex-direction: column;
 
-    aufbau-picker .picker-radio .picker-mark {
-      flex: none;
-      inline-size: 0.85em;
-      block-size: 0.85em;
+      .picker-mark {
+        flex        : none;
+        inline-size : 0.85em;
+        block-size  : 0.85em;
+      }
     }
+    
+    /* look: combobox */
 
-    aufbau-picker .picker-segments {
+    /* look: cycle */
+
+    /* look: radio */
+
+    /* look: segments */
+
+    .picker-segments {
       flex-wrap: nowrap;
       gap: 0;
 
@@ -143,14 +157,9 @@ export default class AufbauPicker extends AufbauControl {
       .picker-mark   { display: none; }
       .picker-label  { flex: 0 1 auto; }
     }
-
     
-
-    /* filterElements() marks non matching entries with this, see filter() below.
-       last on purpose: same specificity as the .picker-option rules above, so it
-       has to come after them to win */
-    aufbau-picker .is-hidden { display: none; }
-  `;
+    .is-hidden { display: none; }
+  }`;
 
   // options live in the light dom, the ui gets its own shell next to them
   get renderTarget () { return this.shell('aufbau-picker-ui'); }
