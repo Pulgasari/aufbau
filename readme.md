@@ -12,8 +12,10 @@
 - [@aufbau/filters](filters/)
 - [@aufbau/gestures](gestures/)
 - [@aufbau/gui](gui/)
+- [@aufbau/icons](icons/)
 - [@aufbau/import](import/)
 - [@aufbau/patterns](patterns/)
+- [@aufbau/signals](signals/)
 - [@aufbau/store](store/)
 - [@aufbau/webfonts](webfonts/)
 
