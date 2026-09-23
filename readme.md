@@ -24,7 +24,7 @@
 #### side-projects
 - [@bunker](https://github.com/pulgasari/bunker/)
 - [@domina](https://github.com/pulgasari/domina/)
-- [@htx](https://github.com/js-packages/htx/)
+- [@htx](https://github.com/pulgasari/htx/)
 
 #### resources
 - [@aufbau/css](#aufbau-css)
