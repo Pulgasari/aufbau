@@ -27,72 +27,60 @@ export default class AufbauInput extends AufbauControl {
     type         : { type: String, default: 'text', values: TYPE_NAMES },
   };
 
-  // the icon is rendered before the field so look="stepper" keeps its
-  // minus/field/plus order in the source. `order` moves it to the inline end of
-  // the row without touching the markup, which is where an input icon belongs
-  static styles = `
-    aufbau-input { --input-icon-order: 2; }
+  // the host is the field. children are addressed structurally, no classes:
+  // the native <input>, the type icon and the stepper buttons
+  static styles = `aufbau-input {
+    align-items     : center;
+    display         : inline-flex;
+    gap             : var(--aufbau-control-gap, 0.5em);
+    min-inline-size : 0;
 
-    aufbau-input .aufbau-input-wrapper {
-      display: flex;
-      align-items: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      inline-size: 100%;
-      min-inline-size: 0;
+    > input {
+      background      : none;
+      border          : 0;
+      color           : inherit;
+      flex            : 1 1 auto;
+      font            : inherit;
+      margin          : 0;
+      min-inline-size : 0;
+      padding         : 0;
+
+      &:focus { outline: none; }
     }
 
-    aufbau-input .input-field {
-      flex: 1 1 auto;
-      min-inline-size: 0;
-      order: 1;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
+    > aufbau-icon { flex: none; opacity: 0.65; }
+
+    > button {
+      align-items     : center;
+      background      : none;
+      border          : 0;
+      color           : inherit;
+      cursor          : pointer;
+      display         : inline-flex;
+      flex            : none;
+      font            : inherit;
+      justify-content : center;
+      margin          : 0;
     }
-
-    aufbau-input .input-field:focus { outline: none; }
-
-    aufbau-input .input-icon {
-      flex: none;
-      order: var(--input-icon-order);
-      opacity: 0.65;
-    }
-
-    aufbau-input .input-swatch {
-      flex: none;
-      order: 3;
-      inline-size: 1.1em;
-      block-size: 1.1em;
-    }
-
-    aufbau-input .input-step {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: none;
-      margin: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      cursor: pointer;
-    }
-
-    aufbau-input .btn-dec { order: 0; }
-    aufbau-input .btn-inc { order: 4; }
 
     /* look="stepper" ships its own buttons, the native spinner would double them */
-    aufbau-input .look-stepper .input-field::-webkit-inner-spin-button,
-    aufbau-input .look-stepper .input-field::-webkit-outer-spin-button {
-      appearance: none;
-      margin: 0;
+    &[look="stepper"] > input {
+      appearance : textfield;
+      text-align : center;
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button { appearance: none; margin: 0; }
     }
 
-    aufbau-input .look-stepper .input-field { -moz-appearance: textfield; text-align: center; }
-  `;
+    /* look="swatch" draws the colour as a pseudo element, fed by --input-swatch from sync() */
+    &[look="swatch"]::after {
+      background  : var(--input-swatch, transparent);
+      block-size  : 1.1em;
+      content     : '';
+      flex        : none;
+      inline-size : 1.1em;
+    }
+  }`;
 
   get type () {
     const raw = this.getAttribute('type');
@@ -134,61 +122,48 @@ export default class AufbauInput extends AufbauControl {
     return this;
   }
 
+  // the native field, not the first focusable child (that would be the minus button of a stepper)
+  get focusTarget () { return this.$(':scope > input'); }
+
   render () {
     const { autocomplete, icon, look, max, maxlength, min, minlength, pattern, placeholder, step } = this.getAttr();
 
     const domain   = this.valueType;
     const iconName = icon === 'false' ? null : (icon || domain.icon);
-
-    // value and disabled are absent on purpose, both are applied in sync().
-    // rebuilding on every keystroke would drop the caret out of the field.
-    const field = html`<input class="input-field" ${attrs({
-      autocomplete,
-      max,
-      maxlength,
-      min,
-      minlength,
-      pattern,
-      placeholder,
-      step,
-      type : domain.input,
-    })} />`;
+    const stepper  = look === 'stepper';
 
     const stepButton = (direction, glyph) => html`
-      <button type="button" class="input-step btn-${direction > 0 ? 'inc' : 'dec'}" data-step="${direction}">
-        <aufbau-icon icon="${glyph}"></aufbau-icon>
-      </button>
+      <button type="button" data-step="${direction}"><aufbau-icon icon="${glyph}"></aufbau-icon></button>
     `;
 
+    // markup is in visual order. value and disabled are absent on purpose, both are
+    // applied in sync(): rebuilding on every keystroke would drop the caret out of the field
     return html`
-      <div class="aufbau-input-wrapper look-${look}">
-        ${look === 'stepper' && stepButton(-1, 'lucide:minus')}
-        ${iconName && html`<aufbau-icon icon="${iconName}" class="input-icon"></aufbau-icon>`}
-        ${field}
-        ${look === 'swatch' && html`<span class="input-swatch"></span>`}
-        ${look === 'stepper' && stepButton(1, 'lucide:plus')}
-      </div>
+      ${stepper && stepButton(-1, 'lucide:minus')}
+      <input ${attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: domain.input })} />
+      ${iconName && html`<aufbau-icon icon="${iconName}"></aufbau-icon>`}
+      ${stepper && stepButton(1, 'lucide:plus')}
     `;
   }
 
   sync () {
     super.sync();
 
-    const input = this.$('.input-field');
+    const input = this.focusTarget;
     if (!input) return;
 
-    const { list, readonly } = this.getAttr();
+    const { list, look, readonly } = this.getAttr();
     const value = this.getAttribute('value') ?? '';
 
     // list is an attribute rather than a template hole, interpolating markup
     // into html`` would escape the quotes
-    setAttr(input, { list: list || false, readOnly: readonly });
+    setAttr(input, { list: list || false, readonly });
 
     // never write back into the field while the user is typing in it
     if (input !== document.activeElement) setValue(input, value);
 
-    const swatch = this.$('.input-swatch');
-    if (swatch) swatch.style.background = this.valueType.format(value);
+    if (look === 'swatch') this.style.setProperty('--input-swatch', this.valueType.format(value));
+    else this.style.removeProperty('--input-swatch');
   }
 }
 

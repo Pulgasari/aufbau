@@ -387,8 +387,19 @@ dazukommen und verschwinden können.
 
 ## aufbau-picker
 
-one-of-n. `look` wechselt nur die darstellung — dasselbe markup funktioniert als
-combobox, radiogruppe oder segmented control.
+one-of-n. `look` wechselt nur die darstellung — dieselben optionen funktionieren als
+combobox, cycle, radiogruppe oder segmented control.
+
+| look       | verhalten |
+| ---------- | --------- |
+| `combobox` | der host ist das feld, die optionen stehen in einer popover-liste (default) |
+| `cycle`    | ein button mit der aktuellen option. klick nimmt die nächste, langer druck oder rechtsklick öffnet die liste zur direktauswahl. immer einfachauswahl |
+| `radio`    | alle optionen inline, untereinander, mit markierung |
+| `segments` | alle optionen inline, eine lückenlose reihe |
+
+`icons-only` blendet bei `cycle`, `radio` und `segments` die labels aus, sofern die
+option ein icon hat. das label wird dann accessible name und tooltip. die
+popover-liste zeigt immer labels.
 
 ```html
 <aufbau-picker name="view" look="segments" value="month">
@@ -400,6 +411,12 @@ combobox, radiogruppe oder segmented control.
 <!-- durchsuchbar, optionen aus einer datei -->
 <aufbau-picker name="framework" look="combobox" searchable
                src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-picker>
+
+<!-- ansicht umschalten: ein button, klick wechselt, langer druck wählt gezielt -->
+<aufbau-picker name="layout" look="cycle" icons-only value="grid">
+  <aufbau-option value="list" icon="lucide:list">Liste</aufbau-option>
+  <aufbau-option value="grid" icon="lucide:layout-grid">Raster</aufbau-option>
+</aufbau-picker>
 
 <!-- mehrfachauswahl, ein FormData-eintrag pro wert -->
 <aufbau-picker name="tags" look="radio" multiple>
