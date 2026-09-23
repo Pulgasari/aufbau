@@ -13,7 +13,7 @@ import { setValue } from '@domina/methods/setValue.js';
 
 export default class AufbauPicker extends AufbauControl {
   static attr = {
-    look        : { type: String, default: 'combobox', values: ['combobox', 'radio', 'segments'] },
+    look        : { type: String, default: 'combobox', values: ['combobox', 'cycle', 'radio', 'segments'] },
     multiple    : Boolean,
     placeholder : 'select…',
     searchable  : Boolean,
