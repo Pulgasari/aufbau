@@ -7,7 +7,7 @@ the same <aufbau-option> children work as combobox, radio group or segmented con
 */
 
 import { importFile } from '@aufbau/import';
-import { isArray }    from '@pulgasari/is';
+import { isArray, isFn, isString } from '@pulgasari/is';
 
 import filterElements from '@domina/methods/filterElements.js';
 import setAttr        from '@domina/methods/setAttr.js';
@@ -25,98 +25,83 @@ export default class AufbauPicker extends AufbauControl {
     src         : String,
   };
   
-  /*
-  static styles2 = {
-    'aufbau-picker': {
-      position: 'relative',
-
-      '.ui' : {
-        position: 'relative',
-        display: 'block',
-        inlineSize: '100%',
-      }
-    }
-  };
-  */
-
-  // the list overlays the page instead of pushing it apart, so the ui shell is
-  // the positioning context. everything decorative lives in the skin
   static styles = `aufbau-picker { 
     position: relative;
 
-    .aufbau-picker-ui {
+    .ui {
       position    : relative;
       display     : block;
       inline-size : 100%;
     }
     
-    .picker-field {
-      
+    .field {
       align-items : center;
+      cursor      : pointer;
       display     : flex;
-      gap: var(--aufbau-control-gap, 0.5em);
-      inline-size: 100%;
+      gap         : 0.5rem;
+      inline-size : 100%;
+      min-inline-size : 0;
+    }
+
+    .input {
+      background    : none;
+      flex          : 1 1 auto;
+      text-overflow : ellipsis;
+      
+      border  : 0;
+      margin  : 0;
+      padding : 0;
       min-inline-size: 0;
-      cursor: pointer;
+      
+      color  : inherit;
+      cursor : inherit;
+      font   : inherit;
+
+      :focus { outline: none; }
     }
 
-    .picker-input {
-      flex: 1 1 auto;
-      min-inline-size: 0;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      cursor: inherit;
-      text-overflow: ellipsis;
+    .caret {
+      flex       : none;
+      transition : rotate 0.15s ease;
     }
 
-    .picker-input:focus { outline: none; }
-
-    .picker-caret {
-      flex: none;
-      transition: rotate 0.15s ease;
-    }
-
-    &.is-open .picker-caret { rotate: 180deg; }
+    &.is-open .caret { rotate: 180deg; }
 
     /* top-layer overlay setup via fixed positioning */
-    .picker-list {
+    .list {
       position: fixed;
       z-index: var(--aufbau-overlay-z, 20);
       max-block-size: var(--picker-list-size, 15em);
       overflow-y: auto;
       overscroll-behavior: contain;
-      margin: 0;
-      padding: 0;
-      border: none;
-      background: var(--aufbau-bg, var(--bg, Canvas));
-      color: var(--aufbau-fg, var(--fg, CanvasText));
+      margin     : 0;
+      padding    : 0;
+      border     : none;
+      background : var(--bg, Canvas);
+      color      : var(--fg, CanvasText);
 
 
       &:popover-open { display: block; }
     }
 
-    .picker-option {
-      display: flex;
-      align-items: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      inline-size: 100%;
-      margin: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      text-align: start;
-      cursor: pointer;
+    .option {
+      display     : flex;
+      align-items : center;
+      gap         : 0.5rem;
+      inline-size : 100%;
+      margin      : 0;
+      border      : 0;
+      background  : none;
+      color       : inherit;
+      font        : inherit;
+      text-align  : start;
+      cursor      : pointer;
 
       &[aria-disabled="true"],
       &:disabled { cursor: not-allowed; opacity: 0.5; }
     }
 
-    .picker-label {
+    .label {
       flex: 1 1 auto;
       min-inline-size: 0;
       overflow: hidden;
@@ -124,17 +109,17 @@ export default class AufbauPicker extends AufbauControl {
       white-space: nowrap;
     }
 
-    .picker-group {
+    .group {
       display: flex;
       gap: var(--aufbau-control-gap, 0.5em);
       flex-wrap: wrap;
     }
 
     /* radio stacks and keeps its marks, segments sit in one seamless row */
-    .picker-radio { 
+    .radio { 
       flex-direction: column;
 
-      .picker-mark {
+      .mark {
         flex        : none;
         inline-size : 0.85em;
         block-size  : 0.85em;
@@ -149,20 +134,20 @@ export default class AufbauPicker extends AufbauControl {
 
     /* look: segments */
 
-    .picker-segments {
+    .segments {
       flex-wrap: nowrap;
       gap: 0;
 
-      .picker-option { justify-content: center; }
-      .picker-mark   { display: none; }
-      .picker-label  { flex: 0 1 auto; }
+      .option { justify-content: center; }
+      .mark   { display: none; }
+      .label  { flex: 0 1 auto; }
     }
     
     .is-hidden { display: none; }
   }`;
 
   // options live in the light dom, the ui gets its own shell next to them
-  get renderTarget () { return this.shell('aufbau-picker-ui'); }
+  get renderTarget () { return this.shell('ui'); }
 
   get options () {
     return [...readOptions(this, { ignore: this.renderTarget }), ...(this._remoteOptions ?? [])];
@@ -199,7 +184,7 @@ export default class AufbauPicker extends AufbauControl {
 
     const values = this.value;
     if (!values.length) return null;
-    if (!name) return values.join(',');
+    if (!name)          return values.join(',');
 
     const data = new FormData;
     for (const value of values) data.append(name, value);
@@ -233,10 +218,10 @@ export default class AufbauPicker extends AufbauControl {
     const shell = this.renderTarget;
     this.track(observeOptions(this, () => this.update(), { ignore: shell }));
 
-    this.on('click', '.picker-option', (event, item) => this.select(item.dataset.value));
-    this.on('click', '.picker-field',  () => this.toggle());
+    this.on('click', '.option', (event, item) => this.select(item.dataset.value));
+    this.on('click', '.field',  () => this.toggle());
 
-    this.on('input', '.picker-input', (event, input) => {
+    this.on('input', '.input', (event, input) => {
       this.open();
       this.filter(input.value);
     });
@@ -285,7 +270,7 @@ export default class AufbauPicker extends AufbauControl {
   toggle () { this.setOpen(!this.isOpen); return this; }
 
   setOpen (open) {
-    const list = this.$('.picker-list');
+    const list = this.$('.list');
     if (!list || this.isDisabled) return;
 
     if (open) {
@@ -309,39 +294,39 @@ export default class AufbauPicker extends AufbauControl {
 
   /** computes top-layer placement and auto-flips above trigger when space is constrained */
   updatePlacement () {
-    const list = this.$('.picker-list');
-    const field = this.$('.picker-field');
+    const list  = this.$('.list');
+    const field = this.$('.field');
     if (!list || !field || !this.isOpen) return;
 
-    const rect = field.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
+    const rect                = field.getBoundingClientRect();
+    const viewportHeight      = window.innerHeight;
     const estimatedMenuHeight = Math.min(list.scrollHeight || 240, 240);
 
     const spaceBelow = viewportHeight - rect.bottom;
     const spaceAbove = rect.top;
-    const placeTop = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
+    const placeTop   = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
 
     this.dataset.placement = placeTop ? 'top' : 'bottom';
 
     // align width and position relative to trigger field in viewport space
     list.style.inlineSize = `${rect.width}px`;
-    list.style.left = `${rect.left}px`;
+    list.style.left       = `${rect.left}px`;
 
     if (placeTop) {
-      list.style.top = 'auto';
-      list.style.bottom = `${viewportHeight - rect.top + 4}px`;
+      list.style.top          = 'auto';
+      list.style.bottom       = `${viewportHeight - rect.top + 4}px`;
       list.style.maxBlockSize = `${Math.min(spaceAbove - 12, 240)}px`;
     } else {
-      list.style.bottom = 'auto';
-      list.style.top = `${rect.bottom + 4}px`;
+      list.style.bottom       = 'auto';
+      list.style.top          = `${rect.bottom + 4}px`;
       list.style.maxBlockSize = `${Math.min(spaceBelow - 12, 240)}px`;
     }
   }
 
   filter (query) {
     filterElements({
-      container     : this.$('.picker-list'),
-      item          : '.picker-option',
+      container     : this.$('.list'),
+      item          : '.option',
       filters       : [['', query, 'contains']],
       mismatchClass : 'is-hidden',
     });
@@ -353,11 +338,11 @@ export default class AufbauPicker extends AufbauControl {
 
     if (key === 'Escape' && this.isOpen) { event.preventDefault(); this.close(); return; }
 
-    const items = this.$$('.picker-option:not(.is-hidden):not([disabled])');
+    const items = this.$$('.option:not(.is-hidden):not([disabled])');
     if (!items.length) return;
 
     if (key === 'Enter' || key === ' ') {
-      const target = event.target.closest?.('.picker-option');
+      const target = event.target.closest?.('.option');
       if (!target) return;
       event.preventDefault();
       this.select(target.dataset.value);
@@ -372,7 +357,7 @@ export default class AufbauPicker extends AufbauControl {
     event.preventDefault();
     if (!this.isOpen && this.getAttr('look') === 'combobox') return this.open();
 
-    const current = items.indexOf(event.target.closest?.('.picker-option'));
+    const current = items.indexOf(event.target.closest?.('.option'));
     const next    = key === 'Home' ? 0
                   : key === 'End'  ? items.length - 1
                   : (current + step + items.length) % items.length;
@@ -389,14 +374,15 @@ export default class AufbauPicker extends AufbauControl {
 
     if (look === 'combobox') {
       return html`
-        <div class="picker-field" role="combobox" aria-haspopup="listbox" aria-expanded="false">
-          <input class="picker-input" type="text" ${attrs({ placeholder, readonly: !searchable })} />
-          <aufbau-icon icon="lucide:chevron-down" class="picker-caret"></aufbau-icon>
+        <div class='field' role='combobox' aria-haspopup='listbox' aria-expanded='false'>
+          <input type='text' ${attrs({ placeholder, readonly: !searchable })} />
+          <aufbau-icon icon="lucide:chevron-down" class='caret'></aufbau-icon>
         </div>
-        <div class="picker-list" popover="manual" role="listbox" ${attrs({ 'aria-multiselectable': multiple })}>${options.map(entry => html`
-            <div class="picker-option" role="option" data-value="${entry.value}" tabindex="-1" ${attrs({ 'aria-disabled': entry.disabled })}>
-              ${entry.icon && html`<aufbau-icon icon="${entry.icon}"></aufbau-icon>`}
-              <span class="picker-label">${entry.label}</span>
+        <div class='list' popover='manual' role='listbox' ${attrs({ 'aria-multiselectable': multiple })}>
+          ${options.map(entry => html`
+            <div class='option' role='option' data-value="${entry.value}" tabindex='-1' ${attrs({ 'aria-disabled': entry.disabled })}>
+              ${entry.icon && html`<aufbau-icon icon='${entry.icon}'></aufbau-icon>`}
+              <span class='label'>${entry.label}</span>
             </div>
           `)}
         </div>
@@ -405,13 +391,20 @@ export default class AufbauPicker extends AufbauControl {
 
     // radio and segments share the markup, they differ only in styling
     return html`
-      <div class="picker-group picker-${look}" role="${multiple ? 'group' : 'radiogroup'}">
+      <div class='group ${look}' role='${multiple ? 'group' : 'radiogroup'}'>
         ${options.map(entry => html`
-          <button type="button" class="picker-option" role="${multiple ? 'checkbox' : 'radio'}"
-                  data-value="${entry.value}" tabindex="-1" aria-checked="false" ${attrs({ disabled: entry.disabled })}>
-            <span class="picker-mark"></span>
-            ${entry.icon && html`<aufbau-icon icon="${entry.icon}"></aufbau-icon>`}
-            <span class="picker-label">${entry.label}</span>
+          <button
+            type='button' 
+            class='option' 
+            role='${multiple ? 'checkbox' : 'radio'}'
+            data-value='${entry.value}' 
+            tabindex='-1' 
+            aria-checked='false' 
+            ${attrs({ disabled: entry.disabled })}
+          >
+            <span class='mark'></span>
+            ${entry.icon && html`<aufbau-icon icon='${entry.icon}'></aufbau-icon>`}
+            <span class='label'>${entry.label}</span>
           </button>
         `)}
       </div>
