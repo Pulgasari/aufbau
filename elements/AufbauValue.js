@@ -9,6 +9,7 @@
 
 // :::::: IMPORTS
 
+import { actionButtons, bindActions }           from './core/actions.js';
 import { AufbauElement, TYPE_NAMES, valueType } from './core/index.js';
 import { attrs, html } from './core/html.js';
 import { configKeys }  from './core/AufbauConfig.js';
@@ -16,7 +17,6 @@ import { configKeys }  from './core/AufbauConfig.js';
 // :::::: CONSTANTS
 
 const TAG           = 'aufbau-value';
-const COPY_FEEDBACK = 2000;
 const TIME_TYPES    = new Set(['date', 'datetime', 'time']); // types that are an instant rather than a string, so they render as <time>       
 const NUMERIC       = /^-?\d+$/;
 const STYLES        = ['short', 'medium', 'long', 'full']; // Intl's four date/time presets. anything else falls through to the machine form     
@@ -97,29 +97,24 @@ export default class AufbauValue extends AufbauElement {
 
       &:not([value]) { display: none; }
 
-      &[type="date"], 
-      &[type="datetime"],
-      &[type="number"],
-      &[type="time"],
-      &[type="year"] {
-        .value-text { font-variant-numeric: tabular-nums; }
+      &:is([type="date"], [type="datetime"], [type="number"], [type="time"], [type="year"]) > :is(span, time) {
+        font-variant-numeric: tabular-nums;
       }
-    }
 
-    aufbau-value > .value-icon { align-self: center; }
-    
-    aufbau-value > .value-copy {
-      align-self : center;
-      background : none;
-      color      : inherit;
-      cursor     : pointer;
-      display    : inline-flex;
-      font       : inherit;
+      > aufbau-icon { align-self: center; }
 
-      border      : 0;
-      line-height : 0;
-      margin      : 0;
-      padding     : 0;
+      > button {
+        align-self  : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
+        line-height : 0;
+        margin      : 0;
+        padding     : 0;
+      }
     }
   `;
 
@@ -188,10 +183,12 @@ export default class AufbauValue extends AufbauElement {
 
     this.invalidate();
 
-    this.on('click', '.value-copy', (event, button) => this.copy(button));
+    bindActions(this);
   }
 
-  onUnmount () { clearTimeout(this._copyTimer); }
+  // the contract with core/actions.js. what is on screen is what is copied, the value behind it is `el.machine`
+  actionText   () { return this.text; }
+  actionTarget () { return null; }
 
   // :::::: RENDER
 
@@ -205,38 +202,14 @@ export default class AufbauValue extends AufbauElement {
     // <time> is what an instant is in html, and `datetime` carries the machine
     // form whatever notation the page is reading
     const body = TIME_TYPES.has(type)
-      ? html`<time class="value-text" ${attrs({ datetime: this.machine })}>${text}</time>`
-      : html`<span class="value-text">${text}</span>`;
+      ? html`<time ${attrs({ datetime: this.machine })}>${text}</time>`
+      : html`<span>${text}</span>`;
 
     return html`
-      ${icon && html`<aufbau-icon class="value-icon" icon="${icon}"></aufbau-icon>`}
+      ${icon && html`<aufbau-icon icon="${icon}"></aufbau-icon>`}
       ${body}
-      ${copy && html`
-        <button type="button" class="value-copy" title="copy">
-          <aufbau-icon icon="lucide:copy"></aufbau-icon>
-        </button>`}
+      ${copy && actionButtons(['copy'])}
     `;
-  }
-
-  // :::::: CLIPBOARD
-
-  /** what is on screen is what is copied; the value behind it is `el.machine` */
-  async copy (button) {
-    const text = this.text;
-
-    try {
-      await navigator.clipboard.writeText(text);
-
-      const icon = button?.querySelector('aufbau-icon');
-      icon?.setAttribute('icon', 'lucide:check');
-      clearTimeout(this._copyTimer);
-      this._copyTimer = setTimeout(() => icon?.setAttribute('icon', 'lucide:copy'), COPY_FEEDBACK);
-
-      this.emit('aufbau-value-copy', { value: text });
-    }
-    catch (error) { console.warn('[aufbau-value] clipboard copy failed:', error); }
-
-    return this;
   }
 }
 

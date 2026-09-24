@@ -25,6 +25,7 @@ import setValue from '@domina/methods/setValue.js';
 
 import { AufbauControl, normalizeOptions, observeOptions, readOptions } from './core/index.js';
 import { attrs, html } from './core/html.js';
+import { place }       from './core/placement.js';
 
 const GROUPED    = new Set(['radio', 'segments']);
 const POPUP      = new Set(['combobox', 'cycle']);
@@ -363,29 +364,7 @@ export default class AufbauPicker extends AufbauControl {
     const list   = this.listbox;
     const anchor = this.look === 'cycle' ? this.trigger : this;
     if (!list || !anchor || !this.isOpen) return;
-
-    const rect           = anchor.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const estimated      = Math.min(list.scrollHeight || 240, 240);
-    const spaceBelow     = viewportHeight - rect.bottom;
-    const spaceAbove     = rect.top;
-    const placeTop       = spaceBelow < estimated && spaceAbove > spaceBelow;
-
-    this.dataset.placement = placeTop ? 'top' : 'bottom';
-
-    // at least as wide as the anchor, and kept inside the viewport on the inline axis
-    list.style.minInlineSize = `${rect.width}px`;
-    list.style.left          = `${Math.max(8, Math.min(rect.left, window.innerWidth - list.offsetWidth - 8))}px`;
-
-    if (placeTop) {
-      list.style.top          = 'auto';
-      list.style.bottom       = `${viewportHeight - rect.top + 4}px`;
-      list.style.maxBlockSize = `${Math.min(spaceAbove - 12, 240)}px`;
-    } else {
-      list.style.bottom       = 'auto';
-      list.style.top          = `${rect.bottom + 4}px`;
-      list.style.maxBlockSize = `${Math.min(spaceBelow - 12, 240)}px`;
-    }
+    this.dataset.placement = place(list, anchor);
   }
 
   filter (query) {

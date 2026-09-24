@@ -2,10 +2,18 @@
 // an action menu. it carries commands, not a value, so it is NOT a control and
 // deliberately does not participate in forms. for choosing a value, use
 // <aufbau-picker look="combobox">.
+//
+//   <aufbau-dropdown label="Datei">
+//     <button aria-haspopup="menu">…</button>        <- trigger, created once
+//     <div role="menu" popover>…entries…</div>       <- the authored entries, moved in once
+//   </aufbau-dropdown>
+//
+// the menu is an auto popover: top layer, light dismiss and escape come from
+// the browser. `open` mirrors the popover state in both directions.
 
 import { AufbauElement } from './core/index.js';
-import { attrs, html } from './core/html.js';
-import { setAttr } from '@domina/methods/setAttr.js';
+import { place }         from './core/placement.js';
+import { setAttr }       from '@domina/methods/setAttr.js';
 
 export default class AufbauDropdown extends AufbauElement {
   static attr = {
@@ -16,128 +24,134 @@ export default class AufbauDropdown extends AufbauElement {
     placement : { type: String, default: 'bottom-start', values: ['bottom-start', 'bottom-end', 'top-start', 'top-end'] },
   };
 
-  static styles = `
-    aufbau-dropdown {
-      position: relative;
-      display: inline-block;
+  static styles = `aufbau-dropdown {
+    display: inline-block;
+
+    > button {
+      align-items : center;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      font        : inherit;
+      gap         : var(--aufbau-control-gap, 0.5em);
+      margin      : 0;
+
+      &:disabled { cursor: not-allowed; opacity: 0.5; }
+
+      > aufbau-icon:last-child { transition: rotate 0.15s ease; }
+      &[aria-expanded="true"] > aufbau-icon:last-child { rotate: 180deg; }
     }
 
-    aufbau-dropdown .dropdown-trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      margin: 0;
-      color: inherit;
-      font: inherit;
-      cursor: pointer;
+    > [role="menu"] {
+      border              : 0;
+      color               : inherit;
+      flex-direction      : column;
+      max-block-size      : var(--dropdown-menu-size, 18em);
+      overflow-y          : auto;
+      overscroll-behavior : contain;
+      padding             : 0;
+
+      &:popover-open { display: flex; }
+
+      > * {
+        align-items     : center;
+        color           : inherit;
+        cursor          : pointer;
+        display         : flex;
+        flex            : none;
+        font            : inherit;
+        gap             : var(--aufbau-control-gap, 0.5em);
+        text-align      : start;
+        text-decoration : none;
+      }
     }
+  }`;
 
-    aufbau-dropdown .dropdown-trigger:disabled { cursor: not-allowed; opacity: 0.5; }
-
-    aufbau-dropdown .dropdown-caret { transition: rotate 0.15s ease; }
-    aufbau-dropdown.is-open .dropdown-caret { rotate: 180deg; }
-
-    aufbau-dropdown .aufbau-dropdown-menu {
-      position: absolute;
-      z-index: var(--aufbau-overlay-z, 20);
-      display: flex;
-      flex-direction: column;
-      min-inline-size: 100%;
-      max-block-size: var(--dropdown-menu-size, 18em);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-
-    aufbau-dropdown[data-placement^="bottom"] .aufbau-dropdown-menu { inset-block-start: 100%; }
-    aufbau-dropdown[data-placement^="top"]    .aufbau-dropdown-menu { inset-block-end: 100%; }
-    aufbau-dropdown[data-placement$="start"]  .aufbau-dropdown-menu { inset-inline-start: 0; }
-    aufbau-dropdown[data-placement$="end"]    .aufbau-dropdown-menu { inset-inline-end: 0; }
-
-    aufbau-dropdown .aufbau-dropdown-menu > * {
-      display: flex;
-      align-items: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      flex: none;
-      color: inherit;
-      font: inherit;
-      text-align: start;
-      text-decoration: none;
-      cursor: pointer;
-    }
-  `;
-
-  // the authored menu entries stay in the light dom. the trigger gets its own
-  // shell, prepended so it keeps its place ahead of the entries in tab order
-  get renderTarget () { return this.shell('aufbau-dropdown-ui', { prepend: true }); }
-
-  /**
-   * the entries need one shared box to be positioned as a menu, so they are
-   * collected into a container on first sync. they stay the authored elements,
-   * they only move one level down.
-   */
-  get menu () {
-    let menu = this.querySelector(':scope > .aufbau-dropdown-menu');
-    if (!menu) {
-      menu = document.createElement('div');
-      menu.className = 'aufbau-dropdown-menu';
-      menu.setAttribute('role', 'menu');
-      this.append(menu);
-    }
-    return menu;
-  }
+  get trigger () { return this._trigger; }
+  get menu    () { return this._menu; }
+  get isOpen  () { return Boolean(this._menu?.matches(':popover-open')); }
 
   onMount () {
-    this.on('click', '.dropdown-trigger', () => this.toggle());
-
-    this.on('keydown', (event) => {
-      if (event.key === 'Escape' && this.getAttr('open')) { event.preventDefault(); this.close(); }
-    });
+    this.build();
 
     // any activated entry closes the menu, the entry's own handler still runs
-    this.on('click', 'a, button, [role="menuitem"]', () => this.close());
+    this.on('click', '[role="menu"] :is(a, button, [role="menuitem"])', () => this.close());
 
-    this.onOutside(() => this.close());
+    // the popover may close by itself (light dismiss, escape), the attribute follows
+    this.on(this._menu, 'toggle', (event) => {
+      const open = event.newState === 'open';
+      if (open !== this.getAttr('open')) this.setAttr({ open });
+      this.emit('aufbau-dropdown', { open });
+    });
+
+    this.on(window, 'resize', () => this.reposition(), { passive: true });
+    this.on(window, 'scroll', () => this.reposition(), { capture: true, passive: true });
+  }
+
+  // trigger and menu are created once. the authored entries move into the menu
+  // and stay the very same elements
+  build () {
+    if (!this._trigger) {
+      this._trigger = document.createElement('button');
+      this._trigger.type = 'button';
+      setAttr(this._trigger, { ariaHaspopup: 'menu', ariaExpanded: 'false' });
+
+      this._menu = document.createElement('div');
+      setAttr(this._menu, { popover: 'auto', role: 'menu' });
+
+      // the browser toggles the menu itself and keeps the trigger out of light
+      // dismiss, a click handler of ours would close and reopen it in one go
+      this._trigger.popoverTargetElement = this._menu;
+    }
+
+    const entries = [...this.children].filter(child => child !== this._trigger && child !== this._menu);
+    for (const entry of entries) if (!entry.hasAttribute('role')) entry.setAttribute('role', 'menuitem');
+    this._menu.append(...entries);
+
+    if (this._trigger.parentNode !== this) this.prepend(this._trigger);
+    if (this._menu.parentNode !== this)    this.append(this._menu);
   }
 
   open   () { return this.setOpen(true);  }
   close  () { return this.setOpen(false); }
-  toggle () { return this.setOpen(!this.getAttr('open')); }
+  toggle () { return this.setOpen(!this.isOpen); }
 
   setOpen (open) {
-    if (this.getAttr('disabled')) return this;
+    if (open && this.getAttr('disabled')) return this;
     this.setAttr({ open });
-    this.emit('aufbau-dropdown', { open });
     return this;
   }
 
-  render () {
-    const { icon, label } = this.getAttr();
-
-    return html`
-      <button type="button" class="dropdown-trigger" aria-haspopup="menu" aria-expanded="false">
-        ${icon && html`<aufbau-icon icon="${icon}"></aufbau-icon>`}
-        <span class="dropdown-label">${label}</span>
-        <aufbau-icon icon="lucide:chevron-down" class="dropdown-caret"></aufbau-icon>
-      </button>
-    `;
+  reposition () {
+    if (this.isOpen) place(this._menu, this._trigger, { placement: this.getAttr('placement'), maxSize: 18 * 16 });
   }
 
+  render () { return null; }
+
   sync () {
-    const { disabled, open, placement } = this.getAttr();
+    if (!this._trigger) return;
 
-    setAttr(this.$('.dropdown-trigger'), { ariaExpanded: String(open), disabled });
-    this.classList.toggle('is-open', open);
-    this.dataset.placement = placement;
+    const { disabled, icon, label, open } = this.getAttr();
+    const trigger = this._trigger;
 
-    // entries are the authored children, everything outside our own shell
-    const menu = this.menu;
-    for (const child of [...this.children]) {
-      if (child === this._shell || child === menu) continue;
-      if (!child.getAttribute('role')) child.setAttribute('role', 'menuitem');
-      menu.append(child);
+    // trigger content: optional icon, label, caret. rebuilt only when icon or label change
+    const key = `${icon}|${label}`;
+    if (key !== this._triggerKey) {
+      this._triggerKey = key;
+      const iconOf = name => setAttr(document.createElement('aufbau-icon'), { icon: name });
+      const text   = Object.assign(document.createElement('span'), { textContent: label });
+      trigger.replaceChildren(...(icon ? [iconOf(icon)] : []), text, iconOf('lucide:chevron-down'));
     }
 
-    setAttr(menu, { hidden: !open });
+    trigger.disabled = disabled;
+    trigger.setAttribute('aria-expanded', String(open));
+
+    // the attribute drives the popover, the toggle listener closes the loop the other way
+    const menu = this._menu;
+    if (menu.showPopover && open !== this.isOpen && menu.isConnected) {
+      menu[open ? 'showPopover' : 'hidePopover']();
+    }
+    this.reposition();
   }
 }
 

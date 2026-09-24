@@ -151,7 +151,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 ```html
 <aufbau-audio 
   src="/media/track.mp3" 
-  title="Cyberpunk Theme" 
+  label="Cyberpunk Theme" 
   artist="Synthwave Studio" 
   cover="/media/cover.jpg"
   layout="card">
@@ -226,17 +226,22 @@ gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 
 ```html
 <!-- 1. JSONC mit Kommentaren -->
-<datalist is="aufbau-datalist" id="cities" src="/data/cities.jsonc" key="name"></datalist>
+<aufbau-datalist id="cities" src="/data/cities.jsonc" key="name"></aufbau-datalist>
 
 <!-- 2. Lesbares YAML -->
-<datalist is="aufbau-datalist" id="tags" src="/config/tags.yaml"></datalist>
+<aufbau-datalist id="tags" src="/config/tags.yaml"></aufbau-datalist>
 
 <!-- 3. Riesen CSV/TSV Tabellen (geparst via PapaParse) -->
-<datalist is="aufbau-datalist" id="countries" src="/data/countries.csv" key="CountryName"></datalist>
+<aufbau-datalist id="countries" src="/data/countries.csv" key="CountryName"></aufbau-datalist>
 
 <!-- 4. TOML Config -->
-<datalist is="aufbau-datalist" id="presets" src="/settings/presets.toml" key="title"></datalist>
+<aufbau-datalist id="presets" src="/settings/presets.toml" key="title"></aufbau-datalist>
 ```
+
+autonom statt `<datalist is="…">`, safari kennt keine customized built-ins. das
+element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
+`<input list="cities">` zeigt also weiter auf denselben namen. authored
+`<option>`-kinder bleiben erhalten und stehen vor den geladenen.
 
 ```html
 <!-- Und deine inputs nutzen das einfach nativ -->
@@ -779,7 +784,16 @@ steht, und meldet es als `aufbau-value-copy`; der wert dahinter ist
 
 ```html
 <aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
+
+<!-- vorberechnete peaks, fortschritt und markierter bereich (trim-editoren) -->
+<aufbau-waveform peaks="0.2 0.8 0.5 0.9" progress="40" range-start="20" range-end="60"></aufbau-waveform>
 ```
+
+keine kinder: der host malt seine farben als hintergrund-ebenen und wird von
+einem svg der balken maskiert. ein fortschritts-update ist eine custom property,
+die balken werden nur bei neuen peaks neu gezeichnet. farben über
+`--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
+`--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
 
 ## aufbau-writer
 
@@ -806,7 +820,7 @@ counter, der `maxlength` erreicht hat.
 
 ```html
 <!-- Remote data fetch for datalist autocomplete -->
-<datalist is="aufbau-datalist" id="city-list" src="/api/cities.json" key="name"></datalist>
+<aufbau-datalist id="city-list" src="/api/cities.json" key="name"></aufbau-datalist>
 
 <!-- Input with preset icon & datalist linkage -->
 

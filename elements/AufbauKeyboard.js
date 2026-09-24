@@ -124,52 +124,59 @@ export default class AufbauKeyboard extends AufbauElement {
     shift : Boolean,
   };
 
-  static styles = `
-    aufbau-keyboard {
-      display: flex;
-      flex-direction: column;
-      gap: var(--keyboard-gap, 0.25rem);
-      background: var(--keyboard-bg, var(--bg, Canvas));
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
+  // structure: one role=group block per `rows` entry (aria-label names it),
+  // a <div> per row, <span> for the spacing gaps. key sizes follow from data-key
+  static styles = `aufbau-keyboard {
+    background          : var(--keyboard-bg, var(--bg, Canvas));
+    display             : flex;
+    flex-direction      : column;
+    gap                 : var(--keyboard-gap, 0.25rem);
+    touch-action        : manipulation;
+    user-select         : none;
+    -webkit-user-select : none;
+
+    > div {
+      display        : flex;
+      flex-direction : column;
+      gap            : var(--keyboard-gap, 0.25rem);
+
+      > div {
+        display         : flex;
+        gap             : var(--keyboard-gap, 0.25rem);
+        justify-content : center;
+
+        > span { flex: 1 0 0; }
+      }
     }
 
-    aufbau-keyboard .keyboard-block,
-    aufbau-keyboard .keyboard-row {
-      display: flex;
-      gap: var(--keyboard-gap, 0.25rem);
+    button {
+      background    : var(--keyboard-key-bg, color-mix(in oklch, var(--bg, Canvas), var(--fg, CanvasText) 12%));
+      border        : 0;
+      border-radius : var(--keyboard-key-radius, 4px);
+      color         : var(--keyboard-key-fg, var(--fg, CanvasText));
+      cursor        : pointer;
+      display       : grid;
+      flex          : 1 0 0;
+      font          : inherit;
+      margin        : 0;
+      padding       : var(--keyboard-key-padding, 0.5rem 0);
+      place-content : center;
+
+      &[aria-pressed="true"] {
+        background : var(--keyboard-key-active-bg, var(--accent, Highlight));
+        color      : var(--keyboard-key-active-fg, var(--accent-fg, HighlightText));
+      }
+
+      &:disabled { cursor: not-allowed; opacity: 0.25; }
     }
 
-    aufbau-keyboard .keyboard-block { flex-direction: column; }
-    aufbau-keyboard .keyboard-row   { justify-content: center; }
-    aufbau-keyboard .keyboard-gap   { flex: 1 0 0; }
+    [aria-label="symbols"] button { aspect-ratio: 1; border-radius: 50%; padding: 0; }
 
-    aufbau-keyboard button {
-      flex: 1 0 0;
-      display: grid;
-      place-content: center;
-      margin: 0;
-      padding: var(--keyboard-key-padding, 0.5rem 0);
-      border: 0;
-      border-radius: var(--keyboard-key-radius, 4px);
-      background: var(--keyboard-key-bg, color-mix(in oklch, var(--bg, Canvas), var(--fg, CanvasText) 12%));
-      color: var(--keyboard-key-fg, var(--fg, CanvasText));
-      font: inherit;
-      cursor: pointer;
-    }
+    :is([data-key="alt"], [data-key="backspace"], [data-key="capslock"], [data-key="ctrl"],
+        [data-key="enter"], [data-key="shift"], [data-key="tab"], [data-key="tab-rtl"]) { flex-grow: 2; }
 
-    aufbau-keyboard button.is-symbol { aspect-ratio: 1; padding: 0; border-radius: 50%; }
-    aufbau-keyboard button.is-wide   { flex-grow: 2; }
-    aufbau-keyboard button.is-space  { flex-grow: 7; }
-
-    aufbau-keyboard button[aria-pressed="true"] {
-      background: var(--keyboard-key-active-bg, var(--accent, Highlight));
-      color: var(--keyboard-key-active-fg, var(--accent-fg, HighlightText));
-    }
-
-    aufbau-keyboard button:disabled { cursor: not-allowed; opacity: 0.25; }
-  `;
+    [data-key="space"] { flex-grow: 7; }
+  }`;
 
   // :::::: STATE
 
@@ -307,35 +314,26 @@ export default class AufbauKeyboard extends AufbauElement {
 
   // :::::: RENDER
 
-  key (name, { label, wide, symbol } = {}) {
+  key (name, { label } = {}) {
     const special = SPECIALS[name];
     const icon    = special?.icon;
     const pressed = special?.toggle ? this.getAttr(special.toggle) : null;
 
-    const classes = [
-      wide            && 'is-wide',
-      symbol          && 'is-symbol',
-      name === 'space' && 'is-space',
-    ].filter(Boolean).join(' ');
-
     return html`<button type="button" tabindex="-1" ${attrs({
-      class          : classes,
-      'data-key'     : name,
       'aria-label'   : icon ? name : false,
-      'aria-pressed' : pressed == null ? false : String(!!pressed),
+      'aria-pressed' : pressed == null ? false : String(Boolean(pressed)),
+      'data-key'     : name,
     })}>${icon ? html`<aufbau-icon icon="${icon}"></aufbau-icon>` : (label ?? name)}</button>`;
   }
 
-  row (chars, { symbol = false, edges = null } = {}) {
-    const keys = [...chars].map(char => char === GAP
-      ? html`<span class="keyboard-gap"></span>`
-      : this.key(char, { symbol }));
+  row (chars, { edges = null } = {}) {
+    const keys = [...chars].map(char => char === GAP ? html`<span></span>` : this.key(char));
 
     return html`
-      <div class="keyboard-row">
-        ${edges?.[0] && this.key(edges[0], { wide: true })}
+      <div>
+        ${edges?.[0] && this.key(edges[0])}
         ${keys}
-        ${edges?.[1] && this.key(edges[1], { wide: true })}
+        ${edges?.[1] && this.key(edges[1])}
       </div>`;
   }
 
@@ -344,15 +342,13 @@ export default class AufbauKeyboard extends AufbauElement {
     const alpha  = this.isShifted ? layout.shift : layout.regular;
 
     const blocks = {
-      symbols : html`<div class="keyboard-block">
-        ${layout.symbols.map(row => this.row(row, { symbol: true }))}
+      symbols : html`<div role="group" aria-label="symbols">
+        ${layout.symbols.map(row => this.row(row))}
       </div>`,
 
-      keys : html`<div class="keyboard-block">
+      keys : html`<div role="group" aria-label="keys">
         ${alpha.map((row, index) => this.row(row, { edges: EDGES[index] }))}
-        <div class="keyboard-row">
-          ${BOTTOM.map(name => this.key(name, { wide: name === 'ctrl' || name === 'alt' }))}
-        </div>
+        <div>${BOTTOM.map(name => this.key(name))}</div>
       </div>`,
     };
 

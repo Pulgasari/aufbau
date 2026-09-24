@@ -38,10 +38,10 @@ aufbau-input,
 aufbau-picker[look="combobox"],
 aufbau-picker[look="cycle"] > .ui > button,
 aufbau-writer,
-.dropdown-trigger,
+aufbau-dropdown > button,
 aufbau-button,
 aufbau-toggle[look="button"],
-.upload-zone {
+aufbau-upload > button {
   border: var(--aufbau-control-border);
   border-radius: var(--aufbau-control-radius);
   padding: var(--aufbau-control-pad);
@@ -54,12 +54,12 @@ aufbau-toggle[look="button"],
   outline-offset: 1px;
 }
 
-:is(aufbau-button, .dropdown-trigger, aufbau-toggle, aufbau-picker [data-value], aufbau-picker[look="cycle"] button, aufbau-input > button, .slider-step, .upload-remove, :is(aufbau-code, aufbau-writer) [data-action]):focus-visible {
+:is(aufbau-button, aufbau-dropdown > button, aufbau-toggle, aufbau-picker [data-value], aufbau-picker[look="cycle"] button, aufbau-input > button, aufbau-slider > button, aufbau-upload li > button, aufbau-upload > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible {
   outline: 2px solid var(--aufbau-control-focus);
   outline-offset: 1px;
 }
 
-:is(aufbau-button, .dropdown-trigger, aufbau-input > button, aufbau-picker[look="cycle"] button, .slider-step, .upload-remove, :is(aufbau-code, aufbau-writer) [data-action]):hover:not(:disabled, [disabled]) {
+:is(aufbau-button, aufbau-dropdown > button, aufbau-input > button, aufbau-picker[look="cycle"] button, aufbau-slider > button, aufbau-upload li > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]) {
   background-color: var(--aufbau-control-hover);
 }
 
@@ -227,83 +227,77 @@ aufbau-picker {
 
 /* :::::: <aufbau-slider> :::::: */
 
-.slider-tracks::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 50%;
-  block-size: var(--slider-track-size);
-  translate: 0 -50%;
-  background-color: var(--aufbau-control-track);
-  border-radius: 999px;
-}
+aufbau-slider {
+  > div {
+    &::before { background-color: var(--aufbau-control-track); border-radius: 999px; }
+    &::after  { background-color: var(--aufbau-accent);        border-radius: 999px; }
 
-.slider-fill {
-  background-color: var(--aufbau-accent);
-  border-radius: 999px;
-}
+    > input {
+      &::-webkit-slider-runnable-track { background: none; }
+      &::-moz-range-track              { background: none; }
 
-.type-color .slider-fill { background-color: var(--slider-color, var(--aufbau-accent)); }
+      &::-webkit-slider-thumb {
+        appearance       : none;
+        background-color : var(--aufbau-surface);
+        block-size       : var(--slider-thumb-size);
+        border           : 2px solid var(--aufbau-accent);
+        border-radius    : 999px;
+        cursor           : grab;
+        inline-size      : var(--slider-thumb-size);
+      }
 
-.slider-track::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  inline-size: var(--slider-thumb-size);
-  block-size: var(--slider-thumb-size);
-  background-color: var(--aufbau-surface);
-  border: 2px solid var(--aufbau-accent);
-  border-radius: 999px;
-  cursor: grab;
-}
+      &::-moz-range-thumb {
+        background-color : var(--aufbau-surface);
+        block-size       : var(--slider-thumb-size);
+        border           : 2px solid var(--aufbau-accent);
+        border-radius    : 999px;
+        cursor           : grab;
+        inline-size      : var(--slider-thumb-size);
+      }
+    }
+  }
 
-.slider-track::-moz-range-thumb {
-  inline-size: var(--slider-thumb-size);
-  block-size: var(--slider-thumb-size);
-  background-color: var(--aufbau-surface);
-  border: 2px solid var(--aufbau-accent);
-  border-radius: 999px;
-  cursor: grab;
-}
+  &[type="color"] > div::after { background-color: var(--slider-color, var(--aufbau-accent)); }
 
-.slider-track::-webkit-slider-runnable-track { background: none; }
-.slider-track::-moz-range-track              { background: none; }
-
-.slider-number {
-  border-block-end: var(--aufbau-control-border);
-  padding-block-end: 0.1em;
+  > output > input {
+    border-block-end  : var(--aufbau-control-border);
+    padding-block-end : 0.1em;
+  }
 }
 
 /* :::::: <aufbau-dropdown> :::::: */
 
-.aufbau-dropdown-menu {
-  background-color: var(--aufbau-surface);
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
-  padding: 0.2em;
-  margin-block: 0.25em;
-}
+aufbau-dropdown > [role="menu"] {
+  background-color : var(--aufbau-surface);
+  border           : var(--aufbau-control-border);
+  border-radius    : var(--aufbau-control-radius);
+  padding          : 0.2em;
 
-.aufbau-dropdown-menu > * {
-  border-radius: calc(var(--aufbau-control-radius) * 0.8);
-  padding: var(--aufbau-control-pad);
-}
+  > * {
+    border-radius : calc(var(--aufbau-control-radius) * 0.8);
+    padding       : var(--aufbau-control-pad);
 
-.aufbau-dropdown-menu > *:hover { background-color: var(--aufbau-control-hover); }
+    &:hover { background-color: var(--aufbau-control-hover); }
+  }
+}
 
 /* ::: upload / writer ::::::::::::::::::::::::::::::::::::::::::: */
 
-.upload-zone {
-  border-style: dashed;
-  background-color: var(--aufbau-control-sunken);
-  transition: background-color 0.15s ease;
-}
+aufbau-upload {
+  > button {
+    background-color : var(--aufbau-control-sunken);
+    border-style     : dashed;
+    transition       : background-color 0.15s ease;
+  }
 
-.upload-zone:hover, .is-dragover .upload-zone { background-color: var(--aufbau-control-hover); }
+  > button:hover,
+  &:state(dragging) > button { background-color: var(--aufbau-control-hover); }
 
-.upload-item {
-  border-radius: calc(var(--aufbau-control-radius) * 0.8);
-  padding: 0.2em 0.4em;
-  background-color: var(--aufbau-control-sunken);
+  li {
+    background-color : var(--aufbau-control-sunken);
+    border-radius    : calc(var(--aufbau-control-radius) * 0.8);
+    padding          : 0.2em 0.4em;
+  }
 }
 
 aufbau-writer {
