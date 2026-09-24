@@ -1,5 +1,11 @@
 // @aufbau/patterns
 
+/*
+- bessere konstruktion evtl: PatternClass + MotionClass + publicAPI (apply, remove, update, use)
+- animate/animatePattern kann weg, weil apply/applyPattern auch einfache ne motion prop an options haben kann    
+- generell ist das alles so messy und unnötig kompliziert
+*/
+
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::::
 
 import { PREFIX, defsHost, encodeSvg, resolve, svgId, toElements } from './core.js';
@@ -44,7 +50,7 @@ async function patternImage (id, options = {}) {
 // :::::: DEFS INJECTION :::::::::::::::::::::::::::::::::::::::::
 
 // 
-async function ensurePattern (id, options = {}) {
+async function ensure (id, options = {}) {
   const host      = defsHost();
   const elementId = options.svgId ?? svgId(id);
   if (host.querySelector(`#${CSS.escape(elementId)}`)) return elementId;
@@ -57,7 +63,7 @@ async function ensurePattern (id, options = {}) {
 
 // :::::: PUBLIC API ::::::::::::::::::::::::::::::::::::::::::::::
 
-async function applyPattern (target, id, options = {}) {
+async function apply (target, id, options = {}) {
   const { mode = 'datauri', ...userVars } = options;
   const elements = toElements(target);
   if (elements.length === 0) return;
@@ -83,7 +89,7 @@ async function applyPattern (target, id, options = {}) {
 }
 
 
-function removePattern (target) {
+function remove (target) {
   stopMotion(target);
   for (const el of toElements(target)) {
     el.style.removeProperty('background-image');
@@ -92,14 +98,14 @@ function removePattern (target) {
   }
 }
 
-async function animatePattern (target, id, options = {}) {
+async function animate (target, id, options = {}) {
   const meta = metaOf(id);
   const size = options.size ?? meta.vars.size?.default ?? 20;
-  await applyPattern(target, id, options);
+  await apply(target, id, options);
   applyMotion(target, options.motion ?? 'down', { size, speed: options.speed, timing: options.timing });
 }
 
-function  (id, options = {}) {
+function use (id, options = {}) {
   return {
     id,
 
