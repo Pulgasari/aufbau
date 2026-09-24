@@ -1,3 +1,9 @@
 # @aufbau/api
 
-unified wrapper around all aufbau-packages with lazy loading.
+unified async wrapper around most aufbau-packages with lazy imports.
+
+## install
+
+```sh
+deno install jsr:@aufbau/api
+```
