@@ -24,6 +24,8 @@ const matches = (file, accept) => {
 };
 
 export default class AufbauUpload extends AufbauControl {
+  static reflect = ['look'];
+
   static attr = {
     accept    : String,
     directory : Boolean,

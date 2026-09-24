@@ -9,6 +9,8 @@ const clamp = value => Math.min(100, Math.max(0, value));
 export default class AufbauProgress extends AufbauElement {
   static internals = { role: 'progressbar' };
 
+  static reflect = ['type'];
+
   static attr = {
     max      : 100,
     showText : Boolean,

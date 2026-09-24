@@ -43,6 +43,17 @@ has no ElementInternals. `this.states` wraps its CustomStateSet with `add`,
 `delete`, `has` and `toggle(name, force)`; every call is a guarded no-op in
 browsers without custom states.
 
+### reflect
+
+```javascript
+static reflect = ['look'];
+```
+
+writes the resolved value of those attributes back onto the host on every
+update: the default, a value from `<aufbau-config>`, or the fallback for an
+invalid one. css can then select every state as `[look="…"]`. meant for
+presentation enums, never for values.
+
 ---
 
 ## Component Lifecycle & Registration

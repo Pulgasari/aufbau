@@ -108,6 +108,8 @@ export class AufbauCore extends HTMLElement {
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
+    // our own reflection writes (see reflectAttrs) are not a change of input
+    if (this._reflecting) return;
     if (oldValue !== newValue && this._mounted) {
       this.onAttributeChange(name, oldValue, newValue);
       this.update();
@@ -147,6 +149,8 @@ export class AufbauCore extends HTMLElement {
   update () {
     if (!this._mounted) return this;
 
+    this.reflectAttrs();
+
     const markup = this.render();
     let rebuilt  = false;
 
@@ -162,6 +166,30 @@ export class AufbauCore extends HTMLElement {
     this.applyVars();
     this.sync();
     if (rebuilt) this.onRender();
+
+    return this;
+  }
+
+  /**
+   * `static reflect = ['look']` writes the RESOLVED value of those attributes
+   * back onto the host: defaults, values from config and invalid values that
+   * fell back. css can then select every state as [look="…"], the default and
+   * a config driven one included. meant for presentation enums, not for values.
+   */
+  reflectAttrs () {
+    const names = this.constructor.reflect;
+    if (!isArray(names)) return this;
+
+    for (const name of names) {
+      const kebab = toKebabCase(name);
+      const value = this.getAttr(name);
+      const text  = value == null || value === false ? null : value === true ? '' : String(value);
+      if (this.getAttribute(kebab) === text) continue;
+
+      this._reflecting = true;
+      try   { text === null ? this.removeAttribute(kebab) : this.setAttribute(kebab, text); }
+      finally { this._reflecting = false; }
+    }
 
     return this;
   }

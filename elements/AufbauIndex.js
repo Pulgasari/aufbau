@@ -16,6 +16,8 @@ const parsePx = value => { const number = parseFloat(value); return Number.isFin
 const RELAYOUT = new Set(['item-look', 'item-shape', 'item-size', 'viewmode']);
 
 export default class AufbauIndex extends AufbauElement {
+  static reflect = ['viewmode'];
+
   static attr = {
     gap               : { type: String, var: true },   // -> --aufbau-gap
     itemIntrinsicSize : String,   // stand-in block size for never rendered items. unset = learned from the rendered ones

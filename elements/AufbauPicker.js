@@ -34,6 +34,8 @@ const LONG_PRESS = 500;
 const isInactive = item => item.hidden || item.matches(':disabled, [aria-disabled="true"]');
 
 export default class AufbauPicker extends AufbauControl {
+  static reflect = ['look'];
+
   static attr = {
     iconsOnly   : Boolean,
     look        : { type: String, default: 'combobox', values: ['combobox', 'cycle', 'radio', 'segments'] },
@@ -225,8 +227,6 @@ export default class AufbauPicker extends AufbauControl {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onMount () {
-    // the resolved look is reflected, so every look is selectable as [look="…"], the default included
-    if (this.getAttribute('look') !== this.look) this.setAttribute('look', this.look);
 
     // touch the shell first, the observer needs it to ignore our own repaints
     const shell = this.renderTarget;

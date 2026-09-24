@@ -12,6 +12,8 @@ const MOVED = { file: 'aufbau-upload', range: 'aufbau-slider' };
 const warned = new Set;
 
 export default class AufbauInput extends AufbauControl {
+  static reflect = ['look'];
+
   static attr = {
     autocomplete : String,
     icon         : String,

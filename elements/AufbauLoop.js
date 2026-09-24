@@ -10,6 +10,8 @@ import { AufbauElement } from './core/index.js';
 import { onVisible }     from '@domina/observer';
 
 export default class AufbauLoop extends AufbauElement {
+  static reflect = ['direction', 'mode'];
+
   static attr = {
     direction    : { type: String, default: 'left', values: ['left', 'right'] },
     interval     : 3000,

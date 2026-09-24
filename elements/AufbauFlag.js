@@ -25,6 +25,8 @@ const regionName = (code) => {
 export default class AufbauFlag extends AufbauElement {
   static internals = { role: 'img' };
 
+  static reflect = ['variant'];
+
   static attr = {
     code    : 'de',
     // an explicit label wins over the region name derived from the code

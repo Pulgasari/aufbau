@@ -14,6 +14,8 @@ const formatTime = (seconds) => {
 };
 
 export default class AufbauAudio extends AufbauElement {
+  static reflect = ['layout'];
+
   static attr = {
     artist   : String,
     autoplay : Boolean,

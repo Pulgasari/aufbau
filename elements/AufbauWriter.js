@@ -13,6 +13,8 @@ import { setAttr }       from '@domina/methods/setAttr.js';
 import { setValue }      from '@domina/methods/setValue.js';
 
 export default class AufbauWriter extends AufbauControl {
+  static reflect = ['look', 'resize'];
+
   static attr = {
     actions     : { type: String, default: 'copy paste clear' },
     autogrow    : { type: Boolean, default: true },

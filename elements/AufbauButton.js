@@ -10,6 +10,8 @@ export default class AufbauButton extends AufbauElement {
 
   static internals = { role: 'button' };
 
+  static reflect = ['variant'];
+
   static attr = {
     disabled : Boolean,
     icon     : String,

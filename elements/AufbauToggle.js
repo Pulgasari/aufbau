@@ -10,6 +10,8 @@ import { html }          from './core/html.js';
 const ROLES = { button: 'button', checkbox: 'checkbox', switch: 'switch' };
 
 export default class AufbauToggle extends AufbauControl {
+  static reflect = ['look'];
+
   static attr = {
     checked       : Boolean,
     // set either one to swap the css drawn track/mark for an <aufbau-icon>,
@@ -120,8 +122,6 @@ export default class AufbauToggle extends AufbauControl {
   }
 
   onMount () {
-    // the resolved look is reflected, so every look is selectable as [look="…"], the default included
-    if (this.getAttribute('look') !== this.getAttr('look')) this.setAttribute('look', this.getAttr('look'));
 
     this.on('click', () => this.toggle());
 
