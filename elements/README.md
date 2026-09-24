@@ -316,6 +316,33 @@ das layout gehängt:
 </aufbau-index>
 ```
 
+### render skipping
+
+`<aufbau-item>` hat `content-visibility: auto`: items ausserhalb des viewports
+werden weder gelayoutet noch gezeichnet. damit die scrollhöhe stimmt, braucht ein
+übersprungenes item eine ersatzhöhe (`contain-intrinsic-block-size: auto <schätzung>`).
+`auto` heisst: einmal gerendert, merkt sich der browser die echte grösse. die
+schätzung gilt also nur für items, die noch nie sichtbar waren. quelle, erster treffer gewinnt:
+
+1. `intrinsic-size` am item
+2. `item-intrinsic-size` am index
+3. gelernt: mittelwert der bisher gerenderten items (masonry, listen, variable höhen)
+4. `item-size` als grobe näherung
+
+quadratische items (`shape="circle|square"`) brauchen nichts davon, die höhe
+folgt über `aspect-ratio` aus der spaltenbreite. bei wechsel von `viewmode`,
+`item-size`, `item-shape` oder `item-look` wird neu gelernt und die gemerkten
+grössen verworfen.
+
+`eager` (am index oder item) schaltet das skipping ab. nötig, wenn ein item
+bewusst über seinen rand hinaus zeichnet, denn skipping impliziert paint containment.
+
+```html
+<aufbau-index viewmode="list" item-intrinsic-size="3.5rem">…</aufbau-index>
+<aufbau-index viewmode="masonry">…</aufbau-index>          <!-- lernt selbst -->
+<aufbau-item intrinsic-size="480px">großer teaser</aufbau-item>
+```
+
 ## aufbau-input
 
 `type` ist ausschliesslich der wertetyp, `look` ausschliesslich die darstellung.
