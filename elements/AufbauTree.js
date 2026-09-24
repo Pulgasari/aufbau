@@ -44,8 +44,10 @@ export default class AufbauTree extends AufbauElement {
   }
 
   onMount () {
-    this.on('click', `${ITEM} > div`, (event, row) => {
-      const item = row.parentElement;
+    // the row lives in the item's shadow root, the click arrives retargeted to the
+    // innermost item. only a click on that item's own row counts
+    this.on('click', ITEM, (event, item) => {
+      if (!event.composedPath().includes(item.row)) return;
       item.toggle();
       item.select();
       item.focus();

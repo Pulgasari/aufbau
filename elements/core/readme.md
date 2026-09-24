@@ -52,9 +52,12 @@ preact, anything). aufbau elements follow the same model:
 
 - no own structure (icon, flag, index, item, progress, waveform): render nothing,
   the host plus css and pseudo elements is the whole element
-- own structure, children the author owns (button, dropdown, modal, picker):
+- own structure, children the author owns (button, dropdown, loop, modal,
+  picker, toast, tree-item, upload):
   `static shadow = true`, render() goes into the shadow root, children are
   projected through `<slot>` or only read (picker options)
+- no shadow root possible (datalist: `list=` resolves ids in the document): the
+  children are only read, the element appends one node of its own and fills it
 - styling reaches inside through custom properties and `::part()`. states that
   the skin needs on a part are exposed as extra part tokens (`part="option
   selected"`), `::part()` accepts no attribute selectors

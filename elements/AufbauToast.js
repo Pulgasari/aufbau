@@ -5,8 +5,9 @@
 import { isPlainObject, isString } from '@pulgasari/is';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
-import { AufbauElement } from './core/index.js';
-import { html, raw }     from './core/html.js';
+import { AufbauElement }   from './core/index.js';
+import { html }            from './core/html.js';
+import { adoptBaseStyles } from './core/styles.js';
 
 const ICONS = {
   error   : 'lucide:alert-circle',
@@ -58,6 +59,25 @@ export function toToastOptions (input, options = {}) {
   return result;
 }
 
+// the stack is page level, the shadow root of a toast cannot style it
+const STACK_STYLES = `
+  [data-aufbau-toasts] {
+    background      : none;
+    border          : 0;
+    display         : flex;
+    flex-direction  : column;
+    gap             : 0.5rem;
+    inset           : 1rem 1rem auto auto;
+    margin          : 0;
+    max-inline-size : min(24rem, calc(100vw - 2rem));
+    overflow        : visible;
+    padding         : 0;
+    pointer-events  : none;
+    position        : fixed;
+    z-index         : var(--aufbau-toast-z, 100);
+  }
+`;
+
 export default class AufbauToast extends AufbauElement {
   static attr = {
     dismissible : Boolean,
@@ -68,56 +88,45 @@ export default class AufbauToast extends AufbauElement {
     type        : { default: 'info', values: ['error', 'info', 'success', 'warning'] },
   };
 
-  static styles = `
-    [data-aufbau-toasts] {
-      background      : none;
-      border          : 0;
-      display         : flex;
-      flex-direction  : column;
-      gap             : 0.5rem;
-      inset           : 1rem 1rem auto auto;
-      margin          : 0;
-      max-inline-size : min(24rem, calc(100vw - 2rem));
-      overflow        : visible;
-      padding         : 0;
-      pointer-events  : none;
-      position        : fixed;
-      z-index         : var(--aufbau-toast-z, 100);
-    }
+  // the toast ui lives in the shadow root, children are the message and are
+  // projected, never re-parsed. parts: icon, heading, message, close
+  static shadow = true;
 
-    aufbau-toast {
+  static styles = `
+    :host {
       align-items           : start;
       column-gap            : var(--aufbau-control-gap, 0.5em);
       display               : grid;
       grid-template-columns : auto 1fr auto;
       pointer-events        : auto;
+    }
 
-      > aufbau-icon { grid-row: span 2; line-height: 1.4; }
+    /* horizontal drags belong to the swipe, vertical ones still scroll the page */
+    :host([dismissible]) { touch-action: pan-y; }
 
-      > :is(strong, div) {
-        grid-column     : 2;
-        min-inline-size : 0;
-        overflow-wrap   : anywhere;
-      }
+    [part~="icon"] { grid-row: span 2; line-height: 1.4; }
 
-      > strong { font-weight: 600; }
+    [part~="heading"],
+    [part~="message"] {
+      grid-column     : 2;
+      min-inline-size : 0;
+      overflow-wrap   : anywhere;
+    }
 
-      > button {
-        align-items : center;
-        background  : none;
-        border      : 0;
-        color       : inherit;
-        cursor      : pointer;
-        display     : inline-flex;
-        font        : inherit;
-        grid-column : 3;
-        grid-row    : 1 / span 2;
-        margin      : 0;
-        padding     : 0;
-      }
+    [part~="heading"] { font-weight: 600; }
 
-      /* horizontal drags belong to the swipe, vertical ones still scroll the page */
-      &[dismissible] { touch-action: pan-y; }
+    [part~="close"] {
+      align-items : center;
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      font        : inherit;
+      grid-column : 3;
+      grid-row    : 1 / span 2;
+      margin      : 0;
+      padding     : 0;
     }
   `;
 
@@ -161,9 +170,10 @@ export default class AufbauToast extends AufbauElement {
 
   onMount () {
     // authored children are the message when no message attribute is given
-    this._children ??= this.innerHTML.trim();
+    adoptBaseStyles('aufbau-toast-stack', STACK_STYLES);   // deduplicated by key
 
-    this.on('click', 'button', () => this.dismiss());
+    // the close part only, a button inside the message is the author's
+    this.on('click', '[part~="close"]', () => this.dismiss());
 
     // hovering or focusing a toast holds its countdown
     this.on('pointerenter', () => this.stopTimer());
@@ -222,7 +232,8 @@ export default class AufbauToast extends AufbauElement {
     let offset = 0;
 
     this.on('pointerdown', (event) => {
-      if (!this.getAttr('dismissible') || event.pointerType === 'mouse' || event.target.closest('button')) return;
+      if (!this.getAttr('dismissible') || event.pointerType === 'mouse') return;
+      if (event.composedPath().some(node => node.localName === 'button')) return;   // retargeted, the path still knows
       if (this.gesturesMode() === 'false') return;
       origin = event.clientX;
       offset = 0;
@@ -258,12 +269,12 @@ export default class AufbauToast extends AufbauElement {
   render () {
     const { dismissible, heading, icon, message, type } = this.getAttr();
 
-    // attribute text is escaped. authored children are page markup and pass through unescaped
+    // the message attribute wins, otherwise the children show
     return html`
-      <aufbau-icon icon="${icon || ICONS[type] || ICONS.info}"></aufbau-icon>
-      ${heading && html`<strong>${heading}</strong>`}
-      ${(message || this._children) && html`<div>${message || raw(this._children)}</div>`}
-      ${dismissible && html`<button type="button" aria-label="close"><aufbau-icon icon="lucide:x"></aufbau-icon></button>`}
+      <aufbau-icon part="icon" icon="${icon || ICONS[type] || ICONS.info}"></aufbau-icon>
+      ${heading && html`<strong part="heading">${heading}</strong>`}
+      <div part="message">${message || html`<slot></slot>`}</div>
+      ${dismissible && html`<button type="button" part="close" aria-label="close"><aufbau-icon icon="lucide:x"></aufbau-icon></button>`}
     `;
   }
 

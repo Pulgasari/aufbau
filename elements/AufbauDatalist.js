@@ -2,18 +2,19 @@
 // a data source for native list= autocompletion, fed by @aufbau/import.
 //
 // autonomous on purpose: the former <datalist is="aufbau-datalist"> is a
-// customized built-in, which safari never shipped. the host renders a real
+// customized built-in, which safari never shipped. the host owns one real
 // <datalist> and hands its own id over to it, so <input list="…"> keeps
 // pointing at the same name:
 //
 //   <aufbau-datalist id="cities" src="/data/cities.json" key="name"></aufbau-datalist>
 //   <input list="cities">
 //
-// authored <option> children are kept and listed before the loaded ones.
+// no shadow root here: list= resolves ids in the document, not in a shadow
+// tree. the author's <option> children are left alone and only read, the own
+// <datalist> is appended once and filled, never rendered over the children.
 
 import { AufbauElement, normalizeOptions } from './core/index.js';
-import { importFile }  from '@aufbau/import';
-import { attrs, html } from './core/html.js';
+import { importFile } from '@aufbau/import';
 
 export default class AufbauDatalist extends AufbauElement {
   static attr = {
@@ -24,18 +25,19 @@ export default class AufbauDatalist extends AufbauElement {
 
   static styles = `aufbau-datalist { display: none; }`;
 
+  get list () { return this._list; }
+
   onMount () {
+    this._list ??= document.createElement('datalist');
+
     // the id belongs to the inner datalist, two elements must not share it
     if (this.id) {
-      this._listId = this.id;
+      this._list.id = this.id;
       this.removeAttribute('id');
     }
 
-    this._authored ??= [...this.querySelectorAll(':scope > option')]
-      .map(option => ({ label: option.label, value: option.value }));
+    if (this._list.parentNode !== this) this.append(this._list);
   }
-
-  get list () { return this.$(':scope > datalist'); }
 
   async update () {
     const { key, labelKey, src } = this.getAttr();
@@ -56,14 +58,21 @@ export default class AufbauDatalist extends AufbauElement {
     return super.update();
   }
 
-  render () {
-    const items = [...(this._authored ?? []), ...(this._items ?? [])];
+  render () { return null; }
 
-    return html`
-      <datalist ${attrs({ id: this._listId })}>
-        ${items.map(item => html`<option ${attrs({ label: item.label === item.value ? false : item.label, value: item.value })}></option>`)}
-      </datalist>
-    `;
+  // authored options first, then the loaded ones. rebuilt as nodes, the list is ours alone
+  sync () {
+    if (!this._list) return;
+
+    const authored = [...this.querySelectorAll(':scope > option')].map(option => ({ label: option.label, value: option.value }));
+    const options  = [...authored, ...(this._items ?? [])].map(({ label, value }) => {
+      const option = document.createElement('option');
+      option.value = value;
+      if (label && label !== value) option.label = label;
+      return option;
+    });
+
+    this._list.replaceChildren(...options);
   }
 }
 

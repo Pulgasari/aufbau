@@ -3,7 +3,7 @@
 // a superset: it takes mimetypes ("image/*") as well as extensions (".pdf").
 
 import { AufbauControl }  from './core/index.js';
-import { attrs, html, raw } from './core/html.js';
+import { attrs, html }    from './core/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 
@@ -35,15 +35,20 @@ export default class AufbauUpload extends AufbauControl {
     text      : 'drop files here or click to browse',
   };
 
-  // children: the hidden native file input, a <button> as drop zone and file
-  // dialog trigger, and a <ul> of the picked files. state: :state(dragging),
-  // :state(filled)
-  static styles = `aufbau-upload {
-    display        : flex;
-    flex-direction : column;
-    gap            : var(--aufbau-control-gap, 0.5em);
+  // the ui lives in the shadow root: the hidden native file input, a <button> as
+  // drop zone and file dialog trigger, and the list of picked files. children are
+  // the zone's text and are projected. parts: zone, icon, text, list, file, name,
+  // size, remove. state: :state(dragging), :state(filled)
+  static shadow = true;
 
-    > button {
+  static styles = `
+    :host {
+      display        : flex;
+      flex-direction : column;
+      gap            : var(--aufbau-control-gap, 0.5em);
+    }
+
+    [part~="zone"] {
       align-items     : center;
       background      : none;
       color           : inherit;
@@ -60,14 +65,14 @@ export default class AufbauUpload extends AufbauControl {
       > aufbau-icon { --icon-size: 1.75em; }
     }
 
-    &[look="button"] > button {
+    :host([look="button"]) [part~="zone"] {
       flex-direction : row;
       padding        : var(--aufbau-control-pad, 0.35em 0.55em);
     }
 
-    &[look="list"] > button { display: none; }
+    :host([look="list"]) [part~="zone"] { display: none; }
 
-    > ul {
+    [part~="list"] {
       display        : flex;
       flex-direction : column;
       gap            : 0.25em;
@@ -76,40 +81,41 @@ export default class AufbauUpload extends AufbauControl {
       padding        : 0;
     }
 
-    li {
+    [part~="file"] {
       align-items : center;
       display     : flex;
       gap         : var(--aufbau-control-gap, 0.5em);
-
-      > span {
-        flex            : 1 1 auto;
-        min-inline-size : 0;
-        overflow        : hidden;
-        text-overflow   : ellipsis;
-        white-space     : nowrap;
-      }
-
-      > small {
-        flex                 : none;
-        font-size            : inherit;
-        font-variant-numeric : tabular-nums;
-        opacity              : 0.65;
-      }
-
-      > button {
-        align-items : center;
-        background  : none;
-        border      : 0;
-        color       : inherit;
-        cursor      : pointer;
-        display     : inline-flex;
-        flex        : none;
-        font        : inherit;
-        margin      : 0;
-        padding     : 0;
-      }
     }
-  }`;
+
+    [part~="name"] {
+      flex            : 1 1 auto;
+      min-inline-size : 0;
+      overflow        : hidden;
+      text-overflow   : ellipsis;
+      white-space     : nowrap;
+    }
+
+    [part~="size"] {
+      flex                 : none;
+      font-size            : inherit;
+      font-variant-numeric : tabular-nums;
+      opacity              : 0.65;
+    }
+
+    [part~="remove"] {
+      align-items : center;
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      flex        : none;
+      font        : inherit;
+      margin      : 0;
+      padding     : 0;
+    }
+  `;
+
 
   get files () { return this._files ??= []; }
 
@@ -126,11 +132,8 @@ export default class AufbauUpload extends AufbauControl {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onMount () {
-    // authored children replace the default text of the drop zone
-    this._children ??= this.innerHTML.trim();
-
-    this.on('change', ':scope > input', (event, input) => this.add([...input.files]));
-    this.on('click',  ':scope > button', () => { if (!this.isDisabled) this.field?.click(); });
+    this.on('change', 'input[type="file"]', (event, input) => this.add([...input.files]));
+    this.on('click',  '[part~="zone"]',     () => { if (!this.isDisabled) this.field?.click(); });
     this.on('click',  '[data-remove]',   (event, button) => this.remove(Number(button.dataset.remove)));
 
     this.on('dragenter dragover', (event) => {
@@ -196,7 +199,7 @@ export default class AufbauUpload extends AufbauControl {
     const internals = this.internals;
     if (!internals) return this;
 
-    const anchor = this.$(':scope > button') ?? this;
+    const anchor = this.$('[part~="zone"]') ?? this;
 
     if (this._rejected?.length) internals.setValidity({ typeMismatch: true }, 'one or more files were rejected.', anchor);
     else if (this.getAttr('required') && !this.files.length) {
@@ -212,19 +215,20 @@ export default class AufbauUpload extends AufbauControl {
   render () {
     const { accept, directory, multiple, text } = this.getAttr();
 
+    // the children replace the default text of the drop zone
     return html`
       <input type="file" hidden ${attrs({ accept, multiple, webkitdirectory: directory })} />
-      <button type="button">
-        <aufbau-icon icon="lucide:upload"></aufbau-icon>
-        <span>${this._children ? raw(this._children) : text}</span>
+      <button type="button" part="zone">
+        <aufbau-icon part="icon" icon="lucide:upload"></aufbau-icon>
+        <span part="text"><slot>${text}</slot></span>
       </button>
       ${this.files.length > 0 && html`
-        <ul>
+        <ul part="list">
           ${this.files.map((file, index) => html`
-            <li>
-              <span>${file.name}</span>
-              <small>${formatSize(file.size)}</small>
-              <button type="button" data-remove="${index}" aria-label="remove ${file.name}">
+            <li part="file">
+              <span part="name">${file.name}</span>
+              <small part="size">${formatSize(file.size)}</small>
+              <button type="button" part="remove" data-remove="${index}" aria-label="remove ${file.name}">
                 <aufbau-icon icon="lucide:x"></aufbau-icon>
               </button>
             </li>

@@ -41,7 +41,7 @@ aufbau-writer,
 aufbau-dropdown::part(trigger),
 aufbau-button,
 aufbau-toggle[look="button"],
-aufbau-upload > button {
+aufbau-upload::part(zone) {
   border: var(--aufbau-control-border);
   border-radius: var(--aufbau-control-radius);
   padding: var(--aufbau-control-pad);
@@ -55,7 +55,9 @@ aufbau-upload > button {
 }
 
 /* ::part() cannot sit inside :is(), the shadow parts are listed on their own */
-:is(aufbau-button, aufbau-toggle, aufbau-input > button, aufbau-slider > button, aufbau-upload li > button, aufbau-upload > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible,
+:is(aufbau-button, aufbau-toggle, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible,
+aufbau-upload::part(zone):focus-visible,
+aufbau-upload::part(remove):focus-visible,
 aufbau-dropdown::part(trigger):focus-visible,
 aufbau-picker::part(option):focus-visible,
 aufbau-picker::part(trigger):focus-visible {
@@ -63,7 +65,8 @@ aufbau-picker::part(trigger):focus-visible {
   outline-offset: 1px;
 }
 
-:is(aufbau-button, aufbau-input > button, aufbau-slider > button, aufbau-upload li > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
+:is(aufbau-button, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
+aufbau-upload::part(remove):hover,
 aufbau-dropdown::part(trigger):hover:not(:disabled),
 aufbau-picker::part(trigger):hover {
   background-color: var(--aufbau-control-hover);
@@ -294,21 +297,19 @@ aufbau-dropdown > * {
 
 /* ::: upload / writer ::::::::::::::::::::::::::::::::::::::::::: */
 
-aufbau-upload {
-  > button {
-    background-color : var(--aufbau-control-sunken);
-    border-style     : dashed;
-    transition       : background-color 0.15s ease;
-  }
+aufbau-upload::part(zone) {
+  background-color : var(--aufbau-control-sunken);
+  border-style     : dashed;
+  transition       : background-color 0.15s ease;
+}
 
-  > button:hover,
-  &:state(dragging) > button { background-color: var(--aufbau-control-hover); }
+aufbau-upload::part(zone):hover,
+aufbau-upload:state(dragging)::part(zone) { background-color: var(--aufbau-control-hover); }
 
-  li {
-    background-color : var(--aufbau-control-sunken);
-    border-radius    : calc(var(--aufbau-control-radius) * 0.8);
-    padding          : 0.2em 0.4em;
-  }
+aufbau-upload::part(file) {
+  background-color : var(--aufbau-control-sunken);
+  border-radius    : calc(var(--aufbau-control-radius) * 0.8);
+  padding          : 0.2em 0.4em;
 }
 
 aufbau-writer {
@@ -366,19 +367,17 @@ aufbau-code {
 
 /* :::::: <aufbau-tree> :::::: */
 
-aufbau-tree-item {
-  > div       { border-radius: calc(var(--aufbau-control-radius) * 0.8); }
-  > div:hover { background-color: var(--aufbau-control-hover); }
+aufbau-tree-item::part(row)       { border-radius: calc(var(--aufbau-control-radius) * 0.8); }
+aufbau-tree-item::part(row):hover { background-color: var(--aufbau-control-hover); }
 
-  &[selected] > div {
-    background-color : var(--aufbau-accent);
-    color            : var(--aufbau-surface);
-  }
+aufbau-tree-item[selected]::part(row) {
+  background-color : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
+}
 
-  &:focus-visible > div {
-    outline        : 2px solid var(--aufbau-control-focus);
-    outline-offset : -2px;
-  }
+aufbau-tree-item:focus-visible::part(row) {
+  outline        : 2px solid var(--aufbau-control-focus);
+  outline-offset : -2px;
 }
 
 /* :::::: <aufbau-toc> :::::: */
@@ -418,6 +417,6 @@ aufbau-toast {
   &[type="success"] { border-inline-start-color: var(--aufbau-success, currentColor); }
   &[type="warning"] { border-inline-start-color: var(--aufbau-warn, currentColor); }
   &[type="error"]   { border-inline-start-color: var(--aufbau-error, currentColor); }
-
-  > div { color: var(--aufbau-control-muted); }
 }
+
+aufbau-toast::part(message) { color: var(--aufbau-control-muted); }
