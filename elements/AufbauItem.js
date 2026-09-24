@@ -1,7 +1,8 @@
 // <aufbau-item>
 // one entry of an <aufbau-index>, usable on its own as well. renders nothing,
-// its content stays as authored. skipped while off screen, see the notes in
-// AufbauIndex.js for how its stand-in size is chosen.
+// its content stays as authored, no shadow root, page css reaches all of it.
+// skipped while off screen, see the notes in AufbauIndex.js for how its
+// stand-in size is chosen.
 
 import { AufbauElement }           from './core/index.js';
 import { parseLook, resolveShape } from './core/look.js';

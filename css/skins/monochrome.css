@@ -313,8 +313,8 @@ aufbau-upload::part(file) {
 }
 
 aufbau-writer {
-  > footer > output { color: var(--aufbau-control-muted); }
-  &:state(full) > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
+  > div > footer > output { color: var(--aufbau-control-muted); }
+  &:state(full) > div > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
 }
 
 /* :::::: <aufbau-modal> :::::: */
@@ -349,13 +349,13 @@ aufbau-code {
   border        : var(--aufbau-control-border);
   border-radius : var(--aufbau-control-radius);
 
-  > header {
+  > figure > header {
     border-block-end : var(--aufbau-control-border);
     color            : var(--aufbau-control-muted);
     padding          : 0.3em 0.6em;
   }
 
-  > pre { padding: 0.75em; }
+  > figure > pre { padding: 0.75em; }
 
   code[contenteditable]:focus { background-color: var(--aufbau-control-sunken); }
 }

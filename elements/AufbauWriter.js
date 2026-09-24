@@ -8,6 +8,7 @@
 
 import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { AufbauControl } from './core/index.js';
+import { dedent }        from './core/utils.js';
 import { attrs, html }   from './core/html.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setValue }      from '@domina/methods/setValue.js';
@@ -30,11 +31,19 @@ export default class AufbauWriter extends AufbauControl {
   };
 
   // :state(full) marks a counter that reached maxlength
-  static styles = `aufbau-writer {
-    display        : flex;
-    flex-direction : column;
+  // the children are the default value (static source), like the text of a
+  // <textarea>. they stay untouched, the output is a <div> in the light dom
+  static source = true;
 
-    > textarea {
+  static styles = `aufbau-writer {
+    display: block;
+
+    > div {
+      display        : flex;
+      flex-direction : column;
+    }
+
+    > div > textarea {
       background  : none;
       border      : 0;
       color       : inherit;
@@ -47,10 +56,10 @@ export default class AufbauWriter extends AufbauControl {
       &:focus { outline: none; }
     }
 
-    &[resize="none"] > textarea { resize: none; }
-    &[resize="both"] > textarea { resize: both; }
+    &[resize="none"] > div > textarea { resize: none; }
+    &[resize="both"] > div > textarea { resize: both; }
 
-    > footer {
+    > div > footer {
       align-items     : center;
       display         : flex;
       gap             : var(--aufbau-control-gap, 0.5em);
@@ -78,28 +87,34 @@ export default class AufbauWriter extends AufbauControl {
     }
   }`;
 
-  get field () { return this.$(':scope > textarea'); }
+  get field () { return this.$('textarea'); }
 
   // the contract with core/actions.js
   actionText   () { return this.field?.value ?? this.getAttribute('value') ?? ''; }
   actionTarget () { return this.getAttr('readonly') ? null : this.field; }
 
   onMount () {
-    // authored text content is the initial value: <aufbau-writer>hello</aufbau-writer>.
-    // it has to be cleared BEFORE the attribute is set, because setAttr renders
-    // synchronously and the clear would wipe that markup right back out
-    const inline = this.textContent.trim();
-    this.textContent = '';
-
-    if (inline && !this.hasAttribute('value')) {
-      this._defaultValue = inline;
-      this.setAttr({ value: inline });
-    }
+    // the children are the starting value: <aufbau-writer>hello</aufbau-writer>
+    if (!this.hasAttribute('value') && this.defaultValue) this.commit(this.defaultValue, { notify: false });
 
     this.on('input',  'textarea', (event, field) => { this.commit(field.value); this.grow(field); });
     this.on('change', 'textarea', (event, field) => this.commit(field.value));
 
     bindActions(this);
+  }
+
+  // like a <textarea>: the text content is the default value, the value attribute the current one
+  captureDefaults () {
+    this._defaultValue ??= dedent(this.sourceText) || (this.getAttribute('value') ?? '');
+    return this;
+  }
+
+  // new children are a new default. an untouched field follows it, an edited one keeps its text
+  onSourceChange () {
+    const previous = this._defaultValue;
+    this._defaultValue = dedent(this.sourceText);
+    if ((this.getAttribute('value') ?? '') === previous) this.commit(this._defaultValue, { notify: false });
+    else this.update();
   }
 
   /**
@@ -163,7 +178,7 @@ export default class AufbauWriter extends AufbauControl {
       button.disabled = this.isDisabled || readonly;
     }
 
-    const counter = this.$(':scope > footer > output');
+    const counter = this.$('footer > output');
     if (counter) counter.textContent = maxlength ? `${value.length} / ${maxlength}` : String(value.length);
 
     this.states.toggle('full', Boolean(maxlength) && value.length >= maxlength);

@@ -51,11 +51,20 @@ leaves its children alone, so it does not matter who manages them (plain html,
 preact, anything). aufbau elements follow the same model:
 
 - no own structure (icon, flag, index, item, progress, waveform): render nothing,
-  the host plus css and pseudo elements is the whole element
+  the host plus css and pseudo elements is the whole element. index and item are
+  layout around the author's children, deliberately without shadow root
 - own structure, children the author owns (button, dropdown, loop, modal,
   picker, toast, tree-item, upload):
   `static shadow = true`, render() goes into the shadow root, children are
   projected through `<slot>` or only read (picker options)
+- children are the element's input (reader: markdown, code: code, value: the
+  value, writer: the default value): `static source`. the children stay
+  untouched and are the source, a bare shadow root only projects the output
+  element, which is ours and lives in the light dom as well, so page css reaches
+  everything shown (`aufbau-reader article`). changes to the children re-render
+  (`onSourceChange()`), so a framework can keep rendering them.
+  `this.sourceText` reads them raw, `dedent()` from ./utils.js strips the html
+  indentation
 - no shadow root possible (datalist: `list=` resolves ids in the document): the
   children are only read, the element appends one node of its own and fills it
 - styling reaches inside through custom properties and `::part()`. states that

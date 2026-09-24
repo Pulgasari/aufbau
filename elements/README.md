@@ -526,6 +526,10 @@ lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
 über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
 selbst von einem cdn.
 
+`src`, `raw` oder die kinder als quelle. die kinder bleiben unangetastet und
+werden bei änderung neu gerendert, die ausgabe ist ein `<article>` im light dom.
+einrückung aus dem html wird entfernt.
+
 ```html
 <!-- markdown-datei -->
 <aufbau-reader src="/docs/getting-started.md"></aufbau-reader>
@@ -540,8 +544,8 @@ Text mit **markdown**.
 </aufbau-reader>
 ```
 
-der ladezustand steht als `data-state="loading|ready|error|idle"` am element und
-ist damit direkt per css ansprechbar.
+der ladezustand steht als `:state(loading|ready|error|idle)` am element und ist
+damit direkt per css ansprechbar.
 
 ## aufbau-slider
 

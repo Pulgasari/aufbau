@@ -57,6 +57,14 @@ export class AufbauCore extends HTMLElement {
     const shadow = this.constructor.shadow;
     if (shadow && !this.shadowRoot) this.attachShadow({ mode: 'open', ...(isPlainObject(shadow) ? shadow : {}) });
 
+    // static source: the children are the element's input (markdown, code, a value).
+    // they stay untouched in the light dom but are not displayed: a bare shadow root
+    // only projects the output element, which is ours and lives in the light dom too,
+    // so page css reaches everything that is shown
+    else if (this.constructor.source && !this.shadowRoot) {
+      this.attachShadow({ mode: 'open' }).innerHTML = '<slot name="output"></slot>';
+    }
+
     // static internals: true attaches up front, an object also sets the default
     // semantics, e.g. { role: 'treeitem' }. without it internals attach on first use
     const defaults = this.constructor.internals;
@@ -76,21 +84,71 @@ export class AufbauCore extends HTMLElement {
   /** custom states, styled as :state(name). add, delete, has, toggle(name, force) */
   get states () { return this._states ??= stateSet(this); }
 
-  get root         () { return this.shadowRoot ?? this; }
-  get renderTarget () { return this.root; }
+  // the shadow root only counts as the element's tree with `static shadow`, the bare
+  // outlet of `static source` holds nothing but a slot
+  get root         () { return this.constructor.shadow && this.shadowRoot || this; }
+  get renderTarget () { return this.output ?? this.root; }
 
   /** the focused element inside this one's tree, document.activeElement only sees the host */
-  get focused () { return this.shadowRoot ? this.shadowRoot.activeElement : document.activeElement; }
+  get focused () { return this.root === this ? document.activeElement : this.root.activeElement; }
+
+  // :::::: SOURCE ::::::::::::::::::::::::::::::::::::::::::::::
+
+  /** the output element of a `static source` element, created once and appended as the last child */
+  get output () {
+    const source = this.constructor.source;
+    if (!source) return null;
+
+    if (!this._output) {
+      this._output = document.createElement(source.tag ?? 'div');
+      this._output.slot = 'output';
+    }
+    if (this._output.parentNode !== this) this.append(this._output);
+
+    return this._output;
+  }
+
+  /** the author's children, everything but the output */
+  get sourceNodes () { return [...this.childNodes].filter(node => node !== this._output); }
+
+  /**
+   * the children as source text: text nodes raw, elements as their markup. raw on
+   * purpose, innerHTML would escape `>` and `<` and break markdown quotes and code
+   */
+  get sourceText () {
+    return this.sourceNodes.map(node =>
+        node.nodeType === Node.TEXT_NODE    ? node.data
+      : node.nodeType === Node.ELEMENT_NODE ? node.outerHTML
+      : ''
+    ).join('');
+  }
+
+  // children added, removed or edited by the author (or a framework) re-render the output
+  watchSource () {
+    const observer = new MutationObserver(records => {
+      const own = record => this._output && (record.target === this._output || this._output.contains(record.target)
+        || (record.target === this && [...record.addedNodes, ...record.removedNodes].every(node => node === this._output)));
+      if (records.some(record => !own(record))) this.onSourceChange();
+    });
+    observer.observe(this, { characterData: true, childList: true, subtree: true });
+    this.track(() => observer.disconnect());
+  }
+
+  /** hook, the source changed. rebuilds by default */
+  onSourceChange () { this.invalidate().update(); }
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   connectedCallback () {
     this._mounted = true;
-    adoptClassStyles(this.constructor, this.root); // lazy on purpose: an imported but unused element must not adopt anything    
+    // lazy on purpose: an imported but unused element must not adopt anything. a light
+    // element adopts into the tree it sits in, the document or an enclosing shadow root
+    adoptClassStyles(this.constructor, this.root === this ? this.getRootNode() : this.root);
     applySkin();
     this.on(window, CONFIG_EVENT, (event) => {
       if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
     });
+    if (this.constructor.source) this.watchSource();
     this.onMount();
     this.update();
   }
@@ -251,7 +309,7 @@ export class AufbauCore extends HTMLElement {
     // to the host on the way out, so the host alone could never match them
     if (isString(first) && isString(second) && isFn(third)) {
       const stops = [delegateEvent(this, first, second, third, fourth)];
-      if (this.shadowRoot) stops.push(delegateEvent(this.shadowRoot, first, second, third, fourth));
+      if (this.root !== this) stops.push(delegateEvent(this.root, first, second, third, fourth));
       return this.track(() => stops.forEach(stop => stop()));
     }
 

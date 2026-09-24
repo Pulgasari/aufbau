@@ -3,6 +3,7 @@
 import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { attrs, html }          from './core/html.js';
 import { AufbauElement }        from './core/index.js';
+import { dedent }               from './core/utils.js';
 import { getConfig, setConfig } from './core/AufbauConfig.js';
 
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
@@ -117,13 +118,22 @@ export default class AufbauCode extends AufbauElement {
 
   // structure only, the hljs theme paints the tokens and the skin does the frame.
   // the host is the frame, header and pre are its only children
-  static styles = `aufbau-code {
-    display        : flex;
-    flex-direction : column;
-    font           : inherit;
-    overflow       : hidden;
+  // the children are the code (static source) and stay untouched, the output is
+  // a <figure> in the light dom: header (language + actions) and pre > code
+  static source = { tag: 'figure' };
 
-    > header {
+  static styles = `aufbau-code {
+    display  : block;
+    font     : inherit;
+    overflow : hidden;
+
+    > figure {
+      display        : flex;
+      flex-direction : column;
+      margin         : 0;
+    }
+
+    > figure > header {
       align-items     : center;
       display         : flex;
       flex            : none;
@@ -150,7 +160,7 @@ export default class AufbauCode extends AufbauElement {
       }
     }
 
-    > pre {
+    > figure > pre {
       margin     : 0;
       overflow-x : auto;
     }
@@ -201,11 +211,6 @@ export default class AufbauCode extends AufbauElement {
   static preloadTheme (theme) { return loadTheme(theme); }
 
   onMount () {
-    // keep the original inner text as source if no code attribute is set
-    if (!this.hasAttribute('code') && this._originalCode === undefined) {
-      this._originalCode = this.textContent.trim();
-    }
-
     bindActions(this);
 
     // typing must NOT write back into the code attribute:
@@ -224,12 +229,13 @@ export default class AufbauCode extends AufbauElement {
     });
   }
 
-  // an external write to `code` wins over a pending edit
+  // an external write to `code` or to the children wins over a pending edit
   onAttributeChange (name) { if (name === 'code') this._editedCode = undefined; }
+  onSourceChange    ()     { this._editedCode = undefined; this.invalidate().update(); }
 
   get source () {
     if (this._editedCode !== undefined) return this._editedCode;
-    return this.getAttr('code') || this._originalCode || '';
+    return this.getAttr('code') || dedent(this.sourceText);
   }
 
   /** the current text, including edits made through `editable` */
@@ -248,7 +254,7 @@ export default class AufbauCode extends AufbauElement {
 
   // the contract with core/actions.js
   actionText   () { return this.source; }
-  actionTarget () { return this.getAttr('editable') ? this.$(':scope > pre > code') : null; }
+  actionTarget () { return this.getAttr('editable') ? this.$('figure > pre > code') : null; }
 
   render () {
     const { editable } = this.getAttr();

@@ -75,7 +75,7 @@ export default class AufbauValue extends AufbauElement {
     format : String,
     locale : { type: String, config: true },
     type   : { type: String, default: 'text', values: TYPE_NAMES },
-    value  : String, // the value. absent, the authored text content becomes it (see onMount)
+    value  : String, // the value. absent, the children are it (see get value)
     copy   : Boolean,
     icon   : String,
   };
@@ -89,21 +89,30 @@ export default class AufbauValue extends AufbauElement {
     ...configKeys(TAG, 'locale'),
   ];
 
+  // the children are the value (static source) and stay untouched, the output is
+  // a <span> in the light dom: icon, the formatted value, the copy action.
+  // :state(empty) while there is nothing to show
+  static source = { tag: 'span' };
+
   static styles = `
     aufbau-value {
-      align-items : baseline;
-      display     : inline-flex;
-      gap         : var(--value-gap, 0.25rem);
+      display: inline;
 
-      &:not([value]) { display: none; }
+      &:state(empty) { display: none; }
 
-      &:is([type="date"], [type="datetime"], [type="number"], [type="time"], [type="year"]) > :is(span, time) {
+      > span {
+        align-items : baseline;
+        display     : inline-flex;
+        gap         : var(--value-gap, 0.25rem);
+      }
+
+      &:is([type="date"], [type="datetime"], [type="number"], [type="time"], [type="year"]) > span > :is(span, time) {
         font-variant-numeric: tabular-nums;
       }
 
-      > aufbau-icon { align-self: center; }
+      > span > aufbau-icon { align-self: center; }
 
-      > button {
+      > span > button {
         align-self  : center;
         background  : none;
         border      : 0;
@@ -130,9 +139,10 @@ export default class AufbauValue extends AufbauElement {
   formatValue (value) { return machineText(this.getAttr('type'), value); }
 
   /** the parsed value, in whatever shape its type stores (an epoch for `date`, ms since midnight for `time`) */
+  /** the attribute wins, the children are the value otherwise: <aufbau-value type="date">1745…</aufbau-value> */
   get value () {
-    const raw = this.getAttribute('value');
-    return raw == null || raw === '' ? null : this.parseValue(raw);
+    const raw = this.getAttribute('value') ?? this.sourceText.trim();
+    return raw === '' ? null : this.parseValue(raw);
   }
 
   set value (next) {
@@ -172,19 +182,10 @@ export default class AufbauValue extends AufbauElement {
   // :::::: LIFECYCLE
 
   onMount () {
-    // the authored text content is the value: <aufbau-value type="date">1745…</aufbau-value>.
-    // it is cleared before the attribute is set, because setAttr renders
-    // synchronously and the clear would wipe that markup right back out
-    const inline = this.textContent.trim();
-    if (inline && !this.hasAttribute('value')) {
-      this.textContent = '';
-      this.setAttr({ value: inline });
-    }
-
-    this.invalidate();
-
     bindActions(this);
   }
+
+  sync () { this.states.toggle('empty', !this.text); }
 
   // the contract with core/actions.js. what is on screen is what is copied, the value behind it is `el.machine`
   actionText   () { return this.text; }

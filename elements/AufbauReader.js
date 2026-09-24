@@ -4,13 +4,22 @@
 // markdown handling goes through @aufbau/import for both `src` and `raw`,
 // the element no longer reaches out to a cdn on its own.
 //
-// the host holds exactly one child: the rendered <article>, or a status line
-// while loading / after an error. the state is exposed as :state(loading|ready|error),
-// plus aria-busy while loading.
+// three sources, first match wins: `src`, `raw`, or the children:
+//
+//   <aufbau-reader># Titel
+//     Etwas **Text**.
+//   </aufbau-reader>
+//
+// the children are the source and stay untouched (static source): not shown
+// themselves, re-rendered whenever they change, so a framework can keep
+// rendering them. the output is an <article> in the light dom, page css
+// reaches it. it carries the content, or a status line while loading or
+// after an error. state: :state(loading|ready|error), plus aria-busy.
 
 import { AufbauElement }        from './core/index.js';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from './core/html.js';
+import { dedent }               from './core/utils.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
 
@@ -27,10 +36,12 @@ export default class AufbauReader extends AufbauElement {
   // the property is already present, otherwise it would drop it silently.
   transform = null;
 
+  static source = { tag: 'article' };
+
   static styles = `aufbau-reader {
     display: block;
 
-    > article { min-inline-size: 0; }
+    > article { display: block; min-inline-size: 0; }
   }`;
 
   constructor () {
@@ -40,19 +51,9 @@ export default class AufbauReader extends AufbauElement {
 
   get state () { return this._state; }
 
-  onMount () {
-    // authored inline content is the fallback source. taken out of the dom once,
-    // otherwise the raw markdown would stay visible next to its own rendering
-    const { raw, src } = this.getAttr();
-    if (!src && !raw && this._inline === undefined) {
-      this._inline = this.innerHTML.trim();
-      this.textContent = '';
-    }
-  }
-
   async update () {
     const { format, raw, src } = this.getAttr();
-    const source = src || raw || this._inline || '';
+    const source = src || raw || dedent(this.sourceText);
 
     if (source === this._source && this.state !== 'idle') return super.update();
     this._source = source;
@@ -121,8 +122,8 @@ export default class AufbauReader extends AufbauElement {
     if (this.state === 'loading' && !this._html) return html`<p role="status">loading…</p>`;
     if (this.state === 'error')   return html`<p role="alert">could not load content.</p>`;
 
-    // importFile/renderMD return trusted, already parsed markup
-    return html`<article>${rawHtml(this._html ?? '')}</article>`;
+    // importFile/renderMD return trusted, already parsed markup. the <article> is the output itself
+    return rawHtml(this._html ?? '');
   }
 }
 

@@ -1,6 +1,7 @@
 // <aufbau-index>
 // layout container for a run of items: grid, list, gallery rail or masonry.
-// pure layout, it renders nothing and the children stay as authored.
+// pure layout, it renders nothing and the children stay as authored. no shadow
+// root on purpose: the children ARE the content, page css styles them directly.
 //
 // render skipping: <aufbau-item> uses content-visibility: auto, so off screen
 // items are neither laid out nor painted. a skipped item needs a stand-in block
