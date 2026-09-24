@@ -23,6 +23,8 @@ const regionName = (code) => {
 };
 
 export default class AufbauFlag extends AufbauElement {
+  static internals = { role: 'img' };
+
   static attr = {
     code    : 'de',
     // an explicit label wins over the region name derived from the code
@@ -42,12 +44,6 @@ export default class AufbauFlag extends AufbauElement {
     vertical-align : var(--flag-align, -0.15em);
   }`;
 
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-    if (this._internals) this._internals.role = 'img';
-  }
-
   sync () {
     const { code, label, variant } = this.getAttr();
     const { ratio, set } = VARIANTS[variant];
@@ -57,7 +53,7 @@ export default class AufbauFlag extends AufbauElement {
     this.style.setProperty('--flag-ratio', ratio);
     this.style.setProperty('--flag-url',   url ? `url("${url}")` : '');
 
-    if (this._internals) this._internals.ariaLabel = label || regionName(region);
+    if (this.internals) this.internals.ariaLabel = label || regionName(region);
   }
 }
 

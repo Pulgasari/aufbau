@@ -76,8 +76,7 @@ export default class AufbauIndex extends AufbauElement {
 
   constructor () {
     super();
-    this._internals = this.attachInternals?.() ?? null;
-    this._samples   = { count: 0, total: 0 };
+    this._samples = { count: 0, total: 0 };
   }
 
   render () { return null; }
@@ -139,12 +138,9 @@ export default class AufbauIndex extends AufbauElement {
     this._estimate = null;
     if (this.learns) this.setVar('item-intrinsic-size', null);
 
-    const states = this._internals?.states;
-    if (!states) return;
-
     // two frames: the style change has to reach resize observer timing once
-    try { states.add('relayout'); } catch { return; }
-    requestAnimationFrame(() => requestAnimationFrame(() => states.delete('relayout')));
+    this.states.add('relayout');
+    requestAnimationFrame(() => requestAnimationFrame(() => this.states.delete('relayout')));
   }
 
   // :::::: RESIZE ::::::::::::::::::::::::::::::::::::::::::::::

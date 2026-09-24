@@ -165,7 +165,7 @@ export default class AufbauToggle extends AufbauControl {
     super.sync();
 
     const { checked, icon, iconChecked, indeterminate, label, look } = this.getAttr();
-    const internals = this._internals;
+    const internals = this.internals;
 
     // super.sync() drops the tabindex for inner focusables, here the host is the focus stop
     this.tabIndex = this.isDisabled ? -1 : 0;

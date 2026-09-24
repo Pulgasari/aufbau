@@ -21,17 +21,14 @@ import { attrs, html }   from './core/html.js';
 const ITEM = 'aufbau-tree-item';
 
 export default class AufbauTree extends AufbauElement {
+  static internals = { role: 'tree' };
+
   static attr = {
     src : String,
   };
 
   static styles = `aufbau-tree { display: block; }`;
 
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-    if (this._internals) this._internals.role = 'tree';
-  }
 
   // in-memory data — bypasses `src` and hand-authored markup
   set nodes (value) {

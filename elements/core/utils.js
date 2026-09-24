@@ -46,11 +46,3 @@ export function decorateAll (list) {
 
 
 
-// :::::: CUSTOM STATES :::::::::::::::::::::::::::::::::::::::::
-
-// :state(name) on the host. guarded: browsers before 2024 either lack
-// CustomStateSet or reject names without a leading `--`
-export function toggleState (internals, name, force) {
-  try { force ? internals?.states?.add(name) : internals?.states?.delete(name); }
-  catch {}
-}

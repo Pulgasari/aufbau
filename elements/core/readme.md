@@ -14,19 +14,34 @@ Lightweight, zero-dependency abstraction layer for Web Components. Provides a un
 
 ## Architecture
 
-Components are built on top of the `AufbauCore` mixin. It can wrap `HTMLElement` or any native HTML class for customized built-in elements.
+`AufbauCore` is a plain class on top of `HTMLElement`. every aufbau element is
+autonomous; customized built-ins (`is="…"`) are not supported, safari never
+shipped them.
 
 ```javascript
 import { AufbauCore } from './core/AufbauCore.js';
 
-// Base class for standard Web Components
-export class AufbauElement extends AufbauCore(HTMLElement) {}
+export class AufbauElement extends AufbauCore {}
+```
 
-// Base class for customized built-in elements
-export class AufbauDatalistElement extends AufbauCore(HTMLDataListElement) {
-  static extendsTag = 'datalist';
+### internals and states
+
+```javascript
+class AufbauTreeItem extends AufbauElement {
+  // default semantics, applied in the constructor. `true` only attaches up front
+  static internals = { role: 'treeitem' };
+
+  sync () {
+    this.internals.ariaExpanded = String(this.getAttr('expanded'));   // ElementInternals, attached once
+    this.states.toggle('empty', !this.children.length);               // styled as :state(empty)
+  }
 }
 ```
+
+`this.internals` attaches lazily on first access and is `null` where the browser
+has no ElementInternals. `this.states` wraps its CustomStateSet with `add`,
+`delete`, `has` and `toggle(name, force)`; every call is a guarded no-op in
+browsers without custom states.
 
 ---
 

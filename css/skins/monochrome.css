@@ -47,7 +47,7 @@ aufbau-upload > button {
   padding: var(--aufbau-control-pad);
 }
 
-.is-disabled { opacity: 0.5; }
+:is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) { opacity: 0.5; }
 
 :is(aufbau-input, aufbau-picker[look="combobox"], aufbau-writer):focus-within {
   outline: 2px solid var(--aufbau-control-focus);

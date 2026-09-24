@@ -481,7 +481,7 @@ export default class AufbauPicker extends AufbauControl {
     const selected = this.selected;
     const items    = this.items;
 
-    if (this._internals) this._internals.role = GROUPED.has(look) ? (this.isMultiple ? 'group' : 'radiogroup') : null;
+    if (this.internals) this.internals.role = GROUPED.has(look) ? (this.isMultiple ? 'group' : 'radiogroup') : null;
 
     for (const item of items) {
       const active = String(selected.has(item.dataset.value));

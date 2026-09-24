@@ -102,11 +102,6 @@ export default class AufbauIcon extends AufbauElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-  }
-
   sync () {
     const { color, icon, label, size } = this.getAttr();
     let id = resolveIcon(icon);
@@ -128,10 +123,10 @@ export default class AufbauIcon extends AufbauElement {
     this.style.setProperty('--icon-size',  size  || '');
     this.style.setProperty('--icon-color', color || '');
 
-    if (this._internals) {
-      this._internals.role       = label ? 'img' : null;
-      this._internals.ariaLabel  = label || null;
-      this._internals.ariaHidden = label ? null : 'true';
+    if (this.internals) {
+      this.internals.role       = label ? 'img' : null;
+      this.internals.ariaLabel  = label || null;
+      this.internals.ariaHidden = label ? null : 'true';
     }
   }
 }

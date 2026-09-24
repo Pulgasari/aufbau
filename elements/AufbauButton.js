@@ -8,6 +8,8 @@ import { html, raw }     from './core/html.js';
 export default class AufbauButton extends AufbauElement {
   static formAssociated = true;
 
+  static internals = { role: 'button' };
+
   static attr = {
     disabled : Boolean,
     icon     : String,
@@ -29,22 +31,15 @@ export default class AufbauButton extends AufbauElement {
     &[disabled] { cursor: not-allowed; opacity: 0.5; }
   }`;
 
-  constructor () {
-    super();
-    // guarded, older browsers and ssr shims have no ElementInternals
-    this._internals = this.attachInternals?.() ?? null;
-    if (this._internals) this._internals.role = 'button';
-  }
-
   get disabled ()     { return this.hasAttribute('disabled'); }
   set disabled (next) { this.toggleAttribute('disabled', Boolean(next)); }
-  get form     ()     { return this._internals?.form ?? null; }
+  get form     ()     { return this.internals?.form ?? null; }
 
   onMount () {
     // authored children are the content when no label/text is given.
     // captured before the first render replaces them
     this._children ??= this.innerHTML.trim();
-    if (!this._internals) this.setAttribute('role', 'button');
+    if (!this.internals) this.setAttribute('role', 'button');
 
     // capture phase: runs before any bubble listener on the host, also for clicks on children
     this.on('click', event => {
@@ -84,7 +79,7 @@ export default class AufbauButton extends AufbauElement {
   // kept out of render() so toggling disabled does not rebuild the markup
   sync () {
     const disabled = this.disabled;
-    if (this._internals) this._internals.ariaDisabled = String(disabled);
+    if (this.internals) this.internals.ariaDisabled = String(disabled);
     else this.setAttribute('aria-disabled', String(disabled));
     this.tabIndex = disabled ? -1 : 0;
   }

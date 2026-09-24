@@ -17,14 +17,8 @@ let   baseURL   = import.meta.url;
 let   manifest  = null;
 const PREFIX    = 'aufbau-';
 
-// covers both autonomous elements (<aufbau-flag>) and customized built-ins
-// (<datalist is="aufbau-datalist">), which carry the name on `is` instead
-function tagOf (element) {
-  if (element.localName?.startsWith(PREFIX)) return element.localName;
-
-  const is = element.getAttribute?.('is');
-  return is?.startsWith(PREFIX) ? is : null;
-}
+// every aufbau element is autonomous, the tag name is the whole story
+const tagOf = element => element.localName?.startsWith(PREFIX) ? element.localName : null;
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::
 

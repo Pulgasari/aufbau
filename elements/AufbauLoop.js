@@ -7,7 +7,6 @@
 // animation is paused through :state(offscreen).
 
 import { AufbauElement } from './core/index.js';
-import { toggleState }   from './core/utils.js';
 import { onVisible }     from '@domina/observer';
 
 export default class AufbauLoop extends AufbauElement {
@@ -59,8 +58,7 @@ export default class AufbauLoop extends AufbauElement {
 
   constructor () {
     super();
-    this._internals = this.attachInternals?.() ?? null;
-    this._index     = 0;
+    this._index = 0;
   }
 
   onMount () {
@@ -72,7 +70,7 @@ export default class AufbauLoop extends AufbauElement {
 
     this.track(onVisible(this, (element, entry) => {
       this._offscreen = !entry.isIntersecting;
-      toggleState(this._internals, 'offscreen', this._offscreen);
+      this.states.toggle('offscreen', this._offscreen);
     }));
 
     this.arrange();

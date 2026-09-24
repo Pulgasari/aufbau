@@ -159,11 +159,6 @@ export default class AufbauToast extends AufbauElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-  }
-
   onMount () {
     // authored children are the message when no message attribute is given
     this._children ??= this.innerHTML.trim();
@@ -275,7 +270,7 @@ export default class AufbauToast extends AufbauElement {
   // errors interrupt, everything else waits for a pause in speech
   sync () {
     const role = this.getAttr('type') === 'error' ? 'alert' : 'status';
-    if (this._internals) this._internals.role = role;
+    if (this.internals) this.internals.role = role;
     else this.setAttribute('role', role);
   }
 }

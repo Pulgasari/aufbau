@@ -6,7 +6,6 @@
 
 import { AufbauElement } from './core/index.js';
 import { attrs, html }   from './core/html.js';
-import { toggleState }   from './core/utils.js';
 
 const formatTime = (seconds) => {
   if (!Number.isFinite(seconds)) return '0:00';
@@ -83,8 +82,7 @@ export default class AufbauAudio extends AufbauElement {
 
   constructor () {
     super();
-    this._internals = this.attachInternals?.() ?? null;
-    this._audio     = new Audio;
+    this._audio = new Audio;
   }
 
   get playing () { return !this._audio.paused; }
@@ -139,9 +137,9 @@ export default class AufbauAudio extends AufbauElement {
       if (autoplay) this.play();
     }
 
-    if (this._internals) {
-      this._internals.role      = 'group';
-      this._internals.ariaLabel = label;
+    if (this.internals) {
+      this.internals.role      = 'group';
+      this.internals.ariaLabel = label;
     }
 
     this.syncPlayState();
@@ -154,7 +152,7 @@ export default class AufbauAudio extends AufbauElement {
 
     button?.setAttribute('aria-label', playing ? 'pause' : 'play');
     button?.querySelector('aufbau-icon')?.setAttribute('icon', playing ? 'lucide:pause' : 'lucide:play');
-    toggleState(this._internals, 'playing', playing);
+    this.states.toggle('playing', playing);
   }
 
   syncProgress () {

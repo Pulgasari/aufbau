@@ -14,6 +14,8 @@ import { getElements } from '@domina/methods/getElements.js';
 import { observe }     from '@domina/observer';
 
 export default class AufbauToc extends AufbauElement {
+  static internals = { role: 'navigation' };
+
   static attr = {
     label    : 'On This Page',
     selector : 'h1, h2, h3, h4, h5, h6',
@@ -39,12 +41,6 @@ export default class AufbauToc extends AufbauElement {
       &[aria-level="6"] { --toc-level: 6; }
     }
   }`;
-
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-    if (this._internals) this._internals.role = 'navigation';
-  }
 
   get container () {
     const { target } = this.getAttr();
@@ -121,7 +117,7 @@ export default class AufbauToc extends AufbauElement {
   onRender () { this.spy(); }
 
   sync () {
-    if (this._internals) this._internals.ariaLabel = this.getAttr('label');
+    if (this.internals) this.internals.ariaLabel = this.getAttr('label');
   }
 
   // marks the entry of the topmost heading in view. headings that leave keep

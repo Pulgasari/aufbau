@@ -3,15 +3,9 @@
 // an <aufbau-input type="search">. mismatches get the `hidden` attribute, so
 // filtering works without any css; `mismatch-class` switches to a class instead.
 
-import { AufbauElement } from './core/index.js';
-import { html }          from './core/html.js';
-
-const MATCH = {
-  contains   : (text, query) => text.includes(query),
-  endsWith   : (text, query) => text.endsWith(query),
-  exact      : (text, query) => text === query,
-  startsWith : (text, query) => text.startsWith(query),
-};
+import { AufbauElement }  from './core/index.js';
+import { html }           from './core/html.js';
+import { filterElements } from '@domina/methods/filterElements.js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {
@@ -41,20 +35,15 @@ export default class AufbauFilter extends AufbauElement {
     const { container, mismatchClass, mode, target } = this.getAttr();
     if (!target) return this;
 
-    const scope  = container ? document.querySelector(container) : document;
-    const items  = [...(scope?.querySelectorAll(target) ?? [])];
-    const needle = String(query ?? '').trim().toLowerCase();
-    const match  = MATCH[mode];
-    const hits   = [];
+    const result = filterElements({
+      container : container || document,
+      filters   : [['', query, mode]],
+      hide      : !mismatchClass,
+      item      : target,
+      mismatchClass,
+    });
 
-    for (const item of items) {
-      const matches = !needle || match(item.textContent.toLowerCase(), needle);
-      if (mismatchClass) item.classList.toggle(mismatchClass, !matches);
-      else item.hidden = !matches;
-      if (matches) hits.push(item);
-    }
-
-    this.emit('aufbau-filter', { items: hits, matched: hits.length, query, total: items.length });
+    this.emit('aufbau-filter', { query, ...result });
     return this;
   }
 

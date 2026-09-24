@@ -7,6 +7,8 @@ import { AufbauElement } from './core/index.js';
 const clamp = value => Math.min(100, Math.max(0, value));
 
 export default class AufbauProgress extends AufbauElement {
+  static internals = { role: 'progressbar' };
+
   static attr = {
     max      : 100,
     showText : Boolean,
@@ -56,12 +58,6 @@ export default class AufbauProgress extends AufbauElement {
     }
   `;
 
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-    if (this._internals) this._internals.role = 'progressbar';
-  }
-
   onMount () { this.watchScroll(); }
 
   onAttributeChange (name) {
@@ -103,10 +99,10 @@ export default class AufbauProgress extends AufbauElement {
 
     this.style.setProperty('--progress', `${percentage}%`);
 
-    if (this._internals) {
-      this._internals.ariaValueMin = '0';
-      this._internals.ariaValueMax = String(max);
-      this._internals.ariaValueNow = indeterminate ? null : String(value ?? 0);
+    if (this.internals) {
+      this.internals.ariaValueMin = '0';
+      this.internals.ariaValueMax = String(max);
+      this.internals.ariaValueNow = indeterminate ? null : String(value ?? 0);
     }
 
     const text = this.$(':scope > span');

@@ -19,6 +19,8 @@ const ICONS = {
 };
 
 export default class AufbauTreeItem extends AufbauElement {
+  static internals = { role: 'treeitem' };
+
   static attr = {
     expanded : Boolean,
     icon     : String,
@@ -71,12 +73,6 @@ export default class AufbauTreeItem extends AufbauElement {
     > aufbau-tree-item                      { padding-inline-start: var(--tree-indent); }
     &:not([expanded]) > aufbau-tree-item    { display: none; }
   }`;
-
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-    if (this._internals) this._internals.role = 'treeitem';
-  }
 
   get row          () { return this._row; }
   get items        () { return [...this.children].filter(child => child.localName === 'aufbau-tree-item'); }
@@ -135,10 +131,10 @@ export default class AufbauTreeItem extends AufbauElement {
     iconElement.setAttribute('icon', icon || (hasChildren ? (expanded ? ICONS.open : ICONS.folder) : ICONS.file));
     if (text.textContent !== label) text.textContent = label;
 
-    if (this._internals) {
-      this._internals.ariaExpanded = hasChildren ? String(expanded) : null;
-      this._internals.ariaLevel    = String(this.level);
-      this._internals.ariaSelected = String(selected);
+    if (this.internals) {
+      this.internals.ariaExpanded = hasChildren ? String(expanded) : null;
+      this.internals.ariaLevel    = String(this.level);
+      this.internals.ariaSelected = String(selected);
     }
   }
 }

@@ -1,18 +1,13 @@
-  // @aufbau/elements/core/AufbauCore.js
+// @aufbau/elements/core/AufbauCore.js
 
 // :::::: IMPORTS
 
 import { BASE, schemaOf }   from './schema.js';
 import { applySkin }        from './skin.js';
 import { adoptClassStyles } from './styles.js';
+import { decorate, decorateAll } from './utils.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-// extra ones
-import { createElement }  from '@domina/methods/createElement.js';
-import { getStyleToken }  from '@domina/methods/getStyleToken.js';
-import { setStyleToken }  from '@domina/methods/setStyleToken.js';
-
-//
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';
 import { emitEvent }      from '@domina/methods/emitEvent.js';
 import { getElement }     from '@domina/methods/getElement.js';
@@ -32,43 +27,6 @@ const isBlank   = sth => sth === undefined || sth === null || sth === false || s
 const isDefined = sth => sth !== undefined;
 const log       = new Logger({ prefix: 'aufbau-core' });
 
-// :::::: DECORATION
-
-// non-enumerable definition, keeps the descriptor boilerplate in one place
-const define = (target, props) => {
-  for (const [key, value] of Object.entries(props)) {
-    Object.defineProperty(target, key, { value, configurable: true, writable: true });
-  }
-  return target;
-};
-
-const decorated = new WeakSet;
-
-function decorate (target) {
-  if (!target || decorated.has(target)) return target;
-  decorated.add(target);
-
-  return define(target, {
-    on  (...args) { return onEvent  (this, ...args); },
-    off (...args) { return offEvent (this, ...args); }
-  });
-}
-
-function decorateAll (list) {
-  const items = list.map(decorate);
-
-  return define(items, {
-    on (...args) {
-      const unsubs = items.map(item => item.on(...args));
-      return () => unsubs.forEach(unsub => unsub());
-    },
-    off (...args) {
-      items.forEach(item => item.off(...args));
-      return items;
-    }
-  });
-}
-
 const disposer = () => {
   const entries = new Set;
   return {
@@ -78,26 +36,41 @@ const disposer = () => {
   };
 };
 
+// :state() access, guarded: browsers before 2024 either lack CustomStateSet or
+// reject names without a leading `--`. every call degrades to a no-op there
+const stateSet = (host) => ({
+  add    (name)        { try { host.internals?.states?.add(name);    } catch {} return this; },
+  delete (name)        { try { host.internals?.states?.delete(name); } catch {} return this; },
+  has    (name)        { try { return Boolean(host.internals?.states?.has(name)); } catch { return false; } },
+  toggle (name, force) { return (force ?? !this.has(name)) ? this.add(name) : this.delete(name); },
+});
 
-
-export const AufbauCore = (BaseClass = HTMLElement) => {
-return class extends BaseClass {
-  /*
-  #isMounted = false;
-  #tag       = this.localName;
-  #logger    = new Logger({ prefix: this.#tag });
-  */
-  //#error  = (...args) => this.#logger.error (...args);
-  //#info   = (...args) => this.#logger.info  (...args);
-  //#log    = (...args) => this.#logger.log   (...args);
-  //#warn   = (...args) => this.#logger.warn  (...args);
+export class AufbauCore extends HTMLElement {
 
   constructor () {
     super();
     this._effects = disposer();
     this._mounted = false;
+
+    // static internals: true attaches up front, an object also sets the default
+    // semantics, e.g. { role: 'treeitem' }. without it internals attach on first use
+    const defaults = this.constructor.internals;
+    if (defaults && this.internals && isPlainObject(defaults)) Object.assign(this.internals, defaults);
   }
-  
+
+  /**
+   * the element's ElementInternals, attached once on first access. null where
+   * the browser or an ssr shim has none. form association still needs
+   * `static formAssociated = true` on the class.
+   */
+  get internals () {
+    if (this._internals === undefined) this._internals = this.attachInternals?.() ?? null;
+    return this._internals;
+  }
+
+  /** custom states, styled as :state(name). add, delete, has, toggle(name, force) */
+  get states () { return this._states ??= stateSet(this); }
+
   get root         () { return this.shadowRoot ?? this; }
   get renderTarget () { return this.root; }
   
@@ -141,21 +114,19 @@ return class extends BaseClass {
     }
   }
 
-  static init (options) {
-    const tagName    = isString      (options) ? options         : options?.name;
-    const extendsTag = isPlainObject (options) ? options.extends : this.extendsTag;
-    const name       = tagName || toKebabCase(this.name);
-    
-    if (!name || !name.includes('-')) return log.warn(`invalid tag name "${name}", custom elements require a hyphen.`);    
-    if (customElements.get(name)) return;
+  static init (name) {
+    const tag = (isString(name) ? name : name?.name) || toKebabCase(this.name);
+
+    if (!tag.includes('-')) return log.warn(`invalid tag name "${tag}", custom elements require a hyphen.`);
+    if (customElements.get(tag)) return;
 
     // schema keys are already kebab-case, so they map 1:1 onto observedAttributes
     const observed = Object.keys(schemaOf(this));
     if (observed.length && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
-      Object.defineProperty (this, 'observedAttributes', { configurable: true, get: () => observed });
+      Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
     }
 
-    customElements.define(name, this, extendsTag ? { extends: extendsTag } : undefined);
+    customElements.define(tag, this);
   }
 
   // ::: hooks, override in subclasses
@@ -201,7 +172,7 @@ return class extends BaseClass {
   // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
   
   get schema () { return schemaOf(this.constructor); }
-  get tag    () { return this.getAttribute('is') || this.localName; }
+  get tag    () { return this.localName; }
 
   get configWatchlist () {
     if (this._configWatchlist !== undefined) return this._configWatchlist;
@@ -400,7 +371,7 @@ return class extends BaseClass {
     return spec => decorateAll(getElements(spec, this.root));
   }
 
-};};
+}
 
 export default AufbauCore;
 

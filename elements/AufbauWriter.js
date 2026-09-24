@@ -9,7 +9,6 @@
 import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { AufbauControl } from './core/index.js';
 import { attrs, html }   from './core/html.js';
-import { toggleState }   from './core/utils.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setValue }      from '@domina/methods/setValue.js';
 
@@ -165,7 +164,7 @@ export default class AufbauWriter extends AufbauControl {
     const counter = this.$(':scope > footer > output');
     if (counter) counter.textContent = maxlength ? `${value.length} / ${maxlength}` : String(value.length);
 
-    toggleState(this._internals, 'full', Boolean(maxlength) && value.length >= maxlength);
+    this.states.toggle('full', Boolean(maxlength) && value.length >= maxlength);
   }
 }
 

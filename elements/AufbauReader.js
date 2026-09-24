@@ -11,7 +11,6 @@
 import { AufbauElement }        from './core/index.js';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from './core/html.js';
-import { toggleState }          from './core/utils.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
 
@@ -36,8 +35,7 @@ export default class AufbauReader extends AufbauElement {
 
   constructor () {
     super();
-    this._internals = this.attachInternals?.() ?? null;
-    this._state     = 'idle';
+    this._state = 'idle';
   }
 
   get state () { return this._state; }
@@ -108,8 +106,8 @@ export default class AufbauReader extends AufbauElement {
 
   setState (state) {
     this._state = state;
-    for (const name of STATES) toggleState(this._internals, name, name === state);
-    if (this._internals) this._internals.ariaBusy = String(state === 'loading');
+    for (const name of STATES) this.states.toggle(name, name === state);
+    if (this.internals) this.internals.ariaBusy = String(state === 'loading');
   }
 
   finish (state) {

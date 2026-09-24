@@ -4,7 +4,6 @@
 
 import { AufbauControl }  from './core/index.js';
 import { attrs, html, raw } from './core/html.js';
-import { toggleState }    from './core/utils.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 
@@ -135,17 +134,17 @@ export default class AufbauUpload extends AufbauControl {
     this.on('dragenter dragover', (event) => {
       if (this.isDisabled) return;
       event.preventDefault();
-      toggleState(this._internals, 'dragging', true);
+      this.states.toggle('dragging', true);
     });
 
     // dragleave also fires when the pointer moves onto a child, only leaving the host counts
     this.on('dragleave', (event) => {
-      if (!this.contains(event.relatedTarget)) toggleState(this._internals, 'dragging', false);
+      if (!this.contains(event.relatedTarget)) this.states.toggle('dragging', false);
     });
 
     this.on('drop', (event) => {
       event.preventDefault();
-      toggleState(this._internals, 'dragging', false);
+      this.states.toggle('dragging', false);
       if (!this.isDisabled) this.add([...(event.dataTransfer?.files ?? [])]);
     });
   }
@@ -192,7 +191,7 @@ export default class AufbauUpload extends AufbauControl {
   formResetCallback () { this._files = []; this._rejected = []; this.invalidate().update(); }
 
   validate () {
-    const internals = this._internals;
+    const internals = this.internals;
     if (!internals) return this;
 
     const anchor = this.$(':scope > button') ?? this;
@@ -235,7 +234,7 @@ export default class AufbauUpload extends AufbauControl {
 
   sync () {
     super.sync();
-    toggleState(this._internals, 'filled', this.files.length > 0);
+    this.states.toggle('filled', this.files.length > 0);
   }
 }
 

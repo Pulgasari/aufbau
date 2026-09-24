@@ -57,11 +57,6 @@ export default class AufbauWaveform extends AufbauElement {
     &[interactive] { cursor: pointer; touch-action: pan-y; }
   }`;
 
-  constructor () {
-    super();
-    this._internals = this.attachInternals?.() ?? null;
-  }
-
   onMount () {
     this.on('click', (event) => {
       if (!this.getAttr('interactive')) return;
@@ -123,12 +118,12 @@ export default class AufbauWaveform extends AufbauElement {
     if (interactive) this.tabIndex = 0;
     else this.removeAttribute('tabindex');
 
-    if (this._internals) {
-      this._internals.role         = interactive ? 'slider' : 'img';
-      this._internals.ariaValueNow = interactive ? String(Math.round(progress)) : null;
-      this._internals.ariaValueMin = interactive ? '0'   : null;
-      this._internals.ariaValueMax = interactive ? '100' : null;
-      this._internals.ariaLabel    = 'waveform';
+    if (this.internals) {
+      this.internals.role         = interactive ? 'slider' : 'img';
+      this.internals.ariaValueNow = interactive ? String(Math.round(progress)) : null;
+      this.internals.ariaValueMin = interactive ? '0'   : null;
+      this.internals.ariaValueMax = interactive ? '100' : null;
+      this.internals.ariaLabel    = 'waveform';
     }
   }
 
