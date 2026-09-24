@@ -93,6 +93,11 @@ export default class AufbauTreeItem extends AufbauElement {
     return level;
   }
 
+  // structure only, label and icon are applied in sync()
+  render () {
+    return html`<div part="row"><aufbau-icon part="icon"></aufbau-icon><span part="label"></span></div><slot></slot>`;
+  }
+
   expand   (expanded = true) { return this.setExpanded(expanded); }
   collapse ()                { return this.setExpanded(false); }
   toggle   ()                { return this.setExpanded(!this.getAttr('expanded')); }
