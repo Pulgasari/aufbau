@@ -102,26 +102,39 @@ async function animatePattern (target, id, options = {}) {
 function  (id, options = {}) {
   return {
     id,
-    image  : (opts = options) => patternImage(id, opts),
-    css    : async (opts = options) => `background-image: ${await patternImage(id, opts)};`,
-    ensure : () => ensurePattern(id, options),
-    apply   : (target, opts = options) => applyPattern(target, id, opts),
-    animate : (target, opts = options) => animatePattern(target, id, opts),
-    remove  : target => removePattern(target),
-    svg     : (opts = options) => patternSvg(id, opts),
+
+    apply  : (target, opts) => apply   (target, id, opts || options),
+    remove : (target)       => remove  (target),
+    
+    css   : async (opts) => `background-image: ${await patternImage(id, opts || options)};`,
+    image :       (opts) => patternImage (id, opts || options),
+    svg   :       (opts) => patternSvg   (id, opts || options),
+
+    //animate : (target, opts) => animate (target, id, opts || options),
+    //ensure  : () => ensure(id, options),
   };
 }
 
 // :::::: EXPORT :::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { manifest };
-export { animatePattern, applyPattern, ensurePattern, removePattern, usePattern };
-export { list, patternImage, patternSvg };
+export { apply, remove, use };
+
+export { list, manifest, patternImage, patternSvg };
 export { applyMotion, stopMotion, MOTIONS, motionCss, motionKeyframes };
 
+export {
+  apply  as applyPattern,
+  remove as removePattern,
+  use    as usePattern,
+};
+
 export default {
-  animatePattern, applyMotion, applyPattern, ensurePattern, list, manifest, motionCss, motionKeyframes,
-  patternImage, patternSvg, removePattern, stopMotion, usePattern,
+  apply, remove, use, 
+  manifest,
+  patternImage, patternSvg, ,
+  applyMotion, stopMotion, motionCss, motionKeyframes,
+  list,
+  // animatePattern, ensurePattern // deprecated (i guess)
 };
 
 /*
