@@ -1,9 +1,10 @@
 // @aufbau/patterns
 
-/*
+/* TODO:
 - bessere konstruktion evtl: PatternClass + MotionClass + publicAPI (apply, remove, update, use)
 - animate/animatePattern kann weg, weil apply/applyPattern auch einfache ne motion prop an options haben kann    
 - generell ist das alles so messy und unnötig kompliziert
+- dieses ganze dumme gesabbel in den unnötigen kommentaren entfernen bzw die kommentare generell
 */
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::::
