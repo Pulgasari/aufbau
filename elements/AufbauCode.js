@@ -277,7 +277,7 @@ export default class AufbauCode extends AufbauElement {
       const hljs = await getHljs();
       await useLanguage(hljs, this.lang);
 
-      const $code = this.$('code');
+      const $code = this.output?.querySelector('pre > code');
       // the node may already be gone or stale again after the await
       if (!$code || !this.isConnected || this.source !== source) return;
 
