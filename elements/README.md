@@ -646,9 +646,14 @@ aufbau-splash-failsafe 0s linear var(--aufbau-splash-limit,10s) forwards}
   </main>
 
   <!-- Autonomous TOC Component -->
-  <aufbau-toc target="#markdown-container" selector="h2, h3"></aufbau-toc>
+  <aufbau-toc target="#markdown-container" selector="h2, h3" label="Inhalt"></aufbau-toc>
 </div>
 ```
+
+der host ist die navigation-landmark, `label` ist sichtbare überschrift und
+accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
+jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
+überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
 
 ## aufbau-toast
 
@@ -704,6 +709,11 @@ ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
 <!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
 <aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
 ```
+
+tastatur wie beim wai-aria tree view: pfeil hoch/runter wandert durch die
+sichtbaren items, rechts öffnet bzw. springt ins erste kind, links schliesst bzw.
+springt zum parent, enter wählt und klappt um, leertaste wählt. ein tab-stop für
+den ganzen baum.
 
 ## aufbau-upload
 

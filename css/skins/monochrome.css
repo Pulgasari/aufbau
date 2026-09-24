@@ -342,6 +342,48 @@ aufbau-code {
   padding       : 0.2em;
 }
 
+/* :::::: <aufbau-tree> :::::: */
+
+aufbau-tree-item {
+  > div       { border-radius: calc(var(--aufbau-control-radius) * 0.8); }
+  > div:hover { background-color: var(--aufbau-control-hover); }
+
+  &[selected] > div {
+    background-color : var(--aufbau-accent);
+    color            : var(--aufbau-surface);
+  }
+
+  &:focus-visible > div {
+    outline        : 2px solid var(--aufbau-control-focus);
+    outline-offset : -2px;
+  }
+}
+
+/* :::::: <aufbau-toc> :::::: */
+
+aufbau-toc {
+  > header {
+    color             : var(--aufbau-control-muted);
+    font-size         : 0.75em;
+    font-weight       : 600;
+    letter-spacing    : 0.04em;
+    margin-block-end  : 0.5em;
+    text-transform    : uppercase;
+  }
+
+  a {
+    border-inline-start  : 2px solid transparent;
+    color                : inherit;
+    display              : block;
+    padding-block        : 0.15em;
+    padding-inline-start : 0.5em;
+    text-decoration      : none;
+
+    &:hover           { color: var(--aufbau-accent); }
+    &[aria-current]   { border-color: var(--aufbau-accent); color: var(--aufbau-accent); }
+  }
+}
+
 /* :::::: <aufbau-toast> :::::: */
 
 aufbau-toast {
