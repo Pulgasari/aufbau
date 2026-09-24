@@ -37,7 +37,7 @@
 aufbau-input,
 aufbau-picker[look="combobox"],
 aufbau-picker[look="cycle"] > .ui > button,
-.aufbau-writer-wrapper,
+aufbau-writer,
 .dropdown-trigger,
 aufbau-button,
 aufbau-toggle[look="button"],
@@ -49,18 +49,17 @@ aufbau-toggle[look="button"],
 
 .is-disabled { opacity: 0.5; }
 
-:is(aufbau-input, aufbau-picker[look="combobox"]):focus-within,
-aufbau-writer:focus-within .aufbau-writer-wrapper {
+:is(aufbau-input, aufbau-picker[look="combobox"], aufbau-writer):focus-within {
   outline: 2px solid var(--aufbau-control-focus);
   outline-offset: 1px;
 }
 
-:is(aufbau-button, .dropdown-trigger, aufbau-toggle, aufbau-picker [data-value], aufbau-picker[look="cycle"] button, aufbau-input > button, .slider-step, .upload-remove, .copy-btn):focus-visible {
+:is(aufbau-button, .dropdown-trigger, aufbau-toggle, aufbau-picker [data-value], aufbau-picker[look="cycle"] button, aufbau-input > button, .slider-step, .upload-remove, :is(aufbau-code, aufbau-writer) [data-action]):focus-visible {
   outline: 2px solid var(--aufbau-control-focus);
   outline-offset: 1px;
 }
 
-:is(aufbau-button, .dropdown-trigger, aufbau-input > button, aufbau-picker[look="cycle"] button, .slider-step, .upload-remove, .copy-btn):hover:not(:disabled, [disabled]) {
+:is(aufbau-button, .dropdown-trigger, aufbau-input > button, aufbau-picker[look="cycle"] button, .slider-step, .upload-remove, :is(aufbau-code, aufbau-writer) [data-action]):hover:not(:disabled, [disabled]) {
   background-color: var(--aufbau-control-hover);
 }
 
@@ -307,7 +306,10 @@ aufbau-picker {
   background-color: var(--aufbau-control-sunken);
 }
 
-.writer-counter { color: var(--aufbau-control-muted); }
+aufbau-writer {
+  > footer > output { color: var(--aufbau-control-muted); }
+  &:state(full) > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
+}
 
 /* :::::: <aufbau-progress> :::::: */
 
@@ -320,26 +322,24 @@ aufbau-progress {
 
 /* :::::: <aufbau-code> :::::: */
 
-.aufbau-code-wrapper {
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
+aufbau-code {
+  border        : var(--aufbau-control-border);
+  border-radius : var(--aufbau-control-radius);
+
+  > header {
+    border-block-end : var(--aufbau-control-border);
+    color            : var(--aufbau-control-muted);
+    padding          : 0.3em 0.6em;
+  }
+
+  > pre { padding: 0.75em; }
+
+  code[contenteditable]:focus { background-color: var(--aufbau-control-sunken); }
 }
 
-.code-header {
-  border-block-end: var(--aufbau-control-border);
-  padding: 0.3em 0.6em;
-  color: var(--aufbau-control-muted);
-}
-
-.copy-btn {
-  border-radius: calc(var(--aufbau-control-radius) * 0.6);
-  padding: 0.2em;
-}
-
-aufbau-code pre { padding: 0.75em; }
-
-aufbau-code code[contenteditable]:focus {
-  background-color: var(--aufbau-control-sunken);
+:is(aufbau-code, aufbau-writer) [data-action] {
+  border-radius : calc(var(--aufbau-control-radius) * 0.6);
+  padding       : 0.2em;
 }
 
 /* :::::: <aufbau-toast> :::::: */

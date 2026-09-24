@@ -181,7 +181,14 @@ console.log(greet('aufbau'));
 
 <!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
 <aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+
+<!-- 3. editierbar: copy, paste und clear im header -->
+<aufbau-code lang="json" editable>{ "a": 1 }</aufbau-code>
 ```
+
+`actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
+`clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
+gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 
 ## aufbau-config
 
@@ -776,7 +783,14 @@ mehrzeiliger text, das gegenstück zu [`<aufbau-reader>`](#aufbau-reader).
 
 <!-- kindinhalt ist der startwert -->
 <aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer>
+
+<!-- nur kopieren, keine anderen buttons -->
+<aufbau-writer name="log" readonly actions="copy"></aufbau-writer>
 ```
+
+`actions` wie bei [`<aufbau-code>`](#aufbau-code), default `copy paste clear`.
+bei `readonly` sind paste und clear deaktiviert. `:state(full)` markiert einen
+counter, der `maxlength` erreicht hat.
 
 ---
 
