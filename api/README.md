@@ -8,9 +8,9 @@ unified async wrapper around most aufbau-packages with lazy imports.
 deno install jsr:@aufbau/api
 ```
 
+---
 
-
-TODO:
+# TODO:
 
 - es soll gewissermaßen `aufbau/runtime` (wird konplett entfernt) ersetzen aber ohne es zu reproduzieren. der ansatz hier ist pragmatischer und einfacher gedacht.
 
@@ -71,7 +71,7 @@ um derlei infos parat zu haben.
 
 ## kandidaten ...
 
-... die hier evtl. (!)virgendwie angedockt werden. bin mir noch nich 100pro sicher was davon letztlich sinn macht und praktikavel wäre.
+... die hier evtl. (!) irgendwie angedockt werden. bin mir noch nich 100pro sicher was davon letztlich sinn macht und praktikavel wäre.
 
 ```
 @aufbau/ass
@@ -85,7 +85,7 @@ um derlei infos parat zu haben.
 @aufbau/patterns
 @aufbau/webfonts
 
-# experimental
+# experimental (bei denen ist aktuemm bissl unklar was damit mittel-/langfristig genau wird
 @aufbau/signals
 @aufbau/store
 @aufbau/stylescript
