@@ -1,0 +1,13 @@
+{
+  "name": "@aufbau/icons",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./aliases": "./aliases.js",
+    "./aliases.js": "./aliases.js",
+    "./data/*": "./data/*"
+  },
+  "peerDependencies": {
+    "@aufbau/elements": "^1.0.0"
+  }
+}

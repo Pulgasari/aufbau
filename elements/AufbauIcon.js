@@ -1,203 +1,139 @@
 // <aufbau-icon>
+// pure css, no markup: the host is a box masked (or painted) by the icon svg.
+//
+// `icon` takes an iconify id ('lucide:save', 'lucide/save') or an alias ('save').
+// aliases come from AufbauIcon.register(). the aufbau default list lives in
+// @aufbau/icons and is loaded lazily the first time an unknown alias shows up,
+// so elements carry no icon data and pages that only use full ids never load it.
+//
+// the svg itself comes from the iconify api unless it was handed over with
+// AufbauIcon.provide() first. that is the hook for offline bundles, see the
+// bundling notes in @aufbau/icons/README.md.
 
 import { AufbauElement } from './core/index.js';
 
-const ICONIFY = 'https://api.iconify.design';
+const API      = 'https://api.iconify.design';
+const DEFAULTS = '@aufbau/icons/aliases.js';
+const FALLBACK = 'material-symbols:help';
 
-/**
- * 'lucide:save' and 'lucide/save' both resolve. collection and name are encoded
- * separately, the colon is part of the iconify path and has to survive.
- */
-function iconUrl (icon) {
-  icon = resolveIcon(icon);
-  const [collection, ...rest] = String(icon).replace('/', ':').split(':');
+const aliases  = new Map;
+const provided = new Map;
+const warned   = new Set;
+
+let defaults       = null;
+let defaultsLoaded = false;
+
+const warnOnce = (key, message) => {
+  if (warned.has(key)) return;
+  warned.add(key);
+  console.warn(`[aufbau-icon] ${message}`);
+};
+
+/** 'set:name' | 'set/name' | alias -> 'set:name', or null when it is an alias not (yet) known */
+export function resolveIcon (icon) {
+  if (!icon) return null;
+  const value = String(icon).trim().replace('/', ':');
+  return value.includes(':') ? value : aliases.get(value) ?? null;
+}
+
+/** css ready url for an iconify id. a provided svg wins over the api */
+export function iconUrl (id) {
+  const svg = provided.get(id);
+  if (svg) return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+
+  // collection and name are encoded separately, the colon is part of the iconify path
+  const [collection, ...rest] = id.split(':');
   const name = rest.join(':');
-  if (!collection || !name) return null;
-  return `${ICONIFY}/${encodeURIComponent(collection)}:${encodeURIComponent(name)}.svg`;
+  return collection && name ? `${API}/${encodeURIComponent(collection)}:${encodeURIComponent(name)}.svg` : null;
 }
 
 export default class AufbauIcon extends AufbauElement {
   static attr = {
     color : String,
     icon  : String,
+    // an icon without a label is decoration and hidden from assistive tech
+    label : String,
     // mask recolours the svg with currentColor and throws its own colours away,
     // image keeps them. multicolour art (flags, logos, emoji) needs image
     mode  : { type: String, default: 'mask', values: ['mask', 'image'] },
     size  : String,
   };
 
-  // the element is a coloured box masked by the icon svg. without these the
-  // mask never applies and nothing is ever visible, so it is base styling
-  // rather than theming. currentColor makes it inherit text colour.
-  static styles = `
-    aufbau-icon {
-      display: inline-block;
-      inline-size: var(--icon-size, 1em);
-      block-size: var(--icon-size, 1em);
-      background-color: var(--icon-color, currentColor);
-      vertical-align: var(--icon-align, -0.125em);
-      -webkit-mask-image: var(--icon-url);
-      mask-image: var(--icon-url);
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      -webkit-mask-position: center;
-      mask-position: center;
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
+  // without the mask nothing is ever visible, so this is structure, not theming.
+  // no url yet (alias still loading) masks everything away instead of showing a solid box
+  static styles = `aufbau-icon {
+    background-color : var(--icon-color, currentColor);
+    block-size       : var(--icon-size, 1em);
+    display          : inline-block;
+    flex             : none;
+    inline-size      : var(--icon-size, 1em);
+    mask             : var(--icon-url, linear-gradient(transparent, transparent)) center / 100% 100% no-repeat;
+    vertical-align   : var(--icon-align, -0.125em);
+
+    &[mode="image"] {
+      background : var(--icon-url, none) center / contain no-repeat;
+      mask       : none;
     }
 
-    aufbau-icon[mode="image"] {
-      background-color: transparent;
-      background-image: var(--icon-url);
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
+    &:not([icon]) { display: none; }
+  }`;
 
-    aufbau-icon:not([icon]) { display: none; }
-  `;
+  // :::::: REGISTRY ::::::::::::::::::::::::::::::::::::::::::::
 
-  // no markup at all, the element is pure css. everything happens in sync()
+  /** adds aliases, { save: 'material-symbols:file-save', … }. later calls override earlier ones */
+  static register (map) {
+    for (const [alias, id] of Object.entries(map ?? {})) aliases.set(alias, id);
+    return this;
+  }
+
+  /** hands over svg markup by iconify id, those icons never touch the network */
+  static provide (svgs) {
+    for (const [id, svg] of Object.entries(svgs ?? {})) provided.set(id, svg);
+    return this;
+  }
+
+  // once per page. resolves either way, a missing @aufbau/icons only means no default aliases
+  static loadDefaults () {
+    return defaults ??= import(DEFAULTS)
+      .then(module => { this.register(module.default); })
+      .catch(() => warnOnce(DEFAULTS, `default aliases unavailable, "${DEFAULTS}" could not be imported.`))
+      .finally(() => { defaultsLoaded = true; });
+  }
+
+  // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
+
+  constructor () {
+    super();
+    this._internals = this.attachInternals?.() ?? null;
+  }
+
   sync () {
-    const { icon, size, color } = this.getAttr();
-    const url = icon ? iconUrl(icon) : null;
+    const { color, icon, label, size } = this.getAttr();
+    let id = resolveIcon(icon);
+
+    // an unknown alias: fetch the defaults once, then try again. until then nothing is painted
+    if (icon && !id && !defaultsLoaded) {
+      AufbauIcon.loadDefaults().then(() => this.update());
+      return;
+    }
+
+    if (icon && !id) {
+      warnOnce(icon, `unknown icon "${icon}", showing ${FALLBACK}.`);
+      id = FALLBACK;
+    }
+
+    const url = id ? iconUrl(id) : null;
 
     this.style.setProperty('--icon-url',   url ? `url("${url}")` : '');
     this.style.setProperty('--icon-size',  size  || '');
     this.style.setProperty('--icon-color', color || '');
 
-    if (icon && !url) console.warn(`[aufbau-icon] could not parse icon "${icon}"`);
+    if (this._internals) {
+      this._internals.role       = label ? 'img' : null;
+      this._internals.ariaLabel  = label || null;
+      this._internals.ariaHidden = label ? null : 'true';
+    }
   }
 }
 
 AufbauIcon.init();
-
-// shared/js/data/icons.js
-
-const icons = {
-  'add'               : 'material-symbols:add',
-  'alert'             : 'mdi:alert-circle-outline',
-  'arrow-down'        : 'mdi:arrow-down-bold',
-  'arrow-left'        : 'material-symbols:arrow-back',
-  'arrow-right'       : 'material-symbols:arrow-forward',
-  'arrow-up'          : 'material-symbols:arrow-upward',
-  'bookmark'          : 'mdi:bookmark',
-  'bookmark-unfilled' : 'mdi:bookmark-outline',
-  'bookmarks'         : 'mdi:bookmark',
-  'books'             : 'mdi:bookshelf',
-  'capslock'          : 'material-symbols:keyboard-capslock',
-  'check'             : 'mdi:check',
-  'check-circle'      : 'mdi:check-circle-outline',
-  'chevron-down'      : 'mdi:chevron-down',
-  'chevron-left'      : 'mdi:chevron-left',
-  'chevron-right'     : 'mdi:chevron-right',
-  'chevron-up'        : 'mdi:chevron-up',
-  'close'             : 'mdi:close',
-  'code'              : 'mdi:code-braces',
-  'commands'          : 'material-symbols:keyboard-command-key',
-  'content-copy'      : 'mdi:content-copy',
-  'copy'              : 'bx:copy',
-  'copy-all'          : 'material-symbols:copy-all',
-  'copy-file'         : 'material-symbols:file-copy',
-  'cut'               : 'material-symbols:cut',
-  'delete'            : 'mdi:trash-can-outline',
-  'deselect'          : 'material-symbols:deselect',
-  'download'          : 'mdi:download',
-  'download-multiple' : 'mdi:download-multiple',
-  'duplicate'         : 'mdi:content-duplicate',
-  'edit'              : 'mdi:pencil-outline',
-  'enter'             : 'material-symbols:keyboard-return',
-  'external'          : 'mdi:open-in-new',
-  'file'              : 'material-symbols:description',
-  'folder'            : 'material-symbols:folder',
-  'folder-add'        : 'mdi:folder-plus-outline',
-  'folder-alert'      : 'mdi:folder-alert-outline',
-  'folder-key'        : 'mdi:folder-key-outline',
-  'folder-open'       : 'material-symbols:folder-open',
-  'folder-search'     : 'mdi:folder-search-outline',
-  'folder-swap'       : 'mdi:folder-swap-outline',
-  'fontsize'          : 'material-symbols:format-size',
-  'fullscreen'        : 'mdi:fullscreen',
-  'grid'              : 'mdi:view-grid-outline',
-  'heart'             : 'mdi:heart',
-  'heart-outline'     : 'mdi:heart-outline',
-  'home'              : 'mdi:home-outline',
-  'image'             : 'mdi:image-outline',
-  'images'            : 'mdi:image-multiple-outline',
-  'image-search'      : 'mdi:image-search-outline',
-  'import'            : 'mdi:import',
-  'info'              : 'mdi:information-outline',
-  'keyboard'          : 'tdesign:keyboard',
-  'lineheight'        : 'material-symbols:format-line-spacing',
-  'loading'           : 'svg-spinners:bars-scale-middle',
-  'menu'              : 'mdi:menu',
-  'notes'             : 'mdi:file-document-outline',
-  'open-in-new'       : 'mdi:open-in-new',
-  'paste'             : 'mdi:content-paste',
-  'pause'             : 'mdi:pause',
-  'play'              : 'mdi:play',
-  'plus'              : 'mdi:plus',
-  'previewer'         : 'material-symbols:preview',
-  'redo'              : 'bx:redo',
-  'refresh'           : 'mdi:refresh',
-  'remove'            : 'material-symbols:remove',
-  'rename'            : 'mdi:form-textbox',
-  'reset'             : 'mdi:restore',
-  'rss'               : 'mdi:rss',
-  'run'               : 'pajamas:live-preview',
-  'save'              : 'material-symbols:file-save',
-  'search'            : 'bx:search',
-  'select'            : 'boxicons:select',
-  'select-all'        : 'boxicons:select-all',
-  'select-none'       : 'boxicons:select-none',
-  'settings'          : 'mdi:cog',
-  'shift'             : 'material-symbols:shift',
-  'skip-next'         : 'mdi:skip-next',
-  'skip-previous'     : 'mdi:skip-previous',
-  'sort-lines'        : 'material-symbols:reorder',
-  'space'             : 'material-symbols:space-bar',
-  'split-line'        : 'material-symbols:split-scene-outline',
-  'svg'               : 'mdi:svg',
-  'tab'               : 'bx:arrow-to-right',
-  'tab-rtl'           : 'bx:arrow-to-left',
-  'toggle-off'        : 'material-symbols:toggle-off',
-  'toggle-on'         : 'material-symbols:toggle-on',
-  'toolbar'           : 'material-symbols:widgets',
-  'trash'             : 'mdi:trash-can-outline',
-  'undo'              : 'bx:undo',
-  'upload'            : 'mdi:upload',
-  'viewmode-grid'     : 'mdi:view-grid',
-  'viewmode-list'     : 'mdi:view-list',
-  'warning'           : 'mdi:alert-outline',
-  'workspaces'        : 'grommet-icons:projects',
-  'zoom-in'           : 'mdi:magnify-plus-outline',
-  'zoom-out'          : 'mdi:magnify-minus-outline',
-
-  // specific for apps/code
-  'backspace'           : 'mdi:backspace',
-  'blockindent'         : 'material-symbols:keyboard-tab',
-  'blockoutdent'        : 'material-symbols:keyboard-tab-rtl',
-  'copy-lines-down'     : 'material-symbols:move-down',
-  'copy-lines-up'       : 'material-symbols:move-up',
-  'join-lines'          : 'material-symbols:join-outline',
-  'move-lines-down'     : 'material-symbols:text-select-move-down',
-  'move-lines-up'       : 'material-symbols:text-select-move-up',
-  'move-selection-down' : 'material-symbols:move-selection-down',
-  'move-selection-up'   : 'material-symbols:move-selection-up',
-
-  // brands
-  'git'           : 'brandico:github-text',
-  'github'        : 'cib:github',
-  'github-action' : 'codicon:github-action',
-  'youtube'       : 'mdi:youtube',
-};
-
-const FALLBACK = 'material-symbols:help';
-function resolveIcon (name) {
-  return !name ? FALLBACK : name.includes(':') ? name : icons[name] ?? FALLBACK;
-}
-
-
-

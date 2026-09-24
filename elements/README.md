@@ -253,6 +253,21 @@ console.log(greet('aufbau'));
 <aufbau-flag code="us"></aufbau-flag>
 ```
 
+der accessible name ist der ländername in der seitensprache (`de` → „Deutschland“),
+`label` überschreibt ihn.
+
+## aufbau-icon
+
+reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
+[`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
+
+```html
+<aufbau-icon icon="lucide:save"></aufbau-icon>
+<aufbau-icon icon="save" size="2em" color="tomato"></aufbau-icon>
+<aufbau-icon icon="logos:deno" mode="image"></aufbau-icon>   <!-- mehrfarbig -->
+<aufbau-icon icon="info" label="Hinweis"></aufbau-icon>      <!-- sonst aria-hidden -->
+```
+
 ## aufbau-index
 
 layout-container für eine reihe von items — media-grid, gallery-rail oder liste.

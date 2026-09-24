@@ -1,44 +1,63 @@
 // <aufbau-flag>
+// the host is the flag, painted as a background image. no inner <aufbau-icon>:
+// a flag is always multicolour art, so the mask path of the icon has nothing to offer.
 
 import { AufbauElement } from './core/index.js';
-import { html } from './core/html.js';
+import { iconUrl }       from './AufbauIcon.js';
 
 // circle-flags ships 1:1 art, flagpack ships 4:3
-const ICON_SETS = { circle: 'circle-flags', square: 'flagpack', '4x3': 'flagpack' };
+const VARIANTS = {
+  '4x3'  : { ratio: '4 / 3', set: 'flagpack'     },
+  circle : { ratio: '1',     set: 'circle-flags' },
+  square : { ratio: '4 / 3', set: 'flagpack'     },
+};
+
+// region names in the page language, e.g. 'de' -> 'Deutschland'
+let regionNames = null;
+const regionName = (code) => {
+  try {
+    regionNames ??= new Intl.DisplayNames([document.documentElement.lang || navigator.language], { type: 'region' });
+    return regionNames.of(code.toUpperCase());
+  }
+  catch { return code.toUpperCase(); }
+};
 
 export default class AufbauFlag extends AufbauElement {
   static attr = {
     code    : 'de',
+    // an explicit label wins over the region name derived from the code
+    label   : String,
     // falls back to <aufbau-config flag-variant="..."> when the attribute is absent
     variant : { type: String, default: 'circle', values: ['circle', 'square', '4x3'], config: true },
   };
 
-  // the inner icon runs in image mode, a mask would flatten the flag into a
-  // single coloured silhouette. the variant rides along as a class, so nothing
-  // has to be reflected back onto the host
-  static styles = `
-    aufbau-flag {
-      display: inline-block;
-      line-height: 0;
-      vertical-align: var(--flag-align, -0.15em);
-    }
+  // the variant can come from config, so the ratio is fed through a custom
+  // property from sync() rather than selected by attribute
+  static styles = `aufbau-flag {
+    aspect-ratio   : var(--flag-ratio, 1);
+    background     : var(--flag-url, none) center / contain no-repeat;
+    display        : inline-block;
+    flex           : none;
+    inline-size    : var(--flag-size, 1.25em);
+    vertical-align : var(--flag-align, -0.15em);
+  }`;
 
-    aufbau-flag > aufbau-icon {
-      inline-size: var(--flag-size, 1.25em);
-      vertical-align: baseline;
-    }
+  constructor () {
+    super();
+    this._internals = this.attachInternals?.() ?? null;
+    if (this._internals) this._internals.role = 'img';
+  }
 
-    aufbau-flag > .flag-circle { block-size: var(--flag-size, 1.25em); }
+  sync () {
+    const { code, label, variant } = this.getAttr();
+    const { ratio, set } = VARIANTS[variant];
+    const region = String(code).toLowerCase();
+    const url    = iconUrl(`${set}:${region}`);
 
-    aufbau-flag > .flag-square,
-    aufbau-flag > .flag-4x3 { block-size: calc(var(--flag-size, 1.25em) * 3 / 4); }
-  `;
+    this.style.setProperty('--flag-ratio', ratio);
+    this.style.setProperty('--flag-url',   url ? `url("${url}")` : '');
 
-  render () {
-    const { code, variant } = this.getAttr();
-    const icon = `${ICON_SETS[variant]}:${String(code).toLowerCase()}`;
-
-    return html`<aufbau-icon mode="image" class="flag-${variant}" icon="${icon}"></aufbau-icon>`;
+    if (this._internals) this._internals.ariaLabel = label || regionName(region);
   }
 }
 
