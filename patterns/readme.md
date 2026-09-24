@@ -26,30 +26,32 @@ in plain svg attributes that cannot read a css var.
 
 ## the dom api
 
-two modes: `datauri` (default) bakes options into a `background-image: url("data:…")`;
-`defs` injects a `<pattern>` and references it by `url(#id)`, keeping paint options
-live through custom properties.
+painted as `background-image: url("data:…")`, options baked in. the contract is
+shared with `@aufbau/filters` and `@aufbau/webfonts`:
 
 ```javascript
-import { applyPattern, removePattern, patternImage, list } from '@aufbau/patterns';
+import { apply, remove, update, use, list } from '@aufbau/patterns';
 
-applyPattern('.box', 'dots', { fg: '#ff0000' });          // data-uri
-applyPattern('.box', 'dots', { fg: '#ff0000', mode: 'defs' });
-removePattern('.box');
+await apply('.box', 'dots', { fg: '#ff0000' });
+await update('.box', { fg: '#00ff00' });   // the pattern already on .box, new options
+remove('.box');
 
-patternImage('dots', { fg: '#ff0000' }); // 'url("data:image/svg+xml,…")'
-list();                                   // [{ id, name, vars }, …]
+list();                                    // [{ id, name, vars }, …], also as `data`
 ```
 
-`usePattern(id, options)` binds one pattern into a small handle:
+`use(id, options)` gives a `Pattern`, one pattern bound to its options:
 
 ```javascript
-import { usePattern } from '@aufbau/patterns';
+const dots = use('dots', { fg: '#ff0000' });
 
-const dots = usePattern('dots', { fg: '#ff0000' });
-dots.image();          // the data-uri
-dots.apply('.box');    // paint targets
+await dots.svg();          // the <svg> tile
+await dots.image();        // 'url("data:image/svg+xml,…")'
+await dots.css();          // 'background-image: url(…);'
+await dots.apply('.box');
 ```
+
+`applyPattern`, `removePattern`, `updatePattern`, `usePattern`, `patternImage` and
+`patternSvg` stay as named aliases.
 
 ## usage with @aufbau/stylesheet
 
@@ -68,31 +70,28 @@ seamless, so it repeats without a visible seam in any direction.
 
 ## motion
 
-motion is a layer *on top* of a pattern: it scrolls the whole tiling and does not
-care what the tile contains or whether the tile animates itself. it animates
-`background-position` by exactly one tile, so the loop is seamless.
+motion scrolls the whole tiling by one tile per cycle, so the loop is seamless. it
+does not care what the tile contains or whether the tile animates itself. it is an
+option of `apply`:
 
 ```javascript
-import { animatePattern, stopMotion } from '@aufbau/patterns';
-
-animatePattern('.hero', 'grid', { motion: 'down', speed: '12s', fg: '#334' });
-animatePattern('.hero', 'dots', { motion: 'up-right' });   // any diagonal too
-stopMotion('.hero');
+await apply('.hero', 'grid', { fg: '#334', motion: 'down', speed: '12s' });
+await apply('.hero', 'dots', { motion: 'up-right' });   // diagonals too
+await update('.hero', { motion: null });                // stops it
 ```
 
 directions: `down`, `up`, `left`, `right`, `down-right`, `down-left`, `up-right`,
-`up-left` (`move-down` / `downwards` are accepted and normalised).
+`up-left`. `speed` is any css `<time>`, `timing` any timing function.
 
-for a css-only background (no js on the element), bake the rule with `motionCss`:
+`Motion` is the same without a pattern, for a background painted elsewhere or a
+css only rule:
 
 ```javascript
-import { patternImage } from '@aufbau/patterns';
-import { motionCss }    from '@aufbau/patterns/motion';
+import { Motion } from '@aufbau/patterns/motion';
 
-const { keyframes, animation } = motionCss('down', { size: 40, speed: '12s' });
-// inject `keyframes` into a <style>, then on the element:
-//   background-image: <patternImage('grid', { size: 40 })>;
-//   animation: <animation>;
+const motion = new Motion('down', { size: 40, speed: '12s' });
+motion.apply('.hero');
+motion.keyframes;   // '@keyframes aufbau-pattern-down-40 { … }'
+motion.animation;   // 'aufbau-pattern-down-40 12s linear infinite'
+Motion.stop('.hero');
 ```
-
-`usePattern(id, opts).animate(target)` is the handle form.

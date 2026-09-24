@@ -1,18 +1,13 @@
-  // @aufbau/elements/core/AufbauCore.js
+// @aufbau/elements/core/AufbauCore.js
 
 // :::::: IMPORTS
 
 import { BASE, schemaOf }   from './schema.js';
 import { applySkin }        from './skin.js';
 import { adoptClassStyles } from './styles.js';
+import { decorate, decorateAll } from './utils.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-// extra ones
-import { createElement }  from '@domina/methods/createElement.js';
-import { getStyleToken }  from '@domina/methods/getStyleToken.js';
-import { setStyleToken }  from '@domina/methods/setStyleToken.js';
-
-//
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';
 import { emitEvent }      from '@domina/methods/emitEvent.js';
 import { getElement }     from '@domina/methods/getElement.js';
@@ -32,43 +27,6 @@ const isBlank   = sth => sth === undefined || sth === null || sth === false || s
 const isDefined = sth => sth !== undefined;
 const log       = new Logger({ prefix: 'aufbau-core' });
 
-// :::::: DECORATION
-
-// non-enumerable definition, keeps the descriptor boilerplate in one place
-const define = (target, props) => {
-  for (const [key, value] of Object.entries(props)) {
-    Object.defineProperty(target, key, { value, configurable: true, writable: true });
-  }
-  return target;
-};
-
-const decorated = new WeakSet;
-
-function decorate (target) {
-  if (!target || decorated.has(target)) return target;
-  decorated.add(target);
-
-  return define(target, {
-    on  (...args) { return onEvent  (this, ...args); },
-    off (...args) { return offEvent (this, ...args); }
-  });
-}
-
-function decorateAll (list) {
-  const items = list.map(decorate);
-
-  return define(items, {
-    on (...args) {
-      const unsubs = items.map(item => item.on(...args));
-      return () => unsubs.forEach(unsub => unsub());
-    },
-    off (...args) {
-      items.forEach(item => item.off(...args));
-      return items;
-    }
-  });
-}
-
 const disposer = () => {
   const entries = new Set;
   return {
@@ -78,52 +36,198 @@ const disposer = () => {
   };
 };
 
+// :state() access, guarded: browsers before 2024 either lack CustomStateSet or
+// reject names without a leading `--`. every call degrades to a no-op there
+const stateSet = (host) => ({
+  add    (name)        { try { host.internals?.states?.add(name);    } catch {} return this; },
+  delete (name)        { try { host.internals?.states?.delete(name); } catch {} return this; },
+  has    (name)        { try { return Boolean(host.internals?.states?.has(name)); } catch { return false; } },
+  toggle (name, force) { return (force ?? !this.has(name)) ? this.add(name) : this.delete(name); },
+});
 
+// :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::::
+// a placeholder painted on the host alone: lines drawn by a gradient, a slow
+// pulse, the content invisible but untouched. shape through custom properties,
+// see `static skeleton` and setSkeleton() below. both selector forms, the rule is
+// adopted into the document and into every shadow root an element lives in
 
-export const AufbauCore = (BaseClass = HTMLElement) => {
-return class extends BaseClass {
-  /*
-  #isMounted = false;
-  #tag       = this.localName;
-  #logger    = new Logger({ prefix: this.#tag });
-  */
-  //#error  = (...args) => this.#logger.error (...args);
-  //#info   = (...args) => this.#logger.info  (...args);
-  //#log    = (...args) => this.#logger.log   (...args);
-  //#warn   = (...args) => this.#logger.warn  (...args);
+const SKELETON_STYLES = `
+  @keyframes aufbau-skeleton { 50% { opacity: 0.45; } }
+
+  :state(skeleton),
+  :host(:state(skeleton)) {
+    --_line : var(--skeleton-line, 1em);
+    --_gap  : var(--skeleton-gap, 0.5em);
+
+    animation       : aufbau-skeleton 1.4s ease-in-out infinite;
+    background      : repeating-linear-gradient(to bottom,
+                        var(--skeleton-color, color-mix(in srgb, currentColor 14%, transparent)) 0 var(--_line),
+                        transparent 0 calc(var(--_line) + var(--_gap)));
+    border-radius   : var(--skeleton-radius, 0.25em);
+    color           : transparent;
+    cursor          : progress;
+    min-block-size  : calc(var(--skeleton-lines, 1) * (var(--_line) + var(--_gap)) - var(--_gap));
+    min-inline-size : var(--skeleton-width, 4em);
+    pointer-events  : none;
+    user-select     : none;
+  }
+
+  :state(skeleton) > *,
+  :host(:state(skeleton)) *,
+  :host(:state(skeleton)) ::slotted(*) { visibility: hidden; }
+
+  @media (prefers-reduced-motion: reduce) {
+    :state(skeleton), :host(:state(skeleton)) { animation: none; }
+  }
+`;
+
+const SKELETON_VARS = { gap: 'gap', line: 'line', lines: 'lines', radius: 'radius', width: 'width' };
+
+export class AufbauCore extends HTMLElement {
+
+  // every element takes `skeleton`, e.g. <aufbau-item skeleton> while an app loads its data
+  static attr = { skeleton: Boolean };
+
+  static styles = SKELETON_STYLES;
+
 
   constructor () {
     super();
     this._effects = disposer();
     this._mounted = false;
-  }
-  
-  get root         () { return this.shadowRoot ?? this; }
-  get renderTarget () { return this.root; }
-  
-  shell (className, { prepend = false } = {}) {
-    if (this._shell?.isConnected) return this._shell;
 
-    //this.$shell = this.$(`:scope > .${className}`) ?? createElement('div', { className });
-    this._shell = this.querySelector(`:scope > .${className}`);
-    if (!this._shell) {
-      this._shell = document.createElement('div');
-      this._shell.className = className;
+    // static shadow: true (or shadow root options) gives the element its own tree.
+    // render() goes there, the children stay the author's and are projected by <slot>
+    const shadow = this.constructor.shadow;
+    if (shadow && !this.shadowRoot) this.attachShadow({ mode: 'open', ...(isPlainObject(shadow) ? shadow : {}) });
+
+    // static source: the children are the element's input (markdown, code, a value).
+    // they stay untouched in the light dom but are not displayed: a bare shadow root
+    // only projects the output element, which is ours and lives in the light dom too,
+    // so page css reaches everything that is shown
+    else if (this.constructor.source && !this.shadowRoot) {
+      this.attachShadow({ mode: 'open' }).innerHTML = '<slot name="output"></slot>';
     }
-    if (!this._shell.isConnected) this[prepend ? 'prepend' : 'append'](this._shell);
 
-    return this._shell;
+    // static internals: true attaches up front, an object also sets the default
+    // semantics, e.g. { role: 'treeitem' }. without it internals attach on first use
+    const defaults = this.constructor.internals;
+    if (defaults && this.internals && isPlainObject(defaults)) Object.assign(this.internals, defaults);
   }
+
+  /**
+   * the element's ElementInternals, attached once on first access. null where
+   * the browser or an ssr shim has none. form association still needs
+   * `static formAssociated = true` on the class.
+   */
+  get internals () {
+    if (this._internals === undefined) this._internals = this.attachInternals?.() ?? null;
+    return this._internals;
+  }
+
+  /** custom states, styled as :state(name). add, delete, has, toggle(name, force) */
+  get states () { return this._states ??= stateSet(this); }
+
+  // the shadow root only counts as the element's tree with `static shadow`, the bare
+  // outlet of `static source` holds nothing but a slot
+  get root         () { return this.constructor.shadow && this.shadowRoot || this; }
+  get renderTarget () { return this.output ?? this.root; }
+
+  /** the focused element inside this one's tree, document.activeElement only sees the host */
+  get focused () { return this.root === this ? document.activeElement : this.root.activeElement; }
+
+  // :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::
+
+  /**
+   * not named skeleton(): a framework setting the `skeleton` attribute as a prop
+   * would find a property of that name and overwrite the method instead.
+   *
+   * shows or hides the placeholder while the element loads by itself. the
+   * `skeleton` attribute shows it as well, either one is enough. the shape comes
+   * from `static skeleton`: { lines, line, gap, width, radius }, or a function
+   * returning that, called with the element as `this`.
+   */
+  setSkeleton (on = true) {
+    this._skeleton = Boolean(on);
+    this.syncSkeleton();
+    return this;
+  }
+
+  syncSkeleton () {
+    // most elements never show one, they must not even touch their internals for it
+    const on = Boolean(this._skeleton || this.getAttr('skeleton'));
+    if (!on && !this._skeletonShown) return;
+    this._skeletonShown = on;
+
+    this.states.toggle('skeleton', on);
+    if (this.internals) this.internals.ariaBusy = on ? 'true' : null;
+
+    const shape   = this.constructor.skeleton;
+    const options = isFn(shape) ? shape.call(this) : (isPlainObject(shape) ? shape : {});
+    for (const [key, name] of Object.entries(SKELETON_VARS)) {
+      const value = on ? options[key] : undefined;
+      if (value == null) this.style.removeProperty(`--skeleton-${name}`);
+      else this.style.setProperty(`--skeleton-${name}`, String(value));
+    }
+  }
+
+  // :::::: SOURCE ::::::::::::::::::::::::::::::::::::::::::::::
+
+  /** the output element of a `static source` element, created once and appended as the last child */
+  get output () {
+    const source = this.constructor.source;
+    if (!source) return null;
+
+    if (!this._output) {
+      this._output = document.createElement(source.tag ?? 'div');
+      this._output.slot = 'output';
+    }
+    if (this._output.parentNode !== this) this.append(this._output);
+
+    return this._output;
+  }
+
+  /** the author's children, everything but the output */
+  get sourceNodes () { return [...this.childNodes].filter(node => node !== this._output); }
+
+  /**
+   * the children as source text: text nodes raw, elements as their markup. raw on
+   * purpose, innerHTML would escape `>` and `<` and break markdown quotes and code
+   */
+  get sourceText () {
+    return this.sourceNodes.map(node =>
+        node.nodeType === Node.TEXT_NODE    ? node.data
+      : node.nodeType === Node.ELEMENT_NODE ? node.outerHTML
+      : ''
+    ).join('');
+  }
+
+  // children added, removed or edited by the author (or a framework) re-render the output
+  watchSource () {
+    const observer = new MutationObserver(records => {
+      const own = record => this._output && (record.target === this._output || this._output.contains(record.target)
+        || (record.target === this && [...record.addedNodes, ...record.removedNodes].every(node => node === this._output)));
+      if (records.some(record => !own(record))) this.onSourceChange();
+    });
+    observer.observe(this, { characterData: true, childList: true, subtree: true });
+    this.track(() => observer.disconnect());
+  }
+
+  /** hook, the source changed. rebuilds by default */
+  onSourceChange () { this.invalidate().update(); }
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   connectedCallback () {
     this._mounted = true;
-    adoptClassStyles(this.constructor, this.root); // lazy on purpose: an imported but unused element must not adopt anything    
+    // lazy on purpose: an imported but unused element must not adopt anything. a light
+    // element adopts into the tree it sits in, the document or an enclosing shadow root
+    adoptClassStyles(this.constructor, this.root === this ? this.getRootNode() : this.root);
     applySkin();
     this.on(window, CONFIG_EVENT, (event) => {
       if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
     });
+    if (this.constructor.source) this.watchSource();
     this.onMount();
     this.update();
   }
@@ -135,27 +239,27 @@ return class extends BaseClass {
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
+    // our own reflection writes (see reflectAttrs) are not a change of input
+    if (this._reflecting) return;
     if (oldValue !== newValue && this._mounted) {
       this.onAttributeChange(name, oldValue, newValue);
       this.update();
     }
   }
 
-  static init (options) {
-    const tagName    = isString      (options) ? options         : options?.name;
-    const extendsTag = isPlainObject (options) ? options.extends : this.extendsTag;
-    const name       = tagName || toKebabCase(this.name);
-    
-    if (!name || !name.includes('-')) return log.warn(`invalid tag name "${name}", custom elements require a hyphen.`);    
-    if (customElements.get(name)) return;
+  static init (name) {
+    const tag = (isString(name) ? name : name?.name) || toKebabCase(this.name);
+
+    if (!tag.includes('-')) return log.warn(`invalid tag name "${tag}", custom elements require a hyphen.`);
+    if (customElements.get(tag)) return;
 
     // schema keys are already kebab-case, so they map 1:1 onto observedAttributes
     const observed = Object.keys(schemaOf(this));
     if (observed.length && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
-      Object.defineProperty (this, 'observedAttributes', { configurable: true, get: () => observed });
+      Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
     }
 
-    customElements.define(name, this, extendsTag ? { extends: extendsTag } : undefined);
+    customElements.define(tag, this);
   }
 
   // ::: hooks, override in subclasses
@@ -176,6 +280,8 @@ return class extends BaseClass {
   update () {
     if (!this._mounted) return this;
 
+    this.reflectAttrs();
+
     const markup = this.render();
     let rebuilt  = false;
 
@@ -189,8 +295,33 @@ return class extends BaseClass {
     }
 
     this.applyVars();
+    this.syncSkeleton();
     this.sync();
     if (rebuilt) this.onRender();
+
+    return this;
+  }
+
+  /**
+   * `static reflect = ['look']` writes the RESOLVED value of those attributes
+   * back onto the host: defaults, values from config and invalid values that
+   * fell back. css can then select every state as [look="…"], the default and
+   * a config driven one included. meant for presentation enums, not for values.
+   */
+  reflectAttrs () {
+    const names = this.constructor.reflect;
+    if (!isArray(names)) return this;
+
+    for (const name of names) {
+      const kebab = toKebabCase(name);
+      const value = this.getAttr(name);
+      const text  = value == null || value === false ? null : value === true ? '' : String(value);
+      if (this.getAttribute(kebab) === text) continue;
+
+      this._reflecting = true;
+      try   { text === null ? this.removeAttribute(kebab) : this.setAttribute(kebab, text); }
+      finally { this._reflecting = false; }
+    }
 
     return this;
   }
@@ -201,7 +332,7 @@ return class extends BaseClass {
   // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
   
   get schema () { return schemaOf(this.constructor); }
-  get tag    () { return this.getAttribute('is') || this.localName; }
+  get tag    () { return this.localName; }
 
   get configWatchlist () {
     if (this._configWatchlist !== undefined) return this._configWatchlist;
@@ -253,8 +384,13 @@ return class extends BaseClass {
 
     // delegated: type first, selector second. dom.delegate takes
     // (container, types, selector, fn), so the order carries straight through
+    // with a shadow root the delegation runs twice: on the host for the author's
+    // children, on the root for the own parts. events from inside are retargeted
+    // to the host on the way out, so the host alone could never match them
     if (isString(first) && isString(second) && isFn(third)) {
-      return this.track(delegateEvent(this, first, second, third, fourth));
+      const stops = [delegateEvent(this, first, second, third, fourth)];
+      if (this.root !== this) stops.push(delegateEvent(this.root, first, second, third, fourth));
+      return this.track(() => stops.forEach(stop => stop()));
     }
 
     // the element itself
@@ -400,7 +536,7 @@ return class extends BaseClass {
     return spec => decorateAll(getElements(spec, this.root));
   }
 
-};};
+}
 
 export default AufbauCore;
 
@@ -421,17 +557,13 @@ runs after a real markup rebuild only, for work that rewrites the new nodes
 structure, without values. return null to opt out of markup entirely
 
 -- renderTarget()
-where render() output goes. defaults to the whole root, so a plain element
-simply owns its markup. containers that must keep their light dom children
-alive (picker, upload, reader …) override this with a dedicated shell.
+where render() output goes: the shadow root with `static shadow`, the element
+itself otherwise. an element never renders over children the author owns.
+anything with its own structure AND authored children declares `static shadow`
+and projects the children through <slot>, like a native element would.
 
 -- root()
 shadow root when present, the element itself otherwise 
-
--- shell()
-lazily creates a dedicated render shell inside the element, so authored
-light dom children are never wiped by a re-render. override renderTarget
-with `this.shell('aufbau-picker-ui')` to opt in.
 
 -- sync()
 values and state, applied to the structure render() produced

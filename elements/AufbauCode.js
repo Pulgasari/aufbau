@@ -1,7 +1,9 @@
 // <aufbau-code>
 
+import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { attrs, html }          from './core/html.js';
 import { AufbauElement }        from './core/index.js';
+import { dedent }               from './core/utils.js';
 import { getConfig, setConfig } from './core/AufbauConfig.js';
 
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
@@ -103,6 +105,8 @@ function collectThemes (data) {
 
 export default class AufbauCode extends AufbauElement {
   static attr = {
+    // copy always, paste and clear only take effect with `editable`
+    actions  : { type: String, default: 'copy paste clear' },
     code     : String,
     editable : Boolean,
     lang     : String,
@@ -112,62 +116,67 @@ export default class AufbauCode extends AufbauElement {
     theme    : { type: String, config: true }
   };
 
-  // structure only, the hljs theme paints the tokens and the skin does the frame
-  static styles = `
-    aufbau-code {
-      display: block;
-      font: inherit;
+  // structure only, the hljs theme paints the tokens and the skin does the frame.
+  // the host is the frame, header and pre are its only children
+  // the children are the code (static source) and stay untouched, the output is
+  // a <figure> in the light dom: header (language + actions) and pre > code
+  static source = { tag: 'figure' };
+
+  static styles = `aufbau-code {
+    display  : block;
+    font     : inherit;
+    overflow : hidden;
+
+    > figure {
+      display        : flex;
+      flex-direction : column;
+      margin         : 0;
     }
 
-    aufbau-code .aufbau-code-wrapper {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    > figure > header {
+      align-items     : center;
+      display         : flex;
+      flex            : none;
+      gap             : var(--aufbau-control-gap, 0.5em);
+      justify-content : space-between;
+
+      > span {
+        font-family : var(--font-family-mono, ui-monospace, monospace);
+        font-size   : 0.8em;
+        line-height : 1;
+        margin-inline-end : auto;
+      }
+
+      > button {
+        align-items : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        flex        : none;
+        font        : inherit;
+        margin      : 0;
+      }
     }
 
-    aufbau-code .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--aufbau-control-gap, 0.5em);
-      flex: none;
+    > figure > pre {
+      margin     : 0;
+      overflow-x : auto;
     }
 
-    aufbau-code .code-lang {
-      font-family: var(--font-family-mono, ui-monospace, monospace);
-      font-size: 0.8em;
-      line-height: 1;
-    }
+    code {
+      display     : block;
+      font-family : var(--font-family-mono, ui-monospace, monospace);
+      tab-size    : 2;
+      white-space : pre;
 
-    aufbau-code .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      flex: none;
-      margin: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      cursor: pointer;
+      &[contenteditable] {
+        caret-color : currentColor;
+        outline     : none;
+      }
     }
-
-    aufbau-code pre {
-      margin: 0;
-      overflow-x: auto;
-    }
-
-    aufbau-code code {
-      display: block;
-      font-family: var(--font-family-mono, ui-monospace, monospace);
-      white-space: pre;
-      tab-size: 2;
-    }
-
-    aufbau-code code[contenteditable] {
-      outline: none;
-      caret-color: currentColor;
-    }
-  `;
+  }`;
 
   /**
    * teaches every <aufbau-code> a grammar highlight.js does not ship.
@@ -202,12 +211,7 @@ export default class AufbauCode extends AufbauElement {
   static preloadTheme (theme) { return loadTheme(theme); }
 
   onMount () {
-    // keep the original inner text as source if no code attribute is set
-    if (!this.hasAttribute('code') && this._originalCode === undefined) {
-      this._originalCode = this.textContent.trim();
-    }
-
-    this.on('click', '.copy-btn', (e, btn) => this.copyToClipboard(this.source, btn));
+    bindActions(this);
 
     // typing must NOT write back into the code attribute:
     // it is observed, would trigger update(), rebuild the markup and drop the caret. 
@@ -225,14 +229,13 @@ export default class AufbauCode extends AufbauElement {
     });
   }
 
-  onUnmount () { clearTimeout(this._copyTimer); }
-
-  // an external write to `code` wins over a pending edit
+  // an external write to `code` or to the children wins over a pending edit
   onAttributeChange (name) { if (name === 'code') this._editedCode = undefined; }
+  onSourceChange    ()     { this._editedCode = undefined; this.invalidate().update(); }
 
   get source () {
     if (this._editedCode !== undefined) return this._editedCode;
-    return this.getAttr('code') || this._originalCode || '';
+    return this.getAttr('code') || dedent(this.sourceText);
   }
 
   /** the current text, including edits made through `editable` */
@@ -243,21 +246,26 @@ export default class AufbauCode extends AufbauElement {
     return lang || language || 'plaintext';
   }
 
-  render () {
+  get actions () {
     const { editable, noCopy } = this.getAttr();
+    return parseActions(this.getAttr('actions'))
+      .filter(action => action === 'copy' ? !noCopy : editable);
+  }
 
+  // the contract with core/actions.js
+  actionText   () { return this.source; }
+  actionTarget () { return this.getAttr('editable') ? this.$('figure > pre > code') : null; }
+
+  render () {
+    const { editable } = this.getAttr();
+
+    // language-* is the highlight.js contract, the one class that stays
     return html`
-      <div class="aufbau-code-wrapper">
-        <div class="code-header">
-          <span class="code-lang">${this.lang}</span>
-          ${!noCopy && html`
-            <button type="button" class="copy-btn" title="Copy code">
-              <aufbau-icon icon="lucide:copy"></aufbau-icon>
-            </button>
-          `}
-        </div>
-        <pre><code class="language-${this.lang}" ${attrs({ contenteditable: editable && 'plaintext-only', spellcheck: editable && 'false' })}>${this.source}</code></pre>
-      </div>
+      <header>
+        <span>${this.lang}</span>
+        ${actionButtons(this.actions)}
+      </header>
+      <pre><code class="language-${this.lang}" ${attrs({ contenteditable: editable && 'plaintext-only', spellcheck: editable && 'false' })}>${this.source}</code></pre>
     `;
   }
 
@@ -269,7 +277,7 @@ export default class AufbauCode extends AufbauElement {
       const hljs = await getHljs();
       await useLanguage(hljs, this.lang);
 
-      const $code = this.$('code');
+      const $code = this.output?.querySelector('pre > code');
       // the node may already be gone or stale again after the await
       if (!$code || !this.isConnected || this.source !== source) return;
 
@@ -289,24 +297,6 @@ export default class AufbauCode extends AufbauElement {
       loadTheme(theme);
     } else {
       this.removeAttribute(THEME_ATTR);
-    }
-  }
-
-  async copyToClipboard (text, btn) {
-    try {
-      await navigator.clipboard.writeText(text);
-
-      const icon = btn.querySelector('aufbau-icon');
-      //const icon = this.$('aufbau-icon');
-      icon?.setAttribute('icon', 'lucide:check');
-      //const $icon;
-
-      this.emit('aufbau-code-copy', { code: text });
-
-      clearTimeout(this._copyTimer);
-      this._copyTimer = setTimeout(() => icon?.setAttribute('icon', 'lucide:copy'), 2000);
-    } catch (error) {
-      console.error('[aufbau-code] clipboard copy failed:', error);
     }
   }
 }

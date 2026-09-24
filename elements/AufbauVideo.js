@@ -1,47 +1,60 @@
 // <aufbau-video>
+// a native <video>, or a youtube embed when `youtube-id` is set. the player is
+// the only child. playback flags are applied as properties, so toggling muted
+// or loop does not rebuild the player and reset playback.
 
 import { AufbauElement } from './core/index.js';
+import { html }          from './core/html.js';
+
+const YOUTUBE = 'https://www.youtube-nocookie.com/embed/';
+const ALLOW   = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
 
 export default class AufbauVideo extends AufbauElement {
   static attr = {
+    autoplay  : Boolean,
+    controls  : true,
+    label     : 'Video player',
+    loop      : Boolean,
+    muted     : Boolean,
+    poster    : String,
     src       : String,
     youtubeId : String,
-    poster    : String,
-    controls  : true,
-    autoplay  : Boolean,
-    loop      : Boolean,
-    muted     : Boolean
   };
 
-  update () {
-    const { src, youtubeId, poster, controls, autoplay, loop, muted } = this.getAttr();
+  static styles = `aufbau-video {
+    display: block;
 
-    if (youtubeId) {
-      this.innerHTML = `
-        <div class="aufbau-video-container aspect-16-9">
-          <iframe 
-            src="https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0" 
-            title="Video player" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
-        </div>
-      `;
-    } else if (src) {
-      this.innerHTML = `
-        <div class="aufbau-video-container">
-          <video 
-            src="${src}" 
-            ${poster ? `poster="${poster}"` : ''} 
-            ${controls ? 'controls' : ''} 
-            ${autoplay ? 'autoplay' : ''} 
-            ${loop ? 'loop' : ''} 
-            ${muted ? 'muted' : ''}>
-          </video>
-        </div>
-      `;
+    > video { display: block; inline-size: 100%; }
+
+    > iframe {
+      aspect-ratio : 16 / 9;
+      border       : 0;
+      display      : block;
+      inline-size  : 100%;
     }
+  }`;
+
+  get player () { return this.$(':scope > video'); }
+
+  render () {
+    const { label, src, youtubeId } = this.getAttr();
+
+    if (youtubeId) return html`
+      <iframe src="${YOUTUBE}${encodeURIComponent(youtubeId)}?rel=0" title="${label}" allow="${ALLOW}" allowfullscreen></iframe>
+    `;
+
+    return src ? html`<video src="${src}"></video>` : '';
+  }
+
+  sync () {
+    const video = this.player;
+    if (!video) return;
+
+    const { autoplay, controls, loop, muted, poster } = this.getAttr();
+
+    Object.assign(video, { autoplay, controls, loop, muted });
+    if (poster) video.poster = poster;
+    else video.removeAttribute('poster');
   }
 }
 

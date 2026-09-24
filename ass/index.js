@@ -15,4 +15,5 @@ function compile (code, options = {}) {
 }
 
 export { compile, parse, serialize, transform };
+export { ass, createASS } from './tag.js';
 export default compile;

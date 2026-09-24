@@ -3,10 +3,26 @@
 //
 // markdown handling goes through @aufbau/import for both `src` and `raw`,
 // the element no longer reaches out to a cdn on its own.
+//
+// three sources, first match wins: `src`, `raw`, or the children:
+//
+//   <aufbau-reader># Titel
+//     Etwas **Text**.
+//   </aufbau-reader>
+//
+// the children are the source and stay untouched (static source): not shown
+// themselves, re-rendered whenever they change, so a framework can keep
+// rendering them. the output is an <article> in the light dom, page css
+// reaches it. it carries the content, or a status line after an error. while
+// the first content loads it shows the core skeleton. state:
+// :state(loading|ready|error|idle|skeleton).
 
-import { AufbauElement } from './core/index.js';
+import { AufbauElement }        from './core/index.js';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from './core/html.js';
+import { dedent }               from './core/utils.js';
+
+const STATES = ['error', 'idle', 'loading', 'ready'];
 
 export default class AufbauReader extends AufbauElement {
   static attr = {
@@ -21,27 +37,36 @@ export default class AufbauReader extends AufbauElement {
   // the property is already present, otherwise it would drop it silently.
   transform = null;
 
-  // authored inline content stays in the light dom and serves as the fallback source
-  get renderTarget () { return this.shell('aufbau-reader-ui'); }
+  static source = { tag: 'article' };
 
-  get state () { return this.getAttribute('data-state') ?? 'idle'; }
+  static skeleton = { lines: 4, width: '100%' };
 
-  onMount () {
-    // read before the shell is appended, otherwise it would count as content
-    const { raw, src } = this.getAttr();
-    if (!src && !raw) this._inline ??= this.innerHTML.trim();
+  static styles = `aufbau-reader {
+    display: block;
+
+    > article { display: block; min-inline-size: 0; }
+  }`;
+
+  constructor () {
+    super();
+    this._state = 'idle';
   }
+
+  get state () { return this._state; }
 
   async update () {
     const { format, raw, src } = this.getAttr();
-    const source = src || raw || this._inline || '';
+    const source = src || raw || dedent(this.sourceText);
 
     if (source === this._source && this.state !== 'idle') return super.update();
     this._source = source;
 
     if (!source) { this._html = ''; return this.finish('idle'); }
 
-    this.setAttribute('data-state', 'loading');
+    // the status line only replaces nothing. existing content stays until the new one is
+    // ready, otherwise a live preview would flicker on every keystroke
+    this.setState('loading');
+    if (!this._html) super.update();
 
     try {
       // one pipeline for both paths: importFile dispatches on the extension,
@@ -53,9 +78,15 @@ export default class AufbauReader extends AufbauElement {
       // optional consumer hook — rewrite the parsed markup before it is committed
       // (resolve folder-relative assets, tag links). kept generic so an app reading
       // local files injects its own resolution without re-implementing rendering.
-      this._html = await this.applyTransform(markup);
+      const transformed = await this.applyTransform(markup);
+
+      // a newer source arrived while this one was rendering, its own pass owns the result
+      if (this._source !== source) return this;
+
+      this._html = transformed;
       this.finish('ready');
     } catch (error) {
+      if (this._source !== source) return this;
       console.warn(`[aufbau-reader] could not render ${src ? `"${src}"` : 'inline content'}:`, error);
       this._html = null;
       this.finish('error');
@@ -77,19 +108,25 @@ export default class AufbauReader extends AufbauElement {
     return root.innerHTML;
   }
 
+  setState (state) {
+    this._state = state;
+    for (const name of STATES) this.states.toggle(name, name === state);
+    // the skeleton only stands in for content that is not there yet, a reload keeps the old text
+    this.setSkeleton(state === 'loading' && !this._html);
+  }
+
   finish (state) {
-    this.setAttribute('data-state', state);
+    this.setState(state);
     super.update();
     if (state !== 'loading') this.emit('aufbau-reader-rendered', { state, src: this.getAttr('src') });
     return this;
   }
 
   render () {
-    if (this.state === 'loading') return html`<div class="reader-status is-loading" role="status">loading…</div>`;
-    if (this.state === 'error')   return html`<div class="reader-status is-error" role="alert">could not load content.</div>`;
+    if (this.state === 'error')   return html`<p role="alert">could not load content.</p>`;
 
-    // importFile/importString return trusted, already parsed markup
-    return html`<article class="reader-content markdown-body">${rawHtml(this._html ?? '')}</article>`;
+    // importFile/renderMD return trusted, already parsed markup. the <article> is the output itself
+    return rawHtml(this._html ?? '');
   }
 }
 

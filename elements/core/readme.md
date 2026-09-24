@@ -14,19 +14,93 @@ Lightweight, zero-dependency abstraction layer for Web Components. Provides a un
 
 ## Architecture
 
-Components are built on top of the `AufbauCore` mixin. It can wrap `HTMLElement` or any native HTML class for customized built-in elements.
+`AufbauCore` is a plain class on top of `HTMLElement`. every aufbau element is
+autonomous; customized built-ins (`is="…"`) are not supported, safari never
+shipped them.
 
 ```javascript
 import { AufbauCore } from './core/AufbauCore.js';
 
-// Base class for standard Web Components
-export class AufbauElement extends AufbauCore(HTMLElement) {}
+export class AufbauElement extends AufbauCore {}
+```
 
-// Base class for customized built-in elements
-export class AufbauDatalistElement extends AufbauCore(HTMLDataListElement) {
-  static extendsTag = 'datalist';
+### internals and states
+
+```javascript
+class AufbauTreeItem extends AufbauElement {
+  // default semantics, applied in the constructor. `true` only attaches up front
+  static internals = { role: 'treeitem' };
+
+  sync () {
+    this.internals.ariaExpanded = String(this.getAttr('expanded'));   // ElementInternals, attached once
+    this.states.toggle('empty', !this.children.length);               // styled as :state(empty)
+  }
 }
 ```
+
+`this.internals` attaches lazily on first access and is `null` where the browser
+has no ElementInternals. `this.states` wraps its CustomStateSet with `add`,
+`delete`, `has` and `toggle(name, force)`; every call is a guarded no-op in
+browsers without custom states.
+
+### children and shadow root
+
+the one rule: **an element never renders over children the author owns.** a
+native `<details>` or `<select>` keeps its own ui in a hidden shadow root and
+leaves its children alone, so it does not matter who manages them (plain html,
+preact, anything). aufbau elements follow the same model:
+
+- no own structure (icon, flag, index, item, progress, waveform): render nothing,
+  the host plus css and pseudo elements is the whole element. index and item are
+  layout around the author's children, deliberately without shadow root
+- own structure, children the author owns (button, dropdown, loop, modal,
+  picker, toast, tree-item, upload):
+  `static shadow = true`, render() goes into the shadow root, children are
+  projected through `<slot>` or only read (picker options)
+- children are the element's input (reader: markdown, code: code, value: the
+  value, writer: the default value): `static source`. the children stay
+  untouched and are the source, a bare shadow root only projects the output
+  element, which is ours and lives in the light dom as well, so page css reaches
+  everything shown (`aufbau-reader article`). changes to the children re-render
+  (`onSourceChange()`), so a framework can keep rendering them.
+  `this.sourceText` reads them raw, `dedent()` from ./utils.js strips the html
+  indentation
+- no shadow root possible (datalist: `list=` resolves ids in the document): the
+  children are only read, the element appends one node of its own and fills it
+- styling reaches inside through custom properties and `::part()`. states that
+  the skin needs on a part are exposed as extra part tokens (`part="option
+  selected"`), `::part()` accepts no attribute selectors
+
+`this.on(type, selector, fn)` delegates on the host and on the shadow root, so
+it catches the author's children as well as the own parts. `this.focused` is the
+focused element inside the element's own tree.
+
+### skeleton
+
+every element takes the `skeleton` attribute, and `this.setSkeleton(on)` shows
+the same placeholder while an element loads by itself. it is css on the host
+alone (`:state(skeleton)`): lines painted by a gradient, a slow pulse, the
+content invisible but untouched. the shape:
+
+```javascript
+static skeleton = { lines: 4, line: '1em', gap: '0.5em', width: '100%', radius: '0.25em' };
+static skeleton () { return { lines: this.getAttr('rows') }; }   // or computed
+```
+
+the method is not called `skeleton()` on purpose: htx and preact set a prop as
+a property when the element has one of that name, `<aufbau-item skeleton>`
+would have replaced the method instead of setting the attribute.
+
+### reflect
+
+```javascript
+static reflect = ['look'];
+```
+
+writes the resolved value of those attributes back onto the host on every
+update: the default, a value from `<aufbau-config>`, or the fallback for an
+invalid one. css can then select every state as `[look="…"]`. meant for
+presentation enums, never for values.
 
 ---
 

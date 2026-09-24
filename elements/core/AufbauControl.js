@@ -8,7 +8,7 @@
 // subclasses override render()/sync() as usual and call super.sync() so the
 // shared state (disabled, aria, form value, validity) is applied.
 
-import AufbauCore         from './AufbauCore.js';
+import { AufbauCore }     from './AufbauCore.js';
 import { resolvePersist } from './persist.js';
 import { Logger }         from '@pulgasari/logger';
 
@@ -16,7 +16,7 @@ const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1
 
 const log = new Logger({ prefix: 'aufbau-control' });
 
-export class AufbauControl extends AufbauCore (HTMLElement) {
+export class AufbauControl extends AufbauCore {
 
   static formAssociated = true;
 
@@ -33,29 +33,32 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
 
   // structure shared by every control. colours, borders and radii belong to the
   // skin, see ../../css/skins/. declared on the base class on purpose: styleOwners()
-  // keys sheets by their declaring class, so this is adopted exactly once
+  // keys sheets by their declaring class, so this is adopted once per root. the
+  // :host variants cover controls with a shadow root, the tag list the others
   static styles = `
     [hidden] { display: none !important; }
 
+    :host,
     aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer {
-      display: inline-block;
-      box-sizing: border-box;
-      font: inherit;
-      color: inherit;
+      box-sizing : border-box;
+      color      : inherit;
+      display    : inline-block;
+      font       : inherit;
     }
 
-    aufbau-input *, aufbau-picker *, aufbau-slider *, aufbau-toggle *, aufbau-upload *, aufbau-writer * {
+    :host *,
+    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer) * {
       box-sizing: border-box;
     }
 
-    .is-disabled { pointer-events: none; }
+    :host(:state(disabled)),
+    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) {
+      pointer-events: none;
+    }
   `;
 
-  constructor () {
-    super();
-    // guarded, older browsers and ssr shims have no ElementInternals
-    this._internals = this.attachInternals?.() ?? null;
-  }
+  // attached up front, the form state is written from the first sync on
+  static internals = true;
 
   connectedCallback () {
     this.captureDefaults(); // strictly before readPersisted(), otherwise a restored value would become the state form.reset() goes back to      
@@ -116,14 +119,14 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
 
   // :::::: FORM ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  get form              () { return this._internals?.form              ?? null;  }
-  get labels            () { return this._internals?.labels            ?? [];    }
-  get validity          () { return this._internals?.validity          ?? null;  }
-  get validationMessage () { return this._internals?.validationMessage ?? '';    }
-  get willValidate      () { return this._internals?.willValidate      ?? false; }
+  get form              () { return this.internals?.form              ?? null;  }
+  get labels            () { return this.internals?.labels            ?? [];    }
+  get validity          () { return this.internals?.validity          ?? null;  }
+  get validationMessage () { return this.internals?.validationMessage ?? '';    }
+  get willValidate      () { return this.internals?.willValidate      ?? false; }
 
-  checkValidity   () { return this._internals?.checkValidity()  ?? true; }
-  reportValidity  () { return this._internals?.reportValidity() ?? true; }
+  checkValidity   () { return this.internals?.checkValidity()  ?? true; }
+  reportValidity  () { return this.internals?.reportValidity() ?? true; }
 
   setCustomValidity (message) {
     this._customError = message || '';
@@ -132,7 +135,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   }
 
   syncFormState () {
-    this._internals?.setFormValue(this.formValue);
+    this.internals?.setFormValue(this.formValue);
     // the one point every write path passes: commit() as well as state that
     // never touches value, like AufbauToggle.setChecked()
     this.savePersisted();
@@ -144,7 +147,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
    * then narrowing with their own setValidity() call.
    */
   validate () {
-    const internals = this._internals; if (!internals) return this;
+    const internals = this.internals; if (!internals) return this;
     const anchor    = this.focusTarget ?? this;
 
     if (this._customError) internals.setValidity({ customError: true }, this._customError, anchor);
@@ -235,7 +238,7 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
   sync () {
     const { label, readonly, required } = this.getAttr();
     const disabled  = this.isDisabled;
-    const internals = this._internals;
+    const internals = this.internals;
 
     if (internals) {
       internals.ariaDisabled = String(disabled);
@@ -244,8 +247,8 @@ export class AufbauControl extends AufbauCore (HTMLElement) {
       if (label) internals.ariaLabel = label;
     }
 
-    this.classList.toggle('is-disabled', disabled);
-    this.classList.toggle('is-readonly', readonly);
+    this.states.toggle('disabled', disabled);
+    this.states.toggle('readonly', readonly);
 
     // a disabled control must drop out of the tab order entirely
     if (disabled) this.setAttribute('tabindex', '-1');

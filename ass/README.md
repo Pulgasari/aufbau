@@ -29,6 +29,45 @@ value resolution is lookup-then-passthrough: any ordinary css that defines no
 token is emitted unchanged, so ass is a strict superset. nesting is flattened
 against the parent selector rather than emitted as native css nesting.
 
+### ass`` — the tagged template
+
+what htx's `` html`` `` is for markup, `` ass`` `` is for css: ass source in, an
+object out that every css sink takes.
+
+```javascript
+import { ass } from '@aufbau/ass';
+
+// a registry per instance, like html.define() in htx
+ass.define('gap, margin, padding', { small: '0.5rem', big: '2rem' });
+ass.define({ color: { brand: '#008800' } });
+ass.mixin('stack', 'display: flex; flex-direction: column;');
+
+const card = ass`
+  .card {
+    use     : .stack;
+    gap     : small;
+    color   : brand;
+    padding : ${size}px;
+    ${dark && ass`background: black;`}
+  }
+`;
+
+card.css;              // compiled css, also String(card)
+card.sheet;            // constructed CSSStyleSheet, shared per css text
+card.adopt(document);  // or a shadow root / element, returns a remover
+
+class MyElement extends AufbauElement {
+  static styles = ass`:host { padding: small; }`;   // stringifies, works as is
+}
+```
+
+interpolation: strings and numbers as they are, a nested `` ass`` `` result as
+its **source** (so its tokens and mixins reach the outer block), arrays one item
+per line, plain objects as declarations (`{ paddingTop: '1rem' }`), nested
+objects as nested rules, `null`/`undefined`/booleans as nothing.
+`createASS({ tokens, mixins })` gives an instance with a registry of its own.
+compiling needs no dom, only `.sheet` and `.adopt()` do.
+
 ### offline / android apps
 
 no network, no runtime dependency. for the capacitor apps the recommended path

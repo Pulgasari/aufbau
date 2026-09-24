@@ -4,8 +4,7 @@ import AufbauConfig  from './AufbauConfig.js';
 import AufbauControl from './AufbauControl.js';
 import AufbauCore    from './AufbauCore.js';
 
-export class AufbauDatalistElement extends AufbauCore (HTMLDataListElement) { static extendsTag = 'datalist'; }
-export class AufbauElement         extends AufbauCore (HTMLElement)         {}
+export class AufbauElement extends AufbauCore {}
 
 export { AufbauConfig, AufbauControl, AufbauCore };
 

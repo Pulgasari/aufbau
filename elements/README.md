@@ -121,6 +121,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-button>`](#aufbau-button) ·
 [`<aufbau-code>`](#aufbau-code) ·
 [`<aufbau-config>`](#aufbau-config) ·
+[`<aufbau-crumbs>`](#aufbau-crumbs) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-filter>`](#aufbau-filter) ·
@@ -129,10 +130,12 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-input>`](#aufbau-input) ·
 [`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
+[`<aufbau-modal>`](#aufbau-modal) ·
 [`<aufbau-option>`](#aufbau-option) ·
 [`<aufbau-picker>`](#aufbau-picker) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
+[`<aufbau-skeleton>`](#aufbau-skeleton) ·
 [`<aufbau-slider>`](#aufbau-slider) ·
 [`<aufbau-splash>`](#aufbau-splash) ·
 [`<aufbau-table>`](#aufbau-table) ·
@@ -151,7 +154,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 ```html
 <aufbau-audio 
   src="/media/track.mp3" 
-  title="Cyberpunk Theme" 
+  label="Cyberpunk Theme" 
   artist="Synthwave Studio" 
   cover="/media/cover.jpg"
   layout="card">
@@ -181,7 +184,14 @@ console.log(greet('aufbau'));
 
 <!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
 <aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+
+<!-- 3. editierbar: copy, paste und clear im header -->
+<aufbau-code lang="json" editable>{ "a": 1 }</aufbau-code>
 ```
+
+`actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
+`clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
+gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 
 ## aufbau-config
 
@@ -215,21 +225,50 @@ console.log(greet('aufbau'));
 <aufbau-code lang="js" theme="github">…</aufbau-code>          <!-- lokaler override -->
 ```
 
+## aufbau-crumbs
+
+brotkrumen-navigation. der host ist die navigation-landmark, die trenner sind
+css (`--crumbs-separator`), die crumbs selbst bleiben normale links und buttons
+im light dom. zwei quellen:
+
+```html
+<!-- eigene kinder, unangetastet. das letzte bekommt aria-current -->
+<aufbau-crumbs>
+  <a href="/">Start</a>
+  <a href="/docs">Docs</a>
+  <span>Elements</span>
+</aufbau-crumbs>
+
+<!-- aus einem pfad. ohne href: buttons + event `aufbau-crumbs` { path, index } -->
+<aufbau-crumbs path="/home/user/docs" root="Home" max="4"></aufbau-crumbs>
+
+<!-- mit href-vorlage: echte links, {path} wird ersetzt -->
+<aufbau-crumbs path="/a/b/c" href="/files?path={path}"></aufbau-crumbs>
+```
+
+`max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
+den pfad (default `/`).
+
 ## aufbau-datalist
 
 ```html
 <!-- 1. JSONC mit Kommentaren -->
-<datalist is="aufbau-datalist" id="cities" src="/data/cities.jsonc" key="name"></datalist>
+<aufbau-datalist id="cities" src="/data/cities.jsonc" key="name"></aufbau-datalist>
 
 <!-- 2. Lesbares YAML -->
-<datalist is="aufbau-datalist" id="tags" src="/config/tags.yaml"></datalist>
+<aufbau-datalist id="tags" src="/config/tags.yaml"></aufbau-datalist>
 
 <!-- 3. Riesen CSV/TSV Tabellen (geparst via PapaParse) -->
-<datalist is="aufbau-datalist" id="countries" src="/data/countries.csv" key="CountryName"></datalist>
+<aufbau-datalist id="countries" src="/data/countries.csv" key="CountryName"></aufbau-datalist>
 
 <!-- 4. TOML Config -->
-<datalist is="aufbau-datalist" id="presets" src="/settings/presets.toml" key="title"></datalist>
+<aufbau-datalist id="presets" src="/settings/presets.toml" key="title"></aufbau-datalist>
 ```
+
+autonom statt `<datalist is="…">`, safari kennt keine customized built-ins. das
+element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
+`<input list="cities">` zeigt also weiter auf denselben namen. authored
+`<option>`-kinder bleiben erhalten und stehen vor den geladenen.
 
 ```html
 <!-- Und deine inputs nutzen das einfach nativ -->
@@ -251,6 +290,21 @@ console.log(greet('aufbau'));
 ```html
 <aufbau-flag code="de" variant="circle"></aufbau-flag>
 <aufbau-flag code="us"></aufbau-flag>
+```
+
+der accessible name ist der ländername in der seitensprache (`de` → „Deutschland“),
+`label` überschreibt ihn.
+
+## aufbau-icon
+
+reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
+[`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
+
+```html
+<aufbau-icon icon="lucide:save"></aufbau-icon>
+<aufbau-icon icon="save" size="2em" color="tomato"></aufbau-icon>
+<aufbau-icon icon="logos:deno" mode="image"></aufbau-icon>   <!-- mehrfarbig -->
+<aufbau-icon icon="info" label="Hinweis"></aufbau-icon>      <!-- sonst aria-hidden -->
 ```
 
 ## aufbau-index
@@ -299,6 +353,33 @@ das layout gehängt:
   <aufbau-item>Apple</aufbau-item>
   <aufbau-item>Banana</aufbau-item>
 </aufbau-index>
+```
+
+### render skipping
+
+`<aufbau-item>` hat `content-visibility: auto`: items ausserhalb des viewports
+werden weder gelayoutet noch gezeichnet. damit die scrollhöhe stimmt, braucht ein
+übersprungenes item eine ersatzhöhe (`contain-intrinsic-block-size: auto <schätzung>`).
+`auto` heisst: einmal gerendert, merkt sich der browser die echte grösse. die
+schätzung gilt also nur für items, die noch nie sichtbar waren. quelle, erster treffer gewinnt:
+
+1. `intrinsic-size` am item
+2. `item-intrinsic-size` am index
+3. gelernt: mittelwert der bisher gerenderten items (masonry, listen, variable höhen)
+4. `item-size` als grobe näherung
+
+quadratische items (`shape="circle|square"`) brauchen nichts davon, die höhe
+folgt über `aspect-ratio` aus der spaltenbreite. bei wechsel von `viewmode`,
+`item-size`, `item-shape` oder `item-look` wird neu gelernt und die gemerkten
+grössen verworfen.
+
+`eager` (am index oder item) schaltet das skipping ab. nötig, wenn ein item
+bewusst über seinen rand hinaus zeichnet, denn skipping impliziert paint containment.
+
+```html
+<aufbau-index viewmode="list" item-intrinsic-size="3.5rem">…</aufbau-index>
+<aufbau-index viewmode="masonry">…</aufbau-index>          <!-- lernt selbst -->
+<aufbau-item intrinsic-size="480px">großer teaser</aufbau-item>
 ```
 
 ## aufbau-input
@@ -371,6 +452,36 @@ hat und sonst gar nichts passieren würde.
 </aufbau-loop>
 ```
 
+## aufbau-modal
+
+modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
+fokus bleibt drin und kehrt danach zurück. der dialog liegt im shadow root, die
+kinder bleiben unangetastet und werden per `<slot>` hineinprojiziert. `open`
+spiegelt den zustand in beide richtungen, ein `<form method="dialog">` schliesst
+ihn und liefert den `returnValue`. styling über `::part(dialog|header|heading|close)`.
+
+```html
+<aufbau-modal id="settings" heading="Einstellungen">
+  <p>…</p>
+  <form method="dialog">
+    <button value="cancel">Abbrechen</button>
+    <button value="save">Speichern</button>
+  </form>
+</aufbau-modal>
+```
+
+```js
+const result = await document.querySelector('#settings').show();   // 'save' | 'cancel' | ''
+
+if (await AufbauModal.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
+```
+
+`dismissible` (default an) erlaubt schliessen per button, escape und klick auf
+den backdrop. öffnen und schliessen blenden über `@starting-style` und diskrete
+transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
+die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
+abdunklung über `--modal-backdrop`.
+
 ## aufbau-option
 
 datenelement, kein control. es rendert sich nie selbst, sondern wird von seinem
@@ -387,8 +498,19 @@ dazukommen und verschwinden können.
 
 ## aufbau-picker
 
-one-of-n. `look` wechselt nur die darstellung — dasselbe markup funktioniert als
-combobox, radiogruppe oder segmented control.
+one-of-n. `look` wechselt nur die darstellung — dieselben optionen funktionieren als
+combobox, cycle, radiogruppe oder segmented control.
+
+| look       | verhalten |
+| ---------- | --------- |
+| `combobox` | der host ist das feld, die optionen stehen in einer popover-liste (default) |
+| `cycle`    | ein button mit der aktuellen option. klick nimmt die nächste, langer druck oder rechtsklick öffnet die liste zur direktauswahl. immer einfachauswahl |
+| `radio`    | alle optionen inline, untereinander, mit markierung |
+| `segments` | alle optionen inline, eine lückenlose reihe |
+
+`icons-only` blendet bei `cycle`, `radio` und `segments` die labels aus, sofern die
+option ein icon hat. das label wird dann accessible name und tooltip. die
+popover-liste zeigt immer labels.
 
 ```html
 <aufbau-picker name="view" look="segments" value="month">
@@ -400,6 +522,12 @@ combobox, radiogruppe oder segmented control.
 <!-- durchsuchbar, optionen aus einer datei -->
 <aufbau-picker name="framework" look="combobox" searchable
                src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-picker>
+
+<!-- ansicht umschalten: ein button, klick wechselt, langer druck wählt gezielt -->
+<aufbau-picker name="layout" look="cycle" icons-only value="grid">
+  <aufbau-option value="list" icon="lucide:list">Liste</aufbau-option>
+  <aufbau-option value="grid" icon="lucide:layout-grid">Raster</aufbau-option>
+</aufbau-picker>
 
 <!-- mehrfachauswahl, ein FormData-eintrag pro wert -->
 <aufbau-picker name="tags" look="radio" multiple>
@@ -424,6 +552,10 @@ lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
 über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
 selbst von einem cdn.
 
+`src`, `raw` oder die kinder als quelle. die kinder bleiben unangetastet und
+werden bei änderung neu gerendert, die ausgabe ist ein `<article>` im light dom.
+einrückung aus dem html wird entfernt.
+
 ```html
 <!-- markdown-datei -->
 <aufbau-reader src="/docs/getting-started.md"></aufbau-reader>
@@ -438,8 +570,23 @@ Text mit **markdown**.
 </aufbau-reader>
 ```
 
-der ladezustand steht als `data-state="loading|ready|error|idle"` am element und
-ist damit direkt per css ansprechbar.
+der ladezustand steht als `:state(loading|ready|error|idle)` am element und ist
+damit direkt per css ansprechbar.
+
+## aufbau-skeleton
+
+platzhalter, solange inhalt lädt. nur der host malt, nichts wird gerendert.
+
+```html
+<aufbau-skeleton lines="3"></aufbau-skeleton>
+<aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
+<aufbau-skeleton shape="rect" size="100% 12rem"></aufbau-skeleton>
+```
+
+jedes andere aufbau-element kann dasselbe an seiner eigenen stelle: das attribut
+`skeleton` (`<aufbau-item skeleton>`), solange die app lädt. reader, table, tree
+und picker zeigen ihn von selbst, während sie `src` laden. aussehen über
+`--skeleton-color`, `--skeleton-line`, `--skeleton-gap`, `--skeleton-radius`.
 
 ## aufbau-slider
 
@@ -580,8 +727,39 @@ aufbau-splash-failsafe 0s linear var(--aufbau-splash-limit,10s) forwards}
   </main>
 
   <!-- Autonomous TOC Component -->
-  <aufbau-toc target="#markdown-container" selector="h2, h3"></aufbau-toc>
+  <aufbau-toc target="#markdown-container" selector="h2, h3" label="Inhalt"></aufbau-toc>
 </div>
+```
+
+der host ist die navigation-landmark, `label` ist sichtbare überschrift und
+accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
+jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
+überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
+
+## aufbau-toast
+
+meist imperativ über `notify()`. errors werden erkannt, auch als rohes objekt aus
+einem `catch`. `dismissible` (default bei `notify()`) erlaubt schliessen per button
+und wegwischen per touch. hover und fokus halten den countdown an.
+
+```js
+import { notify } from '@aufbau/elements/AufbauToast.js';
+
+notify('Gespeichert');
+notify({ success: 'Export fertig', heading: 'Dateien' });
+notify({ error: 'Upload fehlgeschlagen' });
+
+try { await save(); }
+catch (error) { notify(error); }          // type error, message aus dem error
+
+AufbauToast.error('…');                   // + info, success, warning, warn
+notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
+```
+
+```html
+<aufbau-toast type="warning" heading="Achtung" dismissible>
+  Speicher fast voll. <a href="/storage">Aufräumen</a>
+</aufbau-toast>
 ```
 
 ## aufbau-toggle
@@ -612,6 +790,11 @@ ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
 <!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
 <aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
 ```
+
+tastatur wie beim wai-aria tree view: pfeil hoch/runter wandert durch die
+sichtbaren items, rechts öffnet bzw. springt ins erste kind, links schliesst bzw.
+springt zum parent, enter wählt und klappt um, leertaste wählt. ein tab-stop für
+den ganzen baum.
 
 ## aufbau-upload
 
@@ -677,7 +860,16 @@ steht, und meldet es als `aufbau-value-copy`; der wert dahinter ist
 
 ```html
 <aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
+
+<!-- vorberechnete peaks, fortschritt und markierter bereich (trim-editoren) -->
+<aufbau-waveform peaks="0.2 0.8 0.5 0.9" progress="40" range-start="20" range-end="60"></aufbau-waveform>
 ```
+
+keine kinder: der host malt seine farben als hintergrund-ebenen und wird von
+einem svg der balken maskiert. ein fortschritts-update ist eine custom property,
+die balken werden nur bei neuen peaks neu gezeichnet. farben über
+`--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
+`--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
 
 ## aufbau-writer
 
@@ -691,13 +883,20 @@ mehrzeiliger text, das gegenstück zu [`<aufbau-reader>`](#aufbau-reader).
 
 <!-- kindinhalt ist der startwert -->
 <aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer>
+
+<!-- nur kopieren, keine anderen buttons -->
+<aufbau-writer name="log" readonly actions="copy"></aufbau-writer>
 ```
+
+`actions` wie bei [`<aufbau-code>`](#aufbau-code), default `copy paste clear`.
+bei `readonly` sind paste und clear deaktiviert. `:state(full)` markiert einen
+counter, der `maxlength` erreicht hat.
 
 ---
 
 ```html
 <!-- Remote data fetch for datalist autocomplete -->
-<datalist is="aufbau-datalist" id="city-list" src="/api/cities.json" key="name"></datalist>
+<aufbau-datalist id="city-list" src="/api/cities.json" key="name"></aufbau-datalist>
 
 <!-- Input with preset icon & datalist linkage -->
 

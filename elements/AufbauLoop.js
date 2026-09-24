@@ -1,107 +1,148 @@
 // <aufbau-loop>
+// carousel: the children are the slides, stacked in one grid cell. the inactive
+//   ones are inert, the css fades them out. nothing is cloned or moved.
+// marquee: the children are projected into a track in the shadow root, next to
+//   an inert, aria-hidden copy of them. the track scrolls by half its width for
+//   a seamless loop. the copy is rebuilt whenever the children change; it sits
+//   in the shadow root, so page css that targets the originals by selector does
+//   not reach it, inherited styles do.
+// both stop while off screen: the carousel skips its ticks, the marquee
+// animation is paused through :state(offscreen). parts: track, copy
 
 import { AufbauElement } from './core/index.js';
-import { onVisible } from '@domina/observer';
-import { html } from './core/html.js';
+import { onVisible }     from '@domina/observer';
 
 export default class AufbauLoop extends AufbauElement {
+  static reflect = ['direction', 'mode'];
+
   static attr = {
-    mode         : { type: String, default: 'carousel', values: ['carousel', 'marquee'] },
-    interval     : 3000,
-    speed        : '20s',
     direction    : { type: String, default: 'left', values: ['left', 'right'] },
+    interval     : 3000,
+    mode         : { type: String, default: 'carousel', values: ['carousel', 'marquee'] },
     pauseOnHover : Boolean,
+    speed        : '20s',
   };
 
-  onMount () {
+  static shadow = true;
+
+  static styles = `
+    :host { display: block; }
+
+    :host(:not([mode="marquee"])) { display: grid; }
+
+    :host(:not([mode="marquee"])) ::slotted(*) {
+      grid-area  : 1 / 1;
+      transition : opacity var(--loop-fade, 0.4s) ease;
+    }
+
+    :host(:not([mode="marquee"])) ::slotted([inert]) { opacity: 0; }
+
+    :host([mode="marquee"]) { overflow: hidden; }
+
+    [part~="track"] {
+      animation   : aufbau-loop-marquee var(--loop-speed, 20s) linear infinite;
+      display     : flex;
+      inline-size : max-content;
+    }
+
+    [part~="copy"] { display: contents; }
+
+    /* a trailing gap on every item keeps the 50% jump exact */
+    [part~="track"] ::slotted(*),
+    [part~="copy"] > * { flex: none; margin-inline-end: var(--loop-gap, 2rem); }
+
+    :host([direction="right"]) [part~="track"]    { animation-direction: reverse; }
+    :host([pause-on-hover]:hover) [part~="track"] { animation-play-state: paused; }
+    :host(:state(offscreen)) [part~="track"]      { animation-play-state: paused; }
+
+    @keyframes aufbau-loop-marquee { to { translate: -50% 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      [part~="track"] { animation-play-state: paused; }
+    }
+  `;
+
+  constructor () {
+    super();
     this._index = 0;
-    // the original children are the slides and get wiped by the first render
-    this._items ??= [...this.children].map(child => child.cloneNode(true));
-
-    // pointerenter/leave instead of mouseenter/leave: those do not bubble and
-    // cannot be delegated. registered once here, never inside setupLoop()
-    this.on('pointerenter', () => this._paused = true);
-    this.on('pointerleave', () => this._paused = false);
-
-    // a carousel in a background tab or off screen does not need to tick
-    this.track(onVisible(this, (el, entry) => {
-      this._offscreen = !entry.isIntersecting;
-    }));
-
-    this.startLoop();
   }
 
-  onUnmount () { this.stopLoop(); }
+  onMount () {
+    // the marquee copy follows the children
+    this.on(this.root, 'slotchange', () => this.copy());
 
-  onAttributeChange () { this.startLoop(); }
+    this.on('pointerenter', () => { this._hovered = true;  });
+    this.on('pointerleave', () => { this._hovered = false; });
 
-  stopLoop () {
+    this.track(onVisible(this, (element, entry) => {
+      this._offscreen = !entry.isIntersecting;
+      this.states.toggle('offscreen', this._offscreen);
+    }));
+
+    this.start();
+  }
+
+  onUnmount () { this.stop(); }
+
+  onAttributeChange (name) {
+    this.start();
+  }
+
+  // :::::: CAROUSEL ::::::::::::::::::::::::::::::::::::::::::::
+
+  stop () {
     clearInterval(this._timer);
     this._timer = null;
   }
 
-  startLoop () {
-    this.stopLoop();
+  start () {
+    this.stop();
 
-    const { mode, interval } = this.getAttr();
-    if (mode !== 'carousel' || (this._items?.length ?? 0) < 2) return;
+    const { interval, mode } = this.getAttr();
+    if (mode !== 'carousel' || this.slides.length < 2) return;
 
     this._timer = setInterval(() => {
-      if (this._offscreen) return;
-      if (this._paused && this.getAttr('pauseOnHover')) return;
+      if (this._offscreen || document.hidden) return;
+      if (this._hovered && this.getAttr('pauseOnHover')) return;
       this.next();
     }, interval);
   }
 
-  next () {
-    this._index = (this._index + 1) % this._items.length;
-    this.sync();
-    this.emit('aufbau-loop-change', { index: this._index });
-  }
+  next     () { return this.goTo(this._index + 1); }
+  previous () { return this.goTo(this._index - 1); }
 
   goTo (index) {
-    this._index = ((index % this._items.length) + this._items.length) % this._items.length;
+    const count = this.slides.length;
+    if (!count) return this;
+
+    this._index = ((index % count) + count) % count;
     this.sync();
+    this.emit('aufbau-loop-change', { index: this._index });
+    return this;
   }
+
+  get slides () { return [...this.children]; }
 
   render () {
-    const { mode, direction, speed } = this.getAttr();
-    const items = this._items ??= [...this.children].map(child => child.cloneNode(true));
-
-    // marquee duplicates the content for a seamless loop, the copy is aria-hidden
-    if (mode === 'marquee') {
-      return html`
-        <div class="aufbau-loop-wrapper mode-marquee dir-${direction}">
-          <div class="marquee-track" style="animation-duration: ${speed};">
-            <div class="marquee-content"></div>
-            <div class="marquee-content" aria-hidden="true"></div>
-          </div>
-        </div>
-      `;
-    }
-
-    return html`
-      <div class="aufbau-loop-wrapper mode-carousel">
-        <div class="loop-track">
-          ${items.map(() => html`<div class="loop-item"></div>`)}
-        </div>
-      </div>
-    `;
+    return this.getAttr('mode') === 'marquee'
+      ? '<div part="track"><slot></slot><div part="copy" aria-hidden="true" inert></div></div>'
+      : '<slot></slot>';
   }
 
-  /** the slides are real nodes, so they are appended after a structural rebuild */
-  onRender () {
-    const items = this._items ?? [];
+  // the track is new after a mode switch, it needs its copy
+  onRender () { this.copy(); }
 
-    for (const container of this.$$('.marquee-content')) {
-      container.append(...items.map(item => item.cloneNode(true)));
-    }
-
-    this.$$('.loop-item').forEach((slot, i) => slot.append(items[i].cloneNode(true)));
+  copy () {
+    const copy = this.$('[part~="copy"]');
+    copy?.replaceChildren(...this.slides.map(slide => slide.cloneNode(true)));
   }
 
   sync () {
-    this.$$('.loop-item').forEach((item, i) => item.classList.toggle('is-active', i === this._index));
+    this.style.setProperty('--loop-speed', this.getAttr('speed'));
+
+    // inert is an attribute on the author's elements, they are not moved or rewritten
+    const carousel = this.getAttr('mode') === 'carousel';
+    this.slides.forEach((slide, index) => { slide.inert = carousel && index !== this._index; });
   }
 }
 

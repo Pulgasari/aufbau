@@ -9,6 +9,7 @@
 
 // :::::: IMPORTS
 
+import { actionButtons, bindActions }           from './core/actions.js';
 import { AufbauElement, TYPE_NAMES, valueType } from './core/index.js';
 import { attrs, html } from './core/html.js';
 import { configKeys }  from './core/AufbauConfig.js';
@@ -16,7 +17,6 @@ import { configKeys }  from './core/AufbauConfig.js';
 // :::::: CONSTANTS
 
 const TAG           = 'aufbau-value';
-const COPY_FEEDBACK = 2000;
 const TIME_TYPES    = new Set(['date', 'datetime', 'time']); // types that are an instant rather than a string, so they render as <time>       
 const NUMERIC       = /^-?\d+$/;
 const STYLES        = ['short', 'medium', 'long', 'full']; // Intl's four date/time presets. anything else falls through to the machine form     
@@ -75,7 +75,7 @@ export default class AufbauValue extends AufbauElement {
     format : String,
     locale : { type: String, config: true },
     type   : { type: String, default: 'text', values: TYPE_NAMES },
-    value  : String, // the value. absent, the authored text content becomes it (see onMount)
+    value  : String, // the value. absent, the children are it (see get value)
     copy   : Boolean,
     icon   : String,
   };
@@ -89,37 +89,41 @@ export default class AufbauValue extends AufbauElement {
     ...configKeys(TAG, 'locale'),
   ];
 
+  // the children are the value (static source) and stay untouched, the output is
+  // a <span> in the light dom: icon, the formatted value, the copy action.
+  // :state(empty) while there is nothing to show
+  static source = { tag: 'span' };
+
   static styles = `
     aufbau-value {
-      align-items : baseline;
-      display     : inline-flex;
-      gap         : var(--value-gap, 0.25rem);
+      display: inline;
 
-      &:not([value]) { display: none; }
+      &:state(empty) { display: none; }
 
-      &[type="date"], 
-      &[type="datetime"],
-      &[type="number"],
-      &[type="time"],
-      &[type="year"] {
-        .value-text { font-variant-numeric: tabular-nums; }
+      > span {
+        align-items : baseline;
+        display     : inline-flex;
+        gap         : var(--value-gap, 0.25rem);
       }
-    }
 
-    aufbau-value > .value-icon { align-self: center; }
-    
-    aufbau-value > .value-copy {
-      align-self : center;
-      background : none;
-      color      : inherit;
-      cursor     : pointer;
-      display    : inline-flex;
-      font       : inherit;
+      &:is([type="date"], [type="datetime"], [type="number"], [type="time"], [type="year"]) > span > :is(span, time) {
+        font-variant-numeric: tabular-nums;
+      }
 
-      border      : 0;
-      line-height : 0;
-      margin      : 0;
-      padding     : 0;
+      > span > aufbau-icon { align-self: center; }
+
+      > span > button {
+        align-self  : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
+        line-height : 0;
+        margin      : 0;
+        padding     : 0;
+      }
     }
   `;
 
@@ -135,9 +139,10 @@ export default class AufbauValue extends AufbauElement {
   formatValue (value) { return machineText(this.getAttr('type'), value); }
 
   /** the parsed value, in whatever shape its type stores (an epoch for `date`, ms since midnight for `time`) */
+  /** the attribute wins, the children are the value otherwise: <aufbau-value type="date">1745…</aufbau-value> */
   get value () {
-    const raw = this.getAttribute('value');
-    return raw == null || raw === '' ? null : this.parseValue(raw);
+    const raw = this.getAttribute('value') ?? this.sourceText.trim();
+    return raw === '' ? null : this.parseValue(raw);
   }
 
   set value (next) {
@@ -177,21 +182,14 @@ export default class AufbauValue extends AufbauElement {
   // :::::: LIFECYCLE
 
   onMount () {
-    // the authored text content is the value: <aufbau-value type="date">1745…</aufbau-value>.
-    // it is cleared before the attribute is set, because setAttr renders
-    // synchronously and the clear would wipe that markup right back out
-    const inline = this.textContent.trim();
-    if (inline && !this.hasAttribute('value')) {
-      this.textContent = '';
-      this.setAttr({ value: inline });
-    }
-
-    this.invalidate();
-
-    this.on('click', '.value-copy', (event, button) => this.copy(button));
+    bindActions(this);
   }
 
-  onUnmount () { clearTimeout(this._copyTimer); }
+  sync () { this.states.toggle('empty', !this.text); }
+
+  // the contract with core/actions.js. what is on screen is what is copied, the value behind it is `el.machine`
+  actionText   () { return this.text; }
+  actionTarget () { return null; }
 
   // :::::: RENDER
 
@@ -205,38 +203,14 @@ export default class AufbauValue extends AufbauElement {
     // <time> is what an instant is in html, and `datetime` carries the machine
     // form whatever notation the page is reading
     const body = TIME_TYPES.has(type)
-      ? html`<time class="value-text" ${attrs({ datetime: this.machine })}>${text}</time>`
-      : html`<span class="value-text">${text}</span>`;
+      ? html`<time ${attrs({ datetime: this.machine })}>${text}</time>`
+      : html`<span>${text}</span>`;
 
     return html`
-      ${icon && html`<aufbau-icon class="value-icon" icon="${icon}"></aufbau-icon>`}
+      ${icon && html`<aufbau-icon icon="${icon}"></aufbau-icon>`}
       ${body}
-      ${copy && html`
-        <button type="button" class="value-copy" title="copy">
-          <aufbau-icon icon="lucide:copy"></aufbau-icon>
-        </button>`}
+      ${copy && actionButtons(['copy'])}
     `;
-  }
-
-  // :::::: CLIPBOARD
-
-  /** what is on screen is what is copied; the value behind it is `el.machine` */
-  async copy (button) {
-    const text = this.text;
-
-    try {
-      await navigator.clipboard.writeText(text);
-
-      const icon = button?.querySelector('aufbau-icon');
-      icon?.setAttribute('icon', 'lucide:check');
-      clearTimeout(this._copyTimer);
-      this._copyTimer = setTimeout(() => icon?.setAttribute('icon', 'lucide:copy'), COPY_FEEDBACK);
-
-      this.emit('aufbau-value-copy', { value: text });
-    }
-    catch (error) { console.warn('[aufbau-value] clipboard copy failed:', error); }
-
-    return this;
   }
 }
 

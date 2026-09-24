@@ -1,4 +1,9 @@
 // <aufbau-toc>
+// table of contents for the headings inside `target`. the host is the
+// navigation landmark, its children are the visible label and one list.
+// every entry carries its heading level as aria-level, which is also the
+// styling hook for indentation. the entry of the heading currently read is
+// marked with aria-current="location".
 
 import { AufbauElement } from './core/index.js';
 import { html }          from './core/html.js';
@@ -9,18 +14,43 @@ import { getElements } from '@domina/methods/getElements.js';
 import { observe }     from '@domina/observer';
 
 export default class AufbauToc extends AufbauElement {
+  static internals = { role: 'navigation' };
+
   static attr = {
-    target   : String,
+    label    : 'On This Page',
     selector : 'h1, h2, h3, h4, h5, h6',
-    title    : 'On This Page'
+    target   : String,
   };
 
-  onMount () {
-    this.watch();
+  static styles = `aufbau-toc {
+    display: block;
+
+    > ol {
+      list-style : none;
+      margin     : 0;
+      padding    : 0;
+    }
+
+    li {
+      padding-inline-start: calc((var(--toc-level, 1) - 1) * var(--toc-indent, 0.75rem));
+
+      &[aria-level="2"] { --toc-level: 2; }
+      &[aria-level="3"] { --toc-level: 3; }
+      &[aria-level="4"] { --toc-level: 4; }
+      &[aria-level="5"] { --toc-level: 5; }
+      &[aria-level="6"] { --toc-level: 6; }
+    }
+  }`;
+
+  get container () {
+    const { target } = this.getAttr();
+    return target ? getElement(target) : null;
   }
 
-  onAttributeChange () {
-    this.watch();
+  onMount () { this.watch(); }
+
+  onAttributeChange (name) {
+    if (name === 'target' || name === 'selector') this.watch();
   }
 
   /** re-collects whenever headings appear or disappear inside the target */
@@ -28,13 +58,17 @@ export default class AufbauToc extends AufbauElement {
     this._stopWatching?.();
     this._stopWatching = null;
 
-    const { target, selector } = this.getAttr();
-    const container = target ? getElement(target) : null;
+    const container = this.container;
     if (!container) return;
 
-    const rescan = () => this.invalidate().update();
+    // the observer reports every heading on its own, a burst collapses into one rebuild
+    const rescan = () => {
+      if (this._rescanQueued) return;
+      this._rescanQueued = true;
+      queueMicrotask(() => { this._rescanQueued = false; this.invalidate().update(); });
+    };
 
-    this._stopWatching = this.track(observe(selector, {
+    this._stopWatching = this.track(observe(this.getAttr('selector'), {
       within    : container,
       onInit    : rescan,
       onAdded   : rescan,
@@ -42,39 +76,76 @@ export default class AufbauToc extends AufbauElement {
     }));
   }
 
-  /** headings need stable ids to be linkable, so they get one if missing */
+  /** headings need stable, unique ids to be linkable, so they get one if missing */
   collect () {
-    const { target, selector } = this.getAttr();
-    const container = target ? getElement(target) : null;
+    const container = this.container;
     if (!container) return [];
 
-    return getElements(selector, container).map((el, index) => {
-      const text  = el.textContent?.trim() || '';
-      const level = Number(/^H([1-6])$/i.exec(el.tagName)?.[1] ?? el.dataset.level ?? 1);
+    const taken = new Set;
 
-      if (!el.id) el.id = toSlugCase(text) || `heading-${index}`;
+    return getElements(this.getAttr('selector'), container).map((heading, index) => {
+      const text  = heading.textContent?.trim() || '';
+      const level = Number(/^H([1-6])$/i.exec(heading.tagName)?.[1] ?? heading.dataset.level ?? 1);
 
-      return { id: el.id, text, level };
+      if (!heading.id) {
+        const base = toSlugCase(text) || `heading-${index}`;
+        let id = base;
+        for (let n = 2; taken.has(id) || document.getElementById(id); n++) id = `${base}-${n}`;
+        heading.id = id;
+      }
+      taken.add(heading.id);
+
+      return { heading, id: heading.id, level, text };
     });
   }
 
   render () {
-    const { title } = this.getAttr();
-    const items = this.collect();
-    if (!items.length) return '';
+    this._entries = this.collect();
+    if (!this._entries.length) return '';
 
     return html`
-      <nav class="docs-toc-nav">
-        <h4>${title}</h4>
-        <ul>
-          ${items.map(item => html`
-            <li class="toc-level-${item.level}">
-              <a href="#${item.id}">${item.text}</a>
-            </li>
-          `)}
-        </ul>
-      </nav>
+      <header>${this.getAttr('label')}</header>
+      <ol>
+        ${this._entries.map(entry => html`
+          <li aria-level="${entry.level}"><a href="#${entry.id}">${entry.text}</a></li>
+        `)}
+      </ol>
     `;
+  }
+
+  // the list is new, so the spy has to follow it
+  onRender () { this.spy(); }
+
+  sync () {
+    if (this.internals) this.internals.ariaLabel = this.getAttr('label');
+  }
+
+  // marks the entry of the topmost heading in view. headings that leave keep
+  // their mark until another one arrives, so scrolling through a long section
+  // does not leave the list without a current entry
+  spy () {
+    this._stopSpy?.();
+
+    const entries = this._entries ?? [];
+    if (!entries.length || typeof IntersectionObserver === 'undefined') return;
+
+    const visible = new Set;
+    const links   = new Map(entries.map(entry => [entry.heading, this.$(`a[href="#${CSS.escape(entry.id)}"]`)]));
+
+    const observer = new IntersectionObserver((records) => {
+      for (const record of records) visible[record.isIntersecting ? 'add' : 'delete'](record.target);
+
+      const current = entries.find(entry => visible.has(entry.heading));
+      if (!current) return;
+
+      for (const [heading, link] of links) {
+        if (heading === current.heading) link?.setAttribute('aria-current', 'location');
+        else link?.removeAttribute('aria-current');
+      }
+    }, { rootMargin: '0px 0px -60% 0px' });
+
+    for (const entry of entries) observer.observe(entry.heading);
+    this._stopSpy = this.track(() => observer.disconnect());
   }
 }
 

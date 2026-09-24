@@ -164,16 +164,6 @@
       }
     },
     {
-      "id": "glitch",
-      "name": "Glitch",
-      "backends": {
-        "css": false,
-        "svg": false,
-        "canvas": true,
-        "webgl": true
-      }
-    },
-    {
       "id": "glitch-heavy-cyber",
       "name": "Heavy Cyber Glitch",
       "backends": {
@@ -201,6 +191,16 @@
         "svg": true,
         "canvas": true,
         "webgl": false
+      }
+    },
+    {
+      "id": "glitch",
+      "name": "Glitch",
+      "backends": {
+        "css": false,
+        "svg": false,
+        "canvas": true,
+        "webgl": true
       }
     },
     {
@@ -354,8 +354,8 @@
       }
     },
     {
-      "id": "pixelate",
-      "name": "Pixelate",
+      "id": "pixel-sort",
+      "name": "Pixel Sort",
       "backends": {
         "css": false,
         "svg": false,
@@ -364,8 +364,8 @@
       }
     },
     {
-      "id": "pixel-sort",
-      "name": "Pixel Sort",
+      "id": "pixelate",
+      "name": "Pixelate",
       "backends": {
         "css": false,
         "svg": false,

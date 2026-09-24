@@ -12,6 +12,7 @@
       "import": "./index.js"
     },
     "./run": "./run.js",
+    "./tag": "./tag.js",
     "./parse": "./parse.js",
     "./transform": "./transform.js",
     "./serialize": "./serialize.js"
@@ -24,6 +25,7 @@
     "run.js",
     "serialize.js",
     "transform.js",
+    "tag.js",
     "README.md"
   ],
   "scripts": {

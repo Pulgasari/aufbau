@@ -1,15 +1,20 @@
 // <aufbau-toggle>
 // a boolean. one-of-n belongs to <aufbau-picker>, not here.
+// the host IS the control: role, checked state and focus live on it. the track,
+// thumb and checkbox mark are pseudo elements, the only children are the
+// optional icon and the label.
 
 import { AufbauControl } from './core/index.js';
-import { attrs, html } from './core/html.js';
+import { html }          from './core/html.js';
 
-let toggleUID = 0;
+const ROLES = { button: 'button', checkbox: 'checkbox', switch: 'switch' };
 
 export default class AufbauToggle extends AufbauControl {
+  static reflect = ['look'];
+
   static attr = {
     checked       : Boolean,
-    // set either one to swap the css drawn thumb for an <aufbau-icon>,
+    // set either one to swap the css drawn track/mark for an <aufbau-icon>,
     // e.g. icon="famicons:toggle-outline" icon-checked="famicons:toggle"
     icon          : String,
     iconChecked   : String,
@@ -18,87 +23,81 @@ export default class AufbauToggle extends AufbauControl {
   };
 
   // structure only. the track, the thumb and the mark get their borders and
-  // colours from the skin, everything here is geometry
-  static styles = `
-    aufbau-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      cursor: pointer;
+  // colours from the skin, everything here is geometry. the thumb and the mark
+  // are placed with inset, so `translate`, `rotate` and `scale` stay free for the skin
+  static styles = `aufbau-toggle {
+    --toggle-size  : 1.25em;
+    --toggle-track : 2.25em;
+    --toggle-pad   : 0.15em;
 
-      --toggle-size  : 1.25em;
-      --toggle-track : 2.25em;
-      --toggle-pad   : 0.15em;
+    align-items : center;
+    cursor      : pointer;
+    display     : inline-flex;
+    gap         : var(--aufbau-control-gap, 0.5em);
+    position    : relative;
+    user-select : none;
+
+    > aufbau-icon { --icon-size: var(--toggle-size); flex: none; }
+    > span        { line-height: 1.2; }
+
+    &::before,
+    &::after { box-sizing: border-box; flex: none; }
+
+    /* switch: ::before is the track, ::after the thumb sliding in it */
+    &[look="switch"] {
+      --toggle-thumb: calc(var(--toggle-size) - 2 * var(--toggle-pad));
+
+      &::before {
+        block-size  : var(--toggle-size);
+        content     : '';
+        inline-size : var(--toggle-track);
+      }
+
+      &::after {
+        block-size         : var(--toggle-thumb);
+        content            : '';
+        inline-size        : var(--toggle-thumb);
+        inset-block-start  : calc(50% - var(--toggle-thumb) / 2);
+        inset-inline-start : var(--toggle-pad);
+        position           : absolute;
+        transition         : translate 0.15s ease;
+      }
+
+      &[checked]::after { translate: calc(var(--toggle-track) - var(--toggle-size)) 0; }
     }
 
-    aufbau-toggle .toggle-control {
-      display: inline-flex;
-      align-items: center;
-      flex: none;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      cursor: inherit;
+    /* checkbox: ::before is the box, ::after the mark inside it */
+    &[look="checkbox"] {
+      --toggle-mark: calc(var(--toggle-size) * 0.55);
+
+      &::before {
+        block-size  : var(--toggle-size);
+        content     : '';
+        inline-size : var(--toggle-size);
+      }
+
+      &::after {
+        block-size         : var(--toggle-mark);
+        content            : '';
+        inline-size        : var(--toggle-mark);
+        inset-block-start  : calc(50% - var(--toggle-mark) / 2);
+        inset-inline-start : calc((var(--toggle-size) - var(--toggle-mark)) / 2);
+        position           : absolute;
+      }
     }
 
-    aufbau-toggle .toggle-thumb {
-      display: block;
-      flex: none;
+    /* button: the host is a pill that reads as pressed */
+    &[look="button"] {
+      block-size      : calc(var(--toggle-size) * 1.2);
+      justify-content : center;
+      min-inline-size : calc(var(--toggle-track) * 1.1);
+      padding-inline  : 0.6em;
     }
 
-    /* switch: a track the thumb slides in */
-    aufbau-toggle .toggle-switch {
-      inline-size: var(--toggle-track);
-      block-size: var(--toggle-size);
-      padding: var(--toggle-pad);
-      justify-content: flex-start;
-    }
-
-    aufbau-toggle .toggle-switch .toggle-thumb {
-      inline-size: calc(var(--toggle-size) - 2 * var(--toggle-pad));
-      block-size: calc(var(--toggle-size) - 2 * var(--toggle-pad));
-      transition: translate 0.15s ease;
-    }
-
-    aufbau-toggle .toggle-switch.is-active .toggle-thumb {
-      translate: calc(var(--toggle-track) - var(--toggle-size)) 0;
-    }
-
-    /* checkbox: a square box, the thumb is the mark inside it */
-    aufbau-toggle .toggle-checkbox {
-      inline-size: var(--toggle-size);
-      block-size: var(--toggle-size);
-      justify-content: center;
-    }
-
-    aufbau-toggle .toggle-checkbox .toggle-thumb {
-      inline-size: calc(var(--toggle-size) * 0.55);
-      block-size: calc(var(--toggle-size) * 0.55);
-    }
-
-    /* button: a pill that reads as pressed */
-    aufbau-toggle .toggle-button {
-      min-inline-size: calc(var(--toggle-track) * 1.1);
-      block-size: calc(var(--toggle-size) * 1.2);
-      padding-inline: 0.6em;
-      justify-content: center;
-    }
-
-    aufbau-toggle .toggle-button .toggle-thumb { display: none; }
-
-    aufbau-toggle .toggle-icon {
-      --icon-size: var(--toggle-size);
-      flex: none;
-    }
-
-    aufbau-toggle .toggle-label { line-height: 1.2; }
-  `;
-
-  // stable per-instance id so the visible label can name the inner switch
-  get labelId () { return this._labelId ??= `aufbau-toggle-label-${++toggleUID}`; }
+    /* an icon replaces the drawn track or box */
+    &:is([icon], [icon-checked])::before,
+    &:is([icon], [icon-checked])::after { content: none; }
+  }`;
 
   get checked ()     { return this.getAttr('checked'); }
   set checked (next) { this.setChecked(Boolean(next), { notify: false }); }
@@ -123,9 +122,18 @@ export default class AufbauToggle extends AufbauControl {
   }
 
   onMount () {
-    // the inner <button> already turns space and enter into a click,
-    // a keydown handler here would toggle twice
+
     this.on('click', () => this.toggle());
+
+    // native timing does not apply, there is no inner button any more:
+    // space toggles every look, enter only the button look, like a native button
+    this.on('keydown', (event) => {
+      if (event.target !== this) return;
+      if (event.key === ' ' || (event.key === 'Enter' && this.getAttr('look') === 'button')) {
+        event.preventDefault();
+        this.toggle();
+      }
+    });
   }
 
   toggle () { return this.setChecked(!this.checked); }
@@ -144,42 +152,35 @@ export default class AufbauToggle extends AufbauControl {
   formStateRestoreCallback (state) { this.setChecked(state != null, { notify: false }); }
 
   render () {
-    const { icon, iconChecked, label, look } = this.getAttr();
-    const withIcon = Boolean(icon || iconChecked);
+    const { icon, iconChecked, label } = this.getAttr();
 
-    // the switch has no text of its own, so the visible label names it via
-    // aria-labelledby. without this the control was announced with no name
+    // the label is the content of the control, so it names it without any aria wiring
     return html`
-      <button type="button" class="toggle-control toggle-${look}"
-              role="${look === 'checkbox' ? 'checkbox' : 'switch'}"
-              aria-checked="false" tabindex="0"
-              ${attrs({ 'aria-labelledby': label ? this.labelId : null })}>
-        ${withIcon ? html`<aufbau-icon class="toggle-icon"></aufbau-icon>`
-                   : html`<span class="toggle-thumb"></span>`}
-      </button>
-      ${label && html`<span class="toggle-label" id="${this.labelId}">${label}</span>`}
+      ${(icon || iconChecked) && html`<aufbau-icon></aufbau-icon>`}
+      ${label && html`<span>${label}</span>`}
     `;
   }
 
   sync () {
     super.sync();
 
-    const { checked, icon, iconChecked, indeterminate, label } = this.getAttr();
-    const control = this.$('.toggle-control');
-    if (!control) return;
+    const { checked, icon, iconChecked, indeterminate, label, look } = this.getAttr();
+    const internals = this.internals;
 
-    // the visible label already names the switch via aria-labelledby, so drop
-    // the duplicate name super.sync() put on the host — one control, one name
-    if (label && this._internals) this._internals.ariaLabel = null;
+    // super.sync() drops the tabindex for inner focusables, here the host is the focus stop
+    this.tabIndex = this.isDisabled ? -1 : 0;
 
-    control.setAttribute('aria-checked', indeterminate ? 'mixed' : String(checked));
-    control.classList.toggle('is-active', checked);
-    control.classList.toggle('is-indeterminate', indeterminate);
-    this.classList.toggle('is-checked', checked);
+    if (internals) {
+      internals.role        = ROLES[look];
+      internals.ariaChecked = look === 'button' ? null : (indeterminate ? 'mixed' : String(checked));
+      internals.ariaPressed = look === 'button' ? String(checked) : null;
+      // the visible label already names the control, one control, one name
+      if (label) internals.ariaLabel = null;
+    }
 
     // one of the two may be missing, fall back to whichever was given
-    const iconEl = this.$('.toggle-icon');
-    if (iconEl) iconEl.setAttribute('icon', (checked ? iconChecked || icon : icon || iconChecked) ?? '');
+    const iconElement = this.$(':scope > aufbau-icon');
+    if (iconElement) iconElement.setAttribute('icon', (checked ? iconChecked || icon : icon || iconChecked) ?? '');
   }
 }
 

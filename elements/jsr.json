@@ -6,6 +6,7 @@
     "./AufbauAudio"    : "./AufbauAudio.js",
     "./AufbauButton"   : "./AufbauButton.js",
     "./AufbauCode"     : "./AufbauCode.js",
+    "./AufbauCrumbs"   : "./AufbauCrumbs.js",
     "./AufbauDatalist" : "./AufbauDatalist.js",
     "./AufbauDropdown" : "./AufbauDropdown.js",
     "./AufbauFilter"   : "./AufbauFilter.js",
@@ -16,10 +17,12 @@
     "./AufbauItem"     : "./AufbauItem.js",
     "./AufbauKeyboard" : "./AufbauKeyboard.js",
     "./AufbauLoop"     : "./AufbauLoop.js",
+    "./AufbauModal"    : "./AufbauModal.js",
     "./AufbauOption"   : "./AufbauOption.js",
     "./AufbauPicker"   : "./AufbauPicker.js",
     "./AufbauProgress" : "./AufbauProgress.js",
     "./AufbauReader"   : "./AufbauReader.js",
+    "./AufbauSkeleton" : "./AufbauSkeleton.js",
     "./AufbauSlider"   : "./AufbauSlider.js",
     "./AufbauSplash"   : "./AufbauSplash.js",
     "./AufbauTable"    : "./AufbauTable.js",
@@ -32,7 +35,8 @@
     "./AufbauValue"    : "./AufbauValue.js",
     "./AufbauVideo"    : "./AufbauVideo.js",
     "./AufbauWaveform" : "./AufbauWaveform.js",
-    "./AufbauWriter"   : "./AufbauWriter.js"
+    "./AufbauWriter"   : "./AufbauWriter.js",
+    "./htx"            : "./adapters/htx.js"
   },
   "publish": {
     "include": [
@@ -40,6 +44,7 @@
       "jsr.json",
       "Aufbau*.js",
       "core/*.js",
+      "adapters/*.js",
       "README.md",
       "LICENSE"
     ]

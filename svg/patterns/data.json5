@@ -41,11 +41,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "checks",
@@ -76,11 +72,7 @@
         "step": 1,
         "bake": true
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "chevron",
@@ -120,11 +112,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "crosses",
@@ -164,11 +152,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "crosshatch",
@@ -208,11 +192,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "diagonal",
@@ -252,11 +232,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "diamonds",
@@ -287,11 +263,7 @@
         "step": 1,
         "bake": true
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "dots",
@@ -330,11 +302,7 @@
         "step": 1,
         "bake": true
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "grid",
@@ -374,11 +342,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "rings",
@@ -418,11 +382,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "squares",
@@ -462,11 +422,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "stripes",
@@ -506,11 +462,7 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "triangles",
@@ -541,11 +493,7 @@
         "step": 1,
         "bake": true
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   },
   {
     "id": "waves",
@@ -585,10 +533,6 @@
         "bake": true,
         "unit": "px"
       }
-    },
-    "modes": [
-      "datauri",
-      "defs"
-    ]
+    }
   }
 ]

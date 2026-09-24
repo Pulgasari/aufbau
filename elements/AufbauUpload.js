@@ -2,8 +2,8 @@
 // file intake. `accept` rather than `mimetype`, because the native attribute is
 // a superset: it takes mimetypes ("image/*") as well as extensions (".pdf").
 
-import { AufbauControl } from './core/index.js';
-import { attrs, html } from './core/html.js';
+import { AufbauControl }  from './core/index.js';
+import { attrs, html }    from './core/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 
@@ -24,6 +24,8 @@ const matches = (file, accept) => {
 };
 
 export default class AufbauUpload extends AufbauControl {
+  static reflect = ['look'];
+
   static attr = {
     accept    : String,
     directory : Boolean,
@@ -33,80 +35,87 @@ export default class AufbauUpload extends AufbauControl {
     text      : 'drop files here or click to browse',
   };
 
+  // the ui lives in the shadow root: the hidden native file input, a <button> as
+  // drop zone and file dialog trigger, and the list of picked files. children are
+  // the zone's text and are projected. parts: zone, icon, text, list, file, name,
+  // size, remove. state: :state(dragging), :state(filled)
+  static shadow = true;
+
   static styles = `
-    aufbau-upload { display: block; }
-
-    aufbau-upload .aufbau-upload-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: var(--aufbau-control-gap, 0.5em);
+    :host {
+      display        : flex;
+      flex-direction : column;
+      gap            : var(--aufbau-control-gap, 0.5em);
     }
 
-    aufbau-upload .upload-zone {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: var(--aufbau-control-gap, 0.5em);
-      padding: 1.5em 1em;
-      text-align: center;
-      cursor: pointer;
+    [part~="zone"] {
+      align-items     : center;
+      background      : none;
+      color           : inherit;
+      cursor          : pointer;
+      display         : flex;
+      flex-direction  : column;
+      font            : inherit;
+      gap             : var(--aufbau-control-gap, 0.5em);
+      justify-content : center;
+      margin          : 0;
+      padding         : 1.5em 1em;
+      text-align      : center;
+
+      > aufbau-icon { --icon-size: 1.75em; }
     }
 
-    aufbau-upload .look-button .upload-zone {
-      flex-direction: row;
-      padding: var(--aufbau-control-pad, 0.35em 0.55em);
+    :host([look="button"]) [part~="zone"] {
+      flex-direction : row;
+      padding        : var(--aufbau-control-pad, 0.35em 0.55em);
     }
 
-    aufbau-upload .look-list .upload-zone { display: none; }
+    :host([look="list"]) [part~="zone"] { display: none; }
 
-    aufbau-upload .upload-icon { --icon-size: 1.75em; flex: none; }
-
-    aufbau-upload .upload-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25em;
-      margin: 0;
-      padding: 0;
-      list-style: none;
+    [part~="list"] {
+      display        : flex;
+      flex-direction : column;
+      gap            : 0.25em;
+      list-style     : none;
+      margin         : 0;
+      padding        : 0;
     }
 
-    aufbau-upload .upload-item {
-      display: flex;
-      align-items: center;
-      gap: var(--aufbau-control-gap, 0.5em);
+    [part~="file"] {
+      align-items : center;
+      display     : flex;
+      gap         : var(--aufbau-control-gap, 0.5em);
     }
 
-    aufbau-upload .upload-name {
-      flex: 1 1 auto;
-      min-inline-size: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    [part~="name"] {
+      flex            : 1 1 auto;
+      min-inline-size : 0;
+      overflow        : hidden;
+      text-overflow   : ellipsis;
+      white-space     : nowrap;
     }
 
-    aufbau-upload .upload-size {
-      flex: none;
-      opacity: 0.65;
-      font-variant-numeric: tabular-nums;
+    [part~="size"] {
+      flex                 : none;
+      font-size            : inherit;
+      font-variant-numeric : tabular-nums;
+      opacity              : 0.65;
     }
 
-    aufbau-upload .upload-remove {
-      display: inline-flex;
-      align-items: center;
-      flex: none;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      cursor: pointer;
+    [part~="remove"] {
+      align-items : center;
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      flex        : none;
+      font        : inherit;
+      margin      : 0;
+      padding     : 0;
     }
   `;
 
-  // keeps authored children (a custom label, hints) alive across repaints
-  get renderTarget () { return this.shell('aufbau-upload-ui'); }
 
   get files () { return this._files ??= []; }
 
@@ -123,28 +132,26 @@ export default class AufbauUpload extends AufbauControl {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onMount () {
-    this.on('change', '.upload-field', (event, input) => this.add([...input.files]));
-    this.on('click',  '.upload-zone',  () => { if (!this.isDisabled) this.$('.upload-field')?.click(); });
-    this.on('click',  '[data-remove]', (event, button) => {
-      event.stopPropagation();
-      this.remove(Number(button.dataset.remove));
+    this.on('change', 'input[type="file"]', (event, input) => this.add([...input.files]));
+    this.on('click',  '[part~="zone"]',     () => { if (!this.isDisabled) this.field?.click(); });
+    this.on('click',  '[data-remove]',   (event, button) => this.remove(Number(button.dataset.remove)));
+
+    this.on('dragenter dragover', (event) => {
+      if (this.isDisabled) return;
+      event.preventDefault();
+      this.states.toggle('dragging', true);
     });
 
-    for (const type of ['dragenter', 'dragover']) {
-      this.on(type, (event) => {
-        if (this.isDisabled) return;
-        event.preventDefault();
-        this.classList.add('is-dragging');
-      });
-    }
+    // dragleave also fires when the pointer moves onto a child, only leaving the host counts
+    this.on('dragleave', (event) => {
+      if (!this.contains(event.relatedTarget)) this.states.toggle('dragging', false);
+    });
 
-    for (const type of ['dragleave', 'drop']) {
-      this.on(type, (event) => {
-        event.preventDefault();
-        this.classList.remove('is-dragging');
-        if (type === 'drop' && !this.isDisabled) this.add([...(event.dataTransfer?.files ?? [])]);
-      });
-    }
+    this.on('drop', (event) => {
+      event.preventDefault();
+      this.states.toggle('dragging', false);
+      if (!this.isDisabled) this.add([...(event.dataTransfer?.files ?? [])]);
+    });
   }
 
   // :::::: FILES :::::::::::::::::::::::::::::::::::::::::::::::
@@ -189,10 +196,10 @@ export default class AufbauUpload extends AufbauControl {
   formResetCallback () { this._files = []; this._rejected = []; this.invalidate().update(); }
 
   validate () {
-    const internals = this._internals;
+    const internals = this.internals;
     if (!internals) return this;
 
-    const anchor = this.$('.upload-zone') ?? this;
+    const anchor = this.$('[part~="zone"]') ?? this;
 
     if (this._rejected?.length) internals.setValidity({ typeMismatch: true }, 'one or more files were rejected.', anchor);
     else if (this.getAttr('required') && !this.files.length) {
@@ -206,41 +213,34 @@ export default class AufbauUpload extends AufbauControl {
   // :::::: RENDER ::::::::::::::::::::::::::::::::::::::::::::::
 
   render () {
-    const { accept, directory, look, multiple, text } = this.getAttr();
+    const { accept, directory, multiple, text } = this.getAttr();
 
+    // the children replace the default text of the drop zone
     return html`
-      <div class="aufbau-upload-wrapper look-${look}">
-        <input class="upload-field" type="file" hidden ${attrs({
-          accept,
-          multiple,
-          webkitdirectory : directory,
-        })} />
-
-        <div class="upload-zone" role="button" tabindex="0">
-          <aufbau-icon icon="lucide:upload" class="upload-icon"></aufbau-icon>
-          <span class="upload-text">${text}</span>
-        </div>
-
-        ${this.files.length > 0 && html`
-          <ul class="upload-list">
-            ${this.files.map((file, index) => html`
-              <li class="upload-item">
-                <span class="upload-name">${file.name}</span>
-                <span class="upload-size">${formatSize(file.size)}</span>
-                <button type="button" class="upload-remove" data-remove="${index}" aria-label="remove ${file.name}">
-                  <aufbau-icon icon="lucide:x"></aufbau-icon>
-                </button>
-              </li>
-            `)}
-          </ul>
-        `}
-      </div>
+      <input type="file" hidden ${attrs({ accept, multiple, webkitdirectory: directory })} />
+      <button type="button" part="zone">
+        <aufbau-icon part="icon" icon="lucide:upload"></aufbau-icon>
+        <span part="text"><slot>${text}</slot></span>
+      </button>
+      ${this.files.length > 0 && html`
+        <ul part="list">
+          ${this.files.map((file, index) => html`
+            <li part="file">
+              <span part="name">${file.name}</span>
+              <small part="size">${formatSize(file.size)}</small>
+              <button type="button" part="remove" data-remove="${index}" aria-label="remove ${file.name}">
+                <aufbau-icon icon="lucide:x"></aufbau-icon>
+              </button>
+            </li>
+          `)}
+        </ul>
+      `}
     `;
   }
 
   sync () {
     super.sync();
-    this.classList.toggle('has-files', this.files.length > 0);
+    this.states.toggle('filled', this.files.length > 0);
   }
 }
 

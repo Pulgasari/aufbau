@@ -1,0 +1,7 @@
+{
+  "name": "@aufbau/api",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./index.js"
+  }
+}

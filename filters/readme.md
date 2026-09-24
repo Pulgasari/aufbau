@@ -59,28 +59,39 @@ downsampling (`image-rendering`/canvas) and mirror is a geometry transform
 
 ## the dom api
 
-```javascript
-import { applyFilter, removeFilter, list } from '@aufbau/filters';
-
-applyFilter('#logo', 'glitch-rgb', { offsetX: 6 });
-removeFilter('#logo');
-
-list(); // [{ id, name, vars }, …] — used by preview pages and tooling
-```
-
-`applyFilter` injects the `<filter>` once into a shared hidden host and sets
-`filter: url(#aufbau-filter-<id>)`, writing any passed options as inherited custom
-properties. `ensureFilter(id)` does just the injection (no target), and
-`useFilter(id, options)` binds one filter into a small handle:
+the contract is shared with `@aufbau/patterns` and `@aufbau/webfonts`:
 
 ```javascript
-import { useFilter } from '@aufbau/filters';
+import { apply, remove, update, use, list } from '@aufbau/filters';
 
-const glitch = useFilter('glitch-rgb', { offsetX: 6 });
-glitch.ensure();          // inject defs
-glitch.apply('#logo');    // apply to targets
-glitch.css;               // "filter: url(#aufbau-filter-glitch-rgb);"
+await apply('#logo', 'glitch-rgb', { offsetX: 6 });
+await update('#logo', { offsetX: 12 });   // the filter already on #logo, new options
+remove('#logo');
+
+list();   // [{ id, name, vars, backends }, …], also as `data`
 ```
+
+on an element a filter is the native css function when it has one, otherwise its
+`<filter>` is injected once into a shared hidden host and referenced by
+`filter: url(#aufbau-filter-<id>)`, the live options written as custom properties.
+`backend: 'css' | 'svg'` forces one. canvas and webgl only filters throw here,
+they need a `<canvas>` (see below).
+
+`use(id, options)` gives a `Filter`, one filter bound to its options:
+
+```javascript
+const glitch = use('glitch-rgb', { offsetX: 6 });
+
+glitch.backends;            // { css, svg, canvas, webgl }
+await glitch.css();         // native filter function, or null
+await glitch.svg();         // <filter> markup
+await glitch.ensure();      // injects the <filter>, returns its id
+await glitch.apply('#logo');
+await glitch.canvas(canvasElement);
+```
+
+`applyFilter`, `removeFilter`, `updateFilter`, `useFilter`, `ensureFilter`,
+`filterCss`, `filterSvg`, `filterCanvas` and `filterWebgl` stay as named aliases.
 
 ## backends
 

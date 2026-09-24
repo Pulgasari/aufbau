@@ -10,15 +10,27 @@
 // selecting an item bubbles `aufbau-tree-select` and toggling a folder bubbles
 // `aufbau-tree-toggle`; both carry the item's `value` so callers can map the
 // event back onto their own data.
+//
+// the tree owns interaction for all of its items: clicks on a row, and the
+// keyboard pattern of a wai-aria tree view with one roving tab stop.
 
 import { AufbauElement } from './core/index.js';
 import { importFile }    from '@aufbau/import';
 import { attrs, html }   from './core/html.js';
 
+const ITEM = 'aufbau-tree-item';
+
 export default class AufbauTree extends AufbauElement {
+  static internals = { role: 'tree' };
+
+  static skeleton = { lines: 6, line: '1.1em', gap: '0.45em', width: '100%' };
+
   static attr = {
-    src : String
+    src : String,
   };
+
+  static styles = `aufbau-tree { display: block; }`;
+
 
   // in-memory data — bypasses `src` and hand-authored markup
   set nodes (value) {
@@ -28,43 +40,116 @@ export default class AufbauTree extends AufbauElement {
   }
   get nodes () { return this._data; }
 
+  /** every item not hidden inside a collapsed ancestor, in document order */
+  get visibleItems () {
+    return [...this.querySelectorAll(ITEM)].filter(item => !item.parentElement.closest(`${ITEM}:not([expanded])`));
+  }
+
+  onMount () {
+    // the row lives in the item's shadow root, the click arrives retargeted to the
+    // innermost item. only a click on that item's own row counts
+    this.on('click', ITEM, (event, item) => {
+      if (!event.composedPath().includes(item.row)) return;
+      item.toggle();
+      item.select();
+      item.focus();
+    });
+
+    this.on('keydown', (event) => this.onKeydown(event));
+
+    // items added or removed later (hand authored or by the host app) change the
+    // folder state of their parent. one observer for the whole tree, not one per item
+    const observer = new MutationObserver(records => {
+      for (const record of records) {
+        if (record.target.localName === ITEM) record.target.update();
+      }
+      this.syncFocus();
+    });
+    observer.observe(this, { childList: true, subtree: true });
+    this.track(() => observer.disconnect());
+  }
+
   async update () {
     const { src } = this.getAttr();
 
-    // reload whenever src actually changes, not just once (skipped once `nodes`
-    // has supplied in-memory data)
+    // reload whenever src actually changes (skipped once `nodes` supplied in-memory data)
     if (src && src !== this._loadedSrc && this._data == null) {
       this._loadedSrc = src;
+      this.setSkeleton(true);
       try {
         this._data = await importFile(src);
-      } catch (err) {
-        console.warn(`[aufbau-tree] failed to import tree data from "${src}":`, err);
+      } catch (error) {
+        console.warn(`[aufbau-tree] failed to import tree data from "${src}":`, error);
         this._data = null;
       }
+      this.setSkeleton(false);
     }
 
-    // nothing to render from — the markup is authored by hand, leave it alone
-    if (this._data == null) return;
-
-    super.update();
+    return super.update();
   }
 
-  render () {
-    return this.renderNodes(this._data);
-  }
+  // null leaves hand authored items alone
+  render () { return this._data == null ? null : this.renderNodes(this._data); }
 
   renderNodes (nodes) {
     if (!Array.isArray(nodes)) return html``;
 
     return html`${nodes.map(node => html`
       <aufbau-tree-item ${attrs({
-        label    : node.label ?? node.name ?? '',
+        expanded : Boolean(node.expanded),
         icon     : node.icon,
+        label    : node.label ?? node.name ?? '',
+        selected : Boolean(node.selected),
         value    : node.value ?? node.id ?? node.path,
-        expanded : !!node.expanded,
-        selected : !!node.selected,
       })}>${this.renderNodes(node.children)}</aufbau-tree-item>
     `)}`;
+  }
+
+  sync () { this.syncFocus(); }
+
+  // roving tabindex: the selected visible item is the one tab stop, the first one otherwise
+  syncFocus () {
+    const visible = this.visibleItems;
+    const stop    = visible.find(item => item.hasAttribute('selected')) ?? visible[0];
+    for (const item of this.querySelectorAll(ITEM)) item.tabIndex = item === stop ? 0 : -1;
+  }
+
+  onKeydown (event) {
+    const item = event.target.closest?.(ITEM);
+    if (!item || !this.contains(item)) return;
+
+    const visible = this.visibleItems;
+    const index   = visible.indexOf(item);
+    const move    = target => { if (target) { event.preventDefault(); target.focus(); } };
+
+    switch (event.key) {
+      case 'ArrowDown' : return move(visible[index + 1]);
+      case 'ArrowUp'   : return move(visible[index - 1]);
+      case 'Home'      : return move(visible[0]);
+      case 'End'       : return move(visible.at(-1));
+
+      // right opens a closed folder, on an open one it steps to the first child
+      case 'ArrowRight':
+        if (!item.hasChildren) return;
+        event.preventDefault();
+        if (!item.getAttr('expanded')) item.expand();
+        else item.items[0]?.focus();
+        return;
+
+      // left closes an open folder, otherwise it steps up to the parent
+      case 'ArrowLeft':
+        event.preventDefault();
+        if (item.hasChildren && item.getAttr('expanded')) item.collapse();
+        else item.parentElement.closest(ITEM)?.focus();
+        return;
+
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        item.select();
+        if (event.key === 'Enter') item.toggle();
+        return;
+    }
   }
 }
 

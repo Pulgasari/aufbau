@@ -1,16 +1,19 @@
-// @aufbau/webfonts/index.js
+// @aufbau/webfonts
+// the handpicked font collection (./data.js). a font is loaded through the
+// FontFace api and applied as a custom property, so css decides where it goes.
+//
+//   await apply('manrope');                              // --aufbau-font on :root
+//   await apply('.code', 'jetbrains-mono');              // mono fonts default to --aufbau-font-mono
+//   await apply(document.body, 'lexend', { role: 'heading' });
+//   await update(':root', { fallback: 'system-ui' });
+//   remove(':root', { role: 'heading' });
+//
+// the target may be left out, it is the root element then. `role` is a key of
+// ROLES or any custom property name.
 
-// :::::: IMPORTS
+import { fonts } from './data.js';
 
-import data, { fonts } from './data.js';
-import { isElement, isObject, isString } from '@pulgasari/is';
-
-// :::::: META
-
-const baseFontUrl = 'https://code.pulgasari.dev/aufbau/webfonts';
-const loadedFonts = new Set();
-
-const VARS = {
+export const ROLES = {
   body    : '--aufbau-font',
   code    : '--aufbau-font-mono',
   heading : '--aufbau-font-heading',
@@ -19,139 +22,122 @@ const VARS = {
   serif   : '--aufbau-font-serif',
 };
 
-// :::::: HELPERS
+const settings = { baseUrl: 'https://code.pulgasari.dev/aufbau/webfonts' };
 
-const isScopeValue = (val) => {
-  if (!val) return false;
-  if (isElement(val)) return true;
-  if (isString(val)) {
-    if (val.startsWith('--') || val in VARS) return false;
-    if (val.startsWith('#')  || val.startsWith('.') || val.startsWith('[') || val.startsWith(':')) return true;
-    try   { return document.querySelector(val) !== null; }
-    catch { return false; }
-  }
-  return false;
-};
+const applied = new WeakMap;   // element -> Map(property -> { id, options })
+const loading = new Map;       // id -> promise of the load result
 
-const normalizeApplyInput = (input) => {
-  if (!input) return {};
+const propertyOf = role => role.startsWith('--') ? role : ROLES[role] ?? `--aufbau-font-${role}`;
 
-  // Single options object format with flexible aliases
-  if (isObject(input)) {
-    return {
-      name   : input.name   || input.id      || input.font,
-      target : input.target || input.var     || input.category,
-      scope  : input.scope  || input.element || input.el,
-    };
-  }
+function toElements (target) {
+  if (target == null)             return [document.documentElement];
+  if (typeof target === 'string') return [...document.querySelectorAll(target)];
+  if (target instanceof Element)  return [target];
+  if (target?.[Symbol.iterator])  return [...target].filter(element => element instanceof Element);
+  return [];
+}
 
-  // String shorthand format: apply('Manrope')
-  if (isString(input)) return { name: input };
+/** finds a font by id or name */
+export const find = key => key ? fonts.find(font => font.id === key || font.name === key) ?? null : null;
 
-  return {};
-};
+// :::::: FONT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-const resolveCssVar = (target = 'body') => {
-  if (target.startsWith('--')) return target;
-  const key = target.toLowerCase();
-  return VARS[key] || `--aufbau-font-${key}`;
-};
-
-const resolveScope = (scope) => {
-  if (isElement (scope)) return scope;
-  if (isString  (scope)) return document.querySelector(scope) || document.documentElement;
-  return document.documentElement;
-};
-
-// :::::: API
-
-// find font entry in catalog by ID or Name
-const findFont = (id) => id ? fonts.find(f => f.id === id || f.name === id) : null;
-
-// load a single font entry from catalog using FontFace API
-const load = async (identifier) => {
-  const fontData = findFont(identifier);
-  if (!fontData) {
-    console.warn(`[@aufbau/webfonts] Font "${identifier}" not found in catalog.`);
-    return null;
+export class Font {
+  constructor (id, options = {}) {
+    this.meta = find(id);
+    if (!this.meta) throw new Error(`[@aufbau/webfonts] unknown font "${id}"`);
+    this.id      = this.meta.id;
+    this.options = options;
   }
 
-  // Prevent redundant network requests
-  if (loadedFonts.has(fontData.id)) return true;
+  get role () { return this.options.role ?? (this.meta.category === 'mono' ? 'mono' : 'body'); }
 
-  const loadedFaces = await Promise.all(
-    fontData.faces.map(async (face) => {
-      // face.file is a repo-relative path (downloaded fonts) or an absolute url
-      // (generator run with --remote), used as-is in that case
-      const fullUrl = /^https?:\/\//.test(face.file) ? face.file : `${baseFontUrl}/${face.file}`;
-      const descriptors = {
-        style   : face.style || 'normal',
-        weight  : String(face.weight || '400'),
-        display : face.display || 'swap',
-      };
+  /** the font-family value, the font plus its fallback */
+  family (options) {
+    const fallback = { ...this.options, ...options }.fallback ?? this.meta.fallback ?? 'sans-serif';
+    return `'${this.meta.name}', ${fallback}`;
+  }
 
+  /** registers every face with document.fonts once. resolves false when none loaded */
+  load () {
+    if (!loading.has(this.id)) loading.set(this.id, Promise.all(this.meta.faces.map(async face => {
+      const url = /^https?:\/\//.test(face.file) ? face.file : `${settings.baseUrl}/${face.file}`;
       try {
-        const fontFace = new FontFace(fontData.name, `url(${fullUrl})`, descriptors);
-        const loaded   = await fontFace.load();
+        const loaded = await new FontFace(this.meta.name, `url(${url})`, { display: face.display ?? 'swap', style: face.style ?? 'normal', weight: String(face.weight ?? 400) }).load();
         document.fonts.add(loaded);
-        return loaded;
-      } catch (err) {
-        console.error(`[@aufbau/webfonts] Failed to load face for ${fontData.name}:`, err);
-        return null;
+        return true;
+      } catch (error) {
+        console.warn(`[@aufbau/webfonts] failed to load a face of "${this.meta.name}":`, error);
+        return false;
       }
-    })
-  );
+    })).then(results => results.some(Boolean)));
 
-  const success = loadedFaces.some(Boolean);
-  if (success) loadedFonts.add(fontData.id);
-  return success;
-};
+    return loading.get(this.id);
+  }
 
-const apply = (fontInput) => {
-  const { name, target, scope } = normalizeApplyInput(fontInput);
-  if (!name) return;
+  // the property is set even when loading failed, the fallback takes over then
+  async apply (target, options) {
+    const merged   = { ...this.options, ...options };
+    const property = propertyOf(merged.role ?? this.role);
+    await this.load();
 
-  const font       = findFont(name);
-  const familyName = font ? font.name : name;
-  const fallback   = font?.fallback ? `, ${font.fallback}` : ', sans-serif';
-  const targetEl   = resolveScope(scope);
-  const cssVar     = resolveCssVar(target);
+    for (const element of toElements(target)) {
+      element.style.setProperty(property, this.family(merged));
+      if (!applied.has(element)) applied.set(element, new Map);
+      applied.get(element).set(property, { id: this.id, options: merged });
+    }
+    return this;
+  }
 
-  targetEl.style.setProperty(cssVar, `'${familyName}'${fallback}`);
-};
+  remove (target, options) { remove(target, { role: this.role, ...options }); return this; }
+}
 
-const init = async (config) => {
+// :::::: API :::::::::::::::::::::::::::::::::::::::::::::::::::
+
+export const data = fonts;
+export const list = () => fonts.map(({ category, id, name }) => ({ category, id, name }));
+
+export const configure = ({ baseUrl } = {}) => { if (baseUrl) settings.baseUrl = baseUrl.replace(/\/$/, ''); };
+
+export const use  = (id, options) => new Font(id, options);
+export const load = id => use(id).load();
+
+/** apply(target, id, options), or apply(id, options) for the root element */
+export const apply = (target, id, options) =>
+  typeof id === 'string' ? use(id).apply(target, options) : use(target).apply(null, id);
+
+/** changes the options of the fonts already on the targets, `role` narrows it to one */
+export async function update (target, options = {}) {
+  const only = options.role && propertyOf(options.role);
+  const jobs = [];
+  for (const element of toElements(target)) {
+    for (const [property, state] of applied.get(element) ?? []) {
+      if (!only || only === property) jobs.push(use(state.id).apply(element, { ...state.options, ...options, role: property }));
+    }
+  }
+  await Promise.all(jobs);
+}
+
+/** removes the fonts set on the targets, `role` narrows it to one */
+export function remove (target, { role } = {}) {
+  const only = role && propertyOf(role);
+  for (const element of toElements(target)) {
+    const properties = applied.get(element);
+    for (const property of [...properties?.keys() ?? []]) {
+      if (only && only !== property) continue;
+      element.style.removeProperty(property);
+      properties.delete(property);
+    }
+  }
+}
+
+/** loads and applies a list of fonts to the root: ['manrope', { id: 'lexend', role: 'heading' }] */
+export async function init (config) {
   if (!config) return;
-  const items = Array.isArray(config) ? config : [config];
+  const items = (Array.isArray(config) ? config : [config]).map(item => typeof item === 'string' ? { id: item } : item);
+  await Promise.all(items.map(({ id, target, ...options }) => apply(target ?? null, id, options)));
+}
 
-  // Load all unique fonts in parallel
-  await Promise.all(
-    items.map(item => {
-      const id = isString(item) ? item : item.name || item.id || item.font;
-      return load(id);
-    })
-  );
+export { find as findFont, fonts };
 
-  // Apply CSS variables for each item
-  items.forEach(apply);
-};
-
-// :::::: EXPORTS
-
-export {
-  data,
-  fonts,
-  apply,
-  findFont,
-  init,
-  load,
-}; 
-
-export default {
-  data,
-  fonts,
-  apply,
-  findFont,
-  init,
-  load,
-};
+export default { apply, configure, data, find, fonts, init, list, load, remove, update, use, Font, ROLES };

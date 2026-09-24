@@ -45,3 +45,18 @@ export function decorateAll (list) {
 
 
 
+
+// :::::: TEXT ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/**
+ * strips the indentation all non-empty lines share, plus leading and trailing
+ * blank lines. source written inside indented html would otherwise turn every
+ * markdown paragraph into a code block and shift every line of code.
+ */
+export function dedent (text) {
+  const lines  = String(text ?? '').replace(/\t/g, '  ').split('\n');
+  const filled = lines.filter(line => line.trim());
+  const indent = Math.min(...filled.map(line => line.match(/^ */)[0].length));
+  const body   = Number.isFinite(indent) ? lines.map(line => line.slice(indent)) : lines;
+  return body.join('\n').replace(/^\s*\n/, '').trimEnd();
+}

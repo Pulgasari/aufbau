@@ -34,31 +34,41 @@
 
 /* ::: shared ::::::::::::::::::::::::::::::::::::::::::::::::::: */
 
-.aufbau-input-wrapper,
-.aufbau-writer-wrapper,
-.picker-field,
-.dropdown-trigger,
-.aufbau-btn,
-.toggle-button,
-.upload-zone {
+aufbau-input,
+aufbau-picker[look="combobox"],
+aufbau-picker[look="cycle"]::part(trigger),
+aufbau-writer,
+aufbau-dropdown::part(trigger),
+aufbau-button,
+aufbau-toggle[look="button"],
+aufbau-upload::part(zone) {
   border: var(--aufbau-control-border);
   border-radius: var(--aufbau-control-radius);
   padding: var(--aufbau-control-pad);
 }
 
-.is-disabled { opacity: 0.5; }
+:is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) { opacity: 0.5; }
 
-:is(aufbau-input, aufbau-picker, aufbau-writer):focus-within :is(.aufbau-input-wrapper, .picker-field, .aufbau-writer-wrapper) {
+:is(aufbau-input, aufbau-picker[look="combobox"], aufbau-writer):focus-within {
   outline: 2px solid var(--aufbau-control-focus);
   outline-offset: 1px;
 }
 
-:is(.aufbau-btn, .dropdown-trigger, .toggle-control, .picker-option, .input-step, .slider-step, .upload-remove, .copy-btn):focus-visible {
+/* ::part() cannot sit inside :is(), the shadow parts are listed on their own */
+:is(aufbau-button, aufbau-toggle, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible,
+aufbau-upload::part(zone):focus-visible,
+aufbau-upload::part(remove):focus-visible,
+aufbau-dropdown::part(trigger):focus-visible,
+aufbau-picker::part(option):focus-visible,
+aufbau-picker::part(trigger):focus-visible {
   outline: 2px solid var(--aufbau-control-focus);
   outline-offset: 1px;
 }
 
-:is(.aufbau-btn, .dropdown-trigger, .input-step, .slider-step, .upload-remove, .copy-btn):hover:not(:disabled) {
+:is(aufbau-button, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
+aufbau-upload::part(remove):hover,
+aufbau-dropdown::part(trigger):hover:not(:disabled),
+aufbau-picker::part(trigger):hover {
   background-color: var(--aufbau-control-hover);
 }
 
@@ -87,263 +97,326 @@ aufbau-button {
 }
 */
 
-.aufbau-btn { background-color: transparent; }
+aufbau-button {
+  background-color: transparent;
 
-.aufbau-btn.variant-primary {
-  background-color : var(--aufbau-accent);
-  border-color     : var(--aufbau-accent);
-  color            : var(--aufbau-surface);
+  &[variant="ghost"] { border-color: transparent; }
+
+  &[variant="primary"] {
+    background-color : var(--aufbau-accent);
+    border-color     : var(--aufbau-accent);
+    color            : var(--aufbau-surface);
+  }
 }
-
-.aufbau-btn.variant-ghost { border-color: transparent; }
 
 /* ::: input ::::::::::::::::::::::::::::::::::::::::::::::::::::: */
 
-.input-step {
-  border-radius: var(--aufbau-control-radius);
-  padding: 0.15em;
-}
+aufbau-input {
+  > button {
+    border-radius : var(--aufbau-control-radius);
+    padding       : 0.15em;
+  }
 
-.input-swatch {
-  border: var(--aufbau-control-border);
-  border-radius: calc(var(--aufbau-control-radius) * 0.6);
+  &[look="swatch"]::after {
+    border        : var(--aufbau-control-border);
+    border-radius : calc(var(--aufbau-control-radius) * 0.6);
+  }
 }
 
 /* ::: toggle :::::::::::::::::::::::::::::::::::::::::::::::::::: */
 
-.toggle-switch {
-  background-color: var(--aufbau-control-track);
-  border-radius: 999px;
-  transition: background-color 0.15s ease;
-}
+aufbau-toggle {
+  &[look="switch"] {
+    &::before {
+      background-color : var(--aufbau-control-track);
+      border-radius    : 999px;
+      transition       : background-color 0.15s ease;
+    }
 
-.toggle-switch.is-active { background-color: var(--aufbau-accent); }
+    &[checked]::before { background-color: var(--aufbau-accent); }
 
-.toggle-switch .toggle-thumb {
-  background-color: var(--aufbau-surface);
-  border: var(--aufbau-control-border);
-  border-radius: 999px;
-}
+    &::after {
+      background-color : var(--aufbau-surface);
+      border           : var(--aufbau-control-border);
+      border-radius    : 999px;
+    }
+  }
 
-.toggle-checkbox {
-  border: var(--aufbau-control-border);
-  border-radius: calc(var(--aufbau-control-radius) * 0.6);
-}
+  &[look="checkbox"] {
+    &::before {
+      border        : var(--aufbau-control-border);
+      border-radius : calc(var(--aufbau-control-radius) * 0.6);
+    }
 
-/* the mark is drawn as a rotated corner, so it needs no icon request */
-.toggle-checkbox .toggle-thumb {
-  border-inline-end: 2px solid var(--aufbau-accent);
-  border-block-end: 2px solid var(--aufbau-accent);
-  rotate: 45deg;
-  scale: 0;
-  translate: 0 -10%;
-  transition: scale 0.12s ease;
-}
+    /* the mark is drawn as a rotated corner, so it needs no icon request */
+    &::after {
+      border-block-end  : 2px solid var(--aufbau-accent);
+      border-inline-end : 2px solid var(--aufbau-accent);
+      rotate            : 45deg;
+      scale             : 0;
+      transition        : scale 0.12s ease;
+      translate         : 0 -10%;
+    }
 
-.toggle-checkbox.is-active .toggle-thumb { scale: 1; }
+    &[checked]::after { scale: 1; }
 
-.toggle-checkbox.is-indeterminate .toggle-thumb {
-  border-inline-end: 0;
-  rotate: 0deg;
-  scale: 1;
-  block-size: 2px;
-  translate: 0;
-}
+    &[indeterminate]::after {
+      block-size        : 2px;
+      border-inline-end : 0;
+      inset-block-start : calc(50% - 1px);
+      rotate            : 0deg;
+      scale             : 1;
+      translate         : 0;
+    }
+  }
 
-.toggle-button {
-  background-color: transparent;
-  transition: background-color 0.15s ease;
-}
+  &[look="button"] {
+    background-color : transparent;
+    transition       : background-color 0.15s ease;
 
-.toggle-button.is-active {
-  background-color: var(--aufbau-accent);
-  color: var(--aufbau-surface);
+    &[checked] {
+      background-color : var(--aufbau-accent);
+      color            : var(--aufbau-surface);
+    }
+  }
 }
 
 /* ::: picker :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* shadow parts: field, caret, listbox, option (+ selected), trigger, icon, label.
+   ::part() takes pseudo-classes and pseudo-elements, no attribute selectors, so the
+   selection arrives as the extra part token `selected` */
 
-.picker-list {
-  background-color: var(--aufbau-surface);
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
-  padding: 0.2em;
+aufbau-picker::part(option) {
+  border-radius : calc(var(--aufbau-control-radius) * 0.8);
+  padding       : var(--aufbau-control-pad);
 }
 
-.picker-option {
-  border-radius: calc(var(--aufbau-control-radius) * 0.8);
-  padding: var(--aufbau-control-pad);
+aufbau-picker::part(listbox) {
+  background-color : var(--aufbau-surface);
+  border           : var(--aufbau-control-border);
+  border-radius    : var(--aufbau-control-radius);
+  padding          : 0.2em;
 }
 
-.picker-list .picker-option:hover { background-color: var(--aufbau-control-hover); }
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option):hover { background-color: var(--aufbau-control-hover); }
 
-.picker-list .picker-option.is-selected {
-  background-color: var(--aufbau-accent);
-  color: var(--aufbau-surface);
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option selected) {
+  background-color : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
 }
 
-.picker-radio .picker-option { padding-inline: 0; }
+aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
 
-.picker-radio .picker-mark {
-  border: var(--aufbau-control-border);
-  border-radius: 999px;
-  transition: border-width 0.12s ease;
+aufbau-picker[look="radio"]::part(option)::before {
+  border        : var(--aufbau-control-border);
+  border-radius : 999px;
+  transition    : border-width 0.12s ease;
 }
 
-.picker-radio .picker-option.is-selected .picker-mark {
-  border-color: var(--aufbau-accent);
-  border-width: 0.28em;
+aufbau-picker[look="radio"][multiple]::part(option)::before { border-radius: calc(var(--aufbau-control-radius) * 0.4); }
+
+aufbau-picker[look="radio"]::part(option selected)::before {
+  border-color : var(--aufbau-accent);
+  border-width : 0.28em;
 }
 
-.picker-segments {
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
-  overflow: hidden;
+/* structural pseudo-classes are not allowed after ::part(), the divider between
+   segments is drawn by the element itself from --picker-divider */
+aufbau-picker[look="segments"] {
+  --picker-divider : var(--aufbau-control-border);
+
+  border        : var(--aufbau-control-border);
+  border-radius : var(--aufbau-control-radius);
+  overflow      : hidden;
 }
 
-.picker-segments .picker-option {
-  border-radius: 0;
-  border-inline-start: var(--aufbau-control-border);
-}
+aufbau-picker[look="segments"]::part(option)       { border-radius: 0; }
+aufbau-picker[look="segments"]::part(option):hover { background-color: var(--aufbau-control-hover); }
 
-.picker-segments .picker-option:first-child { border-inline-start: 0; }
-.picker-segments .picker-option:hover       { background-color: var(--aufbau-control-hover); }
-
-.picker-segments .picker-option.is-selected {
-  background-color: var(--aufbau-accent);
-  color: var(--aufbau-surface);
+aufbau-picker[look="segments"]::part(option selected) {
+  background-color : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
 }
 
 /* :::::: <aufbau-slider> :::::: */
 
-.slider-tracks::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 50%;
-  block-size: var(--slider-track-size);
-  translate: 0 -50%;
-  background-color: var(--aufbau-control-track);
-  border-radius: 999px;
-}
+aufbau-slider {
+  > div {
+    &::before { background-color: var(--aufbau-control-track); border-radius: 999px; }
+    &::after  { background-color: var(--aufbau-accent);        border-radius: 999px; }
 
-.slider-fill {
-  background-color: var(--aufbau-accent);
-  border-radius: 999px;
-}
+    > input {
+      &::-webkit-slider-runnable-track { background: none; }
+      &::-moz-range-track              { background: none; }
 
-.type-color .slider-fill { background-color: var(--slider-color, var(--aufbau-accent)); }
+      &::-webkit-slider-thumb {
+        appearance       : none;
+        background-color : var(--aufbau-surface);
+        block-size       : var(--slider-thumb-size);
+        border           : 2px solid var(--aufbau-accent);
+        border-radius    : 999px;
+        cursor           : grab;
+        inline-size      : var(--slider-thumb-size);
+      }
 
-.slider-track::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  inline-size: var(--slider-thumb-size);
-  block-size: var(--slider-thumb-size);
-  background-color: var(--aufbau-surface);
-  border: 2px solid var(--aufbau-accent);
-  border-radius: 999px;
-  cursor: grab;
-}
+      &::-moz-range-thumb {
+        background-color : var(--aufbau-surface);
+        block-size       : var(--slider-thumb-size);
+        border           : 2px solid var(--aufbau-accent);
+        border-radius    : 999px;
+        cursor           : grab;
+        inline-size      : var(--slider-thumb-size);
+      }
+    }
+  }
 
-.slider-track::-moz-range-thumb {
-  inline-size: var(--slider-thumb-size);
-  block-size: var(--slider-thumb-size);
-  background-color: var(--aufbau-surface);
-  border: 2px solid var(--aufbau-accent);
-  border-radius: 999px;
-  cursor: grab;
-}
+  &[type="color"] > div::after { background-color: var(--slider-color, var(--aufbau-accent)); }
 
-.slider-track::-webkit-slider-runnable-track { background: none; }
-.slider-track::-moz-range-track              { background: none; }
-
-.slider-number {
-  border-block-end: var(--aufbau-control-border);
-  padding-block-end: 0.1em;
+  > output > input {
+    border-block-end  : var(--aufbau-control-border);
+    padding-block-end : 0.1em;
+  }
 }
 
 /* :::::: <aufbau-dropdown> :::::: */
+/* shadow parts: trigger, icon, label, caret, menu. the entries are the author's children */
 
-.aufbau-dropdown-menu {
-  background-color: var(--aufbau-surface);
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
-  padding: 0.2em;
-  margin-block: 0.25em;
+aufbau-dropdown::part(menu) {
+  background-color : var(--aufbau-surface);
+  border           : var(--aufbau-control-border);
+  border-radius    : var(--aufbau-control-radius);
+  padding          : 0.2em;
 }
 
-.aufbau-dropdown-menu > * {
-  border-radius: calc(var(--aufbau-control-radius) * 0.8);
-  padding: var(--aufbau-control-pad);
-}
+aufbau-dropdown > * {
+  border-radius : calc(var(--aufbau-control-radius) * 0.8);
+  padding       : var(--aufbau-control-pad);
 
-.aufbau-dropdown-menu > *:hover { background-color: var(--aufbau-control-hover); }
+  &:hover { background-color: var(--aufbau-control-hover); }
+}
 
 /* ::: upload / writer ::::::::::::::::::::::::::::::::::::::::::: */
 
-.upload-zone {
-  border-style: dashed;
-  background-color: var(--aufbau-control-sunken);
-  transition: background-color 0.15s ease;
+aufbau-upload::part(zone) {
+  background-color : var(--aufbau-control-sunken);
+  border-style     : dashed;
+  transition       : background-color 0.15s ease;
 }
 
-.upload-zone:hover, .is-dragover .upload-zone { background-color: var(--aufbau-control-hover); }
+aufbau-upload::part(zone):hover,
+aufbau-upload:state(dragging)::part(zone) { background-color: var(--aufbau-control-hover); }
 
-.upload-item {
-  border-radius: calc(var(--aufbau-control-radius) * 0.8);
-  padding: 0.2em 0.4em;
-  background-color: var(--aufbau-control-sunken);
+aufbau-upload::part(file) {
+  background-color : var(--aufbau-control-sunken);
+  border-radius    : calc(var(--aufbau-control-radius) * 0.8);
+  padding          : 0.2em 0.4em;
 }
 
-.writer-counter { color: var(--aufbau-control-muted); }
+aufbau-writer {
+  > div > footer > output { color: var(--aufbau-control-muted); }
+  &:state(full) > div > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
+}
+
+/* :::::: <aufbau-modal> :::::: */
+/* shadow parts: dialog, header, heading, close. the content is the author's children */
+
+aufbau-modal::part(dialog) {
+  background-color : var(--aufbau-surface);
+  border           : var(--aufbau-control-border);
+  border-radius    : var(--aufbau-control-radius);
+  color            : inherit;
+  padding          : 1em 1.25em;
+}
+
+aufbau-modal::part(header) {
+  border-block-end : var(--aufbau-control-border);
+  margin           : -0.25em -0.25em 0.75em;
+  padding          : 0 0.25em 0.5em;
+}
 
 /* :::::: <aufbau-progress> :::::: */
 
-.aufbau-progress-wrapper {
-  background-color: var(--aufbau-control-track);
-  border-radius: 999px;
-}
+aufbau-progress {
+  --progress-bar   : var(--aufbau-accent);
+  --progress-track : var(--aufbau-control-track);
 
-.progress-bar {
-  background-color: var(--aufbau-accent);
-  border-radius: 999px;
+  &::before { border-radius: 999px; }
 }
 
 /* :::::: <aufbau-code> :::::: */
 
-.aufbau-code-wrapper {
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
+aufbau-code {
+  border        : var(--aufbau-control-border);
+  border-radius : var(--aufbau-control-radius);
+
+  > figure > header {
+    border-block-end : var(--aufbau-control-border);
+    color            : var(--aufbau-control-muted);
+    padding          : 0.3em 0.6em;
+  }
+
+  > figure > pre { padding: 0.75em; }
+
+  code[contenteditable]:focus { background-color: var(--aufbau-control-sunken); }
 }
 
-.code-header {
-  border-block-end: var(--aufbau-control-border);
-  padding: 0.3em 0.6em;
-  color: var(--aufbau-control-muted);
+:is(aufbau-code, aufbau-writer) [data-action] {
+  border-radius : calc(var(--aufbau-control-radius) * 0.6);
+  padding       : 0.2em;
 }
 
-.copy-btn {
-  border-radius: calc(var(--aufbau-control-radius) * 0.6);
-  padding: 0.2em;
+/* :::::: <aufbau-tree> :::::: */
+
+aufbau-tree-item::part(row)       { border-radius: calc(var(--aufbau-control-radius) * 0.8); }
+aufbau-tree-item::part(row):hover { background-color: var(--aufbau-control-hover); }
+
+aufbau-tree-item[selected]::part(row) {
+  background-color : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
 }
 
-aufbau-code pre { padding: 0.75em; }
+aufbau-tree-item:focus-visible::part(row) {
+  outline        : 2px solid var(--aufbau-control-focus);
+  outline-offset : -2px;
+}
 
-aufbau-code code[contenteditable]:focus {
-  background-color: var(--aufbau-control-sunken);
+/* :::::: <aufbau-toc> :::::: */
+
+aufbau-toc {
+  > header {
+    color             : var(--aufbau-control-muted);
+    font-size         : 0.75em;
+    font-weight       : 600;
+    letter-spacing    : 0.04em;
+    margin-block-end  : 0.5em;
+    text-transform    : uppercase;
+  }
+
+  a {
+    border-inline-start  : 2px solid transparent;
+    color                : inherit;
+    display              : block;
+    padding-block        : 0.15em;
+    padding-inline-start : 0.5em;
+    text-decoration      : none;
+
+    &:hover           { color: var(--aufbau-accent); }
+    &[aria-current]   { border-color: var(--aufbau-accent); color: var(--aufbau-accent); }
+  }
 }
 
 /* :::::: <aufbau-toast> :::::: */
 
-.aufbau-toast-wrapper {
-  background-color: var(--aufbau-surface);
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
-  border-inline-start-width: 3px;
-  padding: 0.6em 0.75em;
+aufbau-toast {
+  background-color          : var(--aufbau-surface);
+  border                    : var(--aufbau-control-border);
+  border-inline-start-width : 3px;
+  border-radius             : var(--aufbau-control-radius);
+  padding                   : 0.6em 0.75em;
+
+  &[type="success"] { border-inline-start-color: var(--aufbau-success, currentColor); }
+  &[type="warning"] { border-inline-start-color: var(--aufbau-warn, currentColor); }
+  &[type="error"]   { border-inline-start-color: var(--aufbau-error, currentColor); }
 }
 
-.aufbau-toast-wrapper.type-success { border-inline-start-color: var(--aufbau-success, currentColor); }
-.aufbau-toast-wrapper.type-warning { border-inline-start-color: var(--aufbau-warn, currentColor); }
-.aufbau-toast-wrapper.type-error   { border-inline-start-color: var(--aufbau-error, currentColor); }
-
-.toast-message { color: var(--aufbau-control-muted); }
+aufbau-toast::part(message) { color: var(--aufbau-control-muted); }

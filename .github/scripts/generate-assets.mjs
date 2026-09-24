@@ -9,9 +9,16 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath }    from 'node:url';
 
-import { wrapSvg }             from '../../filters/core.js';
-import { filters, backendsOf } from '../../filters/lib/index.js';
-import { patterns }            from '../../patterns/lib/index.js';
+import { wrapSvg }                                        from '../../filters/core.js';
+import { backendsOf, load, manifest as filterManifest }    from '../../filters/lib/registry.js';
+import { manifest as patternManifest }                     from '../../patterns/manifest.js';
+
+// every implementation, loaded through the manifests
+const filters  = await Promise.all(Object.keys(filterManifest).map(load));
+const patterns = await Promise.all(Object.keys(patternManifest).map(async id => {
+  const module = await import(`../../patterns/lib/${id}.js`);
+  return { id, name: module.name, vars: module.vars, render: module.default };
+}));
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SVG  = resolve(ROOT, 'svg');
@@ -40,10 +47,9 @@ function toJson5 (path, entries) {
 }
 
 // catalogue entry per kind. filters carry their backend capabilities (css/svg/canvas/webgl)
-// so tooling and the editor can pick a backend without importing the js; patterns list the
-// two application modes they always support.
-const filterEntry  = m => ({ id: m.id, name: m.name, vars: m.vars, backends: backendsOf(m) });
-const patternEntry = m => ({ id: m.id, name: m.name, vars: m.vars, modes: ['datauri', 'defs'] });
+// so tooling and the editor can pick a backend without importing the js
+const filterEntry  = m => ({ id: m.id, name: m.name, vars: m.vars, backends: backendsOf(filterManifest[m.id]) });
+const patternEntry = m => ({ id: m.id, name: m.name, vars: m.vars });
 
 // :::::: WRITE :::::::::::::::::::::::::::::::::::::::::::::::::::
 

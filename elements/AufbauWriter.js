@@ -1,16 +1,23 @@
 // <aufbau-writer>
 // multiline text control. the counterpart to <aufbau-reader>.
+// the host is the field frame: the native <textarea>, then a footer with the
+// counter and the copy/paste/clear actions when either is enabled.
 //
 // `look` is reserved as the axis a richer editing mode would arrive on
 // (look="markdown"), the value api below stays the same either way.
 
+import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { AufbauControl } from './core/index.js';
-import { attrs, html } from './core/html.js';
-import { setAttr } from '@domina/methods/setAttr.js';
-import { setValue } from '@domina/methods/setValue.js';
+import { dedent }        from './core/utils.js';
+import { attrs, html }   from './core/html.js';
+import { setAttr }       from '@domina/methods/setAttr.js';
+import { setValue }      from '@domina/methods/setValue.js';
 
 export default class AufbauWriter extends AufbauControl {
+  static reflect = ['look', 'resize'];
+
   static attr = {
+    actions     : { type: String, default: 'copy paste clear' },
     autogrow    : { type: Boolean, default: true },
     counter     : Boolean,
     look        : { type: String, default: 'plain', values: ['plain'] },
@@ -23,52 +30,91 @@ export default class AufbauWriter extends AufbauControl {
     spellcheck  : { type: Boolean, default: true },
   };
 
-  static styles = `
-    aufbau-writer { display: block; }
+  // :state(full) marks a counter that reached maxlength
+  // the children are the default value (static source), like the text of a
+  // <textarea>. they stay untouched, the output is a <div> in the light dom
+  static source = true;
 
-    aufbau-writer .aufbau-writer-wrapper {
-      display: flex;
-      flex-direction: column;
-      inline-size: 100%;
+  static styles = `aufbau-writer {
+    display: block;
+
+    > div {
+      display        : flex;
+      flex-direction : column;
     }
 
-    aufbau-writer .writer-field {
-      inline-size: 100%;
-      margin: 0;
-      border: 0;
-      background: none;
-      color: inherit;
-      font: inherit;
-      line-height: 1.4;
+    > div > textarea {
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      font        : inherit;
+      inline-size : 100%;
+      line-height : 1.4;
+      margin      : 0;
+      resize      : vertical;
+
+      &:focus { outline: none; }
     }
 
-    aufbau-writer .writer-field:focus { outline: none; }
+    &[resize="none"] > div > textarea { resize: none; }
+    &[resize="both"] > div > textarea { resize: both; }
 
-    aufbau-writer .writer-counter {
-      align-self: flex-end;
-      font-size: 0.75em;
-      line-height: 1;
-      opacity: 0.65;
-      font-variant-numeric: tabular-nums;
+    > div > footer {
+      align-items     : center;
+      display         : flex;
+      gap             : var(--aufbau-control-gap, 0.5em);
+      justify-content : flex-end;
+
+      > output {
+        font-size            : 0.75em;
+        font-variant-numeric : tabular-nums;
+        line-height          : 1;
+        margin-inline-end    : auto;
+        opacity              : 0.65;
+      }
+
+      > button {
+        align-items : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
+        margin      : 0;
+        padding     : 0;
+      }
     }
-  `;
+  }`;
 
-  get field () { return this.$('.writer-field'); }
+  get field () { return this.$('textarea'); }
+
+  // the contract with core/actions.js
+  actionText   () { return this.field?.value ?? this.getAttribute('value') ?? ''; }
+  actionTarget () { return this.getAttr('readonly') ? null : this.field; }
 
   onMount () {
-    // authored text content is the initial value: <aufbau-writer>hello</aufbau-writer>.
-    // it has to be cleared BEFORE the attribute is set, because setAttr renders
-    // synchronously and the clear would wipe that markup right back out
-    const inline = this.textContent.trim();
-    this.textContent = '';
-
-    if (inline && !this.hasAttribute('value')) {
-      this._defaultValue = inline;
-      this.setAttr({ value: inline });
-    }
+    // the children are the starting value: <aufbau-writer>hello</aufbau-writer>
+    if (!this.hasAttribute('value') && this.defaultValue) this.commit(this.defaultValue, { notify: false });
 
     this.on('input',  'textarea', (event, field) => { this.commit(field.value); this.grow(field); });
     this.on('change', 'textarea', (event, field) => this.commit(field.value));
+
+    bindActions(this);
+  }
+
+  // like a <textarea>: the text content is the default value, the value attribute the current one
+  captureDefaults () {
+    this._defaultValue ??= dedent(this.sourceText) || (this.getAttribute('value') ?? '');
+    return this;
+  }
+
+  // new children are a new default. an untouched field follows it, an edited one keeps its text
+  onSourceChange () {
+    const previous = this._defaultValue;
+    this._defaultValue = dedent(this.sourceText);
+    if ((this.getAttribute('value') ?? '') === previous) this.commit(this._defaultValue, { notify: false });
+    else this.update();
   }
 
   /**
@@ -86,8 +132,8 @@ export default class AufbauWriter extends AufbauControl {
     const padding    = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
 
     field.style.height = 'auto';
-    const lower = minRows * lineHeight + padding;
-    const upper = maxRows ? maxRows * lineHeight + padding : Infinity;
+    const lower  = minRows * lineHeight + padding;
+    const upper  = maxRows ? maxRows * lineHeight + padding : Infinity;
     const wanted = Math.min(upper, Math.max(lower, field.scrollHeight));
 
     field.style.height    = `${wanted}px`;
@@ -96,19 +142,17 @@ export default class AufbauWriter extends AufbauControl {
   }
 
   render () {
-    const { counter, look, maxlength, placeholder, resize, rows, spellcheck } = this.getAttr();
+    const { counter, maxlength, placeholder, rows, spellcheck } = this.getAttr();
+    const actions = parseActions(this.getAttr('actions'));
 
     return html`
-      <div class="aufbau-writer-wrapper look-${look}">
-        <textarea class="writer-field" ${attrs({
-          maxlength,
-          placeholder,
-          rows,
-          spellcheck : String(spellcheck),
-          style      : `resize: ${resize}`,
-        })}></textarea>
-        ${counter && html`<span class="writer-counter" aria-live="polite"></span>`}
-      </div>
+      <textarea ${attrs({ maxlength, placeholder, rows, spellcheck: String(spellcheck) })}></textarea>
+      ${(counter || actions.length) && html`
+        <footer>
+          ${counter && html`<output aria-live="polite"></output>`}
+          ${actionButtons(actions)}
+        </footer>
+      `}
     `;
   }
 
@@ -118,6 +162,7 @@ export default class AufbauWriter extends AufbauControl {
     const field = this.field;
     if (!field) return;
 
+    const { maxlength, readonly } = this.getAttr();
     const value = this.getAttribute('value') ?? '';
 
     // never write back into the field while the user is typing in it
@@ -126,14 +171,17 @@ export default class AufbauWriter extends AufbauControl {
       this.grow(field);
     }
 
-    setAttr(field, { readOnly: this.getAttr('readonly') });
+    setAttr(field, { readonly });
 
-    const counter = this.$('.writer-counter');
-    if (counter) {
-      const { maxlength } = this.getAttr();
-      counter.textContent = maxlength ? `${value.length} / ${maxlength}` : String(value.length);
-      counter.classList.toggle('is-full', Boolean(maxlength) && value.length >= maxlength);
+    // after super.sync(), which only handles the disabled host. read only keeps copy
+    for (const button of this.$$('[data-action="paste"], [data-action="clear"]')) {
+      button.disabled = this.isDisabled || readonly;
     }
+
+    const counter = this.$('footer > output');
+    if (counter) counter.textContent = maxlength ? `${value.length} / ${maxlength}` : String(value.length);
+
+    this.states.toggle('full', Boolean(maxlength) && value.length >= maxlength);
   }
 }
 
