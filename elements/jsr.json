@@ -35,7 +35,8 @@
     "./AufbauValue"    : "./AufbauValue.js",
     "./AufbauVideo"    : "./AufbauVideo.js",
     "./AufbauWaveform" : "./AufbauWaveform.js",
-    "./AufbauWriter"   : "./AufbauWriter.js"
+    "./AufbauWriter"   : "./AufbauWriter.js",
+    "./htx"            : "./adapters/htx.js"
   },
   "publish": {
     "include": [
@@ -43,6 +44,7 @@
       "jsr.json",
       "Aufbau*.js",
       "core/*.js",
+      "adapters/*.js",
       "README.md",
       "LICENSE"
     ]

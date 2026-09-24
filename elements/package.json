@@ -9,14 +9,16 @@
     "./Aufbau*.js"
   ],
   "exports": {
-    "."   : "./index.js",
-    "./*" : "./*.js"
+    "."     : "./index.js",
+    "./htx" : "./adapters/htx.js",
+    "./*"   : "./*.js"
   },
   "files": [
     "index.js",
     "jsr.json",
     "Aufbau*.js",
     "core/*.js",
+    "adapters/*.js",
     "README.md",
     "LICENSE"
   ],
