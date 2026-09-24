@@ -5,6 +5,7 @@
   "exports": {
     ".": "./index.js",
     "./run": "./run.js",
+    "./tag": "./tag.js",
     "./parse": "./parse.js",
     "./transform": "./transform.js",
     "./serialize": "./serialize.js"
