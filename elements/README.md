@@ -601,6 +601,32 @@ aufbau-splash-failsafe 0s linear var(--aufbau-splash-limit,10s) forwards}
 </div>
 ```
 
+## aufbau-toast
+
+meist imperativ über `notify()`. errors werden erkannt, auch als rohes objekt aus
+einem `catch`. `dismissible` (default bei `notify()`) erlaubt schliessen per button
+und wegwischen per touch. hover und fokus halten den countdown an.
+
+```js
+import { notify } from '@aufbau/elements/AufbauToast.js';
+
+notify('Gespeichert');
+notify({ success: 'Export fertig', heading: 'Dateien' });
+notify({ error: 'Upload fehlgeschlagen' });
+
+try { await save(); }
+catch (error) { notify(error); }          // type error, message aus dem error
+
+AufbauToast.error('…');                   // + info, success, warning, warn
+notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
+```
+
+```html
+<aufbau-toast type="warning" heading="Achtung" dismissible>
+  Speicher fast voll. <a href="/storage">Aufräumen</a>
+</aufbau-toast>
+```
+
 ## aufbau-toggle
 
 ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
