@@ -12,6 +12,8 @@ import { arrayfied }     from './core/utils.js';
 import { isArray }       from '@pulgasari/is';
 
 export default class AufbauTable extends AufbauElement {
+  static skeleton = { lines: 5, line: '1.5em', width: '100%' };
+
   static attr = {
     columns  : String,
     sortable : Boolean,
@@ -65,12 +67,14 @@ export default class AufbauTable extends AufbauElement {
 
     if (src && src !== this._loadedSrc) {
       this._loadedSrc = src;
+      this.setSkeleton(true);
       try {
         this._data = await importFile(src);
       } catch (err) {
         console.warn(`[aufbau-table] could not load table data from "${src}":`, err);
         this._error = 'Failed to load table data.';
       }
+      this.setSkeleton(false);
     }
 
     return super.update();

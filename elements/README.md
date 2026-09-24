@@ -121,6 +121,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-button>`](#aufbau-button) ·
 [`<aufbau-code>`](#aufbau-code) ·
 [`<aufbau-config>`](#aufbau-config) ·
+[`<aufbau-crumbs>`](#aufbau-crumbs) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-filter>`](#aufbau-filter) ·
@@ -134,6 +135,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-picker>`](#aufbau-picker) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
+[`<aufbau-skeleton>`](#aufbau-skeleton) ·
 [`<aufbau-slider>`](#aufbau-slider) ·
 [`<aufbau-splash>`](#aufbau-splash) ·
 [`<aufbau-table>`](#aufbau-table) ·
@@ -222,6 +224,30 @@ gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 <aufbau-code lang="js">const x = 1;</aufbau-code>            <!-- nutzt code-theme -->
 <aufbau-code lang="js" theme="github">…</aufbau-code>          <!-- lokaler override -->
 ```
+
+## aufbau-crumbs
+
+brotkrumen-navigation. der host ist die navigation-landmark, die trenner sind
+css (`--crumbs-separator`), die crumbs selbst bleiben normale links und buttons
+im light dom. zwei quellen:
+
+```html
+<!-- eigene kinder, unangetastet. das letzte bekommt aria-current -->
+<aufbau-crumbs>
+  <a href="/">Start</a>
+  <a href="/docs">Docs</a>
+  <span>Elements</span>
+</aufbau-crumbs>
+
+<!-- aus einem pfad. ohne href: buttons + event `aufbau-crumbs` { path, index } -->
+<aufbau-crumbs path="/home/user/docs" root="Home" max="4"></aufbau-crumbs>
+
+<!-- mit href-vorlage: echte links, {path} wird ersetzt -->
+<aufbau-crumbs path="/a/b/c" href="/files?path={path}"></aufbau-crumbs>
+```
+
+`max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
+den pfad (default `/`).
 
 ## aufbau-datalist
 
@@ -546,6 +572,21 @@ Text mit **markdown**.
 
 der ladezustand steht als `:state(loading|ready|error|idle)` am element und ist
 damit direkt per css ansprechbar.
+
+## aufbau-skeleton
+
+platzhalter, solange inhalt lädt. nur der host malt, nichts wird gerendert.
+
+```html
+<aufbau-skeleton lines="3"></aufbau-skeleton>
+<aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
+<aufbau-skeleton shape="rect" size="100% 12rem"></aufbau-skeleton>
+```
+
+jedes andere aufbau-element kann dasselbe an seiner eigenen stelle: das attribut
+`skeleton` (`<aufbau-item skeleton>`), solange die app lädt. reader, table, tree
+und picker zeigen ihn von selbst, während sie `src` laden. aussehen über
+`--skeleton-color`, `--skeleton-line`, `--skeleton-gap`, `--skeleton-radius`.
 
 ## aufbau-slider
 

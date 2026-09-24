@@ -75,6 +75,22 @@ preact, anything). aufbau elements follow the same model:
 it catches the author's children as well as the own parts. `this.focused` is the
 focused element inside the element's own tree.
 
+### skeleton
+
+every element takes the `skeleton` attribute, and `this.setSkeleton(on)` shows
+the same placeholder while an element loads by itself. it is css on the host
+alone (`:state(skeleton)`): lines painted by a gradient, a slow pulse, the
+content invisible but untouched. the shape:
+
+```javascript
+static skeleton = { lines: 4, line: '1em', gap: '0.5em', width: '100%', radius: '0.25em' };
+static skeleton () { return { lines: this.getAttr('rows') }; }   // or computed
+```
+
+the method is not called `skeleton()` on purpose: htx and preact set a prop as
+a property when the element has one of that name, `<aufbau-item skeleton>`
+would have replaced the method instead of setting the attribute.
+
 ### reflect
 
 ```javascript

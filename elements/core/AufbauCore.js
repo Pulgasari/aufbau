@@ -45,7 +45,51 @@ const stateSet = (host) => ({
   toggle (name, force) { return (force ?? !this.has(name)) ? this.add(name) : this.delete(name); },
 });
 
+// :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::::
+// a placeholder painted on the host alone: lines drawn by a gradient, a slow
+// pulse, the content invisible but untouched. shape through custom properties,
+// see `static skeleton` and setSkeleton() below. both selector forms, the rule is
+// adopted into the document and into every shadow root an element lives in
+
+const SKELETON_STYLES = `
+  @keyframes aufbau-skeleton { 50% { opacity: 0.45; } }
+
+  :state(skeleton),
+  :host(:state(skeleton)) {
+    --_line : var(--skeleton-line, 1em);
+    --_gap  : var(--skeleton-gap, 0.5em);
+
+    animation       : aufbau-skeleton 1.4s ease-in-out infinite;
+    background      : repeating-linear-gradient(to bottom,
+                        var(--skeleton-color, color-mix(in srgb, currentColor 14%, transparent)) 0 var(--_line),
+                        transparent 0 calc(var(--_line) + var(--_gap)));
+    border-radius   : var(--skeleton-radius, 0.25em);
+    color           : transparent;
+    cursor          : progress;
+    min-block-size  : calc(var(--skeleton-lines, 1) * (var(--_line) + var(--_gap)) - var(--_gap));
+    min-inline-size : var(--skeleton-width, 4em);
+    pointer-events  : none;
+    user-select     : none;
+  }
+
+  :state(skeleton) > *,
+  :host(:state(skeleton)) *,
+  :host(:state(skeleton)) ::slotted(*) { visibility: hidden; }
+
+  @media (prefers-reduced-motion: reduce) {
+    :state(skeleton), :host(:state(skeleton)) { animation: none; }
+  }
+`;
+
+const SKELETON_VARS = { gap: 'gap', line: 'line', lines: 'lines', radius: 'radius', width: 'width' };
+
 export class AufbauCore extends HTMLElement {
+
+  // every element takes `skeleton`, e.g. <aufbau-item skeleton> while an app loads its data
+  static attr = { skeleton: Boolean };
+
+  static styles = SKELETON_STYLES;
+
 
   constructor () {
     super();
@@ -91,6 +135,41 @@ export class AufbauCore extends HTMLElement {
 
   /** the focused element inside this one's tree, document.activeElement only sees the host */
   get focused () { return this.root === this ? document.activeElement : this.root.activeElement; }
+
+  // :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::
+
+  /**
+   * not named skeleton(): a framework setting the `skeleton` attribute as a prop
+   * would find a property of that name and overwrite the method instead.
+   *
+   * shows or hides the placeholder while the element loads by itself. the
+   * `skeleton` attribute shows it as well, either one is enough. the shape comes
+   * from `static skeleton`: { lines, line, gap, width, radius }, or a function
+   * returning that, called with the element as `this`.
+   */
+  setSkeleton (on = true) {
+    this._skeleton = Boolean(on);
+    this.syncSkeleton();
+    return this;
+  }
+
+  syncSkeleton () {
+    // most elements never show one, they must not even touch their internals for it
+    const on = Boolean(this._skeleton || this.getAttr('skeleton'));
+    if (!on && !this._skeletonShown) return;
+    this._skeletonShown = on;
+
+    this.states.toggle('skeleton', on);
+    if (this.internals) this.internals.ariaBusy = on ? 'true' : null;
+
+    const shape   = this.constructor.skeleton;
+    const options = isFn(shape) ? shape.call(this) : (isPlainObject(shape) ? shape : {});
+    for (const [key, name] of Object.entries(SKELETON_VARS)) {
+      const value = on ? options[key] : undefined;
+      if (value == null) this.style.removeProperty(`--skeleton-${name}`);
+      else this.style.setProperty(`--skeleton-${name}`, String(value));
+    }
+  }
 
   // :::::: SOURCE ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -216,6 +295,7 @@ export class AufbauCore extends HTMLElement {
     }
 
     this.applyVars();
+    this.syncSkeleton();
     this.sync();
     if (rebuilt) this.onRender();
 

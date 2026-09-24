@@ -13,8 +13,9 @@
 // the children are the source and stay untouched (static source): not shown
 // themselves, re-rendered whenever they change, so a framework can keep
 // rendering them. the output is an <article> in the light dom, page css
-// reaches it. it carries the content, or a status line while loading or
-// after an error. state: :state(loading|ready|error), plus aria-busy.
+// reaches it. it carries the content, or a status line after an error. while
+// the first content loads it shows the core skeleton. state:
+// :state(loading|ready|error|idle|skeleton).
 
 import { AufbauElement }        from './core/index.js';
 import { importFile, renderMD } from '@aufbau/import';
@@ -37,6 +38,8 @@ export default class AufbauReader extends AufbauElement {
   transform = null;
 
   static source = { tag: 'article' };
+
+  static skeleton = { lines: 4, width: '100%' };
 
   static styles = `aufbau-reader {
     display: block;
@@ -108,7 +111,8 @@ export default class AufbauReader extends AufbauElement {
   setState (state) {
     this._state = state;
     for (const name of STATES) this.states.toggle(name, name === state);
-    if (this.internals) this.internals.ariaBusy = String(state === 'loading');
+    // the skeleton only stands in for content that is not there yet, a reload keeps the old text
+    this.setSkeleton(state === 'loading' && !this._html);
   }
 
   finish (state) {
@@ -119,7 +123,6 @@ export default class AufbauReader extends AufbauElement {
   }
 
   render () {
-    if (this.state === 'loading' && !this._html) return html`<p role="status">loading…</p>`;
     if (this.state === 'error')   return html`<p role="alert">could not load content.</p>`;
 
     // importFile/renderMD return trusted, already parsed markup. the <article> is the output itself

@@ -36,6 +36,8 @@ const isInactive = item => item.hidden || item.matches(':disabled, [aria-disable
 export default class AufbauPicker extends AufbauControl {
   static reflect = ['look'];
 
+  static skeleton = { line: '2em', width: '10em' };
+
   static attr = {
     iconsOnly   : Boolean,
     look        : { type: String, default: 'combobox', values: ['combobox', 'cycle', 'radio', 'segments'] },
@@ -314,12 +316,14 @@ export default class AufbauPicker extends AufbauControl {
 
     if (src && src !== this._loadedSrc) {
       this._loadedSrc = src;
+      this.setSkeleton(true);
       try {
         this._remoteOptions = normalizeOptions(await importFile(src));
       } catch (error) {
         console.warn(`[aufbau-picker] could not load options from "${src}":`, error);
         this._remoteOptions = [];
       }
+      this.setSkeleton(false);
     }
 
     return super.update();

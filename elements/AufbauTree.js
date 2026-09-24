@@ -23,6 +23,8 @@ const ITEM = 'aufbau-tree-item';
 export default class AufbauTree extends AufbauElement {
   static internals = { role: 'tree' };
 
+  static skeleton = { lines: 6, line: '1.1em', gap: '0.45em', width: '100%' };
+
   static attr = {
     src : String,
   };
@@ -73,12 +75,14 @@ export default class AufbauTree extends AufbauElement {
     // reload whenever src actually changes (skipped once `nodes` supplied in-memory data)
     if (src && src !== this._loadedSrc && this._data == null) {
       this._loadedSrc = src;
+      this.setSkeleton(true);
       try {
         this._data = await importFile(src);
       } catch (error) {
         console.warn(`[aufbau-tree] failed to import tree data from "${src}":`, error);
         this._data = null;
       }
+      this.setSkeleton(false);
     }
 
     return super.update();
