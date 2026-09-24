@@ -1,14 +1,18 @@
 // <aufbau-button>
 // the host IS the button. no inner <button>, so role, focus, keyboard
 // activation and form submission are provided here instead of natively.
+// the children are the label and stay untouched: the shadow root holds the
+// optional icon and projects them through a <slot>. label/text replace them.
 
 import { AufbauElement } from './core/index.js';
-import { html, raw }     from './core/html.js';
+import { html }          from './core/html.js';
 
 export default class AufbauButton extends AufbauElement {
   static formAssociated = true;
 
   static internals = { role: 'button' };
+
+  static shadow = true;
 
   static reflect = ['variant'];
 
@@ -21,26 +25,26 @@ export default class AufbauButton extends AufbauElement {
     variant  : 'default',
   };
 
-  static styles = `aufbau-button {
-    align-items     : center;
-    cursor          : pointer;
-    display         : inline-flex;
-    gap             : 0.5rem;
-    justify-content : center;
-    line-height     : 1.2;
-    user-select     : none;
+  // parts: icon, label
+  static styles = `
+    :host {
+      align-items     : center;
+      cursor          : pointer;
+      display         : inline-flex;
+      gap             : 0.5rem;
+      justify-content : center;
+      line-height     : 1.2;
+      user-select     : none;
+    }
 
-    &[disabled] { cursor: not-allowed; opacity: 0.5; }
-  }`;
+    :host([disabled]) { cursor: not-allowed; opacity: 0.5; }
+  `;
 
   get disabled ()     { return this.hasAttribute('disabled'); }
   set disabled (next) { this.toggleAttribute('disabled', Boolean(next)); }
   get form     ()     { return this.internals?.form ?? null; }
 
   onMount () {
-    // authored children are the content when no label/text is given.
-    // captured before the first render replaces them
-    this._children ??= this.innerHTML.trim();
     if (!this.internals) this.setAttribute('role', 'button');
 
     // capture phase: runs before any bubble listener on the host, also for clicks on children
@@ -71,10 +75,10 @@ export default class AufbauButton extends AufbauElement {
     const { icon, label, text } = this.getAttr();
     const content = label || text;
 
-    // attribute text is escaped. authored children are page markup and pass through unescaped
+    // an explicit label/text wins, otherwise the children show
     return html`
-      ${icon && html`<aufbau-icon icon="${icon}"></aufbau-icon>`}
-      ${(content || this._children) && html`<span>${content || raw(this._children)}</span>`}
+      ${icon && html`<aufbau-icon part="icon" icon="${icon}"></aufbau-icon>`}
+      <span part="label">${content || html`<slot></slot>`}</span>
     `;
   }
 

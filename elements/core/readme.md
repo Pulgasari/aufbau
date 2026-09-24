@@ -43,6 +43,26 @@ has no ElementInternals. `this.states` wraps its CustomStateSet with `add`,
 `delete`, `has` and `toggle(name, force)`; every call is a guarded no-op in
 browsers without custom states.
 
+### children and shadow root
+
+the one rule: **an element never renders over children the author owns.** a
+native `<details>` or `<select>` keeps its own ui in a hidden shadow root and
+leaves its children alone, so it does not matter who manages them (plain html,
+preact, anything). aufbau elements follow the same model:
+
+- no own structure (icon, flag, index, item, progress, waveform): render nothing,
+  the host plus css and pseudo elements is the whole element
+- own structure, children the author owns (button, dropdown, modal, picker):
+  `static shadow = true`, render() goes into the shadow root, children are
+  projected through `<slot>` or only read (picker options)
+- styling reaches inside through custom properties and `::part()`. states that
+  the skin needs on a part are exposed as extra part tokens (`part="option
+  selected"`), `::part()` accepts no attribute selectors
+
+`this.on(type, selector, fn)` delegates on the host and on the shadow root, so
+it catches the author's children as well as the own parts. `this.focused` is the
+focused element inside the element's own tree.
+
 ### reflect
 
 ```javascript

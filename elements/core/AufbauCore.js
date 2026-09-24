@@ -52,6 +52,11 @@ export class AufbauCore extends HTMLElement {
     this._effects = disposer();
     this._mounted = false;
 
+    // static shadow: true (or shadow root options) gives the element its own tree.
+    // render() goes there, the children stay the author's and are projected by <slot>
+    const shadow = this.constructor.shadow;
+    if (shadow && !this.shadowRoot) this.attachShadow({ mode: 'open', ...(isPlainObject(shadow) ? shadow : {}) });
+
     // static internals: true attaches up front, an object also sets the default
     // semantics, e.g. { role: 'treeitem' }. without it internals attach on first use
     const defaults = this.constructor.internals;
@@ -73,20 +78,9 @@ export class AufbauCore extends HTMLElement {
 
   get root         () { return this.shadowRoot ?? this; }
   get renderTarget () { return this.root; }
-  
-  shell (className, { prepend = false } = {}) {
-    if (this._shell?.isConnected) return this._shell;
 
-    //this.$shell = this.$(`:scope > .${className}`) ?? createElement('div', { className });
-    this._shell = this.querySelector(`:scope > .${className}`);
-    if (!this._shell) {
-      this._shell = document.createElement('div');
-      this._shell.className = className;
-    }
-    if (!this._shell.isConnected) this[prepend ? 'prepend' : 'append'](this._shell);
-
-    return this._shell;
-  }
+  /** the focused element inside this one's tree, document.activeElement only sees the host */
+  get focused () { return this.shadowRoot ? this.shadowRoot.activeElement : document.activeElement; }
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
@@ -252,8 +246,13 @@ export class AufbauCore extends HTMLElement {
 
     // delegated: type first, selector second. dom.delegate takes
     // (container, types, selector, fn), so the order carries straight through
+    // with a shadow root the delegation runs twice: on the host for the author's
+    // children, on the root for the own parts. events from inside are retargeted
+    // to the host on the way out, so the host alone could never match them
     if (isString(first) && isString(second) && isFn(third)) {
-      return this.track(delegateEvent(this, first, second, third, fourth));
+      const stops = [delegateEvent(this, first, second, third, fourth)];
+      if (this.shadowRoot) stops.push(delegateEvent(this.shadowRoot, first, second, third, fourth));
+      return this.track(() => stops.forEach(stop => stop()));
     }
 
     // the element itself
@@ -420,17 +419,13 @@ runs after a real markup rebuild only, for work that rewrites the new nodes
 structure, without values. return null to opt out of markup entirely
 
 -- renderTarget()
-where render() output goes. defaults to the whole root, so a plain element
-simply owns its markup. containers that must keep their light dom children
-alive (picker, upload, reader …) override this with a dedicated shell.
+where render() output goes: the shadow root with `static shadow`, the element
+itself otherwise. an element never renders over children the author owns.
+anything with its own structure AND authored children declares `static shadow`
+and projects the children through <slot>, like a native element would.
 
 -- root()
 shadow root when present, the element itself otherwise 
-
--- shell()
-lazily creates a dedicated render shell inside the element, so authored
-light dom children are never wiped by a re-render. override renderTarget
-with `this.shell('aufbau-picker-ui')` to opt in.
 
 -- sync()
 values and state, applied to the structure render() produced

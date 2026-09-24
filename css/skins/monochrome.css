@@ -36,9 +36,9 @@
 
 aufbau-input,
 aufbau-picker[look="combobox"],
-aufbau-picker[look="cycle"] > .ui > button,
+aufbau-picker[look="cycle"]::part(trigger),
 aufbau-writer,
-aufbau-dropdown > button,
+aufbau-dropdown::part(trigger),
 aufbau-button,
 aufbau-toggle[look="button"],
 aufbau-upload > button {
@@ -54,12 +54,18 @@ aufbau-upload > button {
   outline-offset: 1px;
 }
 
-:is(aufbau-button, aufbau-dropdown > button, aufbau-toggle, aufbau-picker [data-value], aufbau-picker[look="cycle"] button, aufbau-input > button, aufbau-slider > button, aufbau-upload li > button, aufbau-upload > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible {
+/* ::part() cannot sit inside :is(), the shadow parts are listed on their own */
+:is(aufbau-button, aufbau-toggle, aufbau-input > button, aufbau-slider > button, aufbau-upload li > button, aufbau-upload > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible,
+aufbau-dropdown::part(trigger):focus-visible,
+aufbau-picker::part(option):focus-visible,
+aufbau-picker::part(trigger):focus-visible {
   outline: 2px solid var(--aufbau-control-focus);
   outline-offset: 1px;
 }
 
-:is(aufbau-button, aufbau-dropdown > button, aufbau-input > button, aufbau-picker[look="cycle"] button, aufbau-slider > button, aufbau-upload li > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]) {
+:is(aufbau-button, aufbau-input > button, aufbau-slider > button, aufbau-upload li > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
+aufbau-dropdown::part(trigger):hover:not(:disabled),
+aufbau-picker::part(trigger):hover {
   background-color: var(--aufbau-control-hover);
 }
 
@@ -173,56 +179,60 @@ aufbau-toggle {
 }
 
 /* ::: picker :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+/* shadow parts: field, caret, listbox, option (+ selected), trigger, icon, label.
+   ::part() takes pseudo-classes and pseudo-elements, no attribute selectors, so the
+   selection arrives as the extra part token `selected` */
 
-aufbau-picker {
-  [data-value] {
-    border-radius : calc(var(--aufbau-control-radius) * 0.8);
-    padding       : var(--aufbau-control-pad);
-  }
+aufbau-picker::part(option) {
+  border-radius : calc(var(--aufbau-control-radius) * 0.8);
+  padding       : var(--aufbau-control-pad);
+}
 
-  [role="listbox"] {
-    background-color : var(--aufbau-surface);
-    border           : var(--aufbau-control-border);
-    border-radius    : var(--aufbau-control-radius);
-    padding          : 0.2em;
+aufbau-picker::part(listbox) {
+  background-color : var(--aufbau-surface);
+  border           : var(--aufbau-control-border);
+  border-radius    : var(--aufbau-control-radius);
+  padding          : 0.2em;
+}
 
-    > [role="option"] {
-      &:hover                 { background-color: var(--aufbau-control-hover); }
-      &[aria-selected="true"] { background-color: var(--aufbau-accent); color: var(--aufbau-surface); }
-    }
-  }
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option):hover { background-color: var(--aufbau-control-hover); }
 
-  &[look="radio"] {
-    [data-value] { padding-inline: 0; }
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option selected) {
+  background-color : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
+}
 
-    :is([role="radio"], [role="checkbox"])::before {
-      border     : var(--aufbau-control-border);
-      transition : border-width 0.12s ease;
-    }
+aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
 
-    [role="radio"]::before    { border-radius: 999px; }
-    [role="checkbox"]::before { border-radius: calc(var(--aufbau-control-radius) * 0.4); }
+aufbau-picker[look="radio"]::part(option)::before {
+  border        : var(--aufbau-control-border);
+  border-radius : 999px;
+  transition    : border-width 0.12s ease;
+}
 
-    [aria-checked="true"]::before {
-      border-color : var(--aufbau-accent);
-      border-width : 0.28em;
-    }
-  }
+aufbau-picker[look="radio"][multiple]::part(option)::before { border-radius: calc(var(--aufbau-control-radius) * 0.4); }
 
-  &[look="segments"] {
-    border        : var(--aufbau-control-border);
-    border-radius : var(--aufbau-control-radius);
-    overflow      : hidden;
+aufbau-picker[look="radio"]::part(option selected)::before {
+  border-color : var(--aufbau-accent);
+  border-width : 0.28em;
+}
 
-    [data-value] {
-      border-inline-start : var(--aufbau-control-border);
-      border-radius       : 0;
+/* structural pseudo-classes are not allowed after ::part(), the divider between
+   segments is drawn by the element itself from --picker-divider */
+aufbau-picker[look="segments"] {
+  --picker-divider : var(--aufbau-control-border);
 
-      &:first-child           { border-inline-start: 0; }
-      &:hover                 { background-color: var(--aufbau-control-hover); }
-      &[aria-checked="true"]  { background-color: var(--aufbau-accent); color: var(--aufbau-surface); }
-    }
-  }
+  border        : var(--aufbau-control-border);
+  border-radius : var(--aufbau-control-radius);
+  overflow      : hidden;
+}
+
+aufbau-picker[look="segments"]::part(option)       { border-radius: 0; }
+aufbau-picker[look="segments"]::part(option):hover { background-color: var(--aufbau-control-hover); }
+
+aufbau-picker[look="segments"]::part(option selected) {
+  background-color : var(--aufbau-accent);
+  color            : var(--aufbau-surface);
 }
 
 /* :::::: <aufbau-slider> :::::: */
@@ -266,19 +276,20 @@ aufbau-slider {
 }
 
 /* :::::: <aufbau-dropdown> :::::: */
+/* shadow parts: trigger, icon, label, caret, menu. the entries are the author's children */
 
-aufbau-dropdown > [role="menu"] {
+aufbau-dropdown::part(menu) {
   background-color : var(--aufbau-surface);
   border           : var(--aufbau-control-border);
   border-radius    : var(--aufbau-control-radius);
   padding          : 0.2em;
+}
 
-  > * {
-    border-radius : calc(var(--aufbau-control-radius) * 0.8);
-    padding       : var(--aufbau-control-pad);
+aufbau-dropdown > * {
+  border-radius : calc(var(--aufbau-control-radius) * 0.8);
+  padding       : var(--aufbau-control-pad);
 
-    &:hover { background-color: var(--aufbau-control-hover); }
-  }
+  &:hover { background-color: var(--aufbau-control-hover); }
 }
 
 /* ::: upload / writer ::::::::::::::::::::::::::::::::::::::::::: */
@@ -306,19 +317,20 @@ aufbau-writer {
 }
 
 /* :::::: <aufbau-modal> :::::: */
+/* shadow parts: dialog, header, heading, close. the content is the author's children */
 
-aufbau-modal > dialog {
+aufbau-modal::part(dialog) {
   background-color : var(--aufbau-surface);
   border           : var(--aufbau-control-border);
   border-radius    : var(--aufbau-control-radius);
   color            : inherit;
   padding          : 1em 1.25em;
+}
 
-  > header {
-    border-block-end  : var(--aufbau-control-border);
-    margin            : -0.25em -0.25em 0.75em;
-    padding           : 0 0.25em 0.5em;
-  }
+aufbau-modal::part(header) {
+  border-block-end : var(--aufbau-control-border);
+  margin           : -0.25em -0.25em 0.75em;
+  padding          : 0 0.25em 0.5em;
 }
 
 /* :::::: <aufbau-progress> :::::: */

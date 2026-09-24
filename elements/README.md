@@ -429,9 +429,10 @@ hat und sonst gar nichts passieren würde.
 ## aufbau-modal
 
 modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
-fokus bleibt drin und kehrt danach zurück. die kinder wandern einmal in den
-dialog. `open` spiegelt den zustand in beide richtungen, ein
-`<form method="dialog">` schliesst ihn nativ und liefert den `returnValue`.
+fokus bleibt drin und kehrt danach zurück. der dialog liegt im shadow root, die
+kinder bleiben unangetastet und werden per `<slot>` hineinprojiziert. `open`
+spiegelt den zustand in beide richtungen, ein `<form method="dialog">` schliesst
+ihn und liefert den `returnValue`. styling über `::part(dialog|header|heading|close)`.
 
 ```html
 <aufbau-modal id="settings" heading="Einstellungen">

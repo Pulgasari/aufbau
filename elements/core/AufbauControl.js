@@ -33,22 +33,28 @@ export class AufbauControl extends AufbauCore {
 
   // structure shared by every control. colours, borders and radii belong to the
   // skin, see ../../css/skins/. declared on the base class on purpose: styleOwners()
-  // keys sheets by their declaring class, so this is adopted exactly once
+  // keys sheets by their declaring class, so this is adopted once per root. the
+  // :host variants cover controls with a shadow root, the tag list the others
   static styles = `
     [hidden] { display: none !important; }
 
+    :host,
     aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer {
-      display: inline-block;
-      box-sizing: border-box;
-      font: inherit;
-      color: inherit;
+      box-sizing : border-box;
+      color      : inherit;
+      display    : inline-block;
+      font       : inherit;
     }
 
-    aufbau-input *, aufbau-picker *, aufbau-slider *, aufbau-toggle *, aufbau-upload *, aufbau-writer * {
+    :host *,
+    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer) * {
       box-sizing: border-box;
     }
 
-    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) { pointer-events: none; }
+    :host(:state(disabled)),
+    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) {
+      pointer-events: none;
+    }
   `;
 
   // attached up front, the form state is written from the first sync on

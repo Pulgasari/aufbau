@@ -1,23 +1,30 @@
 // <aufbau-modal>
 // a modal dialog on a native <dialog>: top layer, inert page behind it, focus
-// kept inside and restored afterwards all come from showModal(). the host
-// creates the dialog once and moves the authored children into it.
+// kept inside and restored afterwards all come from showModal().
 //
-//   <aufbau-modal heading="Löschen?">
-//     <dialog aria-label="Löschen?">
-//       <header><strong>Löschen?</strong><button aria-label="close">…</button></header>
-//       …authored content…
-//     </dialog>
-//   </aufbau-modal>
+// the dialog lives in the shadow root, the children stay the author's and are
+// projected into it. nothing is moved, so a framework can keep rendering them.
 //
-// `open` mirrors the dialog in both directions. a <form method="dialog"> inside
-// closes it natively, the submitter's value becomes the return value.
-// show() resolves with that return value once the modal is closed again.
+//   <aufbau-modal heading="Löschen?">       shadow: <dialog part="dialog">
+//     …children…                                     <header part="header">
+//   </aufbau-modal>                                    <strong part="heading"> <button part="close">
+//                                                    <slot>
+//
+// `open` mirrors the dialog in both directions. show() resolves with the return
+// value once the modal is closed again. a <form method="dialog"> among the
+// children closes it with the submitter's value, like it would natively.
+// parts: dialog, header, heading, close. state: :state(open)
 
-import { AufbauElement } from './core/index.js';
-import { setAttr }       from '@domina/methods/setAttr.js';
+import { AufbauElement }   from './core/index.js';
+import { html }            from './core/html.js';
+import { adoptBaseStyles } from './core/styles.js';
+
+// page scroll lock. document level on purpose, the shadow root cannot reach :root
+const PAGE_STYLES = `:root:has(aufbau-modal:state(open)) { overflow: hidden; }`;
 
 export default class AufbauModal extends AufbauElement {
+  static shadow = true;
+
   static attr = {
     // close button, escape and a click on the backdrop close the modal
     dismissible : { type: Boolean, default: true },
@@ -25,78 +32,73 @@ export default class AufbauModal extends AufbauElement {
     open        : Boolean,
   };
 
-  // the host takes no part in layout, the dialog lives in the top layer.
   // opening and closing fade through @starting-style, display and overlay are
   // transitioned discretely so the exit animation gets to run
   static styles = `
-    aufbau-modal {
-      display: contents;
+    :host { display: contents; }
 
-      > dialog {
-        --modal-duration: 0.2s;
+    dialog {
+      --modal-duration: 0.2s;
 
-        box-sizing      : border-box;
-        max-block-size  : min(var(--modal-max-block-size, 85dvh), calc(100dvh - 2rem));
-        max-inline-size : min(var(--modal-size, 32rem), calc(100vw - 2rem));
-        opacity         : 0;
-        translate       : 0 0.75rem;
-        transition      :
-          opacity   var(--modal-duration) ease,
-          translate var(--modal-duration) ease,
-          display   var(--modal-duration) allow-discrete,
-          overlay   var(--modal-duration) allow-discrete;
+      box-sizing      : border-box;
+      max-block-size  : min(var(--modal-max-block-size, 85dvh), calc(100dvh - 2rem));
+      max-inline-size : min(var(--modal-size, 32rem), calc(100vw - 2rem));
+      opacity         : 0;
+      translate       : 0 0.75rem;
+      transition      :
+        opacity   var(--modal-duration) ease,
+        translate var(--modal-duration) ease,
+        display   var(--modal-duration) allow-discrete,
+        overlay   var(--modal-duration) allow-discrete;
 
-        &[open] {
-          opacity   : 1;
-          translate : 0 0;
+      &[open] {
+        opacity   : 1;
+        translate : 0 0;
 
-          @starting-style { opacity: 0; translate: 0 0.75rem; }
-        }
+        @starting-style { opacity: 0; translate: 0 0.75rem; }
+      }
 
-        &::backdrop {
-          background-color : transparent;
-          transition       :
-            background-color var(--modal-duration) ease,
-            display          var(--modal-duration) allow-discrete,
-            overlay          var(--modal-duration) allow-discrete;
-        }
+      &::backdrop {
+        background-color : transparent;
+        transition       :
+          background-color var(--modal-duration) ease,
+          display          var(--modal-duration) allow-discrete,
+          overlay          var(--modal-duration) allow-discrete;
+      }
 
-        &[open]::backdrop {
-          background-color: var(--modal-backdrop, rgb(0 0 0 / 0.45));
+      &[open]::backdrop {
+        background-color: var(--modal-backdrop, rgb(0 0 0 / 0.45));
 
-          @starting-style { background-color: transparent; }
-        }
-
-        > header {
-          align-items     : center;
-          display         : flex;
-          gap             : var(--aufbau-control-gap, 0.5em);
-          justify-content : space-between;
-
-          > strong { font-weight: 600; }
-
-          > button {
-            align-items       : center;
-            background        : none;
-            border            : 0;
-            color             : inherit;
-            cursor            : pointer;
-            display           : inline-flex;
-            font              : inherit;
-            margin            : 0 0 0 auto;
-            padding           : 0;
-          }
-        }
+        @starting-style { background-color: transparent; }
       }
     }
 
-    /* no page scrolling behind an open modal */
-    :root:has(aufbau-modal > dialog:modal) { overflow: hidden; }
+    header {
+      align-items     : center;
+      display         : flex;
+      gap             : var(--aufbau-control-gap, 0.5em);
+      justify-content : space-between;
+
+      > strong { font-weight: 600; }
+
+      > button {
+        align-items : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
+        margin      : 0 0 0 auto;
+        padding     : 0;
+      }
+    }
 
     @media (prefers-reduced-motion: reduce) {
-      aufbau-modal > dialog { --modal-duration: 0s; }
+      dialog { --modal-duration: 0s; }
     }
   `;
+
 
   // :::::: IMPERATIVE API ::::::::::::::::::::::::::::::::::::::
 
@@ -105,15 +107,13 @@ export default class AufbauModal extends AufbauElement {
    * everything else (cancel, escape, backdrop). the modal removes itself.
    */
   static async confirm (message, { cancel = 'Cancel', confirm = 'OK', heading } = {}) {
-    const modal = document.createElement('aufbau-modal');
-    if (heading) modal.setAttribute('heading', heading);
+    const modal  = document.createElement('aufbau-modal');
+    const text   = Object.assign(document.createElement('p'), { textContent: message });
+    const form   = Object.assign(document.createElement('form'), { method: 'dialog' });
+    const button = (label, value) => Object.assign(document.createElement('button'), { textContent: label, value });
 
-    const text = Object.assign(document.createElement('p'), { textContent: message });
-    const form = Object.assign(document.createElement('form'), { method: 'dialog' });
-    form.append(
-      Object.assign(document.createElement('button'), { textContent: cancel,  value: 'cancel' }),
-      Object.assign(document.createElement('button'), { textContent: confirm, value: 'confirm', autofocus: true }),
-    );
+    if (heading) modal.setAttribute('heading', heading);
+    form.append(button(cancel, 'cancel'), Object.assign(button(confirm, 'confirm'), { autofocus: true }));
     modal.append(text, form);
     document.body.append(modal);
 
@@ -122,8 +122,8 @@ export default class AufbauModal extends AufbauElement {
     return result === 'confirm';
   }
 
-  get dialog () { return this._dialog; }
-  get isOpen () { return Boolean(this._dialog?.open); }
+  get dialog () { return this.$('dialog'); }
+  get isOpen () { return Boolean(this.dialog?.open); }
 
   /** opens the modal, resolves with the dialog's return value once it closes */
   show () {
@@ -133,7 +133,7 @@ export default class AufbauModal extends AufbauElement {
   }
 
   close (returnValue) {
-    if (this.isOpen) this._dialog.close(returnValue);
+    if (this.isOpen) this.dialog.close(returnValue);
     return this;
   }
 
@@ -142,67 +142,70 @@ export default class AufbauModal extends AufbauElement {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onMount () {
-    this.build();
-    const dialog = this._dialog;
+    adoptBaseStyles('aufbau-modal-page', PAGE_STYLES);   // deduplicated by key
 
-    this.on('click', ':scope > dialog > header > button', () => this.close());
+    this.on('click', '[part~="close"]', () => this.close());
 
     // a click whose target is the dialog itself landed on the backdrop, content always sits in children
-    this.on(dialog, 'click', (event) => {
-      if (event.target === dialog && this.getAttr('dismissible')) this.close();
+    this.on(this.root, 'click', (event) => {
+      if (event.target === this.dialog && this.getAttr('dismissible')) this.close();
+    });
+
+    // method="dialog" only closes a dialog that is a dom ancestor of the form.
+    // the children are projected, not contained, so the host does it instead
+    this.on('submit', (event) => {
+      if (event.target.getAttribute('method')?.toLowerCase() !== 'dialog') return;
+      event.preventDefault();
+      this.close(event.submitter?.value ?? '');
     });
 
     // escape arrives as a cancel, a non dismissible modal refuses it
-    this.on(dialog, 'cancel', (event) => {
+    this.on(this.root, 'cancel', (event) => {
       if (!this.getAttr('dismissible')) event.preventDefault();
-    });
+    }, { capture: true });
 
-    this.on(dialog, 'close', () => {
+    this.on(this.root, 'close', () => {
+      const returnValue = this.dialog.returnValue;
+      this.states.delete('open');
       if (this.getAttr('open')) this.setAttr({ open: false });
-      this.emit('aufbau-modal', { open: false, returnValue: dialog.returnValue });
-      this._resolve?.(dialog.returnValue);
+      this.emit('aufbau-modal', { open: false, returnValue });
+      this._resolve?.(returnValue);
       this._closed = this._resolve = null;
-    });
+    }, { capture: true });
   }
 
-  // the dialog and its header are created once, the authored children move in and stay the same nodes
-  build () {
-    if (!this._dialog) {
-      this._dialog = document.createElement('dialog');
-      this._header = document.createElement('header');
-      this._title  = document.createElement('strong');
-
-      const close = setAttr(document.createElement('button'), { ariaLabel: 'close', type: 'button' });
-      close.append(setAttr(document.createElement('aufbau-icon'), { icon: 'lucide:x' }));
-      this._header.append(this._title, close);
-    }
-
-    const content = [...this.childNodes].filter(node => node !== this._dialog);
-    this._dialog.append(...content);
-    if (this._dialog.parentNode !== this) this.append(this._dialog);
+  // structure only, the dialog must survive open/close, so nothing here depends on `open`
+  render () {
+    return html`
+      <dialog part="dialog">
+        <header part="header">
+          <strong part="heading"></strong>
+          <button type="button" part="close" aria-label="close"><aufbau-icon icon="lucide:x"></aufbau-icon></button>
+        </header>
+        <slot></slot>
+      </dialog>
+    `;
   }
-
-  render () { return null; }
 
   sync () {
-    const dialog = this._dialog;
+    const dialog = this.dialog;
     if (!dialog) return;
 
     const { dismissible, heading, open } = this.getAttr();
+    const header = this.$('header');
 
-    // the header only exists when it has something to carry
-    this._title.textContent = heading ?? '';
-    this._title.hidden      = !heading;
-    this._header.querySelector('button').hidden = !dismissible;
+    this.$('strong').textContent = heading ?? '';
+    this.$('strong').hidden      = !heading;
+    this.$('[part~="close"]').hidden = !dismissible;
+    header.hidden = !heading && !dismissible;
 
-    if (heading || dismissible) { if (this._header.parentNode !== dialog) dialog.prepend(this._header); }
-    else this._header.remove();
-
-    setAttr(dialog, { ariaLabel: heading || false });
+    if (heading) dialog.setAttribute('aria-label', heading);
+    else dialog.removeAttribute('aria-label');
 
     if (open && !dialog.open) {
       dialog.returnValue = '';
       dialog.showModal();
+      this.states.add('open');
       this.emit('aufbau-modal', { open: true });
     }
     if (!open && dialog.open) dialog.close();
