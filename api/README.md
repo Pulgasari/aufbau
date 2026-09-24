@@ -12,13 +12,15 @@ deno install jsr:@aufbau/api
 
 TODO:
 
-wird schrittweise implementiert/konstruiert weil ich mir über endgültige shape in allen details noch nicht 101pro sicher bin.
+- es soll gewissermaßen `aufbau/runtime` (wird konplett entfernt) ersetzen aber ohne es zu reproduzieren. der ansatz hier ist pragmatischer und einfacher gedacht.
 
-grundsätzlich sollte hier alles möglichst lazy importiert/angedockt werden.
+- wird schrittweise implementiert/konstruiert weil ich mir über endgültige shape in allen details noch nicht 101pro sicher bin.
 
-für aufbau/filters, aufbau/patters, aufbau/webfonts (und gestures?) gilt aber schonmal.dass sie ne möglichst gleichförmige öffentliche api haben (zb apply, remove, update, use) sodass sie aufbau/api einerseits lazy durchreichen/wrappen kann, sowie ne ähnliche toplevel api mitbringt, diese dann gruppiert angeben kann. konkrrt was ich meine:
+- grundsätzlich sollte hier alles möglichst lazy importiert/angedockt werden.
 
-```
+- für aufbau/filters, aufbau/patters, aufbau/webfonts (und gestures?) gilt aber schonmal.dass sie ne möglichst gleichförmige öffentliche api haben (zb apply, remove, update, use) sodass sie aufbau/api einerseits lazy durchreichen/wrappen kann, sowie ne ähnliche toplevel api mitbringt, diese dann gruppiert angeben kann. konkrrt was ich meine:
+
+```md
 import aufbau from `@aufbau/api`;
 
 // so kann mans regulär nutzen
@@ -52,7 +54,18 @@ aufbau.elements.enableAutoload(...);
 aufbau.elements.setConfig(...);
 ```
 
-und so weiter
+und so weiter.
+
+- ich hab auch irgendwie so n `data` (vllt anderer name?) namespace im sinn:
+
+```
+aufbau.data.filters
+aufbau.data.icons
+aufbau.data.patterns
+aufbau.data.webfonts
+```
+
+um derlei infos parat zu haben.
 
 ---
 
@@ -72,9 +85,12 @@ und so weiter
 @aufbau/patterns
 @aufbau/webfonts
 
+# experimental
 @aufbau/signals
 @aufbau/store
+@aufbau/stylescript
 
+# tochter-projekte
 @bunker
 @domina
 @htx
