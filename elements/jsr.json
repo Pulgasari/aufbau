@@ -16,6 +16,7 @@
     "./AufbauItem"     : "./AufbauItem.js",
     "./AufbauKeyboard" : "./AufbauKeyboard.js",
     "./AufbauLoop"     : "./AufbauLoop.js",
+    "./AufbauModal"    : "./AufbauModal.js",
     "./AufbauOption"   : "./AufbauOption.js",
     "./AufbauPicker"   : "./AufbauPicker.js",
     "./AufbauProgress" : "./AufbauProgress.js",

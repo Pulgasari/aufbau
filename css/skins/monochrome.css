@@ -305,6 +305,22 @@ aufbau-writer {
   &:state(full) > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
 }
 
+/* :::::: <aufbau-modal> :::::: */
+
+aufbau-modal > dialog {
+  background-color : var(--aufbau-surface);
+  border           : var(--aufbau-control-border);
+  border-radius    : var(--aufbau-control-radius);
+  color            : inherit;
+  padding          : 1em 1.25em;
+
+  > header {
+    border-block-end  : var(--aufbau-control-border);
+    margin            : -0.25em -0.25em 0.75em;
+    padding           : 0 0.25em 0.5em;
+  }
+}
+
 /* :::::: <aufbau-progress> :::::: */
 
 aufbau-progress {

@@ -129,6 +129,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-input>`](#aufbau-input) ·
 [`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
+[`<aufbau-modal>`](#aufbau-modal) ·
 [`<aufbau-option>`](#aufbau-option) ·
 [`<aufbau-picker>`](#aufbau-picker) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
@@ -424,6 +425,35 @@ hat und sonst gar nichts passieren würde.
   <aufbau-icon icon="logos:html-5"></aufbau-icon>
 </aufbau-loop>
 ```
+
+## aufbau-modal
+
+modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
+fokus bleibt drin und kehrt danach zurück. die kinder wandern einmal in den
+dialog. `open` spiegelt den zustand in beide richtungen, ein
+`<form method="dialog">` schliesst ihn nativ und liefert den `returnValue`.
+
+```html
+<aufbau-modal id="settings" heading="Einstellungen">
+  <p>…</p>
+  <form method="dialog">
+    <button value="cancel">Abbrechen</button>
+    <button value="save">Speichern</button>
+  </form>
+</aufbau-modal>
+```
+
+```js
+const result = await document.querySelector('#settings').show();   // 'save' | 'cancel' | ''
+
+if (await AufbauModal.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
+```
+
+`dismissible` (default an) erlaubt schliessen per button, escape und klick auf
+den backdrop. öffnen und schliessen blenden über `@starting-style` und diskrete
+transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
+die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
+abdunklung über `--modal-backdrop`.
 
 ## aufbau-option
 
