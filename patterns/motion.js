@@ -1,122 +1,72 @@
 // @aufbau/patterns/motion.js
-// motion is a layer *on top* of a pattern: it scrolls the whole tiling and does
-// not care what the tile contains or whether the tile animates itself. it works
-// by animating `background-position`, so any pattern painted as a background —
-// the datauri mode — can drift in any direction.
+// scrolls a background tiling by one tile per cycle, so the loop is seamless.
+// independent of the tile: static and self animating patterns drift the same.
 //
-// the scroll distance is one tile (the pattern's `size`), so the loop is
-// seamless: after size px the image is exactly back on itself.
+//   const motion = new Motion('up-right', { size: 24, speed: '12s' });
+//   motion.apply('.hero');
+//   Motion.stop('.hero');
 //
-// the string builders (motionKeyframes, motionCss) touch no dom and are safe in
-// node; the apply helpers run in the browser.
+// keyframes, animation and css touch no dom and work in node.
 
-// :::::: DIRECTIONS ::::::::::::::::::::::::::::::::::::::::::::::
+import { toElements } from './core.js';
 
-// unit vectors in tile space. a positive y scrolls the image downward, a
-// positive x rightward. diagonals combine the two.
-export const MOTIONS = {
-  down       : { x:  0, y:  1 },
-  up         : { x:  0, y: -1 },
-  left       : { x: -1, y:  0 },
-  right      : { x:  1, y:  0 },
-  'down-right': { x:  1, y:  1 },
-  'down-left' : { x: -1, y:  1 },
-  'up-right'  : { x:  1, y: -1 },
-  'up-left'   : { x: -1, y: -1 },
+// unit vectors, positive y scrolls down, positive x right
+export const DIRECTIONS = {
+  'down'       : [ 0,  1],
+  'down-left'  : [-1,  1],
+  'down-right' : [ 1,  1],
+  'left'       : [-1,  0],
+  'right'      : [ 1,  0],
+  'up'         : [ 0, -1],
+  'up-left'    : [-1, -1],
+  'up-right'   : [ 1, -1],
 };
 
-// accept "move-down" / "down" / "downwards" and land on a MOTIONS key
-export function normalizeMotion (motion) {
-  const key = String(motion).trim().toLowerCase()
-    .replace(/^move[-_ ]?/, '')
-    .replace(/wards$/, '')
-    .replace(/[ _]/g, '-');
-  return MOTIONS[key] ? key : 'down';
-}
+// one sheet for every keyframes rule, adopted into the document on first use
+let sheet = null;
+const inserted = new Set;
 
-// :::::: STRING BUILDERS (node-safe) ::::::::::::::::::::::::::::
-
-const round = n => Math.round(n * 1000) / 1000;
-
-// a stable, css-safe keyframes name for one direction + tile distance
-export function motionName (motion, distance) {
-  return `aufbau-pat-${normalizeMotion(motion)}-${String(distance).replace(/[^\w-]/g, '_')}`;
-}
-
-// the @keyframes rule that scrolls the background one tile in `motion`'s
-// direction. `distance` is the tile size in px.
-export function motionKeyframes (motion, distance) {
-  const dir  = MOTIONS[normalizeMotion(motion)];
-  const dist = Number(distance) || 0;
-  const x = round(dir.x * dist);
-  const y = round(dir.y * dist);
-  return `@keyframes ${motionName(motion, distance)}{from{background-position:0 0}to{background-position:${x}px ${y}px}}`;
-}
-
-// keyframes + the `animation` shorthand for one motion, ready to drop into a
-// stylesheet. `size` is the pattern tile size; `speed` any css <time>.
-export function motionCss (motion, { size = 20, speed = '8s', timing = 'linear' } = {}) {
-  const name = motionName(motion, size);
-  return {
-    name,
-    keyframes : motionKeyframes(motion, size),
-    animation : `${name} ${speed} ${timing} infinite`,
-  };
-}
-
-// :::::: DOM (browser) :::::::::::::::::::::::::::::::::::::::::::
-
-const STYLE_ID = 'aufbau-pattern-motion';
-
-function motionStyle () {
-  let style = document.getElementById(STYLE_ID);
-  if (!style) {
-    style = document.createElement('style');
-    style.id = STYLE_ID;
-    document.head.appendChild(style);
+export class Motion {
+  constructor (direction = 'down', { size = 20, speed = '8s', timing = 'linear' } = {}) {
+    if (!DIRECTIONS[direction]) throw new Error(`[@aufbau/patterns] unknown motion "${direction}"`);
+    Object.assign(this, { direction, size: Number(size) || 0, speed, timing });
   }
-  return style;
-}
 
-// register a keyframes rule once; returns its name
-export function ensureMotion (motion, distance) {
-  const name  = motionName(motion, distance);
-  const style = motionStyle();
-  if (!style.textContent.includes(`@keyframes ${name}{`)) {
-    style.textContent += motionKeyframes(motion, distance) + '\n';
+  get name      () { return `aufbau-pattern-${this.direction}-${String(this.size).replace(/\W/g, '_')}`; }
+  get animation () { return `${this.name} ${this.speed} ${this.timing} infinite`; }
+
+  get keyframes () {
+    const [x, y] = DIRECTIONS[this.direction].map(unit => unit * this.size);
+    return `@keyframes ${this.name} { to { background-position: ${x}px ${y}px; } }`;
   }
-  return name;
-}
 
-function toElements (target) {
-  if (typeof target === 'string') return [...document.querySelectorAll(target)];
-  if (target instanceof Element)  return [target];
-  if (target?.[Symbol.iterator])  return [...target].filter(el => el instanceof Element);
-  return [];
-}
+  /** keyframes plus the declaration, for a stylesheet */
+  get css () { return `${this.keyframes}\nanimation: ${this.animation};`; }
 
-// scroll whatever background an element already has. the caller passes the tile
-// `size` so the loop stays seamless.
-export function applyMotion (target, motion, { size = 20, speed = '8s', timing = 'linear' } = {}) {
-  const dir  = normalizeMotion(motion);
-  const name = ensureMotion(dir, size);
-  for (const el of toElements(target)) {
-    el.style.animationName           = name;
-    el.style.animationDuration       = speed;
-    el.style.animationTimingFunction = timing;
-    el.style.animationIterationCount = 'infinite';
-    el.dataset.aufbauMotion          = dir;
+  apply (target) {
+    if (!inserted.has(this.name)) {
+      if (!sheet) {
+        sheet = new CSSStyleSheet;
+        document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+      }
+      sheet.insertRule(this.keyframes, sheet.cssRules.length);
+      inserted.add(this.name);
+    }
+
+    for (const element of toElements(target)) {
+      element.style.animation      = this.animation;
+      element.dataset.aufbauMotion = this.direction;
+    }
+    return this;
+  }
+
+  static stop (target) {
+    for (const element of toElements(target)) {
+      if (!element.dataset.aufbauMotion) continue;
+      element.style.removeProperty('animation');
+      delete element.dataset.aufbauMotion;
+    }
   }
 }
 
-export function stopMotion (target) {
-  for (const el of toElements(target)) {
-    el.style.removeProperty('animation-name');
-    el.style.removeProperty('animation-duration');
-    el.style.removeProperty('animation-timing-function');
-    el.style.removeProperty('animation-iteration-count');
-    delete el.dataset.aufbauMotion;
-  }
-}
-
-export default { MOTIONS, applyMotion, ensureMotion, motionCss, motionKeyframes, motionName, normalizeMotion, stopMotion };
+export default Motion;

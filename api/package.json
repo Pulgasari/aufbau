@@ -1,0 +1,22 @@
+{
+  "name": "@aufbau/api",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "@pulgasari/obj": "*"
+  },
+  "peerDependencies": {
+    "@aufbau/elements": "^1.0.0",
+    "@aufbau/filters": "^1.0.0",
+    "@aufbau/icons": "*",
+    "@aufbau/patterns": "^1.1.0",
+    "@aufbau/webfonts": "*",
+    "@domina/methods": "*"
+  },
+  "license": "MIT"
+}

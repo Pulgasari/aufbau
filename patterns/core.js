@@ -1,12 +1,8 @@
 // @aufbau/patterns/core.js
-// shared string + dom helpers, mirroring @aufbau/filters/core.js. patterns differ
-// from filters in that they have a data-uri form (a full <svg> painted as a
-// background-image) as well as a defs form (a <pattern> injected and referenced by
-// url(#id)). the dom helpers are only called from the browser api, never at import
-// time, so this stays node-safe for the generation script.
+// string helpers shared by the patterns and the generation script. no dom access
+// at import time, so node can load it.
 
 export const PREFIX  = '--aufbau-pattern-';
-export const HOST_ID = 'aufbau-pattern-defs';
 
 export const svgId = id => `aufbau-pattern-${id}`;
 
@@ -26,9 +22,8 @@ export function resolve (vars, options = {}) {
   return out;
 }
 
-// wraps a pattern body in a full tile document. the <pattern> carries the id so
-// defs mode can lift it out; the trailing <rect> paints the tile so the same
-// string works as a data-uri background-image.
+// wraps a pattern body in a full tile document, the trailing <rect> paints the
+// tile so the string works as a data-uri background-image.
 export function patternTag (id, size, body, transform, options = {}) {
   const elementId = options.svgId ?? svgId(id);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">` +
@@ -49,16 +44,4 @@ export function toElements (target) {
   if (target instanceof Element)  return [target];
   if (target?.[Symbol.iterator])  return [...target].filter(el => el instanceof Element);
   return [];
-}
-
-export function defsHost () {
-  let host = document.getElementById(HOST_ID);
-  if (!host) {
-    host = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    host.id = HOST_ID;
-    host.setAttribute('aria-hidden', 'true');
-    host.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
-    document.body.appendChild(host);
-  }
-  return host;
 }
