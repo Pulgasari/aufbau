@@ -22,4 +22,7 @@ export {
   effect,
   signal,
   untracked,
+  useComputed,
+  useSignal,
+  useSignalEffect,
 } from '@preact/signals';

@@ -5,7 +5,7 @@
 const ui = signalStore({
   view : { type: 'enum', values: ['grid', 'list'], value: 'grid' },
   dark : { type: Boolean, value: false },
-}, { key: 'app:ui:', store: local });
+}, { key: 'app:ui:', storage: 'local' });
 
 ui.view              // the EnumSignal itself
 ui.view.value        // 'grid'
@@ -30,50 +30,11 @@ leaf is stated, not guessed.
 
 // :::::: IMPORTS
 
-import BaseSignal   from './BaseSignal.js';
-import BoolSignal   from './BoolSignal.js';
-import EnumSignal   from './EnumSignal.js';
-import MapSignal    from './MapSignal.js';
-import RecordSignal from './RecordSignal.js';
-import ScalarSignal from './ScalarSignal.js';
-import SetSignal    from './SetSignal.js';
-import StringSignal from './StringSignal.js';
+import BaseSignal from './BaseSignal.js';
 
-import { resolveStore } from './persistence.js';
-import { computed, effect, isPlainObject, isPromise, signal, untracked } from './shared.js';
-
-// :::::: TYPES
-// a leaf names its type as a string, as the native constructor where one fits, or
-// as the signal class itself. all three land on the same class.
-
-const BY_NAME = {
-  bool   : BoolSignal,
-  enum   : EnumSignal,
-  map    : MapSignal,
-  record : RecordSignal,
-  scalar : ScalarSignal,
-  set    : SetSignal,
-  string : StringSignal,
-};
-
-const BY_NATIVE = new Map([
-  [Boolean, BoolSignal],
-  [String,  StringSignal],
-  [Map,     MapSignal],
-  [Set,     SetSignal],
-  [Object,  RecordSignal],
-]);
-
-// any constructor standing on BaseSignal counts,
-// so the exported (callable) types and anything subclassed from them
-// resolve the same way the built-in names do.
-const isType = type => typeof type === 'function' && (type === BaseSignal || type.prototype instanceof BaseSignal);
-
-const resolveType = type =>
-    typeof type === 'string' ? BY_NAME[type.toLowerCase()]
-  : BY_NATIVE.get(type) ?? (isType(type) ? type : undefined);
-
-const NAMES = Object.keys(BY_NAME).join(', ');
+import { persistSignal }            from './persistence.js';
+import { TYPE_NAMES, typedSignal }  from './TypedSignal.js';
+import { computed, effect, isPlainObject, signal, untracked } from './shared.js';
 
 // :::::: RESERVED
 // the store answers to these itself, so a leaf of the same name is reachable only
@@ -90,13 +51,14 @@ const warnReserved = (keys) => {
 };
 
 // :::::: LEAVES
+// a leaf is a typedSignal spec, with the difference that the type is mandatory:
+// the shape of a leaf is stated, not read off its first value.
 
 const createLeaf = (key, spec) => {
-  if (!isPlainObject(spec)) throw new TypeError(`[signalStore] "${key}": a leaf is declared as { type, value }`);
-
-  const Type = resolveType(spec.type);
-  if (!Type) throw new TypeError(`[signalStore] "${key}": unknown type ${String(spec.type)}`);
-  return Type === EnumSignal ? new EnumSignal(spec.value, spec.values) : new Type(spec.value);
+  if (!isPlainObject(spec))   throw new TypeError(`[signalStore] "${key}": a leaf is declared as { type, value }`);
+  if (spec.type === undefined) throw new TypeError(`[signalStore] "${key}": a leaf needs a type, one of ${TYPE_NAMES.join(', ')}, a native constructor or a signal class`);
+  const { key: _key, storage: _storage, ...leaf } = spec;   // a leaf persists through the store, not on its own
+  return typedSignal(leaf);
 };
 
 // :::::: PERSISTENCE
@@ -109,43 +71,15 @@ const createLeaf = (key, spec) => {
 // most of what an app hangs on a store afterwards is working state that has no
 // business in storage.
 
-// a Map or Set does not survive JSON, so it is stored as the shape it reads back from
-const snapshotOf = (leaf, value) =>
-    leaf instanceof MapSignal ? Object.fromEntries(value)
-  : leaf instanceof SetSignal ? [...value]
-  : value;
-
-const wireLeaf = (key, leaf, store, prefix) => {
-  // $restore, not .value: hydration is authoritative and writes past a leaf's own
-  // validation where the type says so (see EnumSignal)
-  const apply = value => { if (value !== undefined) leaf.$restore(value); };
-
-  const arm = () => {
-    let first = true;
-    effect(() => {
-      const value = leaf.value;
-      if (first) { first = false; return; }   // the hydrated/declared value is already stored, or intentionally not
-      store.set(prefix + key, snapshotOf(leaf, value));
-    });
-    store.subscribe?.(prefix + key, apply);
-  };
-
-  const saved = store.get(prefix + key);
-  if (isPromise(saved)) return saved.then(value => { apply(value); arm(); });
-
-  apply(saved);
-  arm();
-  return Promise.resolve();
-};
-
 // :::::: MAIN
 
 export function signalStore (schema, options = {}) {
   const signals    = new Map();
   const keysSignal = signal([]);   // bumped when a leaf is added, so $keys and $onEffect track
 
-  const store  = options.key ? resolveStore(options.store) : null;
-  const prefix = options.key ?? '';
+  // `store` is the older name of `storage`
+  const storage = options.key ? options.storage ?? options.store ?? 'local' : null;
+  const prefix  = options.key ?? '';
 
   const syncKeys = () => keysSignal.value = [...signals.keys()];
 
@@ -159,7 +93,7 @@ export function signalStore (schema, options = {}) {
     warnReserved([key]);
     syncKeys();
 
-    if (store && persist) leaf.$ready = wireLeaf(key, leaf, store, prefix);
+    if (storage && persist) persistSignal(leaf, storage, prefix + key);
     return leaf;
   };
 
@@ -168,7 +102,7 @@ export function signalStore (schema, options = {}) {
   const keep     = key => !options.persist || options.persist.includes(key);
   for (const [key, spec] of Object.entries(schema)) install(key, spec, keep(key));
 
-  const ready = store
+  const ready = storage
     ? Promise.all(declared.filter(keep).map(key => signals.get(key).$ready))
     : Promise.resolve();
 
