@@ -1,31 +1,91 @@
 // @aufbau/signals/TypedSignal.js
+// the allrounder: one factory for every signal type, so nobody has to import each
+// type by hand. together with signalStore it succeeds betterSignal, without
+// shadowing preact's own signal.
+//
+//   typedSignal({ type: 'bool', value: false })
+//   typedSignal({ type: 'enum', value: 'grid', values: ['grid', 'list'] })
+//   typedSignal({ type: Set, value: ['a'] })
+//   typedSignal({ value: 'hello' })                        // no type: read off the value
+//   typedSignal({ type: 'string', value: '', key: 'app:title', storage: 'local' })
+//
+// the argument is always a spec, never the value itself. that is what keeps a
+// plain object value ({ x: 0, y: 0 }) from being mistaken for config.
 
-/*
-anstatt wie bisher so ein chaos zu veranstalten und ein "betterSignal" zu haben,
-dass dann aber als "signal" nach aussen gegeben wird unddas original signal von @preact shadowed,
-und dann wiederum dessen Umbenennung erfordert, soll das jetzt sauber und klarer werden.
+import BaseSignal   from './BaseSignal.js';
+import BoolSignal   from './BoolSignal.js';
+import EnumSignal   from './EnumSignal.js';
+import MapSignal    from './MapSignal.js';
+import RecordSignal from './RecordSignal.js';
+import ScalarSignal from './ScalarSignal.js';
+import SetSignal    from './SetSignal.js';
+import StringSignal from './StringSignal.js';
 
-typedSignal und signalStore sind dann quasi die successor von betterSignal.
-*/
+import { persistSignal } from './persistence.js';
+import { isPlainObject } from './shared.js';
 
-import { BoolSignal }   from './BoolSignal.js';
-import { EnumSignal }   from './EnumSignal.js';
-import { MapSignal }    from './MapSignal.js';
-import { ScalarSignal } from './ScalarSignal.js';
-import { SetSignal }    from './SetSignal.js';
-import { StringSignal } from './StringSignal.js';
+// :::::: TYPES
+// a type is a lowercase name, the native constructor where one fits, or the
+// signal class itself. all three land on the same class.
 
-function typedSignal (obj) {
-  const { type, value, values } = obj;
-  
-  return {
-    bool    : () => new   BoolSignal (value),
-    boolean : () => new   BoolSignal (value),
-    enum    : () => new   EnumSignal (value, values),
-    map     : () => new    MapSignal (value),
-    set     : () => new    SetSignal (value),
-    string  : () => new StringSignal (value),
-  }[type]();
+const BY_NAME = {
+  bool    : BoolSignal,
+  boolean : BoolSignal,
+  enum    : EnumSignal,
+  map     : MapSignal,
+  record  : RecordSignal,
+  scalar  : ScalarSignal,
+  set     : SetSignal,
+  string  : StringSignal,
+};
+
+const BY_NATIVE = new Map([
+  [Boolean, BoolSignal],
+  [Map,     MapSignal],
+  [Object,  RecordSignal],
+  [Set,     SetSignal],
+  [String,  StringSignal],
+]);
+
+// anything standing on BaseSignal counts, the exported callable types and
+// subclasses of them alike
+const isSignalType = type => typeof type === 'function' && (type === BaseSignal || type.prototype instanceof BaseSignal);
+
+export const TYPE_NAMES = Object.keys(BY_NAME);
+
+export const resolveType = type =>
+    typeof type === 'string' ? BY_NAME[type.toLowerCase()]
+  : BY_NATIVE.get(type) ?? (isSignalType(type) ? type : undefined);
+
+// without a type the value decides. an allow list makes it an enum
+const inferType = ({ value, values }) =>
+    values                     ? EnumSignal
+  : typeof value === 'boolean' ? BoolSignal
+  : typeof value === 'string'  ? StringSignal
+  : value instanceof Map       ? MapSignal
+  : value instanceof Set       ? SetSignal
+  : isPlainObject(value)       ? RecordSignal
+  :                              ScalarSignal;
+
+// :::::: FACTORY
+
+/**
+ * @param {object}  spec
+ * @param {*}       [spec.type]     name, native constructor or signal class. read off the value when absent
+ * @param {*}       [spec.value]
+ * @param {Array}   [spec.values]   the allow list of an enum
+ * @param {string}  [spec.key]      persists the signal under this key
+ * @param {*}       [spec.storage]  'local' (default with a key), 'session', 'cookie', localStorage, a { get, set } store …
+ */
+export function typedSignal (spec = {}) {
+  if (!isPlainObject(spec)) throw new TypeError('[aufbau/signals] typedSignal takes a spec: { type, value }');
+
+  const Type = spec.type === undefined ? inferType(spec) : resolveType(spec.type);
+  if (!Type) throw new TypeError(`[aufbau/signals] unknown type ${String(spec.type)}, expected one of ${TYPE_NAMES.join(', ')}, a native constructor or a signal class`);
+
+  const signal = Type === EnumSignal ? new EnumSignal(spec.value, spec.values) : new Type(spec.value);
+  if (spec.key) persistSignal(signal, spec.storage ?? 'local', spec.key);
+  return signal;
 }
 
 export default typedSignal;

@@ -8,6 +8,7 @@ import { stringSignal } from './StringSignal.js';
 
 import { betterSignal } from './BetterSignal.js';
 import { querySignal }  from './QuerySignal.js';
+import { typedSignal }  from './TypedSignal.js';
 import { useRef }       from './shared.js';
 
 function createUseHook (signalType) {
@@ -20,7 +21,7 @@ function createUseHook (signalType) {
 
 export const
 useSignal       = createUseHook (betterSignal), // deprecated form
-useTypedSignal  = createUseHook (betterSignal), // new form
+useTypedSignal  = createUseHook (typedSignal),
 useQuerySignal  = createUseHook (querySignal),
 useBoolSignal   = createUseHook (boolSignal),
 useEnumSignal   = createUseHook (enumSignal),

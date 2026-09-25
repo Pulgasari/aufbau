@@ -5,8 +5,7 @@
 
 // TODO: back persistence with @bunker/db — the store interface already allows an async
 //       get(), so it can be added without touching the factory.
-// TODO: betterSignal stays for now, but signalStore is where it is headed: a plain
-//       object argument there is a leaf's declared shape, never guessed-at config.
+// TODO: betterSignal stays while call sites move to typedSignal and signalStore.
 
 // :::::: PREACT PRIMITIVES
 
@@ -31,8 +30,11 @@ export { StringSignal, stringSignal } from './StringSignal.js';
 export { deepSignal, isDeep } from './DeepSignal.js';
 export { querySignal }        from './QuerySignal.js';
 
-// :::::: STORE
+// :::::: ALLROUNDER + STORE
+// typedSignal builds any of the types above from a { type, value } spec, signalStore
+// holds several of them by name. both persist through the same storages.
 
+export { typedSignal } from './TypedSignal.js';
 export { signalStore } from './SignalStore.js';
 
 // :::::: FACTORY (legacy)
@@ -40,11 +42,17 @@ export { signalStore } from './SignalStore.js';
 
 export { betterSignal, betterSignal as signal } from './BetterSignal.js';
 
-// :::::: PERSISTENCE STORES
+// :::::: PERSISTENCE
+// a storage is given by name ('local', 'session', 'cookie', 'aufbau', 'none'), as
+// localStorage or sessionStorage, or as a { get, set } store. the factories stay
+// exported for the older form (store: local, store: cookie({ days: 7 }))
 
-export { aufbauStore, cookie, local, none, session } from './persistence.js';
+export { aufbauStore, cookie, local, none, persistSignal, resolveStorage, session } from './persistence.js';
 
 // :::::: FETCHERS + HOOKS
 
-export { dummyFetcher, fakeFetcher }  from './fetchers.js';
-export { useQuerySignal, useSignal }  from './hooks.js';
+export { dummyFetcher, fakeFetcher } from './fetchers.js';
+export {
+  useBoolSignal, useEnumSignal, useMapSignal, useQuerySignal, useSetSignal,
+  useSignal, useStringSignal, useTypedSignal,
+} from './hooks.js';
