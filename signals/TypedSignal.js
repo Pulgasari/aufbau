@@ -6,6 +6,7 @@
 //   typedSignal({ type: 'bool', value: false })
 //   typedSignal({ type: 'enum', value: 'grid', values: ['grid', 'list'] })
 //   typedSignal({ type: Set, value: ['a'] })
+//   typedSignal({ type: 'number', value: 3, min: 0, max: 10, step: 1 })
 //   typedSignal({ value: 'hello' })                        // no type: read off the value
 //   typedSignal({ type: 'string', value: '', key: 'app:title', storage: 'local' })
 //
@@ -16,6 +17,7 @@ import BaseSignal   from './BaseSignal.js';
 import BoolSignal   from './BoolSignal.js';
 import EnumSignal   from './EnumSignal.js';
 import MapSignal    from './MapSignal.js';
+import NumberSignal from './NumberSignal.js';
 import RecordSignal from './RecordSignal.js';
 import ScalarSignal from './ScalarSignal.js';
 import SetSignal    from './SetSignal.js';
@@ -33,6 +35,7 @@ const BY_NAME = {
   boolean : BoolSignal,
   enum    : EnumSignal,
   map     : MapSignal,
+  number  : NumberSignal,
   record  : RecordSignal,
   scalar  : ScalarSignal,
   set     : SetSignal,
@@ -42,6 +45,7 @@ const BY_NAME = {
 const BY_NATIVE = new Map([
   [Boolean, BoolSignal],
   [Map,     MapSignal],
+  [Number,  NumberSignal],
   [Object,  RecordSignal],
   [Set,     SetSignal],
   [String,  StringSignal],
@@ -61,6 +65,7 @@ export const resolveType = type =>
 const inferType = ({ value, values }) =>
     values                     ? EnumSignal
   : typeof value === 'boolean' ? BoolSignal
+  : typeof value === 'number'  ? NumberSignal
   : typeof value === 'string'  ? StringSignal
   : value instanceof Map       ? MapSignal
   : value instanceof Set       ? SetSignal
@@ -74,6 +79,9 @@ const inferType = ({ value, values }) =>
  * @param {*}       [spec.type]     name, native constructor or signal class. read off the value when absent
  * @param {*}       [spec.value]
  * @param {Array}   [spec.values]   the allow list of an enum
+ * @param {number}  [spec.min]      the bounds and step of a number
+ * @param {number}  [spec.max]
+ * @param {number}  [spec.step]
  * @param {string}  [spec.key]      persists the signal under this key
  * @param {*}       [spec.storage]  'local' (default with a key), 'session', 'cookie', localStorage, a { get, set } store …
  */
@@ -83,7 +91,9 @@ export function typedSignal (spec = {}) {
   const Type = spec.type === undefined ? inferType(spec) : resolveType(spec.type);
   if (!Type) throw new TypeError(`[aufbau/signals] unknown type ${String(spec.type)}, expected one of ${TYPE_NAMES.join(', ')}, a native constructor or a signal class`);
 
-  const signal = Type === EnumSignal ? new EnumSignal(spec.value, spec.values) : new Type(spec.value);
+  const signal = Type === EnumSignal   ? new EnumSignal(spec.value, spec.values)
+               : Type === NumberSignal ? new NumberSignal(spec.value, spec)
+               :                         new Type(spec.value);
   if (spec.key) persistSignal(signal, spec.storage ?? 'local', spec.key);
   return signal;
 }
