@@ -1,41 +1,43 @@
 // @aufbau/signals/SignalStore.js
 // a store of named, typed leaves.
-//
-//   const ui = signalStore({
-//     view : { type: 'enum', values: ['grid', 'list'], value: 'grid' },
-//     dark : { type: Boolean, value: false },
-//   }, { key: 'app:ui:', store: local });
-//
-//   ui.view              // the EnumSignal itself
-//   ui.view.value        // 'grid'
-//   ui.view.cycle()      // its own methods, where the type has them
-//   ui.$view             // 'grid'   — the value, no .value
-//   ui.$view = 'list'    // and writes it
-//
-//   ui.get('view')                        // 'grid'
-//   ui.set('view', 'list')                // one leaf
-//   ui.set({ view: 'list', dark: true })  // several
-//
-// a store grows after the fact, either by schema or by handing it a signal:
-//
-//   ui.$extend({ busy: { type: String, value: '' } });
-//   ui.busy = StringSignal('');            // same thing, one leaf
-//
-// every leaf declares its type. that is the whole point of the mandatory `type`:
-// the old factory read a plain object as config, so `signal({ x: 0, y: 0 })` quietly
-// produced an empty scalar instead of the record it looks like. here the shape of a
-// leaf is stated, not guessed.
+
+/*
+const ui = signalStore({
+  view : { type: 'enum', values: ['grid', 'list'], value: 'grid' },
+  dark : { type: Boolean, value: false },
+}, { key: 'app:ui:', store: local });
+
+ui.view              // the EnumSignal itself
+ui.view.value        // 'grid'
+ui.view.cycle()      // its own methods, where the type has them
+ui.$view             // 'grid'   — the value, no .value
+ui.$view = 'list'    // and writes it
+
+ui.get('view')                        // 'grid'
+ui.set('view', 'list')                // one leaf
+ui.set({ view: 'list', dark: true })  // several
+
+a store grows after the fact, either by schema or by handing it a signal:
+
+ui.$extend({ busy: { type: String, value: '' } });
+ui.busy = StringSignal('');
+
+every leaf declares its type. that is the whole point of the mandatory `type`:
+the old factory read a plain object as config, so `signal({ x: 0, y: 0 })` quietly
+produced an empty scalar instead of the record it looks like. here the shape of a
+leaf is stated, not guessed.
+*/
 
 // :::::: IMPORTS
 
-import { BaseSignal }   from './BaseSignal.js';
-import { BoolSignal }   from './BoolSignal.js';
-import { EnumSignal }   from './EnumSignal.js';
-import { MapSignal }    from './MapSignal.js';
-import { RecordSignal } from './RecordSignal.js';
-import { ScalarSignal } from './ScalarSignal.js';
-import { SetSignal }    from './SetSignal.js';
-import { StringSignal } from './StringSignal.js';
+import BaseSignal   from './BaseSignal.js';
+import BoolSignal   from './BoolSignal.js';
+import EnumSignal   from './EnumSignal.js';
+import MapSignal    from './MapSignal.js';
+import RecordSignal from './RecordSignal.js';
+import ScalarSignal from './ScalarSignal.js';
+import SetSignal    from './SetSignal.js';
+import StringSignal from './StringSignal.js';
 
 import { resolveStore } from './persistence.js';
 import { computed, effect, isPlainObject, isPromise, signal, untracked } from './shared.js';
@@ -62,8 +64,9 @@ const BY_NATIVE = new Map([
   [Object,  RecordSignal],
 ]);
 
-// any constructor standing on BaseSignal counts, so the exported (callable) types and
-// anything subclassed from them resolve the same way the built-in names do.
+// any constructor standing on BaseSignal counts,
+// so the exported (callable) types and anything subclassed from them
+// resolve the same way the built-in names do.
 const isType = type => typeof type === 'function' && (type === BaseSignal || type.prototype instanceof BaseSignal);
 
 const resolveType = type =>
@@ -76,13 +79,13 @@ const NAMES = Object.keys(BY_NAME).join(', ');
 // the store answers to these itself, so a leaf of the same name is reachable only
 // through get()/set(). warned about at construction rather than shadowed in silence.
 
-const METHODS   = ['get', 'set'];                                       // ui.get  — shadows a leaf outright
+const METHODS   = ['get', 'set'];                                       // ui.get   — shadows a leaf outright
 const SHORTHAND = ['signals', 'snapshot', 'signal', 'keys', 'ready'];   // ui.$keys — shadows the $ form only
 
 const warnReserved = (keys) => {
   for (const key of keys) {
-    if (METHODS.includes(key))   console.warn(`[signalStore] leaf "${key}" is shadowed by the store's own ${key}() — reach it with get('${key}')`);
-    if (SHORTHAND.includes(key)) console.warn(`[signalStore] leaf "${key}" has no $${key} shorthand ($${key} is the store's own) — read it as .${key}.value`);
+    if   (METHODS.includes(key)) console.warn(`[signalStore] leaf "${key}" is shadowed by the store's own ${key}() — reach it with get('${key}')`);
+    if (SHORTHAND.includes(key)) console.warn(`[signalStore] leaf "${key}" has no $${key} shorthand ($${key} is the store's own) — read it as .${key}.value`);        
   }
 };
 
@@ -92,9 +95,7 @@ const createLeaf = (key, spec) => {
   if (!isPlainObject(spec)) throw new TypeError(`[signalStore] "${key}": a leaf is declared as { type, value }`);
 
   const Type = resolveType(spec.type);
-  if (!Type) throw new TypeError(
-    `[signalStore] "${key}": unknown type ${String(spec.type)} — name one of [${NAMES}], a native (Boolean/String/Map/Set/Object) or a signal class`);
-
+  if (!Type) throw new TypeError(`[signalStore] "${key}": unknown type ${String(spec.type)}`);
   return Type === EnumSignal ? new EnumSignal(spec.value, spec.values) : new Type(spec.value);
 };
 
