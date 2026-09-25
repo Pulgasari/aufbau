@@ -12,6 +12,7 @@
 
 @container style(--theme: amethyst)  { body { --bg: #160f1f; --fg: #ece0f5; --accent: #a855f7; } }     
 @container style(--theme: beton)     { body { --bg: #3a3a3a; --fg: #dcdcdc; --accent: #9ad1d4; } }
+@container style(--theme: classic)   { body { --bg: #ffffff; --fg: #000000; --accent: #880088; } }
 @container style(--theme: desert)    { body { --bg: #e3cfa4; --fg: #3b2c17; --accent: #8a3a0f; } }
 @container style(--theme: dracula)   { body { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; } }
 @container style(--theme: flamingo)  { body { --bg: #2b1e25; --fg: #ffe9f1; --accent: #ff5c8a; } }
@@ -31,7 +32,7 @@
 @container style(--theme: softwhite) { body { --bg: #f2f2ef; --fg: #1c1c1c; --accent: #c2255c; } }
 @container style(--theme: synthwave) { body { --bg: #241b3a; --fg: #ffe9fb; --accent: #f92aad; } }
 @container style(--theme: tinte)     { body { --bg: #0e0e1a; --fg: #dcd9f0; --accent: #8b7dff; } }
-@container style(--theme: zombie)    { body { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; } }
+@container style(--theme: zombie)    { body { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; } }          
 
 html, body {
   background   : var(--bg);
