@@ -110,6 +110,7 @@ a string, coerced on every write. null and undefined read as '' rather than leak
 - `toLowerCase`
 - `toPascalCase`
 - `toSlugCase`
+- `toTitleCase`
 - `toUpperCase`
 
 ---
