@@ -39,18 +39,11 @@ export { querySignal }        from './QuerySignal.js';
 export { typedSignal } from './TypedSignal.js';
 export { signalStore } from './SignalStore.js';
 
-// :::::: FACTORY (legacy)
-// the config object factory, under its own name only. typedSignal and signalStore
-// replace it
-
-export { betterSignal } from './BetterSignal.js';
-
 // :::::: PERSISTENCE
 // a storage is given by name ('local', 'session', 'cookie', 'aufbau', 'none'), as
-// localStorage or sessionStorage, or as a { get, set } store. the factories stay
-// exported for the older form (store: local, store: cookie({ days: 7 }))
+// localStorage or sessionStorage themselves, or as a { get, set } store
 
-export { aufbauStore, cookie, local, none, persistSignal, resolveStorage, session } from './persistence.js';
+export { STORAGE_NAMES, persistSignal } from './persistence.js';
 
 // :::::: FETCHERS + HOOKS
 

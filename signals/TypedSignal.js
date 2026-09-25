@@ -1,7 +1,6 @@
 // @aufbau/signals/TypedSignal.js
 // the allrounder: one factory for every signal type, so nobody has to import each
-// type by hand. together with signalStore it succeeds betterSignal, without
-// shadowing preact's own signal.
+// type by hand.
 //
 //   typedSignal({ type: 'bool', value: false })
 //   typedSignal({ type: 'enum', value: 'grid', values: ['grid', 'list'] })
