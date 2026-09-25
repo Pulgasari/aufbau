@@ -1,6 +1,7 @@
 // @aufbau/signals/persistence.js
 // where a signal persists, and the wiring that keeps it there.
 
+import { readLeaf, restoreLeaf } from './leaf.js';
 import { createStorage, effect, isPromise } from './shared.js';
 
 const MISS   = Symbol('miss');
@@ -90,14 +91,14 @@ const snapshotOf = value =>
 function persistSignal (signal, storage, key) {
   const store = resolveStorage(storage);
 
-  // $restore, not .value: hydration is authoritative and may write past a type's
-  // own validation (see EnumSignal)
-  const apply = value => { if (value !== undefined) signal.$restore(value); };
+  // hydration is authoritative and may write past a type's own validation (see
+  // EnumSignal), a deep node merges (see leaf.js)
+  const apply = value => { if (value !== undefined) restoreLeaf(signal, value); };
 
   const arm = () => {
     let first = true;
     effect(() => {
-      const value = signal.value;
+      const value = readLeaf(signal);
       if (first) { first = false; return; }   // the hydrated or declared value is not written back
       store.set(key, snapshotOf(value));
     });

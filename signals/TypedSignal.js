@@ -6,6 +6,7 @@
 //   typedSignal({ type: 'enum', value: 'grid', values: ['grid', 'list'] })
 //   typedSignal({ type: Set, value: ['a'] })
 //   typedSignal({ type: 'number', value: 3, min: 0, max: 10, step: 1 })
+//   typedSignal({ type: 'deep', value: { font: { size: 14 } } })   // one signal per leaf
 //   typedSignal({ value: 'hello' })                        // no type: read off the value
 //   typedSignal({ type: 'string', value: '', key: 'app:title', storage: 'local' })
 //
@@ -22,6 +23,8 @@ import ScalarSignal from './ScalarSignal.js';
 import SetSignal    from './SetSignal.js';
 import StringSignal from './StringSignal.js';
 
+import { deepSignal }    from './DeepSignal.js';
+import { rememberLeaf }  from './leaf.js';
 import { persistSignal } from './persistence.js';
 import { isPlainObject } from './shared.js';
 
@@ -54,7 +57,10 @@ const BY_NATIVE = new Map([
 // subclasses of them alike
 const isSignalType = type => typeof type === 'function' && (type === BaseSignal || type.prototype instanceof BaseSignal);
 
-export const TYPE_NAMES = Object.keys(BY_NAME);
+// not a class: a deep node is a proxy with one signal per leaf, see DeepSignal.js
+const DEEP = 'deep';
+
+export const TYPE_NAMES = [...Object.keys(BY_NAME), DEEP];
 
 export const resolveType = type =>
     typeof type === 'string' ? BY_NAME[type.toLowerCase()]
@@ -81,11 +87,18 @@ const inferType = ({ value, values }) =>
  * @param {number}  [spec.min]      the bounds and step of a number
  * @param {number}  [spec.max]
  * @param {number}  [spec.step]
+ * @param {*}       [spec.depth]    how deep a 'deep' value is split into leaves, all the way by default
  * @param {string}  [spec.key]      persists the signal under this key
  * @param {*}       [spec.storage]  'local' (default with a key), 'session', 'cookie', localStorage, a { get, set } store …
  */
 export function typedSignal (spec = {}) {
   if (!isPlainObject(spec)) throw new TypeError('[aufbau/signals] typedSignal takes a spec: { type, value }');
+
+  if (spec.type === DEEP) {
+    const node = rememberLeaf(deepSignal(spec.value ?? {}, spec.depth ?? true));
+    if (spec.key) persistSignal(node, spec.storage ?? 'local', spec.key);
+    return node;
+  }
 
   const Type = spec.type === undefined ? inferType(spec) : resolveType(spec.type);
   if (!Type) throw new TypeError(`[aufbau/signals] unknown type ${String(spec.type)}, expected one of ${TYPE_NAMES.join(', ')}, a native constructor or a signal class`);
