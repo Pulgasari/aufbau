@@ -1,5 +1,11 @@
 // @aufbau/signals/hooks.js
 
+import { boolSignal }   from './BoolSignal';
+import { enumSignal }   from './EnumSignal.js';
+import { mapSignal }    from './MapSignal.js';
+import { setSignal }    from './SetSignal.js';
+import { stringSignal } from './StringSignal.js';
+
 import { betterSignal } from './BetterSignal.js';
 import { querySignal }  from './QuerySignal.js';
 import { useRef }       from './shared.js';
