@@ -3,6 +3,7 @@
 // :::::: IMPORT
 
 import { BaseSignal, callable } from './BaseSignal.js';
+import str from '@pulgasari/str';
 
 // :::::: HELPERS
 
@@ -22,6 +23,9 @@ class StringSignal extends BaseSignal {
   get length () { return this.value.length; }
 
   clear () { super.value = ''; return ''; }
+
+  //
+  toCamelCase () { return str.toCamelCase(); }
 
 }
 
