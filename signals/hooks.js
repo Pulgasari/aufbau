@@ -1,6 +1,6 @@
 // @aufbau/signals/hooks.js
 
-import { boolSignal }   from './BoolSignal';
+import { boolSignal }   from './BoolSignal.js';
 import { enumSignal }   from './EnumSignal.js';
 import { mapSignal }    from './MapSignal.js';
 import { setSignal }    from './SetSignal.js';
@@ -10,19 +10,7 @@ import { betterSignal } from './BetterSignal.js';
 import { querySignal }  from './QuerySignal.js';
 import { useRef }       from './shared.js';
 
-export function useSignal (input) {
-  let ref = useRef(null);
-  if (ref.current === null) ref.current = betterSignal(input);
-  return ref.current;
-}
-
-export function useQuerySignal (fetcher, options) {
-  let ref = useRef(null);
-  if (ref.current === null) ref.current = querySignal(fetcher, options);
-  return ref.current;
-}
-
-function useTypedSignal (typedSignal) {
+function createUseHook (typedSignal) {
   return function (...args) {
     let ref = useRef(null);
     if (ref.current === null) ref.current = typedSignal (...args);
@@ -30,9 +18,12 @@ function useTypedSignal (typedSignal) {
   }
 }
 
-const
-useBoolSignal   = useTypedSignal (boolSignal),
-useEnumSignal   = useTypedSignal (enumSignal),
-useMapSignal    = useTypedSignal (mapSignal),
-useSetSignal    = useTypedSignal (setSignal),
-useStringSignal = useTypedSignal (stringSignal);
+export const
+useSignal       = createUseHook (betterSignal), // deprecated form
+useTypedSignal  = createUseHook (betterSignal), // new form
+useQuerySignal  = createUseHook (querySignal),
+useBoolSignal   = createUseHook (boolSignal),
+useEnumSignal   = createUseHook (enumSignal),
+useMapSignal    = createUseHook (mapSignal),
+useSetSignal    = createUseHook (setSignal),
+useStringSignal = createUseHook (stringSignal);
