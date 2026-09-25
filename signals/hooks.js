@@ -1,6 +1,4 @@
 // @aufbau/signals/hooks.js
-// preact bindings — create the carrier once per component instance and keep it stable
-// across renders via a ref.
 
 import { betterSignal } from './BetterSignal.js';
 import { querySignal }  from './QuerySignal.js';
@@ -17,3 +15,18 @@ export function useQuerySignal (fetcher, options) {
   if (ref.current === null) ref.current = querySignal(fetcher, options);
   return ref.current;
 }
+
+function useTypedSignal (typedSignal) {
+  return function (...args) {
+    let ref = useRef(null);
+    if (ref.current === null) ref.current = typedSignal (...args);
+    return ref.current;
+  }
+}
+
+const
+useBoolSignal   = useTypedSignal (boolSignal),
+useEnumSignal   = useTypedSignal (enumSignal),
+useMapSignal    = useTypedSignal (mapSignal),
+useSetSignal    = useTypedSignal (setSignal),
+useStringSignal = useTypedSignal (stringSignal);
