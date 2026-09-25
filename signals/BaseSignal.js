@@ -9,9 +9,20 @@ import { Signal, effect } from './shared.js';
 
 class BaseSignal extends Signal {
 
+  #initial;
+
   $ready = null;
 
+  // the value as constructed, after the type coerced it. reset() goes back there,
+  // not to a value hydration brought in
+  constructor (value) {
+    super(value);
+    this.#initial = this.peek();
+  }
+
   $restore (next) { this.value = next; }
+
+  reset () { this.value = this.#initial; return this.peek(); }
 
   toText () {
     const value = this.value;

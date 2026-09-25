@@ -16,6 +16,8 @@ ui.$view = 'list'    // and writes it
 ui.get('view')                        // 'grid'
 ui.set('view', 'list')                // one leaf
 ui.set({ view: 'list', dark: true })  // several
+ui.toggle('dark')                     // the leaf's own toggle
+ui.reset('view')                      // back to the declared value, ui.reset() for all
 
 a store grows after the fact, either by schema or by handing it a signal:
 
@@ -32,6 +34,7 @@ leaf is stated, not guessed.
 
 import BaseSignal from './BaseSignal.js';
 
+import { isDeep, readLeaf, rememberLeaf, resetLeaf, writeLeaf } from './leaf.js';
 import { persistSignal }            from './persistence.js';
 import { TYPE_NAMES, typedSignal }  from './TypedSignal.js';
 import { computed, effect, isPlainObject, signal, untracked } from './shared.js';
@@ -40,7 +43,7 @@ import { computed, effect, isPlainObject, signal, untracked } from './shared.js'
 // the store answers to these itself, so a leaf of the same name is reachable only
 // through get()/set(). warned about at construction rather than shadowed in silence.
 
-const METHODS   = ['get', 'set'];                                       // ui.get   — shadows a leaf outright
+const METHODS   = ['get', 'reset', 'set', 'toggle'];                    // ui.get   — shadows a leaf outright
 const SHORTHAND = ['signals', 'snapshot', 'signal', 'keys', 'ready'];   // ui.$keys — shadows the $ form only
 
 const warnReserved = (keys) => {
@@ -53,6 +56,8 @@ const warnReserved = (keys) => {
 // :::::: LEAVES
 // a leaf is a typedSignal spec, with the difference that the type is mandatory:
 // the shape of a leaf is stated, not read off its first value.
+
+const isLeaf = value => value instanceof BaseSignal || isDeep(value);
 
 const createLeaf = (key, spec) => {
   if (!isPlainObject(spec))   throw new TypeError(`[signalStore] "${key}": a leaf is declared as { type, value }`);
@@ -78,6 +83,7 @@ export function signalStore (schema, options = {}) {
   const keysSignal = signal([]);   // bumped when a leaf is added, so $keys and $onEffect track
 
   const storage = options.key ? options.storage ?? 'local' : null;
+  const warned  = new Set;   // unknown keys written to, each reported once
   const prefix  = options.key ?? '';
 
   const syncKeys = () => keysSignal.value = [...signals.keys()];
@@ -87,7 +93,7 @@ export function signalStore (schema, options = {}) {
     const existed = signals.get(key);
     if (existed) console.warn(`[signalStore] leaf "${key}" replaced — anything already reading the old carrier stays on it`);
 
-    const leaf = leafOrSpec instanceof BaseSignal ? leafOrSpec : createLeaf(key, leafOrSpec);
+    const leaf = isLeaf(leafOrSpec) ? rememberLeaf(leafOrSpec) : createLeaf(key, leafOrSpec);
     signals.set(key, leaf);
     warnReserved([key]);
     syncKeys();
@@ -106,15 +112,31 @@ export function signalStore (schema, options = {}) {
     : Promise.resolve();
 
   // a plain-object view of every leaf's value, and the same as one reactive signal
-  const snapshot   = () => Object.fromEntries([...signals].map(([key, leaf]) => [key, leaf.value]));
+  const snapshot   = () => Object.fromEntries([...signals].map(([key, leaf]) => [key, readLeaf(leaf)]));
   const snapSignal = computed(snapshot);
 
   // one leaf by name, or several at once
-  const read  = key => signals.get(key)?.value;
+  const read  = key => { const leaf = signals.get(key); return leaf && readLeaf(leaf); };
   const write = (key, value) => {
-    if (isPlainObject(key)) { for (const [k, v] of Object.entries(key)) write(k, v); return; }
+    if (isPlainObject(key)) { for (const [name, next] of Object.entries(key)) write(name, next); return; }
     const leaf = signals.get(key);
-    if (leaf) leaf.value = value;           // unknown keys are ignored: the schema is the shape
+    if (leaf) return writeLeaf(leaf, value);
+
+    // the schema is the shape, an unknown key is not added. but it is said, once:
+    // a silently dropped write reads like a working app that forgets things
+    if (!warned.has(key)) { warned.add(key); console.warn(`[signalStore] "${key}" is not a leaf, the write is ignored — declare it with $extend({ ${key}: { type, value } })`); }
+  };
+
+  // back to the declared value, one leaf or all of them. hydration does not count
+  const reset = key => { for (const leaf of key === undefined ? signals.values() : [signals.get(key)]) if (leaf) resetLeaf(leaf); };
+
+  // the leaf's own toggle: a bool flips, a set toggles an item, a deep node a path
+  const toggle = (key, ...args) => {
+    const leaf = signals.get(key);
+    if (!leaf) return undefined;
+    if (isDeep(leaf))     return leaf.$toggle(...args);
+    if (leaf.toggle)      return leaf.toggle(...args);
+    throw new TypeError(`[signalStore] "${key}" cannot be toggled, its type has no toggle()`);
   };
 
   // grow the store from a schema, the same shape it was built with
@@ -129,7 +151,7 @@ export function signalStore (schema, options = {}) {
     void keysSignal.value;
     const leaf = signals.get(key);
     if (!leaf) return;
-    const value = leaf.value;
+    const value = readLeaf(leaf);
     untracked(() => callback(value));       // the callback's own reads are not this effect's business
   });
 
@@ -145,7 +167,9 @@ export function signalStore (schema, options = {}) {
       // the store's own surface wins over a leaf of the same name
       switch (key) {
         case 'get'        : return read;
+        case 'reset'      : return reset;
         case 'set'        : return write;
+        case 'toggle'     : return toggle;
         case '$extend'    : return extend;
         case '$onEffect'  : return onEffect;
         case '$onEffects' : return onEffects;
@@ -163,7 +187,7 @@ export function signalStore (schema, options = {}) {
     // a signal declares the leaf; anything else writes the value of an existing one
     set (_, key, value) {
       const name = key[0] === '$' ? key.slice(1) : key;
-      if (value instanceof BaseSignal) install(name, value, false);
+      if (isLeaf(value)) install(name, value, false);
       else write(name, value);
       return true;
     },
