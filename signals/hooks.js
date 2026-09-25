@@ -10,10 +10,10 @@ import { betterSignal } from './BetterSignal.js';
 import { querySignal }  from './QuerySignal.js';
 import { useRef }       from './shared.js';
 
-function createUseHook (typedSignal) {
+function createUseHook (signalType) {
   return function (...args) {
     let ref = useRef(null);
-    if (ref.current === null) ref.current = typedSignal (...args);
+    if (ref.current === null) ref.current = signalType (...args);
     return ref.current;
   }
 }
