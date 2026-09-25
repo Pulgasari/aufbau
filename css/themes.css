@@ -1,5 +1,32 @@
 /* @aufbau/css/themes.css */
+
+/*
 @import url('./themes/classic.css');
 @import url('./themes/oled.css');
 @import url('./themes/rainbow.css');
 @import url('./themes/zombie.css');
+*/
+
+:root {
+&[data-theme="amethyst"]  { --bg: #160f1f; --fg: #ece0f5; --accent: #a855f7; }
+&[data-theme="beton"]     { --bg: #3a3a3a; --fg: #dcdcdc; --accent: #9ad1d4; }
+&[data-theme="desert"]    { --bg: #e3cfa4; --fg: #3b2c17; --accent: #8a3a0f; }
+&[data-theme="dracula"]   { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; }
+&[data-theme="flamingo"]  { --bg: #2b1e25; --fg: #ffe9f1; --accent: #ff5c8a; }
+&[data-theme="hell"]      { --bg: #ffffff; --fg: #101317; --accent: #0a66c2; }
+&[data-theme="kontrast"]  { --bg: #000000; --fg: #ffffff; --accent: #ffff00; }
+&[data-theme="lavendel"]  { --bg: #f3f0fa; --fg: #241c33; --accent: #6b3fd4; }
+&[data-theme="matrix"]    { --bg: #0b0f0b; --fg: #c8f7c5; --accent: #39ff14; }
+&[data-theme="nightsky"]  { --bg: #0b1a2e; --fg: #dbe4f0; --accent: #6ea8fe; }
+&[data-theme="oled"]      { --bg: #000000; --fg: #e9e9e9; --accent: #00e5ff; }
+&[data-theme="papier"]    { --bg: #efe9dd; --fg: #2b2622; --accent: #8f5d3a; }
+&[data-theme="parrot"]    { --bg: #10241a; --fg: #f3f7e8; --accent: #ff4d2d; }
+&[data-theme="petrol"]    { --bg: #08191a; --fg: #d5eceb; --accent: #0fb9ad; }
+&[data-theme="rubin"]     { --bg: #1a0a0f; --fg: #f2dfe3; --accent: #f2295b; }
+&[data-theme="smaragd"]   { --bg: #07160f; --fg: #dff3e6; --accent: #50c878; }
+&[data-theme="snowflake"] { --bg: #e9f1f7; --fg: #16262f; --accent: #00697a; }
+&[data-theme="softblack"] { --bg: #151515; --fg: #e6e6e6; --accent: #ffb86c; }
+&[data-theme="softwhite"] { --bg: #f2f2ef; --fg: #1c1c1c; --accent: #c2255c; }
+&[data-theme="synthwave"] { --bg: #241b3a; --fg: #ffe9fb; --accent: #f92aad; }
+&[data-theme="tinte"]     { --bg: #0e0e1a; --fg: #dcd9f0; --accent: #8b7dff; }
+}
