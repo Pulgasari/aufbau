@@ -77,8 +77,7 @@ export function signalStore (schema, options = {}) {
   const signals    = new Map();
   const keysSignal = signal([]);   // bumped when a leaf is added, so $keys and $onEffect track
 
-  // `store` is the older name of `storage`
-  const storage = options.key ? options.storage ?? options.store ?? 'local' : null;
+  const storage = options.key ? options.storage ?? 'local' : null;
   const prefix  = options.key ?? '';
 
   const syncKeys = () => keysSignal.value = [...signals.keys()];

@@ -1,7 +1,8 @@
 // @aufbau/builders/docs/index.js
 
 import initDefaultStylesheet from './ss.js';
-import aufbau, { dom, html, preact, signalStore as aufbauStore, str } from '@aufbau/kits/preact-htm';
+import aufbau, { dom, html, preact, str } from '@aufbau/kits/preact-htm';
+import { signal, typedSignal } from '@aufbau/signals';
 import { isArray, isFn, isString } from '@pulgasari/is';
 import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
 
@@ -227,27 +228,29 @@ export function processContent (htmlContent, { docURL, rootURL } = {}) {
     }
   });
 
-  const brandState = aufbau.signal({
+  const brandState = signal({
     title: isString(brand) ? brand : (brand?.title || title),
     img: null,
     svgContent: null
   });
 
-  const pageTheme = aufbau.signal({
-    value  : PAGE_THEMES.at(-1),
-    values : PAGE_THEMES,
-    key    : 'docs-theme-page',
-    store  : aufbauStore,
+  const pageTheme = typedSignal({
+    type    : 'enum',
+    value   : PAGE_THEMES.at(-1),
+    values  : PAGE_THEMES,
+    key     : 'docs-theme-page',
+    storage : 'aufbau',
   });
-  const codeTheme = aufbau.signal({
-    value : DEFAULT_CODE,
-    key   : 'docs-theme-code',
-    store : aufbauStore,
+  const codeTheme = typedSignal({
+    type    : 'scalar',
+    value   : DEFAULT_CODE,
+    key     : 'docs-theme-code',
+    storage : 'aufbau',
   });
   // seeded with the active one so the picker is never momentarily empty
-  const codeThemes = aufbau.signal([codeTheme.value]);
+  const codeThemes = signal([codeTheme.value]);
 
-  // side-effects betterSignal doesn't own — trigger once with the hydrated value
+  // side effects the signals do not own, run once with the hydrated value
   preact.effect(() => applyPageTheme(pageTheme.value));
   preact.effect(() => applyCodeTheme(codeTheme.value));
 
