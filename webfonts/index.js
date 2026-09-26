@@ -1,19 +1,13 @@
 // @aufbau/webfonts
-// the handpicked font collection (./data.js). a font is loaded through the
-// FontFace api and applied as a custom property, so css decides where it goes.
-//
-//   await apply('manrope');                              // --aufbau-font on :root
-//   await apply('.code', 'jetbrains-mono');              // mono fonts default to --aufbau-font-mono
-//   await apply(document.body, 'lexend', { role: 'heading' });
-//   await update(':root', { fallback: 'system-ui' });
-//   remove(':root', { role: 'heading' });
-//
-// the target may be left out, it is the root element then. `role` is a key of
-// ROLES or any custom property name.
 
+// :::::: IMPORTS
+
+import { isArray, isElement, isFn, isIterable, isNullish, isString } from '@pulgasari/is';
 import { fonts } from './data.js';
 
-export const ROLES = {
+// :::::: 
+
+const ROLES = {
   body    : '--aufbau-font',
   code    : '--aufbau-font-mono',
   heading : '--aufbau-font-heading',
@@ -23,26 +17,47 @@ export const ROLES = {
 };
 
 const settings = { baseUrl: 'https://code.pulgasari.dev/aufbau/webfonts' };
-
-const applied = new WeakMap;   // element -> Map(property -> { id, options })
-const loading = new Map;       // id -> promise of the load result
+const applied  = new WeakMap; // element -> Map(property -> { id, options })
+const loading  = new Map;     // id -> promise of the load result
 
 const propertyOf = role => role.startsWith('--') ? role : ROLES[role] ?? `--aufbau-font-${role}`;
 
 function toElements (target) {
-  if (target == null)             return [document.documentElement];
-  if (typeof target === 'string') return [...document.querySelectorAll(target)];
-  if (target instanceof Element)  return [target];
-  if (target?.[Symbol.iterator])  return [...target].filter(element => element instanceof Element);
+  if (isNullish  (target)) return [document.documentElement];
+  if (isString   (target)) return [...document.querySelectorAll(target)];
+  if (isElement  (target)) return [target]; // target instanceof Element
+  if (isIterable (target)) return [...target].filter(isElement);
   return [];
 }
 
-/** finds a font by id or name */
-export const find = key => key ? fonts.find(font => font.id === key || font.name === key) ?? null : null;
+/*
+function toElements (target) {
+  return shift (target) ({
+    isNullish  : () => [document.documentElement],
+    isString   : () => [...document.querySelectorAll(target)],
+    isElement  : () => [target],
+    isIterable : () => [...target].filter(isElement),
+    fallback   : () => [],
+  });
+}
+
+const toElements = (target) => shift ({
+  isNullish  : () => [document.documentElement],
+  isString   : () => [...document.querySelectorAll(target)],
+  isElement  : () => [target],
+  isIterable : () => [...target].filter(isElement),
+  fallback   : () => [],
+});
+
+const iterable = shape (isIterable);
+const nullish  = shape (isNullish);
+*/
+
+const find = key => key ? fonts.find(font => font.id === key || font.name === key) ?? null : null;
 
 // :::::: FONT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-export class Font {
+class Font {
   constructor (id, options = {}) {
     this.meta = find(id);
     if (!this.meta) throw new Error(`[@aufbau/webfonts] unknown font "${id}"`);
@@ -52,13 +67,11 @@ export class Font {
 
   get role () { return this.options.role ?? (this.meta.category === 'mono' ? 'mono' : 'body'); }
 
-  /** the font-family value, the font plus its fallback */
   family (options) {
     const fallback = { ...this.options, ...options }.fallback ?? this.meta.fallback ?? 'sans-serif';
     return `'${this.meta.name}', ${fallback}`;
   }
 
-  /** registers every face with document.fonts once. resolves false when none loaded */
   load () {
     if (!loading.has(this.id)) loading.set(this.id, Promise.all(this.meta.faces.map(async face => {
       const url = /^https?:\/\//.test(face.file) ? face.file : `${settings.baseUrl}/${face.file}`;
@@ -94,20 +107,18 @@ export class Font {
 
 // :::::: API :::::::::::::::::::::::::::::::::::::::::::::::::::
 
-export const data = fonts;
-export const list = () => fonts.map(({ category, id, name }) => ({ category, id, name }));
+const data = fonts;
+const list = () => fonts.map(({ category, id, name }) => ({ category, id, name }));
 
-export const configure = ({ baseUrl } = {}) => { if (baseUrl) settings.baseUrl = baseUrl.replace(/\/$/, ''); };
+const configure = ({ baseUrl } = {}) => { if (baseUrl) settings.baseUrl = baseUrl.replace(/\/$/, ''); };
 
-export const use  = (id, options) => new Font(id, options);
-export const load = id => use(id).load();
+const use  = (id, options) => new Font (id, options);
+const load = (id)          => use(id).load();
 
-/** apply(target, id, options), or apply(id, options) for the root element */
-export const apply = (target, id, options) =>
-  typeof id === 'string' ? use(id).apply(target, options) : use(target).apply(null, id);
+const apply = (target, id, options) =>
+  isString(id) ? use(id).apply(target, options) : use(target).apply(null, id);
 
-/** changes the options of the fonts already on the targets, `role` narrows it to one */
-export async function update (target, options = {}) {
+async function update (target, options = {}) {
   const only = options.role && propertyOf(options.role);
   const jobs = [];
   for (const element of toElements(target)) {
@@ -118,26 +129,25 @@ export async function update (target, options = {}) {
   await Promise.all(jobs);
 }
 
-/** removes the fonts set on the targets, `role` narrows it to one */
-export function remove (target, { role } = {}) {
+function remove (target, { role } = {}) {
   const only = role && propertyOf(role);
   for (const element of toElements(target)) {
-    const properties = applied.get(element);
-    for (const property of [...properties?.keys() ?? []]) {
-      if (only && only !== property) continue;
-      element.style.removeProperty(property);
-      properties.delete(property);
+    const props = applied.get(element);
+    const keys  = [...props?.keys() ?? []]
+    for (const property of keys) {
+      if (only && only !== prop) continue;
+      element.style.removeProperty(prop);
+      props.delete(prop);
     }
   }
 }
 
-/** loads and applies a list of fonts to the root: ['manrope', { id: 'lexend', role: 'heading' }] */
-export async function init (config) {
+async function init (config) {
   if (!config) return;
-  const items = (Array.isArray(config) ? config : [config]).map(item => typeof item === 'string' ? { id: item } : item);
+  const items = (isArray(config) ? config : [config]).map(item => isString(item) ? { id: item } : item);
   await Promise.all(items.map(({ id, target, ...options }) => apply(target ?? null, id, options)));
 }
 
-export { find as findFont, fonts };
-
+export         { find as findFont };
+export         { apply, configure, data, find, fonts, init, list, load, remove, update, use, Font, ROLES };
 export default { apply, configure, data, find, fonts, init, list, load, remove, update, use, Font, ROLES };
