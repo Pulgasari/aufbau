@@ -1,20 +1,21 @@
-/* @aufbau/css/themes.css */
+/* @aufbau/css/themes.css
 
-/*
-- supports theme presets
-- supports native css named colors as theme name
-- supports any css color value as theme name
+- supports as theme: presets
+- supports as theme: native css named colors
+- supports as theme: any css color value
+- compute to real colors (so they are readable from js and animatable) 
 
-a preset resolves on body: a style query reaches the descendants of the element
-it queries, never the element itself. so tokens derived from --bg, --fg and
---accent belong on body too, on :root they would miss every preset.
+1. usage in css:
+:root { --theme: zombie; }
 
-registered with an initial value, so --bg, --fg and --accent compute to real
-colors (readable from js, animatable) and fall back to zombie where a value does
-not resolve.
+2. usage in html:
+<html data=theme='zombie'>
+<html style='--theme: zombie'>
+
 */
 
 @property --theme  { syntax: "<color> | <custom-ident>"; inherits: true; initial-value: zombie; }
+@property --theme  { syntax: "auto | dark | light";      inherits: true; initial-value: auto;   }
 @property --bg     { syntax: "<color>"; inherits: true; initial-value: #282a36; }
 @property --fg     { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
 @property --accent { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
@@ -25,16 +26,14 @@ not resolve.
   --theme      : zombie;
   --theme-mode : auto;
 
-  &[data-theme]      { --theme      : attr(data-theme      type(*), zombie); }
-  &[data-theme-mode] { --theme-mode : attr(data-theme-mode type(*), auto);   }
+  &[data-theme]      { --theme      : attr(data-theme      type("<color> | <custom-ident>"), zombie); }
+  &[data-theme-mode] { --theme-mode : attr(data-theme-mode type("auto | dark | light"),      auto);   }
 }
 
 @container style(--theme-mode: light) { body { color-scheme: light;      } }
 @container style(--theme-mode: dark)  { body { color-scheme: dark;       } }
 @container style(--theme-mode: auto)  { body { color-scheme: light dark; } }
 
-/* on body like the presets, and where the mode sets color-scheme, which
-   light-dark() reads */
 body {
   --accent : var(--theme);
 
@@ -73,8 +72,6 @@ body {
 @container style(--theme: tinte)     { body { --bg: #0e0e1a; --fg: #dcd9f0; --accent: #8b7dff; } }
 @container style(--theme: zombie)    { body { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; } }          
 
-/* html keeps no background of its own, so body's covers the whole canvas:
-   overscroll and the safe areas included */
 body {
   background   : var(--bg);
   color        : var(--fg);
