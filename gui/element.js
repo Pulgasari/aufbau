@@ -13,7 +13,11 @@ import { readValues }                 from './read.js';
 // one field as dom: <label><span>label</span><aufbau-control/></label>
 function fieldElement (key, spec, value) {
   const { tag, attrs, options } = toControl(key, spec, value);
-  const control = createElement(tag, attrs);
+
+  // attributes, not props: createElement sets a writable property where the tag
+  // has one, and on a defined aufbau-toggle `checked = ''` would read as false
+  const control = createElement(tag);
+  for (const [name, attr] of Object.entries(attrs)) control.setAttribute(name, attr);
 
   if (options) for (const option of options) {
     const [value, textContent] = normalizeOption(option);

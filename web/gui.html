@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/gui</title>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <link rel="stylesheet" href="./demo.css"/>
+  <style>
+    main    { gap: 0; }
+    section { padding: 1.5rem; border-radius: .75rem; }
+    section:nth-child(odd) { background-color: var(--zebra); }
+
+    #spec-error { color: color-mix(in oklab, red 70%, var(--fg)); font-family: ui-monospace, monospace; font-size: .8rem; }
+
+    /* the field builder, a gui form itself */
+    #builder > div { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .75rem 1.5rem; }
+    #builder label { grid-template-columns: 5rem minmax(0, 1fr); }
+
+    .line { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+
+    @media (width < 48rem) {
+      section { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside>
+    <h1>@aufbau/gui</h1>
+    <p>a spec in, aufbau controls out. edit the spec or build it field by field, the form, its values and the code follow live.</p>
+    <nav class="list" id="presets"></nav>
+  </aside>
+
+  <main>
+
+    <section>
+      <h2>spec</h2>
+      <p class="hint">a plain object, key → descriptor. it is evaluated as you type, the link of this page carries it.</p>
+      <aufbau-code id="spec-code" lang="js" editable actions="copy clear"></aufbau-code>
+      <p id="spec-error" hidden></p>
+    </section>
+
+    <section>
+      <h2>add a field</h2>
+      <p class="hint"><code>values</code> takes a comma list and turns any type into a picker, <code>look</code> picks its form. empty fields stay out of the spec.</p>
+      <div class="controls" id="builder"></div>
+      <div class="line">
+        <aufbau-button id="field-add" icon="lucide:plus" variant="primary">add to the spec</aufbau-button>
+        <aufbau-button id="spec-reset" icon="lucide:rotate-ccw">back to the preset</aufbau-button>
+      </div>
+    </section>
+
+    <section>
+      <h2>form</h2>
+      <p class="hint"><code>render(spec, { values, onChange })</code></p>
+      <div class="controls" id="form"></div>
+    </section>
+
+    <section>
+      <h2>values</h2>
+      <p class="hint"><code>readValues(panel, spec)</code>, typed per spec, on every change.</p>
+      <aufbau-code id="values-code" lang="json" actions="copy"></aufbau-code>
+    </section>
+
+    <section>
+      <h2>code</h2>
+      <nav role="tablist">
+        <button type="button" role="tab" aria-controls="code-js">js</button>
+        <button type="button" role="tab" aria-controls="code-html">html</button>
+      </nav>
+      <div role="tabpanel" id="code-js"><aufbau-code id="usage-code" lang="js" actions="copy"></aufbau-code></div>
+      <div role="tabpanel" id="code-html" hidden><aufbau-code id="html-code" lang="html" actions="copy"></aufbau-code></div>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import aufbau from '@aufbau/api';
+    import { readValues, render } from '@aufbau/gui';
+
+    await aufbau.boot();
+
+    const $ = id => document.getElementById(id);
+
+    // :::::: PRESETS
+
+    const PRESETS = {
+      'every type': {
+        title    : { type: 'text',     label: 'Title', default: 'aufbau' },
+        email    : { type: 'email',    label: 'Email' },
+        password : { type: 'password', label: 'Password' },
+        phone    : { type: 'phone',    label: 'Phone' },
+        url      : { type: 'url',      label: 'Url' },
+        size     : { type: 'number',   label: 'Size', min: 8, max: 64, step: 1, unit: 'px', default: 16 },
+        count    : { type: 'integer',  label: 'Count', min: 0, max: 10, default: 3 },
+        angle    : { type: 'angle',    label: 'Angle', default: 45 },
+        speed    : { type: 'duration', label: 'Speed', min: '0.2s', max: '5s', step: '0.1s', default: '2s' },
+        year     : { type: 'year',     label: 'Year', min: 1900, max: 2100, default: 2026 },
+        color    : { type: 'color',    label: 'Color', default: '#ff79c6' },
+        date     : { type: 'date',     label: 'Date' },
+        datetime : { type: 'datetime', label: 'Date and time' },
+        time     : { type: 'time',     label: 'Time' },
+        glitch   : { type: 'boolean',  label: 'Glitch', default: true },
+      },
+
+      'pickers': {
+        view   : { type: 'text', label: 'View', values: ['day', 'week', 'month'], look: 'segments', default: 'week' },
+        mode   : { type: 'text', label: 'Mode', values: [['auto', 'Auto'], ['dark', 'Dark'], ['light', 'Light']], look: 'cycle', default: 'auto' },
+        lang   : { type: 'text', label: 'Language', values: [['de', 'Deutsch'], ['en', 'English'], ['fr', 'Français']], look: 'radio', default: 'en' },
+        city   : { type: 'text', label: 'City', values: ['Berlin', 'Hamburg', 'Köln', 'Leipzig', 'München', 'Wien', 'Zürich'], look: 'combobox' },
+      },
+
+      'a filter': {
+        animate : { type: 'boolean',  label: 'animate', default: true },
+        amount  : { type: 'number',   label: 'amount', min: 0, max: 40, step: 1, default: 8 },
+        speed   : { type: 'duration', label: 'speed', min: '0.1s', max: '4s', step: '0.1s', default: '2s' },
+        tint    : { type: 'color',    label: 'tint', default: '#39ff14' },
+      },
+
+      'app settings': {
+        theme : { type: 'text',    label: 'Theme', values: ['dracula', 'oled', 'papier', 'zombie'], look: 'combobox', default: 'dracula' },
+        dir   : { type: 'text',    label: 'Direction', values: ['ltr', 'rtl'], look: 'segments', default: 'ltr' },
+        font  : { type: 'number',  label: 'Font size', min: 10, max: 22, step: 1, unit: 'px', default: 14 },
+        sync  : { type: 'boolean', label: 'Sync across tabs', default: true },
+      },
+    };
+
+    // :::::: SOURCE
+    // the spec as code and back. written as an object literal with aligned keys,
+    // read by evaluating it: this page runs what its own visitor types
+
+    const quote   = value => `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+    const literal = value =>
+        Array.isArray(value)       ? `[${value.map(literal).join(', ')}]`
+      : typeof value === 'string'  ? quote(value)
+      : String(value);
+
+    const isIdentifier = key => /^[a-z_$][\w$]*$/i.test(key);
+
+    function toSource (spec) {
+      const keys  = Object.keys(spec).map(key => isIdentifier(key) ? key : quote(key));
+      const width = Math.max(0, ...keys.map(key => key.length));
+      const lines = Object.values(spec).map((descriptor, index) => {
+        const fields = Object.entries(descriptor).map(([name, value]) => `${name}: ${literal(value)}`).join(', ');
+        return `  ${keys[index].padEnd(width)} : { ${fields} },`;
+      });
+      return `{\n${lines.join('\n')}\n}`;
+    }
+
+    function fromSource (source) {
+      const spec = Function(`"use strict"; return (${source});`)();
+      if (!spec || typeof spec !== 'object' || Array.isArray(spec)) throw new TypeError('the spec is an object: { key: { type, label, … } }');
+      for (const [key, descriptor] of Object.entries(spec)) {
+        if (!descriptor || typeof descriptor !== 'object') throw new TypeError(`"${key}" needs a descriptor object`);
+      }
+      return spec;
+    }
+
+    // :::::: OUTPUT
+
+    let spec   = {};
+    let preset = null;
+    let panel  = null;
+
+    function showValues () {
+      $('values-code').setAttribute('code', JSON.stringify(readValues(panel, spec), null, 2));
+    }
+
+    function showCode () {
+      const source = toSource(spec);
+      $('usage-code').setAttribute('code', [
+        `import { readValues, render } from '@aufbau/gui';`,
+        ``,
+        `const spec = ${source};`,
+        ``,
+        `// the aufbau-* controls it emits are registered by the page, e.g. aufbau.boot()`,
+        `const panel = render(spec, {`,
+        `  onChange : (values, name) => console.log(name, values),`,
+        `});`,
+        ``,
+        `document.body.append(panel);`,
+        `readValues(panel, spec);   // typed per spec`,
+      ].join('\n'));
+      $('html-code').setAttribute('code', render(spec, { format: 'html' }).replace(/<label/g, '\n  <label').replace(/<\/div>$/, '\n</div>'));
+    }
+
+    // the autoloader defines a tag once it shows up, so a control can still be
+    // waiting for its module. values are read once all of them are defined and updated
+    const frame   = () => new Promise(resolve => requestAnimationFrame(resolve));
+    const settled = async root => {
+      await Promise.all([...new Set([...root.querySelectorAll(':not(:defined)')].map(element => element.localName))].map(tag => customElements.whenDefined(tag)));
+      await frame();
+      await frame();
+    };
+
+    function apply (next, { write = false } = {}) {
+      const rendered = render(next, { onChange: showValues });
+      spec  = next;
+      panel = rendered;
+      $('form').replaceChildren(panel);
+      if (write) $('spec-code').setAttribute('code', toSource(spec));
+      try { history.replaceState(null, '', `#${encodeURIComponent(toSource(spec))}`); } catch {}
+      settled(rendered).then(() => panel === rendered && showValues());   // a newer spec may have taken over
+      showCode();
+    }
+
+    // :::::: SPEC EDITOR
+    // an edit re-renders once typing pauses, a broken spec keeps the last good form
+
+    let pending = null;
+    $('spec-code').addEventListener('input', event => {
+      clearTimeout(pending);
+      pending = setTimeout(() => {
+        try {
+          apply(fromSource(event.detail?.code ?? $('spec-code').code));
+          $('spec-error').hidden = true;
+        } catch (error) {
+          $('spec-error').textContent = error.message;
+          $('spec-error').hidden = false;
+        }
+      }, 300);
+    });
+
+    // :::::: FIELD BUILDER
+    // a gui form that writes gui specs
+
+    const TYPES = ['text', 'number', 'integer', 'boolean', 'angle', 'duration', 'color', 'date', 'datetime', 'time', 'year', 'email', 'password', 'phone', 'url'];
+
+    const BUILDER = {
+      key     : { type: 'text', label: 'key' },
+      type    : { type: 'text', label: 'type', values: TYPES, look: 'combobox', default: 'text' },
+      label   : { type: 'text', label: 'label' },
+      default : { type: 'text', label: 'default' },
+      min     : { type: 'text', label: 'min' },
+      max     : { type: 'text', label: 'max' },
+      step    : { type: 'text', label: 'step' },
+      unit    : { type: 'text', label: 'unit' },
+      values  : { type: 'text', label: 'values' },
+      look    : { type: 'text', label: 'look', values: [['', '—'], 'combobox', 'cycle', 'radio', 'segments'], look: 'combobox', default: '' },
+    };
+
+    const builder = render(BUILDER);
+    $('builder').replaceChildren(builder);
+
+    // numbers stay numbers, "2s" and "#fff" stay strings
+    const typed = value => value !== '' && Number.isFinite(Number(value)) ? Number(value) : value;
+
+    function builtField () {
+      const { key, values, ...rest } = readValues(builder, BUILDER);
+      const name = key.trim();
+      if (!name) throw new Error('a field needs a key');
+
+      const descriptor = {};
+      for (const [field, value] of Object.entries(rest)) {
+        const text = String(value ?? '').trim();
+        if (text) descriptor[field] = field === 'type' || field === 'label' || field === 'unit' || field === 'look' ? text : typed(text);
+      }
+      if (descriptor.type === 'boolean' && 'default' in descriptor) descriptor.default = descriptor.default === true || descriptor.default === 'true';
+
+      const list = values.split(',').map(value => value.trim()).filter(Boolean);
+      if (list.length) descriptor.values = list;
+
+      return [name, descriptor];
+    }
+
+    $('field-add').addEventListener('click', async () => {
+      try {
+        const [name, descriptor] = builtField();
+        apply({ ...spec, [name]: descriptor }, { write: true });
+        $('spec-error').hidden = true;
+      } catch (error) {
+        (await customElements.whenDefined('aufbau-toast')).notify({ message: error.message, type: 'warning' });
+      }
+    });
+
+    $('spec-reset').addEventListener('click', () => preset && choose(preset));
+
+    // :::::: PRESETS + TABS
+
+    function choose (name) {
+      preset = name;
+      for (const button of $('presets').children) button.setAttribute('aria-current', String(button.textContent === name));
+      apply(structuredClone(PRESETS[name]), { write: true });
+    }
+
+    $('presets').append(...Object.keys(PRESETS).map(name => Object.assign(document.createElement('button'), { textContent: name, onclick: () => choose(name) })));
+
+    for (const tab of document.querySelectorAll('[role="tab"]')) tab.addEventListener('click', () => {
+      for (const other of document.querySelectorAll('[role="tab"]')) {
+        other.setAttribute('aria-selected', String(other === tab));
+        $(other.getAttribute('aria-controls')).hidden = other !== tab;
+      }
+    });
+    document.querySelector('[role="tab"]').setAttribute('aria-selected', 'true');
+
+    await aufbau.elements.load('aufbau-toast');
+
+    // a shared link brings its spec, the first preset otherwise
+    const shared = decodeURIComponent(location.hash.slice(1));
+    try { shared ? apply(fromSource(shared), { write: true }) : choose(Object.keys(PRESETS)[0]); }
+    catch { choose(Object.keys(PRESETS)[0]); }
+  </script>
+</body>
+</html>
