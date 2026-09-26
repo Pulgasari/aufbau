@@ -9,6 +9,50 @@
    loaded by elements/core/skin.js into @layer aufbau.elements.skin. switch it
    with <aufbau-config elements-skin="..."> or setSkin(). */
 
+/*
+lol ey wie bekloppt das hier wieder is:
+- was haben schriftgrößen hier zu suchen?
+- was hat überhaupt das meiste hier zu suchen bzw. derart hohl definiert/strukturiert??
+- custom-prop-names alle falsch
+
+refactoring angefangen:
+
+--border   statt  --aufbau-control-border
+
+--gap      statt  –-aufbau-control-gap
+--hover    statt  –-aufbau-control-hover
+--line     statt  –-aufbau-control-line
+--padding  statt  –-aufbau-control-paf
+--radius   statt  –-aufbau-control-radius
+--sunken   statt  –-aufbau-control-sunken
+--track    statt  –-aufbau-control-track
+
+
+--ink       statt   --aufbau-ink
+--surface   statt   --aufbau-surface
+--accent    statt   --aufbau-accent
+
+--color-focus    statt  –-aufbau-control-focus
+--color-muted    statt  --aufbau-control-muted
+*/
+
+/*
+:root[skin="monochrome"] {
+  --color-focus  : color-mix(in oklab, currentColor 55%, transparent);
+  --color-hover  : color-mix(in oklab, currentColor  8%, transparent);
+  --color-line   : color-mix(in oklab, currentColor 35%, transparent);
+  --color-muted  : color-mix(in oklab, currentColor 55%, transparent);
+  --color-sunken : color-mix(in oklab, currentColor  6%, transparent);
+  --color-track  : color-mix(in oklab, currentColor 18%, transparent);
+
+  --border : 1px solid var(--aufbau-control-line);
+   
+  --gap     : 0.50em;
+  --padding : 0.50em;
+  --radius  : 0.25rem;
+}
+*/
+
 :root {
   /* hairlines and tints track the local text colour */
   --aufbau-control-line   : color-mix(in oklab, currentColor 35%, transparent);
@@ -37,14 +81,14 @@ body {
 
 /* ::: shared ::::::::::::::::::::::::::::::::::::::::::::::::::: */
 
+aufbau-button,
+aufbau-dropdown::part(trigger),
 aufbau-input,
 aufbau-picker[look="combobox"],
 aufbau-picker[look="cycle"]::part(trigger),
-aufbau-writer,
-aufbau-dropdown::part(trigger),
-aufbau-button,
 aufbau-toggle[look="button"],
-aufbau-upload::part(zone) {
+aufbau-upload::part(zone),
+aufbau-writer {
   border: var(--aufbau-control-border);
   border-radius: var(--aufbau-control-radius);
   padding: var(--aufbau-control-pad);
