@@ -1,0 +1,24 @@
+none
+#app-header { 
+  background-color : var(--aufbau-bg);
+  color            : var(--aufbau-fg);
+}
+#app-footer {
+  background-color : var(--aufbau-bg);
+  color            : var(--aufbau-fg);
+}
+
+inverted
+#app-header { 
+  background-color : var(--aufbau-fg);
+  color            : var(--aufbau-bg);
+}
+#app-footer {
+  background-color : var(--aufbau-fg);
+  color            : var(--aufbau-bg);
+}
+
+@container style(--surface: darker) {
+  background-color : color-mix(in oklch, var(--bg), black 20%);
+  color            : var(--fg);
+}
