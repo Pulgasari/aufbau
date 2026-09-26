@@ -1,5 +1,13 @@
 /* @aufbau/css/keyframes.css */
 
+/* ==== another package ??? ====
+@aufbau/animate
+@aufbau/animate/animations
+@aufbau/animate/keyframes
+@aufbau/animate/motions
+@aufbau/animate/transitions
+============================= */
+
 @keyframes rotate-in-center {
     0% { opacity: 0; transform: rotate(-360deg); }
   100% { opacity: 1; transform: rotate(0);       }
