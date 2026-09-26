@@ -12,6 +12,10 @@
 <html data=theme='zombie'>
 <html style='--theme: zombie'>
 
+////// TODO:
+- enhance the preset aufbau themes
+- enhance the dynamic/pseudo themes
+- maybe gonna rename this to 'palette(s)' (and 'theme' becomes the sum of palette, shape, skins, etc.) ???    
 */
 
 @property --theme      { syntax: "<color> | <custom-ident>"; inherits: true; initial-value: zombie; }
