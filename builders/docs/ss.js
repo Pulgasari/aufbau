@@ -1,32 +1,32 @@
 // @aufbau/builders/docs/ss.js
 
+import { compile }     from '@aufbau/ass';
 import { createCache } from '@bunker/cache';
-import transformACSS   from '@aufbau/stylesheet';
-import adoptStylesheet from '@domina/methods';
+import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
 
 const KEY      = 'aufbau:docs:shell';
-const cssCache = createCache({ name: 'aufbau-framework-css' });
+const cssCache = createCache({ name: 'aufbau-docs-css' });
 
 /*
-  adopts the compiled framework stylesheet, from cache where there is one.
+  adopts the docs shell, index.ass compiled to css, from cache where there is one.
 
-  a hit is applied straight away and revalidated behind the page; the fresh version
-  lands through onRevalidate. applying it mid-session is deliberate here — this is
-  the docs shell, where a late reflow is cheaper than a stale layout. `replace` keeps
-  both passes on the same sheet object, so its position in the cascade survives.
+  the compile is paid once: the cache stores the css, not the ass. a hit is applied
+  straight away and revalidated behind the page, the fresh version lands through
+  onRevalidate. applying it mid-session is deliberate here, a late reflow is cheaper
+  than a stale layout. `replace` keeps both passes on the same sheet object, so its
+  position in the cascade survives.
 
-  imports: 'link' because the compiled css leads with a block of @import — the
-  @aufbau-config imports, the themes and the webfonts — and a constructed sheet
-  drops those on the floor. base is the stylesheet, not the page: a hand written
-  @import inside a .aufbau.css means the file next to it.
+  imports: 'link' because the shell leads with a few @import, which a constructed
+  sheet drops. base is the stylesheet, not the page: a relative @import means the
+  file next to it.
 */
-export async function initDefaultStylesheet (cssURL = './index.aufbau.css') {
-  const base  = new URL(cssURL, document.baseURI).href;
+export async function initDefaultStylesheet (assURL = './index.ass') {
+  const base  = new URL(assURL, document.baseURI).href;
   const adopt = (css) => adoptStylesheet(css, { base, imports: 'link', key: KEY, replace: true });
 
-  const response = await cssCache.staleWhileRevalidate(cssURL, {
+  const response = await cssCache.staleWhileRevalidate(assURL, {
     onRevalidate : async (fresh) => adopt(await fresh.text()),
-    transform    : transformACSS,
+    transform    : (source) => compile(source),
     type         : 'text/css',
   });
 

@@ -1,48 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>docs</title>
-  <script>
-    const search = globalThis.location?.search ?? '';
-    globalThis.DEBUG = new URLSearchParams(search).has('debug');
-    console.log('DEBUG:', DEBUG);
-  </script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>aufbau docs</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
 </head>
+<body>
+  <div id="app"></div>
 
-<body class='mobilefix'>
-<div id='app'></div>
-  
-<script type='module'>
-import { createDocsFW, html } from '@aufbau/builders/docs';
+  <script type="module">
+    import { createDocsFW } from '@aufbau/builders/docs';
 
-createDocsFW({
-  sw     : new URL('./sw.js', import.meta.url),
-  index  : '$repo/readme.md',
-  target : '#app',
-  brand: {
-    svg   : '$repo/logo.svg',
-    title : 'aufbau'
-  },
-  
-  vars: {
-    repo  : '../',
-  },
-  
-  sidebar: {
-    docs       : '$repo/readme.md',
-    elements   : '$repo/elements/readme.md',
-    kits       : '$repo/kits/readme.md',
-    packages   : 'packages.md',
-    resources  : 'resources.md',
-  },
+    // aufbau.dev serves web/ only, the markdown of the repo comes from where the
+    // packages are published
+    createDocsFW({
+      index  : '$repo/readme.md',
+      target : '#app',
+      brand  : { svg: '$repo/logo.svg', title: 'aufbau' },
+      vars   : { repo: 'https://code.pulgasari.dev/aufbau/' },
 
-  footerText : 'aufbau | 2026',
-  // after, before       
-});
-</script>
-  
+      sidebar: {
+        docs      : '$repo/readme.md',
+        packages  : 'packages.md',
+        resources : 'resources.md',
+      },
+    });
+  </script>
 </body>
 </html>

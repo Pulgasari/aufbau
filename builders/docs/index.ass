@@ -1,0 +1,86 @@
+/* @aufbau/builders/docs/index.ass
+   the docs shell. theme, skin and webfonts come from aufbau.boot() in index.js,
+   --bg, --fg and --accent from css/themes.css, resolved on body. the reset is
+   linked here, before the typography of css/docs.css */
+
+@import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
+@import url('https://code.pulgasari.dev/aufbau/css/default.css');
+@import url('https://code.pulgasari.dev/aufbau/css/docs.css');
+@import url('https://code.pulgasari.dev/aufbau/css/keyframes.css');
+
+/* :::::: MIXINS */
+
+@mixin row {
+  display     : flex;
+  flex-flow   : row;
+  align-items : center;
+}
+
+@mixin column {
+  display    : flex;
+  flex-flow  : column;
+  min-height : 0;
+}
+
+/* :::::: PAGE */
+
+html, body { height: 100%; overflow: hidden; }
+body       { height: 100dvh; use: .column; }
+
+a   { color: currentcolor; }
+svg { width: auto; max-width: 100%; }
+
+pre, code {
+  font-family : var(--aufbau-font-mono, ui-monospace, monospace);
+  font-size   : 0.8rem;
+  line-height : 1.25;
+}
+
+/* :::::: FRAME */
+
+#app { use: .column; flex: 1 1 auto; }
+
+#app-header,
+#app-footer {
+  use         : .row;
+  z-index     : 3;
+  flex        : 0 0 auto;
+  gap         : 1rem;
+  padding     : 1rem;
+  background  : var(--fg);
+  color       : var(--bg);
+}
+
+#app-header { justify-content: space-between; font-size: 0.9rem; text-transform: uppercase; box-shadow: 0  2rem -1rem 0 var(--fg); }
+#app-footer { justify-content: center; box-shadow: 0 -2rem -1rem 1rem var(--fg); }
+
+#app-header nav { use: .row; gap: 0.5rem; }
+#app-header nav a.active { text-decoration: underline; text-underline-offset: 0.3em; }
+#app-header svg { height: 1.5rem; }
+
+#app-body { use: .column; flex: 1; overflow-y: auto; padding: 1rem; }
+
+/* :::::: CONTENT */
+
+.docs-body-wrapper      { display: grid; grid-template-columns: minmax(0, 1fr) 14rem; gap: 2rem; align-items: start; }
+.docs-content-container { min-width: 0; }
+.markdown-body          { use: .column; gap: 1rem; }
+.markdown-body :is(ul, ol) { padding-inline-start: 1.25em; }
+.markdown-body ul       { list-style: disc; }
+.markdown-body ol       { list-style: decimal; }
+
+.docs-toc               { position: sticky; top: 0; font-size: 0.8rem; }
+.docs-status            { padding: 2rem; opacity: 0.7; }
+.docs-status.error      { color: color-mix(in oklab, red 70%, var(--fg)); opacity: 1; }
+
+@media (width < 60rem) {
+  .docs-body-wrapper { grid-template-columns: minmax(0, 1fr); }
+  .docs-toc          { display: none; }
+}
+
+/* :::::: THEME CONTROLS */
+
+.theme-controls              { use: .row; gap: 1rem; font-size: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.theme-control               { use: .row; gap: 0.5rem; }
+.theme-control label         { text-transform: uppercase; opacity: 0.7; white-space: nowrap; }
+.theme-control aufbau-picker { min-width: 11rem; }
