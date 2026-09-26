@@ -22,16 +22,13 @@ import { deepMerge } from '@pulgasari/obj';
 
 // :::::: LAZY ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-const once = (load) => { let promise; return () => promise ??= load(); };
-
-// a namespace of async methods that import their module on the first call
-const facade = (load, names) => Object.fromEntries(names.map(name => [name, async (...args) => (await load())[name](...args)]));
-
 const CONTRACT = ['apply', 'list', 'load', 'remove', 'update', 'use'];
+const facade   = (load, names) => Object.fromEntries(names.map(name => [name, async (...args) => (await load())[name](...args)]));
+const once     = (load)        => { let promise; return () => promise ??= load(); };
 
 const modules = {
   config   : once(() => import('@aufbau/elements/core/AufbauConfig.js')),
-  domina   : name => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default),
+  domina   : name    => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default),
   elements : once(() => import('@aufbau/elements')),
   filters  : once(() => import('@aufbau/filters')),
   icons    : once(() => import('@aufbau/icons/aliases.js')),
@@ -47,10 +44,10 @@ const webfonts = facade(modules.webfonts, [...CONTRACT, 'configure', 'init']);
 
 const elements = {
   enableAutoload : async (options) => (await modules.elements()).autoloader(options),
-  getConfig      : async (...args)  => (await modules.config()).getConfig(...args),
-  load           : async (tag)      => (await modules.elements()).load(tag),
-  registerAll    : async ()         => (await modules.elements()).registerAll(),
-  setConfig      : async (...args)  => (await modules.config()).setConfig(...args),
+  getConfig      : async (...args) => (await modules.config()).getConfig(...args),
+  load           : async (tag)     => (await modules.elements()).load(tag),
+  registerAll    : async ()        => (await modules.elements()).registerAll(),
+  setConfig      : async (...args) => (await modules.config()).setConfig(...args),
 };
 
 // catalogues, each one a promise
@@ -156,11 +153,13 @@ const aufbau = {
   setConfig,
   update,
   webfonts,
-
-  // the --theme token on the root, see css/test-themes.css
-  getTheme : ()   => dom.getStyleToken('theme'),
-  setTheme : (id) => dom.setStyleToken(document.documentElement, 'theme', id),
 };
+
+api.getTheme = ()   => dom.getStyleToken('theme'),
+api.setTheme = (id) => dom.setStyleToken('theme', id),
+
+api.getThemeMode = ()   => dom.getStyleToken('theme-mode'),
+api.setThemeMode = (id) => dom.setStyleToken('theme-mode', id),
 
 export { apply, boot, config, data, dom, elements, filters, patterns, remove, setConfig, update, webfonts };
 export default aufbau;
