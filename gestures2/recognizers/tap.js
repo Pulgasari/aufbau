@@ -3,20 +3,22 @@
 // was released within maximumDuration and was not claimed by anything else.
 // consecutive taps close in time and place count up; `count` is in the detail.
 //
-// with doubleTap active a single tap waits `interval` ms, so the two can be told
-// apart. without it the tap fires at once.
+// every tap fires at once, the second one of a pair also fires doubleTap. with
+// `waitForDoubleTap: true` a single tap is held back `interval` ms instead, so
+// only one of the two fires: exclusive, but every single tap arrives late.
 
 import { toleranceFor } from './../shared.js';
 
 function tap ({ active, emit, options }) {
-  const { interval = 300, maximumDuration = 500, tolerance } = options;
-  const waitsForDouble = active.has('doubleTap');
+  const { interval = 300, maximumDuration = 500, tolerance, waitForDoubleTap = false } = options;
+  const double    = active.has('doubleTap');
+  const exclusive = double && waitForDoubleTap;
 
   let count   = 0;
   let last    = null;   // { x, y, time } of the previous tap
   let pending = null;   // the single tap held back while a second may follow
 
-  const flush = () => { clearTimeout(pending?.timer); pending = null; };
+  const flush = () => { clearTimeout(pending); pending = null; };
 
   function end (session, event) {
     const allowed = toleranceFor(tolerance, session.input);
@@ -27,17 +29,16 @@ function tap ({ active, emit, options }) {
     count = close ? count + 1 : 1;
     last  = { time, x: session.center.x, y: session.center.y };
 
-    if (count === 2 && waitsForDouble) {
-      flush();
-      emit('doubleTap', session, { count });
+    if (!exclusive) {
+      emit('tap', session, { count });
+      if (double && count === 2) emit('doubleTap', session, { count });
       return;
     }
 
-    if (!waitsForDouble || count > 2) { emit('tap', session, { count }); return; }
-
     flush();
-    const held = { count };
-    pending = { timer: setTimeout(() => { pending = null; emit('tap', session, held); }, interval) };
+    if (count === 2) { emit('doubleTap', session, { count }); return; }
+    if (count > 2)   { emit('tap', session, { count }); return; }
+    pending = setTimeout(() => { pending = null; emit('tap', session, { count: 1 }); }, interval);
   }
 
   return {
@@ -47,7 +48,7 @@ function tap ({ active, emit, options }) {
   };
 }
 
-tap.gestures = ['tap', 'doubleTap'];
+tap.gestures = ['doubleTap', 'tap'];
 
 export { tap };
 export default tap;
