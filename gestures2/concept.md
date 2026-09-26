@@ -36,6 +36,7 @@ carries a snapshot of it as `detail`. the names are spelled out.
 
 | field         | meaning                                                          |
 |---------------|------------------------------------------------------------------|
+| `movement`    | `center`'s change since the previous event, `{ x, y }`, for incremental updates |
 | `angle`       | direction of `delta` in degrees, 0 is right, 90 is down          |
 | `buttons`     | the pressed mouse buttons                                        |
 | `center`      | the midpoint of all pointers, `{ x, y }` in client pixels        |
@@ -44,7 +45,7 @@ carries a snapshot of it as `detail`. the names are spelled out.
 | `distance`    | length of `delta`                                                |
 | `duration`    | milliseconds since the session started                          |
 | `element`     | the element `gestures()` was bound to                            |
-| `input`       | `mouse`, `pen` or `touch`                                        |
+| `input`       | `mouse`, `pen`, `touch`, and `trackpad` or `wheel` for the sources without pointers |
 | `maximumPointers` | the most pointers that were down at once                      |
 | `modifiers`   | `{ alt, control, meta, shift }`                                  |
 | `phase`       | `start`, `move`, `end` or `cancel`                               |
@@ -74,9 +75,19 @@ in lowercase.
 | `secondary`   | `onSecondary`                                              | `secondary` |
 | `swipe`       | `onSwipe`, `onSwipeDown`, `onSwipeLeft`, `onSwipeRight`, `onSwipeUp` | `swipe`, `swipedown`, … |
 | `pan`         | `onPanStart`, `onPanMove`, `onPanEnd`, `onPanCancel`       | `panstart`, `panmove`, … |
+| `pinch`       | `onPinchStart`, `onPinchMove`, `onPinchEnd`, `onPinchCancel` | `pinchstart`, … |
+| `rotate`      | `onRotateStart`, `onRotateMove`, `onRotateEnd`, `onRotateCancel` | `rotatestart`, … |
+| `pressRepeat` | `onPressRepeat`                                            | `pressrepeat` |
+| `wheel`       | `onWheelStart`, `onWheelMove`, `onWheelEnd`                | `wheelstart`, … |
 
-planned: `pinch` and `rotate` (the session already measures them), wheel and
-trackpad sources, a repeat while held (the old holdable), bundles.
+`pinch` carries `scaleChange` (ratio to the previous event), `rotate`
+`rotationChange` (degrees since the previous event): an incremental transform
+multiplies and adds those. only `Move` carries a change, `Start` and `End` are
+neutral: the jump up to the threshold arrives as a `Move` right after `Start`,
+so a handler on `Move` alone misses nothing. `wheel` is continuous and ends after a pause, so its
+events can not be mistaken for the native `wheel`.
+
+planned: bundles, an edge swipe, a drag with drop targets.
 
 ### native signals first
 
@@ -87,17 +98,24 @@ where the platform already carries the meaning, it is the source:
   accessibility come for free. the native menu is prevented while a handler
   listens.
 - keyboard activation stays `click`. `tap` is the pointer gesture only.
-- trackpad pinch arrives as `wheel` with `ctrlKey` (chrome, firefox) or as
-  `gesture*` events (safari). **open**: how they join the session.
+- a trackpad sends no pointers. its pinch arrives as `wheel` with `ctrlKey`
+  (chrome, firefox) or as `gesture*` events (safari), its rotation only as
+  safari's `gesture*`. trackpad.js turns both into a session with input
+  `trackpad` and two pointers, so `pinch` and `rotate` treat it like fingers.
+  **open**: a mouse wheel with ctrl held also reads as a pinch.
 
 ## arbitration
 
 several recognizers look at the same session. the rules so far:
 
-- a recognizer that owns the session **claims** it: `pan` once it started,
-  `longPress` once it fired.
+- a recognizer that owns the session **claims** it: `pan`, `pinch`, `rotate`
+  once they started, `longPress` once it fired. a second pointer stops a
+  pending long press and a press repeat.
 - `tap` fails when anything claimed the session, when `travel` exceeds the
   tolerance or when it took longer than `maximumDuration`.
+- `pan` holds its pointer count: a second finger on a one finger pan ends it
+  (`panEnd`), lifting it again starts a new one. a pinch in between owns the
+  movement meanwhile.
 - `swipe` is evaluated on release from the same data as `pan`, the two coexist.
   it fails when `longPress` claimed the session.
 - every `tap` fires at once with its `count`, the second of a pair also fires
@@ -163,11 +181,12 @@ against clashes with future native event names.
 
 ## state
 
-built: tracker, `press`, `tap`, `doubleTap`, `longPress`, `secondary`, `swipe`, `pan`,
+built: tracker, trackpad, `press`, `pressRepeat`, `tap`, `doubleTap`, `longPress`,
+`secondary`, `swipe`, `pan`, `pinch`, `rotate`, `wheel`,
 handler guards, dom events with delegation, touch-action resolution, cleanup.
 
-next candidates: `pinch` and `rotate` on the measured `scale` and `rotation`,
-the wheel and trackpad sources, a repeat while held, the first bundle.
+next candidates: the first bundle (transformable, draggable, dismissable), an
+edge swipe, a drag with drop targets, keyboard counterparts.
 
 ## to try out
 

@@ -9,9 +9,9 @@
 
 import { createTracker }       from './tracker.js';
 import { stricterTouchAction } from './shared.js';
-import { longPress, pan, press, secondary, swipe, tap } from './recognizers/index.js';
+import { longPress, pan, pinch, press, rotate, secondary, swipe, tap, wheel } from './recognizers/index.js';
 
-const RECOGNIZERS = { longPress, pan, press, secondary, swipe, tap };
+const RECOGNIZERS = { longPress, pan, pinch, press, rotate, secondary, swipe, tap, wheel };
 
 // gesture name -> the recognizer reporting it, e.g. doubleTap -> tap
 const OWNERS = {};
@@ -22,9 +22,9 @@ const HANDLER = /^on[A-Z]/;
 const eventTypeOf = gesture => gesture.toLowerCase();                // swipeLeft -> swipeleft
 const gestureOf   = key     => key[2].toLowerCase() + key.slice(3);   // onSwipeLeft -> swipeLeft
 
-// the session as it goes out: everything but the internal claims
+// the session as it goes out: everything but the internals
 const snapshot = (session, extra) => {
-  const { claims, ...fields } = session ?? {};
+  const { claims, startTime, ...fields } = session ?? {};
   return { ...fields, ...extra };
 };
 

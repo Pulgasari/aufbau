@@ -29,6 +29,13 @@
     #pan-chip { width: 4rem; aspect-ratio: 1; border-radius: 1rem; background: var(--accent); transition: translate .25s ease; }
     #pan-chip.dragging { transition: none; }
 
+    #transform-pad { overflow: hidden; min-height: 14rem; }
+    #transform-box { width: 6rem; aspect-ratio: 1; border-radius: .75rem; background: linear-gradient(135deg, var(--accent), #8be9fd); display: grid; place-items: center; color: #000; font-weight: 700; }
+    #wheel-dot     { width: 1.5rem; aspect-ratio: 1; border-radius: 50%; background: var(--accent); }
+    #stepper       { display: flex; gap: 1rem; align-items: center; justify-content: center; }
+    #stepper button { width: 3.5rem; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--line); background: var(--soft); color: inherit; font-size: 1.5rem; }
+    #stepper output { min-width: 4ch; text-align: center; font: 700 2rem/1 ui-monospace, monospace; }
+
     #list    { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: .75rem; overflow: hidden; }
     #list li { padding: .9rem 1rem; border-top: 1px solid var(--line); background: var(--soft); transition: opacity .2s; }
     #list li:first-child { border-top: 0; }
@@ -56,7 +63,7 @@
     </div>
     <div>
       <h2>tap · doubleTap, exclusive</h2>
-      <p><code>tap: { waitForDoubleTap: true }</code>: only one of the two fires, a single tap arrives 300 ms late.</p>
+      <p><code>tap: { waitForDoubleTap: true }</code>: only one of the two fires, a single tap waits 100 ms. taps counted up to 300 ms apart.</p>
       <div class="pad" id="exclusive-pad">press me</div>
     </div>
     <div>
@@ -68,6 +75,28 @@
       <h2>pan</h2>
       <p>drag the chip, it springs back on release.</p>
       <div class="pad" id="pan-pad"><div id="pan-chip"></div></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div>
+      <h2>pinch · rotate · pan</h2>
+      <p>two fingers pinch and turn the box, one finger moves it. on a trackpad: pinch (all browsers), rotate (safari). double tap resets.</p>
+      <div class="pad" id="transform-pad"><div id="transform-box">aufbau</div></div>
+    </div>
+    <div>
+      <h2>wheel</h2>
+      <p><code>wheelStart</code>, <code>wheelMove</code>, <code>wheelEnd</code>: wheel or two-finger trackpad scroll moves the dot, the page does not scroll here.</p>
+      <div class="pad" id="wheel-pad"><div id="wheel-dot"></div></div>
+    </div>
+    <div>
+      <h2>pressRepeat</h2>
+      <p>a stepper: one step on contact (<code>pressStart</code>), then repeating while held.</p>
+      <div class="pad" id="stepper">
+        <button type="button" data-step="-1">−</button>
+        <output>0</output>
+        <button type="button" data-step="1">+</button>
+      </div>
     </div>
   </section>
 
@@ -161,6 +190,43 @@
       onPanMove   : gesture => { chip.style.translate = `${gesture.delta.x}px ${gesture.delta.y}px`; show(gesture); },
       onPanStart  : gesture => { chip.classList.add('dragging'); log('panStart', gesture); },
     });
+
+    // :::::: PINCH · ROTATE · PAN
+    // an incremental transform: every event multiplies by scaleChange and adds
+    // rotationChange and movement, so fingers, trackpad and mouse all compose
+
+    const box = $('transform-box');
+    let state = { rotation: 0, scale: 1, x: 0, y: 0 };
+    const draw = () => { box.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rotation}deg) scale(${state.scale})`; };
+
+    gestures($('transform-pad'), {
+      onDoubleTap   : ()      => { state = { rotation: 0, scale: 1, x: 0, y: 0 }; draw(); log('reset'); },
+      onPanMove     : gesture => { state.x += gesture.movement.x; state.y += gesture.movement.y; draw(); },
+      onPinchEnd    : gesture => log(`pinchEnd · ${gesture.input} · scale ${gesture.scale.toFixed(2)}`, gesture),
+      onPinchMove   : gesture => { state.scale = Math.min(6, Math.max(.2, state.scale * gesture.scaleChange)); if (gesture.pointers > 1) { state.x += gesture.movement.x; state.y += gesture.movement.y; } draw(); show(gesture); },
+      onPinchStart  : gesture => log(`pinchStart · ${gesture.input}`, gesture),
+      onRotateEnd   : gesture => log(`rotateEnd · ${gesture.input} · ${gesture.rotation.toFixed(0)}°`, gesture),
+      onRotateMove  : gesture => { state.rotation += gesture.rotationChange; draw(); },
+      onRotateStart : gesture => log(`rotateStart · ${gesture.input}`, gesture),
+      pan           : { pointers: 1 },
+    });
+
+    // :::::: WHEEL
+
+    const dot = $('wheel-dot');
+    gestures($('wheel-pad'), {
+      onWheelEnd   : gesture => log(`wheelEnd · Δ ${gesture.delta.x.toFixed(0)}, ${gesture.delta.y.toFixed(0)}`, gesture),
+      onWheelMove  : gesture => { dot.style.translate = `${Math.max(-120, Math.min(120, gesture.delta.x / 4))}px ${Math.max(-60, Math.min(60, gesture.delta.y / 4))}px`; show(gesture); },
+      onWheelStart : ()      => log('wheelStart'),
+    });
+
+    // :::::: PRESS REPEAT
+
+    const output = $('stepper').querySelector('output');
+    for (const button of $('stepper').querySelectorAll('button')) {
+      const step = () => { output.value = Number(output.value) + Number(button.dataset.step); };
+      gestures(button, { ...pressed(button), onPressRepeat: step, onPressStart: () => { button.classList.add('pressed'); step(); } });
+    }
 
     // :::::: DELEGATION
 

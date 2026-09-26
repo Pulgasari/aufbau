@@ -11,8 +11,13 @@ function pan ({ emit, options }) {
   const { axis = null, pointers = 1, tolerance } = options;
   let panning = false;
 
-  function move (session) {
+  // another finger count is another gesture: the pan ends, and starts anew with
+  // the next actual movement, not with the finger change itself
+  function move (session, event) {
+    if (panning && session.pointers !== pointers) { panning = false; emit('panEnd', session); return; }
+
     if (!panning) {
+      if (event.type !== 'pointermove') return;
       if (session.pointers !== pointers || session.claims.has('longPress')) return;
       if (session.travel <= toleranceFor(tolerance, session.input)) return;
       panning = true;

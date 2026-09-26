@@ -26,8 +26,9 @@ function longPress ({ element, emit, options }) {
     }, duration);
   }
 
+  // moving away or a second pointer (a pinch beginning) is no long press
   function move (session) {
-    if (timer && session.travel > toleranceFor(tolerance, session.input)) stop();
+    if (timer && (session.travel > toleranceFor(tolerance, session.input) || session.pointers > 1)) stop();
   }
 
   const preventNativeMenu = event => { if (event.pointerType && event.pointerType !== 'mouse') event.preventDefault(); };
