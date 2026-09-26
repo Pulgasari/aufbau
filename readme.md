@@ -4,7 +4,7 @@
 
 #### docs
 
-*read the fucking [docs](https://code.pulgasari.dev/aufbau/docs/)! >.<*
+*read the fucking [docs](https://aufbau.dev/docs/)! >.<*
 
 #### packages
 - [@aufbau/ass](ass/)
