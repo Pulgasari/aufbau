@@ -26,4 +26,44 @@ const stricterTouchAction = (a, b) => {
   return (TOUCH_ACTION_RANK[b] ?? 0) > (TOUCH_ACTION_RANK[a] ?? 0) ? b : a;
 };
 
-export { NO_SELECT, TOLERANCE, stricterTouchAction, toleranceFor };
+// wheel deltas in pixels whatever the deltaMode (lines, pages)
+const WHEEL_UNIT = { 0: 1, 1: 16, 2: 400 };
+const normalizeWheel = event => ({ x: event.deltaX * WHEEL_UNIT[event.deltaMode], y: event.deltaY * WHEEL_UNIT[event.deltaMode] });
+
+const modifiersOf = event => ({ alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey });
+
+// a session for input that brings no pointers: a trackpad pinch or rotation, a
+// wheel. the same fields as the tracker's, so handlers do not need to care
+function inputSession (element, event, input) {
+  const point = { x: event.clientX, y: event.clientY };
+  return {
+    angle           : 0,
+    buttons         : 0,
+    center          : point,
+    claims          : new Set,
+    delta           : { x: 0, y: 0 },
+    direction       : null,
+    distance        : 0,
+    duration        : 0,
+    element,
+    input,
+    maximumPointers : 0,
+    modifiers       : modifiersOf(event),
+    movement        : { x: 0, y: 0 },
+    phase           : 'start',
+    pointers        : 0,
+    rotation        : 0,
+    scale           : 1,
+    start           : point,
+    startTime       : event.timeStamp,
+    target          : event.target,
+    time            : event.timeStamp,
+    travel          : 0,
+    velocity        : { speed: 0, x: 0, y: 0 },
+  };
+}
+
+// continuous input without an end of its own (wheel events) ends after a pause
+const IDLE = 150;
+
+export { IDLE, NO_SELECT, TOLERANCE, inputSession, modifiersOf, normalizeWheel, stricterTouchAction, toleranceFor };

@@ -9,9 +9,9 @@
 
 import { createTracker }       from './tracker.js';
 import { stricterTouchAction } from './shared.js';
-import { longPress, pan, press, secondary, swipe, tap } from './recognizers/index.js';
+import { edgeSwipe, longPress, pan, pinch, press, rotate, secondary, swipe, tap, wheel } from './recognizers/index.js';
 
-const RECOGNIZERS = { longPress, pan, press, secondary, swipe, tap };
+const RECOGNIZERS = { edgeSwipe, longPress, pan, pinch, press, rotate, secondary, swipe, tap, wheel };
 
 // gesture name -> the recognizer reporting it, e.g. doubleTap -> tap
 const OWNERS = {};
@@ -22,9 +22,9 @@ const HANDLER = /^on[A-Z]/;
 const eventTypeOf = gesture => gesture.toLowerCase();                // swipeLeft -> swipeleft
 const gestureOf   = key     => key[2].toLowerCase() + key.slice(3);   // onSwipeLeft -> swipeLeft
 
-// the session as it goes out: everything but the internal claims
+// the session as it goes out: everything but the internals
 const snapshot = (session, extra) => {
-  const { claims, ...fields } = session ?? {};
+  const { claims, startTime, ...fields } = session ?? {};
   return { ...fields, ...extra };
 };
 
@@ -60,7 +60,8 @@ function gestures (element, options = {}) {
   // :::::: EMITTING
 
   function emit (gesture, session, extra = {}, sourceEvent = null) {
-    const detail = snapshot(session, { element, ...extra, gesture, sourceEvent });
+    const detail = snapshot(session, { element, ...extra, gesture });
+    detail.sourceEvent = sourceEvent ?? detail.sourceEvent ?? null;
     const target = detail.target?.isConnected && element.contains(detail.target) ? detail.target : element;
     target.dispatchEvent(new CustomEvent(eventTypeOf(gesture), { bubbles: true, cancelable: true, detail }));
   }
@@ -77,7 +78,10 @@ function gestures (element, options = {}) {
 
   // :::::: RECOGNIZERS
 
-  const parts = [...names].map(name => RECOGNIZERS[name]({ active, element, emit, handled, options: options[name] ?? {} }));
+  // a higher priority hears the session first: edgeSwipe decides before pan does
+  const parts = [...names]
+    .sort((a, b) => (RECOGNIZERS[b].priority ?? 0) - (RECOGNIZERS[a].priority ?? 0))
+    .map(name => RECOGNIZERS[name]({ active, element, emit, handled, options: options[name] ?? {} }));
 
   const each    = hook => (session, event) => { for (const part of parts) part[hook]?.(session, event); };
   const tracked = parts.some(part => part.start || part.move || part.end || part.cancel);
@@ -117,4 +121,5 @@ function gestures (element, options = {}) {
 }
 
 export { gestures, RECOGNIZERS };
+export * from './bundles/index.js';
 export default gestures;

@@ -4,15 +4,18 @@
 // consecutive taps close in time and place count up; `count` is in the detail.
 //
 // every tap fires at once, the second one of a pair also fires doubleTap. with
-// `waitForDoubleTap: true` a single tap is held back `interval` ms instead, so
-// only one of the two fires: exclusive, but every single tap arrives late.
+// `waitForDoubleTap` a single tap is held back (true: 100 ms, or a number of ms)
+// so that only one of the two fires. `interval` stays the window in which taps
+// count up: a second tap after the wait but within the interval fires tap and
+// doubleTap, the price of a short wait.
 
 import { toleranceFor } from './../shared.js';
 
 function tap ({ active, emit, options }) {
   const { interval = 300, maximumDuration = 500, tolerance, waitForDoubleTap = false } = options;
   const double    = active.has('doubleTap');
-  const exclusive = double && waitForDoubleTap;
+  const exclusive = double && waitForDoubleTap !== false;
+  const wait      = typeof waitForDoubleTap === 'number' ? waitForDoubleTap : 100;
 
   let count   = 0;
   let last    = null;   // { x, y, time } of the previous tap
@@ -38,7 +41,7 @@ function tap ({ active, emit, options }) {
     flush();
     if (count === 2) { emit('doubleTap', session, { count }); return; }
     if (count > 2)   { emit('tap', session, { count }); return; }
-    pending = setTimeout(() => { pending = null; emit('tap', session, { count: 1 }); }, interval);
+    pending = setTimeout(() => { pending = null; emit('tap', session, { count: 1 }); }, wait);
   }
 
   return {

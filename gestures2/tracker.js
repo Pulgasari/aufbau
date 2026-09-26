@@ -3,6 +3,12 @@
 // down to the last pointer up. the recognizers read the session through the
 // hooks, see concept.md for its fields.
 //
+// hooks.move also runs when a pointer comes or goes, that is when a pinch can
+// start or stop. `movement` is the center's change since the previous event,
+// `sourceEvent` that event and `time` its timestamp: gestures reported for the
+// same event share the sourceEvent, which is how a bundle applies one movement
+// only once.
+//
 // the pointer that went down on the element is followed through window-level
 // listeners instead of pointer capture: capture also retargets the compatibility
 // mouse events, which would swallow the clicks of buttons inside the element.
@@ -58,6 +64,7 @@ function createTracker (element, hooks) {
     const time   = event.timeStamp;
 
     session.buttons   = event.buttons;
+    session.movement  = { x: center.x - session.center.x, y: center.y - session.center.y };
     session.center    = center;
     session.delta     = delta;
     session.direction = directionOf(delta.x, delta.y);
@@ -65,7 +72,9 @@ function createTracker (element, hooks) {
     session.angle     = session.distance ? Math.atan2(delta.y, delta.x) * 180 / Math.PI : 0;
     session.duration  = time - internal.startTime;
     session.modifiers = { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey };
-    session.pointers  = pointers.size;
+    session.pointers    = pointers.size;
+    session.sourceEvent = event;
+    session.time        = time;
     session.travel    = Math.max(session.travel, session.distance);
 
     // velocity over the recent samples: a pointer that rested before release reads as still
@@ -104,12 +113,14 @@ function createTracker (element, hooks) {
       input           : event.pointerType || 'mouse',
       maximumPointers : 1,
       modifiers       : { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey },
+      movement        : { x: 0, y: 0 },
       phase           : 'start',
       pointers        : 1,
       rotation        : 0,
       scale           : 1,
       start           : point,
       target          : event.target,
+      time            : event.timeStamp,
       travel          : 0,
       velocity        : { speed: 0, x: 0, y: 0 },
     };
@@ -138,9 +149,11 @@ function createTracker (element, hooks) {
     }
 
     session.maximumPointers = Math.max(session.maximumPointers, pointers.size);
+    session.phase = 'move';
     rebaseCenter();
     rebasePair();
     measure(event);
+    hooks.move(session, event);   // the pointer count changed, recognizers may start or stop
   }
 
   function move (event) {
@@ -158,9 +171,11 @@ function createTracker (element, hooks) {
 
     if (pointers.size > 1) {
       pointers.delete(event.pointerId);
+      session.phase = 'move';
       rebaseCenter();
       rebasePair();
       measure(event);
+      hooks.move(session, event);
       return;
     }
 
