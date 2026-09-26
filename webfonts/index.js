@@ -30,29 +30,6 @@ function toElements (target) {
   return [];
 }
 
-/*
-function toElements (target) {
-  return shift (target) ({
-    isNullish  : () => [document.documentElement],
-    isString   : () => [...document.querySelectorAll(target)],
-    isElement  : () => [target],
-    isIterable : () => [...target].filter(isElement),
-    fallback   : () => [],
-  });
-}
-
-const toElements = (target) => shift ({
-  isNullish  : () => [document.documentElement],
-  isString   : () => [...document.querySelectorAll(target)],
-  isElement  : () => [target],
-  isIterable : () => [...target].filter(isElement),
-  fallback   : () => [],
-});
-
-const iterable = shape (isIterable);
-const nullish  = shape (isNullish);
-*/
-
 const find = key => key ? fonts.find(font => font.id === key || font.name === key) ?? null : null;
 
 // :::::: FONT ::::::::::::::::::::::::::::::::::::::::::::::::::
