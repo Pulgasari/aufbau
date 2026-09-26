@@ -7,7 +7,9 @@
 status: **v0.1** implements the four core constructs — `@default`, `@prop`,
 `@value`, `@mixin` (incl. `use:` and class-as-mixin). everything below beyond
 those (aufbau-props, `@aufbau-config`, `@aufbau-media`, themes, shade engine, the
-service-worker/boot no-flash paths) is still spec, not built.
+service-worker/boot no-flash paths) is still spec, not built. the skills of
+the retired @aufbau/stylesheet, which covered most of it with string transforms,
+are parked in `_stylesheet/` as the starting point.
 
 the constructs restructure the `target -> property -> value` triple:
 `@default` defines named values (tokens) scoped to properties (+ longhands);
