@@ -4,12 +4,20 @@
 - supports theme presets
 - supports native css named colors as theme name
 - supports any css color value as theme name
+
+a preset resolves on body: a style query reaches the descendants of the element
+it queries, never the element itself. so tokens derived from --bg, --fg and
+--accent belong on body too, on :root they would miss every preset.
+
+registered with an initial value, so --bg, --fg and --accent compute to real
+colors (readable from js, animatable) and fall back to zombie where a value does
+not resolve.
 */
 
 @property --theme  { syntax: "<color> | <custom-ident>"; inherits: true; initial-value: zombie; }
-@property --bg     { syntax: "<color>"; inherits: true; }
-@property --fg     { syntax: "<color>"; inherits: true; }
-@property --accent { syntax: "<color>"; inherits: true; }
+@property --bg     { syntax: "<color>"; inherits: true; initial-value: #282a36; }
+@property --fg     { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
 
 :root {
   color-scheme: light dark;
@@ -25,7 +33,9 @@
 @container style(--theme-mode: dark)  { body { color-scheme: dark;       } }
 @container style(--theme-mode: auto)  { body { color-scheme: light dark; } }
 
-html {
+/* on body like the presets, and where the mode sets color-scheme, which
+   light-dark() reads */
+body {
   --accent : var(--theme);
 
   --bg: light-dark(
@@ -63,7 +73,9 @@ html {
 @container style(--theme: tinte)     { body { --bg: #0e0e1a; --fg: #dcd9f0; --accent: #8b7dff; } }
 @container style(--theme: zombie)    { body { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; } }          
 
-html, body {
+/* html keeps no background of its own, so body's covers the whole canvas:
+   overscroll and the safe areas included */
+body {
   background   : var(--bg);
   color        : var(--fg);
   accent-color : var(--accent);

@@ -79,7 +79,7 @@ await aufbau.setTheme('oled');   // the --theme token on the root
 
 # TODO:
 
-- es soll gewissermaßen `aufbau/runtime` (wird konplett entfernt) ersetzen aber ohne es zu reproduzieren. der ansatz hier ist pragmatischer und einfacher gedacht.
+- es ersetzt `aufbau/runtime` (entfernt), ohne es zu reproduzieren. der ansatz hier ist pragmatischer und einfacher gedacht.
 
 - wird schrittweise implementiert/konstruiert weil ich mir über endgültige shape in allen details noch nicht 101pro sicher bin.
 

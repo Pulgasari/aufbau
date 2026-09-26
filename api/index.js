@@ -14,11 +14,14 @@
 //   await aufbau.elements.enableAutoload();
 //   await aufbau.data.filters;
 //
+//   await aufbau.gestalt.set({ theme: 'oled', look: 'rounded' });   // see gestalt.js
+//
 // filters, patterns and webfonts share one contract:
 //   apply(target, id, options)   update(target, options)   remove(target, options)
 //   use(id, options) -> handle   load(id)                   list()   data
 
-import { deepMerge } from '@pulgasari/obj';
+import { deepMerge }          from '@pulgasari/obj';
+import { CSS_PATH, gestalt } from './gestalt.js';
 
 // :::::: LAZY ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -93,15 +96,17 @@ const remove = (target, keys = Object.keys(KINDS)) => Promise.all(keys.map(key =
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-const CSS_PATH = 'https://code.pulgasari.dev/aufbau/css';
-
 const config = {
+  // reset and themes are stylesheets that are either there or not, the rest goes
+  // through gestalt. themes: false when the page links css/themes.css itself
   css : {
     layout : false,
     look   : 'flat',
+    mode   : null,
     reset  : true,
     skin   : 'monochrome',
     theme  : 'zombie',
+    themes : true,
   },
 
   // mode: 'auto' | 'all' | false. every other key is element config, e.g. { code: { theme: 'nord' } }
@@ -121,15 +126,16 @@ async function boot (options = {}) {
   if (booted || typeof window === 'undefined') return booted;
   booted = true;
 
-  const { css, elements: { mode, ...defaults }, font } = config;
+  const { css: { layout, look, mode: themeMode, reset, skin, theme, themes }, elements: { mode, ...defaults }, font } = config;
 
-  // the reset first, the layers after it in cascade order
-  const sheets = [css.reset && 'aufbau', css.layout && `layouts/${css.layout}`, css.look && `looks/${css.look}`, css.skin && `skins/${css.skin}`, css.theme && `themes/${css.theme}`];
-  for (const sheet of sheets.filter(Boolean)) dom.adoptStylesheet(`${CSS_PATH}/${sheet}.css`);
+  // the reset first, the themes next, the gestalt layers after them
+  if (reset)  dom.adoptStylesheet(`${CSS_PATH}/aufbau.css`);
+  if (themes) dom.adoptStylesheet(`${CSS_PATH}/themes.css`);
 
   if (Object.keys(defaults).length) await elements.setConfig(defaults, { layer: 'defaults' });
 
   await Promise.all([
+    gestalt.set({ layout, look, mode: themeMode, skin, theme }),
     mode === 'auto' && elements.enableAutoload(),
     mode === 'all'  && elements.registerAll(),
     font && webfonts.init(font),
@@ -137,20 +143,6 @@ async function boot (options = {}) {
 
   return booted;
 }
-
-// :::::: THEMES
-
-const themes = {};
-
-themes.getTheme = ()   => dom.getStyleToken('theme');
-themes.setTheme = (id) => dom.setStyleToken('theme', id);
-themes.getMode  = ()   => dom.getStyleToken('theme-mode');
-themes.setMode  = (id) => dom.setStyleToken('theme-mode', id);
-
-themes.apply = ({ theme, mode }) => {
-  if (theme) themes.setTheme (theme);
-  if (mode)  themes.setMode  (mode);
-};
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -162,13 +154,13 @@ const aufbau = {
   dom,
   elements,
   filters,
+  gestalt,
   patterns,
   remove,
   setConfig,
   update,
   webfonts,
-  themes,
 };
 
-export { apply, boot, config, data, dom, elements, filters, patterns, remove, setConfig, update, webfonts, themes };
+export { apply, boot, config, data, dom, elements, filters, gestalt, patterns, remove, setConfig, update, webfonts };
 export default aufbau;
