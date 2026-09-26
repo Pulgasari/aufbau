@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/gestures2 · playground</title>
+  <style>
+    :root { color-scheme: light dark; --line: color-mix(in oklch, currentColor 20%, transparent); --soft: color-mix(in oklch, currentColor 6%, transparent); --accent: #ff79c6; }
+    *    { box-sizing: border-box; }
+    body { margin: 0; padding: 1rem; font: 15px/1.5 system-ui, sans-serif; display: grid; gap: 1.5rem; max-width: 56rem; margin-inline: auto; }
+    h1   { font-size: 1.25rem; margin: 0; }
+    h2   { font-size: 1rem; margin: 0 0 .25rem; }
+    p    { margin: 0; opacity: .7; font-size: .85rem; }
+    code { font-size: .85em; }
+
+    section { display: grid; gap: .5rem; }
+    .grid   { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+
+    .pad {
+      display: grid; place-items: center; min-height: 10rem; padding: 1rem;
+      border: 1px solid var(--line); border-radius: .75rem; background: var(--soft);
+      text-align: center; font-weight: 600;
+    }
+    .pad.flash { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+    #pan-pad  { position: relative; overflow: hidden; }
+    #pan-chip { width: 4rem; aspect-ratio: 1; border-radius: 1rem; background: var(--accent); transition: translate .25s ease; }
+    #pan-chip.dragging { transition: none; }
+
+    #list    { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: .75rem; overflow: hidden; }
+    #list li { padding: .9rem 1rem; border-top: 1px solid var(--line); background: var(--soft); transition: opacity .2s; }
+    #list li:first-child { border-top: 0; }
+    #list li.done { opacity: .35; text-decoration: line-through; }
+
+    table { border-collapse: collapse; font: 12px/1.4 ui-monospace, monospace; width: 100%; }
+    td    { padding: .15rem .5rem; border-top: 1px solid var(--line); vertical-align: top; }
+    td:first-child { opacity: .6; white-space: nowrap; }
+
+    #log { font: 12px/1.5 ui-monospace, monospace; max-height: 12rem; overflow: auto; border: 1px solid var(--line); border-radius: .5rem; padding: .5rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>@aufbau/gestures2 · playground</h1>
+    <p>a draft. try everything with mouse, touch and pen, the log and the session table show what was measured and recognized.</p>
+  </header>
+
+  <section class="grid">
+    <div>
+      <h2>tap · doubleTap · longPress · secondary</h2>
+      <p>single, double, hold, right click or menu key. two fingers count as <code>maximumPointers: 2</code>.</p>
+      <div class="pad" id="press-pad" tabindex="0">press me</div>
+    </div>
+    <div>
+      <h2>swipe</h2>
+      <p>any direction. a fast right swipe (speed &gt; 1) has its own guarded handler.</p>
+      <div class="pad" id="swipe-pad">swipe me</div>
+    </div>
+    <div>
+      <h2>pan</h2>
+      <p>drag the chip, it springs back on release.</p>
+      <div class="pad" id="pan-pad"><div id="pan-chip"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>delegation</h2>
+    <p>one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>, dom events from the items: swipe left marks done, swipe right undoes, tap logs.</p>
+    <ul id="list">
+      <li>eins</li><li>zwei</li><li>drei</li><li>vier</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>session</h2>
+    <p>the last gesture's detail.</p>
+    <table id="session"></table>
+  </section>
+
+  <section>
+    <h2>log</h2>
+    <div id="log"></div>
+  </section>
+
+  <script type="module">
+    import gestures from './index.js';
+
+    const $ = id => document.getElementById(id);
+
+    // :::::: OUTPUT
+
+    const round  = value => typeof value === 'number' ? Math.round(value * 100) / 100 : value;
+    const format = value =>
+        value == null               ? String(value)
+      : value instanceof Element    ? `<${value.localName}${value.id ? '#' + value.id : ''}>`
+      : value instanceof Event      ? value.type
+      : typeof value === 'object'   ? JSON.stringify(value, (key, inner) => round(inner))
+      :                               String(round(value));
+
+    function show (gesture) {
+      $('session').replaceChildren(...Object.keys(gesture).sort().map(key => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${key}</td><td></td>`;
+        row.lastChild.textContent = format(gesture[key]);
+        return row;
+      }));
+    }
+
+    function log (text, gesture) {
+      const line = `${new Date().toLocaleTimeString()}  ${text}`;
+      $('log').textContent = line + '\n' + $('log').textContent.split('\n').slice(0, 60).join('\n');
+      if (gesture) show(gesture);
+    }
+
+    const flash = element => { element.classList.add('flash'); setTimeout(() => element.classList.remove('flash'), 180); };
+
+    // :::::: PRESS
+
+    gestures($('press-pad'), {
+      onDoubleTap : gesture => { flash($('press-pad')); log(`doubleTap  · ${gesture.input}`, gesture); },
+      onLongPress : gesture => { flash($('press-pad')); log(`longPress  · ${gesture.input} · ${Math.round(gesture.duration)} ms`, gesture); },
+      onSecondary : gesture => { flash($('press-pad')); log(`secondary  · ${gesture.input}`, gesture); },
+      onTap       : gesture => { flash($('press-pad')); log(`tap        · ${gesture.input} · pointers ${gesture.maximumPointers}`, gesture); },
+    });
+
+    // :::::: SWIPE
+
+    gestures($('swipe-pad'), {
+      onSwipe      : gesture => { flash($('swipe-pad')); log(`swipe ${gesture.direction} · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
+      onSwipeRight : { minimumSpeed: 1, handler: () => log('swipeRight, fast (guard minimumSpeed: 1)') },
+    });
+
+    // :::::: PAN
+
+    const chip = $('pan-chip');
+    gestures($('pan-pad'), {
+      onPanCancel : ()      => { chip.classList.remove('dragging'); chip.style.translate = ''; log('panCancel'); },
+      onPanEnd    : gesture => { chip.classList.remove('dragging'); chip.style.translate = ''; log(`panEnd · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
+      onPanMove   : gesture => { chip.style.translate = `${gesture.delta.x}px ${gesture.delta.y}px`; show(gesture); },
+      onPanStart  : gesture => { chip.classList.add('dragging'); log('panStart', gesture); },
+    });
+
+    // :::::: DELEGATION
+
+    const list = $('list');
+    gestures(list, { recognize: ['swipe', 'tap'], swipe: { touchAction: 'pan-y' } });
+    list.addEventListener('swipeleft',  event => { event.target.closest('li')?.classList.add('done');    log('list swipeleft', event.detail); });
+    list.addEventListener('swiperight', event => { event.target.closest('li')?.classList.remove('done'); log('list swiperight', event.detail); });
+    list.addEventListener('tap',        event => log(`list tap · ${event.target.closest('li')?.textContent}`, event.detail));
+  </script>
+</body>
+</html>
