@@ -1,239 +1,732 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@aufbau/elements — controls</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/elements</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
-
+  <link rel="stylesheet" href="./demo.css"/>
   <style>
-    body        { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 1rem; max-width: 60rem; }
-    h1          { font-size: 2rem; }
-    body        { --line: color-mix(in oklch, var(--fg) 14%, var(--bg)); }
-    h2          { font-size: 1.5rem; margin: 2.5rem 0 .75rem; padding-bottom: .35rem; border-bottom: 1px solid var(--line); }
-    h3          { font-size: 1.25rem; border-bottom: 1px solid var(--line); }
-	section     { display: grid; gap: 1rem; }
-    .row        { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-    label       { font-size: .8rem; opacity: .7; min-width: 9rem; }
-    output      { display: block; white-space: pre-wrap; font: 12px/1.5 ui-monospace, monospace;
-                  background: color-mix(in oklch, var(--fg) 6%, var(--bg)); padding: .75rem; border-radius: .4rem; }
+    #form   { display: grid; gap: 3rem; min-width: 0; }
+    section { gap: .75rem; scroll-margin-top: 1rem; }
+    h2      { font-size: 1.25rem; }
+    h3      { font-size: .9rem; font-weight: 600; color: var(--muted); margin-top: .5rem; }
+
+    code  { font-size: .9em; }
+    small { color: var(--muted); }
+
+    /* one variant per row: what it is on the left, the element on the right */
+    .row {
+      display               : grid;
+      grid-template-columns : 12rem minmax(0, 1fr);
+      gap                   : 1rem;
+      align-items           : center;
+
+      > span { color: var(--muted); font-size: .8rem; font-family: ui-monospace, monospace; }
+
+      /* inline controls keep their own width, fields take the row */
+      > :is(aufbau-picker, aufbau-toggle, aufbau-button, aufbau-value) { justify-self: start; }
+    }
+    .line { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+
+    /* :::::: ASIDE: filter + toc */
+
+    aside aufbau-filter { display: block; margin-bottom: .75rem; }
+    aside aufbau-toc {
+      header { display: none; }
+      ol     { list-style: none; }
+      a      { display: block; padding: .2rem .6rem; border-radius: .4rem; color: inherit; text-decoration: none; }
+      a:hover                        { background: var(--panel); }
+      a[aria-current]                { background: var(--accent); color: var(--bg); }
+    }
+
+    /* :::::: ELEMENTS */
+
+    .flags { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .75rem; }
+    .flags figure { display: grid; justify-items: center; gap: .25rem; font-size: .75rem; color: var(--muted); }
+    .flags aufbau-flag { width: 2.5rem; }
+
+    #index aufbau-item {
+      display         : grid;
+      place-items     : center;
+      aspect-ratio    : 1;
+      background      : color-mix(in oklch, var(--accent) calc(var(--mix) * 1%), var(--bg));
+      color           : var(--fg);
+      font-weight     : 600;
+    }
+    #index aufbau-index[viewmode="list"] aufbau-item { aspect-ratio: auto; padding: .75rem; place-items: start; }
+
+    #loop aufbau-loop[mode="carousel"] { block-size: 8rem; border: 1px solid var(--line); border-radius: .75rem; }
+    #loop aufbau-loop[mode="carousel"] > div { display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; }
+    #loop aufbau-loop[mode="marquee"] span { padding-inline: 1.5rem; font-family: ui-monospace, monospace; }
+
+    #keyboard textarea {
+      width: 100%; min-height: 4rem; padding: .5rem;
+      border: 1px solid var(--line); border-radius: .4rem;
+      background: var(--panel); color: inherit; font: inherit;
+    }
+
+    #skeleton aufbau-item { display: grid; grid-template-columns: 3rem 1fr; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: .75rem; }
+    #skeleton .avatar { width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--accent); }
+
+    aufbau-video, aufbau-audio { max-width: 32rem; }
+
+    @media (width < 48rem) {
+      .row { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+    }
   </style>
 </head>
-
 <body>
 
-<h1>@aufbau/elements</h1>
+  <aside>
+    <h1>@aufbau/elements</h1>
+    <p>every element with its types and looks. the aside is an aufbau-filter over an aufbau-toc.</p>
+    <aufbau-filter target="#toc li" placeholder="filter elements…"></aufbau-filter>
+    <aufbau-toc id="toc" target="main" selector="h2"></aufbau-toc>
+  </aside>
 
-<h2>controls</h2>
+  <!-- the whole page is one form: every named control lands in getFormValues() at the end -->
+  <main>
+  <form id="form">
 
-<p>
-	alle controls in einem <code>&lt;form&gt;</code>.
-	die ausgabe unten kommt aus <code>getFormValues()</code> 
-	und aktualisiert sich bei jeder änderung.
-</p>
+    <!-- :::::: AUDIO -->
 
-<form id="playground">
+    <section id="audio">
+      <h2>aufbau-audio</h2>
+      <div class="row"><span>layout="card"</span>
+        <aufbau-audio src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" label="T-Rex Roar" artist="MDN, CC0"></aufbau-audio></div>
+      <div class="row"><span>layout="minimal"</span>
+        <aufbau-audio layout="minimal" src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" label="T-Rex Roar"></aufbau-audio></div>
+    </section>
 
-  <h3>aufbau-picker</h3>
-  <section>
-    <div class="row">
-      <label>look="combobox" searchable</label>
-      <aufbau-picker name="framework" look="combobox" searchable placeholder="Framework wählen...">
-        <aufbau-option value="preact">Preact</aufbau-option>
-        <aufbau-option value="svelte">Svelte</aufbau-option>
-        <aufbau-option value="vanilla" selected>Vanilla</aufbau-option>
-      </aufbau-picker>
-    </div>
-    <div class="row">
-      <label>look="segments"</label>
-      <aufbau-picker name="view" look="segments" value="month">
-        <aufbau-option value="day">Tag</aufbau-option>
-        <aufbau-option value="month">Monat</aufbau-option>
-        <aufbau-option value="year">Jahr</aufbau-option>
-      </aufbau-picker>
-    </div>
-    <div class="row">
-      <label>look="radio"</label>
-      <aufbau-picker name="lang" look="radio">
-        <aufbau-option value="de">Deutsch</aufbau-option>
-        <aufbau-option value="en">English</aufbau-option>
-        <aufbau-option value="fr" disabled>Français (disabled)</aufbau-option>
-      </aufbau-picker>
-    </div>
-    <div class="row">
-      <label>multiple</label>
-      <aufbau-picker name="tags" look="radio" multiple>
-        <aufbau-option value="js">JavaScript</aufbau-option>
-        <aufbau-option value="css">CSS</aufbau-option>
-        <aufbau-option value="html">HTML</aufbau-option>
-      </aufbau-picker>
-    </div>
-    <div class="row">
-      <button type="button" id="add-option">option zur laufzeit anhängen</button>
-      <button type="button" id="drop-option">letzte entfernen</button>
-    </div>
-  </section>
+    <!-- :::::: BUTTON -->
 
-  <h2>aufbau-toggle</h2>
-  <section>
-    <div class="row">
-      <label>look="switch"</label>
-      <aufbau-toggle name="darkmode" label="Darkmode" checked></aufbau-toggle>
-    </div>
-    <div class="row">
-      <label>look="checkbox" required</label>
-      <aufbau-toggle name="agb" look="checkbox" label="AGB akzeptieren" required></aufbau-toggle>
-    </div>
-    <div class="row">
-      <label>look="button"</label>
-      <aufbau-toggle name="pin" look="button" label="Anheften"></aufbau-toggle>
-    </div>
-  </section>
+    <section id="button">
+      <h2>aufbau-button</h2>
+      <div class="row"><span>variant</span>
+        <div class="line">
+          <aufbau-button>default</aufbau-button>
+          <aufbau-button variant="primary">primary</aufbau-button>
+          <aufbau-button variant="ghost">ghost</aufbau-button>
+          <aufbau-button disabled>disabled</aufbau-button>
+        </div></div>
+      <div class="row"><span>icon + label</span>
+        <div class="line">
+          <aufbau-button icon="lucide:bell" label="toast me" data-toast="a button said hello"></aufbau-button>
+          <aufbau-button icon="lucide:shuffle" variant="primary" id="random-theme">random theme</aufbau-button>
+        </div></div>
+      <div class="row"><span>type="submit|reset"</span>
+        <p class="hint">see the form at the end of the page.</p></div>
+    </section>
 
-  <h2>aufbau-input</h2>
-  <section>
-    <div class="row"><label>type="text"</label>     <aufbau-input name="titel"  type="text" placeholder="Titel"></aufbau-input></div>
-    <div class="row"><label>type="email"</label>    <aufbau-input name="mail"   type="email" placeholder="mail@example.com"></aufbau-input></div>
-    <div class="row"><label>type="password"</label> <aufbau-input name="pass"   type="password"></aufbau-input></div>
-    <div class="row"><label>type="phone"</label>    <aufbau-input name="tel"    type="phone"></aufbau-input></div>
-    <div class="row"><label>type="url"</label>      <aufbau-input name="url"    type="url"></aufbau-input></div>
-    <div class="row"><label>type="date"</label>     <aufbau-input name="datum"  type="date"></aufbau-input></div>
-    <div class="row"><label>type="datetime"</label> <aufbau-input name="stamp"  type="datetime"></aufbau-input></div>
-    <div class="row"><label>type="time"</label>     <aufbau-input name="uhr"    type="time"></aufbau-input></div>
-    <div class="row"><label>type="color" swatch</label><aufbau-input name="brand" type="color" look="swatch" value="#3355ff"></aufbau-input></div>
-    <div class="row"><label>type="number" stepper</label><aufbau-input name="size" type="number" look="stepper" value="16" min="8" max="64" step="2"></aufbau-input></div>
-  </section>
+    <!-- :::::: CODE -->
 
-  <h2>aufbau-slider</h2>
-  <section>
-    <div class="row"><label>type="number"</label>
-      <aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider></div>
-    <div class="row"><label>type="number" range</label>
-      <aufbau-slider name="preis" type="number" range value="20,80" min="0" max="100" unit="€"></aufbau-slider></div>
-    <div class="row"><label>type="color"</label>
-      <aufbau-slider name="hue" type="color" value="#3355ff"></aufbau-slider></div>
-    <div class="row"><label>type="time"</label>
-      <aufbau-slider name="von" type="time" value="09:00"></aufbau-slider></div>
-    <div class="row"><label>type="date"</label>
-      <aufbau-slider name="tag" type="date" value="2026-06-01" min="2026-01-01" max="2026-12-31"></aufbau-slider></div>
-  </section>
+    <section id="code">
+      <h2>aufbau-code</h2>
+      <div class="row"><span>lang="json", live</span>
+        <aufbau-code id="gestalt-code" lang="json" actions="copy"></aufbau-code></div>
+      <div class="row"><span>lang="js" editable</span>
+        <aufbau-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</aufbau-code></div>
+      <div class="row"><span>lang="css" no-copy</span>
+        <aufbau-code lang="css" no-copy code="body { background: var(--bg); color: var(--fg); }"></aufbau-code></div>
+    </section>
 
-  <h2>aufbau-writer</h2>
-  <section>
-    <div class="row"><label>counter maxlength</label>
-      <aufbau-writer name="bio" placeholder="Kurz über dich..." counter maxlength="280"></aufbau-writer></div>
-    <div class="row"><label>autogrow 3–12</label>
-      <aufbau-writer name="notiz" autogrow min-rows="3" max-rows="12"></aufbau-writer></div>
-    <div class="row"><label>kindinhalt als startwert</label>
-      <aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer></div>
-  </section>
+    <!-- :::::: CRUMBS -->
 
-  <h2>aufbau-upload</h2>
-  <section>
-    <div class="row"><label>accept="image/*"</label>
-      <aufbau-upload name="avatar" accept="image/*"></aufbau-upload></div>
-    <div class="row"><label>multiple max-size=5MB</label>
-      <aufbau-upload name="belege" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload></div>
-  </section>
+    <section id="crumbs">
+      <h2>aufbau-crumbs</h2>
+      <div class="row"><span>children</span>
+        <aufbau-crumbs><a href="#">aufbau</a><a href="#">elements</a><span>crumbs</span></aufbau-crumbs></div>
+      <div class="row"><span>path + root</span>
+        <aufbau-crumbs id="crumbs-path" path="/elements/core/AufbauCore.js" root="aufbau"></aufbau-crumbs></div>
+      <div class="row"><span>max="3"</span>
+        <aufbau-crumbs path="/a/very/deep/folder/for/crumbs" root="root" max="3"></aufbau-crumbs></div>
+    </section>
 
-  <div class="row" style="margin-top:1.5rem">
-    <button type="submit">absenden (validity prüfen)</button>
-    <button type="reset">reset</button>
-  </div>
+    <!-- :::::: DATALIST -->
 
-</form>
+    <section id="datalist">
+      <h2>aufbau-datalist</h2>
+      <p class="hint">a source for native list= completion. here its options are the element names of this page.</p>
+      <aufbau-datalist id="element-names"></aufbau-datalist>
+      <div class="row"><span>list="element-names"</span>
+        <aufbau-input name="datalist" list="element-names" placeholder="aufbau-…"></aufbau-input></div>
+    </section>
 
-<h2>getFormValues()</h2>
-<output id="dump"></output>
+    <!-- :::::: DROPDOWN -->
 
-<h2>aufbau-button</h2>
-	
-<div class="row">
-  <aufbau-button label="Speichern" icon="lucide:save" variant="primary"></aufbau-button>
-  <aufbau-button variant="danger"><strong>Löschen</strong> <small>(irreversibel)</small></aufbau-button>
-  <aufbau-button label="Deaktiviert" disabled></aufbau-button>
-</div>
+    <section id="dropdown">
+      <h2>aufbau-dropdown</h2>
+      <div class="row"><span>placement</span>
+        <aufbau-picker id="dropdown-placement" look="segments" value="bottom-start">
+          <aufbau-option>bottom-start</aufbau-option>
+          <aufbau-option>bottom-end</aufbau-option>
+          <aufbau-option>top-start</aufbau-option>
+          <aufbau-option>top-end</aufbau-option>
+        </aufbau-picker></div>
+      <div class="row"><span>entries</span>
+        <aufbau-dropdown id="dropdown-menu" label="file" icon="lucide:folder">
+          <button type="button" data-toast="open…">open</button>
+          <button type="button" data-toast="saved">save</button>
+          <button type="button" data-toast="exported" data-type="success">export</button>
+        </aufbau-dropdown></div>
+    </section>
 
-<h2>aufbau-code</h2>
-	
-<aufbau-code lang="javascript">
-	const greet = (name) => `Hello, ${name}!`;
-	console.log(greet('aufbau'));
-</aufbau-code>
-<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
+    <!-- :::::: FILTER -->
 
-<h2>aufbau-dropdown</h2>
+    <section id="filter">
+      <h2>aufbau-filter</h2>
+      <p class="hint">filters other elements by their text. the aside uses one over the table of contents.</p>
+      <div class="row"><span>target=".flags figure"</span>
+        <aufbau-filter target="#flag-list figure" placeholder="filter countries…"></aufbau-filter></div>
+    </section>
 
-<aufbau-dropdown label="Optionen">
-  <a href="#edit">Bearbeiten</a>
-  <a href="#delete">Löschen</a>
-</aufbau-dropdown>
+    <!-- :::::: FLAG -->
 
-<h2>aufbau-flag</h2>
-	
-<aufbau-flag></aufbau-flag>
-<aufbau-flag code="de" variant="circle"></aufbau-flag>
-<aufbau-flag code="us"></aufbau-flag>
-		
-<h2>aufbau-icon</h2>
-	
-<aufbau-icon icon='bx:search'></aufbau-icon>
+    <section id="flag">
+      <h2>aufbau-flag</h2>
+      <div class="row"><span>variant</span>
+        <div class="line">
+          <aufbau-flag code="de" variant="circle"></aufbau-flag>
+          <aufbau-flag code="de" variant="square"></aufbau-flag>
+          <aufbau-flag code="de" variant="4x3"></aufbau-flag>
+        </div></div>
+      <div class="flags" id="flag-list"></div>
+    </section>
 
-<h2>aufbau-progress</h2>
-		
-<aufbau-progress type="scroll" target="body"></aufbau-progress>
-<aufbau-progress value="75" max="100" show-text unit="%"></aufbau-progress>
+    <!-- :::::: ICON -->
 
-<h2>aufbau-reader</h2>
-	
-<aufbau-reader raw="# Inline&#10;Kommt durch **denselben** markdown-compiler wie `src`."></aufbau-reader>
+    <section id="icon">
+      <h2>aufbau-icon</h2>
+      <div class="row"><span>mode="mask"</span>
+        <div class="line">
+          <aufbau-icon icon="lucide:house"></aufbau-icon>
+          <aufbau-icon icon="lucide:search"></aufbau-icon>
+          <aufbau-icon icon="lucide:settings"></aufbau-icon>
+          <aufbau-icon icon="save"></aufbau-icon>
+          <small>the last one is an alias</small>
+        </div></div>
+      <div class="row"><span>size, color</span>
+        <div class="line">
+          <aufbau-icon icon="lucide:heart" size="1rem"></aufbau-icon>
+          <aufbau-icon icon="lucide:heart" size="2rem" color="var(--accent)"></aufbau-icon>
+          <aufbau-icon icon="lucide:heart" size="3rem" color="var(--accent)"></aufbau-icon>
+        </div></div>
+      <div class="row"><span>mode="image"</span>
+        <div class="line">
+          <aufbau-icon icon="logos:javascript" mode="image" size="2rem"></aufbau-icon>
+          <aufbau-icon icon="logos:css-3" mode="image" size="2rem"></aufbau-icon>
+          <aufbau-icon icon="logos:html-5" mode="image" size="2rem"></aufbau-icon>
+        </div></div>
+    </section>
 
+    <!-- :::::: INDEX + ITEM -->
 
+    <section id="index">
+      <h2>aufbau-index · aufbau-item</h2>
+      <div class="row"><span>viewmode</span>
+        <aufbau-picker id="index-viewmode" look="segments" value="grid">
+          <aufbau-option>grid</aufbau-option>
+          <aufbau-option>list</aufbau-option>
+          <aufbau-option>gallery</aufbau-option>
+          <aufbau-option>masonry</aufbau-option>
+        </aufbau-picker></div>
+      <div class="row"><span>item-size</span>
+        <aufbau-slider id="index-size" type="number" value="96" min="48" max="200" step="8" unit="px"></aufbau-slider></div>
+      <aufbau-index id="index-demo" viewmode="grid" item-size="96px" gap=".75rem">
+        <aufbau-item shape="circle"   style="--mix: 80">circle</aufbau-item>
+        <aufbau-item shape="square"   style="--mix: 60">square</aufbau-item>
+        <aufbau-item shape="rounded"  style="--mix: 40">rounded</aufbau-item>
+        <aufbau-item shape="squircle" style="--mix: 20">squircle</aufbau-item>
+        <aufbau-item shape="1rem 0"   style="--mix: 70">1rem 0</aufbau-item>
+        <aufbau-item shape="rounded"  style="--mix: 50">rounded</aufbau-item>
+        <aufbau-item shape="circle"   style="--mix: 30">circle</aufbau-item>
+        <aufbau-item shape="squircle" style="--mix: 90">squircle</aufbau-item>
+      </aufbau-index>
+    </section>
 
-<script type="module">
-  import aufbau         from '@aufbau/api';
-  import getFormValues  from '@domina/methods/getFormValues.js';
+    <!-- :::::: INPUT -->
 
-  await aufbau.boot();
+    <section id="input">
+      <h2>aufbau-input</h2>
+      <h3>type</h3>
+      <div class="row"><span>text</span>     <aufbau-input name="text"     type="text" placeholder="a title" icon="lucide:type"></aufbau-input></div>
+      <div class="row"><span>email</span>    <aufbau-input name="email"    type="email" placeholder="mail@example.com"></aufbau-input></div>
+      <div class="row"><span>password</span> <aufbau-input name="password" type="password" autocomplete="new-password"></aufbau-input></div>
+      <div class="row"><span>phone</span>    <aufbau-input name="phone"    type="phone"></aufbau-input></div>
+      <div class="row"><span>url</span>      <aufbau-input name="url"      type="url" placeholder="https://aufbau.dev"></aufbau-input></div>
+      <div class="row"><span>number</span>   <aufbau-input name="number"   type="number" value="42"></aufbau-input></div>
+      <div class="row"><span>year</span>     <aufbau-input name="year"     type="year" value="2026"></aufbau-input></div>
+      <div class="row"><span>date</span>     <aufbau-input name="date"     type="date"></aufbau-input></div>
+      <div class="row"><span>datetime</span> <aufbau-input name="datetime" type="datetime"></aufbau-input></div>
+      <div class="row"><span>time</span>     <aufbau-input name="time"     type="time"></aufbau-input></div>
+      <div class="row"><span>duration</span> <aufbau-input name="duration" type="duration" value="90s"></aufbau-input></div>
+      <div class="row"><span>color</span>    <aufbau-input name="color"    type="color" value="#ff79c6"></aufbau-input></div>
+      <h3>look</h3>
+      <div class="row"><span>look="stepper", the page's font size</span>
+        <aufbau-input id="font-size" name="fontSize" type="number" look="stepper" value="14" min="10" max="22" step="1"></aufbau-input></div>
+      <div class="row"><span>look="swatch", the theme</span>
+        <aufbau-input id="theme-swatch" name="themeColor" type="color" look="swatch" value="#ff79c6"></aufbau-input></div>
+      <h3>constraints</h3>
+      <div class="row"><span>required minlength="3"</span>
+        <aufbau-input name="nickname" required minlength="3" placeholder="at least 3 characters"></aufbau-input></div>
+      <div class="row"><span>pattern="[a-z]+"</span>
+        <aufbau-input name="slug" pattern="[a-z]+" placeholder="lowercase only"></aufbau-input></div>
+    </section>
 
-  const form = document.getElementById('playground');
-  const dump = document.getElementById('dump');
+    <!-- :::::: KEYBOARD -->
 
-  const show = () => {
-    const values = getFormValues(form);
-    const data   = Object.fromEntries([...new FormData(form).entries()]
-      .map(([key, value]) => [key, value instanceof File ? `File(${value.name})` : value]));
+    <section id="keyboard">
+      <h2>aufbau-keyboard</h2>
+      <div class="row"><span>layout</span>
+        <aufbau-picker id="keyboard-layout" look="segments" value="de">
+          <aufbau-option>de</aufbau-option>
+          <aufbau-option>en</aufbau-option>
+        </aufbau-picker></div>
+      <textarea id="keyboard-target" placeholder="type with the keys below"></textarea>
+      <aufbau-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></aufbau-keyboard>
+    </section>
 
-    dump.textContent = `getFormValues: ${JSON.stringify(values, null, 2)}\n\nFormData:     ${JSON.stringify(data, null, 2)}`;
-  };
+    <!-- :::::: LOOP -->
 
-  form.addEventListener('input',  show);
-  form.addEventListener('change', show);
-  form.addEventListener('reset',  () => setTimeout(show));
+    <section id="loop">
+      <h2>aufbau-loop</h2>
+      <div class="row"><span>mode="carousel"</span>
+        <aufbau-loop mode="carousel" interval="2000" pause-on-hover>
+          <div>eins</div>
+          <div>zwei</div>
+          <div>drei</div>
+        </aufbau-loop></div>
+      <div class="row"><span>mode="marquee"</span>
+        <aufbau-loop id="marquee" mode="marquee" speed="30s" pause-on-hover></aufbau-loop></div>
+      <div class="row"><span>direction="right"</span>
+        <aufbau-loop id="marquee-right" mode="marquee" direction="right" speed="40s"></aufbau-loop></div>
+    </section>
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    console.log('valid:', form.checkValidity());
-    show();
-  });
+    <!-- :::::: MODAL -->
 
-  // options must survive being added and removed at runtime
-  const picker = form.querySelector('[name="lang"]');
-  let counter = 0;
+    <section id="modal">
+      <h2>aufbau-modal</h2>
+      <div class="row"><span>show() resolves on close</span>
+        <aufbau-button id="modal-open" icon="lucide:square-arrow-out-up-right">open the modal</aufbau-button></div>
+      <aufbau-modal id="modal-demo" heading="choose">
+        <p>the modal resolves with the value it closes with.</p>
+        <div class="line">
+          <aufbau-button data-close="yes" variant="primary">yes</aufbau-button>
+          <aufbau-button data-close="no">no</aufbau-button>
+        </div>
+      </aufbau-modal>
+    </section>
 
-  document.getElementById('add-option').addEventListener('click', () => {
-    const option = document.createElement('aufbau-option');
-    option.setAttribute('value', `neu-${++counter}`);
-    option.textContent = `Neu ${counter}`;
-    picker.append(option);
-  });
+    <!-- :::::: OPTION -->
 
-  document.getElementById('drop-option').addEventListener('click', () => {
-    [...picker.querySelectorAll('aufbau-option')].pop()?.remove();
-  });
+    <section id="option">
+      <h2>aufbau-option</h2>
+      <p class="hint">a data element, read by its container. options stay live, they can come and go at runtime.</p>
+      <div class="row"><span>runtime</span>
+        <div class="line">
+          <aufbau-button id="option-add" icon="lucide:plus">add an option</aufbau-button>
+          <aufbau-button id="option-drop" icon="lucide:minus">drop the last</aufbau-button>
+        </div></div>
+      <div class="row"><span>look="radio"</span>
+        <aufbau-picker id="option-picker" name="options" look="radio">
+          <aufbau-option value="one">one</aufbau-option>
+          <aufbau-option value="two">two</aufbau-option>
+          <aufbau-option value="off" disabled>disabled</aufbau-option>
+        </aufbau-picker></div>
+    </section>
 
-  setTimeout(show, 300);
-</script>
+    <!-- :::::: PICKER -->
 
+    <section id="picker">
+      <h2>aufbau-picker</h2>
+      <div class="row"><span>look="combobox" searchable, the theme</span>
+        <aufbau-picker id="theme-picker" name="theme" look="combobox" searchable placeholder="theme…"></aufbau-picker></div>
+      <div class="row"><span>look="segments", the look</span>
+        <aufbau-picker id="look-picker" name="look" look="segments" value="flat">
+          <aufbau-option>flat</aufbau-option>
+          <aufbau-option>rounded</aufbau-option>
+        </aufbau-picker></div>
+      <div class="row"><span>look="cycle", the mode</span>
+        <aufbau-picker id="mode-picker" name="mode" look="cycle" value="auto">
+          <aufbau-option value="auto"  icon="lucide:sun-moon">auto</aufbau-option>
+          <aufbau-option value="dark"  icon="lucide:moon">dark</aufbau-option>
+          <aufbau-option value="light" icon="lucide:sun">light</aufbau-option>
+        </aufbau-picker></div>
+      <div class="row"><span>look="radio"</span>
+        <aufbau-picker name="language" look="radio" value="en">
+          <aufbau-option value="de">Deutsch</aufbau-option>
+          <aufbau-option value="en">English</aufbau-option>
+          <aufbau-option value="fr">Français</aufbau-option>
+        </aufbau-picker></div>
+      <div class="row"><span>look="radio" multiple</span>
+        <aufbau-picker name="languages" look="radio" multiple value="js,css">
+          <aufbau-option value="js">JavaScript</aufbau-option>
+          <aufbau-option value="css">CSS</aufbau-option>
+          <aufbau-option value="html">HTML</aufbau-option>
+        </aufbau-picker></div>
+      <div class="row"><span>look="segments" icons-only</span>
+        <aufbau-picker name="align" look="segments" icons-only value="left">
+          <aufbau-option value="left"   icon="lucide:align-left">left</aufbau-option>
+          <aufbau-option value="center" icon="lucide:align-center">center</aufbau-option>
+          <aufbau-option value="right"  icon="lucide:align-right">right</aufbau-option>
+        </aufbau-picker></div>
+    </section>
+
+    <!-- :::::: PROGRESS -->
+
+    <section id="progress">
+      <h2>aufbau-progress</h2>
+      <div class="row"><span>type="standard" show-text</span>
+        <aufbau-progress id="progress-demo" value="40" max="100" show-text></aufbau-progress></div>
+      <div class="row"><span>value</span>
+        <aufbau-slider id="progress-value" type="number" value="40" min="0" max="100" unit="%"></aufbau-slider></div>
+      <div class="row"><span>type="scroll"</span>
+        <p class="hint">the bar at the top of the page follows the scroll position.</p></div>
+      <aufbau-progress type="scroll" target="body" style="position: fixed; inset: 0 0 auto; z-index: 10;"></aufbau-progress>
+    </section>
+
+    <!-- :::::: READER -->
+
+    <section id="reader">
+      <h2>aufbau-reader</h2>
+      <div class="row"><span>markdown, children</span>
+        <aufbau-reader>## prose
+          through **the same** markdown pipeline as `src` and `raw`.
+
+          - lists
+          - [links](https://aufbau.dev)
+        </aufbau-reader></div>
+      <div class="row"><span>format="html"</span>
+        <aufbau-reader format="html"><p>plain <em>html</em>, rendered as is.</p></aufbau-reader></div>
+    </section>
+
+    <!-- :::::: SKELETON -->
+
+    <section id="skeleton">
+      <h2>aufbau-skeleton</h2>
+      <div class="row"><span>shape="text" lines="3"</span>  <aufbau-skeleton lines="3"></aufbau-skeleton></div>
+      <div class="row"><span>shape="circle"</span>          <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton></div>
+      <div class="row"><span>shape="rect"</span>            <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton></div>
+      <div class="row"><span>the skeleton attribute</span>
+        <aufbau-toggle id="skeleton-toggle" look="switch" label="loading"></aufbau-toggle></div>
+      <aufbau-item id="skeleton-card">
+        <div class="avatar"></div>
+        <div>any aufbau element takes <code>skeleton</code> for the same look in its own place.</div>
+      </aufbau-item>
+    </section>
+
+    <!-- :::::: SLIDER -->
+
+    <section id="slider">
+      <h2>aufbau-slider</h2>
+      <div class="row"><span>type="number" controls editable</span>
+        <aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider></div>
+      <div class="row"><span>type="number" range</span>
+        <aufbau-slider name="price" type="number" range value="20,80" min="0" max="100" unit="€"></aufbau-slider></div>
+      <div class="row"><span>type="color", the theme</span>
+        <aufbau-slider id="theme-hue" name="hue" type="color" value="#ff79c6"></aufbau-slider></div>
+      <div class="row"><span>type="date"</span>
+        <aufbau-slider name="day" type="date" value="2026-06-01" min="2026-01-01" max="2026-12-31"></aufbau-slider></div>
+      <div class="row"><span>type="datetime"</span>
+        <aufbau-slider name="moment" type="datetime" value="2026-06-01T12:00" min="2026-06-01T00:00" max="2026-06-02T00:00"></aufbau-slider></div>
+      <div class="row"><span>type="time"</span>
+        <aufbau-slider name="from" type="time" value="09:00"></aufbau-slider></div>
+      <div class="row"><span>type="duration"</span>
+        <aufbau-slider name="length" type="duration" value="2s" min="0s" max="10s" step="0.5"></aufbau-slider></div>
+      <div class="row"><span>type="year"</span>
+        <aufbau-slider name="era" type="year" value="1990" min="1900" max="2030"></aufbau-slider></div>
+    </section>
+
+    <!-- :::::: TABLE -->
+
+    <section id="table">
+      <h2>aufbau-table</h2>
+      <p class="hint">the elements of this page as data, sortable by every column.</p>
+      <aufbau-table id="table-demo" sortable></aufbau-table>
+    </section>
+
+    <!-- :::::: TOAST -->
+
+    <section id="toast">
+      <h2>aufbau-toast</h2>
+      <div class="row"><span>type</span>
+        <div class="line">
+          <aufbau-button data-toast="just so you know" data-type="info">info</aufbau-button>
+          <aufbau-button data-toast="it worked" data-type="success">success</aufbau-button>
+          <aufbau-button data-toast="careful now" data-type="warning">warning</aufbau-button>
+          <aufbau-button data-toast="that went wrong" data-type="error">error</aufbau-button>
+        </div></div>
+    </section>
+
+    <!-- :::::: TOC -->
+
+    <section id="toc-section">
+      <h2>aufbau-toc</h2>
+      <p class="hint">the table of contents in the aside, built from the h2 of this page. the entry of the section you read is marked.</p>
+    </section>
+
+    <!-- :::::: TOGGLE -->
+
+    <section id="toggle">
+      <h2>aufbau-toggle</h2>
+      <div class="row"><span>look="switch", dark mode</span>
+        <aufbau-toggle id="dark-toggle" name="dark" label="dark"></aufbau-toggle></div>
+      <div class="row"><span>look="checkbox" required</span>
+        <aufbau-toggle name="terms" look="checkbox" label="accept the terms" required></aufbau-toggle></div>
+      <div class="row"><span>look="checkbox" indeterminate</span>
+        <aufbau-toggle name="partial" look="checkbox" label="some of them" indeterminate></aufbau-toggle></div>
+      <div class="row"><span>look="button" icon icon-checked</span>
+        <aufbau-toggle name="pinned" look="button" label="pin" icon="lucide:pin-off" icon-checked="lucide:pin"></aufbau-toggle></div>
+    </section>
+
+    <!-- :::::: TREE -->
+
+    <section id="tree">
+      <h2>aufbau-tree · aufbau-tree-item</h2>
+      <div class="row"><span>children</span>
+        <aufbau-tree>
+          <aufbau-tree-item label="aufbau" icon="lucide:folder" expanded>
+            <aufbau-tree-item label="api" icon="lucide:folder">
+              <aufbau-tree-item label="gestalt.js" icon="lucide:file-code" value="api/gestalt.js"></aufbau-tree-item>
+              <aufbau-tree-item label="index.js"   icon="lucide:file-code" value="api/index.js"></aufbau-tree-item>
+            </aufbau-tree-item>
+            <aufbau-tree-item label="css" icon="lucide:folder">
+              <aufbau-tree-item label="themes.css" icon="lucide:file" value="css/themes.css"></aufbau-tree-item>
+            </aufbau-tree-item>
+          </aufbau-tree-item>
+        </aufbau-tree></div>
+      <div class="row"><span>nodes, from js</span>
+        <aufbau-tree id="tree-nodes"></aufbau-tree></div>
+    </section>
+
+    <!-- :::::: UPLOAD -->
+
+    <section id="upload">
+      <h2>aufbau-upload</h2>
+      <div class="row"><span>look="dropzone" accept="image/*"</span>
+        <aufbau-upload name="avatar" accept="image/*"></aufbau-upload></div>
+      <div class="row"><span>look="button" multiple</span>
+        <aufbau-upload name="attachments" look="button" multiple text="pick files"></aufbau-upload></div>
+      <div class="row"><span>look="list" max-size="5MB"</span>
+        <aufbau-upload name="documents" look="list" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload></div>
+    </section>
+
+    <!-- :::::: VALUE -->
+
+    <section id="value">
+      <h2>aufbau-value</h2>
+      <div class="row"><span>type="number" format="locale"</span> <aufbau-value type="number" format="locale" value="1234567.891"></aufbau-value></div>
+      <div class="row"><span>type="date" format="long"</span>     <aufbau-value type="date" format="long" value="2026-04-20"></aufbau-value></div>
+      <div class="row"><span>type="datetime" format="short"</span><aufbau-value type="datetime" format="short" value="2026-04-20T18:30"></aufbau-value></div>
+      <div class="row"><span>type="time"</span>                   <aufbau-value type="time" value="18:30"></aufbau-value></div>
+      <div class="row"><span>type="duration"</span>               <aufbau-value type="duration" value="3725s"></aufbau-value></div>
+      <div class="row"><span>type="color" copy</span>             <aufbau-value type="color" value="#ff79c6" copy></aufbau-value></div>
+      <div class="row"><span>type="email" icon</span>             <aufbau-value type="email" value="hello@aufbau.dev" icon="lucide:mail"></aufbau-value></div>
+      <div class="row"><span>type="url"</span>                    <aufbau-value type="url" value="https://aufbau.dev"></aufbau-value></div>
+    </section>
+
+    <!-- :::::: VIDEO -->
+
+    <section id="video">
+      <h2>aufbau-video</h2>
+      <div class="row"><span>src, muted loop</span>
+        <aufbau-video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" muted loop></aufbau-video></div>
+    </section>
+
+    <!-- :::::: WAVEFORM -->
+
+    <section id="waveform">
+      <h2>aufbau-waveform</h2>
+      <div class="row"><span>peaks interactive</span>
+        <aufbau-waveform id="waveform-demo" interactive progress="30" style="block-size: 4rem;"></aufbau-waveform></div>
+      <div class="row"><span>range-start range-end</span>
+        <aufbau-waveform id="waveform-range" range-start="25" range-end="60" progress="45" style="block-size: 4rem;"></aufbau-waveform></div>
+    </section>
+
+    <!-- :::::: WRITER -->
+
+    <section id="writer">
+      <h2>aufbau-writer</h2>
+      <div class="row"><span>counter maxlength="280"</span>
+        <aufbau-writer name="bio" placeholder="a short bio…" counter maxlength="280"></aufbau-writer></div>
+      <div class="row"><span>autogrow 3–12 rows</span>
+        <aufbau-writer name="note" min-rows="3" max-rows="12"></aufbau-writer></div>
+      <div class="row"><span>resize="both", children</span>
+        <aufbau-writer name="draft" resize="both">a first draft.</aufbau-writer></div>
+    </section>
+
+    <!-- :::::: FORM -->
+
+    <section id="form-values">
+      <h2>getFormValues()</h2>
+      <p class="hint">every named control of this page sits in one form. the values below update on every change.</p>
+      <div class="line">
+        <aufbau-button type="submit" variant="primary">submit, checks validity</aufbau-button>
+        <aufbau-button type="reset">reset</aufbau-button>
+      </div>
+      <aufbau-code id="form-dump" lang="json" actions="copy"></aufbau-code>
+    </section>
+
+  </form>
+  </main>
+
+  <script type="module">
+    import aufbau        from '@aufbau/api';
+    import getFormValues from '@domina/methods/getFormValues.js';
+
+    await aufbau.boot();
+
+    const { gestalt } = aufbau;
+    const $ = id => document.getElementById(id);
+
+    // :::::: TOASTS
+    // every [data-toast] on the page, buttons and dropdown entries alike
+
+    await aufbau.elements.load('aufbau-toast');
+    const Toast = customElements.get('aufbau-toast');
+    const toast = (message, type = 'info') => Toast.notify({ message, type });
+
+    document.addEventListener('click', event => {
+      const source = event.target.closest('[data-toast]');
+      if (source) toast(source.dataset.toast, source.dataset.type);
+    });
+
+    // :::::: GESTALT
+    // the theme picker, the look segments, the mode cycle, the dark switch and
+    // the two color controls all go through one function, the code block shows the result
+
+    const themes = await gestalt.themes();
+
+    async function setGestalt (values) {
+      await gestalt.set(values);
+      $('gestalt-code').setAttribute('code', JSON.stringify({ ...gestalt.get(), colors: gestalt.colors() }, null, 2));
+    }
+
+    $('theme-picker').append(...themes.map(name => Object.assign(document.createElement('aufbau-option'), { textContent: name })));
+    $('theme-picker').setAttribute('value', gestalt.get('theme'));
+
+    const onChange = (id, handler) => $(id).addEventListener('change', event => handler(event.currentTarget));
+
+    onChange('theme-picker', picker => picker.value && setGestalt({ theme: picker.value }));
+    onChange('look-picker',  picker => setGestalt({ look: picker.value }));
+    onChange('mode-picker',  picker => { setGestalt({ mode: picker.value }); $('dark-toggle').checked = picker.value === 'dark'; });
+    onChange('dark-toggle',  toggle => { setGestalt({ mode: toggle.checked ? 'dark' : 'light' }); $('mode-picker').value = toggle.checked ? 'dark' : 'light'; });
+
+    // a color is a theme too, themes.css derives bg and fg from it and the mode decides which way
+    for (const id of ['theme-swatch', 'theme-hue']) $(id).addEventListener('input', event => setGestalt({ theme: event.currentTarget.value }));
+
+    $('random-theme').addEventListener('click', () => {
+      const theme = themes[Math.floor(Math.random() * themes.length)];
+      $('theme-picker').value = theme;
+      setGestalt({ theme });
+    });
+
+    $('dark-toggle').checked = matchMedia('(prefers-color-scheme: dark)').matches;
+    setGestalt({});
+
+    onChange('font-size', input => { document.body.style.fontSize = `${input.value}px`; });
+
+    // :::::: DATALIST, TABLE
+    // both read the elements of this page, from the section headings
+
+    const tags = [...document.querySelectorAll('main h2')].flatMap(heading => heading.textContent.split('·').map(tag => tag.trim())).filter(tag => tag.startsWith('aufbau-'));
+
+    $('element-names').append(...tags.map(tag => Object.assign(document.createElement('option'), { value: tag })));
+
+    $('table-demo').data = tags.map(tag => {
+      const Element = customElements.get(tag);
+      const schema  = Element?.attr ?? {};
+      return {
+        element : tag,
+        control : Boolean(Element?.formAssociated),
+        looks   : schema.look?.values?.join(', ') ?? schema.type?.values?.join(', ') ?? '',
+      };
+    });
+
+    // :::::: CRUMBS, DROPDOWN, INDEX, KEYBOARD
+
+    document.addEventListener('aufbau-crumbs', event => toast(`crumb: ${event.detail.path}`));
+
+    onChange('dropdown-placement', picker => $('dropdown-menu').setAttribute('placement', picker.value));
+    onChange('index-viewmode',     picker => $('index-demo').setAttribute('viewmode', picker.value));
+    $('index-size').addEventListener('input', event => $('index-demo').setAttribute('item-size', `${event.currentTarget.value}px`));
+    onChange('keyboard-layout',    picker => $('keyboard-demo').setAttribute('layout', picker.value));
+
+    // :::::: FLAGS
+
+    const regions = new Intl.DisplayNames(['en'], { type: 'region' });
+    $('flag-list').append(...['at', 'br', 'ch', 'de', 'es', 'fr', 'gb', 'in', 'it', 'jp', 'ke', 'mx', 'nl', 'no', 'pl', 'se', 'ua', 'us'].map(code => {
+      const figure = document.createElement('figure');
+      figure.innerHTML = `<aufbau-flag code="${code}"></aufbau-flag><figcaption>${regions.of(code.toUpperCase())}</figcaption>`;
+      return figure;
+    }));
+
+    // :::::: LOOP
+
+    const words = tags.map(tag => Object.assign(document.createElement('span'), { textContent: tag }));
+    $('marquee').append(...words);
+    $('marquee-right').append(...words.map(word => word.cloneNode(true)));
+
+    // :::::: MODAL
+
+    $('modal-open').addEventListener('click', async () => {
+      const answer = await $('modal-demo').show();
+      toast(`the modal closed with: ${answer ?? 'nothing'}`);
+    });
+    $('modal-demo').addEventListener('click', event => {
+      const button = event.target.closest('[data-close]');
+      if (button) $('modal-demo').close(button.dataset.close);
+    });
+
+    // :::::: OPTION
+
+    let added = 0;
+    $('option-add').addEventListener('click', () => {
+      const option = document.createElement('aufbau-option');
+      option.setAttribute('value', `new-${++added}`);
+      option.textContent = `new ${added}`;
+      $('option-picker').append(option);
+    });
+    $('option-drop').addEventListener('click', () => [...$('option-picker').querySelectorAll('aufbau-option')].pop()?.remove());
+
+    // :::::: PROGRESS, SKELETON
+
+    $('progress-value').addEventListener('input', event => $('progress-demo').setAttribute('value', event.currentTarget.value));
+    onChange('skeleton-toggle', toggle => $('skeleton-card').toggleAttribute('skeleton', toggle.checked));
+
+    // :::::: TREE
+
+    $('tree-nodes').nodes = [
+      { label: 'elements', icon: 'lucide:folder', expanded: true, children: tags.slice(0, 6).map(tag => ({ label: `${tag}.js`, icon: 'lucide:file-code', value: tag })) },
+      { label: 'more', icon: 'lucide:folder', children: tags.slice(6).map(tag => ({ label: `${tag}.js`, icon: 'lucide:file-code', value: tag })) },
+    ];
+    document.addEventListener('aufbau-tree-select', event => event.detail?.value && toast(`selected: ${event.detail.value}`));
+
+    // :::::: WAVEFORM
+
+    const peaks = Array.from({ length: 64 }, (_, index) => (.35 + .65 * Math.abs(Math.sin(index * .37) * Math.cos(index * .11))).toFixed(2));
+    for (const id of ['waveform-demo', 'waveform-range']) $(id).setAttribute('peaks', peaks.join(','));
+    $('waveform-demo').addEventListener('aufbau-waveform-seek', event => $('waveform-demo').setAttribute('progress', event.detail.progress));
+
+    // :::::: FORM
+
+    const form = $('form');
+    const dump = () => $('form-dump').setAttribute('code', JSON.stringify(getFormValues(form), null, 2));
+
+    let pending = false;
+    const scheduleDump = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; dump(); }); } };
+
+    form.addEventListener('input',  scheduleDump);
+    form.addEventListener('change', scheduleDump);
+    form.addEventListener('reset',  () => setTimeout(dump));
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      form.reportValidity() ? toast('the form is valid', 'success') : toast('the form is not valid yet', 'warning');
+      dump();
+    });
+
+    dump();
+  </script>
 </body>
 </html>

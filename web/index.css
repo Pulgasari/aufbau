@@ -1,5 +1,4 @@
-@import url("https://cdn.ratcode.dev/css/reset.css");
-@import url("https://cdn.ratcode.dev/css/default.css");
+@import url("https://code.pulgasari.dev/aufbau/css/aufbau.css");
 @import url("https://code.pulgasari.dev/aufbau/css/animations.css");
 
     * { font-family: "Hubot Sans"; line-height: 1; }

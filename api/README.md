@@ -61,8 +61,9 @@ await aufbau.elements.enableAutoload();   // returns the stop function
 await aufbau.elements.registerAll();
 await aufbau.elements.setConfig({ code: { theme: 'nord' } });
 
-await aufbau.data.filters;    // also icons, patterns, webfonts. each one a promise
-await aufbau.setTheme('oled');   // the --theme token on the root
+await aufbau.data.filters;    // also icons, patterns, themes, webfonts. each one a promise
+await aufbau.gestalt.set({ theme: 'oled' });   // see gestalt.js
+await aufbau.gestalt.themes();                 // the presets, read off css/themes.css
 ```
 
 ### boot config

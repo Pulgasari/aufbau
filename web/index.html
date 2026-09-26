@@ -48,7 +48,8 @@
     const filter = pick(Object.keys(FILTERS));
     applyFilter('body', filter, FILTERS[filter]);
 
-    await aufbau.boot({ css: { theme: pick(aufbau.gestalt.themes) } });
+    // index.css brings the reset itself
+    await aufbau.boot({ css: { reset: false, theme: pick(await aufbau.gestalt.themes()) } });
   </script>
 
 </body>

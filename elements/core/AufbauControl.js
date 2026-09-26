@@ -34,12 +34,14 @@ export class AufbauControl extends AufbauCore {
   // structure shared by every control. colours, borders and radii belong to the
   // skin, see ../../css/skins/. declared on the base class on purpose: styleOwners()
   // keys sheets by their declaring class, so this is adopted once per root. the
-  // :host variants cover controls with a shadow root, the tag list the others
+  // :host variants cover controls with a shadow root, the tag list the others.
+  // a shadowed control must not be in that list: page rules beat :host, so its
+  // own display would lose
   static styles = `
     [hidden] { display: none !important; }
 
     :host,
-    aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer {
+    aufbau-input, aufbau-slider, aufbau-toggle, aufbau-writer {
       box-sizing : border-box;
       color      : inherit;
       display    : inline-block;
@@ -47,12 +49,12 @@ export class AufbauControl extends AufbauCore {
     }
 
     :host *,
-    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer) * {
+    :is(aufbau-input, aufbau-slider, aufbau-toggle, aufbau-writer) * {
       box-sizing: border-box;
     }
 
     :host(:state(disabled)),
-    :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) {
+    :is(aufbau-input, aufbau-slider, aufbau-toggle, aufbau-writer):state(disabled) {
       pointer-events: none;
     }
   `;
@@ -118,6 +120,13 @@ export class AufbauControl extends AufbauCore {
   }
 
   // :::::: FORM ::::::::::::::::::::::::::::::::::::::::::::::::
+
+  // the surface of a native control, which form.elements consumers such as
+  // getFormValues() read. type is the attribute where a control has one,
+  // otherwise the tag; a subclass with native semantics overrides it
+  get disabled () { return this.hasAttribute('disabled') || Boolean(this._formDisabled); }
+  get name     () { return this.getAttribute('name') ?? ''; }
+  get type     () { return this.getAttribute('type') ?? this.localName; }
 
   get form              () { return this.internals?.form              ?? null;  }
   get labels            () { return this.internals?.labels            ?? [];    }
