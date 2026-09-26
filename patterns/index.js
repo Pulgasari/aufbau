@@ -110,7 +110,7 @@ export function remove (target) {
   }
 }
 
-// the render path without a Pattern around it, used by @aufbau/stylesheet
+// the render path without a Pattern around it, for the aufbau-pattern skill parked in ass/_stylesheet
 export const patternSvg   = (id, options) => use(id).svg(options);
 export const patternImage = (id, options) => use(id).image(options);
 

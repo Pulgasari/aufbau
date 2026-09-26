@@ -4,7 +4,7 @@
 // @aufbau/runtime/client.js
 
 import { createCache } from '@bunker/cache';
-import transformACSS   from './../stylesheet/index.js'; //from '@aufbau/stylesheet';
+import { compile }     from '@aufbau/ass';
 
 // :::::: DATA
 
@@ -31,7 +31,7 @@ export async function processStylesheetLink (node) {
 
   try {
     const response = await cssCache.staleWhileRevalidate(href, {
-      transform : transformACSS,
+      transform : (source) => compile(source),
       type      : 'text/css; charset=utf-8',
     });
     if (!response) return;
@@ -48,7 +48,7 @@ export async function processStylesheetLink (node) {
 export function processStyleElement (node) {
   if (node.type !== 'text/aufbau' || node.hasAttribute('data-aufbau-processed')) return;
 
-  node.textContent = transformACSS(node.textContent);
+  node.textContent = compile(node.textContent);
   node.type = 'text/css';
   node.setAttribute('data-aufbau-processed', 'true');
 }

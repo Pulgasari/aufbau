@@ -152,9 +152,10 @@ pipe.render(targetCanvas);          // re-run, source untouched
 
 try the canvas filters live in the canvas tab of [aufbau.dev/filters.html](https://aufbau.dev/filters.html#canvas).
 
-## usage with @aufbau/stylesheet
+## usage in css
 
-built into `@aufbau/stylesheet`, which injects the defs during its async pre-pass:
+planned as an `aufbau-filter` property of `@aufbau/ass`, which injects the defs
+(the retired stylesheet skill is parked in `ass/_stylesheet/`):
 
 ```css
 #logo      { aufbau-filter: glitch-rgb offsetX(6); }

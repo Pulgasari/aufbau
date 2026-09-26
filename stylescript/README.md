@@ -1,7 +1,7 @@
 # @aufbau/stylescript
 
 Styles authored directly in JavaScript. The JS-native counterpart to
-`@aufbau/stylesheet`'s `.ass` pseudo-CSS: a central controller holds aliases,
+`@aufbau/ass`: a central controller holds aliases,
 tokens, custom-property vars and reusable traits, and renders named, layered
 stylesheets — with a content-addressed cache so warm visits don't flicker.
 

@@ -53,10 +53,10 @@ await dots.apply('.box');
 `applyPattern`, `removePattern`, `updatePattern`, `usePattern`, `patternImage` and
 `patternSvg` stay as named aliases.
 
-## usage with @aufbau/stylesheet
+## usage in css
 
-built into `@aufbau/stylesheet`, which prebuilds the data-uri during its async
-pre-pass (colour tokens resolve like `aufbau-icon`):
+planned as an `aufbau-pattern` property of `@aufbau/ass`, which prebuilds the
+data-uri (the retired stylesheet skill is parked in `ass/_stylesheet/`):
 
 ```css
 .box { aufbau-pattern: dots bg(transparent) fg(#FF0000) rotate(90); }
