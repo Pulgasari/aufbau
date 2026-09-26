@@ -24,7 +24,6 @@
     "./AufbauReader"   : "./AufbauReader.js",
     "./AufbauSkeleton" : "./AufbauSkeleton.js",
     "./AufbauSlider"   : "./AufbauSlider.js",
-    "./AufbauSplash"   : "./AufbauSplash.js",
     "./AufbauTable"    : "./AufbauTable.js",
     "./AufbauToast"    : "./AufbauToast.js",
     "./AufbauToc"      : "./AufbauToc.js",

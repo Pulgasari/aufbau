@@ -14,9 +14,7 @@
 @import url("shapes/flat.css") layer(shapes);
 
 /* Theme options */
-@import url("themes/oled.css") layer(themes);
-@import url("themes/zombie.css") layer(themes);
-@import url("themes/rainbow.css") layer(themes);
+@import url("themes.css") layer(themes);
 
 /* Component scoped styles */
 @import url("components/card.css") layer(components);

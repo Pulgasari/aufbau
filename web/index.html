@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>aufbau</title>
   <link rel="stylesheet" href="./index.css" />
-  <script src="https://code.pulgasari.dev/aufbau/boot.js"></script>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
 </head>
 
@@ -34,55 +33,22 @@
   </footer>
 
   <script type="module">
+    import aufbau           from '@aufbau/api';
     import { applyFilter } from '@aufbau/filters';
-    import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-  	const { effect, signal  } = preact;
-  
-  	//aufbau.init();
 
-	function getRandomEntry (map) {
-      const keys = Object.keys(map);
-      const randomKey = keys[Math.floor(Math.random() * keys.length)];
-      return { key: randomKey, value: map[randomKey] };
-    }
+    const pick = list => list[Math.floor(Math.random() * list.length)];
 
-	function getRandomItem (arr) {
-  	  if (!arr || arr.length === 0) return undefined;
-  	  return arr[Math.floor(Math.random() * arr.length)];
-	}
-    
-    const filtersMap = {
-      'glitch-heavy-cyber' : { animate: true, frequency: "0.0 0.95", scale: 40, speed: "1.5s" },
-      'glitch-live'        : { animate: true, speed: "2s" },
-      'night-vision'       : { animate: true, noise: 0.5, speed: "0.4s" },
+    // a random glitch over the page, a random theme under it
+    const FILTERS = {
+      'glitch-heavy-cyber' : { animate: true, frequency: '0.0 0.95', scale: 40, speed: '1.5s' },
+      'glitch-live'        : { animate: true, speed: '2s' },
+      'night-vision'       : { animate: true, noise: 0.5, speed: '0.4s' },
     };
 
-    const { key, value } = getRandomEntry(filtersMap);
-    applyFilter('body', key, value);
+    const filter = pick(Object.keys(FILTERS));
+    applyFilter('body', filter, FILTERS[filter]);
 
-	  const theme = getRandomItem(aufbau.data.css.themes);
-    aufbau.init({ css: { theme }});
-
-    //const Test = () => html`<div>moin!</div>`;
-    //aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
-    
-
-    // Register custom CSS custom properties
-    //define({ key: 'bg', type: 'property' });
-    //define({ key: 'fg', type: 'property' });
-
-    //const indexSignal = signal(0);
-
-    // Reactively update theme variables via signal effect
-    /*
-    effect(() => {
-      const { bg, fg } = colors[indexSignal.value];
-      update({ key: 'bg', value: bg });
-      update({ key: 'fg', value: fg });
-    });
-    */
-
-    //setInterval(() => { indexSignal.value = (indexSignal.value + 1) % colors.length; }, 1000);
+    await aufbau.boot({ css: { theme: pick(aufbau.gestalt.themes) } });
   </script>
 
 </body>
