@@ -1,13 +1,34 @@
 /* @aufbau/css/themes.css */
 
-@property --theme  { syntax: "<custom-ident>"; inherits: true; initial-value: zombie; }
-@property --bg     { syntax: "<color>";        inherits: true; }
-@property --fg     { syntax: "<color>";        inherits: true; }
-@property --accent { syntax: "<color>";        inherits: true; }
+@property --theme  { syntax: "<color> | <custom-ident>"; inherits: true; initial-value: zombie; }
+@property --bg     { syntax: "<color>"; inherits: true; }
+@property --fg     { syntax: "<color>"; inherits: true; }
+@property --accent { syntax: "<color>"; inherits: true; }
 
 :root {
   --theme: zombie;
   &[data-theme] { --theme: attr(data-theme type(<custom-ident>), zombie); }
+}
+
+:root {
+  color-scheme: light dark; /* Enable native CSS light-dark() resolution */
+
+  --theme: zombie;
+  &[data-theme] { --theme: attr(data-theme type(*), zombie); }
+}
+
+body {
+  --accent : var(--theme);
+
+  --bg: light-dark(
+    oklch(from var(--theme) 0.97 calc(c * 0.15) h),
+    oklch(from var(--theme) 0.14 calc(c * 0.25) h)
+  );
+
+  --fg: light-dark(
+    oklch(from var(--theme) 0.18 calc(c * 0.05) h),
+    oklch(from var(--theme) 0.94 calc(c * 0.05) h)
+  );
 }
 
 @container style(--theme: amethyst)  { body { --bg: #160f1f; --fg: #ece0f5; --accent: #a855f7; } }     
