@@ -21,7 +21,9 @@
       border: 1px solid var(--line); border-radius: .75rem; background: var(--soft);
       text-align: center; font-weight: 600;
     }
-    .pad.flash { outline: 3px solid var(--accent); outline-offset: -3px; }
+    .pad.flash   { outline: 3px solid var(--accent); outline-offset: -3px; }
+    .pad.pressed { background: color-mix(in oklch, var(--accent) 25%, transparent); scale: .98; }
+    .pad         { transition: background-color .08s, scale .08s; }
 
     #pan-pad  { position: relative; overflow: hidden; }
     #pan-chip { width: 4rem; aspect-ratio: 1; border-radius: 1rem; background: var(--accent); transition: translate .25s ease; }
@@ -49,8 +51,13 @@
   <section class="grid">
     <div>
       <h2>tap · doubleTap · longPress · secondary</h2>
-      <p>single, double, hold, right click or menu key. two fingers count as <code>maximumPointers: 2</code>.</p>
+      <p>every tap at once, the second of a pair also as doubleTap. <code>press</code> colors the pad the moment it is touched.</p>
       <div class="pad" id="press-pad" tabindex="0">press me</div>
+    </div>
+    <div>
+      <h2>tap · doubleTap, exclusive</h2>
+      <p><code>tap: { waitForDoubleTap: true }</code>: only one of the two fires, a single tap arrives 300 ms late.</p>
+      <div class="pad" id="exclusive-pad">press me</div>
     </div>
     <div>
       <h2>swipe</h2>
@@ -117,11 +124,25 @@
 
     // :::::: PRESS
 
+    const pressed = element => ({
+      onPressCancel : () => element.classList.remove('pressed'),
+      onPressEnd    : () => element.classList.remove('pressed'),
+      onPressStart  : () => element.classList.add('pressed'),
+    });
+
     gestures($('press-pad'), {
+      ...pressed($('press-pad')),
       onDoubleTap : gesture => { flash($('press-pad')); log(`doubleTap  · ${gesture.input}`, gesture); },
       onLongPress : gesture => { flash($('press-pad')); log(`longPress  · ${gesture.input} · ${Math.round(gesture.duration)} ms`, gesture); },
       onSecondary : gesture => { flash($('press-pad')); log(`secondary  · ${gesture.input}`, gesture); },
-      onTap       : gesture => { flash($('press-pad')); log(`tap        · ${gesture.input} · pointers ${gesture.maximumPointers}`, gesture); },
+      onTap       : gesture => { flash($('press-pad')); log(`tap ${gesture.count}      · ${gesture.input} · pointers ${gesture.maximumPointers}`, gesture); },
+    });
+
+    gestures($('exclusive-pad'), {
+      ...pressed($('exclusive-pad')),
+      onDoubleTap : gesture => { flash($('exclusive-pad')); log('exclusive doubleTap', gesture); },
+      onTap       : gesture => { flash($('exclusive-pad')); log('exclusive tap', gesture); },
+      tap         : { waitForDoubleTap: true },
     });
 
     // :::::: SWIPE

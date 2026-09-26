@@ -9,9 +9,9 @@
 
 import { createTracker }       from './tracker.js';
 import { stricterTouchAction } from './shared.js';
-import { longPress, pan, secondary, swipe, tap } from './recognizers/index.js';
+import { longPress, pan, press, secondary, swipe, tap } from './recognizers/index.js';
 
-const RECOGNIZERS = { longPress, pan, secondary, swipe, tap };
+const RECOGNIZERS = { longPress, pan, press, secondary, swipe, tap };
 
 // gesture name -> the recognizer reporting it, e.g. doubleTap -> tap
 const OWNERS = {};

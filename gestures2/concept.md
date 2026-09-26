@@ -67,6 +67,7 @@ in lowercase.
 
 | gesture       | handlers                                                   | dom events |
 |---------------|------------------------------------------------------------|------------|
+| `press`       | `onPressStart`, `onPressEnd`, `onPressCancel`              | `pressstart`, … |
 | `tap`         | `onTap`                                                    | `tap` |
 | `doubleTap`   | `onDoubleTap`                                              | `doubletap` |
 | `longPress`   | `onLongPress`                                              | `longpress` |
@@ -75,7 +76,7 @@ in lowercase.
 | `pan`         | `onPanStart`, `onPanMove`, `onPanEnd`, `onPanCancel`       | `panstart`, `panmove`, … |
 
 planned: `pinch` and `rotate` (the session already measures them), wheel and
-trackpad sources, `press` with repeat (the old holdable), bundles.
+trackpad sources, a repeat while held (the old holdable), bundles.
 
 ### native signals first
 
@@ -99,8 +100,13 @@ several recognizers look at the same session. the rules so far:
   tolerance or when it took longer than `maximumDuration`.
 - `swipe` is evaluated on release from the same data as `pan`, the two coexist.
   it fails when `longPress` claimed the session.
-- with `doubleTap` active a single `tap` waits `interval` ms to tell the two
-  apart, without it the tap fires at once.
+- every `tap` fires at once with its `count`, the second of a pair also fires
+  `doubleTap`. `tap: { waitForDoubleTap: true }` makes the two exclusive: a
+  single tap waits `interval` ms, which is felt as lag. **open**: which one is
+  the better default (the first draft waited, and it felt slow).
+- `press` decides nothing and claims nothing: `pressStart` on contact,
+  `pressEnd` on release. it is the immediate feedback, like `:active` for
+  every input.
 - a `pointercancel` (the browser took the pointer, e.g. to scroll) cancels the
   whole session.
 
@@ -157,11 +163,11 @@ against clashes with future native event names.
 
 ## state
 
-built: tracker, `tap`, `doubleTap`, `longPress`, `secondary`, `swipe`, `pan`,
+built: tracker, `press`, `tap`, `doubleTap`, `longPress`, `secondary`, `swipe`, `pan`,
 handler guards, dom events with delegation, touch-action resolution, cleanup.
 
 next candidates: `pinch` and `rotate` on the measured `scale` and `rotation`,
-the wheel and trackpad sources, `press` with repeat, the first bundle.
+the wheel and trackpad sources, a repeat while held, the first bundle.
 
 ## to try out
 
