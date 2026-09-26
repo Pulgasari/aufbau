@@ -134,7 +134,7 @@ filterWebglChain(myCanvas, [
 
 `createPipeline` holds a source and a non-destructive stack of stages — any backend mixes
 freely, and the source is never mutated, so tweaking/reordering/toggling and re-rendering
-always starts clean. See [`editor.html`](editor.html) for a working editor.
+always starts clean. See the editor tab of [aufbau.dev/filters.html](https://aufbau.dev/filters.html#editor) for a working one.
 
 ```javascript
 import { createPipeline } from '@aufbau/filters';
@@ -150,7 +150,7 @@ pipe.toggle(2); pipe.move(0, 2);    // … reorder / toggle
 pipe.render(targetCanvas);          // re-run, source untouched
 ```
 
-try the canvas filters live in [`canvas.html`](canvas.html).
+try the canvas filters live in the canvas tab of [aufbau.dev/filters.html](https://aufbau.dev/filters.html#canvas).
 
 ## usage with @aufbau/stylesheet
 

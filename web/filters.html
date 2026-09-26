@@ -3,138 +3,328 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <script src="https://code.pulgasari.dev/importmap.js"></script>
   <title>@aufbau/filters</title>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <link rel="stylesheet" href="./demo.css"/>
   <style>
-    body      { display: flex; flex-direction: column; gap: 1rem; }
-    main      { display: flex; flex-direction: column; gap: 1rem; }
-    #controls { display: flex; flex-direction: column; gap: 1rem; }
-    
-    body { padding: 1rem; }
-    
-    #defs { position: absolute; width: 0; height: 0; }
+    #subject     { width: min(32rem, 80%); }
+    #subject svg { display: block; width: 100%; height: auto; }
+    #defs        { position: absolute; width: 0; height: 0; }
+
+    .stack { display: grid; gap: .75rem; }
+    .card  {
+      display       : grid;
+      gap           : .75rem;
+      padding       : .75rem;
+      border        : 1px solid var(--line);
+      border-radius : .6rem;
+
+      &.off { opacity: .5; }
+
+      header         { display: flex; gap: .5rem; align-items: center; }
+      header .name   { flex: 1; font-weight: 600; }
+      header .badge  { color: var(--muted); font-size: .75rem; }
+      header button  { padding: 0 .4rem; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
+    }
   </style>
-  <!--
-  <script type='stylescript'>
-    body { flow: y; gap: true; padding: true; }
-    main { flow: y; gap: true; }
-  </script>
-  -->
 </head>
 <body>
-  
+
   <aside>
     <h1>@aufbau/filters</h1>
-    <p>
-      filters are js functions that generate svg. pick one and tweak it live.<br/>
-      <a href="canvas.html">canvas backend →</a> · <a href="editor.html">editor →</a>
-    </p>
+    <p id="about"></p>
+    <nav class="list" id="list"></nav>
   </aside>
 
   <main>
 
-    <nav id="nav"></nav>
-    
-    <div id='stage'><div id='subject'>aufbau</div></div>
-    
-    <h2 id="title"></h2>
-    
-    <div id='controls'></div>
-    
-    <div id="panels">
-      <aufbau-code id="svg" lang="svg"></aufbau-code>
-      <aufbau-code id="css" lang="css"></aufbau-code>
-      <aufbau-code id="js"  lang="js"></aufbau-code>
-    </div>
-    
+    <nav role="tablist">
+      <button role="tab" aria-controls="dom">dom</button>
+      <button role="tab" aria-controls="canvas">canvas</button>
+      <button role="tab" aria-controls="editor">editor</button>
+    </nav>
+
+    <section role="tabpanel" id="dom" hidden>
+      <div class="stage"><div id="subject"></div></div>
+      <h2 id="dom-title"></h2>
+      <div class="controls" id="dom-controls"></div>
+      <div class="panels">
+        <aufbau-code id="dom-svg" lang="svg"></aufbau-code>
+        <aufbau-code id="dom-css" lang="css"></aufbau-code>
+        <aufbau-code id="dom-js"  lang="js"></aufbau-code>
+      </div>
+    </section>
+
+    <section role="tabpanel" id="canvas" hidden>
+      <div class="stage"><canvas id="canvas-stage" width="760" height="300"></canvas></div>
+      <h2 id="canvas-title"></h2>
+      <div class="controls" id="canvas-controls"></div>
+      <p class="hint" id="canvas-backend"></p>
+      <aufbau-code id="canvas-js" lang="js"></aufbau-code>
+    </section>
+
+    <section role="tabpanel" id="editor" hidden>
+      <div class="stage"><canvas id="editor-preview"></canvas></div>
+      <p class="hint" id="editor-hint"></p>
+      <div class="stack" id="editor-stack"></div>
+    </section>
+
   </main>
 
-  <!-- shared host the previewed <filter> lives in -->
+  <!-- the host the previewed <filter> of the dom tab lives in -->
   <svg id="defs" aria-hidden="true"></svg>
 
   <script type="module">
-    import { list, filterSvg, filterCss } from '@aufbau/filters';
-    import aufbau, { dom, str } from '@aufbau/runtime';
+    import aufbau from '@aufbau/api';
+    import { createPipeline, filterCanvas, filterCss, filterSvg, list } from '@aufbau/filters';
+    import { render as renderControls } from '@aufbau/gui';
 
-    await aufbau.init({ elements: { mode: 'auto' }});
-    //dom.adoptStylesheet('./../css/themes/zombie.css');
+    await aufbau.boot();
 
-    // refs (domina wrappers; .node is the raw element, .setAttr/.setHTML/.setText chain)
-    //const { defs, $controls, $css, $js, $nav, $subject, $svg, $title } = dom.get;
-    
-    const $controls = dom.element('#controls');
-    const $css      = dom.element('#css');
-    const defs      = dom.getElement('#defs');
-    const $js       = dom.element('#js');
-    const $nav      = dom.element('#nav');
-    const $subject  = dom.element('#subject');
-    const $svg      = dom.element('#svg');
-    const $title    = dom.element('#title');
+    // :::::: HELPERS
 
-    const logo = await aufbau.import('https://code.pulgasari.dev/aufbau/logo.svg', { as: 'string' });
-    $subject.setHTML(logo);
+    const $ = id => document.getElementById(id);
 
-    const catalogue = list().filter(f => f.backends.svg || f.backends.css);
+    const catalogue = list();
+    const byId      = Object.fromEntries(catalogue.map(filter => [filter.id, filter]));
 
-    let current = catalogue[0];
-    let options = {};
-    let counter = 0;
+    const defaultsOf  = filter  => Object.fromEntries(Object.entries(filter.vars).map(([key, spec]) => [key, spec.default]));
+    const optionsCode = options => JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
 
-    for (const filter of catalogue) {
-      dom.createElement('button', {
-        appendTo    : $nav.node,
-        data        : { id: filter.id },
-        onclick     : () => select(filter),
-        textContent : filter.name,
-      });
+    const backendOf = ({ backends }) =>
+        backends.webgl                    ? 'webgl'
+      : !backends.svg && !backends.css    ? 'imageData'
+      :                                     'bridge';
+
+    function showControls (tab, filter, values, onChange) {
+      $(`${tab}-title`).textContent = `${filter.name}  ·  ${filter.id}`;
+      $(`${tab}-controls`).replaceChildren(renderControls(filter.vars, { values, onChange }));
     }
 
-    function select (filter) {
-      current = filter;
-      options = {};
-      for (const [key, spec] of Object.entries(filter.vars)) options[key] = spec.default;
-      for (const button of $nav.node.children) button.setAttribute('aria-current', String(button.dataset.id === filter.id));    
-      buildControls();
-      render();
-    }
+    // :::::: SCENE
+    // the logo inline for the dom tab. for the canvases it goes in recoloured
+    // white as a data uri, which keeps them untainted for the imageData filters
 
-    function buildControls () {
-      const backends = ['svg', current.backends.css && 'css'].filter(Boolean).join(' + ');
-      $title.setText(`${current.name}  ·  ${current.id}  ·  ${backends}`);
-      const $gui = aufbau.gui.controls (current.vars, { values: options, onChange: values => { options = values; render(); } })
-      $controls.node.replaceChildren($gui);
-    }
+    const logo = await fetch('./logo.svg').then(response => response.text());
+    $('subject').innerHTML = logo;
 
-    async function render () {
-      const cssValue = await filterCss(current.id, options); // css backend, or null
+    const logoImage = await (async () => {
+      try {
+        const image = new Image();
+        image.src = 'data:image/svg+xml,' + encodeURIComponent(logo.replace(/currentcolor/gi, '#ffffff'));
+        await image.decode();
+        return image;
+      } catch { return null; }
+    })();
 
-      if (cssValue) {
-        $subject.node.style.filter = cssValue;         // preview through the native css backend
-      } else {
-        // baked, uniquely-ided <filter> so every var — live or baked — reflects instantly.
-        const uid    = `preview-${current.id}-${counter++}`;
-        const markup = await filterSvg(current.id, { ...options, svgId: uid });
-        const node   = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml').querySelector('filter');
-        //const node2  = dom.createSVG(markup).find('filter');
-        defs.replaceChildren(node);
-        $subject.node.style.filter = `url(#${uid})`;
+    // gradient, discs, stripes and the logo: enough detail that pixelate, dither
+    // and dot-screen read clearly
+    function drawScene (canvas) {
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      const { width, height } = canvas;
+
+      const gradient = context.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#3b2fd6'); gradient.addColorStop(.5, '#c026a3'); gradient.addColorStop(1, '#0fb8a0');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, width, height);
+
+      for (const [x, y, radius, color] of [[140, 90, 60, '#ffd166'], [620, 210, 80, '#ef476f'], [430, 70, 40, '#06d6a0']]) {
+        context.fillStyle = color;
+        context.beginPath(); context.arc(x, y, radius, 0, Math.PI * 2); context.fill();
       }
 
-      // <aufbau-code> reads its content from the `code` attribute (setAttr re-highlights).
-      //$css.attr.code = `#logo { filter: ${cssValue ?? url(#aufbau-filter-${current.id}) }; }`
-      //$svg.attr.code = filterSvg(current.id, options);
-      $svg.setAttr('code', await filterSvg(current.id, options));
-      $css.setAttr('code', cssValue
-        ? `#logo { filter: ${cssValue}; }  /* css backend */`
-        : `#logo { filter: url(#aufbau-filter-${current.id}); }  /* svg backend */`);
-      const opts = JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
-      $js.setAttr('code',
-        `import ${str.toCamelCase(current.id)} from '@aufbau/filters/${current.id}';\n` +
-        `// or: import { applyFilter } from '@aufbau/filters';\n\n` +
-        `applyFilter('#logo', '${current.id}', ${opts});`);
+      context.strokeStyle = 'rgba(255, 255, 255, .25)';
+      context.lineWidth   = 2;
+      for (let x = 0; x < width; x += 18) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x + 40, height); context.stroke(); }
+
+      if (logoImage) {
+        const logoWidth  = Math.min(560, width * .72);
+        const logoHeight = logoWidth * logoImage.height / logoImage.width;
+        context.drawImage(logoImage, (width - logoWidth) / 2, (height - logoHeight) / 2, logoWidth, logoHeight);
+      }
     }
 
-    select(current);
+    // :::::: TAB: DOM
+    // svg and css filters on an element, previewed through a baked <filter> with
+    // its own id, so every change shows at once
+
+    let previews = 0;
+
+    const dom = {
+      about   : 'filters are js functions that generate svg, some of them css too. pick one and tweak it live.',
+      enabled : filter => filter.backends.svg || filter.backends.css,
+
+      pick (filter) {
+        this.filter  = filter;
+        this.options = defaultsOf(filter);
+        showControls('dom', filter, this.options, values => { this.options = values; this.render(); });
+        this.render();
+      },
+
+      async render () {
+        const { filter, options } = this;
+        const css = await filterCss(filter.id, options);   // null without a css backend
+
+        if (css) $('subject').style.filter = css;
+        else {
+          const id     = `preview-${filter.id}-${previews++}`;
+          const markup = await filterSvg(filter.id, { ...options, svgId: id });
+          const node   = new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml').querySelector('filter');
+          $('defs').replaceChildren(node);
+          $('subject').style.filter = `url(#${id})`;
+        }
+
+        $('dom-svg').setAttribute('code', await filterSvg(filter.id, options));
+        $('dom-css').setAttribute('code', css
+          ? `#logo { filter: ${css}; }  /* css backend */`
+          : `#logo { filter: url(#aufbau-filter-${filter.id}); }  /* svg backend */`);
+        $('dom-js').setAttribute('code',
+          `import { apply } from '@aufbau/filters';\n\n` +
+          `await apply('#logo', '${filter.id}', ${optionsCode(options)});`);
+      },
+    };
+
+    // :::::: TAB: CANVAS
+    // every filter on a canvas: imageData, the ctx.filter bridge or webgl
+
+    const canvas = {
+      about   : 'every filter on a <canvas> via filterCanvas: imageData where the filter has it, the ctx.filter bridge for css and svg, or webgl.',
+      enabled : () => true,
+
+      pick (filter) {
+        this.filter  = filter;
+        this.options = defaultsOf(filter);
+        showControls('canvas', filter, this.options, values => { this.options = values; this.render(); });
+        this.render();
+      },
+
+      async render () {
+        const { filter, options } = this;
+        const stage = $('canvas-stage');
+
+        drawScene(stage);
+        try { await filterCanvas(stage, filter.id, options); }
+        catch (error) { $('canvas-backend').textContent = String(error.message); return; }
+
+        const { backends } = filter;
+        $('canvas-backend').textContent =
+            backends.webgl                 ? 'webgl: a fragment shader on the gpu.'
+          : !backends.svg && !backends.css ? 'imageData: the filter walks the pixels itself.'
+          : backends.css                   ? 'bridge: ctx.filter runs the css string.'
+          :                                  'bridge: ctx.filter runs a baked svg <filter>.';
+
+        $('canvas-js').setAttribute('code',
+          `import { filterCanvas } from '@aufbau/filters';\n\n` +
+          `await filterCanvas(canvas, '${filter.id}', ${optionsCode(options)});`);
+      },
+    };
+
+    // :::::: TAB: EDITOR
+    // a non-destructive stack over one source canvas, any backend mixed
+
+    const editor = {
+      about   : 'a non-destructive stack: every stage runs through the pipeline over one source. pick a filter to add it.',
+      enabled : () => true,
+
+      // the source and a demo stack, on the first visit
+      enter () {
+        if (this.pipe) return;
+        const source = Object.assign(document.createElement('canvas'), { width: 760, height: 300 });
+        drawScene(source);
+        this.pipe = createPipeline(source)
+          .add('levels', { black: .05, white: .95, gamma: 1.1 })
+          .add('bloom', { threshold: .6, radius: 6, strength: 1 })
+          .add('kaleidoscope', { segments: 6, angle: 0 });
+        this.build();
+      },
+
+      pick (filter) {
+        this.pipe.add(filter.id, defaultsOf(filter));
+        this.build();
+      },
+
+      async render () {
+        const { stages } = this.pipe;
+        await this.pipe.render($('editor-preview'));
+        $('editor-hint').textContent = stages.length
+          ? `${stages.filter(stage => stage.enabled).length} active stage(s). the source is never touched, a change re-runs the whole stack.`
+          : 'an empty pipeline. add a filter from the list, stages of any backend mix freely.';
+      },
+
+      build () {
+        const { pipe } = this;
+        const cards = pipe.stages.map((stage, index) => {
+          const filter = byId[stage.id];
+          const card   = document.createElement('div');
+          card.className = 'card controls' + (stage.enabled ? '' : ' off');
+          card.innerHTML = `
+            <header>
+              <input type="checkbox" ${stage.enabled ? 'checked' : ''}/>
+              <span class="name">${filter.name}</span>
+              <span class="badge">${backendOf(filter)}</span>
+              <button data-action="up"     aria-label="move up">↑</button>
+              <button data-action="down"   aria-label="move down">↓</button>
+              <button data-action="remove" aria-label="remove">✕</button>
+            </header>`;
+
+          const actions = {
+            down   : () => index < pipe.stages.length - 1 && pipe.move(index, index + 1),
+            remove : () => pipe.remove(index),
+            up     : () => index > 0 && pipe.move(index, index - 1),
+          };
+          card.querySelector('input').onchange = event => { pipe.toggle(index, event.target.checked); this.build(); };
+          for (const button of card.querySelectorAll('[data-action]')) button.onclick = () => { actions[button.dataset.action](); this.build(); };
+
+          card.append(renderControls(filter.vars, { values: stage.options, onChange: values => { pipe.set(index, values); this.render(); } }));
+          return card;
+        });
+
+        $('editor-stack').replaceChildren(...cards);
+        this.render();
+      },
+    };
+
+    // :::::: TABS
+    // the list on the side belongs to the open tab: dom and canvas pick a filter,
+    // the editor adds one. the hash keeps the tab across reloads and links
+
+    const tabs = { canvas, dom, editor };
+
+    for (const filter of catalogue) {
+      const button = Object.assign(document.createElement('button'), { textContent: filter.name });
+      button.dataset.id = filter.id;
+      button.onclick    = () => { current.pick(filter); markList(); };
+      $('list').append(button);
+    }
+
+    let current = null;
+
+    function markList () {
+      for (const button of $('list').children) {
+        const filter = byId[button.dataset.id];
+        button.disabled = !current.enabled(filter);
+        button.setAttribute('aria-current', String(current.filter?.id === filter.id));
+      }
+    }
+
+    function open (name) {
+      if (!(name in tabs)) name = 'dom';
+      current = tabs[name];
+      for (const tab of document.querySelectorAll('[role="tab"]')) {
+        const selected = tab.getAttribute('aria-controls') === name;
+        tab.setAttribute('aria-selected', String(selected));
+        $(tab.getAttribute('aria-controls')).hidden = !selected;
+      }
+      $('about').textContent = current.about;
+      current.enter?.();
+      if (current !== editor && !current.filter) current.pick(catalogue.find(current.enabled));
+      markList();
+    }
+
+    for (const tab of document.querySelectorAll('[role="tab"]')) tab.onclick = () => { location.hash = tab.getAttribute('aria-controls'); };
+    addEventListener('hashchange', () => open(location.hash.slice(1)));
+
+    open(location.hash.slice(1));
   </script>
 </body>
 </html>

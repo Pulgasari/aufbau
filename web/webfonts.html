@@ -5,26 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>aufbau webfonts</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
-  <link rel="stylesheet" href="./../css/themes/zombie.css" />
   <style>
-    /* @aufbau/webfonts/index.css
-       theme comes from ../css/themes/zombie.css (--aufbau-bg, --aufbau-fg, --aufbau-purple, ...)
-       surfaces are derived via color-mix so the page follows any theme swap. */
-    
-    :root {
-      --surface : color-mix(in oklab, var(--aufbau-bg) 88%, var(--aufbau-fg));
-      --line    : color-mix(in oklab, var(--aufbau-bg) 78%, var(--aufbau-fg));
-      --muted   : color-mix(in oklab, var(--aufbau-fg) 55%, var(--aufbau-bg));
-      --accent  : var(--aufbau-purple);
+    /* the colors come from css/themes.css (aufbau.boot adopts it), which
+       resolves --bg, --fg and --accent on body. the surfaces derive from them
+       there, so the page follows any theme */
+
+    body {
+      --surface : color-mix(in oklab, var(--bg) 88%, var(--fg));
+      --line    : color-mix(in oklab, var(--bg) 78%, var(--fg));
+      --muted   : color-mix(in oklab, var(--fg) 55%, var(--bg));
       --rail    : 3.5rem;
       --ui      : system-ui, sans-serif;
-    }
-    
-    body {
+
       margin      : 0;
       padding     : 1rem 1rem calc(var(--rail) + 1rem);
-      background  : var(--aufbau-bg);
-      color       : var(--aufbau-fg);
       font-family : var(--ui);
       line-height : 1.5;
     }
@@ -45,7 +39,7 @@
   flex-direction   : column;
   gap              : 0.75rem;
   padding          : 0.75rem 0;
-  background       : var(--aufbau-bg);
+  background       : var(--bg);
   border-bottom    : 1px solid var(--line);
 }
 
@@ -126,7 +120,7 @@
 }
 
 .letterbar a:hover,
-.letterbar a:focus-visible { color: var(--accent); background: var(--aufbau-bg); }
+.letterbar a:focus-visible { color: var(--accent); background: var(--bg); }
 
 /* :::::: sections ::::::::::::::::::::::::::::::::::::::::::: */
 
@@ -187,7 +181,7 @@ main h2 {
 .specimen[data-state="loading"] .preview { opacity: 0.45; }
 .specimen[data-state="error"]   .preview { opacity: 0.3; }
 
-.hint  { margin: 0.4rem 0 0; color: var(--aufbau-red); font-size: 0.72rem; }
+.hint  { margin: 0.4rem 0 0; color: color-mix(in oklab, red 70%, var(--fg)); font-size: 0.72rem; }
 .state { color: var(--muted); }
 
 /* list mode keeps one specimen per row, so the single line stays comparable */
@@ -259,14 +253,18 @@ html { scroll-behavior: smooth; }
 <div id="app"></div>
 
 <script type="module">
-import { data } from '@aufbau/webfonts';
-import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-const { computed, render, signal, useEffect, useRef, useState } = preact;
-await aufbau.init();
+import aufbau                           from '@aufbau/api';
+import { data, load }                   from '@aufbau/webfonts';
+import htm                              from 'htm';
+import { h, render }                    from 'preact';
+import { useEffect, useRef, useState }  from 'preact/hooks';
+import { computed, signal }             from '@preact/signals';
+
+const html = htm.bind(h);
+
+await aufbau.boot();
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
-
-//const MANIFEST = new URL('./data.js', import.meta.url);
 
 // pangram exercises umlauts and eszett - relevant for the german/blackletter part of the collection
 const SPECIMEN_LINE  = 'Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.';
@@ -277,8 +275,7 @@ const CATEGORIES = ['all', 'sans', 'serif', 'mono', 'display', 'handwriting'];
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::::
 
-const fonts    = signal([]);
-const status   = signal('loading'); // loading | ready | error
+const fonts    = signal(data);
 const query    = signal('');
 const category = signal('all');
 const viewmode = signal('list');    // list | grid
@@ -309,40 +306,18 @@ const groups = computed(() => {
 
 // :::::: FONT LOADING ::::::::::::::::::::::::::::::::::::::::::
 
-const registry = new Map(); // font.id -> Promise, prevents duplicate FontFace registration
-
-// css font `format()` hint by file extension; unknown extensions omit the hint
-const FONT_FORMATS = { otf: 'opentype', ttf: 'truetype', woff: 'woff', woff2: 'woff2' };
-const faceSource = (file) => {
-  // face.file is repo-relative (resolved against data.js) or an absolute url
-  const url    = new URL(file, MANIFEST).href;
-  const format = FONT_FORMATS[file.split('.').pop().toLowerCase()];
-  return format ? `url("${url}") format("${format}")` : `url("${url}")`;
-};
+// font.id -> Promise, the fonts that started loading. @aufbau/webfonts
+// registers every face once, this only tells a card whether it may skip the observer
+const registry = new Map();
 
 /**
- * loads every face of a font via the FontFace api and registers it on the document.
+ * loads every face of a font through @aufbau/webfonts.
  * @param {object} font - manifest entry
- * @returns {Promise<void>}
+ * @returns {Promise<void>} rejects when not a single face loaded
  */
 function loadFont (font) {
-  if (registry.has(font.id)) return registry.get(font.id);
-
-  const task = Promise.all(font.faces.map(async face => {
-    // weight may be a variable range like "100 800", which the descriptor accepts
-    const loaded = await new FontFace(font.name, faceSource(face.file), {
-      weight  : String(face.weight),
-      style   : face.style,
-      display : 'swap'
-    }).load();
-    document.fonts.add(loaded);
-  })).catch(err => {
-    console.warn(`[@aufbau/webfonts] could not load "${font.name}":`, err);
-    throw err;
-  });
-
-  registry.set(font.id, task);
-  return task;
+  if (!registry.has(font.id)) registry.set(font.id, load(font.id).then(loaded => { if (!loaded) throw new Error(`no face of "${font.name}" loaded`); }));
+  return registry.get(font.id);
 }
 
 // :::::: COMPONENTS ::::::::::::::::::::::::::::::::::::::::::::
@@ -458,9 +433,6 @@ function Toolbar () {
 }
 
 function App () {
-  if (status.value === 'loading') return html`<p class="state">Sammlung wird geladen…</p>`;
-  if (status.value === 'error')   return html`<p class="state">data.js ist nicht erreichbar.</p>`;
-
   return html`
     <header class="masthead">
       <h1>@aufbau/webfonts</h1>
@@ -485,15 +457,7 @@ function App () {
   `;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-try {
-  fonts.value  = data.fonts ?? [];
-  status.value = 'ready';
-} catch (err) {
-  console.error('[@aufbau/webfonts] manifest failed:', err);
-  status.value = 'error';
-}
+// :::::: RENDER ::::::::::::::::::::::::::::::::::::::::::::::::
 
 render(html`<${App} />`, document.querySelector('#app'));
 </script>

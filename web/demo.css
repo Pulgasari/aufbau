@@ -1,0 +1,125 @@
+/* @aufbau/web/demo.css
+   the package demos: a list on the side, stage, controls and code in main.
+
+   the colors come from css/themes.css (aufbau.boot adopts it), which resolves
+   them on body. so the tokens derived from them live on body as well. */
+
+body {
+  --line  : color-mix(in oklch, var(--fg) 14%, var(--bg));
+  --muted : color-mix(in oklch, var(--fg) 60%, var(--bg));
+  --panel : color-mix(in oklch, var(--fg) 6%,  var(--bg));
+
+  display               : grid;
+  grid-template-columns : 14rem minmax(0, 1fr);
+  min-height            : 100dvh;
+  font-size             : 14px;
+  line-height           : 1.5;
+}
+
+a { color: var(--accent); }
+
+h1 { font-size: 1rem; }
+h2 { font-size: 1rem; font-weight: 600; }
+
+/* :::::: ASIDE */
+
+aside {
+  position     : sticky;
+  top          : 0;
+  height       : 100dvh;
+  overflow     : auto;
+  padding      : 1rem;
+  border-right : 1px solid var(--line);
+
+  p { margin-block: .25rem 1rem; color: var(--muted); font-size: .8rem; text-align: start; }
+}
+
+.list button {
+  display       : block;
+  background    : none;
+  border        : 0;
+  width         : 100%;
+  padding       : .35rem .6rem;
+  border-radius : .4rem;
+  color         : inherit;
+  font          : inherit;
+  text-align    : left;
+  cursor        : pointer;
+
+  &:hover                { background: var(--panel); }
+  &[aria-current="true"] { background: var(--accent); color: var(--bg); }
+  &:disabled             { opacity: .35; cursor: default; background: none; }
+}
+
+/* :::::: MAIN */
+
+main {
+  display       : grid;
+  gap           : 1.25rem;
+  align-content : start;
+  max-width     : 60rem;
+  padding       : 1.5rem;
+}
+
+[hidden] { display: none !important; }
+
+section { display: grid; gap: 1.25rem; align-content: start; min-width: 0; }
+
+.stage {
+  display       : grid;
+  place-items   : center;
+  min-height    : 16rem;
+  overflow      : hidden;
+  border        : 1px solid var(--line);
+  border-radius : .75rem;
+
+  canvas { display: block; max-width: 100%; height: auto; }
+}
+
+.hint { color: var(--muted); font-size: .8rem; }
+
+/* @aufbau/gui renders a div of <label><span>name</span><control/></label> */
+.controls > div { display: grid; gap: .75rem; }
+.controls label {
+  display               : grid;
+  grid-template-columns : 8rem minmax(0, 1fr);
+  gap                   : 1rem;
+  align-items           : center;
+
+  > span { color: var(--muted); }
+}
+
+.panels { display: grid; gap: .75rem; min-width: 0; }
+
+/* :::::: TABS */
+
+[role="tablist"] {
+  display       : flex;
+  gap           : .25rem;
+  border-bottom : 1px solid var(--line);
+}
+
+[role="tab"] {
+  padding       : .5rem .9rem;
+  background    : none;
+  border        : 0;
+  margin-bottom : -1px;
+  border-bottom : 2px solid transparent;
+  color         : var(--muted);
+  font          : inherit;
+  cursor        : pointer;
+
+  &[aria-selected="true"] { border-color: var(--accent); color: var(--fg); }
+}
+
+/* :::::: NARROW */
+
+@media (width < 48rem) {
+  body  { grid-template-columns: minmax(0, 1fr); }
+  aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main  { padding: 1rem; }
+
+  .list          { display: flex; gap: .25rem; overflow-x: auto; }
+  .list button   { width: auto; white-space: nowrap; }
+  .controls label { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+}

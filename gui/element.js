@@ -38,8 +38,8 @@ function renderElement (spec, { values = {}, wrap = 'div', onChange } = {}) {
     // resolve the field name off the nearest named control, not the raw target:
     // composite controls (aufbau-picker) bubble change/input from an inner
     // element that carries no name, which would otherwise read back as null
-    const $target = event.target?.closest?.('[name]')?.getAttribute('name') ?? null;
-    const handler = event => onChange(readValues(container, spec), $target, event);
+    const nameOf  = event => event.target?.closest?.('[name]')?.getAttribute('name') ?? null;
+    const handler = event => onChange(readValues(container, spec), nameOf(event), event);
     onEvent(container, ['change', 'input'], handler);
   }
   return container;

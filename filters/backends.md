@@ -156,7 +156,7 @@ canvas, applies each enabled stage — coalescing runs of consecutive webgl stag
 `filterWebglChain` call (gpu-resident) and sending imageData/bridge stages through
 `filterCanvas` — then blits to the target; the source is never mutated, so
 `add`/`remove`/`move`/`set`/`toggle` + re-render always start clean. This is the editor
-foundation. See [`editor.html`](editor.html).
+foundation. See the editor tab of [aufbau.dev/filters.html](https://aufbau.dev/filters.html#editor).
 
 ---
 
@@ -193,13 +193,13 @@ webgl backends.
    `supports`, `applyFilter({backend})`, the 8 css-capable filters.
 2. **canvas backend** *(done)* — `filterCanvas` with the imageData tier
    (`pixelate`, `polar-pixelate`, `dither`, `threshold`) and the `ctx.filter` bridge
-   (css string / baked svg) for every other filter. demo: [`canvas.html`](canvas.html).
+   (css string / baked svg) for every other filter. demo: the canvas tab of [aufbau.dev/filters.html](https://aufbau.dev/filters.html#canvas).
 3. **webgl backend** *(done)* — framebuffer-ping-pong runner, single- and multi-pass,
    gpu-resident chaining (`filterWebglChain`). single-pass `fisheye`/`mirror`/`kaleidoscope`/
    `zoom-blur`/`chromatic`, multi-pass `gaussian-blur`/`bloom`, noise-driven `noise`/
    `displace`/`glitch`. next (later): WebGPU, more ported effects.
 4. **editor pipeline** *(done)* — `createPipeline(source)`: non-destructive, mixed-backend
-   stage stack, gpu-resident where stages allow; `editor.html` demo.
+   stage stack, gpu-resident where stages allow; editor tab of aufbau.dev/filters.html.
 5. **capability catalogue** *(done)* — the generator bakes each filter's `backends`
    (`{ css, svg, canvas, webgl }`) into `svg/filters/data.json5` and the lightweight
    `svg/index.json5`, so tooling and the editor can pick a backend from the catalogue

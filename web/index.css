@@ -1,8 +1,7 @@
 @import url("https://cdn.ratcode.dev/css/reset.css");
 @import url("https://cdn.ratcode.dev/css/default.css");
-@import url("./../css/animations.css");
+@import url("https://code.pulgasari.dev/aufbau/css/animations.css");
 
-:root { --bg: white; --fg: black; }
     * { font-family: "Hubot Sans"; line-height: 1; }
 
 a { color: currentcolor; }
@@ -13,6 +12,7 @@ body  { z-index: 1; }
 #logo { z-index: 2; }
 
 body {
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--fg);
   padding: 1rem;

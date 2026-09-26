@@ -128,9 +128,11 @@ async function boot (options = {}) {
 
   const { css: { layout, look, mode: themeMode, reset, skin, theme, themes }, elements: { mode, ...defaults }, font } = config;
 
-  // the reset first, the themes next, the gestalt layers after them
-  if (reset)  dom.adoptStylesheet(`${CSS_PATH}/aufbau.css`);
-  if (themes) dom.adoptStylesheet(`${CSS_PATH}/themes.css`);
+  // the reset first, the themes next, the gestalt layers after them. a sheet is
+  // appended once it is fetched, so each waits for the one before it: otherwise
+  // the reset can land last and override body's colors
+  if (reset)  await dom.adoptStylesheet(`${CSS_PATH}/aufbau.css`);
+  if (themes) await dom.adoptStylesheet(`${CSS_PATH}/themes.css`);
 
   if (Object.keys(defaults).length) await elements.setConfig(defaults, { layer: 'defaults' });
 
