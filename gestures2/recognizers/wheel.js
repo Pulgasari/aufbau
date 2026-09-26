@@ -41,6 +41,8 @@ function wheel ({ active, element, emit, options }) {
     session.duration  = event.timeStamp - session.startTime;
     session.modifiers = modifiersOf(event);
     session.movement  = movement;
+    session.time      = event.timeStamp;
+    session.sourceEvent = event;
     session.direction = Math.abs(movement.x) >= Math.abs(movement.y) ? (movement.x > 0 ? 'right' : 'left') : (movement.y > 0 ? 'down' : 'up');
 
     if (starting) emit('wheelStart', session);

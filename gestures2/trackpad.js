@@ -21,9 +21,12 @@ function createTrackpad (element, hooks, { wheel: withWheel = true, wheelIntensi
   };
 
   const update = (event, scale, rotation) => {
-    session.center   = { x: event.clientX, y: event.clientY };
     session.duration = event.timeStamp - session.startTime;
+    session.movement = { x: event.clientX - session.center.x, y: event.clientY - session.center.y };
     session.phase    = 'move';
+    session.time        = event.timeStamp;
+    session.sourceEvent = event;
+    session.center   = { x: event.clientX, y: event.clientY };
     session.rotation = rotation;
     session.scale    = scale;
     hooks.move(session, event);

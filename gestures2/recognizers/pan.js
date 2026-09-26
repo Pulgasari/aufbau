@@ -18,7 +18,7 @@ function pan ({ emit, options }) {
 
     if (!panning) {
       if (event.type !== 'pointermove') return;
-      if (session.pointers !== pointers || session.claims.has('longPress')) return;
+      if (session.pointers !== pointers || session.claims.has('longPress') || session.claims.has('edgeSwipe')) return;
       if (session.travel <= toleranceFor(tolerance, session.input)) return;
       panning = true;
       session.claims.add('pan');

@@ -1,5 +1,6 @@
 // @aufbau/gestures2/recognizers/index.js
 
+export * from './edgeSwipe.js';
 export * from './longPress.js';
 export * from './pan.js';
 export * from './pinch.js';

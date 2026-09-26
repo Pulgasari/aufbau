@@ -25,7 +25,7 @@ element.addEventListener('swipeleft', event => next());   // the same, as a dom 
 2. **recognizers** decide. each one is a small state machine over the session
    and turns it into named gestures: tap, long press, swipe, pan …
 3. **bundles** act. recipes that turn recognized gestures into an effect on the
-   dom: draggable, dismissable, zoomable, sortable … (not started yet)
+   dom: `transformable`, `draggable`, `dismissable`, later sortable, pullable …
 
 recognizers report *what happened*, bundles decide *what it does*.
 
@@ -50,6 +50,8 @@ carries a snapshot of it as `detail`. the names are spelled out.
 | `modifiers`   | `{ alt, control, meta, shift }`                                  |
 | `phase`       | `start`, `move`, `end` or `cancel`                               |
 | `pointers`    | the pointers down right now                                      |
+| `sourceEvent` | the native event that produced this state                        |
+| `time`        | its timestamp                                                    |
 | `rotation`    | degrees the first two pointers turned since two were down        |
 | `scale`       | their spread relative to the moment two were down                |
 | `start`       | where `center` started, `{ x, y }`                               |
@@ -79,6 +81,12 @@ in lowercase.
 | `rotate`      | `onRotateStart`, `onRotateMove`, `onRotateEnd`, `onRotateCancel` | `rotatestart`, … |
 | `pressRepeat` | `onPressRepeat`                                            | `pressrepeat` |
 | `wheel`       | `onWheelStart`, `onWheelMove`, `onWheelEnd`                | `wheelstart`, … |
+| `edgeSwipe`   | `onEdgeSwipeStart`, `onEdgeSwipeMove`, `onEdgeSwipeEnd`, `onEdgeSwipeCancel` | `edgeswipestart`, … |
+
+`edgeSwipe` needs the first pointer within `size` px of one of its `edges` and a
+movement away from it, then it claims the session before `pan` or `swipe` see
+it (recognizers carry a `priority`). it reports the `edge` and a `progress`
+from 0 to 1 across the element.
 
 `pinch` carries `scaleChange` (ratio to the previous event), `rotate`
 `rotationChange` (degrees since the previous event): an incremental transform
@@ -87,7 +95,7 @@ neutral: the jump up to the threshold arrives as a `Move` right after `Start`,
 so a handler on `Move` alone misses nothing. `wheel` is continuous and ends after a pause, so its
 events can not be mistaken for the native `wheel`.
 
-planned: bundles, an edge swipe, a drag with drop targets.
+planned: more bundles, see below.
 
 ### native signals first
 
@@ -179,14 +187,32 @@ element, not the ones bubbling up from a nested `gestures()`.
 **open**: whether events should be composed (cross shadow roots), a prefix
 against clashes with future native event names.
 
+## bundles
+
+| bundle          | does | keyboard |
+|-----------------|------|----------|
+| `transformable` | one finger moves, two pinch and turn around their center, wheel or trackpad pinch zooms toward the cursor, double tap zooms in and back. taken on a `surface` (the parent), applied as `matrix()` | arrows, + −, [ ], 0 |
+| `draggable`     | follows the pointer with `translate`, `axis`, `bounds`, glides on after a flick, `grid` and `snap` on release, `drop` targets with data-drop-over, `revert` | arrows (shift: more) |
+| `dismissable`   | follows along an axis and fades, leaves when far or fast enough, snaps back otherwise, resistance for directions it may not go | delete, backspace |
+
+a bundle returns `{ get, set, reset, destroy }` (or `dismiss`) and reports
+through callbacks (`onChange`, `onDrop`, `onDismiss` …). **open**: whether
+bundles should dispatch dom events as well, `draggable` could not use the
+native `drag*` names.
+
+keyboard counterparts live in the bundles: a recognizer is a pointer gesture,
+what it does is what the keyboard can do too.
+
 ## state
 
 built: tracker, trackpad, `press`, `pressRepeat`, `tap`, `doubleTap`, `longPress`,
-`secondary`, `swipe`, `pan`, `pinch`, `rotate`, `wheel`,
+`secondary`, `swipe`, `edgeSwipe`, `pan`, `pinch`, `rotate`, `wheel`, the bundles
+`transformable`, `draggable`, `dismissable`,
 handler guards, dom events with delegation, touch-action resolution, cleanup.
 
-next candidates: the first bundle (transformable, draggable, dismissable), an
-edge swipe, a drag with drop targets, keyboard counterparts.
+next candidates: `sortable` (long press, then drag to reorder), `pullable`
+(pull to refresh), a pan with inertia as a recognizer option, and trying all of
+it on real devices.
 
 ## to try out
 

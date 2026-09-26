@@ -15,7 +15,7 @@ function swipe ({ emit, handled, options }) {
   const generic    = handled.has('swipe') || (!horizontal && !vertical);   // enabled through `recognize` only counts as generic
 
   function end (session) {
-    if (session.claims.has('longPress')) return;
+    if (session.claims.has('longPress') || session.claims.has('edgeSwipe')) return;
     if (session.distance < minimumDistance || session.velocity.speed < minimumSpeed) return;
     emit('swipe', session);
     emit('swipe' + session.direction[0].toUpperCase() + session.direction.slice(1), session);

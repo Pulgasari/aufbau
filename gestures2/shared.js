@@ -57,6 +57,7 @@ function inputSession (element, event, input) {
     start           : point,
     startTime       : event.timeStamp,
     target          : event.target,
+    time            : event.timeStamp,
     travel          : 0,
     velocity        : { speed: 0, x: 0, y: 0 },
   };

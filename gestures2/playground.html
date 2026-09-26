@@ -36,6 +36,25 @@
     #stepper button { width: 3.5rem; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--line); background: var(--soft); color: inherit; font-size: 1.5rem; }
     #stepper output { min-width: 4ch; text-align: center; font: 700 2rem/1 ui-monospace, monospace; }
 
+    /* :::::: BUNDLES */
+
+    #viewer       { position: relative; overflow: hidden; min-height: 16rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--soft); outline-offset: 2px; }
+    #viewer-image { position: absolute; left: calc(50% - 5rem); top: calc(50% - 4rem); width: 10rem; height: 8rem; border-radius: .5rem; background: conic-gradient(from 45deg, var(--accent), #8be9fd, #50fa7b, #f1fa8c, var(--accent)); display: grid; place-items: center; font-weight: 800; color: #000; }
+
+    #yard  { position: relative; min-height: 14rem; border: 1px dashed var(--line); border-radius: .75rem; padding: .75rem; display: flex; gap: .75rem; align-items: flex-start; flex-wrap: wrap; }
+    .chip  { width: 3.5rem; aspect-ratio: 1; border-radius: .75rem; background: var(--accent); display: grid; place-items: center; font-weight: 700; color: #000; cursor: grab; }
+    .chip[data-dragging] { cursor: grabbing; box-shadow: 0 .5rem 1.5rem #0006; z-index: 2; }
+    .slot  { width: 5rem; aspect-ratio: 1; border: 2px dashed var(--line); border-radius: .75rem; display: grid; place-items: center; font-size: .75rem; opacity: .8; margin-left: auto; }
+    .slot[data-drop-over] { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 20%, transparent); }
+    .slot .chip { cursor: default; }
+
+    #cards      { display: grid; gap: .5rem; }
+    #cards .card { padding: 1rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--soft); }
+
+    #drawer-panel { position: relative; overflow: hidden; min-height: 14rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--soft); display: grid; place-items: center; padding: 1rem; text-align: center; }
+    #drawer       { position: absolute; inset: 0 auto 0 0; width: 70%; background: var(--accent); color: #000; padding: 1rem; translate: -100% 0; font-weight: 700; }
+    #drawer.animated { transition: translate .2s ease; }
+
     #list    { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: .75rem; overflow: hidden; }
     #list li { padding: .9rem 1rem; border-top: 1px solid var(--line); background: var(--soft); transition: opacity .2s; }
     #list li:first-child { border-top: 0; }
@@ -101,6 +120,39 @@
   </section>
 
   <section>
+    <h2>bundles</h2>
+    <p>bundles act on the element: <code>transformable</code>, <code>draggable</code>, <code>dismissable</code>. each has keyboard counterparts once focused.</p>
+  </section>
+
+  <section class="grid">
+    <div>
+      <h2>transformable</h2>
+      <p>one finger moves, two pinch and turn, wheel zooms toward the cursor, double tap zooms in and back. keys: arrows, + −, [ ], 0.</p>
+      <div id="viewer"><div id="viewer-image">aufbau</div></div>
+    </div>
+    <div>
+      <h2>draggable</h2>
+      <p>the pink chips go into the slot or back. the blue one is free: bounds, a flick glides on, snaps to a 40 px grid. keys: arrows.</p>
+      <div id="yard">
+        <div class="chip" data-kind="slot">1</div>
+        <div class="chip" data-kind="slot">2</div>
+        <div class="chip" id="free-chip" style="background: #8be9fd">~</div>
+        <div class="slot">drop here</div>
+      </div>
+    </div>
+    <div>
+      <h2>dismissable</h2>
+      <p>swipe a card away to either side, a slow short drag snaps back. key: delete. <button type="button" id="cards-reset">bring them back</button></p>
+      <div id="cards"></div>
+    </div>
+    <div>
+      <h2>edgeSwipe</h2>
+      <p>pull the drawer out from the left edge of the panel. swipe left or tap the panel to close.</p>
+      <div id="drawer-panel">content<div id="drawer">drawer</div></div>
+    </div>
+  </section>
+
+  <section>
     <h2>delegation</h2>
     <p>one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>, dom events from the items: swipe left marks done, swipe right undoes, tap logs.</p>
     <ul id="list">
@@ -120,7 +172,7 @@
   </section>
 
   <script type="module">
-    import gestures from './index.js';
+    import gestures, { dismissable, draggable, transformable } from './index.js';
 
     const $ = id => document.getElementById(id);
 
@@ -227,6 +279,56 @@
       const step = () => { output.value = Number(output.value) + Number(button.dataset.step); };
       gestures(button, { ...pressed(button), onPressRepeat: step, onPressStart: () => { button.classList.add('pressed'); step(); } });
     }
+
+    // :::::: BUNDLES
+
+    transformable($('viewer-image'), {
+      maximumScale : 6,
+      onChange     : state => { $('viewer-image').dataset.state = JSON.stringify(state); },
+      surface      : $('viewer'),
+    });
+
+    for (const chip of document.querySelectorAll('.chip[data-kind="slot"]')) {
+      draggable(chip, {
+        bounds  : 'parent',
+        drop    : '.slot',
+        onDrop  : ({ target }) => { target.replaceChildren(chip); chip.style.translate = ''; log(`dropped chip ${chip.textContent}`); },
+        onEnter : () => log('over the slot'),
+        revert  : true,
+      });
+    }
+
+    draggable($('free-chip'), {
+      bounds : 'parent',
+      grid   : 40,
+      onEnd  : ({ position }) => log(`free chip at ${position.x}, ${position.y}`),
+    });
+
+    const cardTexts = ['a message', 'another one', 'swipe me', 'and me'];
+    function makeCards () {
+      $('cards').replaceChildren(...cardTexts.map(text => {
+        const card = Object.assign(document.createElement('div'), { className: 'card', textContent: text });
+        dismissable(card, { onDismiss: ({ direction }) => { card.remove(); log(`dismissed "${text}" to the ${direction}`); } });
+        return card;
+      }));
+    }
+    makeCards();
+    $('cards-reset').addEventListener('click', makeCards);
+
+    const drawer = $('drawer');
+    let drawerOpen = false;
+    const placeDrawer = progress => { drawer.style.translate = `${(progress - 1) * 100}% 0`; };
+    const setDrawer   = open => { drawerOpen = open; drawer.classList.add('animated'); placeDrawer(open ? 1 : 0); };
+
+    gestures($('drawer-panel'), {
+      edgeSwipe            : { edges: ['left'], size: 32 },
+      onEdgeSwipeCancel    : () => setDrawer(false),
+      onEdgeSwipeEnd       : gesture => { setDrawer(gesture.progress > 0.35 || gesture.velocity.x > 0.4); log(`edgeSwipeEnd · ${gesture.progress.toFixed(2)}`, gesture); },
+      onEdgeSwipeMove      : gesture => { drawer.classList.remove('animated'); placeDrawer(Math.min(1, gesture.progress / 0.7)); },
+      onEdgeSwipeStart     : gesture => log(`edgeSwipeStart · ${gesture.edge}`, gesture),
+      onSwipeLeft          : () => drawerOpen && setDrawer(false),
+      onTap                : gesture => { if (drawerOpen && !drawer.contains(gesture.target)) setDrawer(false); },
+    });
 
     // :::::: DELEGATION
 

@@ -4,7 +4,10 @@
 // hooks, see concept.md for its fields.
 //
 // hooks.move also runs when a pointer comes or goes, that is when a pinch can
-// start or stop. `movement` is the center's change since the previous event.
+// start or stop. `movement` is the center's change since the previous event,
+// `sourceEvent` that event and `time` its timestamp: gestures reported for the
+// same event share the sourceEvent, which is how a bundle applies one movement
+// only once.
 //
 // the pointer that went down on the element is followed through window-level
 // listeners instead of pointer capture: capture also retargets the compatibility
@@ -69,7 +72,9 @@ function createTracker (element, hooks) {
     session.angle     = session.distance ? Math.atan2(delta.y, delta.x) * 180 / Math.PI : 0;
     session.duration  = time - internal.startTime;
     session.modifiers = { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey };
-    session.pointers  = pointers.size;
+    session.pointers    = pointers.size;
+    session.sourceEvent = event;
+    session.time        = time;
     session.travel    = Math.max(session.travel, session.distance);
 
     // velocity over the recent samples: a pointer that rested before release reads as still
@@ -115,6 +120,7 @@ function createTracker (element, hooks) {
       scale           : 1,
       start           : point,
       target          : event.target,
+      time            : event.timeStamp,
       travel          : 0,
       velocity        : { speed: 0, x: 0, y: 0 },
     };
