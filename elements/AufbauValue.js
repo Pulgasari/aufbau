@@ -133,6 +133,9 @@ export default class AufbauValue extends AufbauElement {
     const type = this.getAttr('type');
     const text = String(raw ?? '').trim();
     if (TIME_TYPES.has(type) && NUMERIC.test(text)) return Number(text);
+    // the duration type parses to the bare amount for a slider axis, which would
+    // show "3725s" as 3725. shown, the unit belongs to the value
+    if (type === 'duration') return text;
     return valueType(type).parse(raw);
   }
 

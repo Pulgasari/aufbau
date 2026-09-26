@@ -64,12 +64,15 @@ const SKELETON_STYLES = `
                         var(--skeleton-color, color-mix(in srgb, currentColor 14%, transparent)) 0 var(--_line),
                         transparent 0 calc(var(--_line) + var(--_gap)));
     border-radius   : var(--skeleton-radius, 0.25em);
-    color           : transparent;
     cursor          : progress;
     min-block-size  : calc(var(--skeleton-lines, 1) * (var(--_line) + var(--_gap)) - var(--_gap));
     min-inline-size : var(--skeleton-width, 4em);
     pointer-events  : none;
     user-select     : none;
+
+    /* hides the host's own text. not color: transparent, the lines above are
+       drawn from currentColor and would vanish with it */
+    -webkit-text-fill-color : transparent;
   }
 
   :state(skeleton) > *,
