@@ -6,18 +6,20 @@
 @property --accent { syntax: "<color>"; inherits: true; }
 
 :root {
-  --theme: zombie;
-  &[data-theme] { --theme: attr(data-theme type(<custom-ident>), zombie); }
+  color-scheme: light dark;
+
+  --theme      : zombie;
+  --theme-mode : auto;
+
+  &[data-theme]      { --theme      : attr(data-theme      type(*), zombie); }
+  &[data-theme-mode] { --theme-mode : attr(data-theme-mode type(*), auto);   }
 }
 
-:root {
-  color-scheme: light dark; /* Enable native CSS light-dark() resolution */
+@container style(--theme-mode: light) { body { color-scheme: light;      } }
+@container style(--theme-mode: dark)  { body { color-scheme: dark;       } }
+@container style(--theme-mode: auto)  { body { color-scheme: light dark; } }
 
-  --theme: zombie;
-  &[data-theme] { --theme: attr(data-theme type(*), zombie); }
-}
-
-body {
+html {
   --accent : var(--theme);
 
   --bg: light-dark(
