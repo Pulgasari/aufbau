@@ -138,6 +138,20 @@ async function boot (options = {}) {
   return booted;
 }
 
+// :::::: THEMES
+
+const themes = {};
+
+themes.getTheme = ()   => dom.getStyleToken('theme');
+themes.setTheme = (id) => dom.setStyleToken('theme', id);
+themes.getMode  = ()   => dom.getStyleToken('theme-mode');
+themes.setMode  = (id) => dom.setStyleToken('theme-mode', id);
+
+themes.apply = ({ theme, mode }) => {
+  if (theme) themes.setTheme (theme);
+  if (mode)  themes.setMode  (mode);
+};
+
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 const aufbau = {
@@ -153,13 +167,8 @@ const aufbau = {
   setConfig,
   update,
   webfonts,
+  themes,
 };
 
-api.getTheme = ()   => dom.getStyleToken('theme'),
-api.setTheme = (id) => dom.setStyleToken('theme', id),
-
-api.getThemeMode = ()   => dom.getStyleToken('theme-mode'),
-api.setThemeMode = (id) => dom.setStyleToken('theme-mode', id),
-
-export { apply, boot, config, data, dom, elements, filters, patterns, remove, setConfig, update, webfonts };
+export { apply, boot, config, data, dom, elements, filters, patterns, remove, setConfig, update, webfonts, themes };
 export default aufbau;
