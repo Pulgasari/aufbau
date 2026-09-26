@@ -1,144 +1,128 @@
 // @aufbau/builders/docs/index.js
+// a docs site from markdown files: a hash router over the files, a sidebar, a
+// table of contents and the theme controls. aufbau.boot() brings reset, theme,
+// skin, elements and webfonts, index.ass the shell around them.
+//
+//   createDocsFW({ index: '$repo/readme.md', sidebar: { … }, vars: { repo: '../' } });
 
 import initDefaultStylesheet from './ss.js';
-import aufbau, { dom, html, preact, str } from '@aufbau/kits/preact-htm';
-import { signal, typedSignal } from '@aufbau/signals';
-import { isArray, isFn, isString } from '@pulgasari/is';
-import AufbauCode  from '@aufbau/elements/AufbauCode.js'; // imported for its static themes()
+import AufbauCode            from '@aufbau/elements/AufbauCode.js';   // for its static themes()
+import aufbau                from '@aufbau/api';
+import importFile            from '@aufbau/import';
+import { effect, signal, typedSignal } from '@aufbau/signals';
+import { isArray, isFn, isString }     from '@pulgasari/is';
+import { toSlugCase }        from '@pulgasari/str';
+import htm                   from 'htm';
+import { h, render }         from 'preact';
 
-const { Fragment } = preact; //TODO: use htm/preact to enable <> syntax
-aufbau.init();
+const html = htm.bind(h);
 
-// :::::: muss raus
-const isExternal = (href) => /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
-const PAGE_THEMES  = ['classic', 'oled', 'rainbow', 'zombie'];
-const DEFAULT_CODE = 'github-dark';
+const DEFAULT_CODE  = 'github-dark';
+const DEFAULT_THEME = 'zombie';
 
-// :::::: THEMING :::::::::::::::::::::::::::::::::::::::::::::::
+const isExternal = href => /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
 
-const applyCodeTheme = theme => aufbau.elements.setConfig({ code: { theme } });
-const applyPageTheme = theme => dom.root.dataset.theme = theme;
-const toImportPath   = path  => str(path).startsWith('.', '/', 'http') ? path : `./${path}`;
-const importFile     = async (path, vars) => {
-  const imported = await aufbau.import(toImportPath(resolvePath(path, vars)));
-  return isString(imported) ? imported : null;
-};
-// resolve vars, import, return the string content or null on failure
-async function importText (raw, vars, label) {
-  const resolved = resolvePath(raw, vars);
-  try {
-    const imported = await aufbau.import(toImportPath(resolved));
-    return isString(imported) ? imported : null;
-  } catch (err) {
-    console.warn(`[DocsFW] Failed to load ${label} from "${resolved}":`, err);
-    return null;
-  }
-}
+// :::::: PATHS :::::::::::::::::::::::::::::::::::::::::::::::::
 
-async function resolveBrandConfig (brandOption, titleOption, vars = {}) {
-  let title = titleOption || 'Documentation';
-  let img        = null;
-  let svgContent = null;
-  let svgPath    = null;
-
-  if (typeof brandOption === 'string') {
-    title = brandOption;
-  } else if (brandOption && typeof brandOption === 'object') {
-    if (brandOption.title) title = brandOption.title;
-    if (brandOption.img) img = resolvePath(brandOption.img, vars);
-    if (brandOption.svg) svgPath = brandOption.svg;
-  }
-
-  // Fetch raw SVG content if path/string is provided
-  if (svgPath) {
-    const trimmed = svgPath.trim();
-    if (trimmed.startsWith('<svg')) {
-      svgContent = trimmed;
-    } else {
-      try       { svgContent = await importFile(trimmed, vars); }
-      catch (e) { console.warn(`[DocsFW] Failed to load brand SVG from "${trimmed}":`, e); }
-    }
-  }
-
-  return { title, img, svgContent };
-}
-
-export function resolvePath(pathStr, vars = {}) {
+/** replaces $name and ${name} with their vars, nested vars included */
+export function resolvePath (pathStr, vars = {}) {
   if (!pathStr || !isString(pathStr)) return pathStr;
 
   let resolved  = pathStr;
-  let maxPasses = 10; // Prevent infinite loops on circular variables
+  let maxPasses = 10; // circular vars must not loop forever
 
   while (maxPasses-- > 0) {
     let replaced = false;
     resolved = resolved.replace(/\$(\{([a-zA-Z0-9_]+)\}|([a-zA-Z0-9_]+))/g, (match, _, braced, unbraced) => {
-      const varName = braced || unbraced;
-      if (Object.prototype.hasOwnProperty.call(vars, varName)) {
-        replaced = true;
-        return vars[varName];
-      }
-      return match;
+      const name = braced || unbraced;
+      if (!Object.hasOwn(vars, name)) return match;
+      replaced = true;
+      return vars[name];
     });
-
     if (!replaced) break;
   }
 
-  // Clean up duplicate slashes (preserving protocols like http://)
+  // duplicate slashes, protocols like http:// excepted
   return resolved.replace(/(?<!:)\/{2,}/g, '/');
 }
 
-export function parseHash(defaultPath = 'readme.md') {
-  const rawHash = window.location.hash.replace(/^#\/?/, '');
-  if (!rawHash) return { path: defaultPath, anchor: null };
+const toImportPath = path => /^(\.|\/|https?:)/.test(path) ? path : `./${path}`;
 
-  const [path, anchor] = rawHash.split('#');
-  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+/** a file as text, or null. markdown comes back as html, svg as markup */
+async function importText (raw, vars, label) {
+  const resolved = resolvePath(raw, vars);
+  try {
+    const imported = await importFile(toImportPath(resolved));
+    return isString(imported) ? imported : null;
+  } catch (error) {
+    console.warn(`[DocsFW] failed to load ${label} from "${resolved}":`, error);
+    return null;
+  }
+}
+
+// a folder link means its readme, the way github shows one. resolves [html, file]
+async function importMarkdown (path) {
+  const files = path.endsWith('/') ? [`${path}README.md`, `${path}readme.md`] : [path];
+  let failure;
+  for (const file of files) {
+    try   { return [await importFile(toImportPath(file)), file]; }
+    catch (error) { failure = error; }
+  }
+  throw failure;
+}
+
+export function parseHash (defaultPath = 'readme.md') {
+  const raw = location.hash.replace(/^#\/?/, '');
+  if (!raw) return { path: defaultPath, anchor: null };
+
+  const [path, anchor] = raw.split('#');
+  return { path: path.replace(/^\//, '') || defaultPath, anchor: anchor || null };
+}
+
+// :::::: CONFIG :::::::::::::::::::::::::::::::::::::::::::::::::
+
+async function resolveBrand (brand, title, vars = {}) {
+  if (isString(brand)) return { title: brand, img: null, svg: null };
+
+  const svgSource = brand?.svg?.trim();
+  const svg       = !svgSource                 ? null
+                  : svgSource.startsWith('<svg') ? svgSource
+                  : await importText(svgSource, vars, 'brand svg');
 
   return {
-    path   : cleanPath || defaultPath,
-    anchor : anchor    || null
+    title : brand?.title || title,
+    img   : brand?.img ? resolvePath(brand.img, vars) : null,
+    svg,
   };
 }
 
 function normalizeSidebar (sidebar) {
   if (isArray(sidebar)) return sidebar;
-  if (sidebar && typeof sidebar === 'object') {
-    return Object.entries(sidebar).map(([title, path]) => ({ title, path }));
-  }
+  if (sidebar && typeof sidebar === 'object') return Object.entries(sidebar).map(([title, path]) => ({ title, path }));
   return [];
 }
 
-async function resolveExtension (ext, vars = {}) {
-  if (!ext)      return null;
-  if (isFn(ext)) return { type: 'component', value: ext };
+// a component, inline html, or a path to an html file
+async function resolveExtension (extension, vars = {}) {
+  if (!extension)      return null;
+  if (isFn(extension)) return { type: 'component', value: extension };
+  if (!isString(extension)) return null;
 
-  if (isString(ext)) {
-    const trimmed = ext.trim();
-    
-    // Inline HTML check
-    //if (str(trimmed).like('<*\n'))
-    if (trimmed.startsWith('<') || trimmed.includes('\n')) {
-      return { type: 'html', value: trimmed };
-    }
-    
-    try {
-      const value = await importFile(trimmed, vars);
-      return { type: 'html', value };
-    } catch (err) {
-      console.warn(`[DocsFW] Failed to load extension content from "${trimmed}":`, err);
-      return null;
-    }
-  }
+  const trimmed = extension.trim();
+  if (trimmed.startsWith('<') || trimmed.includes('\n')) return { type: 'html', value: trimmed };
 
-  return null;
+  const value = await importText(trimmed, vars, 'extension');
+  return value == null ? null : { type: 'html', value };
 }
+
+// :::::: CONTENT :::::::::::::::::::::::::::::::::::::::::::::::
 
 const ASSET_ELEMENTS   = 'img[src], source[src], video[src], video[poster], audio[src]';
 const ASSET_ATTRIBUTES = ['src', 'poster'];
 
 /*
   markdown resolves against the file it came from, the rendered html against the page
-  showing it — and here those are two different directories. an asset url is therefore
+  showing it, and here those are two different directories. an asset url is therefore
   rebased onto the markdown file itself, and a leading slash onto the repo root, which
   is what the same path means when github renders the file.
 
@@ -146,7 +130,7 @@ const ASSET_ATTRIBUTES = ['src', 'poster'];
   through the hash router, and an absolutised link would count as external there.
 */
 function rebaseAssets (doc, docURL, rootURL) {
-  dom.eachElements(ASSET_ELEMENTS, element => {
+  for (const element of doc.querySelectorAll(ASSET_ELEMENTS)) {
     for (const attribute of ASSET_ATTRIBUTES) {
       const value = element.getAttribute(attribute);
       if (!value || value.startsWith('#') || isExternal(value)) continue;
@@ -155,158 +139,119 @@ function rebaseAssets (doc, docURL, rootURL) {
         ? new URL(value.replace(/^\/+/, ''), rootURL).href
         : new URL(value, docURL).href);
     }
-  }, doc);
+  }
 }
 
-// rewrite fenced code blocks into <aufbau-code>, so highlighting and copy-to-clipboard
-// come from the element instead of a docsfw-level hljs pass
+// fenced code blocks become <aufbau-code>, so highlighting and copy come from the element.
+// doc.createElement on purpose: the live document would upgrade an element that
+// never lives there
 function upgradeCodeBlocks (doc) {
-  dom.eachElements('pre > code', codeEl => {
-    const lang    = [...codeEl.classList].find(cls => cls.startsWith('language-'))?.slice(9) || 'plaintext';
-    // doc.createElement, not dom.createElement: the latter builds in the live document,
-    // which upgrades the custom element in a page it is never going to live in
+  for (const code of doc.querySelectorAll('pre > code')) {
     const element = doc.createElement('aufbau-code');
-    element.setAttribute('lang', lang);
-    element.textContent = codeEl.textContent;
-    codeEl.parentElement.replaceWith(element);
-  }, doc);
+    element.setAttribute('lang', [...code.classList].find(name => name.startsWith('language-'))?.slice(9) || 'plaintext');
+    element.textContent = code.textContent;
+    code.parentElement.replaceWith(element);
+  }
 }
 
-// every pass takes `doc` as its context. without it eachElements falls back to the
-// live document, and the html returned here is the untouched parse
+/** the rendered markdown with heading ids, rebased assets and upgraded code blocks */
 export function processContent (htmlContent, { docURL, rootURL } = {}) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
-  dom.eachElements('h1, h2, h3, h4, h5, h6', (heading, index) => {
-    if (!heading.id) heading.id = str.toSlugCase(heading.textContent || '') || `heading-${index}`;
-  }, doc);
+  doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading, index) => {
+    heading.id ||= toSlugCase(heading.textContent || '') || `heading-${index}`;
+  });
   if (docURL) rebaseAssets(doc, docURL, rootURL ?? docURL);
   upgradeCodeBlocks(doc);
   return doc.body.innerHTML;
 }
 
- export function createDocsFW (config = {}) {
-  const {
-    brand      = null,
-    title      = 'Documentation',
-    index      = 'readme.md',
-    root       = null, // what a leading slash in markdown points at, see rootURL below
-    sidebar    = [],
-    vars       = {},
-    target     = '#app',
-    footerText = 'Powered by @aufbau/docsfw',
-    toc        = 'h2, h3',
-    before     = null,
-    after      = null,
+// :::::: MAIN ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    sw         = false,
+export function createDocsFW (config = {}) {
+  const {
+    after   = null,
+    before  = null,
+    brand   = null,
+    index   = 'readme.md',
+    root    = null,   // what a leading slash in markdown points at, see rootURL below
+    sidebar = [],
+    sw      = false,
+    target  = '#app',
+    title   = 'Documentation',
+    toc     = 'h2, h3',
+    vars    = {},
   } = config;
 
-  // connect with aufbau config/init interface
-  const defaultDocsStylesheetURL = import.meta.resolve('./index.aufbau.css');
-  console.log('defaultDocsStylesheetURL:', defaultDocsStylesheetURL);
-  initDefaultStylesheet(defaultDocsStylesheetURL);
-  if (sw) globalThis.navigator?.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
+  // :::::: THEME
+  // the page theme is a preset of css/themes.css (or any css color), the code theme
+  // one of aufbau-code's. both persist, both lists are loaded behind the first paint
 
+  const pageTheme  = typedSignal({ type: 'string', value: DEFAULT_THEME, key: 'docs-theme-page', storage: 'aufbau' });
+  const codeTheme  = typedSignal({ type: 'string', value: DEFAULT_CODE,  key: 'docs-theme-code', storage: 'aufbau' });
+  const pageThemes = signal([pageTheme.value]);   // seeded with the active one, so a picker is never empty
+  const codeThemes = signal([codeTheme.value]);
+
+  // index.ass links the reset: linked sheets come before adopted ones in the
+  // cascade, an adopted reset would undo the typography of css/docs.css
+  aufbau.boot({ css: { reset: false, theme: pageTheme.value }, font: ['manrope', 'jetbrains-mono'] });
+  initDefaultStylesheet(import.meta.resolve('./index.ass'));
+  if (sw) navigator.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
+
+  effect(() => { aufbau.gestalt.set({ theme: pageTheme.value }); });
+  effect(() => { aufbau.elements.setConfig({ code: { theme: codeTheme.value } }); });
+
+  const withActive = (list, active) => list.includes(active) ? list : [active, ...list];
+  aufbau.gestalt.themes().then(list => { pageThemes.value = withActive(list, pageTheme.value); });
+  AufbauCode.themes().then(list => { codeThemes.value = withActive(list, codeTheme.value); });
+
+  // :::::: STATE
 
   // the repo root, defaulted from the $repo convention the config already uses.
   // resolved once, every markdown page rebases its assets against it
   const rootURL = new URL(resolvePath(root ?? vars.repo ?? './', vars), document.baseURI).href;
+  const items   = normalizeSidebar(sidebar);
 
-  const normalizedSidebar = normalizeSidebar(sidebar);
-  const state = aufbau.signals({
-    currentRoute : parseHash(index),
-    mdContent    : '',
-    tocList      : [],
-    isLoading    : true,
-    errorMessage : null,
-    beforeSlot   : null,
-    afterSlot    : null,
-    brand        : {
-      title: isString(brand) ? brand : (brand?.title || title),
-      img: null,
-      svgContent: null
-    }
-  });
+  const route  = signal(parseHash(index));
+  const brandS = signal({ title: isString(brand) ? brand : (brand?.title || title), img: null, svg: null });
+  const page   = signal({ status: 'loading', html: '', before: null, after: null });
 
-  const brandState = signal({
-    title: isString(brand) ? brand : (brand?.title || title),
-    img: null,
-    svgContent: null
-  });
+  addEventListener('hashchange', () => { route.value = parseHash(index); });
 
-  const pageTheme = typedSignal({
-    type    : 'enum',
-    value   : PAGE_THEMES.at(-1),
-    values  : PAGE_THEMES,
-    key     : 'docs-theme-page',
-    storage : 'aufbau',
-  });
-  const codeTheme = typedSignal({
-    type    : 'scalar',
-    value   : DEFAULT_CODE,
-    key     : 'docs-theme-code',
-    storage : 'aufbau',
-  });
-  // seeded with the active one so the picker is never momentarily empty
-  const codeThemes = signal([codeTheme.value]);
+  resolveBrand(brand, title, vars).then(value => { brandS.value = value; });
 
-  // side effects the signals do not own, run once with the hydrated value
-  preact.effect(() => applyPageTheme(pageTheme.value));
-  preact.effect(() => applyCodeTheme(codeTheme.value));
+  // the slots are the same on every page, loaded once
+  const slots = Promise.all([resolveExtension(before, vars), resolveExtension(after, vars)]);
 
-  AufbauCode.themes().then(list => {
-    codeThemes.value = list.includes(codeTheme.value) ? list : [codeTheme.value, ...list];
-  });
+  // one load per route. a newer route wins over a slower older one
+  let loads = 0;
+  effect(() => {
+    const { path, anchor } = route.value;
+    const load = ++loads;
 
-  // Hash router event listener
-  if (typeof window !== 'undefined') {
-    window.addEventListener('hashchange', () => {
-      state.currentRoute = parseHash(index);
-    });
-  }
+    page.value = { ...page.peek(), status: 'loading' };
 
-  // Reactive data loader effect
-  preact.effect(() => {
-    const { path, anchor } = state.currentRoute;
-
-    async function loadDocument() {
-      state.isLoading    = true;
-      state.errorMessage = null;
-
-      try {
-        const [resolvedBrand, rawHtml, beforeSlot, afterSlot] = await Promise.all([
-          resolveBrandConfig(brand, title, vars),
-          aufbau.import(toImportPath(resolvePath(path, vars))),
-          resolveExtension(before, vars),
-          resolveExtension(after, vars)
-        ]);
+    Promise.all([importMarkdown(resolvePath(path, vars)), slots])
+      .then(([[raw, file], [beforeSlot, afterSlot]]) => {
+        if (load !== loads) return;
 
         // where the markdown actually lives, which is not where the page lives
-        const docURL = new URL(resolvePath(path, vars), document.baseURI).href;
-
-        state.$update({
-          brand: resolvedBrand,
-          afterSlot, beforeSlot,
-          mdContent: processContent(rawHtml, { docURL, rootURL }),
-          isLoading: false,
-        });
+        const docURL = new URL(file, document.baseURI).href;
+        page.value = { status: 'ready', html: processContent(raw, { docURL, rootURL }), before: beforeSlot, after: afterSlot };
 
         requestAnimationFrame(() => {
-          anchor ? dom.scrollTo('#'+anchor) : dom.scrollToTop(0);
+          if (anchor) document.getElementById(anchor)?.scrollIntoView();
+          else document.getElementById('app-body')?.scrollTo(0, 0);
         });
-      } catch (err) {
-        console.error('[DocsFW Error]:', err);
-        state.errorMessage = `Failed to load document: ${path}`;
-        state.isLoading    = false;
-      }
-    }
-
-    loadDocument();
+      })
+      .catch(error => {
+        if (load !== loads) return;
+        console.error('[DocsFW]', error);
+        page.value = { ...page.peek(), status: 'error', error: `failed to load: ${path}` };
+      });
   });
 
-  
-  // translates github-compatible hrefs into router hashes at click time,
-  // so the markdown source stays readable on github itself
+  // translates github compatible hrefs into router hashes at click time, so the
+  // markdown source stays readable on github itself
   function onContentClick (event) {
     const link = event.target.closest?.('a[href]');
     if (!link || event.defaultPrevented) return;
@@ -316,165 +261,105 @@ export function processContent (htmlContent, { docURL, rootURL } = {}) {
     if (!href || isExternal(href) || link.target === '_blank') return;
 
     event.preventDefault();
-    const { path } = state.currentRoute;
+    const { path } = route.value;
 
-    // plain anchor: stay in the current document
+    // a plain anchor stays in the current document
     if (href.startsWith('#')) {
-      window.location.hash = `#/${path}#${href.slice(1)}`;
+      location.hash = `#/${path}#${href.slice(1)}`;
       return;
     }
 
     const [to, anchor] = href.split('#');
     const next = new URL(to, new URL(path, 'file:///')).pathname.replace(/^\//, '');
-    window.location.hash = `#/${next}${anchor ? `#${anchor}` : ''}`;
+    location.hash = `#/${next}${anchor ? `#${anchor}` : ''}`;
   }
 
-  // Helper component to render dynamic extensions
-  function ExtensionSlot ({ slotData }) {
-    switch (slotData?.type) {
-      case 'component' : return html`<${slotData.value} />`;
-      case 'html'      : return html`<div class="docs-extension" dangerouslySetInnerHTML=${{ __html: slotData.value }} />`;     
-      default          : return null;
-    }
+  // :::::: COMPONENTS
+
+  function ExtensionSlot ({ slot }) {
+    if (slot?.type === 'component') return html`<${slot.value} />`;
+    if (slot?.type === 'html')      return html`<div class="docs-extension" dangerouslySetInnerHTML=${{ __html: slot.value }} />`;
+    return null;
   }
 
-  // internal link that owns the hash-routing convention
+  // an internal link, owns the hash routing convention
   function RouterLink ({ to, anchor, class: className, children }) {
-    const href  = `#/${to}${anchor ? `#${anchor}` : ''}`;
-    const active = state.currentRoute.path === to;
-  
+    const active = route.value.path === to;
     return html`
-      <a href=${href} class=${[className, active && 'active'].filter(Boolean).join(' ')}>
+      <a href=${`#/${to}${anchor ? `#${anchor}` : ''}`} class=${[className, active && 'active'].filter(Boolean).join(' ')}>
         ${children}
       </a>
     `;
   }
 
-  // UI Components
   function Header () {
-    const activePath = state.currentRoute.path;
-    const { title: brandTitle, img: brandImg, svgContent: brandSvg } = state.brand;
-
+    const { title: brandTitle, img, svg } = brandS.value;
     return html`
       <header id="app-header">
         <${RouterLink} to=${index} class="brand-link">
           <div class="brand">
-            ${brandSvg   ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: brandSvg }} />`
-            : brandImg   ? html`<img class="brand-img" src=${brandImg} alt=${brandTitle} />`
-            : brandTitle ? html`<span class="brand-title">${brandTitle}</span>` 
-            : null}
+            ${svg ? html`<span class="brand-svg" dangerouslySetInnerHTML=${{ __html: svg }} />`
+            : img ? html`<img class="brand-img" src=${img} alt=${brandTitle} />`
+            :       html`<span class="brand-title">${brandTitle}</span>`}
           </div>
         </${RouterLink}>
         <nav class="docs-nav">
-          ${normalizedSidebar.map(item => html`
-            <${RouterLink} key=${item.path} to=${item.path}>${item.title}</${RouterLink}>
-          `)}
-          </nav>
+          ${items.map(item => html`<${RouterLink} key=${item.path} to=${item.path}>${item.title}</${RouterLink}>`)}
+        </nav>
       </header>
     `;
   }
 
-
-  function TableOfContents() {
-    const items = state.tocList;
-    const currentPath = state.currentRoute.path;
-
-    if (!items.length) return null;
+  function MainContent () {
+    const { status, html: content, before: beforeSlot, after: afterSlot, error } = page.value;
+    if (status === 'error')  return html`<div class="docs-status error">${error}</div>`;
+    if (!content)            return html`<div class="docs-status">loading…</div>`;
 
     return html`
-      <aside class="docs-toc">
-        <h4>On This Page</h4>
-        <nav>
-          ${items.map(item => html`
-            <a 
-              key=${item.id} 
-              href="#/${currentPath}#${item.id}"
-              class=${`toc-item level-${item.level}`}
-            >
-              ${item.text}
-            </a>
-          `)}
-        </nav>
-      </aside>
-    `;
-  }
-
-  function MainContent() {
-    if (state.isLoading)    return html`<div class="docs-status">Loading documentation...</div>`;
-    if (state.errorMessage) return html`<div class="docs-status error">${state.errorMessage}</div>`;
-
-    return html`
-      <div class="docs-body-wrapper">
+      <div class="docs-body-wrapper" aria-busy=${status === 'loading'}>
         <div class="docs-content-container">
-          <${ExtensionSlot} slotData=${state.beforeSlot} />
-          <article id="docs-content" class="markdown-body"
-            dangerouslySetInnerHTML=${{ __html: state.mdContent }} />
-          <${ExtensionSlot} slotData=${state.afterSlot} />
+          <${ExtensionSlot} slot=${beforeSlot} />
+          <article id="docs-content" class="markdown-body" dangerouslySetInnerHTML=${{ __html: content }} />
+          <${ExtensionSlot} slot=${afterSlot} />
         </div>
         ${toc ? html`<aufbau-toc class="docs-toc" target="#docs-content" selector=${toc} />` : null}
       </div>
     `;
   }
 
-  function ThemeControls () {
-    const choose = signal => event => {
-      const value = event.target.value;
-      if (value && value !== signal.value) signal.value = value;  // effect applies + store persists
-    };
-
-    const picker = (id, label, options, signal, apply, extra = {}) => html`
+  function ThemePicker ({ id, label, options, value }) {
+    const onChange = event => { if (event.currentTarget.value) value.value = event.currentTarget.value; };   // effect applies, the store persists
+    return html`
       <div class="theme-control">
         <label for=${id}>${label}</label>
-        <aufbau-picker
-          id=${id}
-          look="combobox"
-          value=${signal.value}
-          onChange=${choose(signal, apply)}
-          ...${extra}
-        >
-          ${options.map(name => html`
-            <aufbau-option key=${name} value=${name}>${name}</aufbau-option>
-          `)}
+        <aufbau-picker id=${id} look="combobox" searchable value=${value.value} onChange=${onChange}>
+          ${options.value.map(name => html`<aufbau-option key=${name} value=${name}>${name}</aufbau-option>`)}
         </aufbau-picker>
       </div>
     `;
-
-    return html`
-      <div class="theme-controls">
-        ${picker('page-theme', 'theme',  PAGE_THEMES,       pageTheme, applyPageTheme, { searchable: true })}
-        ${picker('code-theme', 'syntax', codeThemes.value,  codeTheme, applyCodeTheme, { searchable: true })}
-      </div>
-    `;
   }
 
-  // footerText is still accepted as an option, it is just not rendered any more.
-  // the footer carries the theme controls now
-  function Footer() {
+  function Footer () {
     return html`
       <footer id="app-footer">
-        <${ThemeControls} />
+        <div class="theme-controls">
+          <${ThemePicker} id="page-theme" label="theme"  options=${pageThemes} value=${pageTheme} />
+          <${ThemePicker} id="code-theme" label="syntax" options=${codeThemes} value=${codeTheme} />
+        </div>
       </footer>
     `;
   }
-  
-  function App() {
-    return html`
-      <${Fragment}>
-        <${Header} />
-        <div id="app-body" onClick=${onContentClick}>
-          <main class="docs-main-content">
-            <${MainContent} />
-          </main>
-        </div>
-        <${Footer} />
-      </${Fragment}>
-    `;
-  }
 
-  // Mount framework to target node
-  const $target = dom.getElement(target);
-  if ($target) preact.render(html`<${App} />`, $target);
-  
+  const App = () => html`
+    <${Header} />
+    <div id="app-body" onClick=${onContentClick}>
+      <main class="docs-main-content"><${MainContent} /></main>
+    </div>
+    <${Footer} />
+  `;
+
+  const $target = isString(target) ? document.querySelector(target) : target;
+  if ($target) render(html`<${App} />`, $target);
 }
 
 export { html };

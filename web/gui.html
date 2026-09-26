@@ -36,7 +36,7 @@
 
     <section>
       <h2>spec</h2>
-      <p class="hint">a plain object, key → descriptor. it is evaluated as you type, the link of this page carries it.</p>
+      <p class="hint">a plain object, key → descriptor. it is evaluated as you type, the link of this page carries it as query params.</p>
       <aufbau-code id="spec-code" lang="js" editable actions="copy clear"></aufbau-code>
       <p id="spec-error" hidden></p>
     </section>
@@ -157,6 +157,52 @@
       return spec;
     }
 
+    // :::::: LINK
+    // the spec travels in the query. an untouched preset is ?preset=pickers, any
+    // other spec one param per field, type first:
+    //   ?size=number,label:Size,min:8,max:64&mode=text,values:auto~Auto|dark~Dark
+    // `,` `:` `|` `~` delimit, inside a value they are escaped, a space is `+`
+
+    const encode = value => encodeURIComponent(String(value)).replace(/%20/g, '+').replace(/~/g, '%7E').replace(/%2F/g, '/').replace(/%40/g, '@');
+    const decode = token => decodeURIComponent(token.replace(/\+/g, ' '));
+
+    const LITERALS = { false: false, true: true };
+    const valueOf  = token => { const text = decode(token); return text in LITERALS ? LITERALS[text] : typed(text); };
+
+    function toQuery (spec) {
+      const name = Object.keys(PRESETS).find(key => toSource(PRESETS[key]) === toSource(spec));
+      if (name) return `?preset=${encode(name)}`;
+
+      return '?' + Object.entries(spec).map(([key, { type, ...rest }]) => {
+        const fields = Object.entries(rest).map(([field, value]) => `${field}:${
+          Array.isArray(value)
+            ? value.map(option => Array.isArray(option) ? option.map(encode).join('~') : encode(option)).join('|')
+            : encode(value)
+        }`);
+        return `${encode(key)}=${[encode(type ?? ''), ...fields].join(',')}`;
+      }).join('&');
+    }
+
+    // read raw, not through URLSearchParams: it would decode the escaped delimiters first
+    function fromQuery (search) {
+      const spec = {};
+      for (const pair of search.replace(/^\?/, '').split('&').filter(Boolean)) {
+        const [rawKey, rawDescriptor = ''] = pair.split('=');
+        const [type, ...fields] = rawDescriptor.split(',');
+        const descriptor = type ? { type: decode(type) } : {};
+
+        for (const field of fields) {
+          const [name, ...rest] = field.split(':');
+          const raw = rest.join(':');
+          descriptor[decode(name)] = name === 'values'
+            ? raw.split('|').map(option => option.includes('~') ? option.split('~').map(decode) : decode(option))
+            : name === 'label' ? decode(raw) : valueOf(raw);
+        }
+        spec[decode(rawKey)] = descriptor;
+      }
+      return spec;
+    }
+
     // :::::: OUTPUT
 
     let spec   = {};
@@ -200,7 +246,7 @@
       panel = rendered;
       $('form').replaceChildren(panel);
       if (write) $('spec-code').setAttribute('code', toSource(spec));
-      try { history.replaceState(null, '', `#${encodeURIComponent(toSource(spec))}`); } catch {}
+      try { history.replaceState(null, '', toQuery(spec)); } catch {}
       settled(rendered).then(() => panel === rendered && showValues());   // a newer spec may have taken over
       showCode();
     }
@@ -296,9 +342,13 @@
 
     await aufbau.elements.load('aufbau-toast');
 
-    // a shared link brings its spec, the first preset otherwise
-    const shared = decodeURIComponent(location.hash.slice(1));
-    try { shared ? apply(fromSource(shared), { write: true }) : choose(Object.keys(PRESETS)[0]); }
+    // a shared link brings its preset or its spec, the first preset otherwise
+    const shared = new URLSearchParams(location.search).get('preset');
+    try {
+      if (shared in PRESETS)  choose(shared);
+      else if (location.search.length > 1) apply(fromQuery(location.search), { write: true });
+      else choose(Object.keys(PRESETS)[0]);
+    }
     catch { choose(Object.keys(PRESETS)[0]); }
   </script>
 </body>
