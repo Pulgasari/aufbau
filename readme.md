@@ -21,7 +21,6 @@
 
 #### packages (experimental)
 - [@aufbau/stylescript](stylescript/) *(experimental)*
-- [@aufbau/stylesheet](stylesheet/) *(experimental)*
 
 #### side-projects
 - [@bunker](https://github.com/pulgasari/bunker/)

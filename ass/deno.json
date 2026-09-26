@@ -13,6 +13,7 @@
   "publish": {
     "exclude": [
       "**/*.test.js",
+      "_stylesheet",
       "test"
     ]
   }

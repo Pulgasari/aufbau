@@ -1,8 +1,8 @@
 // file "gerettet" aus aufbau/runtime 
 // – es ist noch unklar was aus dem zeug wird
 
-import transformStylesheet from '@aufbau/stylesheet';
-import { createCache }     from '@bunker/cache';
+import { compile }     from '@aufbau/ass';
+import { createCache } from '@bunker/cache';
 
 const TARGET_EXTENSIONS   = ['.aufbau.css', '.ass'];
 const REGEX_TARGET_EXT    = new RegExp(`(${TARGET_EXTENSIONS.map(ext => ext.replace('.', '\\.')).join('|')})$`, 'i');
@@ -28,7 +28,7 @@ async function interceptFetchStylesheet ({ request }) {
 
   try {
     return await stylesheetCache.staleWhileRevalidate(request, {
-      transform : transformStylesheet,
+      transform : (source) => compile(source),
       ttl  : TTL_STYLESHEET,
       type : 'text/css; charset=utf-8',
     });
