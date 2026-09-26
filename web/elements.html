@@ -11,6 +11,10 @@
     section { gap: .75rem; padding: 1.5rem; border-radius: .75rem; scroll-margin-top: 1rem; }
 
     #form > section:nth-child(odd) { background-color: var(--zebra); }
+    
+    #form           { padding: 0; }
+    #form > section { border-radius: 0; }
+    
     h2      { font-size: 1.25rem; }
     h3      { font-size: .9rem; font-weight: 600; color: var(--muted); margin-top: .5rem; }
 
@@ -129,19 +133,29 @@
     <section id="code">
       <h2>aufbau-code</h2>
       <div class="row"><span>lang="json", live</span>
-        <aufbau-code id="gestalt-code" lang="json" actions="copy"></aufbau-code></div>
-      <div class="row"><span>lang="js" editable</span>
-        <aufbau-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</aufbau-code></div>
-      <div class="row"><span>lang="css" no-copy</span>
-        <aufbau-code lang="css" no-copy code="body { background: var(--bg); color: var(--fg); }"></aufbau-code></div>
+      <aufbau-code id="gestalt-code" lang="json" actions="copy"></aufbau-code></div>
+      <div class="row">
+        <span>lang="js" editable</span>
+        <aufbau-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</aufbau-code>
+      </div>
+      <div class="row">
+        <span>lang="css" no-copy</span>
+        <aufbau-code lang="css" no-copy code="body { background: var(--bg); color: var(--fg); }"></aufbau-code>
+      </div>
     </section>
 
     <!-- :::::: CRUMBS -->
 
     <section id="crumbs">
       <h2>aufbau-crumbs</h2>
-      <div class="row"><span>children</span>
-        <aufbau-crumbs><a href="#">aufbau</a><a href="#">elements</a><span>crumbs</span></aufbau-crumbs></div>
+      <div class="row">
+        <span>children</span>
+        <aufbau-crumbs>
+          <a href="#">aufbau</a>
+          <a href="#">elements</a>
+          <span>crumbs</span>
+        </aufbau-crumbs>
+      </div>
       <div class="row"><span>path + root</span>
         <aufbau-crumbs id="crumbs-path" path="/elements/core/AufbauCore.js" root="aufbau"></aufbau-crumbs></div>
       <div class="row"><span>max="3"</span>
@@ -154,8 +168,10 @@
       <h2>aufbau-datalist</h2>
       <p class="hint">a source for native list= completion. here its options are the element names of this page.</p>
       <aufbau-datalist id="element-names"></aufbau-datalist>
-      <div class="row"><span>list="element-names"</span>
-        <aufbau-input name="datalist" list="element-names" placeholder="aufbau-…"></aufbau-input></div>
+      <div class="row">
+        <span>list="element-names"</span>
+        <aufbau-input name="datalist" list="element-names" placeholder="aufbau-…"></aufbau-input>
+      </div>
     </section>
 
     <!-- :::::: DROPDOWN -->
@@ -190,7 +206,8 @@
 
     <section id="flag">
       <h2>aufbau-flag</h2>
-      <div class="row"><span>variant</span>
+      <div class="row">
+        <span>variant</span>
         <div class="line">
           <aufbau-flag code="de" variant="circle"></aufbau-flag>
           <aufbau-flag code="de" variant="square"></aufbau-flag>
@@ -220,8 +237,8 @@
       <div class="row"><span>mode="image"</span>
         <div class="line">
           <aufbau-icon icon="logos:javascript" mode="image" size="2rem"></aufbau-icon>
-          <aufbau-icon icon="logos:css-3" mode="image" size="2rem"></aufbau-icon>
-          <aufbau-icon icon="logos:html-5" mode="image" size="2rem"></aufbau-icon>
+          <aufbau-icon icon="logos:css-3"      mode="image" size="2rem"></aufbau-icon>
+          <aufbau-icon icon="logos:html-5"     mode="image" size="2rem"></aufbau-icon>
         </div></div>
     </section>
 
@@ -255,28 +272,36 @@
     <section id="input">
       <h2>aufbau-input</h2>
       <h3>type</h3>
-      <div class="row"><span>text</span>     <aufbau-input name="text"     type="text" placeholder="a title" icon="lucide:type"></aufbau-input></div>
-      <div class="row"><span>email</span>    <aufbau-input name="email"    type="email" placeholder="mail@example.com"></aufbau-input></div>
+      <div class="row"><span>text</span>     <aufbau-input name="text"     type="text"     placeholder="a title" icon="lucide:type"></aufbau-input></div>
+      <div class="row"><span>email</span>    <aufbau-input name="email"    type="email"    placeholder="mail@example.com"></aufbau-input></div>
       <div class="row"><span>password</span> <aufbau-input name="password" type="password" autocomplete="new-password"></aufbau-input></div>
       <div class="row"><span>phone</span>    <aufbau-input name="phone"    type="phone"></aufbau-input></div>
       <div class="row"><span>url</span>      <aufbau-input name="url"      type="url" placeholder="https://aufbau.dev"></aufbau-input></div>
       <div class="row"><span>number</span>   <aufbau-input name="number"   type="number" value="42"></aufbau-input></div>
-      <div class="row"><span>year</span>     <aufbau-input name="year"     type="year" value="2026"></aufbau-input></div>
+      <div class="row"><span>year</span>     <aufbau-input name="year"     type="year"   value="2026"></aufbau-input></div>
       <div class="row"><span>date</span>     <aufbau-input name="date"     type="date"></aufbau-input></div>
       <div class="row"><span>datetime</span> <aufbau-input name="datetime" type="datetime"></aufbau-input></div>
       <div class="row"><span>time</span>     <aufbau-input name="time"     type="time"></aufbau-input></div>
       <div class="row"><span>duration</span> <aufbau-input name="duration" type="duration" value="90s"></aufbau-input></div>
-      <div class="row"><span>color</span>    <aufbau-input name="color"    type="color" value="#ff79c6"></aufbau-input></div>
+      <div class="row"><span>color</span>    <aufbau-input name="color"    type="color"    value="#ff79c6"></aufbau-input></div>
       <h3>look</h3>
-      <div class="row"><span>look="stepper", the page's font size</span>
-        <aufbau-input id="font-size" name="fontSize" type="number" look="stepper" value="14" min="10" max="22" step="1"></aufbau-input></div>
-      <div class="row"><span>look="swatch", the theme</span>
-        <aufbau-input id="theme-swatch" name="themeColor" type="color" look="swatch" value="#ff79c6"></aufbau-input></div>
+      <div class="row">
+        <span>look="stepper", the page's font size</span>
+        <aufbau-input id="font-size" name="fontSize" type="number" look="stepper" value="14" min="10" max="22" step="1"></aufbau-input>
+      </div>
+      <div class="row">
+        <span>look="swatch", the theme</span>
+        <aufbau-input id="theme-swatch" name="themeColor" type="color" look="swatch" value="#ff79c6"></aufbau-input>
+      </div>
       <h3>constraints</h3>
-      <div class="row"><span>required minlength="3"</span>
-        <aufbau-input name="nickname" required minlength="3" placeholder="at least 3 characters"></aufbau-input></div>
-      <div class="row"><span>pattern="[a-z]+"</span>
-        <aufbau-input name="slug" pattern="[a-z]+" placeholder="lowercase only"></aufbau-input></div>
+      <div class="row">
+        <span>required minlength="3"</span>
+        <aufbau-input name="nickname" required minlength="3" placeholder="at least 3 characters"></aufbau-input>
+      </div>
+      <div class="row">
+        <span>pattern="[a-z]+"</span>
+        <aufbau-input name="slug" pattern="[a-z]+" placeholder="lowercase only"></aufbau-input>
+      </div>
     </section>
 
     <!-- :::::: KEYBOARD -->
@@ -410,11 +435,22 @@
 
     <section id="skeleton">
       <h2>aufbau-skeleton</h2>
-      <div class="row"><span>shape="text" lines="3"</span>  <aufbau-skeleton lines="3"></aufbau-skeleton></div>
-      <div class="row"><span>shape="circle"</span>          <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton></div>
-      <div class="row"><span>shape="rect"</span>            <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton></div>
-      <div class="row"><span>the skeleton attribute</span>
-        <aufbau-toggle id="skeleton-toggle" look="switch" label="loading"></aufbau-toggle></div>
+      <div class="row">
+        <span>shape="text" lines="3"</span>
+        <aufbau-skeleton lines="3"></aufbau-skeleton>
+      </div>
+      <div class="row">
+        <span>shape="circle"</span>
+        <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
+      </div>
+      <div class="row">
+        <span>shape="rect"</span>
+        <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton>
+      </div>
+      <div class="row">
+        <span>the skeleton attribute</span>
+        <aufbau-toggle id="skeleton-toggle" look="switch" label="loading"></aufbau-toggle>
+      </div>
       <aufbau-item id="skeleton-card">
         <div class="avatar"></div>
         <div>any aufbau element takes <code>skeleton</code> for the same look in its own place.</div>
@@ -425,22 +461,38 @@
 
     <section id="slider">
       <h2>aufbau-slider</h2>
-      <div class="row"><span>type="number" controls editable</span>
-        <aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider></div>
-      <div class="row"><span>type="number" range</span>
-        <aufbau-slider name="price" type="number" range value="20,80" min="0" max="100" unit="€"></aufbau-slider></div>
-      <div class="row"><span>type="color", the theme</span>
-        <aufbau-slider id="theme-hue" name="hue" type="color" value="#ff79c6"></aufbau-slider></div>
-      <div class="row"><span>type="date"</span>
-        <aufbau-slider name="day" type="date" value="2026-06-01" min="2026-01-01" max="2026-12-31"></aufbau-slider></div>
-      <div class="row"><span>type="datetime"</span>
-        <aufbau-slider name="moment" type="datetime" value="2026-06-01T12:00" min="2026-06-01T00:00" max="2026-06-02T00:00"></aufbau-slider></div>
-      <div class="row"><span>type="time"</span>
-        <aufbau-slider name="from" type="time" value="09:00"></aufbau-slider></div>
-      <div class="row"><span>type="duration"</span>
-        <aufbau-slider name="length" type="duration" value="2s" min="0s" max="10s" step="0.5"></aufbau-slider></div>
-      <div class="row"><span>type="year"</span>
-        <aufbau-slider name="era" type="year" value="1990" min="1900" max="2030"></aufbau-slider></div>
+      <div class="row">
+        <span>type="number" controls editable</span>
+        <aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="number" range</span>
+        <aufbau-slider name="price" type="number" range value="20,80" min="0" max="100" unit="€"></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="color", the theme</span>
+        <aufbau-slider id="theme-hue" name="hue" type="color" value="#ff79c6"></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="date"</span>
+        <aufbau-slider name="day" type="date" value="2026-06-01" min="2026-01-01" max="2026-12-31"></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="datetime"</span>
+        <aufbau-slider name="moment" type="datetime" value="2026-06-01T12:00" min="2026-06-01T00:00" max="2026-06-02T00:00"></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="time"</span>
+        <aufbau-slider name="from" type="time" value="09:00"></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="duration"</span>
+        <aufbau-slider name="length" type="duration" value="2s" min="0s" max="10s" step="0.5"></aufbau-slider>
+      </div>
+      <div class="row">
+        <span>type="year"</span>
+        <aufbau-slider name="era" type="year" value="1990" min="1900" max="2030"></aufbau-slider>
+      </div>
     </section>
 
     <!-- :::::: TABLE -->
@@ -455,12 +507,13 @@
 
     <section id="toast">
       <h2>aufbau-toast</h2>
-      <div class="row"><span>type</span>
+      <div class="row">
+        <span>type</span>
         <div class="line">
           <aufbau-button data-toast="just so you know" data-type="info">info</aufbau-button>
-          <aufbau-button data-toast="it worked" data-type="success">success</aufbau-button>
-          <aufbau-button data-toast="careful now" data-type="warning">warning</aufbau-button>
-          <aufbau-button data-toast="that went wrong" data-type="error">error</aufbau-button>
+          <aufbau-button data-toast="it worked"        data-type="success">success</aufbau-button>
+          <aufbau-button data-toast="careful now"      data-type="warning">warning</aufbau-button>
+          <aufbau-button data-toast="that went wrong"  data-type="error">error</aufbau-button>
         </div></div>
     </section>
 
@@ -654,7 +707,7 @@
     document.addEventListener('aufbau-crumbs', event => toast(`crumb: ${event.detail.path}`));
 
     onChange('dropdown-placement', picker => $('dropdown-menu').setAttribute('placement', picker.value));
-    onChange('index-viewmode',     picker => $('index-demo').setAttribute('viewmode', picker.value));
+    onChange('index-viewmode',     picker =>    $('index-demo').setAttribute('viewmode',  picker.value));
     $('index-size').addEventListener('input', event => $('index-demo').setAttribute('item-size', `${event.currentTarget.value}px`));
     onChange('keyboard-layout',    picker => $('keyboard-demo').setAttribute('layout', picker.value));
 
