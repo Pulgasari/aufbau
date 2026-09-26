@@ -117,6 +117,10 @@ export default class AufbauUpload extends AufbauControl {
   `;
 
 
+  // reads as a file input: getFormValues() takes `files`, one or all of them
+  get multiple () { return this.getAttr('multiple'); }
+  get type     () { return 'file'; }
+
   get files () { return this._files ??= []; }
 
   /** a file control submits FormData, one entry per file */

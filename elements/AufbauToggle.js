@@ -99,6 +99,9 @@ export default class AufbauToggle extends AufbauControl {
     &:is([icon], [icon-checked])::after { content: none; }
   }`;
 
+  // reads as a checkbox: getFormValues() and friends take `checked`, not `value`
+  get type () { return 'checkbox'; }
+
   get checked ()     { return this.getAttr('checked'); }
   set checked (next) { this.setChecked(Boolean(next), { notify: false }); }
 

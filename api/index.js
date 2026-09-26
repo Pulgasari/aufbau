@@ -58,6 +58,7 @@ const data = {
   get filters  () { return modules.filters ().then(module => module.data); },
   get icons    () { return modules.icons   ().then(module => module.default); },
   get patterns () { return modules.patterns().then(module => module.data); },
+  get themes   () { return gestalt.themes(); },
   get webfonts () { return modules.webfonts().then(module => module.data); },
 };
 

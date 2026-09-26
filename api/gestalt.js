@@ -5,6 +5,7 @@
 //   await gestalt.set({ theme: 'oled', mode: 'dark', look: 'rounded' });
 //   gestalt.get('theme')    // 'oled'
 //   gestalt.colors()        // { accent, bg, fg } as the browser computed them
+//   await gestalt.themes()  // the preset names of css/themes.css
 //
 // theme and mode are custom properties on the root, which css/themes.css reads.
 // so a theme is a preset name or any css color: 'dracula', 'teal', '#ff8800'.
@@ -12,13 +13,6 @@
 // removes one.
 
 export const CSS_PATH = 'https://code.pulgasari.dev/aufbau/css';
-
-// the presets of css/themes.css, keep them in sync
-export const THEMES = [
-  'amethyst', 'beton', 'classic', 'desert', 'dracula', 'flamingo', 'hell', 'kontrast',
-  'lavendel', 'matrix', 'nightsky', 'oled', 'papier', 'parrot', 'petrol', 'rubin',
-  'smaragd', 'snowflake', 'softblack', 'softwhite', 'synthwave', 'tinte', 'zombie',
-];
 
 export const MODES   = ['auto', 'dark', 'light'];
 export const LAYOUTS = ['landing', 'mobile-basic', 'three-panels'];
@@ -61,6 +55,40 @@ async function setSheet (kind, name) {
   return (await domina('adoptStylesheet'))(`${CSS_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
 }
 
+// :::::: THEMES
+// the presets are read off the container queries of css/themes.css, so the
+// stylesheet stays the only place that lists them. loaded once, on first ask
+
+const PRESET = /style\(\s*--theme\s*:\s*([\w-]+)\s*\)/;
+
+// @layer and @media nest rules, an @import carries its own sheet
+function presetsOf (rules, names = []) {
+  for (const rule of rules) {
+    const match = rule instanceof CSSContainerRule && rule.conditionText.match(PRESET);
+    if (match) names.push(match[1]);
+    else if (rule.cssRules ?? rule.styleSheet?.cssRules) presetsOf(rule.cssRules ?? rule.styleSheet.cssRules, names);
+  }
+  return names;
+}
+
+// a css module where the browser has them, fetched and parsed where not
+async function loadSheet (url) {
+  try {
+    return (await import(url, { with: { type: 'css' } })).default;
+  } catch {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`[@aufbau/api] gestalt: ${response.status} ${response.statusText} - ${url}`);
+    return new CSSStyleSheet().replace(await response.text());
+  }
+}
+
+let presets = null;
+
+/** the preset names of css/themes.css, in their order there. a failed load is retried on the next call */
+const themes = () => presets ??= loadSheet(`${CSS_PATH}/themes.css`)
+  .then(sheet => [...new Set(presetsOf(sheet.cssRules))])
+  .catch(error => { presets = null; throw error; });
+
 // :::::: API
 
 /** sets any of theme, mode, layout, look and skin. resolves once the stylesheets are in */
@@ -83,6 +111,6 @@ const colors = (element = document.body) => {
   return Object.fromEntries(['accent', 'bg', 'fg'].map(name => [name, style.getPropertyValue(`--${name}`).trim()]));
 };
 
-export const gestalt = { colors, get, set, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS, themes: THEMES };
+export const gestalt = { colors, get, set, themes, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS };
 
 export default gestalt;

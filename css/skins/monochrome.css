@@ -21,15 +21,18 @@
   --aufbau-control-radius : 0.25rem;
   --aufbau-control-sunken : color-mix(in oklab, currentColor 6%, transparent);
   --aufbau-control-track  : color-mix(in oklab, currentColor 18%, transparent);
+}
 
-  /* the absolute pair, for the few rules that fill a box AND put text on it.
-     currentColor is useless there: the same rule sets `color`, and currentColor
-     resolves per element at used-value time, so it would become the new colour
-     and paint the text onto its own background. picks up @aufbau/css/themes
-     when one is loaded, the ua system colours otherwise. */
-  --aufbau-ink            : var(--aufbau-fg, CanvasText);
-  --aufbau-surface        : var(--aufbau-bg, Canvas);
-  --aufbau-accent         : var(--aufbau-ink);
+/* the absolute pair, for the few rules that fill a box AND put text on it.
+   currentColor is useless there: the same rule sets `color`, and currentColor
+   resolves per element at used-value time, so it would become the new colour
+   and paint the text onto its own background. picks up --fg, --bg and --accent
+   of css/themes.css when it is loaded, the ua system colours otherwise. on body,
+   because that is where themes.css resolves them */
+body {
+  --aufbau-ink     : var(--fg, CanvasText);
+  --aufbau-surface : var(--bg, Canvas);
+  --aufbau-accent  : var(--accent, var(--aufbau-ink));
 }
 
 /* ::: shared ::::::::::::::::::::::::::::::::::::::::::::::::::: */
