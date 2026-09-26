@@ -1,5 +1,11 @@
 /* @aufbau/css/themes.css */
 
+/*
+- supports theme presets
+- supports native css named colors as theme name
+- supports any css color value as theme name
+*/
+
 @property --theme  { syntax: "<color> | <custom-ident>"; inherits: true; initial-value: zombie; }
 @property --bg     { syntax: "<color>"; inherits: true; }
 @property --fg     { syntax: "<color>"; inherits: true; }
