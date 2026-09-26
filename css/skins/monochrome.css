@@ -346,6 +346,29 @@ aufbau-progress {
   &::before { border-radius: 999px; }
 }
 
+/* :::::: <aufbau-table> :::::: */
+
+aufbau-table {
+  table        { border-collapse: collapse; inline-size: 100%; }
+  :is(th, td)  { padding: 0.35em 0.6em; text-align: start; vertical-align: top; }
+  thead th     { border-block-end: var(--aufbau-control-border); }
+  th > button  { inline-size: 100%; padding: 0; background: none; border: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+  tbody tr + tr { border-block-start: 1px solid var(--aufbau-control-track); }
+  tbody tr:hover { background-color: var(--aufbau-control-hover); }
+}
+
+/* :::::: <aufbau-reader> :::::: */
+
+/* the reset strips lists and spacing, prose needs them back */
+aufbau-reader article {
+  > * + *             { margin-block-start: 0.75em; }
+  :is(ul, ol)         { padding-inline-start: 1.25em; }
+  ul                  { list-style: disc; }
+  ol                  { list-style: decimal; }
+  :is(h1, h2, h3, h4) { line-height: 1.2; }
+  a                   { color: var(--aufbau-accent); }
+}
+
 /* :::::: <aufbau-code> :::::: */
 
 aufbau-code {

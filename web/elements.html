@@ -7,8 +7,10 @@
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <link rel="stylesheet" href="./demo.css"/>
   <style>
-    #form   { display: grid; gap: 3rem; min-width: 0; }
-    section { gap: .75rem; scroll-margin-top: 1rem; }
+    #form   { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+    section { gap: .75rem; padding: 1.5rem; border-radius: .75rem; scroll-margin-top: 1rem; }
+
+    #form > section:nth-child(odd) { background-color: var(--zebra); }
     h2      { font-size: 1.25rem; }
     h3      { font-size: .9rem; font-weight: 600; color: var(--muted); margin-top: .5rem; }
 
@@ -25,7 +27,7 @@
       > span { color: var(--muted); font-size: .8rem; font-family: ui-monospace, monospace; }
 
       /* inline controls keep their own width, fields take the row */
-      > :is(aufbau-picker, aufbau-toggle, aufbau-button, aufbau-value) { justify-self: start; }
+      > :is(aufbau-picker, aufbau-toggle, aufbau-button, aufbau-value, aufbau-skeleton[shape="circle"]) { justify-self: start; }
     }
     .line { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
 
@@ -45,6 +47,8 @@
     .flags { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .75rem; }
     .flags figure { display: grid; justify-items: center; gap: .25rem; font-size: .75rem; color: var(--muted); }
     .flags aufbau-flag { width: 2.5rem; }
+
+    #table-demo td:first-child { white-space: nowrap; }
 
     #index aufbau-item {
       display         : grid;
@@ -72,7 +76,8 @@
     aufbau-video, aufbau-audio { max-width: 32rem; }
 
     @media (width < 48rem) {
-      .row { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+      .row     { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+      section  { padding: 1rem; }
     }
   </style>
 </head>
@@ -158,7 +163,7 @@
     <section id="dropdown">
       <h2>aufbau-dropdown</h2>
       <div class="row"><span>placement</span>
-        <aufbau-picker id="dropdown-placement" look="segments" value="bottom-start">
+        <aufbau-picker id="dropdown-placement" look="cycle" value="bottom-start">
           <aufbau-option>bottom-start</aufbau-option>
           <aufbau-option>bottom-end</aufbau-option>
           <aufbau-option>top-start</aufbau-option>

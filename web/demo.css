@@ -8,6 +8,7 @@ body {
   --line  : color-mix(in oklch, var(--fg) 14%, var(--bg));
   --muted : color-mix(in oklch, var(--fg) 60%, var(--bg));
   --panel : color-mix(in oklch, var(--fg) 6%,  var(--bg));
+  --zebra : color-mix(in oklch, var(--fg) 3%,  var(--bg));
 
   display               : grid;
   grid-template-columns : 14rem minmax(0, 1fr);
@@ -53,17 +54,20 @@ aside {
 
 /* :::::: MAIN */
 
+/* minmax(0, 1fr): an auto track grows to its widest child, a long line of code
+   would push the page past the viewport */
 main {
-  display       : grid;
-  gap           : 1.25rem;
-  align-content : start;
-  max-width     : 60rem;
-  padding       : 1.5rem;
+  display               : grid;
+  grid-template-columns : minmax(0, 1fr);
+  gap                   : 1.25rem;
+  align-content         : start;
+  max-width             : 60rem;
+  padding               : 1.5rem;
 }
 
 [hidden] { display: none !important; }
 
-section { display: grid; gap: 1.25rem; align-content: start; min-width: 0; }
+section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-content: start; min-width: 0; }
 
 .stage {
   display       : grid;
@@ -76,7 +80,7 @@ section { display: grid; gap: 1.25rem; align-content: start; min-width: 0; }
   canvas { display: block; max-width: 100%; height: auto; }
 }
 
-.hint { color: var(--muted); font-size: .8rem; }
+.hint { color: var(--muted); font-size: .8rem; text-align: start; }   /* aufbau.css justifies p, short lines tear apart */
 
 /* @aufbau/gui renders a div of <label><span>name</span><control/></label> */
 .controls > div { display: grid; gap: .75rem; }

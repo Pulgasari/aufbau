@@ -54,9 +54,12 @@ export function decorateAll (list) {
  * markdown paragraph into a code block and shift every line of code.
  */
 export function dedent (text) {
-  const lines  = String(text ?? '').replace(/\t/g, '  ').split('\n');
-  const filled = lines.filter(line => line.trim());
-  const indent = Math.min(...filled.map(line => line.match(/^ */)[0].length));
-  const body   = Number.isFinite(indent) ? lines.map(line => line.slice(indent)) : lines;
-  return body.join('\n').replace(/^\s*\n/, '').trimEnd();
+  const [first, ...rest] = String(text ?? '').replace(/\t/g, '  ').split('\n');
+
+  // text right after the opening tag starts at column 0 whatever the markup's
+  // indent, so only the lines after it tell how far the source is indented
+  const filled = rest.filter(line => line.trim());
+  const indent = filled.length ? Math.min(...filled.map(line => line.match(/^ */)[0].length)) : 0;
+
+  return [first.trimStart(), ...rest.map(line => line.slice(indent))].join('\n').replace(/^\s*\n/, '').trimEnd();
 }
