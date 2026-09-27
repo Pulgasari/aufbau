@@ -116,12 +116,7 @@ export default class AufbauCode extends AufbauElement {
     theme    : { type: String, config: true }
   };
 
-  // structure only, the hljs theme paints the tokens and the skin does the frame.
-  // the host is the frame, header and pre are its only children
-  // the children are the code (static source) and stay untouched, the output is
-  // a <figure> in the light dom: header (language + actions) and pre > code
   static source = { tag: 'figure' };
-
   static styles = `aufbau-code {
     display  : block;
     font     : inherit;
@@ -134,10 +129,11 @@ export default class AufbauCode extends AufbauElement {
     }
 
     > figure > header {
-      align-items     : center;
-      display         : flex;
-      flex            : none;
-      gap             : var(--aufbau-control-gap, 0.5em);
+      --gap: small; /* gap: var(--aufbau-control-gap, 0.5em); */
+      
+      align-items : center;
+      display     : flex;
+      flex        : none;
       justify-content : space-between;
 
       > span {
@@ -146,8 +142,11 @@ export default class AufbauCode extends AufbauElement {
         line-height : 1;
         margin-inline-end : auto;
       }
-
-      > button {
+      > div {
+        display : inline-flex;
+        gap     : small;
+      }
+      button {
         align-items : center;
         background  : none;
         border      : 0;
@@ -177,22 +176,13 @@ export default class AufbauCode extends AufbauElement {
       }
     }
   }`;
-
-  /**
-   * teaches every <aufbau-code> a grammar highlight.js does not ship.
-   * @param {string} name
-   * @param {Function|string} source - a language definition or a module specifier
-   */
+j
   static registerLanguage (name, source) {
     languages.set(name, source);
     resolved.delete(name);
     return this;
   }
-
-  /**
-   * every highlight.js theme of the pinned version, cached for the session.
-   * @returns {Promise<string[]>}
-   */
+  
   static themes () {
     return (themesPromise ??= fetch(HLJS_INDEX)
       .then(response => response.json())
@@ -207,8 +197,7 @@ export default class AufbauCode extends AufbauElement {
       }));
   }
 
-  /** preloads a theme stylesheet without rendering anything */
-  static preloadTheme (theme) { return loadTheme(theme); }
+  static preloadTheme (theme) { return loadTheme (theme); }
 
   onMount () {
     bindActions(this);
@@ -234,7 +223,8 @@ export default class AufbauCode extends AufbauElement {
   onSourceChange    ()     { this._editedCode = undefined; this.invalidate().update(); }
 
   get source () {
-    if (this._editedCode !== undefined) return this._editedCode;
+    if (this._editedCode !== undefined)
+    return this._editedCode;
     return this.getAttr('code') || dedent(this.sourceText);
   }
 
@@ -263,9 +253,16 @@ export default class AufbauCode extends AufbauElement {
     return html`
       <header>
         <span>${this.lang}</span>
-        ${actionButtons(this.actions)}
+        <div>${actionButtons(this.actions)}</div>
       </header>
-      <pre><code class="language-${this.lang}" ${attrs({ contenteditable: editable && 'plaintext-only', spellcheck: editable && 'false' })}>${this.source}</code></pre>
+      <pre>
+        <code class="language-${this.lang}" ${attrs({ 
+          contenteditable : editable && 'plaintext-only', 
+          spellcheck      : editable && 'false' 
+        })}>
+          ${this.source}
+        </code>
+      </pre>
     `;
   }
 
