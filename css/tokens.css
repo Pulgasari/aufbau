@@ -1,5 +1,13 @@
 /* @aufbau/css/tokens.css */
 
+:root {
+  --spacing-tiny   : 0.25rem;
+  --spacing-small  : 0.50rem;
+  --spacing-normal : 1.00rem;
+  --spacing-large  : 2.00rem;
+  --spacing-huge   : 4.00rem;
+}
+
 @layer tokens { :root {
 
 --aufbau-error   : red;
