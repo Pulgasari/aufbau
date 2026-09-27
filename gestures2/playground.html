@@ -55,6 +55,18 @@
     #drawer       { position: absolute; inset: 0 auto 0 0; width: 70%; background: var(--accent); color: #000; padding: 1rem; translate: -100% 0; font-weight: 700; }
     #drawer.animated { transition: translate .2s ease; }
 
+    #sort-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+    #sort-list li, #sort-grid div { padding: .75rem 1rem; border: 1px solid var(--line); border-radius: .6rem; background: var(--soft); transition: box-shadow .15s, scale .15s; }
+    #sort-list li[data-lifted], #sort-grid div[data-lifted] { scale: 1.03; box-shadow: 0 .4rem 1rem #0005; }
+    #sort-list li[data-dragging], #sort-grid div[data-dragging] { box-shadow: 0 .6rem 1.5rem #0007; background: color-mix(in oklch, var(--accent) 25%, var(--soft)); }
+    #sort-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; }
+    #sort-grid div { aspect-ratio: 1; display: grid; place-items: center; font-weight: 700; padding: 0; }
+
+    #feed      { height: 14rem; overflow: auto; border: 1px solid var(--line); border-radius: .75rem; position: relative; }
+    #feed-hint { position: absolute; inset: 0 0 auto; height: 64px; display: grid; place-items: center; font-size: .8rem; opacity: .7; }
+    #feed-list { list-style: none; margin: 0; padding: 0; background: var(--soft); position: relative; min-height: 100%; }
+    #feed-list li { padding: .75rem 1rem; border-top: 1px solid var(--line); }
+
     #list    { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: .75rem; overflow: hidden; }
     #list li { padding: .9rem 1rem; border-top: 1px solid var(--line); background: var(--soft); transition: opacity .2s; }
     #list li:first-child { border-top: 0; }
@@ -152,6 +164,24 @@
     </div>
   </section>
 
+  <section class="grid">
+    <div>
+      <h2>sortable · list</h2>
+      <p>touch and pen: hold, then drag. mouse: drag at once. keys: alt + arrows.</p>
+      <ul id="sort-list"><li>eins</li><li>zwei</li><li>drei</li><li>vier</li><li>fünf</li></ul>
+    </div>
+    <div>
+      <h2>sortable · grid</h2>
+      <p>the same in two dimensions, <code>axis: null</code>.</p>
+      <div id="sort-grid"><div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div><div>H</div></div>
+    </div>
+    <div>
+      <h2>pullable</h2>
+      <p>at the top pull down, release past the line to refresh (1 s, adds an entry).</p>
+      <div id="feed"><div id="feed-hint">pull to refresh</div><ul id="feed-list"></ul></div>
+    </div>
+  </section>
+
   <section>
     <h2>delegation</h2>
     <p>one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>, dom events from the items: swipe left marks done, swipe right undoes, tap logs.</p>
@@ -172,7 +202,7 @@
   </section>
 
   <script type="module">
-    import gestures, { dismissable, draggable, transformable } from './index.js';
+    import gestures, { dismissable, draggable, pullable, sortable, transformable } from './index.js';
 
     const $ = id => document.getElementById(id);
 
@@ -328,6 +358,22 @@
       onEdgeSwipeStart     : gesture => log(`edgeSwipeStart · ${gesture.edge}`, gesture),
       onSwipeLeft          : () => drawerOpen && setDrawer(false),
       onTap                : gesture => { if (drawerOpen && !drawer.contains(gesture.target)) setDrawer(false); },
+    });
+
+    // :::::: SORTABLE · PULLABLE
+
+    sortable($('sort-list'), { onSort: ({ from, to, order }) => log(`sorted ${from} → ${to}: ${order.map(item => item.textContent).join(' ')}`) });
+    sortable($('sort-grid'), { axis: null, onSort: ({ from, to }) => log(`grid ${from} → ${to}`) });
+
+    const feed = $('feed-list');
+    let entries = 0;
+    const addEntry = () => { const item = document.createElement('li'); item.textContent = `entry ${++entries} · ${new Date().toLocaleTimeString()}`; feed.prepend(item); };
+    for (let i = 0; i < 12; i++) addEntry();
+
+    pullable($('feed'), {
+      content   : feed,
+      onPull    : ({ progress, refreshing }) => { $('feed-hint').textContent = refreshing ? 'refreshing …' : progress >= 1 ? 'release to refresh' : 'pull to refresh'; },
+      onRefresh : () => new Promise(resolve => setTimeout(() => { addEntry(); log('refreshed'); resolve(); }, 1000)),
     });
 
     // :::::: DELEGATION

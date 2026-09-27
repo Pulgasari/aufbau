@@ -8,6 +8,7 @@
 
 #### packages
 - [@aufbau/ass](ass/)
+- [@aufbau/devtools](devtools/)
 - [@aufbau/elements](elements/)
 - [@aufbau/filters](filters/)
 - [@aufbau/gestures](gestures/)

@@ -1,0 +1,30 @@
+{
+  "name": "@aufbau/devtools",
+  "version": "0.1.0",
+  "description": "In-page devtools: console, dom, css, data, files and settings panels, loaded on demand.",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./boot": "./boot.js",
+    "./boot.js": "./boot.js"
+  },
+  "peerDependencies": {
+    "@aufbau/elements": "^1.0.0",
+    "@domina/methods": "*",
+    "@htx/js": "*"
+  },
+  "keywords": [
+    "aufbau",
+    "devtools",
+    "debug",
+    "esm"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "devtools"
+  }
+}
