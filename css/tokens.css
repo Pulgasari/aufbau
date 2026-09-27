@@ -1,6 +1,5 @@
 /* @aufbau/css/tokens.css */
 
-/*
 @property --gap     { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 @property --margin  { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 @property --padding { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
@@ -37,20 +36,19 @@
     style(--padding: huge)   : var(--spacing-huge);
   );
 }
-*/
 
 /* --skin */
 
 /* --theme */
 
+/*
 :root {
   --skin : monochrome;
   &[data-skin] { --skin: attr(data-skin type("<custom-ident>"), monochrome); }
 }
 
-@container style(--skin: monochrome) {}          
-
-
+@container style(--skin: monochrome) {}
+*/
 
 
 
