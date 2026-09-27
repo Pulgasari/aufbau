@@ -1,26 +1,8 @@
 // @aufbau/api
-// one entry for the aufbau packages. nothing is imported up front, every
-// namespace imports its package on the first call, so every method is async.
-//
-//   import aufbau from '@aufbau/api';
-//
-//   await aufbau.boot({ css: { theme: 'oled' }, font: ['manrope'] });
-//
-//   await aufbau.filters.apply('#logo', 'blur', { amount: 4 });
-//   await aufbau.apply('#hero', { filter: 'grain', font: 'lexend', pattern: { id: 'dots', fg: '#f00' } });
-//   await aufbau.update('#hero', { pattern: { fg: '#0f0' } });
-//   await aufbau.remove('#hero', ['pattern']);
-//
-//   await aufbau.elements.enableAutoload();
-//   await aufbau.data.filters;
-//
-//   await aufbau.gestalt.set({ theme: 'oled', look: 'rounded' });   // see gestalt.js
-//
-// filters, patterns and webfonts share one contract:
-//   apply(target, id, options)   update(target, options)   remove(target, options)
-//   use(id, options) -> handle   load(id)                   list()   data
 
-import { deepMerge }          from '@pulgasari/obj';
+import { deepMerge } from '@pulgasari/obj';
+import { shift }     from '@pulgasari/shapeshift
+  
 import { CSS_PATH, gestalt } from './gestalt.js';
 
 // :::::: LAZY ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -37,6 +19,7 @@ const modules = {
   icons    : once(() => import('@aufbau/icons/aliases.js')),
   patterns : once(() => import('@aufbau/patterns')),
   webfonts : once(() => import('@aufbau/webfonts')),
+//$load    : (name)  => modules[name]().then(module => module.data),
 };
 
 // :::::: NAMESPACES ::::::::::::::::::::::::::::::::::::::::::::
@@ -46,15 +29,23 @@ const patterns = facade(modules.patterns, CONTRACT);
 const webfonts = facade(modules.webfonts, [...CONTRACT, 'configure', 'init']);
 
 const elements = {
-  enableAutoload : async (options) => (await modules.elements()).autoloader(options),
   getConfig      : async (...args) => (await modules.config()).getConfig(...args),
+  setConfig      : async (...args) => (await modules.config()).setConfig(...args),
+  
+  enableAutoload : async (options) => (await modules.elements()).autoloader(options),
   load           : async (tag)     => (await modules.elements()).load(tag),
   registerAll    : async ()        => (await modules.elements()).registerAll(),
-  setConfig      : async (...args) => (await modules.config()).setConfig(...args),
+  
 };
 
 // catalogues, each one a promise
 const data = {
+  /*
+  get filters  () { return modules.$load('filters');  },
+  get patterns () { return modules.$load('patterns'); },
+  get webfonts () { return modules.$load('webfonts'); },
+  */
+  
   get filters  () { return modules.filters ().then(module => module.data); },
   get icons    () { return modules.icons   ().then(module => module.default); },
   get patterns () { return modules.patterns().then(module => module.data); },
