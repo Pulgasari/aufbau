@@ -3,4 +3,6 @@
 
 export * from './dismissable.js';
 export * from './draggable.js';
+export * from './pullable.js';
+export * from './sortable.js';
 export * from './transformable.js';

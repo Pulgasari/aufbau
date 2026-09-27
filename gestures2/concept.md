@@ -25,7 +25,7 @@ element.addEventListener('swipeleft', event => next());   // the same, as a dom 
 2. **recognizers** decide. each one is a small state machine over the session
    and turns it into named gestures: tap, long press, swipe, pan …
 3. **bundles** act. recipes that turn recognized gestures into an effect on the
-   dom: `transformable`, `draggable`, `dismissable`, later sortable, pullable …
+   dom: `transformable`, `draggable`, `dismissable`, `sortable`, `pullable`.
 
 recognizers report *what happened*, bundles decide *what it does*.
 
@@ -194,6 +194,14 @@ against clashes with future native event names.
 | `transformable` | one finger moves, two pinch and turn around their center, wheel or trackpad pinch zooms toward the cursor, double tap zooms in and back. taken on a `surface` (the parent), applied as `matrix()` | arrows, + −, [ ], 0 |
 | `draggable`     | follows the pointer with `translate`, `axis`, `bounds`, glides on after a flick, `grid` and `snap` on release, `drop` targets with data-drop-over, `revert` | arrows (shift: more) |
 | `dismissable`   | follows along an axis and fades, leaves when far or fast enough, snaps back otherwise, resistance for directions it may not go | delete, backspace |
+| `sortable`      | reorders the items of a list or grid: touch and pen lift an item by a long press (a plain drag still scrolls), the mouse drags at once; the dom order changes while dragging, the others slide into place | alt + arrows |
+| `pullable`      | pull to refresh on a scroll container: at the top the content follows a pull down with resistance, past `threshold` it holds while `onRefresh` runs | a refresh button |
+
+`pan` got `after: 'longPress'` for that (per input, `{ touch: 'longPress' }`) and
+`touchAction` to set it outright. a drag after a long press, and a pull at the
+top, refuse the touchmove's default, otherwise the browser would scroll and
+cancel the session. **open**: sortable does not scroll its container near the
+edges yet.
 
 a bundle returns `{ get, set, reset, destroy }` (or `dismiss`) and reports
 through callbacks (`onChange`, `onDrop`, `onDismiss` …). **open**: whether
@@ -207,12 +215,12 @@ what it does is what the keyboard can do too.
 
 built: tracker, trackpad, `press`, `pressRepeat`, `tap`, `doubleTap`, `longPress`,
 `secondary`, `swipe`, `edgeSwipe`, `pan`, `pinch`, `rotate`, `wheel`, the bundles
-`transformable`, `draggable`, `dismissable`,
+`transformable`, `draggable`, `dismissable`, `sortable`, `pullable`,
 handler guards, dom events with delegation, touch-action resolution, cleanup.
 
-next candidates: `sortable` (long press, then drag to reorder), `pullable`
-(pull to refresh), a pan with inertia as a recognizer option, and trying all of
-it on real devices.
+next candidates: auto scroll while sorting, a pan with inertia as a recognizer
+option, the mouse wheel in `transformable` (zoom or pan), and trying all of it
+on real devices.
 
 ## to try out
 
