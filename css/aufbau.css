@@ -83,8 +83,8 @@ table {
 }
 
 body {
-  background-color : var(--aufbau-bg);
-  color            : var(--aufbau-fg);
+  background-color : var(--bg);
+  color            : var(--fg);
 }
 
 /*//////////////////////// TYPO ////////////////////////*/
