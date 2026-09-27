@@ -1,7 +1,7 @@
 // @aufbau/api
 
 import { deepMerge } from '@pulgasari/obj';
-import { shift }     from '@pulgasari/shapeshift
+//import { shift }     from '@pulgasari/shapeshift';
   
 import { CSS_PATH, gestalt } from './gestalt.js';
 
@@ -74,6 +74,14 @@ const entryOf = (value) =>
     typeof value === 'string' ? [value, {}]
   : Array.isArray(value)      ? [value[0], value[1] ?? {}]
   : (({ id, ...options }) => [id, options])(value);
+
+/*
+const entryOf = shift.from ({
+  string   : (value) => [value, {}],
+  array    : (value) => [value[0], value[1] ?? {}],
+  fallback : (({ id, ...options }) => [id, options]),
+});
+*/
 
 /** applies several kinds at once, null removes one: { filter, font, pattern } */
 const apply = (target, spec = {}) => Promise.all(Object.entries(spec).map(([key, value]) =>
