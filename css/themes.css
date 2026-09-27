@@ -77,7 +77,7 @@ body {
 @container style(--theme: zombie)    { body { --bg: #282a36; --fg: #f8f8f2; --accent: #ff79c6; } }          
 
 body {
-  background   : var(--bg);
-  color        : var(--fg);
-  accent-color : var(--accent);
+  background-color : var(--bg);
+  color            : var(--fg);
+  accent-color     : var(--accent);
 }
