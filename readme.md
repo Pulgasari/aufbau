@@ -36,11 +36,5 @@
 - [@htx](https://github.com/pulgasari/htx/)
 
 #### resources
-- [@aufbau/css](#aufbau-css)
-- [@aufbau/svg](#aufbau-svg)
-
-#### test
-- [elements](https://code.pulgasari.dev/aufbau/elements/)
-- [filters](https://code.pulgasari.dev/aufbau/filters/)
-- [test](https://code.pulgasari.dev/aufbau/test/index.html)
-- [test/flicker](https://code.pulgasari.dev/aufbau/test/flicker.html)
+- [@aufbau/css](css/)
+- [@aufbau/svg](svg/)
