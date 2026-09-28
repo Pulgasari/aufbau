@@ -36,40 +36,25 @@ und aliases bleiben leer.
 | `data/code.json`   | editor-spezifisch (apps/code) |
 | `data/brands.json` | marken |
 
-## konzept: offline-bundling (noch nicht gebaut)
+## offline-bundling
 
 ziel: ein build ohne netz zur laufzeit, z. b. zugriff als capacitor-android-app
-mit lokalen assets. `<aufbau-icon>` fragt dafür schon heute zuerst
-`AufbauIcon.provide()` ab und nur, wenn dort nichts liegt, die iconify-api.
-ein bundler-schritt muss also nur ein modul erzeugen, das vor den elementen läuft:
+mit lokalen assets. `<aufbau-icon>` fragt zuerst `AufbauIcon.provide()` ab und
+nur, wenn dort nichts liegt, die iconify-api.
+
+das übernimmt der `icons`-schritt von `@aufbau/bundler` (`bundler/steps/icons.js`):
+
+1. **sammeln**: jedes gequotete `set:name` im gestageten code und in den daten,
+   dessen set eine iconify-collection ist (`@iconify/collections`). das deckt
+   `icon="…"`, die alias-listen hier und die eines projekts und datendateien wie
+   eine registry ab. dynamische namen findet kein scanner, dafür `include`.
+2. **svgs holen**: aus `@iconify-json/<set>` von npm, mit `getIconData()` +
+   `iconToSVG()` aus `@iconify/utils`.
+3. **ausgeben**: ein modul, das sie per `AufbauIcon.provide()` übergibt, am ende
+   von `<head>` eingebunden, also vor der app:
 
 ```js
-// icons.bundle.js (generiert)
-import { AufbauIcon } from '@aufbau/icons';
-AufbauIcon.provide({
-  'material-symbols:file-save': '<svg …>…</svg>',
-  'mdi:folder'                : '<svg …>…</svg>',
-});
+// /_icons/provide.js (generiert)
+import AufbauIcon from '@aufbau/elements/AufbauIcon.js';
+AufbauIcon.provide({ 'mdi:folder': '<svg …>…</svg>', … });
 ```
-
-bausteine:
-
-1. **sammeln**: quelltext scannen nach `icon="…"`, `icon=${'…'}`, `icon: '…'`,
-   dazu die ids, die elements selbst setzen (`lucide:x`, `lucide:chevron-down`,
-   die toast-icons, …) und `<aufbau-flag code>` → `circle-flags:<code>`.
-   dynamische namen findet kein scanner, dafür eine `include`-liste in der config.
-2. **auflösen**: aliases über `aliases.js` zu ids.
-3. **svgs holen**: offline aus `@iconify/json` (alle sets, gross, nur dev-dependency)
-   oder gezielt aus `@iconify-json/<set>`. `getIconData()` + `iconToSVG()` aus
-   `@iconify/utils` machen daraus das svg-markup.
-4. **ausgeben**: `icons.bundle.js` wie oben, bei vite als virtuelles modul.
-
-umsetzung als vite-plugin (oder `unplugin`, dann vite/rollup/esbuild aus einer
-quelle). `unplugin-icons` selbst passt nicht direkt: es erzeugt komponenten pro
-import, nicht eine laufzeit-map für attribut-strings. `@iconify/utils` +
-`@iconify/json` sind aber genau die teile, die es intern nutzt.
-
-offen:
-- scanner-heuristik vs. explizite liste, oder beides
-- deno ohne vite: dasselbe als cli-skript (`deno run icons:bundle`)
-- alternativ statt `provide()` ein self-hosted iconify-api-endpoint (config `icon-api`)
