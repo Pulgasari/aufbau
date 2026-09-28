@@ -151,7 +151,7 @@
 /* one color, its interaction states: hover, active, focus, disabled */
 @function --state(
   --color <color>        : var(--accent, royalblue),
-  --state <custom-ident> : normal
+  --state type(normal | hover | active | focus | disabled) : normal
 ) returns <color> {
   result: if(
     style(--state: hover)    : color-mix(in oklch, var(--color), var(--fg, black) 12%);
@@ -172,14 +172,11 @@
 
 /*//////////// SPACE AND SIZE ////////////*/
 
-/* multiples of --unit: --space(4) is 1rem with the default 0.25rem */
-/*
-@function --space(--steps <number> : 4) returns <length> {
-  result: calc(var(--unit, 0.25rem) * var(--steps));
-}
-*/
+/* multiples of --unit, as a number or by name: --space(4) and --space(normal)
+   are both 1rem with the default 0.25rem. the keywords are part of the type,
+   an unknown one falls back to the default instead of invalidating the value */
 @function --space(
-   --size type(<number> | <custom-ident>) : normal
+  --size type(<number> | tiny | small | normal | large | huge) : normal
 ) returns <length> {
   --steps: if(
     style(--size: tiny)   :  1; /* 0.25rem */
@@ -246,8 +243,8 @@
 
 /* a safe area inset plus --extra: padding-top: --safe(top, 1rem) */
 @function --safe(
-  --side  <custom-ident> : top,
-  --extra <length>       : 0px
+  --side  type(top | right | bottom | left) : top,
+  --extra <length>                         : 0px
 ) returns <length> {
   result: if(
     style(--side: right)  : calc(env(safe-area-inset-right,  0px) + var(--extra));
@@ -327,12 +324,39 @@
 
 /* a mask that fades the edges of a scroll area: mask-image: --fade-edges(1.5rem) */
 @function --fade-edges(
-  --size      <length>       : 1rem,
-  --direction <custom-ident> : vertical
+  --size      <length>                    : 1rem,
+  --direction type(vertical | horizontal) : vertical
 ) returns <image> {
   result: if(
     style(--direction: horizontal) : linear-gradient(to right,  transparent, black var(--size), black calc(100% - var(--size)), transparent);
     else                           : linear-gradient(to bottom, transparent, black var(--size), black calc(100% - var(--size)), transparent);
+  );
+}
+
+/* a gradient out of one color. tonal: lighter to darker in its own hue, vivid:
+   the ends also turn ±20° on the wheel, fade: the color into transparent.
+   interpolated in oklch, so two hues do not pass through grey */
+@function --gradient(
+  --color  <color>                       : var(--accent, royalblue),
+  --style  type(tonal | vivid | fade)    : tonal,
+  --shape  type(linear | radial | conic) : linear,
+  --angle  <angle>                       : 135deg,
+  --spread <number>                      : 0.08
+) returns <image> {
+  --start: if(
+    style(--style: vivid) : oklch(from var(--color) min(1, l + var(--spread)) c calc(h - 20) / alpha);
+    style(--style: fade)  : var(--color);
+    else                  : oklch(from var(--color) min(1, l + var(--spread)) c h / alpha);
+  );
+  --end: if(
+    style(--style: vivid) : oklch(from var(--color) max(0, l - var(--spread)) c calc(h + 20) / alpha);
+    style(--style: fade)  : oklch(from var(--color) l c h / 0);
+    else                  : oklch(from var(--color) max(0, l - var(--spread)) c h / alpha);
+  );
+  result: if(
+    style(--shape: radial) : radial-gradient(circle at top left in oklch, var(--start), var(--end));
+    style(--shape: conic)  : conic-gradient(from var(--angle) in oklch, var(--start), var(--end), var(--start));
+    else                   : linear-gradient(var(--angle) in oklch, var(--start), var(--end));
   );
 }
 
@@ -347,7 +371,9 @@
 /*//////////// MOTION ////////////*/
 
 /* named easing curves */
-@function --ease(--kind <custom-ident> : smooth) {
+@function --ease(
+  --kind type(smooth | snappy | enter | exit | bounce | spring | linear) : smooth
+) {
   result: if(
     style(--kind: snappy)     : cubic-bezier(0.2, 0, 0, 1);
     style(--kind: enter)      : cubic-bezier(0, 0, 0.2, 1);
@@ -361,7 +387,9 @@
 
 /* named durations times --motion, a token that goes to 0 for reduced motion:
    @media (prefers-reduced-motion: reduce) { :root { --motion: 0; } } */
-@function --duration(--speed <custom-ident> : normal) returns <time> {
+@function --duration(
+  --speed type(instant | fast | normal | slow | lazy) : normal
+) returns <time> {
   result: calc(var(--motion, 1) * if(
     style(--speed: instant) : 60ms;
     style(--speed: fast)    : 120ms;
@@ -373,9 +401,9 @@
 
 /* one transition entry: transition: --transition(opacity), --transition(transform, slow, spring) */
 @function --transition(
-  --property <custom-ident> : all,
-  --speed    <custom-ident> : normal,
-  --kind     <custom-ident> : smooth
+  --property <custom-ident>                                                   : all,
+  --speed    type(instant | fast | normal | slow | lazy)                      : normal,
+  --kind     type(smooth | snappy | enter | exit | bounce | spring | linear) : smooth
 ) {
   result: var(--property) --duration(var(--speed)) --ease(var(--kind));
 }
@@ -383,7 +411,9 @@
 /*//////////// LAYERS ////////////*/
 
 /* z-index by name, one order for the whole system */
-@function --z(--layer <custom-ident> : base) returns <integer> {
+@function --z(
+  --layer type(base | below | raised | dropdown | sticky | overlay | modal | toast | tooltip) : base
+) returns <integer> {
   result: if(
     style(--layer: below)    : -1;
     style(--layer: raised)   : 10;
