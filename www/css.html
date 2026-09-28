@@ -200,6 +200,8 @@ th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start
 
   <script type="module">
     import aufbau from '@aufbau/api';
+    import { autoload } from '@aufbau/elements';
+    autoload();
 
     await aufbau.boot();
 
