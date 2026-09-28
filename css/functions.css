@@ -108,7 +108,9 @@
   result: oklch(from var(--color) l c calc(h + var(--degrees) / 1deg) / alpha);
 }
 
-@function --complement(--color <color> : var(--accent, royalblue)) returns <color> {
+@function --complement(
+   --color <color> : var(--accent, royalblue)
+) returns <color> {
   result: --hue-shift(var(--color), 180deg);
 }
 
@@ -131,7 +133,9 @@
 }
 
 /* the text color between --fg and --bg: 0 is --fg, 100% the background */
-@function --muted(--amount <percentage> : 40%) returns <color> {
+@function --muted(
+   --amount <percentage> : 40%
+) returns <color> {
   result: color-mix(in oklch, var(--fg, black), var(--bg, white) var(--amount));
 }
 
@@ -169,7 +173,22 @@
 /*//////////// SPACE AND SIZE ////////////*/
 
 /* multiples of --unit: --space(4) is 1rem with the default 0.25rem */
+/*
 @function --space(--steps <number> : 4) returns <length> {
+  result: calc(var(--unit, 0.25rem) * var(--steps));
+}
+*/
+@function --space(
+   --size type(<number> | <custom-ident>) : normal
+) returns <length> {
+  --steps: if(
+    style(--size: tiny)   :  1; /* 0.25rem */
+    style(--size: small)  :  2; /* 0.5rem  */
+    style(--size: normal) :  4; /* 1rem    */
+    style(--size: large)  :  6; /* 1.5rem  */
+    style(--size: huge)   : 10; /* 2.5rem  */
+    else                  : var(--size);
+  );
   result: calc(var(--unit, 0.25rem) * var(--steps));
 }
 
@@ -181,8 +200,8 @@
 
 /* grows from --min at --from wide to --max at --to wide, clamped outside */
 @function --fluid(
-  --min  <length> : 1rem,
-  --max  <length> : 2rem,
+  --min  <length> :  1rem,
+  --max  <length> :  2rem,
   --from <length> : 20rem,
   --to   <length> : 80rem
 ) returns <length> {
