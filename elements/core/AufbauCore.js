@@ -205,12 +205,17 @@ export class AufbauCore extends HTMLElement {
     ).join('');
   }
 
-  // children added, removed or edited by the author (or a framework) re-render the output
+  // children added, removed or edited by the author (or a framework) re-render the output.
+  // a record counts when its target is one of the source nodes or inside one. asking the
+  // other way round (is it inside the output?) fails for a node already removed from the
+  // output, a text node whose span an edit dropped reads as the author's
   watchSource () {
+    const isSource = node => this.sourceNodes.some(source => source === node || source.contains(node));
+    const counts   = record => record.target === this
+      ? [...record.addedNodes, ...record.removedNodes].some(node => node !== this._output)
+      : isSource(record.target);
     const observer = new MutationObserver(records => {
-      const own = record => this._output && (record.target === this._output || this._output.contains(record.target)
-        || (record.target === this && [...record.addedNodes, ...record.removedNodes].every(node => node === this._output)));
-      if (records.some(record => !own(record))) this.onSourceChange();
+      if (records.some(counts)) this.onSourceChange();
     });
     observer.observe(this, { characterData: true, childList: true, subtree: true });
     this.track(() => observer.disconnect());

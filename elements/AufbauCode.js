@@ -103,6 +103,38 @@ function collectThemes (data) {
   return found.sort();
 }
 
+// ::: editing
+
+// the pause after a keystroke before the edit is highlighted again
+const HIGHLIGHT_DELAY = 150;
+
+// the caret as a text offset inside `root`, null when it is not in there
+function caretOffset (root) {
+  const selection = root.ownerDocument.getSelection();
+  if (!selection?.rangeCount || !root.contains(selection.focusNode)) return null;
+  const range = root.ownerDocument.createRange();
+  range.selectNodeContents(root);
+  range.setEnd(selection.focusNode, selection.focusOffset);
+  return range.toString().length;
+}
+
+// puts the caret back at a text offset, across whatever spans the text now sits in
+function setCaret (root, offset) {
+  const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node, rest = offset;
+  while ((node = walker.nextNode())) {
+    if (rest <= node.length) break;
+    rest -= node.length;
+  }
+  const range = root.ownerDocument.createRange();
+  if (node) range.setStart(node, rest);
+  else      range.selectNodeContents(root), range.collapse(false);
+  range.collapse(true);
+  const selection = root.ownerDocument.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
 export default class AufbauCode extends AufbauElement {
   static attr = {
     // copy always, paste and clear only take effect with `editable`
@@ -203,19 +235,46 @@ j
     bindActions(this);
 
     // typing must NOT write back into the code attribute:
-    // it is observed, would trigger update(), rebuild the markup and drop the caret. 
-    // the edit is held aside and only re-highlighted once the field is left. 
-    // focusout instead of blur, blur does not bubble and could not be delegated
+    // it is observed, would trigger update(), rebuild the markup and drop the caret.
+    // the edit is held aside and highlighted in place, with the caret put back.
+    // focusin/focusout instead of focus/blur, those do not bubble and could not be delegated
+    this.on('focusin', 'code[contenteditable]', () => { this._focusedCode = this.source; });
+
     this.on('input', 'code[contenteditable]', (event, node) => {
       this._editedCode = node.textContent;
       this.emit('input', { code: this._editedCode });
+      clearTimeout(this._highlightTimer);
+      this._highlightTimer = setTimeout(() => this.highlightInPlace(node), HIGHLIGHT_DELAY);
     });
 
     this.on('focusout', 'code[contenteditable]', () => {
-      if (this._editedCode === undefined || this._editedCode === this._highlighted) return;
+      if (this._editedCode === undefined || this._editedCode === this._focusedCode) return;
+      this._focusedCode = this._editedCode;
       this.emit('change', { code: this._editedCode });
-      this.invalidate().update();
     });
+  }
+
+  onUnmount () { clearTimeout(this._highlightTimer); }
+
+  /** re-highlights the edited node without a rebuild, the caret keeps its text offset */
+  async highlightInPlace (node) {
+    const source = node.textContent;
+    if (source === this._highlighted) return;
+
+    try {
+      const hljs = await getHljs();
+      await useLanguage(hljs, this.lang);
+      // typed on meanwhile, the next timer takes it
+      if (!node.isConnected || node.textContent !== source) return;
+
+      const language = hljs.getLanguage(this.lang) ? this.lang : 'plaintext';
+      const caret    = caretOffset(node);
+      node.innerHTML = hljs.highlight(source, { ignoreIllegals: true, language }).value;
+      if (caret !== null) setCaret(node, caret);
+      this._highlighted = source;
+    } catch (error) {
+      console.warn('[aufbau-code] could not highlight the edit:', error);
+    }
   }
 
   // an external write to `code` or to the children wins over a pending edit
