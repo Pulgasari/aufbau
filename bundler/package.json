@@ -1,0 +1,16 @@
+{
+  "name": "@aufbau/bundler",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "bin": {
+    "aufbau-bundler": "./cli.js"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./steps": "./steps/index.js"
+  },
+  "license": "MIT"
+}

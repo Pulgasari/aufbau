@@ -27,6 +27,7 @@
   | [html](https://aufbau.dev/webfonts.html)
 
 #### packages (experimental)
+- [@aufbau/bundler](bundler/) *(experimental)*
 - [@aufbau/stylescript](stylescript/) *(experimental)*
 
 #### side-projects
