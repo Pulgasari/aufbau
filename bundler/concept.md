@@ -40,21 +40,31 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | `copy`     | built | the project's own files, everything under a source for now |
 | `packages` | built | repos from a package origin become local copies, the origin is rewritten to them |
 | `start`    | built | index.html moves / to the start path before the shell reads its route |
-| `vendor`   | next  | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
-| `icons`    | later | the icon names a project uses, their svgs in one local file `aufbau-icon` reads |
+| `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
+| `icons`    | next  | the icon names a project uses, their svgs in one local file `aufbau-icon` reads |
 | `webfonts` | later | only the fonts a config names, the rest stays out |
 | `prune`    | later | files nothing loads are dropped |
 | `report`   | built | what still goes over the network, and the size |
 
 ## vendor
 
-resolving esm.sh is a solved problem, the bundler uses an existing tool:
+the cdns are not needed to build: a cdn url names an npm package, a version and
+a subpath (`esm.sh/preact@10.20.1/hooks`, `cdn.jsdelivr.net/npm/gifenc@1.0.3/+esm`,
+`esm.sh/jsr/@scope/name` as `@jsr/scope__name`). the step installs those packages
+from the npm registry (jsr through npm.jsr.io) and builds one browser module per
+url with **esbuild**. whatever the importmap maps stays a bare import, so preact
+is one instance for everything that uses it.
 
-- **jspm** (`@jspm/generator`) works on importmaps directly: it traces what is
-  imported, downloads it and writes an importmap to the local files. the
-  project stays unbundled, it just stops leaving the device. first choice.
-- **esbuild** for real bundles (one file per entry, minified), with a plugin
-  that resolves through the importmap. later, as an option.
+- importmap entries on a cdn host that a staged file names become local entries,
+  handed to the pages before anything else (`inject`, default an importmap
+  script; zugriff lays them over its own map through `__BOOT_CONFIG__`)
+- cdn urls written out in the staged files are rewritten in place
+- a url that does not build (node builtins, a package that is not on npm) stays
+  as it is and is listed as not vendored
+
+**open**: jspm (`@jspm/generator`) as an alternative that keeps the modules
+unbundled. **open**: a lockfile, the versions a url does not pin (`@11`, jsr
+without one) are resolved at build time.
 
 ## scanning
 
@@ -73,4 +83,6 @@ resolving esm.sh is a solved problem, the bundler uses an existing tool:
 ## size
 
 the packages step copies whole repos, aufbau alone is 25 mb, 23 of them fonts.
-`webfonts` and `prune` are what brings that down.
+vendor adds what the staged files name, not what an app loads: in zugriff every
+app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` and `prune`
+are what brings that down.

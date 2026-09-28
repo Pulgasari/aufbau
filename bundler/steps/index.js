@@ -6,7 +6,8 @@ import copy     from './copy.js';
 import packages from './packages.js';
 import report   from './report.js';
 import start    from './start.js';
+import vendor   from './vendor.js';
 
-const STEPS = [copy, packages, start, report];
+const STEPS = [copy, packages, vendor, start, report];
 
-export { copy, packages, report, start, STEPS };
+export { copy, packages, report, start, STEPS, vendor };

@@ -12,5 +12,8 @@
     ".": "./index.js",
     "./steps": "./steps/index.js"
   },
+  "dependencies": {
+    "esbuild": "^0.25.0"
+  },
   "license": "MIT"
 }
