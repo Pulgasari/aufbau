@@ -10,21 +10,21 @@ class EnumSignal extends BaseSignal {
 
   constructor (value, values = []) {
     super(values.includes(value) ? value : values[0]);
-    this.$values = [...values];
+    this.values = [...values];
   }
 
   get value ()     { return super.value; }
   set value (next) {
-    if (!this.$values.includes(next))
-      return void console.warn(`[aufbau/signals] ignored "${next}" — not in [${this.$values}]`);
+    if (!this.values.includes(next))
+      return void console.warn(`[aufbau/signals] ignored "${next}" — not in [${this.values}]`);
     super.value = next;
   }
 
   // steps to the next allowed value and wraps around — a two-value list is a toggle
   cycle () {
-    if (!this.$values.length) return this.peek();
-    const index = this.$values.indexOf(this.peek());
-    super.value = this.$values[(index + 1) % this.$values.length];
+    if (!this.values.length) return this.peek();
+    const index = this.values.indexOf(this.peek());
+    super.value = this.values[(index + 1) % this.values.length];
     return this.peek();
   }
 
