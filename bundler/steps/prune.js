@@ -4,7 +4,8 @@
 //
 //   prune: {
 //     entries : ['/notes/app.js'],                 // loaded by a path built at runtime
-//     keep    : ['/.shared/js/components/'],       // directories loaded by name, kept whole
+//     keep    : ['/notes/'],                       // directories kept whole
+//     loaders : { 'zugriff.component': '/.shared/js/components/{name}.js' },
 //     origins : ['https://zugriff.dev'],           // urls on these hosts are the output itself
 //   }
 //
@@ -18,10 +19,19 @@
 // file's directory. bare specifiers go through the importmap the vendor step left
 // (or `importmap` in this config), a prefix entry whose key is quoted keeps its
 // whole directory. importmap targets are only reached through their keys, so a
-// map written into a page does not keep everything it lists.
+// map written into a page does not keep everything it lists, and the keys in the
+// file that defines the map (one naming at least half of them) count as no use.
 //
-// imports by a name built at runtime (a component loader, an app's views) are
-// what `keep` is for, until a manifest replaces the convention.
+// a loader that imports by a name, `zugriff.component('Icon')`, is declared in
+// `loaders` with the path its names stand for: every string argument of a call
+// in a reachable file reaches that path (an argument that names no file, like a
+// member to pick, is ignored). what is loaded by a name that is never written
+// out goes into `keep` or `entries`.
+//
+// packages declare their own runtime paths in a package.json, the packages step
+// collects them into the context and they are kept too:
+//
+//   "aufbau": { "bundle": { "keep": ["css/"] } }
 
 import { existsSync, statSync } from 'node:fs';
 import { readFile, rm, rmdir, readdir, stat } from 'node:fs/promises';
@@ -47,7 +57,12 @@ async function removeEmptyDirectories (directory) {
 async function prune (context) {
   const { config, log, out, report } = context;
   if (!config.prune) return;
-  const { entries = [], keep = [], origins = [] } = config.prune;
+  const { entries = [], loaders = {}, origins = [] } = config.prune;
+  const keep = [...(config.prune.keep ?? []), ...(context.keep ?? [])];
+
+  // `<call>(` not preceded by more of a name, its arguments up to the closing parenthesis
+  const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const calls  = Object.entries(loaders).map(([call, path]) => ({ path, pattern: new RegExp(`(?<![\\w$.])${escape(call)}\\s*\\(([^)]*)\\)`, 'g') }));
 
   const { init, parse } = await import('es-module-lexer');
   await init;
@@ -76,9 +91,11 @@ async function prune (context) {
 
   // :::::: WALK
 
-  const reached = new Set;
+  // file -> the file it was first reached from, for BUNDLER_WHY=<output path>
+  const reached = new Map;
   const queue   = [];
-  const reach   = path => { if (path && !reached.has(path) && isFile(path)) { reached.add(path); queue.push(path); } };
+  let   current = null;
+  const reach   = path => { if (path && !reached.has(path) && isFile(path)) { reached.set(path, current); queue.push(path); } };
 
   const reachDirectory = async directory => {
     if (!existsSync(directory) || !statSync(directory).isDirectory()) return;
@@ -110,10 +127,11 @@ async function prune (context) {
   for (const directory of keep) await reachDirectory(join(out, directory));
 
   while (queue.length) {
-    const file = queue.shift();
+    const file = current = queue.shift();
     const type = extname(file);
     if (!['.css', '.html', '.js', '.json', '.mjs'].includes(type)) continue;
-    const text = await readFile(file, 'utf8');
+    let text = await readFile(file, 'utf8');
+    for (const snippet of context.injected ?? []) text = text.replace(snippet, '');
 
     if (type === '.css') {
       for (const [, , reference] of text.matchAll(CSSURL)) reach(local(reference, file));
@@ -121,13 +139,28 @@ async function prune (context) {
     }
 
     if (type === '.js' || type === '.mjs') {
+      for (const { path, pattern } of calls) {
+        for (const [, args] of text.matchAll(pattern)) {
+          for (const [, , name] of args.matchAll(/(["'`])([\w./-]+)\1/g)) reach(local(path.replaceAll('{name}', name), file));
+        }
+      }
+
       try {
         const [found] = parse(text);
         for (const { n: specifier } of found) if (specifier) await reachSpecifier(specifier, file);
       } catch { /* not parseable as a module, the strings below still count */ }
     }
 
-    for (const [, , value] of text.matchAll(QUOTED)) await reachString(value, file);
+    // the file that writes the importmap names all of its keys, that is no use of them
+    const strings  = [...text.matchAll(QUOTED)].map(([, , value]) => value);
+    const defining = keys.length && strings.filter(value => Object.hasOwn(imports, value)).length >= keys.length / 2;
+    for (const value of strings) if (!(defining && Object.hasOwn(imports, value))) await reachString(value, file);
+  }
+
+  if (process.env.BUNDLER_WHY) {
+    const chain = [];
+    for (let file = join(out, process.env.BUNDLER_WHY); file; file = reached.get(file)) chain.push('/' + relative(out, file).split(sep).join('/'));
+    log(`why ${chain.join(' <- ')}`);
   }
 
   // :::::: DROP

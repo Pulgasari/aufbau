@@ -39,9 +39,17 @@ node aufbau/bundler/cli.js bundler.config.js slug=notes out=build/notes/www
 | `vendor`   | `vendor`   | `{ exclude, hosts, importmap, inject, pages, path }` |
 | `icons`    | `icons`    | `{ element, include, pages, path }` |
 | `webfonts` | `webfonts` | `{ catalog, keep, scan }` |
-| `prune`    | `prune`    | `{ entries, importmap, keep, origins, pages }` |
+| `prune`    | `prune`    | `{ entries, importmap, keep, loaders, origins, pages }` |
 
 vendor and prune need the bundler's dependencies (`npm install` in `bundler/`).
+`BUNDLER_WHY=<output path>` makes prune log why a file stays.
+
+a package can name the paths it loads by computed names in its package.json,
+they stay whenever the package is bundled:
+
+```json
+"aufbau": { "bundle": { "keep": ["css/"] } }
+```
 vendor and icons install what they need from npm into the system temp dir.
 
 `bundle()` returns `{ out, sections, summary }`, the summary as markdown (what is

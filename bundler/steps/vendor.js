@@ -202,11 +202,14 @@ async function vendor (context) {
 
   // the importmap entries as local overrides, ahead of everything in the pages
   const imports = Object.fromEntries(entries.filter(([, url]) => local.has(url)).map(([key, url]) => [key, local.get(url)]));
+  // prune reads the pages without it: a map naming its keys is no use of them
   if (Object.keys(imports).length) {
+    const snippet = inject(imports);
+    context.injected = [...(context.injected ?? []), snippet];
     for (const page of pages) {
       const file = join(out, page);
       if (!existsSync(file)) continue;
-      await writeFile(file, (await readFile(file, 'utf8')).replace(/<head>/, `<head>\n  ${inject(imports)}`));
+      await writeFile(file, (await readFile(file, 'utf8')).replace(/<head>/, `<head>\n  ${snippet}`));
     }
   }
 

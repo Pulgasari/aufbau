@@ -12,11 +12,16 @@
 //
 // the repos are found in the copied files: `${origin}/<repo>/…`, and `${pkg}/<repo>/…`
 // for an importmap that keeps its origin in a `pkg` constant.
+//
+// a package.json in a copied repo can name paths its package loads by names
+// built at runtime, relative to itself. they go into context.keep for prune:
+//
+//   "aufbau": { "bundle": { "keep": ["css/"] } }
 
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join, relative, sep } from 'node:path';
 import { copy, isText, walk } from './../shared.js';
 
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -31,7 +36,22 @@ async function reposIn (out, origin) {
   return [...repos].sort();
 }
 
-async function packages ({ config, log, out, report, root }) {
+// the keep paths the package.json files of a copied repo declare, as output paths
+async function declaredKeep (directory, out) {
+  const paths = [];
+  for (const file of await walk(directory)) {
+    if (!file.endsWith(`${sep}package.json`)) continue;
+    let manifest;
+    try { manifest = JSON.parse(await readFile(file, 'utf8')); } catch { continue; }
+    for (const path of manifest.aufbau?.bundle?.keep ?? []) {
+      paths.push('/' + relative(out, join(dirname(file), path)).split(sep).join('/') + (path.endsWith('/') ? '/' : ''));
+    }
+  }
+  return paths;
+}
+
+async function packages (context) {
+  const { config, log, out, report, root } = context;
   if (!config.packages) return;
   const { clone, origin, path = '/_pkg', source = '_pkg' } = config.packages;
   const base = origin.replace(/\/+$/, '');
@@ -46,6 +66,7 @@ async function packages ({ config, log, out, report, root }) {
     if (!existsSync(checkout)) { missing.push(repo); continue; }
     await copy(checkout, join(out, path, repo));
     staged.push(repo);
+    context.keep = [...(context.keep ?? []), ...await declaredKeep(join(out, path, repo), out)];
   }
 
   // after the copies, so the packages' own mentions of the origin move along
@@ -59,6 +80,7 @@ async function packages ({ config, log, out, report, root }) {
   log(`packages ${staged.join(', ') || 'none'} -> ${path}`);
   report('packages', [
     `local: ${staged.join(', ') || 'none'}`,
+    ...(context.keep?.length ? [`declared keep: ${context.keep.join(', ')}`] : []),
     ...(missing.length ? [`**missing** (no checkout, not clonable): ${missing.join(', ')}`] : []),
   ]);
 }
