@@ -333,6 +333,33 @@
   );
 }
 
+/* a gradient out of one color. tonal: lighter to darker in its own hue, vivid:
+   the ends also turn ±20° on the wheel, fade: the color into transparent.
+   interpolated in oklch, so two hues do not pass through grey */
+@function --gradient(
+  --color  <color>                       : var(--accent, royalblue),
+  --style  type(tonal | vivid | fade)    : tonal,
+  --shape  type(linear | radial | conic) : linear,
+  --angle  <angle>                       : 135deg,
+  --spread <number>                      : 0.08
+) returns <image> {
+  --start: if(
+    style(--style: vivid) : oklch(from var(--color) min(1, l + var(--spread)) c calc(h - 20) / alpha);
+    style(--style: fade)  : var(--color);
+    else                  : oklch(from var(--color) min(1, l + var(--spread)) c h / alpha);
+  );
+  --end: if(
+    style(--style: vivid) : oklch(from var(--color) max(0, l - var(--spread)) c calc(h + 20) / alpha);
+    style(--style: fade)  : oklch(from var(--color) l c h / 0);
+    else                  : oklch(from var(--color) max(0, l - var(--spread)) c h / alpha);
+  );
+  result: if(
+    style(--shape: radial) : radial-gradient(circle at top left in oklch, var(--start), var(--end));
+    style(--shape: conic)  : conic-gradient(from var(--angle) in oklch, var(--start), var(--end), var(--start));
+    else                   : linear-gradient(var(--angle) in oklch, var(--start), var(--end));
+  );
+}
+
 /* a soft glow of --color from the top, for hero areas and cards */
 @function --glow(
   --color <color>      : var(--accent, royalblue),
