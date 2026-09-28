@@ -124,6 +124,15 @@ blockquote, q {
   &::before, &::after { content: ''; content: none; }
 }
 
+/*//////////////////// TRANSITIONS ///////////////////*/
+
+@view-transition { navigation: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
 /*//////////////////// TRAIT CLASSES ///////////////////*/
 
 .hidden  { display: none; }
