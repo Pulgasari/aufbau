@@ -5,7 +5,7 @@ function: --alpha
 applies transparency to a color.
 if no color is provided, defaults to currentColor.
 */
-@function --alpha (
+@function --alpha(
   --color   <color>      : currentColor,
   --opacity <percentage> : 50%,
   --mode                 : oklch
@@ -18,7 +18,7 @@ if no color is provided, defaults to currentColor.
   darkens a color by mixing it with black.
   if no color is provided, defaults to currentColor.
 */
-@function --darker (
+@function --darker(
   --color  <color>      : currentColor, 
   --amount <percentage> : 10%,
   --mode                : oklch
@@ -26,12 +26,26 @@ if no color is provided, defaults to currentColor.
   result: color-mix(in var(--mode), var(--color), black var(--amount));
 }
 
+@function --darker-bg( 
+  --amount <percentage> : 10%,
+  --mode: oklch 
+){ 
+    result: --darker(var(--bg), var(--amount), var(--mode)); 
+}
+
+@function --darker-fg( 
+  --amount <percentage> : 10%,
+  --mode: oklch 
+){ 
+    result: --darker(var(--bg), var(--amount), var(--mode)); 
+}
+
 /* 
   function: --lighter
   lightens a color by mixing it with white.
   if no color is provided, defaults to currentColor.
 */
-@function --lighter (
+@function --lighter(
   --color  <color>      : currentColor, 
   --amount <percentage> : 10%,
   --mode                : oklch
@@ -46,7 +60,7 @@ if no color is provided, defaults to currentColor.
   Maps predefined size keywords (small, normal, large) to rem values.
   Defaults to 'normal' if no argument is passed.
 */
-@function --space (
+@function --space(
   --size <custom-ident> : normal
 ){
   result: if(
@@ -62,8 +76,8 @@ if no color is provided, defaults to currentColor.
 
 
 /* trash */
-
+/*
 @function --dashed-border(--color: red) {
   result: 2px dashed var(--color);
 }
-
+*/
