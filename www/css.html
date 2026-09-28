@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>css playground</title>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <style>
+    /* the playground chrome only, the css under test lives in the frame */
+
+    body {
+      --line  : color-mix(in oklch, var(--fg, #ddd) 14%, var(--bg, #111));
+      --muted : color-mix(in oklch, var(--fg, #ddd) 60%, var(--bg, #111));
+      --panel : color-mix(in oklch, var(--fg, #ddd) 6%,  var(--bg, #111));
+
+      display               : grid;
+      grid-template-columns : minmax(0, 1fr);   /* a long code line must not widen the page */
+      grid-template-rows    : 50dvh 50dvh;
+      height             : 100dvh;
+      margin             : 0;
+      overflow           : hidden;
+      font               : 14px/1.4 system-ui, sans-serif;
+    }
+
+    section {
+      display        : flex;
+      flex-direction : column;
+      min-height     : 0;
+      min-width      : 0;
+    }
+
+    #top    { border-bottom: 1px solid var(--line); }
+    #bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+    /* :::::: BAR */
+
+    nav {
+      display     : flex;
+      flex        : none;
+      gap         : .25rem;
+      align-items : center;
+      padding     : .35rem .5rem;
+      padding-top : max(.35rem, env(safe-area-inset-top));
+      background  : var(--panel);
+      border-bottom : 1px solid var(--line);
+
+      button {
+        padding       : .35rem .7rem;
+        border        : 0;
+        border-radius : .4rem;
+        background    : none;
+        color         : inherit;
+        font          : inherit;
+        cursor        : pointer;
+
+        &[aria-selected="true"] { background: var(--accent, #7c7cf0); color: var(--bg, #111); }
+      }
+
+      .spacer { flex: 1; }
+      .reset  { color: var(--muted); font-size: .85em; }
+    }
+
+    /* :::::: PANELS */
+
+    .panel          { flex: 1; min-height: 0; }
+    .panel[hidden]  { display: none; }
+
+    iframe {
+      display    : block;
+      width      : 100%;
+      height     : 100%;
+      border     : 0;
+      background : #fff;
+    }
+
+    /* a code element fills its panel, the text scrolls inside */
+    aufbau-code {
+      height   : 100%;
+      overflow : hidden;
+
+      > figure       { height: 100%; }
+      > figure > header { padding: .35rem .6rem; border-bottom: 1px solid var(--line); }
+      > figure > pre { flex: 1; min-height: 0; overflow: auto; padding: .6rem; }
+      code           { font-size: 13px; white-space: pre; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="top">
+    <nav role="tablist">
+      <button role="tab" data-tab="preview" aria-selected="true">preview</button>
+      <button role="tab" data-tab="html">html</button>
+      <span class="spacer"></span>
+      <button class="reset" id="reset-html">reset html</button>
+      <button class="reset" id="reset-css">reset css</button>
+    </nav>
+    <div class="panel" data-panel="preview"><iframe id="frame" title="preview"></iframe></div>
+    <div class="panel" data-panel="html" hidden><aufbau-code id="html-code" lang="html" editable actions="copy paste clear"></aufbau-code></div>
+  </section>
+
+  <section id="bottom">
+    <div class="panel"><aufbau-code id="css-code" lang="css" editable actions="copy paste clear"></aufbau-code></div>
+  </section>
+
+  <script type="text/plain" id="default-html">
+<header>
+  <h1>Heading one</h1>
+  <p class="lead">A lead paragraph with <a href="#">a link</a>, <strong>strong</strong>, <em>em</em> and <code>code</code>.</p>
+</header>
+
+<h2>Heading two</h2>
+<p>Body text wraps across the width of the screen, long enough to show line height and measure on a phone.</p>
+
+<div class="buttons">
+  <button>Button</button>
+  <button class="primary">Primary</button>
+  <button disabled>Disabled</button>
+</div>
+
+<form>
+  <label>Text <input type="text" placeholder="placeholder"></label>
+  <label>Select
+    <select><option>one</option><option>two</option></select>
+  </label>
+  <label>Textarea <textarea rows="2">some text</textarea></label>
+  <label><input type="checkbox" checked> checkbox</label>
+  <label><input type="radio" name="r" checked> radio</label>
+  <label>Range <input type="range"></label>
+  <progress value="60" max="100"></progress>
+</form>
+
+<div class="card">
+  <h3>Card</h3>
+  <p>A box with a title and some text.</p>
+</div>
+
+<ul>
+  <li>List item one</li>
+  <li>List item two</li>
+</ul>
+
+<blockquote>A quote, set apart from the text.</blockquote>
+
+<details>
+  <summary>Details</summary>
+  <p>Hidden until opened.</p>
+</details>
+
+<table>
+  <thead><tr><th>Name</th><th>Value</th></tr></thead>
+  <tbody><tr><td>alpha</td><td>1</td></tr><tr><td>beta</td><td>2</td></tr></tbody>
+</table>
+  </script>
+
+  <script type="text/plain" id="default-css">
+:root {
+  --bg     : #fdfdfd;
+  --fg     : #1d1d22;
+  --accent : #5b5bd6;
+  --line   : #e2e2e8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin     : 0;
+  padding    : 1rem;
+  background : var(--bg);
+  color      : var(--fg);
+  font       : 16px/1.5 system-ui, sans-serif;
+}
+
+a { color: var(--accent); }
+
+.buttons { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+button {
+  padding       : .5rem 1rem;
+  border        : 1px solid var(--line);
+  border-radius : .5rem;
+  background    : #fff;
+  font          : inherit;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+form  { display: grid; gap: .6rem; margin-block: 1rem; }
+label { display: grid; gap: .25rem; }
+
+.card {
+  padding       : 1rem;
+  border        : 1px solid var(--line);
+  border-radius : .75rem;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start; }
+  </script>
+
+  <script type="module">
+    import aufbau from '@aufbau/api';
+
+    await aufbau.boot();
+
+    const $    = id => document.getElementById(id);
+    const KEYS = { css: 'aufbau:www:css:css', html: 'aufbau:www:css:html', tab: 'aufbau:www:css:tab' };
+
+    // storage may be blocked (private mode), the playground still works without it
+    const load = key => { try { return localStorage.getItem(key); } catch { return null; } };
+    const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+    const drop = key => { try { localStorage.removeItem(key); } catch {} };
+
+    const defaults = { css: $('default-css').textContent.trim(), html: $('default-html').textContent.trim() };
+    const current  = { css: load(KEYS.css) ?? defaults.css, html: load(KEYS.html) ?? defaults.html };
+
+    // :::::: FRAME
+    // the css under test never touches the playground itself
+
+    const frame = $('frame');
+
+    function renderFrame () {
+      frame.srcdoc = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style id="user"></style></head><body>${current.html}</body></html>`;
+    }
+
+    function applyCss () {
+      const style = frame.contentDocument?.getElementById('user');
+      if (style) style.textContent = current.css;
+    }
+
+    frame.addEventListener('load', applyCss);
+    renderFrame();
+
+    // :::::: EDITORS
+    // `input` on every keystroke, paste and clear included. the markup waits a moment
+    // so the frame does not reload per key
+
+    const css  = $('css-code');
+    const html = $('html-code');
+    css .setAttribute('code', current.css);
+    html.setAttribute('code', current.html);
+
+    const textOf = (event, element) => event.detail?.code ?? element.code;
+
+    css.addEventListener('input', event => {
+      current.css = textOf(event, css);
+      save(KEYS.css, current.css);
+      applyCss();
+    });
+
+    let timer = 0;
+    html.addEventListener('input', event => {
+      current.html = textOf(event, html);
+      save(KEYS.html, current.html);
+      clearTimeout(timer);
+      timer = setTimeout(renderFrame, 400);
+    });
+
+    $('reset-css').addEventListener('click', () => {
+      current.css = defaults.css;
+      drop(KEYS.css);
+      css.setAttribute('code', current.css);
+      applyCss();
+    });
+
+    $('reset-html').addEventListener('click', () => {
+      current.html = defaults.html;
+      drop(KEYS.html);
+      html.setAttribute('code', current.html);
+      renderFrame();
+    });
+
+    // :::::: TABS
+
+    function select (tab) {
+      for (const button of document.querySelectorAll('[data-tab]')) button.setAttribute('aria-selected', button.dataset.tab === tab);
+      for (const panel  of document.querySelectorAll('[data-panel]')) panel.hidden = panel.dataset.panel !== tab;
+      save(KEYS.tab, tab);
+    }
+
+    for (const button of document.querySelectorAll('[data-tab]')) button.addEventListener('click', () => select(button.dataset.tab));
+    select(load(KEYS.tab) === 'html' ? 'html' : 'preview');
+  </script>
+
+</body>
+</html>

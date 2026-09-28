@@ -249,20 +249,17 @@ j
   render () {
     const { editable } = this.getAttr();
 
-    // language-* is the highlight.js contract, the one class that stays
+    // language-* is the highlight.js contract, the one class that stays.
+    // no whitespace around the code, a <pre> would keep it
     return html`
       <header>
         <span>${this.lang}</span>
         <div>${actionButtons(this.actions)}</div>
       </header>
-      <pre>
-        <code class="language-${this.lang}" ${attrs({ 
-          contenteditable : editable && 'plaintext-only', 
-          spellcheck      : editable && 'false' 
-        })}>
-          ${this.source}
-        </code>
-      </pre>
+      <pre><code class="language-${this.lang}" ${attrs({
+        contenteditable : editable && 'plaintext-only',
+        spellcheck      : editable && 'false'
+      })}>${this.source}</code></pre>
     `;
   }
 
