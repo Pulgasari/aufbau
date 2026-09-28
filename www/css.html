@@ -6,7 +6,7 @@
   <title>css playground</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <style>
-    /* the playground chrome only, the css under test lives in the stage's shadow root */
+    /* the playground chrome only, scoped so the markup in #stage is left alone */
 
     body {
       --line  : color-mix(in oklch, var(--fg, #ddd) 14%, var(--bg, #111));
@@ -22,7 +22,7 @@
       font               : 14px/1.4 system-ui, sans-serif;
     }
 
-    section {
+    body > section {
       display        : flex;
       flex-direction : column;
       min-height     : 0;
@@ -34,7 +34,7 @@
 
     /* :::::: BAR */
 
-    nav {
+    #top > nav {
       display     : flex;
       flex        : none;
       gap         : .25rem;
@@ -62,30 +62,16 @@
 
     /* :::::: PANELS */
 
-    .panel          { flex: 1; min-height: 0; }
-    .panel[hidden]  { display: none; }
+    body > section > .panel         { flex: 1; min-height: 0; }
+    body > section > .panel[hidden] { display: none; }
 
-    /* layout only: a rule out here wins over any :host rule in there */
-    #stage {
-      display  : block;
+    .panel > #stage {
       height   : 100%;
       overflow : auto;
     }
 
-    /* a template that does not parse, the last good render stays below it */
-    #error {
-      margin     : 0;
-      padding    : .4rem .6rem;
-      background : #fde2e2;
-      color      : #8a1c1c;
-      font       : 12px/1.4 ui-monospace, monospace;
-      white-space: pre-wrap;
-
-      &:empty { display: none; }
-    }
-
     /* a code element fills its panel, the text scrolls inside */
-    aufbau-code {
+    .panel > aufbau-code {
       height   : 100%;
       overflow : hidden;
 
@@ -95,6 +81,8 @@
       code           { font-size: 13px; white-space: pre; }
     }
   </style>
+  <!-- the css under test, after the chrome so it wins a tie -->
+  <style id="user"></style>
 </head>
 
 <body>
@@ -107,7 +95,7 @@
       <button class="reset" id="reset-html">reset html</button>
       <button class="reset" id="reset-css">reset css</button>
     </nav>
-    <div class="panel" data-panel="preview"><pre id="error"></pre><div id="stage"></div></div>
+    <div class="panel" data-panel="preview"><div id="stage"></div></div>
     <div class="panel" data-panel="html" hidden><aufbau-code id="html-code" lang="html" editable actions="copy paste clear"></aufbau-code></div>
   </section>
 
@@ -172,55 +160,50 @@
   </script>
 
   <script type="text/plain" id="default-css">
-/* the preview is a shadow root: :host takes the tokens (what :root
-   would), .page the markup (what body would) */
-:host {
+/* the preview is #stage, everything nests in it so the playground stays as is */
+#stage {
   --bg     : #fdfdfd;
   --fg     : #1d1d22;
   --accent : #5b5bd6;
   --line   : #e2e2e8;
-}
 
-.page {
-  min-height : 100%;
   padding    : 1rem;
   background : var(--bg);
   color      : var(--fg);
   font       : 16px/1.5 system-ui, sans-serif;
+
+  * { box-sizing: border-box; }
+
+  a { color: var(--accent); }
+
+  .buttons { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+  button {
+    padding       : .5rem 1rem;
+    border        : 1px solid var(--line);
+    border-radius : .5rem;
+    background    : #fff;
+    font          : inherit;
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  form  { display: grid; gap: .6rem; margin-block: 1rem; }
+  label { display: grid; gap: .25rem; }
+
+  .card {
+    padding       : 1rem;
+    border        : 1px solid var(--line);
+    border-radius : .75rem;
+  }
+
+  table  { width: 100%; border-collapse: collapse; }
+  th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start; }
 }
-
-* { box-sizing: border-box; }
-
-a { color: var(--accent); }
-
-.buttons { display: flex; gap: .5rem; flex-wrap: wrap; }
-
-button {
-  padding       : .5rem 1rem;
-  border        : 1px solid var(--line);
-  border-radius : .5rem;
-  background    : #fff;
-  font          : inherit;
-}
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-form  { display: grid; gap: .6rem; margin-block: 1rem; }
-label { display: grid; gap: .25rem; }
-
-.card {
-  padding       : 1rem;
-  border        : 1px solid var(--line);
-  border-radius : .75rem;
-}
-
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start; }
   </script>
 
   <script type="module">
-    import aufbau                from '@aufbau/api';
-    import { autoloader }        from '@aufbau/elements';
-    import { createPreactHtml, render } from '@htx/preact';
+    import aufbau         from '@aufbau/api';
+    import { autoloader } from '@aufbau/elements';
 
     autoloader();
 
@@ -238,42 +221,20 @@ th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start
     const current  = { css: load(KEYS.css) ?? defaults.css, html: load(KEYS.html) ?? defaults.html };
 
     // :::::: STAGE
-    // the markup is an htx template rendered by preact into a shadow root: the css
-    // under test stays inside, the custom elements work there, and an edit only
-    // patches what changed
+    // plain markup in #stage, the css in a <style> of the page. the autoloader
+    // picks up any aufbau-* in there
 
-    const stage = $('stage').attachShadow({ mode: 'open' });
-    stage.innerHTML = '<style id="user"></style><div class="page"></div>';
-    autoloader({ root: stage });
+    const stage = $('stage');
 
-    // htm, under htx, knows no void elements: <input> without a slash would take
-    // everything after it as its children
-    const VOID = /<(area|br|col|embed|hr|img|input|link|meta|source|track|wbr)\b([^>]*?)\s*\/?>/gi;
-    const closeVoid = markup => markup.replace(VOID, '<$1$2 />');
-
-    function renderStage () {
-      try {
-        // a template is cached per strings array, a fresh tag per render lets the
-        // cache go with it instead of growing per keystroke
-        const html = createPreactHtml();
-        render(html([closeVoid(current.html)]), stage.querySelector('.page'));
-        $('error').textContent = '';
-      }
-      catch (error) {
-        $('error').textContent = error.message;
-      }
-    }
-
-    function applyCss () {
-      stage.getElementById('user').textContent = current.css;
-    }
+    const renderStage = () => { stage.innerHTML = current.html; };
+    const applyCss    = () => { $('user').textContent = current.css; };
 
     applyCss();
     renderStage();
 
     // :::::: EDITORS
     // `input` on every keystroke, paste and clear included. the markup waits a moment,
-    // a half typed tag would not parse
+    // so a half typed tag does not flash up
 
     const css  = $('css-code');
     const html = $('html-code');
