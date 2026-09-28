@@ -67,25 +67,3 @@ if no color is provided, defaults to currentColor.
   result: 2px dashed var(--color);
 }
 
-.argument {
-  border: --dashed-border(blue);
-}
-
-.default {
-  border: --dashed-border();
-}
-
-
-.grid-container {
-  display: grid;
-  /* Two columns: left narrower, right wider */
-  grid-template-columns: 1fr 2fr; 
-  /* Two rows of equal height */
-  grid-template-rows: 1fr 1fr;    
-  gap: 12px;
-}
-
-.left {
-  /* Spans across both vertical rows */
-  grid-row: span 2; 
-}
