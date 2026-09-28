@@ -8,11 +8,6 @@
     "generate": "node .github/scripts/generate-assets.mjs",
     "generate:webfonts": "node .github/scripts/generate-webfonts.mjs"
   },
-  "aufbau": {
-    "bundle": {
-      "keep": ["css/"]
-    }
-  },
   "license": "MIT",
   "repository": {
     "type": "git",

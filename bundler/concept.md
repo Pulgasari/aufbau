@@ -89,9 +89,13 @@ without one) are resolved at build time.
   string arguments of its calls in reachable files keep exactly those files.
   what is loaded by a name that is never written out goes into `keep`
   (directories kept whole) or `entries`.
-  packages declare the paths they load by computed names in their own
-  package.json (`"aufbau": { "bundle": { "keep": ["css/"] } }`), the packages
-  step collects them, so a project config does not have to know them.
+  a package declares the paths it loads by computed names in its own
+  package.json, relative to itself (`@aufbau/api`: `"aufbau": { "bundle": { "keep":
+  ["../css/"] } }`, once there is an @aufbau/css that becomes a dependency). the
+  packages step collects them, prune keeps them as soon as a file of the declaring
+  package is reached, so a project config does not have to know them.
+  `exclude` cuts a part off on purpose, e.g. `@aufbau/devtools/boot.js` for a
+  release build; a dev build leaves it in.
   `BUNDLER_WHY=<output path>` logs the chain a file was reached through.
 
 ## size
@@ -99,5 +103,6 @@ without one) are resolved at build time.
 the packages step copies whole repos, aufbau alone is 25 mb, 23 of them fonts.
 vendor adds what the staged files name, not what an app loads: in zugriff every
 app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` took 22 mb
-off, `prune` the rest (zugriff podcasts: 63.6 -> 41.6 -> 3.0 mb), once the
-loaders replaced keeping the whole components directory.
+off, `prune` the rest (zugriff podcasts: 63.6 -> 41.6 -> 2.9 mb without
+devtools, 7.6 mb with), once the loaders replaced keeping the whole components
+directory.

@@ -3,15 +3,13 @@
 //
 //   copy: [{ from: 'index.html' }, { from: '.shared' }, { from: 'apps/notes', to: 'notes' }]
 //
-// for now everything under a source goes along. what a page never loads is sorted
-// out later by a prune step (see concept.md).
+// everything under a source goes along, prune drops what nothing reaches.
 
-import { join } from 'node:path';
-import { copy as copyFiles } from './../shared.js';
+import { copyPath, joinPath, SKIP } from './../shared.js';
 
 async function copy ({ config, log, out, root }) {
   for (const { from, to = from } of config.copy ?? []) {
-    await copyFiles(join(root, from), join(out, to));
+    await copyPath(joinPath(root, from), joinPath(out, to), { skip: SKIP });
     log(`copy ${from}${to === from ? '' : ` -> ${to}`}`);
   }
 }

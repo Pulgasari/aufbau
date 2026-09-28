@@ -8,7 +8,8 @@
   "exports": {
     ".": "./index.js",
     "./boot": "./boot.js",
-    "./boot.js": "./boot.js"
+    "./boot.js": "./boot.js",
+    "./recorder.js": "./recorder.js"
   },
   "peerDependencies": {
     "@aufbau/elements": "^1.0.0",
