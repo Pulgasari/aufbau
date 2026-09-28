@@ -6,7 +6,7 @@
   <title>css playground</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <style>
-    /* the playground chrome only, the css under test lives in the frame */
+    /* the playground chrome only, the css under test lives in the stage's shadow root */
 
     body {
       --line  : color-mix(in oklch, var(--fg, #ddd) 14%, var(--bg, #111));
@@ -65,12 +65,23 @@
     .panel          { flex: 1; min-height: 0; }
     .panel[hidden]  { display: none; }
 
-    iframe {
-      display    : block;
-      width      : 100%;
-      height     : 100%;
-      border     : 0;
-      background : #fff;
+    /* layout only: a rule out here wins over any :host rule in there */
+    #stage {
+      display  : block;
+      height   : 100%;
+      overflow : auto;
+    }
+
+    /* a template that does not parse, the last good render stays below it */
+    #error {
+      margin     : 0;
+      padding    : .4rem .6rem;
+      background : #fde2e2;
+      color      : #8a1c1c;
+      font       : 12px/1.4 ui-monospace, monospace;
+      white-space: pre-wrap;
+
+      &:empty { display: none; }
     }
 
     /* a code element fills its panel, the text scrolls inside */
@@ -96,7 +107,7 @@
       <button class="reset" id="reset-html">reset html</button>
       <button class="reset" id="reset-css">reset css</button>
     </nav>
-    <div class="panel" data-panel="preview"><iframe id="frame" title="preview"></iframe></div>
+    <div class="panel" data-panel="preview"><pre id="error"></pre><div id="stage"></div></div>
     <div class="panel" data-panel="html" hidden><aufbau-code id="html-code" lang="html" editable actions="copy paste clear"></aufbau-code></div>
   </section>
 
@@ -120,14 +131,14 @@
 </div>
 
 <form>
-  <label>Text <input type="text" placeholder="placeholder"></label>
+  <label>Text <input type="text" placeholder="placeholder" /></label>
   <label>Select
     <select><option>one</option><option>two</option></select>
   </label>
   <label>Textarea <textarea rows="2">some text</textarea></label>
-  <label><input type="checkbox" checked> checkbox</label>
-  <label><input type="radio" name="r" checked> radio</label>
-  <label>Range <input type="range"></label>
+  <label><input type="checkbox" checked /> checkbox</label>
+  <label><input type="radio" name="r" checked /> radio</label>
+  <label>Range <input type="range" /></label>
   <progress value="60" max="100"></progress>
 </form>
 
@@ -143,6 +154,12 @@
 
 <blockquote>A quote, set apart from the text.</blockquote>
 
+<p class="icons">
+  <aufbau-icon icon="lucide:heart"></aufbau-icon>
+  <aufbau-icon icon="lucide:star"></aufbau-icon>
+  <aufbau-icon icon="lucide:bell"></aufbau-icon>
+</p>
+
 <details>
   <summary>Details</summary>
   <p>Hidden until opened.</p>
@@ -155,22 +172,24 @@
   </script>
 
   <script type="text/plain" id="default-css">
-:root {
+/* the preview is a shadow root: :host takes the tokens (what :root
+   would), .page the markup (what body would) */
+:host {
   --bg     : #fdfdfd;
   --fg     : #1d1d22;
   --accent : #5b5bd6;
   --line   : #e2e2e8;
 }
 
-* { box-sizing: border-box; }
-
-body {
-  margin     : 0;
+.page {
+  min-height : 100%;
   padding    : 1rem;
   background : var(--bg);
   color      : var(--fg);
   font       : 16px/1.5 system-ui, sans-serif;
 }
+
+* { box-sizing: border-box; }
 
 a { color: var(--accent); }
 
@@ -199,8 +218,10 @@ th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start
   </script>
 
   <script type="module">
-    import aufbau from '@aufbau/api';
-    import { autoloader } from '@aufbau/elements';
+    import aufbau                from '@aufbau/api';
+    import { autoloader }        from '@aufbau/elements';
+    import { createPreactHtml, render } from '@htx/preact';
+
     autoloader();
 
     await aufbau.boot();
@@ -216,26 +237,43 @@ th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start
     const defaults = { css: $('default-css').textContent.trim(), html: $('default-html').textContent.trim() };
     const current  = { css: load(KEYS.css) ?? defaults.css, html: load(KEYS.html) ?? defaults.html };
 
-    // :::::: FRAME
-    // the css under test never touches the playground itself
+    // :::::: STAGE
+    // the markup is an htx template rendered by preact into a shadow root: the css
+    // under test stays inside, the custom elements work there, and an edit only
+    // patches what changed
 
-    const frame = $('frame');
+    const stage = $('stage').attachShadow({ mode: 'open' });
+    stage.innerHTML = '<style id="user"></style><div class="page"></div>';
+    autoloader({ root: stage });
 
-    function renderFrame () {
-      frame.srcdoc = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style id="user"></style></head><body>${current.html}</body></html>`;
+    // htm, under htx, knows no void elements: <input> without a slash would take
+    // everything after it as its children
+    const VOID = /<(area|br|col|embed|hr|img|input|link|meta|source|track|wbr)\b([^>]*?)\s*\/?>/gi;
+    const closeVoid = markup => markup.replace(VOID, '<$1$2 />');
+
+    function renderStage () {
+      try {
+        // a template is cached per strings array, a fresh tag per render lets the
+        // cache go with it instead of growing per keystroke
+        const html = createPreactHtml();
+        render(html([closeVoid(current.html)]), stage.querySelector('.page'));
+        $('error').textContent = '';
+      }
+      catch (error) {
+        $('error').textContent = error.message;
+      }
     }
 
     function applyCss () {
-      const style = frame.contentDocument?.getElementById('user');
-      if (style) style.textContent = current.css;
+      stage.getElementById('user').textContent = current.css;
     }
 
-    frame.addEventListener('load', applyCss);
-    renderFrame();
+    applyCss();
+    renderStage();
 
     // :::::: EDITORS
-    // `input` on every keystroke, paste and clear included. the markup waits a moment
-    // so the frame does not reload per key
+    // `input` on every keystroke, paste and clear included. the markup waits a moment,
+    // a half typed tag would not parse
 
     const css  = $('css-code');
     const html = $('html-code');
@@ -255,7 +293,7 @@ th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start
       current.html = textOf(event, html);
       save(KEYS.html, current.html);
       clearTimeout(timer);
-      timer = setTimeout(renderFrame, 400);
+      timer = setTimeout(renderStage, 300);
     });
 
     $('reset-css').addEventListener('click', () => {
@@ -269,7 +307,7 @@ th, td { padding: .4rem; border-bottom: 1px solid var(--line); text-align: start
       current.html = defaults.html;
       drop(KEYS.html);
       html.setAttribute('code', current.html);
-      renderFrame();
+      renderStage();
     });
 
     // :::::: TABS
