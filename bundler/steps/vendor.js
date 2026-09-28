@@ -93,7 +93,8 @@ async function jsFiles (directory) {
 
 // :::::: STEP
 
-async function vendor ({ config, log, out, report }) {
+async function vendor (context) {
+  const { config, log, out, report } = context;
   if (!config.vendor) return;
   const {
     exclude   = [],
@@ -132,7 +133,7 @@ async function vendor ({ config, log, out, report }) {
   const modules = new Map;   // url -> parsed
   for (const [key, url] of entries) { const parsed = parse(url, key.endsWith('/')); if (parsed) modules.set(url, parsed); }
   for (const url of written) if (!modules.has(url)) { const parsed = parse(url); if (parsed) modules.set(url, parsed); }
-  if (!modules.size) return;
+  if (!modules.size) { context.importmap = importmap; return; }
 
   // :::::: INSTALL
 
@@ -208,6 +209,13 @@ async function vendor ({ config, log, out, report }) {
       await writeFile(file, (await readFile(file, 'utf8')).replace(/<head>/, `<head>\n  ${inject(imports)}`));
     }
   }
+
+  // the map the pages end up with, for the steps after this one (prune): the
+  // project's own with the package origin moved to its copies, the local
+  // entries over it
+  const { origin, path: packagesPath = '/_pkg' } = config.packages ?? {};
+  const moved = url => origin ? url.replace(origin.replace(/\/+$/, ''), packagesPath) : url;
+  context.importmap = { imports: { ...Object.fromEntries(Object.entries(importmap.imports ?? {}).map(([key, url]) => [key, moved(url)])), ...imports } };
 
   // :::::: REPORT
 

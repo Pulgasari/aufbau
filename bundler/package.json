@@ -13,6 +13,7 @@
     "./steps": "./steps/index.js"
   },
   "dependencies": {
+    "es-module-lexer": "^1.7.0",
     "esbuild": "^0.25.0"
   },
   "license": "MIT"

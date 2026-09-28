@@ -43,7 +43,7 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
 | `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `AufbauIcon.provide()` |
 | `webfonts` | built | only the fonts a config names or the code quotes, the catalog lists only those |
-| `prune`    | next  | files nothing loads are dropped |
+| `prune`    | built | files nothing reaches are dropped |
 | `report`   | built | what still goes over the network, and the size |
 
 ## vendor
@@ -78,14 +78,24 @@ without one) are resolved at build time.
 - webfonts: the fonts in `keep`, plus every font whose name the staged css and js
   quote (a font stack, a default). a font picked at runtime can not be scanned,
   the catalog is cut down to the kept ones so a picker only offers those.
-- prune: the static module graph from the entries. imports by name at runtime
-  (`zugriff.component(name)`, `app.view(name)`) are kept by convention: every file
-  in a directory such a loader reads from (`components/*`) stays. **open**: a
-  manifest instead of the convention, so a loader could be pruned too.
+- prune: what the pages reach, followed file by file: static and literal dynamic
+  imports (es-module-lexer), bare specifiers through the importmap, css
+  `@import`/`url()`, and every quoted string that is an importmap key or names a
+  file of the output (paths built from a constant and a literal, like a font
+  catalog's `files/…`, are caught that way). importmap targets only count through
+  their keys, so a map written into a page does not keep all it lists.
+  imports by a name built at runtime (`zugriff.component(name)`, `app.view(name)`,
+  a css directory read by look and skin names) are kept by convention: `keep`
+  lists directories that stay whole, `entries` files loaded by a computed path.
+  **open**: a manifest instead of the convention, so a loader could be pruned
+  too. **open**: packages declaring their runtime-loaded paths themselves (aufbau's
+  css directory), so a project config does not have to know them.
 
 ## size
 
 the packages step copies whole repos, aufbau alone is 25 mb, 23 of them fonts.
 vendor adds what the staged files name, not what an app loads: in zugriff every
 app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` took 22 mb
-off (zugriff podcasts: 63.6 -> 41.6 mb), `prune` is what takes the rest.
+off, `prune` another 32 (zugriff podcasts: 63.6 -> 41.6 -> 9.5 mb). what stays is
+mostly what the `keep` convention holds on to (the components directory pulls
+highlight.js, pdfjs, epubjs for every app).

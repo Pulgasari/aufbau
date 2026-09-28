@@ -5,11 +5,12 @@
 import copy     from './copy.js';
 import icons    from './icons.js';
 import packages from './packages.js';
+import prune    from './prune.js';
 import report   from './report.js';
 import start    from './start.js';
 import vendor   from './vendor.js';
 import webfonts from './webfonts.js';
 
-const STEPS = [copy, packages, vendor, icons, webfonts, start, report];
+const STEPS = [copy, packages, vendor, icons, webfonts, start, prune, report];
 
-export { copy, icons, packages, report, start, STEPS, vendor, webfonts };
+export { copy, icons, packages, prune, report, start, STEPS, vendor, webfonts };
