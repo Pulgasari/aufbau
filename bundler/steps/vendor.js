@@ -31,16 +31,13 @@
 //
 // esbuild comes from the bundler's own dependencies, loaded only by this step.
 
-import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { cp, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, relative } from 'node:path';
-import { walk } from './../shared.js';
+import { install, walk } from './../shared.js';
 
-const HOSTS      = ['cdn.jsdelivr.net', 'esm.sh', 'unpkg.com'];
-const REGISTRIES = { '@jsr': 'https://npm.jsr.io' };
-const SCANNED    = new Set(['.css', '.html', '.js', '.mjs']);
+const HOSTS   = ['cdn.jsdelivr.net', 'esm.sh', 'unpkg.com'];
+const SCANNED = new Set(['.css', '.html', '.js', '.mjs']);
 
 // :::::: PARSE
 
@@ -79,34 +76,9 @@ function parse (url, isDirectory = false) {
 
 // :::::: INSTALL
 
+// the first version of a name installs under its own name (packages import
+// themselves by it), others under an alias
 const installNameOf = (name, version, first) => first ? name : `v-${name.replace(/[@/]/g, '-').replace(/^-+/, '')}-${version.replace(/[^\w.]+/g, '_')}`;
-
-// one npm install for all packages, the first version of a name under its own
-// name (packages import themselves by it), others under an alias. a failing
-// install is retried per package, to leave out only the ones that fail
-async function install (directory, packages, log) {
-  await mkdir(directory, { recursive: true });
-  await writeFile(join(directory, '.npmrc'), Object.entries(REGISTRIES).map(([scope, url]) => `${scope}:registry=${url}`).join('\n') + '\n');
-
-  const run = async dependencies => {
-    await rm(join(directory, 'node_modules'), { force: true, recursive: true });
-    await rm(join(directory, 'package-lock.json'), { force: true });
-    await writeFile(join(directory, 'package.json'), JSON.stringify({ dependencies, name: 'aufbau-bundler-vendor', private: true }, null, 2));
-    execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--silent'], { cwd: directory, stdio: 'pipe' });
-  };
-
-  const dependencies = Object.fromEntries(packages.map(({ install, name, version }) => [install, install === name ? version : `npm:${name}@${version}`]));
-  try { await run(dependencies); return []; }
-  catch { log('vendor: the joint install failed, trying the packages one by one'); }
-
-  const failed = [], working = {};
-  for (const [install, spec] of Object.entries(dependencies)) {
-    try   { await run({ ...working, [install]: spec }); working[install] = spec; }
-    catch { failed.push(`${install}@${spec}`); }
-  }
-  await run(working);
-  return failed;
-}
 
 // :::::: BUILD
 
@@ -174,9 +146,8 @@ async function vendor ({ config, log, out, report }) {
     packages.push({ install, name, version });
   }
 
-  const directory = join(tmpdir(), 'aufbau-bundler-vendor');
-  const failedInstalls = await install(directory, packages, log);
-  const modulesDirectory = join(directory, 'node_modules');
+  const dependencies = Object.fromEntries(packages.map(({ install: key, name, version }) => [key, key === name ? version : `npm:${name}@${version}`]));
+  const { directory, failed: failedInstalls, modules: modulesDirectory } = await install('vendor', dependencies, log);
 
   // :::::: BUILD
 

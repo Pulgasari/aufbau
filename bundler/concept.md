@@ -41,9 +41,9 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | `packages` | built | repos from a package origin become local copies, the origin is rewritten to them |
 | `start`    | built | index.html moves / to the start path before the shell reads its route |
 | `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
-| `icons`    | next  | the icon names a project uses, their svgs in one local file `aufbau-icon` reads |
-| `webfonts` | later | only the fonts a config names, the rest stays out |
-| `prune`    | later | files nothing loads are dropped |
+| `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `AufbauIcon.provide()` |
+| `webfonts` | built | only the fonts a config names or the code quotes, the catalog lists only those |
+| `prune`    | next  | files nothing loads are dropped |
 | `report`   | built | what still goes over the network, and the size |
 
 ## vendor
@@ -70,11 +70,14 @@ without one) are resolved at build time.
 
 `icons`, `webfonts` and `prune` need to know what a project uses:
 
-- icons: `icon="set:name"` and `name=` in markup and components, the aliases of
-  a project's icon data, names in data files (e.g. a registry). names built at
-  runtime can not be found, they need a list in the config or the network.
-- webfonts: a font chosen at runtime (a settings picker) can not be scanned
-  either. the config names the fonts that ship, the settings offer only those.
+- icons: every quoted `set:name` in the staged code and data whose set is an
+  iconify collection (`@iconify/collections`), which covers `icon="…"`, alias
+  lists (@aufbau/icons, a project's own) and data files like a registry. the
+  svgs come from `@iconify-json/<set>` on npm through `@iconify/utils`. ids built
+  at runtime go into `include`, or come from the api as before.
+- webfonts: the fonts in `keep`, plus every font whose name the staged css and js
+  quote (a font stack, a default). a font picked at runtime can not be scanned,
+  the catalog is cut down to the kept ones so a picker only offers those.
 - prune: the static module graph from the entries. imports by name at runtime
   (`zugriff.component(name)`, `app.view(name)`) are kept by convention: every file
   in a directory such a loader reads from (`components/*`) stays. **open**: a
@@ -84,5 +87,5 @@ without one) are resolved at build time.
 
 the packages step copies whole repos, aufbau alone is 25 mb, 23 of them fonts.
 vendor adds what the staged files name, not what an app loads: in zugriff every
-app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` and `prune`
-are what brings that down.
+app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` took 22 mb
+off (zugriff podcasts: 63.6 -> 41.6 mb), `prune` is what takes the rest.
