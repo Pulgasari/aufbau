@@ -84,18 +84,25 @@ without one) are resolved at build time.
   file of the output (paths built from a constant and a literal, like a font
   catalog's `files/…`, are caught that way). importmap targets only count through
   their keys, so a map written into a page does not keep all it lists.
-  imports by a name built at runtime (`zugriff.component(name)`, `app.view(name)`,
-  a css directory read by look and skin names) are kept by convention: `keep`
-  lists directories that stay whole, `entries` files loaded by a computed path.
-  **open**: a manifest instead of the convention, so a loader could be pruned
-  too. **open**: packages declaring their runtime-loaded paths themselves (aufbau's
-  css directory), so a project config does not have to know them.
+  a loader that imports by name is declared with the path its names stand for
+  (`loaders: { 'zugriff.component': '/.shared/js/components/{name}.js' }`): the
+  string arguments of its calls in reachable files keep exactly those files.
+  what is loaded by a name that is never written out goes into `keep`
+  (directories kept whole) or `entries`.
+  a package declares the paths it loads by computed names in its own
+  package.json, relative to itself (`@aufbau/api`: `"aufbau": { "bundle": { "keep":
+  ["../css/"] } }`, once there is an @aufbau/css that becomes a dependency). the
+  packages step collects them, prune keeps them as soon as a file of the declaring
+  package is reached, so a project config does not have to know them.
+  `exclude` cuts a part off on purpose, e.g. `@aufbau/devtools/boot.js` for a
+  release build; a dev build leaves it in.
+  `BUNDLER_WHY=<output path>` logs the chain a file was reached through.
 
 ## size
 
 the packages step copies whole repos, aufbau alone is 25 mb, 23 of them fonts.
 vendor adds what the staged files name, not what an app loads: in zugriff every
 app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` took 22 mb
-off, `prune` another 32 (zugriff podcasts: 63.6 -> 41.6 -> 9.5 mb). what stays is
-mostly what the `keep` convention holds on to (the components directory pulls
-highlight.js, pdfjs, epubjs for every app).
+off, `prune` the rest (zugriff podcasts: 63.6 -> 41.6 -> 2.9 mb without
+devtools, 7.6 mb with), once the loaders replaced keeping the whole components
+directory.

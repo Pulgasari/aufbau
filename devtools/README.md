@@ -24,4 +24,17 @@ if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devto
 
 it uses `@aufbau/elements`, `@domina/methods` and `@htx/js` from the import map.
 
+## recorder
+
+the console panel mounts late, after boot and the app have already logged.
+`recorder.js` is a classic script for `<head>` that records console calls, failed
+loads, unhandled rejections and csp violations from the start into a ring buffer
+(`globalThis.__DEVTOOLS_RECORDER__`, 500 entries), which the panel drains when it
+opens. load it unconditionally, before anything else, not behind `?dev`: turning
+devtools on with a reload would lose the error you wanted to see.
+
+```html
+<script src="https://code.pulgasari.dev/aufbau/devtools/recorder.js"></script>
+```
+
 formerly `@pulgasari/devtools` in js-packages.

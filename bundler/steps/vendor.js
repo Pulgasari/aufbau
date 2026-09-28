@@ -25,16 +25,17 @@
 //              -> one esbuild bundle
 //   directory  an importmap prefix entry (key and url end in /)
 //              -> every js file of that package directory
-//   file       unpkg and jsdelivr urls of a concrete file or directory (css,
-//              wasm loaders) -> copied as is, a js file with its whole directory
-//              (wasm siblings)
+//   file       unpkg urls, and jsdelivr urls without +esm, which serve the files
+//              as they are (css, wasm loaders, a umd build for a classic
+//              <script>) -> copied as is, a js file with its whole directory (wasm
+//              siblings). no subpath is the package's main file, as jsdelivr picks it
 //
 // esbuild comes from the bundler's own dependencies, loaded only by this step.
 
-import { existsSync } from 'node:fs';
-import { cp, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, join, relative } from 'node:path';
-import { install, walk } from './../shared.js';
+import {
+  copyPath, directoryOf, extensionOf, install, isDirectory, joinPath, listFiles, megabytes,
+  outputPath, pathExists, readJson, readText, sizeOf, writeText,
+} from './../shared.js';
 
 const HOSTS   = ['cdn.jsdelivr.net', 'esm.sh', 'unpkg.com'];
 const SCANNED = new Set(['.css', '.html', '.js', '.mjs']);
@@ -68,7 +69,7 @@ function parse (url, isDirectory = false) {
   const esm     = found.subpath === '+esm' || found.subpath.endsWith('/+esm');
   const subpath = found.subpath.replace(/\/?\+esm$/, '').replace(/\/+$/, '');
   const kind    = isDirectory ? 'directory'
-                : address.host === 'unpkg.com' || (address.host === 'cdn.jsdelivr.net' && !esm && extname(subpath)) ? 'file'
+                : address.host === 'unpkg.com' || (address.host === 'cdn.jsdelivr.net' && !esm) ? 'file'
                 : 'module';
 
   return { ...found, kind, subpath, url };
@@ -84,11 +85,11 @@ const installNameOf = (name, version, first) => first ? name : `v-${name.replace
 
 // the folder of a package in the output, a url without a version reads as latest
 const folderOf  = ({ name, version }) => `${name}@${version === '*' ? 'latest' : version}`;
-const moduleOut = module => join(folderOf(module), module.subpath ? module.subpath.replace(/\.(m?js)$/, '') : 'index') + '.js';
+const moduleOut = module => joinPath(folderOf(module), module.subpath ? module.subpath.replace(/\.(m?js)$/, '') : 'index') + '.js';
 
 async function jsFiles (directory) {
-  if (!existsSync(directory)) return [];
-  return (await walk(directory)).filter(file => /\.m?js$/.test(file));
+  if (!pathExists(directory)) return [];
+  return (await listFiles(directory)).filter(file => /\.m?js$/.test(file));
 }
 
 // :::::: STEP
@@ -107,11 +108,11 @@ async function vendor (context) {
 
   const onHost   = url => { try { return hosts.includes(new URL(url).host); } catch { return false; } };
   const excluded = url => exclude.some(pattern => pattern.test(url));
-  const texts    = (await walk(out)).filter(file => SCANNED.has(extname(file)));
+  const texts    = (await listFiles(out)).filter(file => SCANNED.has(extensionOf(file)));
 
   // the staged code, to tell used importmap keys and find written urls
   const sources = new Map;
-  for (const file of texts) sources.set(file, await readFile(file, 'utf8'));
+  for (const file of texts) sources.set(file, await readText(file));
   const code = [...sources.values()].join('\n');
 
   // :::::: COLLECT
@@ -154,35 +155,37 @@ async function vendor (context) {
 
   const { build } = await import('esbuild');
   const external  = Object.keys(importmap.imports ?? {}).map(key => key.endsWith('/') ? `${key}*` : key);
-  const target    = join(out, path);
+  const target    = joinPath(out, path);
   const local     = new Map;   // url -> local path
   const failed    = [...failedInstalls];
 
   for (const [url, module] of modules) {
     const installName = installNames.get(`${module.name}@${module.version}`);
-    const source      = join(modulesDirectory, installName);
-    if (!existsSync(source)) { failed.push(url); continue; }
+    const source      = joinPath(modulesDirectory, installName);
+    if (!pathExists(source)) { failed.push(url); continue; }
 
     try {
       if (module.kind === 'file') {
-        const file = join(source, module.subpath);
-        const into = join(target, folderOf(module), module.subpath);
-        if ((await stat(file)).isDirectory()) await cp(file, into, { recursive: true });
-        else if (extname(file) === '.js')     await cp(dirname(file), dirname(into), { recursive: true });
-        else                                  await cp(file, into);
-        local.set(url, `${path}/${folderOf(module)}/${module.subpath}`);
+        const manifest = await readJson(joinPath(source, 'package.json'));
+        const subpath  = module.subpath || [manifest.jsdelivr, typeof manifest.browser === 'string' && manifest.browser, manifest.main, 'index.js'].find(Boolean).replace(/^\.\//, '');
+        const file     = joinPath(source, subpath);
+        const into     = joinPath(target, folderOf(module), subpath);
+        if (isDirectory(file))                 await copyPath(file, into);
+        else if (extensionOf(file) === '.js')  await copyPath(directoryOf(file), directoryOf(into));
+        else                                   await copyPath(file, into);
+        local.set(url, `${path}/${folderOf(module)}/${subpath}`);
       }
       else if (module.kind === 'directory') {
-        const files = await jsFiles(join(source, module.subpath));
+        const files = await jsFiles(joinPath(source, module.subpath));
         if (!files.length) throw new Error('no js files');
-        const outdir = join(target, folderOf(module), module.subpath);
+        const outdir = joinPath(target, folderOf(module), module.subpath);
         await build({ bundle: true, entryPoints: files, external, format: 'esm', logLevel: 'silent', minify: true, outdir, platform: 'browser' });
         local.set(url, `${path}/${folderOf(module)}/${module.subpath}/`);
       }
       else {
-        const outfile = join(target, moduleOut(module));
+        const outfile = joinPath(target, moduleOut(module));
         await build({ absWorkingDir: directory, bundle: true, entryPoints: [module.subpath ? `${installName}/${module.subpath}` : installName], external, format: 'esm', logLevel: 'silent', minify: true, outfile, platform: 'browser' });
-        local.set(url, `${path}/${relative(target, outfile).split('\\').join('/')}`);
+        local.set(url, outputPath(out, outfile));
       }
     }
     catch (error) {
@@ -197,16 +200,19 @@ async function vendor (context) {
   for (const [file, text] of sources) {
     let next = text;
     for (const [url, path] of byLength) next = next.replaceAll(url, path);
-    if (next !== text) await writeFile(file, next);
+    if (next !== text) await writeText(file, next);
   }
 
   // the importmap entries as local overrides, ahead of everything in the pages
   const imports = Object.fromEntries(entries.filter(([, url]) => local.has(url)).map(([key, url]) => [key, local.get(url)]));
+  // prune reads the pages without it: a map naming its keys is no use of them
   if (Object.keys(imports).length) {
+    const snippet = inject(imports);
+    context.injected = [...(context.injected ?? []), snippet];
     for (const page of pages) {
-      const file = join(out, page);
-      if (!existsSync(file)) continue;
-      await writeFile(file, (await readFile(file, 'utf8')).replace(/<head>/, `<head>\n  ${inject(imports)}`));
+      const file = joinPath(out, page);
+      if (!pathExists(file)) continue;
+      await writeText(file, (await readText(file)).replace(/<head>/, `<head>\n  ${snippet}`));
     }
   }
 
@@ -219,12 +225,9 @@ async function vendor (context) {
 
   // :::::: REPORT
 
-  let bytes = 0;
-  if (existsSync(target)) for (const file of await walk(target)) bytes += (await stat(file)).size;
-
   log(`vendor ${local.size} of ${modules.size} urls -> ${path}`);
   report('vendor', [
-    `local: ${local.size} of ${modules.size} urls, ${(bytes / 1024 / 1024).toFixed(1)} mb (${Object.keys(imports).length} importmap entries, ${byLength.length} written urls)`,
+    `local: ${local.size} of ${modules.size} urls, ${megabytes(await sizeOf(target))} mb (${Object.keys(imports).length} importmap entries, ${byLength.length} written urls)`,
     ...failed.map(entry => `**not vendored**: ${entry}`),
   ]);
 }

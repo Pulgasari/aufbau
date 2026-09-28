@@ -4,6 +4,7 @@
   "license": "MIT",
   "exports": {
     ".": "./index.js",
-    "./boot": "./boot.js"
+    "./boot": "./boot.js",
+    "./recorder.js": "./recorder.js"
   }
 }

@@ -18,5 +18,10 @@
     "@aufbau/webfonts": "*",
     "@domina/methods": "*"
   },
+  "aufbau": {
+    "bundle": {
+      "keep": ["../css/"]
+    }
+  },
   "license": "MIT"
 }

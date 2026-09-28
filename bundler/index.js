@@ -6,13 +6,12 @@
 //   import { bundle } from '@aufbau/bundler';
 //   const { summary } = await bundle({ root: '.', out: 'build/www', copy: [...], packages: {...}, start: '/notes/' });
 
-import { mkdir, rm } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { makeDirectory, removePath, resolvePath } from './shared.js';
 import { STEPS } from './steps/index.js';
 
 async function bundle (config, { steps = STEPS } = {}) {
-  const root = resolve(config.root ?? '.');
-  const out  = resolve(root, config.out ?? 'dist');
+  const root = resolvePath(config.root ?? '.');
+  const out  = resolvePath(root, config.out ?? 'dist');
 
   const sections = new Map;
   const context  = {
@@ -23,8 +22,8 @@ async function bundle (config, { steps = STEPS } = {}) {
     root,
   };
 
-  await rm(out, { force: true, recursive: true });
-  await mkdir(out, { recursive: true });
+  await removePath(out);
+  await makeDirectory(out);
   for (const step of steps) await step(context);
 
   // markdown, e.g. for a ci step summary
