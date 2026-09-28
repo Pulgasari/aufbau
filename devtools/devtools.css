@@ -8,6 +8,11 @@
   --color-plain  : var(--fg);
   --color-result : var(--fg);
   --color-warn   : orange;
+
+  --c-string : #98c379;
+  --c-number : #d19a66;
+  --c-bool   : #56b6c2;
+  --c-null   : #e06c75;
 }
 
   dd, dl, ul { margin: 0; padding: 0; }
