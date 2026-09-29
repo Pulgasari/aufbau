@@ -1,31 +1,34 @@
 /* @aufbau/css/animate/animations.css
-   animations by attribute, or by custom property from any rule:
 
-     <div data-animate="shake" data-animate-count="3" data-animate-duration="fast">
-     .alert { --animate: shake; }            (the element needs data-animate)
+animations by attribute, or by custom property from any rule:
 
-   parameters, as data-animate-* attribute or --animate-* property:
+   <div data-animate="shake" data-animate-count="3" data-animate-duration="fast">
+   .alert { --animate: shake; }            (the element needs data-animate)
 
-     duration   auto | instant | fast | normal | slow | lazy | <time>
-     ease       auto | linear | ease | ease-in | ease-out | ease-in-out
-                | smooth | snappy | enter | exit | bounce | spring
-     count      infinite | <number>             (1 when not set)
-     delay      <time>
-     stagger    <time>, added per sibling: lists play one item after the other
-     direction  normal | reverse | alternate | alternate-reverse
-     state      running | paused
-     timeline   auto | view | scroll    (view: plays while scrolling into view)
-     from       left | right | top | bottom    (slide, drift)
-     distance   auto | <length-percentage>      (shake, jump, bounce, whip, slide, drift)
-     angle      <angle>                         (wobble)
-     scale      <number>                        (pulse)
-     opacity    <number>                        (blink)
-     turns      <number>                        (flip)
+parameters, as data-animate-* attribute or --animate-* property:
 
-   auto takes the default of the animation (see functions.css). an attribute
-   counts like a class, the animation rule itself sits in :where() so any rule
-   of the page overrides it. needs keyframes.css and functions.css, durations
-   follow the --motion token. */
+duration   auto | instant | fast | normal | slow | lazy | <time>
+ease       auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring
+count      infinite | <number>             (1 when not set)
+delay      <time>
+stagger    <time>, added per sibling: lists play one item after the other
+direction  normal | reverse | alternate | alternate-reverse
+state      running | paused
+timeline   auto | view | scroll            (view: plays while scrolling into view)
+from       left | right | top | bottom     (slide, drift)
+distance   auto | <length-percentage>      (shake, jump, bounce, whip, slide, drift)
+angle      <angle>                         (wobble)
+scale      <number>                        (pulse)
+opacity    <number>                        (blink)
+turns      <number>                        (flip)
+
+'auto' takes the default of the animation (see functions.css).
+an attribute counts like a class, the animation rule itself sits in :where() 
+so any rule of the page overrides it. 
+
+needs keyframes.css and functions.css,
+durations follow the --motion token. 
+*/
 
 /*//////////// PARAMETERS ////////////*/
 
@@ -46,6 +49,13 @@
 @property --animate-scale     { inherits: false; initial-value: 1.15;    syntax: "<number>"; }
 @property --animate-opacity   { inherits: false; initial-value: 0.2;     syntax: "<number>"; }
 @property --animate-turns     { inherits: false; initial-value: 1;       syntax: "<number>"; }
+
+/* resolved from the ones above, read by the keyframes */
+@property --animate-length    { inherits: false; initial-value: 0.75rem; syntax: "<length-percentage>"; }
+@property --animate-offset    { inherits: false; initial-value: 0 0;     syntax: "<length-percentage>+"; }
+
+/* animated by the progress keyframes, inherited so children can follow it */
+@property --animate-progress  { inherits: true;  initial-value: 0;       syntax: "<number>"; }
 
 /*//////////// ATTRIBUTES ////////////*/
 
