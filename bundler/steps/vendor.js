@@ -1,36 +1,40 @@
 // @aufbau/bundler/steps/vendor.js
-// third-party modules from cdns (esm.sh, jsdelivr, unpkg) become local files. the
-// cdns themselves are not needed: every url is read as an npm package, version and
-// subpath, the packages are installed from the npm registry (jsr through
-// npm.jsr.io), and esbuild builds one browser module per url. bare imports that
-// the importmap maps stay bare, so a shared package (preact) stays one instance.
-//
-//   vendor: {
-//     exclude   : [/eruda/],                        // urls left alone
-//     hosts     : ['esm.sh', 'cdn.jsdelivr.net', 'unpkg.com'],
-//     importmap : { imports: { … } },               // the map the project builds at runtime
-//     inject    : imports => html,                  // how the local entries reach the pages
-//     pages     : ['index.html'],
-//     path      : '/_vendor',
-//   }
-//
-// two sources of urls: the importmap entries on those hosts that the staged files
-// name (a key no file mentions is left out), and full urls written in the staged
-// files. the first are handed to the pages as an importmap of local entries,
-// injected before anything else (`inject`, default a <script type="importmap">),
-// the second are rewritten in place.
-//
-// kinds of urls:
-//   module     esm.sh/<pkg>@<version>/<subpath>, jsdelivr /npm/<pkg>@<version>/+esm
-//              -> one esbuild bundle
-//   directory  an importmap prefix entry (key and url end in /)
-//              -> every js file of that package directory
-//   file       unpkg urls, and jsdelivr urls without +esm, which serve the files
-//              as they are (css, wasm loaders, a umd build for a classic
-//              <script>) -> copied as is, a js file with its whole directory (wasm
-//              siblings). no subpath is the package's main file, as jsdelivr picks it
-//
-// esbuild comes from the bundler's own dependencies, loaded only by this step.
+
+/*
+third-party modules from cdns (esm.sh, jsdelivr, unpkg) become local files. the
+cdns themselves are not needed: every url is read as an npm package, version and
+subpath, the packages are installed from the npm registry (jsr through
+npm.jsr.io), and esbuild builds one browser module per url. bare imports that
+the importmap maps stay bare, so a shared package (preact) stays one instance.
+
+vendor: {
+  exclude   : [/eruda/],                        // urls left alone
+  hosts     : ['esm.sh', 'cdn.jsdelivr.net', 'unpkg.com'],
+  importmap : { imports: { … } },               // the map the project builds at runtime
+  inject    : imports => html,                  // how the local entries reach the pages
+  pages     : ['index.html'],
+  path      : '/_vendor',
+}
+
+two sources of urls: the importmap entries on those hosts that the staged files
+name (a key no file mentions is left out), and full urls written in the staged
+files. the first are handed to the pages as an importmap of local entries,
+injected before anything else (`inject`, default a <script type="importmap">),
+the second are rewritten in place.
+
+kinds of urls:
+
+module     esm.sh/<pkg>@<version>/<subpath>, jsdelivr /npm/<pkg>@<version>/+esm
+           -> one esbuild bundle
+directory  an importmap prefix entry (key and url end in /)
+           -> every js file of that package directory
+file       unpkg urls, and jsdelivr urls without +esm, which serve the files
+           as they are (css, wasm loaders, a umd build for a classic
+           <script>) -> copied as is, a js file with its whole directory (wasm
+           siblings). no subpath is the package's main file, as jsdelivr picks it
+
+esbuild comes from the bundler's own dependencies, loaded only by this step.
+*/
 
 import {
   copyPath, directoryOf, extensionOf, install, isDirectory, joinPath, listFiles, megabytes,
