@@ -1,12 +1,15 @@
 /* @aufbau/css/animate/functions.css
-   the shared logic of animate/: speeds and curves by name, the defaults per
-   animation, stagger and slide offsets. animations.css reads these, a page can
-   call them directly:
 
-     animation: --animation(shake, fast, snappy, 3);
+the shared logic of animate/: 
 
-   every duration is multiplied by the --motion token, which a page sets to 0
-   for reduced motion. */
+speeds and curves by name, the defaults per animation, stagger and offsets.
+animations.css reads these, a page can call them directly:
+
+animation: --animation(shake, fast, snappy, 3);
+
+every duration is multiplied by the --motion token,
+which a page sets to 0 for reduced motion. 
+*/
 
 /*//////////// DURATION ////////////*/
 
@@ -16,10 +19,10 @@
   --name  <custom-ident>                                              : none
 ) returns <time> {
   --time: if(
-    style(--speed: instant) : 60ms;
-    style(--speed: fast)    : 150ms;
-    style(--speed: normal)  : 300ms;
-    style(--speed: slow)    : 600ms;
+    style(--speed: instant) :  60ms;
+    style(--speed: fast)    :  150ms;
+    style(--speed: normal)  :  300ms;
+    style(--speed: slow)    :  600ms;
     style(--speed: lazy)    : 1200ms;
     style(--speed: auto)    : if(
       style(--name: vibrate)     : 100ms;
@@ -37,6 +40,7 @@
       style(--name: wobble)      : 800ms;
       style(--name: hue)         : 8s;
       style(--name: shimmer)     : 1500ms;
+      style(--name: drift)       : 2s;
       else                       : 1s);
     else                    : var(--speed);
   );
@@ -64,8 +68,9 @@
     style(--kind: bounce)      : linear(0, 0.36 18%, 0.98 36%, 0.84 45%, 1 58%, 0.95 66%, 1 80%, 0.99 88%, 1);
     style(--kind: spring)      : linear(0, 0.21 6%, 0.66 14%, 1.03 24%, 1.12 30%, 1.07 38%, 0.99 48%, 0.98 58%, 1 72%, 1);
     else: if(
-      style(--name: spin)     : linear;
+      style(--name: drift)    : linear;
       style(--name: hue)      : linear;
+      style(--name: spin)     : linear;
       style(--name: shimmer)  : linear;
       style(--name: progress) : linear;
       style(--name: pulse)    : ease-in-out;
@@ -78,48 +83,41 @@
   );
 }
 
-/*//////////// COUNT ////////////*/
-
-/* auto: the ongoing ones loop, the gestures play once */
-@function --animate-count(
-  --count type(auto | infinite | <number>) : auto,
-  --name  <custom-ident>                   : none
-) {
-  result: if(
-    style(--count: auto): if(
-      style(--name: blink)    : infinite;
-      style(--name: hue)      : infinite;
-      style(--name: progress) : infinite;
-      style(--name: pulse)    : infinite;
-      style(--name: shimmer)  : infinite;
-      style(--name: spin)     : infinite;
-      style(--name: vibrate)  : infinite;
-      else                    : 1);
-    else: var(--count);
-  );
-}
-
 /*//////////// SHORTHAND ////////////*/
 
-/* one animation entry: animation: --animation(pulse), --animation(spin, slow) */
+/*
+one animation entry: 
+animation: --animation(pulse, auto, auto, infinite), --animation(spin, slow)
+*/
 @function --animation(
   --name  <custom-ident>                                                                                                 : none,
   --speed type(auto | instant | fast | normal | slow | lazy | <time>)                                                    : auto,
   --kind  type(auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring) : auto,
-  --count type(auto | infinite | <number>)                                                                               : auto
+  --count type(infinite | <number>)                                                                                      : 1
 ) {
-  result: var(--name) --animate-time(var(--speed), var(--name)) --animate-easing(var(--kind), var(--name)) --animate-count(var(--count), var(--name)) both;
+  result: var(--name) --animate-time(var(--speed), var(--name)) --animate-easing(var(--kind), var(--name)) var(--count) both;
+}
+
+@function --animate-once(
+  --name  <custom-ident>                                                                                                   : none,
+  --speed type(auto | instant | fast | normal | slow | lazy | <time>)                                                      : auto,
+  --kind  type(auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring) : auto,                                                                                      : 1
+) {
+  result: --animation(var(--name), var(--speed), var(--kind), 1);
 }
 
 /*//////////// STAGGER AND OFFSET ////////////*/
 
-/* a delay that grows with the position among the siblings: a list that plays one
-   item after the other. animation-delay: --stagger(40ms) */
+/* 
+a delay that grows with the position among the siblings: 
+a list that plays one item after the other. 
+animation-delay: --stagger(40ms) 
+*/
 @function --stagger(--step <time> : 40ms) returns <time> {
   result: calc((sibling-index() - 1) * var(--step) * var(--motion, 1));
 }
 
-/* where slide starts, as a translate value */
+/* where slide and drift start, as a translate or background-position value */
 @function --slide-offset(
   --from     type(left | right | top | bottom) : left,
   --distance <length-percentage>               : 100%
