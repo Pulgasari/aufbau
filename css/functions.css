@@ -1,6 +1,5 @@
 /* @aufbau/css/functions.css */
-
-@import url("./functions.color.css");
+@import url("./functions/color.css");
 
 /*
 https://caniuse.com/wf-function
@@ -52,7 +51,7 @@ fn fg-lighter (n <number> : 0.1) <color> { result: darker(fg, n) }
 @function --muted(
    --amount <percentage> : 40%
 ) returns <color> {
-  result: color-mix(in oklch, var(--fg, black), var(--bg, white) var(--amount));
+  result: color-mix(in oklch, var(--fg), var(--bg) var(--amount));
 }
 
 /* surfaces stacked on the background: every level mixes a bit more --fg in.
