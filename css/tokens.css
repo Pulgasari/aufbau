@@ -56,13 +56,13 @@ Verstärker für --surface-step und --border-alpha
   --color-error   : red;
   --color-success : green;
   --color-warn    : yellow;
-  
+  /*
   --spacing-tiny   : 0.25rem;
   --spacing-small  : 0.50rem;
   --spacing-normal : 1.00rem;
   --spacing-large  : 2.00rem;
   --spacing-huge   : 4.00rem;
-
+  */
   --palette  : zombie;
   --scheme   : auto;
   --geometry : soft;
@@ -80,6 +80,45 @@ Verstärker für --surface-step und --border-alpha
   accent-color     : var(--ink);
 }
 
+* {
+  --gap: 0;
+  --mgn: 0;
+  --pad: 0;
+  
+  gap     : if( style(--gap) : --space(var(--gap)); else: 0; );
+  margin  : if( style(--mgn) : --space(var(--mgn)); else: 0; );
+  padding : if( style(--pad) : --space(var(--pad)); else: 0; );
+}
+
+/*
+* {
+  gap: if(
+    style(--gap: tiny)   : --space(tiny);
+    style(--gap: small)  : --space(small);
+    style(--gap: normal) : --space(normal);
+    style(--gap: large)  : --space(large);
+    style(--gap: huge)   : --space(huge);
+    else                 : --space();
+  );
+ margin: if(
+    style(--margin: tiny)   : --space(tiny);
+    style(--margin: small)  : --space(small);
+    style(--margin: normal) : --space(normal);
+    style(--margin: large)  : --space(large);
+    style(--margin: huge)   : --space(huge);
+    else                    : --space();
+  );
+  padding: if(
+    style(--padding: tiny)   : --space(tiny);
+    style(--padding: small)  : --space(small);
+    style(--padding: normal) : --space(normal);
+    style(--padding: large)  : --space(large);
+    style(--padding: huge)   : --space(huge);
+    else                     : --space();
+  );
+}
+*/
+/*
 * {
   gap: if(
     style(--gap: tiny)   : var(--spacing-tiny);
@@ -104,6 +143,7 @@ Verstärker für --surface-step und --border-alpha
     style(--padding: huge)   : var(--spacing-huge);
   );
 }
+*/
 
 /* --skin */
 
