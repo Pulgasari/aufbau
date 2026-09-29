@@ -98,9 +98,9 @@ const remove = (target, keys = Object.keys(KINDS)) => Promise.all(keys.map(key =
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const config = {
-  // reset and themes are stylesheets that are either there or not, the rest goes
-  // through gestalt. themes: false when the page links css/palettes.css and
-  // css/themes.css itself. a palette set here wins over the one of the theme
+  // reset is css/aufbau.css, which brings tokens, palettes and themes along.
+  // false when the page links it itself. the rest goes through gestalt, a
+  // palette set here wins over the one of the theme
   css : {
     layout  : false,
     look    : 'flat',
@@ -109,7 +109,6 @@ const config = {
     reset   : true,
     skin    : 'monochrome',
     theme   : 'zombie',
-    themes  : true,
   },
 
   // mode: 'auto' | 'all' | false. every other key is element config, e.g. { code: { theme: 'nord' } }
@@ -120,6 +119,17 @@ const config = {
   font : ['manrope'],
 };
 
+// a real <link>: aufbau.css imports its parts into layers, and an adopted
+// (constructed) sheet cannot carry @import. first in <head>, the page's own
+// sheets come after it. resolves once it is loaded, at once when it is there
+function linkStylesheet (href) {
+  if (document.querySelector(`link[rel="stylesheet"][href="${href}"]`)) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const link = Object.assign(document.createElement('link'), { href, onerror: reject, onload: resolve, rel: 'stylesheet' });
+    document.head.prepend(link);
+  });
+}
+
 let booted = false;
 
 const setConfig = (options = {}) => deepMerge(config, options);
@@ -129,19 +139,15 @@ async function boot (options = {}) {
   if (booted || typeof window === 'undefined') return booted;
   booted = true;
 
-  const { css: { layout, look, mode: paletteMode, palette, reset, skin, theme, themes }, elements: { mode, ...defaults }, font } = config;
+  const { css: { layout, look, mode: scheme, palette, reset, skin, theme }, elements: { mode, ...defaults }, font } = config;
 
-  // the reset first, the themes next, the gestalt layers after them. a sheet is
-  // appended once it is fetched, so each waits for the one before it: otherwise
-  // the reset can land last and override body's colors
-  if (reset)  await dom.adoptStylesheet(`${CSS_PATH}/aufbau.css`);
-  if (themes) await dom.adoptStylesheet(`${CSS_PATH}/palettes.css`);
-  if (themes) await dom.adoptStylesheet(`${CSS_PATH}/themes.css`);
+  // aufbau.css first, the gestalt sheets after it
+  if (reset) await linkStylesheet(`${CSS_PATH}/aufbau.css`);
 
   if (Object.keys(defaults).length) await elements.setConfig(defaults, { layer: 'defaults' });
 
   await Promise.all([
-    gestalt.set({ layout, look, mode: paletteMode, skin, theme, ...(palette && { palette }) }),
+    gestalt.set({ layout, look, mode: scheme, skin, theme, ...(palette && { palette }) }),
     mode === 'auto' && elements.enableAutoload(),
     mode === 'all'  && elements.registerAll(),
     font && webfonts.init(font),

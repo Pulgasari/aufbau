@@ -1,168 +1,153 @@
-/*
-@import url('./reset.css');
-@import url('./design.css');
+/* @aufbau/css/aufbau.css
+   the one stylesheet a page links. the layers in their order, lowest first:
+   tokens (axes, palettes, shorthands), reset (this file), elements (the
+   structure of @aufbau/elements), skin (its decoration, elements/core/skin.js),
+   utilities. any unlayered rule of the page wins over all of them. skins and
+   looks still come on their own. */
+
+@layer aufbau.tokens, aufbau.reset, aufbau.elements, aufbau.skin, aufbau.utilities;
+
 @import url('./functions.css');
-@import url('./palettes.css');
-@import url('./themes.css');
-@import url('./tokens.css');
-@import url('./animate/animations.css');
 @import url('./animate/functions.css');
-@import url('./animate/keyframes.css');
-*/
+@import url('./tokens.css')              layer(aufbau.tokens);
+@import url('./palettes.css')            layer(aufbau.tokens);
+@import url('./themes.css')              layer(aufbau.tokens);
+@import url('./animate/keyframes.css')   layer(aufbau.utilities);
+@import url('./animate/animations.css')  layer(aufbau.utilities);
 
-/*////////////////////// SPECIAL ///////////////////////*/
+@layer aufbau.reset {
+  /*////////////////////// SPECIAL ///////////////////////*/
 
-:root {
-  interpolate-size     : allow-keywords;
-  transition-behaviour : allow-discrete; /* or * ??? */
+  :root {
+    interpolate-size     : allow-keywords;
+    transition-behavior  : allow-discrete; /* or * ??? */
+  }
+
+  /*/////////////////////// RESET ////////////////////////*/
+
+  /* margin and padding start at 0 through the shorthands (tokens.css) */
+  *, *::before, *::after { box-sizing: border-box; }
+  * { user-select: none; }
+
+  a, abbr, acronym, address, applet, article, aside, audio,
+  b, big, blockquote, body,
+  canvas, caption, center, cite, code,
+  dd, del, details, dfn, div, dl, dt,
+  em, embed,
+  fieldset, figure, figcaption, footer, form,
+  h1, h2, h3, h4, h5, h6, header, hgroup, html,
+  i, iframe, img, ins,
+  kbd,
+  label, legend,
+  mark, menu,
+  nav,
+  object, output,
+  p, pre,
+  q,
+  ruby,
+  s, samp, section, small, span, strike, strong, sub, summary, sup,
+  table, tbody, tfoot, thead, td, th, tr, tt,
+  time,
+  u,
+  var, video {
+  	border         : 0;
+  	border-color   : currentcolor; 
+  	border-style   : solid; 
+  	border-width   : 0;
+    	font-size      : 100%;
+  	vertical-align : baseline;
+  }
+
+  a { text-decoration: none; }
+
+  button {
+    align-items     : center;
+    cursor          : pointer; 
+    display         : inline-flex;
+    flex-direction  : row;
+    justify-content : center;
+
+    text-box: trim-both cap alphabetic;
+    /*
+    text-box-edge: text text;
+    text-box-trim: trim-both;
+    */
+  }
+
+  div    { min-height: 0; }
+  svg    { max-width : 100%; }
+  ol, ul { list-style: none; }
+
+  img {
+    /*display: inline-block;*/
+    max-width      : 100%;
+    object-fit     : cover;
+    vertical-align : bottom
+  }
+
+   input:focus { border: none; outline: none; }
+  select:focus { border: none; outline: none; }
+
+  table {
+  	border-collapse : collapse;
+  	border-spacing  : 0;
+  }
+
+  /*//////////////////////// TYPO ////////////////////////*/
+
+  :root {
+    --aufbau-font           : sans;
+    --aufbau-font-monospace : monospace;
+  }
+
+  body { 
+    font-family : var(--aufbau-font);
+    line-height : 1;
+
+    text-rendering: optimizeLegibility;
+     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight : 700;
+    line-height : 1.25;
+    text-wrap   : balance;
+  }
+
+  p {
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 3;
+
+    line-height   : 1.25;
+    overflow-wrap : break-word;
+    text-align    : justify; 
+    text-wrap     : pretty;
+  }
+
+  blockquote, q {
+    quotes: none;
+    &::before, &::after { content: ''; content: none; }
+  }
+
+  /*//////////////////// TRANSITIONS ///////////////////*/
+
+  @view-transition { navigation: auto; }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  /*//////////////////// TRAIT CLASSES ///////////////////*/
+
+  .hidden  { display: none; }
+  .numeric { font-variant-numeric: tabular-nums; }
+
+  .flow-y {
+    display         : flex;
+    flex-direction  : column;
+    align-items     : center;
+    justify-content : center;
+  }
 }
-
-/*/////////////////////// RESET ////////////////////////*/
-
-*, *::before, *::after {
-  box-sizing : border-box;
-  margin     : 0;
-  padding    : 0;
-}
-* { user-select: none; }
-
-a, abbr, acronym, address, applet, article, aside, audio,
-b, big, blockquote, body,
-canvas, caption, center, cite, code,
-dd, del, details, dfn, div, dl, dt,
-em, embed,
-fieldset, figure, figcaption, footer, form,
-h1, h2, h3, h4, h5, h6, header, hgroup, html,
-i, iframe, img, ins,
-kbd,
-label, legend,
-mark, menu,
-nav,
-object, output,
-p, pre,
-q,
-ruby,
-s, samp, section, small, span, strike, strong, sub, summary, sup,
-table, tbody, tfoot, thead, td, th, tr, tt,
-time,
-u,
-var, video {
-	border         : 0;
-	border-color   : currentcolor; 
-	border-style   : solid; 
-	border-width   : 0;
-  	font-size      : 100%;
-	vertical-align : baseline;
-}
-
-a { text-decoration: none; }
-
-button {
-  align-items     : center;
-  cursor          : pointer; 
-  display         : inline-flex;
-  flex-direction  : row;
-  justify-content : center;
-
-  text-box: trim-both cap alphabetic;
-  /*
-  text-box-edge: text text;
-  text-box-trim: trim-both;
-  */
-}
-
-div    { min-height: 0; }
-svg    { max-width : 100%; }
-ol, ul { list-style: none; }
-
-img {
-  /*display: inline-block;*/
-  max-width      : 100%;
-  object-fit     : cover;
-  vertical-align : bottom
-}
-
- input:focus { border: none; outline: none; }
-select:focus { border: none; outline: none; }ö
-
-table {
-	border-collapse : collapse;
-	border-spacing  : 0;
-}
-
-/*/////////////////////// COLORS ///////////////////////*/
-
-:root {
-  --aufbau-error   : red;
-  --aufbau-success : green;
-  --aufbau-warn    : yellow;
-}
-
-body {
-  background-color : var(--bg);
-  color            : var(--fg);
-}
-
-/*//////////////////////// TYPO ////////////////////////*/
-
-:root {
-  --aufbau-font           : sans;
-  --aufbau-font-monospace : monospace;
-}
-	 
-body { 
-  font-family : var(--aufbau-font);
-  line-height : 1;
-  
-  text-rendering: optimizeLegibility;
-   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight : 700;
-  line-height : 1.25;
-  text-wrap   : balance;
-}
-
-p {
-  hyphens: auto;
-  hyphenate-limit-chars: 6 3 3;
-  
-  line-height   : 1.25;
-  overflow-wrap : break-word;
-  text-align    : justify; 
-  text-wrap     : pretty;
-}
-
-blockquote, q {
-  quotes: none;
-  &::before, &::after { content: ''; content: none; }
-}
-
-/*//////////////////// TRANSITIONS ///////////////////*/
-
-@view-transition { navigation: auto; }
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) { animation: none; }
-}
-
-/*//////////////////// TRAIT CLASSES ///////////////////*/
-
-.hidden  { display: none; }
-.numeric { font-variant-numeric: tabular-nums; }
-
-.flow-y {
-  display         : flex;
-  flex-direction  : column;
-  align-items     : center;
-  justify-content : center;
-}
-  
-
-
- 
-
-

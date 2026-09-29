@@ -5,10 +5,10 @@
    them on body. so the tokens derived from them live on body as well. */
 
 body {
-  --line  : color-mix(in oklch, var(--fg) 14%, var(--bg));
-  --muted : color-mix(in oklch, var(--fg) 60%, var(--bg));
-  --panel : color-mix(in oklch, var(--fg) 6%,  var(--bg));
-  --zebra : color-mix(in oklch, var(--fg) 3%,  var(--bg));
+  --line  : color-mix(in oklch, var(--color-fg) 14%, var(--color-bg));
+  --muted : color-mix(in oklch, var(--color-fg) 60%, var(--color-bg));
+  --panel : color-mix(in oklch, var(--color-fg) 6%,  var(--color-bg));
+  --zebra : color-mix(in oklch, var(--color-fg) 3%,  var(--color-bg));
 
   display               : grid;
   grid-template-columns : 14rem minmax(0, 1fr);
@@ -17,7 +17,7 @@ body {
   line-height           : 1.5;
 }
 
-a { color: var(--accent); }
+a { color: var(--color-ink); }
 
 h1 { font-size: 1rem; }
 h2 { font-size: 1rem; font-weight: 600; }
@@ -48,7 +48,7 @@ aside {
   cursor        : pointer;
 
   &:hover                { background: var(--panel); }
-  &[aria-current="true"] { background: var(--accent); color: var(--bg); }
+  &[aria-current="true"] { background: var(--color-ink); color: var(--color-bg); }
   &:disabled             { opacity: .35; cursor: default; background: none; }
 }
 
@@ -113,7 +113,7 @@ section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; al
   font          : inherit;
   cursor        : pointer;
 
-  &[aria-selected="true"] { border-color: var(--accent); color: var(--fg); }
+  &[aria-selected="true"] { border-color: var(--color-ink); color: var(--color-fg); }
 }
 
 /* :::::: NARROW */

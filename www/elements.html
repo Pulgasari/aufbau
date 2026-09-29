@@ -43,7 +43,7 @@
       ol     { list-style: none; }
       a      { display: block; padding: .2rem .6rem; border-radius: .4rem; color: inherit; text-decoration: none; }
       a:hover                        { background: var(--panel); }
-      a[aria-current]                { background: var(--accent); color: var(--bg); }
+      a[aria-current]                { background: var(--color-ink); color: var(--color-bg); }
     }
 
     /* :::::: ELEMENTS */
@@ -58,8 +58,8 @@
       display         : grid;
       place-items     : center;
       aspect-ratio    : 1;
-      background      : color-mix(in oklch, var(--accent) calc(var(--mix) * 1%), var(--bg));
-      color           : var(--fg);
+      background      : color-mix(in oklch, var(--color-ink) calc(var(--mix) * 1%), var(--color-bg));
+      color           : var(--color-fg);
       font-weight     : 600;
     }
     #index aufbau-index[viewmode="list"] aufbau-item { aspect-ratio: auto; padding: .75rem; place-items: start; }
@@ -75,7 +75,7 @@
     }
 
     #skeleton aufbau-item { display: grid; grid-template-columns: 3rem 1fr; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: .75rem; }
-    #skeleton .avatar { width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--accent); }
+    #skeleton .avatar { width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--color-ink); }
 
     aufbau-video, aufbau-audio { max-width: 32rem; }
 
@@ -140,7 +140,7 @@
       </div>
       <div class="row">
         <span>lang="css" no-copy</span>
-        <aufbau-code lang="css" no-copy code="body { background: var(--bg); color: var(--fg); }"></aufbau-code>
+        <aufbau-code lang="css" no-copy code="body { background: var(--color-bg); color: var(--color-fg); }"></aufbau-code>
       </div>
     </section>
 
@@ -231,8 +231,8 @@
       <div class="row"><span>size, color</span>
         <div class="line">
           <aufbau-icon icon="lucide:heart" size="1rem"></aufbau-icon>
-          <aufbau-icon icon="lucide:heart" size="2rem" color="var(--accent)"></aufbau-icon>
-          <aufbau-icon icon="lucide:heart" size="3rem" color="var(--accent)"></aufbau-icon>
+          <aufbau-icon icon="lucide:heart" size="2rem" color="var(--color-ink)"></aufbau-icon>
+          <aufbau-icon icon="lucide:heart" size="3rem" color="var(--color-ink)"></aufbau-icon>
         </div></div>
       <div class="row"><span>mode="image"</span>
         <div class="line">

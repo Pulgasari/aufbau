@@ -1,435 +1,324 @@
 /* @aufbau/css/skins/monochrome.css
-   the default look of @aufbau/elements. flat and outlined: one hairline border,
-   small radii, no shadows, no gradients.
+   the default decoration of @aufbau/elements: one hairline, small radii, no
+   shadows, no gradients. lines and tints are mixed from currentColor, surfaces
+   are --color-bg, highlights --color-ink. so the skin follows whatever palette
+   or text color it sits in.
 
-   every colour is derived from currentColor, so the skin inherits whatever the
-   page or the active theme sets and never fights it. the elements ship their own
-   structure, this file only decorates it.
+   a skin decorates: lines, radii, colors, states. sizes, font sizes and spacing
+   are not its business, the block at the end holds the spacing the elements do
+   not carry themselves yet.
 
-   loaded by elements/core/skin.js into @layer aufbau.elements.skin. switch it
-   with <aufbau-config elements-skin="..."> or setSkin(). */
+   loaded by elements/core/skin.js into @layer aufbau.skin.
 
-/*
-lol ey wie bekloppt das hier wieder is:
-- was haben schriftgrößen hier zu suchen?
-- was hat überhaupt das meiste hier zu suchen bzw. derart hohl definiert/strukturiert??
-- custom-prop-names alle falsch
+   to do in the elements, so this file can shrink to rules per role:
+   - one part name per role across all elements: control (a framed field or
+     trigger), surface (a popup: listbox, menu, dialog), option (a pickable row)
+   - one way to states: :state(checked | selected | disabled | open) instead of
+     attributes here, part tokens there
+   - the spacing below moves into the structure of each element */
 
-refactoring angefangen:
+/*//////////// TOKENS ////////////*/
 
---border   statt  --aufbau-control-border
-
---gap      statt  –-aufbau-control-gap
---hover    statt  –-aufbau-control-hover
---line     statt  –-aufbau-control-line
---padding  statt  –-aufbau-control-paf
---radius   statt  –-aufbau-control-radius
---sunken   statt  –-aufbau-control-sunken
---track    statt  –-aufbau-control-track
-
-
---ink       statt   --aufbau-ink
---surface   statt   --aufbau-surface
---accent    statt   --aufbau-accent
-
---color-focus    statt  –-aufbau-control-focus
---color-muted    statt  --aufbau-control-muted
-*/
-
-/*
-:root[skin="monochrome"] {
-  --color-focus  : color-mix(in oklab, currentColor 55%, transparent);
-  --color-hover  : color-mix(in oklab, currentColor  8%, transparent);
-  --color-line   : color-mix(in oklab, currentColor 35%, transparent);
-  --color-muted  : color-mix(in oklab, currentColor 55%, transparent);
-  --color-sunken : color-mix(in oklab, currentColor  6%, transparent);
-  --color-track  : color-mix(in oklab, currentColor 18%, transparent);
-
-  --border : 1px solid var(--aufbau-control-line);
-   
-  --gap     : 0.50em;
-  --padding : 0.50em;
-  --radius  : 0.25rem;
-}
-*/
-
+/* unregistered on purpose: a registered <color> would resolve currentColor once
+   on :root, unregistered it resolves where the token is used */
 :root {
-  /* hairlines and tints track the local text colour */
-  --aufbau-control-line   : color-mix(in oklab, currentColor 35%, transparent);
-  --aufbau-control-border : 1px solid var(--aufbau-control-line);
-  --aufbau-control-focus  : color-mix(in oklab, currentColor 55%, transparent);
-  --aufbau-control-gap    : 0.5em;
-  --aufbau-control-hover  : color-mix(in oklab, currentColor 8%, transparent);
-  --aufbau-control-muted  : color-mix(in oklab, currentColor 55%, transparent);
-  --aufbau-control-pad    : 0.35em 0.55em;
-  --aufbau-control-radius : 0.25rem;
-  --aufbau-control-sunken : color-mix(in oklab, currentColor 6%, transparent);
-  --aufbau-control-track  : color-mix(in oklab, currentColor 18%, transparent);
+  --line         : color-mix(in oklab, currentColor 35%, transparent);
+  --hover        : color-mix(in oklab, currentColor  8%, transparent);
+  --sunken       : color-mix(in oklab, currentColor  6%, transparent);
+  --track        : color-mix(in oklab, currentColor 18%, transparent);
+  --color-focus  : color-mix(in oklab, currentColor 55%, transparent);
+  --color-muted  : color-mix(in oklab, currentColor 55%, transparent);
+
+  --border : 1px solid var(--line);
+  --radius : 0.25rem;
 }
 
-
-body {
-  --element-bg  : var(--bg, Canvas);
-  --element-fg  : var(--fg, CanvasText);
-  --element-ink : var(--accent, var(--aufbau-ink));
-
-  --color-focus : --alpha(cc, 50%);
-  --color-muted : --muted(cc, 50%);
-  --color-track : --alpha(cc, 18%);
-
-}
-
-
-
-/* ::: shared ::::::::::::::::::::::::::::::::::::::::::::::::::: */
+/*//////////// FRAME ////////////*/
 
 aufbau-button,
-aufbau-dropdown::part(trigger),
+aufbau-code,
 aufbau-input,
 aufbau-picker[look="combobox"],
-aufbau-picker[look="cycle"]::part(trigger),
+aufbau-picker[look="segments"],
 aufbau-toggle[look="button"],
-aufbau-upload::part(zone),
-aufbau-writer {
-  border        : var(--aufbau-control-border);
-  border-radius : var(--aufbau-control-radius);
-  padding       : var(--aufbau-control-pad);
+aufbau-writer,
+aufbau-dropdown::part(trigger),
+aufbau-picker[look="cycle"]::part(trigger),
+aufbau-upload::part(zone) {
+  border        : var(--border);
+  border-radius : var(--radius);
 }
+
+/*//////////// SURFACE ////////////*/
+
+aufbau-toast,
+aufbau-dropdown::part(menu),
+aufbau-modal::part(dialog),
+aufbau-picker::part(listbox) {
+  background-color : var(--color-bg);
+  border           : var(--border);
+  border-radius    : var(--radius);
+  color            : var(--color-fg);
+}
+
+/*//////////// STATES ////////////*/
 
 :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) { opacity: 0.5; }
 
-:is(aufbau-input, aufbau-picker[look="combobox"], aufbau-writer):focus-within {
-  outline: 2px solid var(--aufbau-control-focus);
-  outline-offset: 1px;
+/* hover, a tint of the text color */
+:is(aufbau-button, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
+aufbau-dropdown > *:hover,
+aufbau-table tbody tr:hover,
+aufbau-dropdown::part(trigger):hover:not(:disabled),
+aufbau-picker::part(trigger):hover,
+aufbau-picker[look="segments"]::part(option):hover,
+aufbau-tree-item::part(row):hover,
+aufbau-upload::part(remove):hover,
+aufbau-upload::part(zone):hover,
+aufbau-upload:state(dragging)::part(zone) {
+  background-color: var(--hover);
 }
 
-/* ::part() cannot sit inside :is(), the shadow parts are listed on their own */
+/* focus, one ring for all of them. ::part() cannot sit inside :is(), the parts are listed on their own */
+:is(aufbau-input, aufbau-picker[look="combobox"], aufbau-writer):focus-within,
 :is(aufbau-button, aufbau-toggle, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible,
-aufbau-upload::part(zone):focus-visible,
-aufbau-upload::part(remove):focus-visible,
 aufbau-dropdown::part(trigger):focus-visible,
 aufbau-picker::part(option):focus-visible,
-aufbau-picker::part(trigger):focus-visible {
-  outline: 2px solid var(--aufbau-control-focus);
-  outline-offset: 1px;
+aufbau-picker::part(trigger):focus-visible,
+aufbau-upload::part(remove):focus-visible,
+aufbau-upload::part(zone):focus-visible {
+  outline        : 2px solid var(--color-focus);
+  outline-offset : 1px;
 }
 
-:is(aufbau-button, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
-aufbau-upload::part(remove):hover,
-aufbau-dropdown::part(trigger):hover:not(:disabled),
-aufbau-picker::part(trigger):hover {
-  background-color: var(--aufbau-control-hover);
+aufbau-tree-item:focus-visible::part(row) {
+  outline        : 2px solid var(--color-focus);
+  outline-offset : -2px;
 }
 
-/*
-:is(aufbau-button, aufbau-toggle, aufbau-input > button) {
-  &:focus-visible {
-    outline: 2px solid var(--aufbau-control-focus);
-    outline-offset: 1px;
-  }
-
-  &:hover:not(:disabled, [disabled]) {
-    background-color: var(--aufbau-control-hover);
-  }
-}
-*/
-
-/* ::: button ::::::::::::::::::::::::::::::::::::::::::::::::::: */
-
-/*
-aufbau-button,
-aufbau-input,
-aufbau-slider,
-aufbau-picker,
-aufbau-reader,
-aufbau-toggle,
-aufbau-writer,
-{
-   --bg  : transparent;  
-   --fg  : currentColor; 
-   --rad : 0;            
-
-   background-color : var(--bg, transparent);
-   border-radius    : var(--rad, 0);
-   color            : var(--fg, currentColor);
+/* selected, the ink with the background as text */
+aufbau-picker[look="combobox"]::part(option):hover,
+aufbau-picker[look="cycle"]::part(option):hover,
+aufbau-picker[look="combobox"]::part(option selected),
+aufbau-picker[look="cycle"]::part(option selected),
+aufbau-picker[look="segments"]::part(option selected),
+aufbau-toggle[look="button"][checked],
+aufbau-tree-item[selected]::part(row) {
+  background-color : var(--color-ink);
+  color            : var(--color-bg);
 }
 
-aufbau-button {
-   &[variant="ghost"] { border-color: transparent; }
+/*//////////// TRACK AND FILL ////////////*/
+
+aufbau-progress {
+  --progress-bar   : var(--color-ink);
+  --progress-track : var(--track);
 }
-*/
+
+aufbau-slider > div {
+  &::before { background-color: var(--track); }
+  &::after  { background-color: var(--color-ink); }
+}
+
+aufbau-slider[type="color"] > div::after { background-color: var(--slider-color, var(--color-ink)); }
+
+aufbau-toggle[look="switch"] {
+  &::before          { background-color: var(--track); transition: background-color 0.15s ease; }
+  &[checked]::before { background-color: var(--color-ink); }
+  &::after           { background-color: var(--color-bg); border: var(--border); }
+}
+
+/* round ends */
+aufbau-progress::before,
+aufbau-slider > div::before,
+aufbau-slider > div::after,
+aufbau-toggle[look="switch"]::before,
+aufbau-toggle[look="switch"]::after,
+aufbau-picker[look="radio"]::part(option)::before {
+  border-radius: 999px;
+}
+
+/*//////////// ELEMENTS ////////////*/
 
 aufbau-button {
   background-color : transparent;
-  border-color     : currentcolor;
+  border-color     : currentColor;
 
   &[variant="ghost"]   { border-color: transparent; }
   &[variant="primary"] { color: var(--color-ink); }
 }
 
-/* ::: input ::::::::::::::::::::::::::::::::::::::::::::::::::::: */
-
-aufbau-input {
-  > button {
-    border-radius : var(--radius);
-    padding       : 0.15em;
-  }
-
-  &[look="swatch"]::after {
-    border        : var(--border);
-    border-radius : calc(var(--radius) * 0.6);
-  }
+aufbau-code > figure > header {
+  border-block-end : var(--border);
+  color            : var(--color-muted);
 }
 
-/* ::: toggle :::::::::::::::::::::::::::::::::::::::::::::::::::: */
+aufbau-code code[contenteditable]:focus { background-color: var(--sunken); }
 
-aufbau-toggle {
-  &[look="switch"] {
-    &::before {
-      background-color : var(--aufbau-control-track);
-      border-radius    : 999px;
-      transition       : background-color 0.15s ease;
-    }
-
-    &[checked]::before { background-color: var(--aufbau-accent); }
-
-    &::after {
-      background-color : var(--aufbau-surface);
-      border           : var(--aufbau-control-border);
-      border-radius    : 999px;
-    }
-  }
-
-  &[look="checkbox"] {
-    &::before {
-      border        : var(--border);
-      border-radius : calc(var(--radius) * 0.6);
-    }
-
-    /* the mark is drawn as a rotated corner, so it needs no icon request */
-    &::after {
-      border-block-end  : 2px solid var(--ink);
-      border-inline-end : 2px solid var(--ink);
-      rotate            : 45deg;
-      scale             : 0;
-      transition        : scale 0.12s ease;
-      translate         : 0 -10%;
-    }
-
-    &[checked]::after { scale: 1; }
-
-    &[indeterminate]::after {
-      block-size        : 2px;
-      border-inline-end : 0;
-      inset-block-start : calc(50% - 1px);
-      rotate            : 0deg;
-      scale             : 1;
-      translate         : 0;
-    }
-  }
-
-  &[look="button"] {
-    background-color : transparent;
-    transition       : background-color 0.15s ease;
-
-    &[checked] {
-      background-color : var(--accent);
-      color            : var(--aufbau-surface);
-    }
-  }
+aufbau-input[look="swatch"]::after,
+aufbau-toggle[look="checkbox"]::before {
+  border        : var(--border);
+  border-radius : calc(var(--radius) * 0.6);
 }
 
-/* ::: picker :::::::::::::::::::::::::::::::::::::::::::::::::::: */
-/* shadow parts: field, caret, listbox, option (+ selected), trigger, icon, label.
-   ::part() takes pseudo-classes and pseudo-elements, no attribute selectors, so the
-   selection arrives as the extra part token `selected` */
-
-aufbau-picker::part(option) {
-  border-radius : --rad();
-  padding       : --pad();
+aufbau-input > button,
+aufbau-dropdown > *,
+aufbau-picker::part(option),
+aufbau-tree-item::part(row),
+aufbau-upload::part(file),
+:is(aufbau-code, aufbau-writer) [data-action] {
+  border-radius: calc(var(--radius) * 0.8);
 }
 
-aufbau-picker::part(listbox) {
-  background-color : var(--aufbau-surface);
-  border           : var(--border);
-  border-radius    : var(--radius);
-  padding          : 0.2em;
-}
+aufbau-modal::part(header) { border-block-end: var(--border); }
 
-aufbau-picker[look="combobox"], 
-aufbau-picker[look="cycle"] {
-   &::part(option):hover { 
-     background-color: var(--ink); 
-  }
-
-   &::part(option selected) {
-     background-color : var(--ink);
-     color            : var(--aufbau-surface);
-   }
-}
-   
-aufbau-picker {
-   &[look="radio"] {
-   
-      &::part(option) { padding-inline: 0; }
-
-      &::part(option)::before {
-        border        : var(--border);
-        border-radius : 999px;
-        transition    : border-width 0.12s ease;
-      }
-   
-      &[multiple]::part(option)::before {
-         border-radius: calc(var(--radius) * 0.4); 
-      }
-      
-      &::part(option selected)::before {
-        border-color : var(--accent);
-        border-width : 0.28em;
-      }
-   }
-}
-/* structural pseudo-classes are not allowed after ::part(), the divider between
-   segments is drawn by the element itself from --picker-divider */
+/* the segments share one frame, the element draws the dividers from --picker-divider */
 aufbau-picker[look="segments"] {
   --picker-divider : var(--border);
+  overflow         : hidden;
 
-  border        : var(--border);
-  border-radius : var(--radius);
-  overflow      : hidden;
+  &::part(option) { border-radius: 0; }
+}
 
-  &::part(option)       { border-radius: 0; }
-  &::part(option):hover { background-color: var(--aufbau-control-hover); }
-   
-  &::part(option selected) {
-    background-color : var(--color-ink);
-    color            : var(--aufbau-surface);
+aufbau-picker[look="radio"] {
+  &::part(option)::before          { border: var(--border); transition: border-width 0.12s ease; }
+  &[multiple]::part(option)::before { border-radius: calc(var(--radius) * 0.4); }
+  &::part(option selected)::before  { border-color: var(--color-ink); border-width: 0.28em; }
+}
+
+aufbau-slider > div > input {
+  &::-webkit-slider-runnable-track { background: none; }
+  &::-moz-range-track              { background: none; }
+
+  &::-webkit-slider-thumb {
+    appearance       : none;
+    background-color : var(--color-bg);
+    block-size       : var(--slider-thumb-size);
+    border           : 2px solid var(--color-ink);
+    border-radius    : 999px;
+    cursor           : grab;
+    inline-size      : var(--slider-thumb-size);
+  }
+
+  &::-moz-range-thumb {
+    background-color : var(--color-bg);
+    block-size       : var(--slider-thumb-size);
+    border           : 2px solid var(--color-ink);
+    border-radius    : 999px;
+    cursor           : grab;
+    inline-size      : var(--slider-thumb-size);
   }
 }
 
-
-
-/* :::::: <aufbau-slider> :::::: */
-
-aufbau-slider {
-  > div {
-    &::before { background-color: var(--aufbau-control-track); border-radius: 999px; }
-    &::after  { background-color: var(--aufbau-accent);        border-radius: 999px; }
-
-    > input {
-      &::-webkit-slider-runnable-track { background: none; }
-      &::-moz-range-track              { background: none; }
-
-      &::-webkit-slider-thumb {
-        appearance       : none;
-        background-color : var(--aufbau-surface);
-        block-size       : var(--slider-thumb-size);
-        border           : 2px solid var(--aufbau-accent);
-        border-radius    : 999px;
-        cursor           : grab;
-        inline-size      : var(--slider-thumb-size);
-      }
-
-      &::-moz-range-thumb {
-        background-color : var(--aufbau-surface);
-        block-size       : var(--slider-thumb-size);
-        border           : 2px solid var(--ink);
-        border-radius    : 999px;
-        cursor           : grab;
-        inline-size      : var(--slider-thumb-size);
-      }
-    }
-  }
-
-  &[type="color"] > div::after { background-color: var(--slider-color, var(--aufbau-accent)); }
-
-  > output > input {
-    border-block-end  : var(--border);
-    padding-block-end : 0.1em;
-  }
-}
-
-/* :::::: <aufbau-dropdown> :::::: */
-/* shadow parts: trigger, icon, label, caret, menu. the entries are the author's children */
-
-aufbau-dropdown::part(menu) {
-  background-color : var(--aufbau-surface);
-  border           : var(--border);
-  border-radius    : var(--radius);
-  padding          : 0.2em;
-}
-
-aufbau-dropdown > * {
-  border-radius : calc(var(--radius) * 0.8);
-  padding       : var(--aufbau-control-pad);
-
-  &:hover { background-color: var(--aufbau-control-hover); }
-}
-
-/* ::: upload / writer ::::::::::::::::::::::::::::::::::::::::::: */
-
-aufbau-upload {
-   &::part(zone) {
-     background-color : var(--aufbau-control-sunken);
-     border-style     : dashed;
-     transition       : background-color 0.15s ease;
-   }
-   
-   &::part(zone):hover,
-   &:state(dragging)::part(zone) { background-color: var(--aufbau-control-hover); }
-   
-   &::part(file) {
-     background-color : var(--aufbau-control-sunken);
-     border-radius    : calc(var(--radius) * 0.8);
-     padding          : 0.2em 0.4em;
-   }
-}
-   
-aufbau-writer {
-                > div > footer > output { color: var(--color-muted); }
-  &:state(full) > div > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
-}
-
-/* :::::: <aufbau-modal> :::::: */
-/* shadow parts: dialog, header, heading, close. the content is the author's children */
-
-aufbau-modal {
-   &::part(dialog) {
-     background-color : var(--aufbau-surface);
-     border           : var(--border);
-     border-radius    : var(--radius);
-     color            : inherit;
-     padding          : --space(normal);
-   }
-   
-   &::part(header) {
-     border-block-end : var(--aufbau-control-border);
-     margin           : -0.25em -0.25em 0.75em;
-     padding          : 0 0.25em 0.5em;
-   }
-}
-
-/* :::::: <aufbau-progress> :::::: */
-
-aufbau-progress {
-  --progress-bar   : var(--ink);
-  --progress-track : var(--aufbau-control-track);
-
-  &::before { border-radius: 999px; }
-}
-
-/* :::::: <aufbau-table> :::::: */
+aufbau-slider > output > input { border-block-end: var(--border); }
 
 aufbau-table {
-  table        { border-collapse: collapse; inline-size: 100%; }
-  :is(th, td)  { padding: 0.35em 0.6em; text-align: start; vertical-align: top; }
-  thead th     { border-block-end: var(--aufbau-control-border); }
-  th > button  { inline-size: 100%; padding: 0; background: none; border: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
-  tbody tr + tr { border-block-start: 1px solid var(--aufbau-control-track); }
-  tbody tr:hover { background-color: var(--aufbau-control-hover); }
+  thead th       { border-block-end: var(--border); }
+  tbody tr + tr  { border-block-start: 1px solid var(--track); }
 }
 
-/* :::::: <aufbau-reader> :::::: */
+aufbau-toast {
+  border-inline-start-width : 3px;
+
+  &[type="success"] { border-inline-start-color: var(--color-success); }
+  &[type="warning"] { border-inline-start-color: var(--color-warning); }
+  &[type="error"]   { border-inline-start-color: var(--color-error); }
+}
+
+aufbau-toast::part(message) { color: var(--color-muted); }
+
+aufbau-toc {
+  > header { color: var(--color-muted); }
+
+  a {
+    border-inline-start : 2px solid transparent;
+    color               : inherit;
+
+    &:hover         { color: var(--color-ink); }
+    &[aria-current] { border-color: currentColor; color: var(--color-ink); }
+  }
+}
+
+/* the mark is a rotated corner, no icon request */
+aufbau-toggle[look="checkbox"] {
+  &::after {
+    border-block-end  : 2px solid var(--color-ink);
+    border-inline-end : 2px solid var(--color-ink);
+    rotate            : 45deg;
+    scale             : 0;
+    transition        : scale 0.12s ease;
+    translate         : 0 -10%;
+  }
+
+  &[checked]::after { scale: 1; }
+
+  &[indeterminate]::after {
+    block-size        : 2px;
+    border-inline-end : 0;
+    inset-block-start : calc(50% - 1px);
+    rotate            : 0deg;
+    scale             : 1;
+    translate         : 0;
+  }
+}
+
+aufbau-toggle[look="button"] {
+  background-color : transparent;
+  transition       : background-color 0.15s ease;
+}
+
+aufbau-upload {
+  &::part(zone) {
+    background-color : var(--sunken);
+    border-style     : dashed;
+    transition       : background-color 0.15s ease;
+  }
+
+  &::part(file) { background-color: var(--sunken); }
+}
+
+aufbau-writer {
+                > div > footer > output { color: var(--color-muted); }
+  &:state(full) > div > footer > output { color: var(--color-error); }
+}
+
+aufbau-reader article a { color: var(--color-ink); }
+
+/*//////////// SPACING THE ELEMENTS DO NOT CARRY YET ////////////*/
+/* belongs into the structure of each element, see the note at the top */
+
+aufbau-button,
+aufbau-input,
+aufbau-picker[look="combobox"],
+aufbau-toggle[look="button"],
+aufbau-writer,
+aufbau-dropdown > *,
+aufbau-dropdown::part(trigger),
+aufbau-picker[look="cycle"]::part(trigger),
+aufbau-upload::part(zone) {
+  padding: 0.35em 0.55em;
+}
+
+aufbau-picker::part(listbox),
+aufbau-dropdown::part(menu)       { padding: 0.2em; }
+aufbau-picker::part(option)       { padding: 0.35em 0.55em; }
+aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
+aufbau-input > button             { padding: 0.15em; }
+aufbau-upload::part(file)         { padding: 0.2em 0.4em; }
+:is(aufbau-code, aufbau-writer) [data-action] { padding: 0.2em; }
+aufbau-code > figure > header     { padding: 0.3em 0.6em; }
+aufbau-code > figure > pre        { padding: 0.75em; }
+aufbau-modal::part(dialog)        { padding: 1rem; }
+aufbau-modal::part(header)        { margin: -0.25em -0.25em 0.75em; padding: 0 0.25em 0.5em; }
+aufbau-slider > output > input    { padding-block-end: 0.1em; }
+aufbau-toast                      { padding: 0.6em 0.75em; }
+aufbau-toc a                      { display: block; padding-block: 0.15em; padding-inline-start: 0.5em; }
+
+aufbau-table {
+  table       { border-collapse: collapse; inline-size: 100%; }
+  :is(th, td) { padding: 0.35em 0.6em; text-align: start; vertical-align: top; }
+  th > button { background: none; border: 0; color: inherit; cursor: pointer; font: inherit; inline-size: 100%; padding: 0; text-align: start; }
+}
 
 /* the reset strips lists and spacing, prose needs them back */
 aufbau-reader article {
@@ -438,83 +327,4 @@ aufbau-reader article {
   ul                  { list-style: disc; }
   ol                  { list-style: decimal; }
   :is(h1, h2, h3, h4) { line-height: 1.2; }
-  a                   { color: var(--aufbau-accent); }
 }
-
-/* :::::: <aufbau-code> :::::: */
-
-aufbau-code {
-  border        : var(--border);
-  border-radius : var(--radius);
-
-  > figure > header {
-    border-block-end : var(--border);
-    color            : var(--color-muted);
-    padding          : 0.3em 0.6em;
-  }
-
-  > figure > pre { padding: 0.75em; }
-
-  code[contenteditable]:focus { background-color: var(--aufbau-control-sunken); }
-}
-
-:is(aufbau-code, aufbau-writer) [data-action] {
-  border-radius : calc(var(--radius) * 0.6);
-  padding       : 0.2em;
-}
-
-/* :::::: <aufbau-tree> :::::: */
-
-aufbau-tree-item::part(row)       { border-radius: calc(var(--radius) * 0.8); }
-aufbau-tree-item::part(row):hover { background-color: var(--aufbau-control-hover); }
-
-aufbau-tree-item[selected]::part(row) {
-  background-color : var(--aufbau-accent);
-  color            : var(--aufbau-surface);
-}
-
-aufbau-tree-item:focus-visible::part(row) {
-  outline        : 2px solid var(--aufbau-control-focus);
-  outline-offset : -2px;
-}
-
-/* :::::: <aufbau-toc> :::::: */
-
-aufbau-toc {
-  > header {
-    color             : var(--aufbau-control-muted);
-    font-size         : 0.75em;
-    font-weight       : 600;
-    letter-spacing    : 0.04em;
-    margin-block-end  : 0.5em;
-    text-transform    : uppercase;
-  }
-
-  a {
-    border-inline-start  : 2px solid transparent;
-    color                : inherit;
-    display              : block;
-    padding-block        : 0.15em;
-    padding-inline-start : 0.5em;
-    text-decoration      : none;
-
-    &:hover           { color: var(--color-ink); }
-    &[aria-current]   { border-color: currentcolor; color: var(--color-ink); }
-  }
-}
-
-/* :::::: <aufbau-toast> :::::: */
-
-aufbau-toast {
-  background-color          : var(--aufbau-surface);
-  border                    : var(--border);
-  border-inline-start-width : 3px;
-  border-radius             : var(--radius);
-  padding                   : 0.6em 0.75em;
-
-  &[type="success"] { border-inline-start-color: var(--color-success, currentColor); }
-  &[type="warning"] { border-inline-start-color: var(--color-warn, currentColor); }
-  &[type="error"]   { border-inline-start-color: var(--color-error, currentColor); }
-}
-
-aufbau-toast::part(message) { color: var(--aufbau-control-muted); }
