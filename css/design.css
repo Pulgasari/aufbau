@@ -1,0 +1,7 @@
+@property --density  { syntax: "<custom-ident>"; inherits: true; initial-value: compact; }
+@property --geometry { syntax: "<custom-ident>"; inherits: true; initial-value: sharp; }     
+
+:root {
+  --density  : compact;
+  --geometry : sharp; /* sharp | moderate | round */
+}
