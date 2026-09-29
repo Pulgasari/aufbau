@@ -10,15 +10,15 @@ const off = trigger(button, 'click', 'jump');
 reveal('.card', 'slide', { from: 'bottom' });
 */
 
-import { forceReflow }       from '@domina/methods/forceReflow.js';
-import { onEvent }           from '@domina/methods/onEvent.js';
-import { resolveElements }   from '@domina/methods/resolveElements.js';
-import { setData }           from '@domina/methods/setData.js';
-import { waitForAnimations } from '@domina/methods/waitForAnimations.js';
-import { observe }           from '@domina/observer';
+import forceReflow       from '@domina/methods/forceReflow.js';
+import onEvent           from '@domina/methods/onEvent.js';
+import resolveElements   from '@domina/methods/resolveElements.js';
+import setData           from '@domina/methods/setData.js';
+import waitForAnimations from '@domina/methods/waitForAnimations.js';
+import { observe }       from '@domina/observer';
 
 // the parameters animations.css reads, as option names. data-animate-<key>
-const PARAMETERS = ['angle', 'count', 'delay', 'direction', 'distance', 'duration', 'ease', 'from', 'opacity', 'scale', 'stagger', 'state', 'timeline', 'turns'];
+const PARAMETERS = ['angle', 'count', 'delay', 'direction', 'distance', 'duration', 'ease', 'from', 'opacity', 'scale', 'stagger', 'state', 'timeline', 'turns'];      
 
 // :::::: INTERNAL
 
@@ -43,11 +43,13 @@ const write = (element, name, options) => setData(element, { animate: name, ...d
 function animate (target, name, options = {}) {
   const { keep = false } = options;
   const elements = resolveElements(target);
+  //const each     = elements.forEach;
 
   // off and on again: the same name set twice would not restart
   elements.forEach(clear);
   forceReflow();
   for (const element of elements) write(element, name, options);
+  //each(clear); forceReflow(); each(el => write(el, name, options));
 
   const finished = waitForAnimations(elements, { name }).then(() => {
     if (!keep) for (const element of elements) if (element.dataset.animate === name) clear(element);
