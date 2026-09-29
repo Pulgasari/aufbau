@@ -8,7 +8,7 @@
   result: if(
     style(--arg: bg)  : var(--color-bg);
     style(--arg: fg)  : var(--color-fg);
-    style(--arg: ink) : var(--color-bg);
+    style(--arg: ink) : var(--color-ink);
     style(--arg: cc)  : currentColor;
     else              : var(--arg);
   );
