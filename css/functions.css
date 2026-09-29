@@ -5,13 +5,33 @@
 https://caniuse.com/wf-function
 */
 
+/* returns the negative of a value */
+@function --negate(--value type(<length> | <number>)) {
+  result: calc(-1 * var(--value));
+}
+
+/* custom light-dark() function that works for any value */
+/* found here: https://www.bram.us/2025/09/30/css-custom-light-dark/ */
+@function --light-dark(--l, --d) { result: if(color-scheme(dark): var(--d); else: var(--l)); }
+@function --ld(--L, --D) { result: if(color-scheme(dark): var(--D); else: var(--L)); }
+
 /*//////////// COLOR ////////////*/
 
 /* transparency, currentColor by default */
 
 
 /*
-fn fg-lighter (n <number> : 0.1) <color> { result: darker(fg, n) }
+@type color-with-benefits = <color> | bg | fg | ink
+
+@fn darker (
+  $color  <color-with-benefits> = currentColor,
+  $number <number>              = 0.1
+) <color> { 
+  result: darker ($fg, $n);
+}
+
+@fn fg-darker  ($n <number> = 0.1) <color> { result: darker  ($fg, $n) }
+@fn fg-lighter ($n <number> = 0.1) <color> { result: lighter ($fg, $n) }
 */
 
 
@@ -48,11 +68,8 @@ fn fg-lighter (n <number> : 0.1) <color> { result: darker(fg, n) }
 }
 
 /* the text color between --fg and --bg: 0 is --fg, 100% the background */
-@function --muted(
-   --amount <percentage> : 40%
-) returns <color> {
-  result: color-mix(in oklch, var(--fg), var(--bg) var(--amount));
-}
+@function --muted(--amount <percentage> : 50%) returns <color>
+{ result: color-mix(in oklch, var(--fg), var(--bg) var(--amount)); }
 
 /* surfaces stacked on the background: every level mixes a bit more --fg in.
    cards, panels, zebra rows, in light and dark alike */
