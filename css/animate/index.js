@@ -10,9 +10,9 @@ const off = trigger(button, 'click', 'jump');
 reveal('.card', 'slide', { from: 'bottom' });
 */
 
-import getElement       from '@domina/methods/getElement.js';
-import removeAttributes from '@domina/methods/removeAttributes.js';
-import setAttributes    from '@domina/methods/setAttributes.js';
+import getElement from '@domina/methods/getElement.js';
+import removeAttr from '@domina/methods/removeAttributes.js';
+import setAttr    from '@domina/methods/setAttributes.js';
 
 const PREFIX = 'data-animate';
 
