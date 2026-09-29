@@ -1,0 +1,15 @@
+/* @aufbau/css/themes.css */
+
+@property --theme { syntax: "<custom-ident>"; inherits: true; initial-value: zombie; }
+
+:root {
+  --theme: zombie-monochrome;
+  &[data-theme] { --theme: attr(data-theme type("<custom-ident>"), var--theme)); }
+}
+
+body {
+  @container style(--theme: classic)           { --palette: classic; }
+  @container style(--theme: oled)              { --palette: oled;    }
+  @container style(--theme: zombie)            { --palette: zombie;  }     
+  @container style(--theme: zombie-monochrome) { --palette: zombie; --skin: monochrome; }    
+}
