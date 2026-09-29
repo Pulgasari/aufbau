@@ -74,10 +74,15 @@ refactoring angefangen:
    of css/themes.css when it is loaded, the ua system colours otherwise. on body,
    because that is where themes.css resolves them */
 body {
-  --aufbau-ink     : var(--fg, CanvasText);
-  --aufbau-surface : var(--bg, Canvas);
-  --aufbau-accent  : var(--accent, var(--aufbau-ink));
+  --element-bg  : var(--bg, Canvas);
+  --element-fg  : var(--fg, CanvasText);
+  --element-ink : var(--accent, var(--aufbau-ink));
+
+  --color-focus : --alpha(cc, 50%);
+  --color-muted : --muted(cc, 50%);
 }
+
+
 
 /* ::: shared ::::::::::::::::::::::::::::::::::::::::::::::::::: */
 
@@ -191,14 +196,14 @@ aufbau-toggle {
 
   &[look="checkbox"] {
     &::before {
-      border        : var(--aufbau-control-border);
-      border-radius : calc(var(--aufbau-control-radius) * 0.6);
+      border        : var(--border);
+      border-radius : calc(var(--radius) * 0.6);
     }
 
     /* the mark is drawn as a rotated corner, so it needs no icon request */
     &::after {
-      border-block-end  : 2px solid var(--aufbau-accent);
-      border-inline-end : 2px solid var(--aufbau-accent);
+      border-block-end  : 2px solid var(--ink);
+      border-inline-end : 2px solid var(--ink);
       rotate            : 45deg;
       scale             : 0;
       transition        : scale 0.12s ease;
@@ -248,11 +253,11 @@ aufbau-picker::part(listbox) {
 aufbau-picker[look="combobox"], 
 aufbau-picker[look="cycle"] {
    &::part(option):hover { 
-     background-color: var(--aufbau-control-hover); 
+     background-color: var(--ink); 
   }
 
    &::part(option selected) {
-     background-color : var(--aufbau-accent);
+     background-color : var(--ink);
      color            : var(--aufbau-surface);
    }
 }
@@ -291,7 +296,7 @@ aufbau-picker[look="segments"] {
   &::part(option):hover { background-color: var(--aufbau-control-hover); }
    
   &::part(option selected) {
-    background-color : var(--accent);
+    background-color : var(--color-ink);
     color            : var(--aufbau-surface);
   }
 }
@@ -322,7 +327,7 @@ aufbau-slider {
       &::-moz-range-thumb {
         background-color : var(--aufbau-surface);
         block-size       : var(--slider-thumb-size);
-        border           : 2px solid var(--aufbau-accent);
+        border           : 2px solid var(--ink);
         border-radius    : 999px;
         cursor           : grab;
         inline-size      : var(--slider-thumb-size);
@@ -333,7 +338,7 @@ aufbau-slider {
   &[type="color"] > div::after { background-color: var(--slider-color, var(--aufbau-accent)); }
 
   > output > input {
-    border-block-end  : var(--aufbau-control-border);
+    border-block-end  : var(--border);
     padding-block-end : 0.1em;
   }
 }
@@ -343,13 +348,13 @@ aufbau-slider {
 
 aufbau-dropdown::part(menu) {
   background-color : var(--aufbau-surface);
-  border           : var(--aufbau-control-border);
-  border-radius    : var(--aufbau-control-radius);
+  border           : var(--border);
+  border-radius    : var(--radius);
   padding          : 0.2em;
 }
 
 aufbau-dropdown > * {
-  border-radius : calc(var(--aufbau-control-radius) * 0.8);
+  border-radius : calc(var(--radius) * 0.8);
   padding       : var(--aufbau-control-pad);
 
   &:hover { background-color: var(--aufbau-control-hover); }
@@ -369,13 +374,13 @@ aufbau-upload {
    
    &::part(file) {
      background-color : var(--aufbau-control-sunken);
-     border-radius    : calc(var(--aufbau-control-radius) * 0.8);
+     border-radius    : calc(var(--radius) * 0.8);
      padding          : 0.2em 0.4em;
    }
 }
    
 aufbau-writer {
-                > div > footer > output { color: var(--aufbau-control-muted); }
+                > div > footer > output { color: var(--color-muted); }
   &:state(full) > div > footer > output { color: var(--aufbau-error, currentColor); opacity: 1; }
 }
 
@@ -385,8 +390,8 @@ aufbau-writer {
 aufbau-modal {
    &::part(dialog) {
      background-color : var(--aufbau-surface);
-     border           : var(--aufbau-control-border);
-     border-radius    : var(--aufbau-control-radius);
+     border           : var(--border);
+     border-radius    : var(--radius);
      color            : inherit;
      padding          : --space(normal);
    }
@@ -401,7 +406,7 @@ aufbau-modal {
 /* :::::: <aufbau-progress> :::::: */
 
 aufbau-progress {
-  --progress-bar   : var(--accent);
+  --progress-bar   : var(--ink);
   --progress-track : var(--aufbau-control-track);
 
   &::before { border-radius: 999px; }
@@ -433,12 +438,12 @@ aufbau-reader article {
 /* :::::: <aufbau-code> :::::: */
 
 aufbau-code {
-  border        : var(--aufbau-control-border);
-  border-radius : var(--aufbau-control-radius);
+  border        : var(--border);
+  border-radius : var(--radius);
 
   > figure > header {
-    border-block-end : var(--aufbau-control-border);
-    color            : var(--aufbau-control-muted);
+    border-block-end : var(--border);
+    color            : var(--color-muted);
     padding          : 0.3em 0.6em;
   }
 
@@ -448,13 +453,13 @@ aufbau-code {
 }
 
 :is(aufbau-code, aufbau-writer) [data-action] {
-  border-radius : calc(var(--aufbau-control-radius) * 0.6);
+  border-radius : calc(var(--radius) * 0.6);
   padding       : 0.2em;
 }
 
 /* :::::: <aufbau-tree> :::::: */
 
-aufbau-tree-item::part(row)       { border-radius: calc(var(--aufbau-control-radius) * 0.8); }
+aufbau-tree-item::part(row)       { border-radius: calc(var(--radius) * 0.8); }
 aufbau-tree-item::part(row):hover { background-color: var(--aufbau-control-hover); }
 
 aufbau-tree-item[selected]::part(row) {
@@ -487,8 +492,8 @@ aufbau-toc {
     padding-inline-start : 0.5em;
     text-decoration      : none;
 
-    &:hover           { color: var(--aufbau-accent); }
-    &[aria-current]   { border-color: var(--aufbau-accent); color: var(--aufbau-accent); }
+    &:hover           { color: var(--color-ink); }
+    &[aria-current]   { border-color: currentcolor; color: var(--color-ink); }
   }
 }
 
@@ -496,14 +501,14 @@ aufbau-toc {
 
 aufbau-toast {
   background-color          : var(--aufbau-surface);
-  border                    : var(--aufbau-control-border);
+  border                    : var(--border);
   border-inline-start-width : 3px;
-  border-radius             : var(--aufbau-control-radius);
+  border-radius             : var(--radius);
   padding                   : 0.6em 0.75em;
 
-  &[type="success"] { border-inline-start-color: var(--aufbau-success, currentColor); }
-  &[type="warning"] { border-inline-start-color: var(--aufbau-warn, currentColor); }
-  &[type="error"]   { border-inline-start-color: var(--aufbau-error, currentColor); }
+  &[type="success"] { border-inline-start-color: var(--color-success, currentColor); }
+  &[type="warning"] { border-inline-start-color: var(--color-warn, currentColor); }
+  &[type="error"]   { border-inline-start-color: var(--color-error, currentColor); }
 }
 
 aufbau-toast::part(message) { color: var(--aufbau-control-muted); }
