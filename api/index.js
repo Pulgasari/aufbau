@@ -48,6 +48,7 @@ const data = {
   
   get filters  () { return modules.filters ().then(module => module.data); },
   get icons    () { return modules.icons   ().then(module => module.default); },
+  get palettes () { return gestalt.palettes(); },
   get patterns () { return modules.patterns().then(module => module.data); },
   get themes   () { return gestalt.themes(); },
   get webfonts () { return modules.webfonts().then(module => module.data); },
@@ -98,15 +99,17 @@ const remove = (target, keys = Object.keys(KINDS)) => Promise.all(keys.map(key =
 
 const config = {
   // reset and themes are stylesheets that are either there or not, the rest goes
-  // through gestalt. themes: false when the page links css/themes.css itself
+  // through gestalt. themes: false when the page links css/palettes.css and
+  // css/themes.css itself. a palette set here wins over the one of the theme
   css : {
-    layout : false,
-    look   : 'flat',
-    mode   : null,
-    reset  : true,
-    skin   : 'monochrome',
-    theme  : 'zombie',
-    themes : true,
+    layout  : false,
+    look    : 'flat',
+    mode    : null,
+    palette : null,
+    reset   : true,
+    skin    : 'monochrome',
+    theme   : 'zombie',
+    themes  : true,
   },
 
   // mode: 'auto' | 'all' | false. every other key is element config, e.g. { code: { theme: 'nord' } }
@@ -126,18 +129,19 @@ async function boot (options = {}) {
   if (booted || typeof window === 'undefined') return booted;
   booted = true;
 
-  const { css: { layout, look, mode: themeMode, reset, skin, theme, themes }, elements: { mode, ...defaults }, font } = config;
+  const { css: { layout, look, mode: paletteMode, palette, reset, skin, theme, themes }, elements: { mode, ...defaults }, font } = config;
 
   // the reset first, the themes next, the gestalt layers after them. a sheet is
   // appended once it is fetched, so each waits for the one before it: otherwise
   // the reset can land last and override body's colors
   if (reset)  await dom.adoptStylesheet(`${CSS_PATH}/aufbau.css`);
+  if (themes) await dom.adoptStylesheet(`${CSS_PATH}/palettes.css`);
   if (themes) await dom.adoptStylesheet(`${CSS_PATH}/themes.css`);
 
   if (Object.keys(defaults).length) await elements.setConfig(defaults, { layer: 'defaults' });
 
   await Promise.all([
-    gestalt.set({ layout, look, mode: themeMode, skin, theme }),
+    gestalt.set({ layout, look, mode: paletteMode, skin, theme, ...(palette && { palette }) }),
     mode === 'auto' && elements.enableAutoload(),
     mode === 'all'  && elements.registerAll(),
     font && webfonts.init(font),
