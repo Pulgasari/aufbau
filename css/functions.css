@@ -6,56 +6,11 @@ https://caniuse.com/wf-function
 /*//////////// COLOR ////////////*/
 
 /* transparency, currentColor by default */
-@function --alpha(
-  --color   <color>      : currentColor,
-  --opacity <percentage> : 50%,
-  --mode                 : oklch
-) returns <color> {
-  result: color-mix(in var(--mode), var(--color) var(--opacity), transparent);
-}
 
-/* two colors mixed, --amount of the second */
-@function --mix(
-  --from   <color>      : var(--bg, white),
-  --to     <color>      : var(--fg, black),
-  --amount <percentage> : 50%,
-  --mode                : oklch
-) returns <color> {
-  result: color-mix(in var(--mode), var(--from), var(--to) var(--amount));
-}
 
-/* lightness down or up in oklch, hue and chroma stay. mixing with black or
-   white would wash the chroma out as well. no space between a function name
-   and its parenthesis, that makes the declaration invalid */
-@function --darker(
-  --color  <color>  : currentColor,
-  --amount <number> : 0.1
-) returns <color> {
-  result: oklch(from var(--color) max(0, l - var(--amount)) c h / alpha);
-}
-
-@function --lighter(
-  --color  <color>  : currentColor,
-  --amount <number> : 0.1
-) returns <color> {
-  result: oklch(from var(--color) min(1, l + var(--amount)) c h / alpha);
-}
-
-@function --darker-bg(--amount <number> : 0.1) returns <color> {
-  result: --darker(var(--bg, white), var(--amount));
-}
-
-@function --darker-fg(--amount <number> : 0.1) returns <color> {
-  result: --darker(var(--fg, black), var(--amount));
-}
-
-@function --lighter-bg(--amount <number> : 0.1) returns <color> {
-  result: --lighter(var(--bg, white), var(--amount));
-}
-
-@function --lighter-fg(--amount <number> : 0.1) returns <color> {
-  result: --lighter(var(--fg, black), var(--amount));
-}
+/*
+fn fg-lighter (n <number> : 0.1) <color> { result: darker(fg, n) }
+*/
 
 /* towards the background or the foreground: lighter or darker depending on the
    scheme, so a tint reads the same in light and dark */
