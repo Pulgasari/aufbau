@@ -1,7 +1,8 @@
 /* @aufbau/css/functions.css */
-@import url("./functions/color.css");
-
 /*
+hier ist alles noch recht experimentell.
+
+--- links to read
 https://caniuse.com/wf-function
 */
 
@@ -17,7 +18,95 @@ https://caniuse.com/wf-function
 
 /*//////////// COLOR ////////////*/
 
-/* transparency, currentColor by default */
+/* HELPERS (experimental) */
+
+@function --resolve-color-argument(
+  --arg type(<color> | bg | fg | ink) : currentColor
+) returns <color> {
+  result: if(
+    style(--arg: bg)  : var(--color-bg);
+    style(--arg: fg)  : var(--color-fg);
+    style(--arg: ink) : var(--color-ink);
+    style(--arg: cc)  : currentColor;
+    else              : var(--arg);
+  );
+}
+
+@function --alpha(
+  --color   <color>      : currentColor,
+  --opacity <percentage> : 50%,
+  --mode                 : oklch
+) returns <color> {
+  result: color-mix(in var(--mode), var(--color) var(--opacity), transparent);
+}
+
+@function --mix(
+  --from   type(<color> | bg | fg | ink) : var(--color-bg),
+  --to     type(<color> | bg | fg | ink) : var(--color-fg),
+  --amount <percentage>                  : 50%,
+  --mode                                 : oklch
+) returns <color> {
+  --F: --resolve-color-argument(var(--from));
+  --T: --resolve-color-argument(var(--to));
+  result: color-mix(in var(--mode), var(--F), var(--T) var(--amount));
+}
+
+@function --darker(
+  --color  type(<color> | bg | fg | ink) : currentColor,
+  --number <number> : 0.1
+) returns <color> {
+  --C : --resolve-color-argument(var(--color));
+  result  : oklch(from var(--C) max(0, l - var(--number)) c h / alpha);
+}
+
+@function --lighter(
+  --color  <color>  : currentColor,
+  --number <number> : 0.1
+) returns <color> {
+  --C : --resolve-color-argument(var(--color));
+  result: oklch(from var(--C) min(1, l + var(--number)) c h / alpha);
+}
+
+
+
+/* towards the background or the foreground: lighter or darker depending on the
+   scheme, so a tint reads the same in light and dark */
+@function --tint(
+  --C <color>      : var(--accent),
+  --N <percentage> : 20%
+) returns <color> {
+  result: color-mix(in oklch, var(--C), var(--bg) var(--N));
+}
+
+@function --shade(
+  --C <color>      : var(--accent),
+  --N <percentage> : 20%
+) returns <color> {
+  result: color-mix(in oklch, var(--C), var(--fg) var(--N));
+}
+
+/* a fixed lightness, 0 black to 1 white: --tone(var(--accent), 0.95) is a pale background in the accent's hue */
+@function --tone(
+  --C <color>  : var(--accent),
+  --N <number> : 0.5
+) returns <color> {
+  result: oklch(from var(--c) var(--N) c h / alpha);
+}
+
+/* chroma times --factor, 0 is grey, above 1 more vivid */
+@function --saturate(
+  --color  <color>  : currentColor,
+  --factor <number> : 1.5
+) returns <color> {
+  result: oklch(from var(--color) l calc(c * var(--factor)) h / alpha);
+}
+
+@function --grayscale(--C <color> : currentColor) returns <color> 
+{ result: oklch(from var(--C) l 0 h / alpha); }
+
+
+
+
 
 
 /*
@@ -352,3 +441,12 @@ https://caniuse.com/wf-function
     else                     : 0;
   );
 }
+
+/*//////////////////////// MAYBE TRASH ////////////////////////*/
+
+/* if the 'resolve-color-argument' helper works we would not neeed these */
+@function   --bg-darker(--n <number> : 0.1) returns <color> { result:  --darker(var(--bg), var(--n)); }
+@function   --fg-darker(--n <number> : 0.1) returns <color> { result:  --darker(var(--fg), var(--n)); }
+@function  --bg-lighter(--n <number> : 0.1) returns <color> { result: --lighter(var(--bg), var(--n)); }
+@function --fg-lighter-(--n <number> : 0.1) returns <color> { result: --lighter(var(--fg), var(--n)); }
+
