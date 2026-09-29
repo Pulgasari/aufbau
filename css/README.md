@@ -6,7 +6,7 @@
 /* with shorthands */
 div {
   --bg  : black;
-  --fg: : white;
+  --fg  : white;
   --ink : red;
 }
 
