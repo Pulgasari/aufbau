@@ -67,12 +67,7 @@ refactoring angefangen:
   --aufbau-control-track  : color-mix(in oklab, currentColor 18%, transparent);
 }
 
-/* the absolute pair, for the few rules that fill a box AND put text on it.
-   currentColor is useless there: the same rule sets `color`, and currentColor
-   resolves per element at used-value time, so it would become the new colour
-   and paint the text onto its own background. picks up --fg, --bg and --accent
-   of css/themes.css when it is loaded, the ua system colours otherwise. on body,
-   because that is where themes.css resolves them */
+
 body {
   --element-bg  : var(--bg, Canvas);
   --element-fg  : var(--fg, CanvasText);
@@ -80,6 +75,8 @@ body {
 
   --color-focus : --alpha(cc, 50%);
   --color-muted : --muted(cc, 50%);
+  --color-track : --alpha(cc, 18%);
+
 }
 
 
@@ -94,9 +91,9 @@ aufbau-picker[look="cycle"]::part(trigger),
 aufbau-toggle[look="button"],
 aufbau-upload::part(zone),
 aufbau-writer {
-  border: var(--aufbau-control-border);
-  border-radius: var(--aufbau-control-radius);
-  padding: var(--aufbau-control-pad);
+  border        : var(--aufbau-control-border);
+  border-radius : var(--aufbau-control-radius);
+  padding       : var(--aufbau-control-pad);
 }
 
 :is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) { opacity: 0.5; }
