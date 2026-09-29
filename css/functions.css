@@ -1,4 +1,7 @@
 /* @aufbau/css/functions.css */
+
+@import url("./functions.color.css");
+
 /*
 https://caniuse.com/wf-function
 */
@@ -12,42 +15,7 @@ https://caniuse.com/wf-function
 fn fg-lighter (n <number> : 0.1) <color> { result: darker(fg, n) }
 */
 
-/* towards the background or the foreground: lighter or darker depending on the
-   scheme, so a tint reads the same in light and dark */
-@function --tint(
-  --color  <color>      : var(--accent, royalblue),
-  --amount <percentage> : 20%
-) returns <color> {
-  result: color-mix(in oklch, var(--color), var(--bg, white) var(--amount));
-}
 
-@function --shade(
-  --color  <color>      : var(--accent, royalblue),
-  --amount <percentage> : 20%
-) returns <color> {
-  result: color-mix(in oklch, var(--color), var(--fg, black) var(--amount));
-}
-
-/* a fixed lightness, 0 black to 1 white: --tone(var(--accent), 0.95) is a pale
-   background in the accent's hue */
-@function --tone(
-  --color     <color>  : var(--accent, royalblue),
-  --lightness <number> : 0.5
-) returns <color> {
-  result: oklch(from var(--color) var(--lightness) c h / alpha);
-}
-
-/* chroma times --factor, 0 is grey, above 1 more vivid */
-@function --saturate(
-  --color  <color>  : currentColor,
-  --factor <number> : 1.5
-) returns <color> {
-  result: oklch(from var(--color) l calc(c * var(--factor)) h / alpha);
-}
-
-@function --grayscale(--color <color> : currentColor) returns <color> {
-  result: oklch(from var(--color) l 0 h / alpha);
-}
 
 @function --hue-shift(
   --color   <color> : var(--accent, royalblue),
