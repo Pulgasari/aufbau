@@ -13,6 +13,18 @@ round    = abgerundet
 aber im neuen system am besten irgendwie relativ
 */
 
+@function --rad(--n <number> : 0.1) 
+returns <color> { 
+  result: --if(
+    style(--geometry: sharp)    : 0;
+    style(--geometry: sharpish) : 0.1rem;
+    style(--geometry: rounded)  : if(
+      /* hier müsste es jetzt iwie relativ zum parent werden
+         sodass falls dieser schon radius hat hier um faktor 1 wächst */
+    )
+  );
+}
+
 :root {
   --density  : compact;
   --geometry : sharp;
