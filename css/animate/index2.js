@@ -91,8 +91,9 @@ function reveal (target, name = 'fade', options = {}) {
     onVisible : {
       threshold,
       handler : element => {
-        if (element.dataset.animateState !== 'paused') return;
-        setData(element, 'animate-state', 'running');
+        const state = element.dataset.animateState;
+        if (state !== 'paused') return;
+        state = 'running';
         waitForAnimations(element, { name }).then(() => { if (!keep) clear(element); });
       },
     },
