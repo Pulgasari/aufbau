@@ -1,5 +1,18 @@
 /* @aufbau/css/functions/color.css */
 
+/* HELPERS (experimental) */
+
+@function --resolve-color-argument(
+  --arg type(<color> | bg | fg | ink) : currentColor
+) returns <color> {
+  result: if(
+    style(--arg: bg)  : var(--color-bg);
+    style(--arg: fg)  : var(--color-fg);
+    style(--arg: ink) : var(--color-bg);
+    else              : var(--arg);
+  );
+}
+
 @function --alpha(
   --color   <color>      : currentColor,
   --opacity <percentage> : 50%,
@@ -9,19 +22,24 @@
 }
 
 @function --mix(
-  --from   <color>      : var(--bg, white),
-  --to     <color>      : var(--fg, black),
-  --amount <percentage> : 50%,
-  --mode                : oklch
+  --from   type(<color> | bg | fg | ink) : var(--color-bg),
+  --to     type(<color> | bg | fg | ink) : var(--color-fg),
+  --amount <percentage>                  : 50%,
+  --mode                                 : oklch
 ) returns <color> {
-  result: color-mix(in var(--mode), var(--from), var(--to) var(--amount));
+  --F: --resolve-color-argument(var(--from));
+  --T: --resolve-color-argument(var(--to));
+  result: color-mix(in var(--mode), var(--F), var(--T) var(--amount));
 }
 
+
+
 @function --darker(
-  --C  <color>  : currentColor,
-  --N <number> : 0.1
+  --color  type(<color> | bg | fg | ink) : currentColor,
+  --number <number> : 0.1
 ) returns <color> {
-  result: oklch(from var(--C) max(0, l - var(--N)) c h / alpha);
+  --C : --resolve-color-argument(var(--color));
+  result  : oklch(from var(--C) max(0, l - var(--number)) c h / alpha);
 }
 
 @function --lighter(
@@ -31,15 +49,19 @@
   result: oklch(from var(--C) min(1, l + var(--N)) c h / alpha);
 }
 
+/* if the helper above works we would not neeed these */
 @function --bg-darker(--n <number> : 0.1) 
-returns <color> { result: --darker(var(--bg), var(--n)); }
+returns <color> { result: --darker(bg, var(--n)); }
 
+/* if the helper above works we would not neeed these */
 @function --fg-darker(--n <number> : 0.1) 
-returns <color> { result: --darker(var(--fg), var(--n)); }
+returns <color> { result: --darker(fg, var(--n)); }
 
+/* if the helper above works we would not neeed these */
 @function --bg-lighter(--n <number> : 0.1) 
 returns <color> { result: --lighter(var(--bg), var(--n)); }
 
+/* if the helper above works we would not neeed these */
 @function --fg-lighter-(--n <number> : 0.1) 
 returns <color> { result: --lighter(var(--fg), var(--n)); }
 
