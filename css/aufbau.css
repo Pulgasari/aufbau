@@ -10,6 +10,13 @@
 @import url('./animate/keyframes.css');
 */
 
+/*////////////////////// SPECIAL ///////////////////////*/
+
+:root {
+  interpolate-size     : allow-keywords;
+  transition-behaviour : allow-discrete; /* or * ??? */
+}
+
 /*/////////////////////// RESET ////////////////////////*/
 
 *, *::before, *::after {
@@ -44,7 +51,7 @@ var, video {
 	border-color   : currentcolor; 
 	border-style   : solid; 
 	border-width   : 0;
-  font-size      : 100%;
+  	font-size      : 100%;
 	vertical-align : baseline;
 }
 
@@ -64,22 +71,19 @@ button {
   */
 }
 
-div { min-height: 0; }
+div    { min-height: 0; }
+svg    { max-width : 100%; }
+ol, ul { list-style: none; }
 
-img { /*display: inline-block;*/
+img {
+  /*display: inline-block;*/
   max-width      : 100%;
   object-fit     : cover;
   vertical-align : bottom
 }
 
  input:focus { border: none; outline: none; }
-select:focus { border: none; outline: none; }
-
-svg { max-width : 100%; }
-
-ol, ul {
-	list-style: none;
-}
+select:focus { border: none; outline: none; }ö
 
 table {
 	border-collapse : collapse;
