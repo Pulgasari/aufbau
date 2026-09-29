@@ -2,10 +2,6 @@
 @property --palette      { syntax: "<color> | <custom-ident>"; inherits: true; initial-value: zombie; }
 @property --palette-mode { syntax: "auto | dark | light";      inherits: true; initial-value: auto;   }
 
-@property --bg           { syntax: "<color>";                  inherits: true; initial-value: #282a36; }
-@property --fg           { syntax: "<color>";                  inherits: true; initial-value: #f8f8f2; }
-@property --accent       { syntax: "<color>";                  inherits: true; initial-value: #ff79c6; }
-
 :root {
   color-scheme: light dark;
 
