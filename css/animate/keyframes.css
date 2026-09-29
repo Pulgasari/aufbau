@@ -1,35 +1,41 @@
 /* @aufbau/css/animate/keyframes.css
-   the keyframes only, no selectors. the parameters are custom properties,
-   set by animations.css, each with a fallback here so the file works on its
-   own:
 
-     --animate-length     how far shake, jump, bounce and whip move
-     --animate-angle      how far wobble turns
-     --animate-scale      how far pulse grows
-     --animate-opacity    how far blink fades
-     --animate-turns      how often flip turns
-     --animate-offset     where slide starts (see --slide-offset())
+the keyframes only, no selectors. the parameters are custom properties,
+set by animations.css, each with a fallback here so the file works on its own:
 
-   individual transforms (translate, rotate, scale) keep animations on the same
-   element from overriding each other. */
+--animate-length     how far shake, jump, bounce and whip move
+--animate-angle      how far wobble turns
+--animate-scale      how far pulse grows
+--animate-opacity    how far blink fades
+--animate-turns      how often flip turns
+--animate-offset     where slide and drift start (see --slide-offset())
 
-/*//////////// ENTER ////////////*/
+one-way keyframes run from a start state into the element at rest,
+repeated they jump back each time. 
 
-@keyframes fade { from { opacity: 0; } }
+cyclic ones end where they start, they repeat seamlessly.
+how often either plays is up to the element.
+
+individual transforms (translate, rotate, scale)
+keep animations on the same element from overriding each other. 
+*/
+
+/*//////////// ONE-WAY ////////////*/
+
+@keyframes fade      { from { opacity: 0; } }
+@keyframes rotate-in { from { opacity: 0; rotate: -1turn; } }
+@keyframes slide     { from { translate: var(--animate-offset, -100% 0); } }
+@keyframes zoom      { from { opacity: 0; scale: 0.5; } }
 
 @keyframes pop {
-  0%   { opacity: 0; scale: 0.6;  }
-  60%  { opacity: 1; scale: 1.08; }
-  100% { opacity: 1; scale: 1;    }
+    0% { opacity: 0; scale: 0.6; }
+   60% { opacity: 1; scale: 1.1; }
+  100% { opacity: 1; scale: 1;   }
 }
 
-@keyframes rotate-in { from { opacity: 0; rotate: -1turn; } }
+/*//////////// CYCLIC ////////////*/
 
-@keyframes slide { from { translate: var(--animate-offset, -100% 0); } }
-
-@keyframes zoom { from { opacity: 0; scale: 0.5; } }
-
-/*//////////// GESTURE ////////////*/
+@keyframes blink { 50% { opacity: var(--animate-opacity, 0.2); } }
 
 /* each step carries its own curve: up slows down, down speeds up */
 @keyframes bounce {
@@ -39,11 +45,30 @@
   100% { translate: 0 0; scale: 1;    }
 }
 
+/* 
+the background moves by --animate-offset, the way slide moves the element.
+with a pattern tile as the distance it repeats without a seam. 
+*/
+@keyframes drift {
+  from { background-position: var(--animate-offset, -20px 0); }
+  to   { background-position: 0 0; }
+}
+
 @keyframes flip {
   0%   { rotate: 0turn; animation-timing-function: ease-in; }
   50%  { rotate: calc(var(--animate-turns, 1) * 0.5turn); animation-timing-function: ease-out; }
   100% { rotate: calc(var(--animate-turns, 1) * 1turn); }
 }
+
+@keyframes glitch {
+  0%, 100% { translate: 0 0;      skew: 0deg;  }
+  20%      { translate: -2px 1px; skew: 8deg;  }
+  40%      { translate: 2px -1px; skew: -6deg; }
+  60%      { translate: -1px 0;   skew: 0deg;  }
+  80%      { translate: 1px 1px;  skew: 4deg;  }
+}
+
+@keyframes hue { to { filter: hue-rotate(1turn); } }
 
 @keyframes jump {
   0%, 100% { scale: 1 1;    translate: 0 0; }
@@ -53,45 +78,23 @@
   80%      { scale: 1 1.08; translate: 0 0; }
 }
 
+/*
+--animate-progress from 0 to 1, registered so it interpolates:
+any property of the element or its children can follow it,
+background-position: calc(var(--animate-progress) * 20px) 0 
+*/
+@keyframes progress {
+  from { --animate-progress: 0; }
+  to   { --animate-progress: 1; }
+}
+
+@keyframes pulse { 50% { scale: var(--animate-scale, 1.15); } }
+
 @keyframes shake {
   0%, 100% { translate: 0 0; }
   20%, 60% { translate: calc(      var(--animate-length, 0.75rem) / 2) 0; }
   40%, 80% { translate: calc(-1 *  var(--animate-length, 0.75rem) / 2) 0; }
 }
-
-@keyframes whip {
-  0%, 100% { translate: 0 0; }
-  15%      { translate: calc( 1.2 * var(--animate-length, 0.75rem)) 0; }
-  35%      { translate: calc(-0.8 * var(--animate-length, 0.75rem)) 0; }
-  55%      { translate: calc( 0.4 * var(--animate-length, 0.75rem)) 0; }
-  75%      { translate: calc(-0.2 * var(--animate-length, 0.75rem)) 0; }
-}
-
-@keyframes wobble {
-  0%, 100% { rotate: 0deg; }
-  25%, 75% { rotate: var(--animate-angle, 15deg); }
-  50%      { rotate: calc(-1 * var(--animate-angle, 15deg)); }
-}
-
-/*//////////// BACKGROUND ////////////*/
-
-@keyframes drift { to { background-position: var(--animate-offset, 20px 20px); } }
-
-/*//////////// ONGOING ////////////*/
-
-@keyframes blink { 50% { opacity: var(--animate-opacity, 0.2); } }
-
-@keyframes glitch {
-  0%, 100% { translate: 0 0;       skew:  0deg; }
-  20%      { translate: -2px  1px; skew:  8deg; }
-  40%      { translate:  2px -1px; skew: -6deg; }
-  60%      { translate: -1px  0;   skew:  0deg; }
-  80%      { translate:  1px 1px;  skew:  4deg; }
-}
-
-@keyframes hue { to { filter: hue-rotate(1turn); } }
-
-@keyframes pulse { 50% { scale: var(--animate-scale, 1.15); } }
 
 /* a light sweep across the element, for loading placeholders */
 @keyframes shimmer {
@@ -110,13 +113,16 @@
   80%           { translate: -2px -2px; }
 }
 
-/*
---animate-progress from 0 to 1, registered so it interpolates: 
-any property of the element or its children can follow it,
-background-position: calc(var(--animate-progress) * 20px) 0 
-*/
-@keyframes progress {
-  from { --animate-progress: 0; }
-  to   { --animate-progress: 1; }
+@keyframes whip {
+  0%, 100% { translate: 0 0; }
+  15%      { translate: calc( 1.2 * var(--animate-length, 0.75rem)) 0; }
+  35%      { translate: calc(-0.8 * var(--animate-length, 0.75rem)) 0; }
+  55%      { translate: calc( 0.4 * var(--animate-length, 0.75rem)) 0; }
+  75%      { translate: calc(-0.2 * var(--animate-length, 0.75rem)) 0; }
 }
 
+@keyframes wobble {
+  0%, 100% { rotate: 0deg; }
+  25%, 75% { rotate: var(--animate-angle, 15deg); }
+  50%      { rotate: calc(-1 * var(--animate-angle, 15deg)); }
+}
