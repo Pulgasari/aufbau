@@ -73,6 +73,10 @@
   50%      { rotate: calc(-1 * var(--animate-angle, 15deg)); }
 }
 
+/*//////////// BACKGROUND ////////////*/
+
+@keyframes drift { to { background-position: var(--animate-offset, 20px 20px); } }
+
 /*//////////// ONGOING ////////////*/
 
 @keyframes blink { 50% { opacity: var(--animate-opacity, 0.2); } }
@@ -115,3 +119,4 @@ background-position: calc(var(--animate-progress) * 20px) 0
   from { --animate-progress: 0; }
   to   { --animate-progress: 1; }
 }
+
