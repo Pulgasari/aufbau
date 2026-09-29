@@ -1,5 +1,10 @@
 /* @aufbau/css/tokens.css */
 
+@property --bg           { syntax: "<color>"; inherits: true; initial-value: #282a36; }
+@property --fg           { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
+@property --accent       { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
+
+
 @property --gap     { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 @property --margin  { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 @property --padding { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
