@@ -1,5 +1,11 @@
 # @aufbau/css
 
+```md
+functions.css
+palettes.css
+tokens.css
+```
+
 ## shorthand props
 
 ```css
