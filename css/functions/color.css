@@ -1,3 +1,5 @@
+/* @aufbau/css/functions/color.css */
+
 @function --alpha(
   --color   <color>      : currentColor,
   --opacity <percentage> : 50%,
