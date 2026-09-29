@@ -4,7 +4,7 @@
 
 :root {
   --theme: zombie-monochrome;
-  &[data-theme] { --theme: attr(data-theme type("<custom-ident>"), var--theme)); }
+  &[data-theme] { --theme: attr(data-theme type("<custom-ident>"), zombie-monochrome); }
 }
 
 body {

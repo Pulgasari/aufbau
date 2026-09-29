@@ -19,17 +19,17 @@ body {
   color            : var(--fg);
   accent-color     : var(--accent);
 
-  /* Fallback palette dynamically generated from --theme */
-  --accent : var(--theme);
+  /* Fallback palette dynamically generated from --palette, when it is a color */
+  --accent : var(--palette);
 
   --bg: light-dark(
-    oklch(from var(--theme) 0.97 calc(c * 0.15) h),
-    oklch(from var(--theme) 0.14 calc(c * 0.25) h)
+    oklch(from var(--palette) 0.97 calc(c * 0.15) h),
+    oklch(from var(--palette) 0.14 calc(c * 0.25) h)
   );
 
   --fg: light-dark(
-    oklch(from var(--theme) 0.18 calc(c * 0.05) h),
-    oklch(from var(--theme) 0.94 calc(c * 0.05) h)
+    oklch(from var(--palette) 0.18 calc(c * 0.05) h),
+    oklch(from var(--palette) 0.94 calc(c * 0.05) h)
   );
 
   /* Color-scheme container conditions */
