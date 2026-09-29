@@ -26,7 +26,7 @@ color-scheme (die Paletten arbeiten mit light-dark())
 --border-alpha
 --blur
 
---type :: system | humanist | mono | editorial
+--typo :: system | humanist | mono | editorial
 --font-body
 --font-heading
 --font-mono
@@ -41,15 +41,17 @@ normal, high
 Verstärker für --surface-step und --border-alpha
 */
 
-@property --bg           { syntax: "<color>"; inherits: true; initial-value: #282a36; }
-@property --fg           { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
-@property --accent       { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
+/* pseudo-props für kurzschreibweisen */
+@property --bg  { syntax: "<color>"; inherits: true; initial-value: #282a36; }
+@property --fg  { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
+@property --ink { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
 
-
+/* */
 @property --gap     { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 @property --margin  { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 @property --padding { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
 
+/* default config */
 :root {
   --color-error   : red;
   --color-success : green;
@@ -60,6 +62,22 @@ Verstärker für --surface-step und --border-alpha
   --spacing-normal : 1.00rem;
   --spacing-large  : 2.00rem;
   --spacing-huge   : 4.00rem;
+
+  --palette  : zombie;
+  --scheme   : auto;
+  --geometry : soft;
+  --skin     : monochrome;
+}
+
+/* ermöglicht dann kurzschreibweisen für reguläre rules */
+* { 
+  --bg  : var(--color-bg);
+  --fg  : var(--color-fg);
+  --ink : var(--color-ink);
+  
+  background-color : var(--bg);
+  color            : var(--fg);
+  accent-color     : var(--ink);
 }
 
 * {
