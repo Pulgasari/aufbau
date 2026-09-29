@@ -1,0 +1,42 @@
+@function --alpha(
+  --color   <color>      : currentColor,
+  --opacity <percentage> : 50%,
+  --mode                 : oklch
+) returns <color> {
+  result: color-mix(in var(--mode), var(--color) var(--opacity), transparent);
+}
+
+@function --mix(
+  --from   <color>      : var(--bg, white),
+  --to     <color>      : var(--fg, black),
+  --amount <percentage> : 50%,
+  --mode                : oklch
+) returns <color> {
+  result: color-mix(in var(--mode), var(--from), var(--to) var(--amount));
+}
+
+@function --darker(
+  --color  <color>  : currentColor,
+  --amount <number> : 0.1
+) returns <color> {
+  result: oklch(from var(--color) max(0, l - var(--amount)) c h / alpha);
+}
+
+@function --lighter(
+  --color  <color>  : currentColor,
+  --amount <number> : 0.1
+) returns <color> {
+  result: oklch(from var(--color) min(1, l + var(--amount)) c h / alpha);
+}
+
+@function --bg-darker(--n <number> : 0.1) 
+returns <color> { result: --darker(var(--bg), var(--n)); }
+
+@function --fg-darker(--n <number> : 0.1) 
+returns <color> { result: --darker(var(--fg), var(--n)); }
+
+@function --bg-lighter(--n <number> : 0.1) 
+returns <color> { result: --lighter(var(--bg), var(--n)); }
+
+@function --fg-lighter-(--n <number> : 0.1) 
+returns <color> { result: --lighter(var(--fg), var(--n)); }
