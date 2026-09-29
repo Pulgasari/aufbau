@@ -160,15 +160,11 @@ aufbau-button {
 */
 
 aufbau-button {
-  background-color: transparent;
+  background-color : transparent;
+  border-color     : currentcolor;
 
-  &[variant="ghost"] { border-color: transparent; }
-
-  &[variant="primary"] {
-    background-color : var(--aufbau-accent);
-    border-color     : var(--aufbau-accent);
-    color            : var(--aufbau-surface);
-  }
+  &[variant="ghost"]   { border-color: transparent; }
+  &[variant="primary"] { color: var(--color-ink); }
 }
 
 /* ::: input ::::::::::::::::::::::::::::::::::::::::::::::::::::: */
