@@ -1,5 +1,46 @@
 /* @aufbau/css/tokens.css */
 
+/*
+--palette :: zombie | oled | classic | <color>
+--color-bg
+--color-fg
+--color-ink
+--color-success
+--color-warning
+--color-error
+
+--scheme :: auto | light | dark
+color-scheme (die Paletten arbeiten mit light-dark())
+
+--geometry :: sharp | soft | round | pill
+--radius
+--border-width
+
+--density :: compact | normal | comfortable | touch
+--unit
+--control-size
+
+--skin :: flat | outlined | elevated | glass | monochrome
+--surface-step
+--shadow-level
+--border-alpha
+--blur
+
+--type :: system | humanist | mono | editorial
+--font-body
+--font-heading
+--font-mono
+--ratio
+
+--motion :: none | calm | normal | playful
+--motion
+--ease-default
+
+--contrast
+normal, high
+Verstärker für --surface-step und --border-alpha
+*/
+
 @property --bg           { syntax: "<color>"; inherits: true; initial-value: #282a36; }
 @property --fg           { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
 @property --accent       { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
