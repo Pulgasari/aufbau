@@ -1,14 +1,16 @@
 @property --density  { syntax: "<custom-ident>"; inherits: true; initial-value: compact; }
-@property --geometry { syntax: "<custom-ident>"; inherits: true; initial-value: sharp; }     
+@property --geometry { syntax: "sharp | soft | round | pill"; inherits: true; initial-value: sharp; }     
 
 /*
 ---------- density ----------
 
 ---------- geometry ----------
+type(sharp | soft | round | pill)
 
-sharp    = keinerlei rundungen
-sharpish = minimale rundung, quasi überall gleich
-round    = abgerundet
+sharp = keinerlei rundungen
+soft  = minimale rundung, quasi überall gleich
+round = abgerundet
+pill  = 
 
 aber im neuen system am besten irgendwie relativ
 */
