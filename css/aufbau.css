@@ -1,3 +1,15 @@
+/*
+@import url('./reset.css');
+@import url('./design.css');
+@import url('./functions.css');
+@import url('./palettes.css');
+@import url('./themes.css');
+@import url('./tokens.css');
+@import url('./animate/animations.css');
+@import url('./animate/functions.css');
+@import url('./animate/keyframes.css');
+*/
+
 /*/////////////////////// RESET ////////////////////////*/
 
 *, *::before, *::after {
