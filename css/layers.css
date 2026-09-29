@@ -2,8 +2,8 @@
 @layer tokens, reset, layout, shapes, themes, components, utilities;
 
 /* Import modules into their corresponding layers */
-@import url("tokens/variables.css") layer(tokens);
-@import url("base/reset.css") layer(reset);
+@import url("tokens.css") layer(tokens);
+@import url("reset.css") layer(reset);
 
 /* Layout options */
 @import url("layout/three-panels.css") layer(layout);
@@ -17,4 +17,4 @@
 @import url("themes.css") layer(themes);
 
 /* Component scoped styles */
-@import url("components/card.css") layer(components);
+/* @import url("components/card.css") layer(components); */
