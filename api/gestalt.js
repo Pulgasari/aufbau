@@ -1,34 +1,41 @@
 // @aufbau/api/gestalt.js
-// the appearance of a page as a whole: palette, mode, theme, look, layout and
-// skin, one controller for all of them.
+// the appearance of a page as a whole: palette, mode, theme, density, geometry,
+// look, layout and skin, one controller for all of them.
 //
-//   await gestalt.set({ palette: 'oled', mode: 'dark', look: 'rounded' });
+//   await gestalt.set({ palette: 'oled', mode: 'dark', density: 'touch', geometry: 'round' });
 //   gestalt.get('palette')    // 'oled'
 //   gestalt.colors()          // { bg, fg, ink } as the browser computed them
 //   await gestalt.palettes()  // the preset names of css/palettes.css
 //   await gestalt.themes()    // the preset names of css/themes.css
 //
-// palette, mode and theme are custom properties on the root, mode as --scheme.
+// palette, mode, theme, density and geometry are custom properties on the root,
+// mode as --scheme.
 // css/palettes.css reads palette, css/tokens.css the scheme, so a palette is a preset name or any css color:
 // 'dracula', 'teal', '#ff8800'. css/themes.css turns a theme into a palette
 // and a skin.
-// look, layout and skin are stylesheets, one per kind, swapped in place, false
-// removes one.
+// look and layout are stylesheets, one per kind, swapped in place, false
+// removes one. skin is both: the --skin token, and the sheet the elements adopt
+// into @layer aufbau.skin (elements/core/skin.js).
 
 export const CSS_PATH = 'https://code.pulgasari.dev/aufbau/css';
 
-export const MODES   = ['auto', 'dark', 'light'];
-export const LAYOUTS = ['landing', 'mobile-basic', 'three-panels'];
-export const LOOKS   = ['flat', 'rounded'];
-export const SKINS   = ['monochrome'];
+export const DENSITIES  = ['compact', 'normal', 'comfortable', 'touch'];
+export const GEOMETRIES = ['sharp', 'soft', 'round', 'pill'];
+export const LAYOUTS    = ['landing', 'mobile-basic', 'three-panels'];
+export const LOOKS      = ['flat', 'rounded'];
+export const MODES      = ['auto', 'dark', 'light'];
+export const SKINS      = ['monochrome'];
 
 // the properties tokens.css, palettes.css and themes.css read, mirrored as data-* for selectors
-const TOKENS = { mode: 'scheme', palette: 'palette', theme: 'theme' };
+const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };
 
 // the folder of each stylesheet kind
-const SHEETS = { layout: 'layouts', look: 'looks', skin: 'skins' };
+const SHEETS = { layout: 'layouts', look: 'looks' };
 
 const current = {};
+
+// the skin sheet belongs to the elements, one adoption in their layer. false or null removes it
+const setSkin = async name => (await import('@aufbau/elements/core/skin.js')).setSkin(name || null);
 
 const domina = name => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default);
 
@@ -101,10 +108,13 @@ const themes   = () => presetNames('themes.css', 'theme');
 
 // :::::: API
 
-/** sets any of palette, mode, theme, layout, look and skin. resolves once the stylesheets are in */
+/** sets any of palette, mode, theme, density, geometry, layout, look and skin. resolves once the stylesheets are in */
 async function set (values = {}) {
   for (const [key, name] of Object.entries(TOKENS)) if (key in values) setToken(name, values[key]);
-  await Promise.all(Object.keys(SHEETS).filter(key => key in values).map(key => setSheet(key, values[key])));
+  await Promise.all([
+    ...Object.keys(SHEETS).filter(key => key in values).map(key => setSheet(key, values[key])),
+    'skin' in values && setSkin(values.skin),
+  ]);
   Object.assign(current, values);
   return { ...current };
 }
@@ -121,6 +131,6 @@ const colors = (element = document.body) => {
   return Object.fromEntries(['bg', 'fg', 'ink'].map(name => [name, style.getPropertyValue(`--color-${name}`).trim()]));
 };
 
-export const gestalt = { colors, get, palettes, set, themes, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS };
+export const gestalt = { colors, get, palettes, set, themes, densities: DENSITIES, geometries: GEOMETRIES, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS };
 
 export default gestalt;

@@ -24,18 +24,25 @@
 
 /*//////////// AXES ////////////*/
 
-@property --palette { inherits: true; initial-value: zombie; syntax: "<color> | <custom-ident>"; }
-@property --scheme  { inherits: true; initial-value: auto;   syntax: "auto | light | dark"; }
-@property --skin    { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
+@property --density  { inherits: true; initial-value: normal;     syntax: "compact | normal | comfortable | touch"; }
+@property --geometry { inherits: true; initial-value: soft;       syntax: "sharp | soft | round | pill"; }
+@property --palette  { inherits: true; initial-value: zombie;     syntax: "<color> | <custom-ident>"; }
+@property --scheme   { inherits: true; initial-value: auto;       syntax: "auto | light | dark"; }
+@property --skin     { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
 
+/* density and geometry are set but not read yet, the tokens they drive follow */
 :root {
-  --palette : zombie;
-  --scheme  : auto;
-  --skin    : monochrome;
+  --density  : normal;
+  --geometry : soft;
+  --palette  : zombie;
+  --scheme   : auto;
+  --skin     : monochrome;
 
-  &[data-palette] { --palette : attr(data-palette type(<color> | <custom-ident>), zombie); }
-  &[data-scheme]  { --scheme  : attr(data-scheme  type(auto | light | dark), auto); }
-  &[data-skin]    { --skin    : attr(data-skin    type(<custom-ident>), monochrome); }
+  &[data-density]  { --density  : attr(data-density  type(compact | normal | comfortable | touch), normal); }
+  &[data-geometry] { --geometry : attr(data-geometry type(sharp | soft | round | pill), soft); }
+  &[data-palette]  { --palette  : attr(data-palette  type(<color> | <custom-ident>), zombie); }
+  &[data-scheme]   { --scheme   : attr(data-scheme   type(auto | light | dark), auto); }
+  &[data-skin]     { --skin     : attr(data-skin     type(<custom-ident>), monochrome); }
 
   color-scheme: if(style(--scheme: light): light; style(--scheme: dark): dark; else: light dark);
 }
