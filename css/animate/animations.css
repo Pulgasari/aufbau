@@ -1,87 +1,86 @@
 /* @aufbau/css/animate/animations.css
-animations by attribute, or by custom property from any rule:
+   animations by attribute, or by custom property from any rule:
 
-  <div data-animate="shake" data-animate-count="3" data-animate-duration="fast">
-  .alert { --animate: shake; }            (the element needs data-animate)
+     <div data-animate="shake" data-animate-count="3" data-animate-duration="fast">
+     .alert { --animate: shake; }            (the element needs data-animate)
 
-parameters, as data-animate-* attribute or --animate-* property:
+   parameters, as data-animate-* attribute or --animate-* property:
 
      duration   auto | instant | fast | normal | slow | lazy | <time>
      ease       auto | linear | ease | ease-in | ease-out | ease-in-out
                 | smooth | snappy | enter | exit | bounce | spring
-     count      auto | infinite | <number>
+     count      infinite | <number>             (1 when not set)
      delay      <time>
      stagger    <time>, added per sibling: lists play one item after the other
      direction  normal | reverse | alternate | alternate-reverse
      state      running | paused
      timeline   auto | view | scroll    (view: plays while scrolling into view)
-     from       left | right | top | bottom    (slide)
-     distance   auto | <length-percentage>      (shake, jump, bounce, whip, slide)
+     from       left | right | top | bottom    (slide, drift)
+     distance   auto | <length-percentage>      (shake, jump, bounce, whip, slide, drift)
      angle      <angle>                         (wobble)
      scale      <number>                        (pulse)
      opacity    <number>                        (blink)
      turns      <number>                        (flip)
 
-   auto takes the default of the animation (see functions.css). the rules sit
-   in :where(), any rule of the page wins. needs keyframes.css and functions.css,
-   durations follow the --motion token. */
+   auto takes the default of the animation (see functions.css). an attribute
+   counts like a class, the animation rule itself sits in :where() so any rule
+   of the page overrides it. needs keyframes.css and functions.css, durations
+   follow the --motion token. */
 
 /*//////////// PARAMETERS ////////////*/
 
 /* not inherited: a setting stays on its element and does not leak into a
    nested animation */
-@property --animate           { syntax: "none | <custom-ident>";                                              inherits: false; initial-value: none;    }
-@property --animate-duration  { syntax: "auto | instant | fast | normal | slow | lazy | <time>";              inherits: false; initial-value: auto;    }
-@property --animate-ease      { syntax: "auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring"; inherits: false; initial-value: auto; }
-@property --animate-count     { syntax: "auto | infinite | <number>";                                         inherits: false; initial-value: auto;    }
-@property --animate-delay     { syntax: "<time>";                                                             inherits: false; initial-value: 0s;      }
-@property --animate-stagger   { syntax: "<time>";                                                             inherits: false; initial-value: 0s;      }
-@property --animate-direction { syntax: "normal | reverse | alternate | alternate-reverse";                   inherits: false; initial-value: normal;  }
-@property --animate-state     { syntax: "running | paused";                                                   inherits: false; initial-value: running; }
-@property --animate-timeline  { syntax: "auto | view | scroll";                                               inherits: false; initial-value: auto;    }
-@property --animate-from      { syntax: "left | right | top | bottom";                                        inherits: false; initial-value: left;    }
-@property --animate-distance  { syntax: "auto | <length-percentage>";                                         inherits: false; initial-value: auto;    }
-@property --animate-angle     { syntax: "<angle>";                                                            inherits: false; initial-value: 15deg;   }
-@property --animate-scale     { syntax: "<number>";                                                           inherits: false; initial-value: 1.15;    }
-@property --animate-opacity   { syntax: "<number>";                                                           inherits: false; initial-value: 0.2;     }
-@property --animate-turns     { syntax: "<number>";                                                           inherits: false; initial-value: 1;       }
-
-/* animated by the progress keyframes, inherited so children can follow it */
-@property --animate-progress  { syntax: "<number>";                                                           inherits: true;  initial-value: 0;       }
+@property --animate           { inherits: false; initial-value: none;    syntax: "none | <custom-ident>"; }
+@property --animate-duration  { inherits: false; initial-value: auto;    syntax: "auto | instant | fast | normal | slow | lazy | <time>"; }
+@property --animate-ease      { inherits: false; initial-value: auto;    syntax: "auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring"; }
+@property --animate-count     { inherits: false; initial-value: 1;       syntax: "infinite | <number>"; }
+@property --animate-delay     { inherits: false; initial-value: 0s;      syntax: "<time>"; }
+@property --animate-stagger   { inherits: false; initial-value: 0s;      syntax: "<time>"; }
+@property --animate-direction { inherits: false; initial-value: normal;  syntax: "normal | reverse | alternate | alternate-reverse"; }
+@property --animate-state     { inherits: false; initial-value: running; syntax: "running | paused"; }
+@property --animate-timeline  { inherits: false; initial-value: auto;    syntax: "auto | view | scroll"; }
+@property --animate-from      { inherits: false; initial-value: left;    syntax: "left | right | top | bottom"; }
+@property --animate-distance  { inherits: false; initial-value: auto;    syntax: "auto | <length-percentage>"; }
+@property --animate-angle     { inherits: false; initial-value: 15deg;   syntax: "<angle>"; }
+@property --animate-scale     { inherits: false; initial-value: 1.15;    syntax: "<number>"; }
+@property --animate-opacity   { inherits: false; initial-value: 0.2;     syntax: "<number>"; }
+@property --animate-turns     { inherits: false; initial-value: 1;       syntax: "<number>"; }
 
 /*//////////// ATTRIBUTES ////////////*/
 
-/* each attribute only where it is set, so a property from a rule is not
-   overwritten by a missing attribute */
-:where([data-animate])            { --animate           : attr(data-animate           type(<custom-ident>), none); }
-:where([data-animate-duration])   { --animate-duration  : attr(data-animate-duration  type(auto | instant | fast | normal | slow | lazy | <time>), auto); }
-:where([data-animate-ease])       { --animate-ease      : attr(data-animate-ease      type(auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring), auto); }      
-:where([data-animate-count])      { --animate-count     : attr(data-animate-count     type(auto | infinite | <number>), auto); }
-:where([data-animate-delay])      { --animate-delay     : attr(data-animate-delay     type(<time>), 0s); }
-:where([data-animate-stagger])    { --animate-stagger   : attr(data-animate-stagger   type(<time>), 0s); }
-:where([data-animate-direction])  { --animate-direction : attr(data-animate-direction type(normal | reverse | alternate | alternate-reverse), normal); }
-:where([data-animate-state])      { --animate-state     : attr(data-animate-state     type(running | paused), running); }
-:where([data-animate-timeline])   { --animate-timeline  : attr(data-animate-timeline  type(auto | view | scroll), auto); }
-:where([data-animate-from])       { --animate-from      : attr(data-animate-from      type(left | right | top | bottom), left); }
-:where([data-animate-distance])   { --animate-distance  : attr(data-animate-distance  type(auto | <length-percentage>), auto); }
-:where([data-animate-angle])      { --animate-angle     : attr(data-animate-angle     type(<angle>), 15deg); }
-:where([data-animate-scale])      { --animate-scale     : attr(data-animate-scale     type(<number>), 1.15); }
-:where([data-animate-opacity])    { --animate-opacity   : attr(data-animate-opacity   type(<number>), 0.2); }
-:where([data-animate-turns])      { --animate-turns     : attr(data-animate-turns     type(<number>), 1); }
+[data-animate]            { --animate           : attr(data-animate           type(<custom-ident>), none); }
+[data-animate-duration]   { --animate-duration  : attr(data-animate-duration  type(auto | instant | fast | normal | slow | lazy | <time>), auto); }
+[data-animate-ease]       { --animate-ease      : attr(data-animate-ease      type(auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring), auto); }
+[data-animate-count]      { --animate-count     : attr(data-animate-count     type(infinite | <number>), 1); }
+[data-animate-delay]      { --animate-delay     : attr(data-animate-delay     type(<time>), 0s); }
+[data-animate-stagger]    { --animate-stagger   : attr(data-animate-stagger   type(<time>), 0s); }
+[data-animate-direction]  { --animate-direction : attr(data-animate-direction type(normal | reverse | alternate | alternate-reverse), normal); }
+[data-animate-state]      { --animate-state     : attr(data-animate-state     type(running | paused), running); }
+[data-animate-timeline]   { --animate-timeline  : attr(data-animate-timeline  type(auto | view | scroll), auto); }
+[data-animate-from]       { --animate-from      : attr(data-animate-from      type(left | right | top | bottom), left); }
+[data-animate-distance]   { --animate-distance  : attr(data-animate-distance  type(auto | <length-percentage>), auto); }
+[data-animate-angle]      { --animate-angle     : attr(data-animate-angle     type(<angle>), 15deg); }
+[data-animate-scale]      { --animate-scale     : attr(data-animate-scale     type(<number>), 1.15); }
+[data-animate-opacity]    { --animate-opacity   : attr(data-animate-opacity   type(<number>), 0.2); }
+[data-animate-turns]      { --animate-turns     : attr(data-animate-turns     type(<number>), 1); }
 
 /*//////////// ANIMATION ////////////*/
 
 :where([data-animate]) {
-  /* auto: a slide comes all the way in, a gesture moves a little */
+  /* auto: a slide comes all the way in, a drift moves one tile, the rest a little */
   --animate-length: if(
-    style(--animate-distance: auto): if(style(--animate: slide): 100%; else: 0.75rem);
+    style(--animate-distance: auto): if(
+      style(--animate: slide) : 100%;
+      style(--animate: drift) : 20px;
+      else                    : 0.75rem);
     else: var(--animate-distance));
   --animate-offset: --slide-offset(var(--animate-from), var(--animate-length));
 
   animation-name            : var(--animate);
   animation-duration        : --animate-time(var(--animate-duration), var(--animate));
   animation-timing-function : --animate-easing(var(--animate-ease), var(--animate));
-  animation-iteration-count : --animate-count(var(--animate-count), var(--animate));
+  animation-iteration-count : var(--animate-count);
   animation-delay           : calc(var(--animate-delay) + (sibling-index() - 1) * var(--animate-stagger) * var(--motion, 1));
   animation-direction       : var(--animate-direction);
   animation-play-state      : var(--animate-state);
