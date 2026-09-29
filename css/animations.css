@@ -3,12 +3,12 @@
 [data-animate],
 .ani, .animation, .animate, .anima, .animus {
   --atf: linear;
-  animation-direction:       var(--direction, normal);
-  animation-duration:        var(--duration, 1000ms);
-  animation-fill-mode:       both;
-  animation-iteration-count: var(--iterations, infinite);
-  animation-timing-function: var(--atf);
-  transform-origin:          var(--origin, center);
+  animation-direction       : var(--direction, normal);
+  animation-duration        : var(--duration, 1000ms);
+  animation-fill-mode       : both;
+  animation-iteration-count : var(--iterations, infinite);
+  animation-timing-function : var(--atf);
+  transform-origin          : var(--origin, center);
 }
 /* Richtung */
 .normal   { --direction: normal; }
@@ -112,6 +112,9 @@
 [data-animate="whip"],     .whip      { animation-name: whip;      --duration: var(--duration,  600ms); --d: var(--distance,20px); }
 [data-animate="wobble"],   .wobble    { animation-name: wobble; }
 
-/* QualitĆ¤ts-Empfehlungen (optional) */
+[data-animate][data-animate-atf] { --atf      : attr(data-animate-atf); }
+[data-animate][data-animate-dur] { --duration : attr(data-animate-dur ms); }
+
+/* Qualitäts-Empfehlungen (optional) */
 .opacity   { will-change: opacity;   }
 .transform { will-change: transform; }
