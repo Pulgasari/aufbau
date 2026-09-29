@@ -37,17 +37,14 @@ https://caniuse.com/wf-function
 
 
 @function --hue-shift(
-  --color   <color> : var(--accent, royalblue),
-  --degrees <angle> : 30deg
+  --color <color> : var(--ink),
+  --angle <angle> : 30deg
 ) returns <color> {
-  result: oklch(from var(--color) l c calc(h + var(--degrees) / 1deg) / alpha);
+  result: oklch(from var(--color) l c calc(h + var(--angle) / 1deg) / alpha);
 }
 
-@function --complement(
-   --color <color> : var(--accent, royalblue)
-) returns <color> {
-  result: --hue-shift(var(--color), 180deg);
-}
+@function --complement(--color <color> : var(--ink)) returns <color> 
+{ result: --hue-shift(var(--color), 180deg); }
 
 /* the neighbours on the wheel: --analogous(var(--accent), -1) and (…, 1) */
 @function --analogous(
@@ -142,19 +139,16 @@ https://caniuse.com/wf-function
 }
 
 /* line height for a --step: large type sits tighter */
-@function --leading(--n <number> : 0) returns <number> {
-  result: clamp(1.1, 1.55 - var(--n) * 0.08, 1.7);
-}
+@function --leading(--n <number> : 0) returns <number>
+{ result: clamp(1.1, 1.55 - var(--n) * 0.08, 1.7); }
 
 /* letter spacing for a --step: large type a little tighter, small a little wider */
-@function --tracking(--n <number> : 0) returns <length> {
-  result: calc(var(--n) * -0.012em);
-}
+@function --tracking(--n <number> : 0) returns <length>
+{ result: calc(var(--n) * -0.012em); }
 
 /* a readable line length, never wider than the parent */
-@function --measure(--characters <number> : 65) returns <length-percentage> {
-  result: min(100%, calc(var(--characters) * 1ch));
-}
+@function --measure(--characters <number> : 65) returns <length-percentage>
+{ result: min(100%, calc(var(--characters) * 1ch)); }
 
 /* the side padding that centers --width content in a full width parent, at least
    --minimum. for full bleed layouts: padding-inline: --gutter(60rem) */
