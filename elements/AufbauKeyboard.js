@@ -127,7 +127,7 @@ export default class AufbauKeyboard extends AufbauElement {
   // structure: one role=group block per `rows` entry (aria-label names it),
   // a <div> per row, <span> for the spacing gaps. key sizes follow from data-key
   static styles = `aufbau-keyboard {
-    background          : var(--keyboard-bg, var(--bg, Canvas));
+    background          : var(--keyboard-bg, var(--color-bg, Canvas));
     display             : flex;
     flex-direction      : column;
     gap                 : var(--keyboard-gap, 0.25rem);
@@ -150,10 +150,10 @@ export default class AufbauKeyboard extends AufbauElement {
     }
 
     button {
-      background    : var(--keyboard-key-bg, color-mix(in oklch, var(--bg, Canvas), var(--fg, CanvasText) 12%));
+      background    : var(--keyboard-key-bg, color-mix(in oklch, var(--color-bg, Canvas), var(--color-fg, CanvasText) 12%));
       border        : 0;
       border-radius : var(--keyboard-key-radius, 4px);
-      color         : var(--keyboard-key-fg, var(--fg, CanvasText));
+      color         : var(--keyboard-key-fg, var(--color-fg, CanvasText));
       cursor        : pointer;
       display       : grid;
       flex          : 1 0 0;
@@ -163,7 +163,7 @@ export default class AufbauKeyboard extends AufbauElement {
       place-content : center;
 
       &[aria-pressed="true"] {
-        background : var(--keyboard-key-active-bg, var(--accent, Highlight));
+        background : var(--keyboard-key-active-bg, var(--color-ink, Highlight));
         color      : var(--keyboard-key-active-fg, var(--accent-fg, HighlightText));
       }
 

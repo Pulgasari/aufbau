@@ -1,12 +1,12 @@
 /* @aufbau/devtools */
 
 :root {
-  --color-debug  : var(--fg);
+  --color-debug  : var(--color-fg);
   --color-error  : red; 
   --color-info   : #8be9fd;
-  --color-input  : var(--fg);
-  --color-plain  : var(--fg);
-  --color-result : var(--fg);
+  --color-input  : var(--color-fg);
+  --color-plain  : var(--color-fg);
+  --color-result : var(--color-fg);
   --color-warn   : orange;
 
   --c-string : #98c379;
@@ -84,7 +84,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 }
 
 #devtools {
-  background     : color-mix(in oklch, var(--bg), black 20%);
+  background     : color-mix(in oklch, var(--color-bg), black 20%);
   display        : flex;
   flex-flow      : column;
   /* no height here: the aside is the menu plus whatever panel is open, and a
@@ -123,7 +123,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
       border-radius: 1rem;
     }
 
-    &:active::before { background: var(--accent, #ff79c6); }
+    &:active::before { background: var(--color-ink, #ff79c6); }
   }
 
   > menu {
@@ -139,7 +139,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
     aufbau-icon {
       cursor: pointer;
-      &[aria-pressed="true"] { color: var(--accent, #ff79c6); }
+      &[aria-pressed="true"] { color: var(--color-ink, #ff79c6); }
     }
   }
 
@@ -189,7 +189,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
     &[data-state="missing"] { color: var(--color-error); font-style: italic; }
     &[data-state="good"]    { color: var(--color-success, #50fa7b); }
     &[data-state="warn"]    { color: var(--color-warn); }
-    &[data-state="bad"]     { color: var(--accent, #ff5555); }
+    &[data-state="bad"]     { color: var(--color-ink, #ff5555); }
   }
 
   small  { color: var(--mix-600, #777); }
@@ -220,8 +220,8 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
     /* second tap confirms — see armAction() in panels/data.js */
     &[data-armed] {
-      border-color: var(--accent, #ff5555);
-      color       : var(--accent, #ff5555);
+      border-color: var(--color-ink, #ff5555);
+      color       : var(--color-ink, #ff5555);
       background  : var(--accent-10, #fff2);
     }
 
@@ -241,8 +241,8 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
     min-inline-size: 0;
   }
 
-  input[type="range"]    { flex: 1; padding: 0; accent-color: var(--accent, #ff79c6); }
-  input[type="checkbox"] { inline-size: 1.4em; block-size: 1.4em; accent-color: var(--accent, #ff79c6); }
+  input[type="range"]    { flex: 1; padding: 0; accent-color: var(--color-ink, #ff79c6); }
+  input[type="checkbox"] { inline-size: 1.4em; block-size: 1.4em; accent-color: var(--color-ink, #ff79c6); }
 
   /* a toolbar row: search field plus the buttons that act on it */
   header {
@@ -315,11 +315,11 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
     background     : #fff1;
     overflow       : hidden;
 
-    .progress-bar { background: var(--accent, #ff79c6); }
+    .progress-bar { background: var(--color-ink, #ff79c6); }
   }
 
   [data-state="warn"] aufbau-progress .progress-bar { background: var(--accent-2, #f1fa8c); }
-  [data-state="bad"]  aufbau-progress .progress-bar { background: var(--accent,   #ff5555); }
+  [data-state="bad"]  aufbau-progress .progress-bar { background: var(--color-ink,   #ff5555); }
 
   /* :::: tables ::::::::::::::::::::::::::::::::::::::::::::::::: */
 
@@ -332,7 +332,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
       inset-block-start: 0;
       z-index          : 1;
       padding          : 0.3em 0.4em;
-      background       : color-mix(in oklch, var(--bg), black 30%);
+      background       : color-mix(in oklch, var(--color-bg), black 30%);
       color            : var(--mix-500, #888);
       text-align       : start;
       white-space      : nowrap;
@@ -410,7 +410,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
       &.is-undefined,
       &.is-circular { color: var(--mix-600, #777); }
       &.is-circular { font-style: italic; }
-      &.is-error    { color: var(--accent, #ff5555); }
+      &.is-error    { color: var(--color-ink, #ff5555); }
       &.is-node     { color: #8be9fd; }
     }
 
@@ -447,7 +447,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
         &[aria-pressed="true"] { 
           opacity: 1; color: inherit; 
           --bgc: white; 
-          --fgc: var(--bg);
+          --fgc: var(--color-bg);
           &[data-level="error"] { --bgc: var(--color-error); }
           &[data-level="info"]  { --bgc: var(--color-info); }
           &[data-level="warn"]  { --bgc: var(--color-warn); }
@@ -568,7 +568,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
           color         : #8be9fd;
 
           &::before { border-width: 1px 1px 0 0; rotate: 45deg; opacity: 0.6; block-size: 0.4em; inline-size: 0.4em; }
-          &[aria-selected="true"] { background: var(--accent-25, #fff2); outline: 1px solid var(--accent, #ff79c6); }
+          &[aria-selected="true"] { background: var(--accent-25, #fff2); outline: 1px solid var(--color-ink, #ff79c6); }
         }
 
         &[open]      > summary::before { rotate: 135deg; }
@@ -588,7 +588,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
         font-style : italic;
       }
 
-      div[data-node="text"] { color: var(--fg, #f8f8f2); opacity: 0.8; font-style: normal; }
+      div[data-node="text"] { color: var(--color-fg, #f8f8f2); opacity: 0.8; font-style: normal; }
     }
 
     /* the detail view for whatever is selected */

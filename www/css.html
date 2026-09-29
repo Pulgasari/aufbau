@@ -9,9 +9,9 @@
     /* the playground chrome only, scoped so the markup in #stage is left alone */
 
     body {
-      --line  : color-mix(in oklch, var(--fg, #ddd) 14%, var(--bg, #111));
-      --muted : color-mix(in oklch, var(--fg, #ddd) 60%, var(--bg, #111));
-      --panel : color-mix(in oklch, var(--fg, #ddd) 6%,  var(--bg, #111));
+      --line  : color-mix(in oklch, var(--color-fg, #ddd) 14%, var(--color-bg, #111));
+      --muted : color-mix(in oklch, var(--color-fg, #ddd) 60%, var(--color-bg, #111));
+      --panel : color-mix(in oklch, var(--color-fg, #ddd) 6%,  var(--color-bg, #111));
 
       display               : grid;
       grid-template-columns : minmax(0, 1fr);   /* a long code line must not widen the page */
@@ -53,7 +53,7 @@
         font          : inherit;
         cursor        : pointer;
 
-        &[aria-selected="true"] { background: var(--accent, #7c7cf0); color: var(--bg, #111); }
+        &[aria-selected="true"] { background: var(--color-ink, #7c7cf0); color: var(--color-bg, #111); }
       }
 
       .spacer { flex: 1; }
@@ -162,19 +162,19 @@
   <script type="text/plain" id="default-css">
 /* the preview is #stage, everything nests in it so the playground stays as is */
 #stage {
-  --bg     : #fdfdfd;
-  --fg     : #1d1d22;
-  --accent : #5b5bd6;
-  --line   : #e2e2e8;
+  --color-bg  : #fdfdfd;
+  --color-fg  : #1d1d22;
+  --color-ink : #5b5bd6;
+  --line      : #e2e2e8;
 
   padding    : 1rem;
-  background : var(--bg);
-  color      : var(--fg);
+  background : var(--color-bg);
+  color      : var(--color-fg);
   font       : 16px/1.5 system-ui, sans-serif;
 
   * { box-sizing: border-box; }
 
-  a { color: var(--accent); }
+  a { color: var(--color-ink); }
 
   .buttons { display: flex; gap: .5rem; flex-wrap: wrap; }
 
@@ -185,7 +185,7 @@
     background    : #fff;
     font          : inherit;
   }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary { background: var(--color-ink); border-color: var(--color-ink); color: #fff; }
 
   form  { display: grid; gap: .6rem; margin-block: 1rem; }
   label { display: grid; gap: .25rem; }

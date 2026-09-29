@@ -7,9 +7,9 @@
   <title>@aufbau/gestures — demo</title>
 
   <style>
-    :root { --line: #e2e2e6; --accent: #5b5bd6; --ink: #1a1a1e; --muted: #6b6b74; }
+    :root { --line: #e2e2e6; --color-ink: #5b5bd6; --text: #1a1a1e; --muted: #6b6b74; }
     * { box-sizing: border-box; }
-    body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 1rem 1rem 4rem; max-width: 56rem; margin-inline: auto; color: var(--ink); }
+    body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 1rem 1rem 4rem; max-width: 56rem; margin-inline: auto; color: var(--text); }
     h1 { font-size: 1.8rem; margin: 0 0 .25rem; }
     h2 { font-size: 1.15rem; margin: 2.25rem 0 .5rem; }
     p.lead { color: var(--muted); margin: 0 0 1rem; }
@@ -18,7 +18,7 @@
     .card { border: 1px solid var(--line); border-radius: .6rem; padding: 1rem; }
     .read { font: 12px/1.5 ui-monospace, monospace; color: var(--muted); white-space: pre-wrap; margin-top: .5rem; }
     button { font: inherit; padding: .4rem .8rem; border: 1px solid var(--line); border-radius: .4rem; background: #fff; cursor: pointer; }
-    button:hover { border-color: var(--accent); }
+    button:hover { border-color: var(--color-ink); }
 
     /* transformable */
     .stage { position: relative; height: 62vh; min-height: 320px; overflow: hidden; border: 1px solid var(--line);
@@ -33,7 +33,7 @@
     .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
     .pad { height: 150px; border-radius: .5rem; display: grid; place-items: center; color: #fff; font-weight: 600;
            background: #3a3a44; touch-action: none; user-select: none; text-align: center; padding: .5rem; }
-    .follow { width: 64px; height: 64px; border-radius: .5rem; background: var(--accent); }
+    .follow { width: 64px; height: 64px; border-radius: .5rem; background: var(--color-ink); }
     .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--size, 64px), 1fr)); gap: .4rem; touch-action: pan-x pan-y; }
     .gallery > div { aspect-ratio: 1; border-radius: .4rem; background: linear-gradient(135deg, #5b5bd6, #7ab8ff); }
   </style>

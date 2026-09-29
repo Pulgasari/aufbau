@@ -4,12 +4,12 @@
 //
 //   await gestalt.set({ palette: 'oled', mode: 'dark', look: 'rounded' });
 //   gestalt.get('palette')    // 'oled'
-//   gestalt.colors()          // { accent, bg, fg } as the browser computed them
+//   gestalt.colors()          // { bg, fg, ink } as the browser computed them
 //   await gestalt.palettes()  // the preset names of css/palettes.css
 //   await gestalt.themes()    // the preset names of css/themes.css
 //
-// palette, mode and theme are custom properties on the root. css/palettes.css
-// reads palette and mode, so a palette is a preset name or any css color:
+// palette, mode and theme are custom properties on the root, mode as --scheme.
+// css/palettes.css reads palette, css/tokens.css the scheme, so a palette is a preset name or any css color:
 // 'dracula', 'teal', '#ff8800'. css/themes.css turns a theme into a palette
 // and a skin.
 // look, layout and skin are stylesheets, one per kind, swapped in place, false
@@ -22,8 +22,8 @@ export const LAYOUTS = ['landing', 'mobile-basic', 'three-panels'];
 export const LOOKS   = ['flat', 'rounded'];
 export const SKINS   = ['monochrome'];
 
-// the properties palettes.css and themes.css read, mirrored as data-* for selectors
-const TOKENS = { mode: 'palette-mode', palette: 'palette', theme: 'theme' };
+// the properties tokens.css, palettes.css and themes.css read, mirrored as data-* for selectors
+const TOKENS = { mode: 'scheme', palette: 'palette', theme: 'theme' };
 
 // the folder of each stylesheet kind
 const SHEETS = { layout: 'layouts', look: 'looks', skin: 'skins' };
@@ -118,7 +118,7 @@ const get = key => {
 /** the colors the palette resolved to, as rgb() strings. on body, where the presets land */
 const colors = (element = document.body) => {
   const style = getComputedStyle(element);
-  return Object.fromEntries(['accent', 'bg', 'fg'].map(name => [name, style.getPropertyValue(`--${name}`).trim()]));
+  return Object.fromEntries(['bg', 'fg', 'ink'].map(name => [name, style.getPropertyValue(`--color-${name}`).trim()]));
 };
 
 export const gestalt = { colors, get, palettes, set, themes, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS };

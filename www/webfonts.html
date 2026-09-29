@@ -11,9 +11,9 @@
        there, so the page follows any theme */
 
     body {
-      --surface : color-mix(in oklab, var(--bg) 88%, var(--fg));
-      --line    : color-mix(in oklab, var(--bg) 78%, var(--fg));
-      --muted   : color-mix(in oklab, var(--fg) 55%, var(--bg));
+      --surface : color-mix(in oklab, var(--color-bg) 88%, var(--color-fg));
+      --line    : color-mix(in oklab, var(--color-bg) 78%, var(--color-fg));
+      --muted   : color-mix(in oklab, var(--color-fg) 55%, var(--color-bg));
       --rail    : 3.5rem;
       --ui      : system-ui, sans-serif;
 
@@ -39,7 +39,7 @@
   flex-direction   : column;
   gap              : 0.75rem;
   padding          : 0.75rem 0;
-  background       : var(--bg);
+  background       : var(--color-bg);
   border-bottom    : 1px solid var(--line);
 }
 
@@ -67,8 +67,8 @@
 }
 
 .chips button[aria-pressed="true"] {
-  border-color : var(--accent);
-  color        : var(--accent);
+  border-color : var(--color-ink);
+  color        : var(--color-ink);
 }
 
 .controls {
@@ -86,7 +86,7 @@
   color       : var(--muted);
 }
 
-.controls input[type="range"] { width: 8rem; accent-color: var(--accent); }
+.controls input[type="range"] { width: 8rem; accent-color: var(--color-ink); }
 .controls output { min-width: 3.2rem; font-variant-numeric: tabular-nums; }
 
 /* :::::: letterbar :::::::::::::::::::::::::::::::::::::::::::
@@ -120,7 +120,7 @@
 }
 
 .letterbar a:hover,
-.letterbar a:focus-visible { color: var(--accent); background: var(--bg); }
+.letterbar a:focus-visible { color: var(--color-ink); background: var(--color-bg); }
 
 /* :::::: sections ::::::::::::::::::::::::::::::::::::::::::: */
 
@@ -166,7 +166,7 @@ main h2 {
   font-size : 0.72rem;
 }
 
-.specimen .cat     { color: var(--accent); }
+.specimen .cat     { color: var(--color-ink); }
 .specimen .license { font-variant-numeric: tabular-nums; }
 
 .preview {
@@ -181,7 +181,7 @@ main h2 {
 .specimen[data-state="loading"] .preview { opacity: 0.45; }
 .specimen[data-state="error"]   .preview { opacity: 0.3; }
 
-.hint  { margin: 0.4rem 0 0; color: color-mix(in oklab, red 70%, var(--fg)); font-size: 0.72rem; }
+.hint  { margin: 0.4rem 0 0; color: color-mix(in oklab, red 70%, var(--color-fg)); font-size: 0.72rem; }
 .state { color: var(--muted); }
 
 /* list mode keeps one specimen per row, so the single line stays comparable */
@@ -238,7 +238,7 @@ aufbau-index[viewmode="grid"] {
 
 /* :::::: a11y ::::::::::::::::::::::::::::::::::::::::::::::: */
 
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
 html { scroll-behavior: smooth; }
 
 @media (prefers-reduced-motion: reduce) {

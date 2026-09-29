@@ -1,164 +1,78 @@
-/* @aufbau/css/tokens.css */
+/* @aufbau/css/tokens.css
+   the axes of the design system and the shorthand properties.
 
-/*
---palette :: zombie | oled | classic | <color>
---color-bg
---color-fg
---color-ink
---color-success
---color-warning
---color-error
+   axes, each writes its own raw tokens:
 
---scheme :: auto | light | dark
-color-scheme (die Paletten arbeiten mit light-dark())
+     --palette  :: <preset> | <color>   -> --color-bg, --color-fg, --color-ink (palettes.css)
+     --scheme   :: auto | light | dark  -> color-scheme (the palettes use light-dark())
+     --geometry :: sharp | soft | round | pill  -> --radius, --border-width
+     --density  :: compact | normal | comfortable | touch  -> --unit, --control-size
+     --skin     :: monochrome | …       -> the decoration of the elements (skins/)
+     --typo     :: system | humanist | mono | editorial  -> --font-body, --font-heading, --font-mono, --ratio
+     --motion   :: <number>, 0 turns every duration off
 
---geometry :: sharp | soft | round | pill
---radius
---border-width
+   shorthands, set on an element to style that element only. they do not
+   inherit: a child of an element with --bg keeps its own transparent background.
+   the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 
---density :: compact | normal | comfortable | touch
---unit
---control-size
+     --bg  : <color>                  background-color
+     --fg  : <color>                  color
+     --ink : <color>                  accent-color
+     --gap : <number> | tiny … huge   gap     (through --space())
+     --pad : <number> | tiny … huge   padding (through --space())
+     --mgn : <number> | tiny … huge   margin  (through --space()) */
 
---skin :: flat | outlined | elevated | glass | monochrome
---surface-step
---shadow-level
---border-alpha
---blur
+/*//////////// AXES ////////////*/
 
---typo :: system | humanist | mono | editorial
---font-body
---font-heading
---font-mono
---ratio
+@property --palette { inherits: true; initial-value: zombie; syntax: "<color> | <custom-ident>"; }
+@property --scheme  { inherits: true; initial-value: auto;   syntax: "auto | light | dark"; }
+@property --skin    { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
 
---motion :: none | calm | normal | playful
---motion
---ease-default
+:root {
+  --palette : zombie;
+  --scheme  : auto;
+  --skin    : monochrome;
 
---contrast
-normal, high
-Verstärker für --surface-step und --border-alpha
-*/
+  &[data-palette] { --palette : attr(data-palette type(<color> | <custom-ident>), zombie); }
+  &[data-scheme]  { --scheme  : attr(data-scheme  type(auto | light | dark), auto); }
+  &[data-skin]    { --skin    : attr(data-skin    type(<custom-ident>), monochrome); }
 
-/* pseudo-props für kurzschreibweisen */
-@property --bg  { syntax: "<color>"; inherits: true; initial-value: #282a36; }
-@property --fg  { syntax: "<color>"; inherits: true; initial-value: #f8f8f2; }
-@property --ink { syntax: "<color>"; inherits: true; initial-value: #ff79c6; }
+  color-scheme: if(style(--scheme: light): light; style(--scheme: dark): dark; else: light dark);
+}
 
-/* */
-@property --gap     { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
-@property --margin  { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
-@property --padding { syntax: "<length> | <custom-ident>"; inherits: false; initial-value: 0; }
+/*//////////// COLORS ////////////*/
 
-/* default config */
+/* the state colors every palette shares, a palette may set its own */
 :root {
   --color-error   : red;
   --color-success : green;
-  --color-warn    : yellow;
-  /*
-  --spacing-tiny   : 0.25rem;
-  --spacing-small  : 0.50rem;
-  --spacing-normal : 1.00rem;
-  --spacing-large  : 2.00rem;
-  --spacing-huge   : 4.00rem;
-  */
-  --palette  : zombie;
-  --scheme   : auto;
-  --geometry : soft;
-  --skin     : monochrome;
+  --color-warning : yellow;
 }
 
-/* ermöglicht dann kurzschreibweisen für reguläre rules */
-* { 
+/*//////////// SHORTHANDS ////////////*/
+
+@property --bg  { inherits: false; initial-value: transparent; syntax: "<color>"; }
+@property --fg  { inherits: false; initial-value: none;        syntax: "<color> | none"; }
+@property --ink { inherits: false; initial-value: none;        syntax: "<color> | none"; }
+
+@property --gap { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
+@property --pad { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
+@property --mgn { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
+
+/* specificity 0: any rule of the page that sets the property itself wins */
+:where(*) {
+  background-color : var(--bg);
+  color            : if(style(--fg:  none): inherit; else: var(--fg));
+  accent-color     : if(style(--ink: none): inherit; else: var(--ink));
+
+  gap     : if(style(--gap: none): normal; else: --space(var(--gap)));
+  padding : if(style(--pad: none): 0;      else: --space(var(--pad)));
+  margin  : if(style(--mgn: none): 0;      else: --space(var(--mgn)));
+}
+
+/* the page paints the palette */
+body {
   --bg  : var(--color-bg);
   --fg  : var(--color-fg);
   --ink : var(--color-ink);
-  
-  background-color : var(--bg);
-  color            : var(--fg);
-  accent-color     : var(--ink);
 }
-
-* {
-  --gap: 0;
-  --mgn: 0;
-  --pad: 0;
-  
-  gap     : if( style(--gap) : --space(var(--gap)); else: 0; );
-  margin  : if( style(--mgn) : --space(var(--mgn)); else: 0; );
-  padding : if( style(--pad) : --space(var(--pad)); else: 0; );
-}
-
-/*
-* {
-  gap: if(
-    style(--gap: tiny)   : --space(tiny);
-    style(--gap: small)  : --space(small);
-    style(--gap: normal) : --space(normal);
-    style(--gap: large)  : --space(large);
-    style(--gap: huge)   : --space(huge);
-    else                 : --space();
-  );
- margin: if(
-    style(--margin: tiny)   : --space(tiny);
-    style(--margin: small)  : --space(small);
-    style(--margin: normal) : --space(normal);
-    style(--margin: large)  : --space(large);
-    style(--margin: huge)   : --space(huge);
-    else                    : --space();
-  );
-  padding: if(
-    style(--padding: tiny)   : --space(tiny);
-    style(--padding: small)  : --space(small);
-    style(--padding: normal) : --space(normal);
-    style(--padding: large)  : --space(large);
-    style(--padding: huge)   : --space(huge);
-    else                     : --space();
-  );
-}
-*/
-/*
-* {
-  gap: if(
-    style(--gap: tiny)   : var(--spacing-tiny);
-    style(--gap: small)  : var(--spacing-small);
-    style(--gap: normal) : var(--spacing-normal);
-    style(--gap: large)  : var(--spacing-large);
-    style(--gap: huge)   : var(--spacing-huge);
-    else : var(--spacing-normal);
-  );
- margin: if(
-    style(--margin: tiny)   : var(--spacing-tiny);
-    style(--margin: small)  : var(--spacing-small);
-    style(--margin: normal) : var(--spacing-normal);
-    style(--margin: large)  : var(--spacing-large);
-    style(--margin: huge)   : var(--spacing-huge);
-  );
-  padding: if(
-    style(--padding: tiny)   : var(--spacing-tiny);
-    style(--padding: small)  : var(--spacing-small);
-    style(--padding: normal) : var(--spacing-normal);
-    style(--padding: large)  : var(--spacing-large);
-    style(--padding: huge)   : var(--spacing-huge);
-  );
-}
-*/
-
-/* --skin */
-
-/* --theme */
-
-/*
-:root {
-  --skin : monochrome;
-  &[data-skin] { --skin: attr(data-skin type("<custom-ident>"), monochrome); }
-}
-
-@container style(--skin: monochrome) {}
-*/
-
-
-/*
-@layer tokens {}
-*/
