@@ -3,6 +3,7 @@
 ```md
 functions.css
 palettes.css
+themes.css
 tokens.css
 ```
 
