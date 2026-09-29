@@ -1,16 +1,18 @@
 // @aufbau/bundler/steps/webfonts.js
-// only the fonts a project uses stay in its copy of an @aufbau/webfonts catalog,
-// the files of all others are dropped and the catalog lists the kept ones only,
-// so a font picker offers nothing that is not there:
-//
-//   webfonts: {
-//     catalog : '_pkg/aufbau/webfonts/data.js',   // in the output
-//     keep    : ['manrope'],                       // ids or names
-//     scan    : true,                              // plus every font whose name the staged css and js quote
-//   }
-//
-// the catalog module is left as generated, a line at its end filters the
-// exported array in place.
+
+/*
+only the fonts a project uses stay in its copy of an @aufbau/webfonts catalog,
+the files of all others are dropped and the catalog lists the kept ones only,
+so a font picker offers nothing that is not there:
+
+webfonts: {
+  catalog : '_pkg/aufbau/webfonts/data.js', // in the output
+  keep    : ['manrope'],                    // ids or names
+  scan    : true,                           // plus every font whose name the staged css and js quote
+}
+
+the catalog module is left as generated, a line at its end filters the exported array in place.
+*/
 
 import {
   appendText, directoryOf, extensionOf, importFile, joinPath, listFiles, megabytes, pathExists,
