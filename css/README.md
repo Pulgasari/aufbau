@@ -2,6 +2,7 @@
 
 ```md
 functions.css
+keyframes.css
 palettes.css
 themes.css
 tokens.css
