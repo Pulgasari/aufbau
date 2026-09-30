@@ -6,32 +6,28 @@ Quotes:
 "Note: The @property at-rule syntax descriptor value uses the same <syntax>
 to define the permitted data types for registered custom properties, 
 however, this always takes the form of a string." 
-
------ snippets
-
-// single value
-type(<color>)
-type(auto)
-
-// "|" combinator for multiple types
-type(<length> | <percentage>)
-
-// Space-separated list of values
-type(<color>+)
-
-// Comma-separated list of values
-type(<length>#)
-
-// multiple keywords
-type(red | blue | green)
-
-// combination of data type and keyword
-type(<percentage> | auto)
-
-// universal syntax value
-type(*)
-
 */
+
+/*
+examples:
+
+shorthands:
+  cc   :: currentColor  ->  --color(cc)   --color(darker(cc))
+  bg   :: --color-bg    ->  --color(bg)   --color(darker(bg))
+  fg   :: --color-fg    ->  --color(fg)   --color(darker(fg))
+  ink  :: --color-ink   ->  --color(ink)  --color(darker(ink))
+*/
+@function --color(
+  --arg type(<color> | bg | fg | ink | cc) : cc
+) returns <color> {
+  result: if(
+    style(--arg: bg)  : var(--color-bg);
+    style(--arg: fg)  : var(--color-fg);
+    style(--arg: ink) : var(--color-ink);
+    style(--arg: cc)  : currentColor;
+    else              : var(--arg);
+  );
+}
 
 
 :root {
