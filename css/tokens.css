@@ -1,26 +1,28 @@
 /* @aufbau/css/tokens.css
-   the axes of the design system and the shorthand properties.
 
-   axes, each writes its own raw tokens:
+the axes of the design system and the shorthand properties.
 
-     --palette  :: <preset> | <color>   -> --color-bg, --color-fg, --color-ink (palettes.css)
-     --scheme   :: auto | light | dark  -> color-scheme (the palettes use light-dark())
-     --geometry :: sharp | soft | round | pill  -> --radius, --border-width
-     --density  :: compact | normal | comfortable | touch  -> --unit, --control-size
-     --skin     :: monochrome | …       -> the decoration of the elements (skins/)
-     --typo     :: system | humanist | mono | editorial  -> --font-body, --font-heading, --font-mono, --ratio
-     --motion   :: <number>, 0 turns every duration off
+axes, each writes its own raw tokens:
 
-   shorthands, set on an element to style that element only. they do not
-   inherit: a child of an element with --bg keeps its own transparent background.
-   the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
+--palette  :: <preset> | <color>                      -> --color-bg, --color-fg, --color-ink (palettes.css)
+--scheme   :: auto | light | dark                     -> color-scheme (the palettes use light-dark())
+--geometry :: sharp | soft | round | pill             -> --radius, --border-width
+--density  :: compact | normal | comfortable | touch  -> --unit, --control-size
+--skin     :: monochrome | …                          -> the decoration of the elements (skins/)
+--typo     :: system | humanist | mono | editorial    -> --font-body, --font-heading, --font-mono, --ratio
+--motion   :: <number>, 0 turns every duration off
 
-     --bg  : <color>                  background-color
-     --fg  : <color>                  color
-     --ink : <color>                  accent-color
-     --gap : <number> | tiny … huge   gap     (through --space())
-     --pad : <number> | tiny … huge   padding (through --space())
-     --mgn : <number> | tiny … huge   margin  (through --space()) */
+shorthands, set on an element to style that element only.
+they do not inherit: a child of an element with --bg keeps its own transparent background.
+the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
+
+--bg  : <color>                  background-color
+--fg  : <color>                  color
+--ink : <color>                  accent-color
+--gap : <number> | tiny … huge   gap     (through --space())
+--pad : <number> | tiny … huge   padding (through --space())
+--mgn : <number> | tiny … huge   margin  (through --space())
+*/
 
 /*//////////// AXES ////////////*/
 
