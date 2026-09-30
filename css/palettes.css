@@ -9,6 +9,8 @@
      one area of the page. a container query asks the parent, a function
      is evaluated on the element itself */
 
+
+
 /*//////////// DERIVED ////////////*/
 
 /* a color as the palette: the ink itself, background and text from its hue */
@@ -59,7 +61,7 @@ body {
 
 @function --palette-color(
   --name type(<color> | <custom-ident>) : zombie,
-  --role type(bg | fg | ink)             : bg
+  --role type(bg | fg | ink)            : bg
 ) returns <color> {
   --role-bg: if(
     style(--name: amethyst)  : #160f1f;
