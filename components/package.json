@@ -6,6 +6,7 @@
   "main"   : "./index.js",
   "module" : "./index.js",
   "sideEffects": [
+    "./embed/*.js",
     "./input/*.js",
     "./write/*.js"
   ],
@@ -19,6 +20,7 @@
     "adapters/*.js",
     "core/*.js",
     "data/*.js",
+    "embed/*.js",
     "input/*.js",
     "write/*.js",
     "README.md"

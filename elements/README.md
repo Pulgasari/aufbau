@@ -308,6 +308,7 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 | `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
 | `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
 | `height`   | eine feste höhe statt eines verhältnisses |
+| `width`    | eine breite, höchstens die verfügbare |
 | `poster`   | ein bild der seite für den platzhalter |
 | `label`    | name auf dem platzhalter und des frames |
 

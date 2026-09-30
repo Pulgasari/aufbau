@@ -64,6 +64,32 @@ hits as a wrapping row).
 | `input-year`     | `2026`                             | `aufbau-input type=year`, stepper          |
 | `write-md`       | markdown                           | `aufbau-writer`, `aufbau-reader`           |
 
+### embed
+
+third party content behind a click, one component per provider over
+`<aufbau-embed>` (no request to the provider before the click, `consent`,
+`remember`, `height`, `width`, `ratio`, `poster`, `label` as there).
+
+| component          | src                                                       |
+| ------------------ | --------------------------------------------------------- |
+| `embed-youtube`    | url or video id, `start="1m30s"`                          |
+| `embed-vimeo`      | url or video id                                           |
+| `embed-spotify`    | url, `spotify:` uri, or id with `type="track"` (default)  |
+| `embed-soundcloud` | url                                                       |
+| `embed-mastodon`   | post url                                                  |
+| `embed-bandcamp`   | id, player url or the whole embed snippet                 |
+
+`embed-bandcamp` takes `type="release | track"` and the styles of bandcamp's
+embed dialog as `look`: `slim`, `slim-plain`, `standard`, `standard-short`,
+`artwork`, `wide`. its colors follow the palette (`--color-bg`, `--color-ink`),
+`bgcol` and `linkcol` override them. the id is not in the page urls, it comes
+from bandcamp's own embed code; a page url turns the placeholder into a link.
+
+```html
+<embed-youtube src="dQw4w9WgXcQ"></embed-youtube>
+<embed-bandcamp src="3119776030" look="slim"></embed-bandcamp>
+```
+
 the list components (country, currency, font, item, language, locale,
 timezone, unit) take the looks of `aufbau-picker`: `look="combobox | cycle |
 radio | segments"`, plus `searchable` and `stepper`.
