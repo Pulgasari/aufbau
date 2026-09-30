@@ -50,62 +50,60 @@ button {
  input:focus { border: none; outline: none; }
 select:focus { border: none; outline: none; }
 
-  
+/*//////////////////// TRANSITIONS ///////////////////*/
 
-  /*//////////////////////// TYPO ////////////////////////*/
+@view-transition { navigation: auto; }
 
-  :root {
-    --aufbau-font           : sans;
-    --aufbau-font-monospace : monospace;
-  }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
 
-  body { 
-    font-family : var(--aufbau-font);
-    line-height : 1;
+/*//////////////////////// TYPO ////////////////////////*/
 
-    text-rendering: optimizeLegibility;
-     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+:root {
+  --aufbau-font           : sans;
+  --aufbau-font-monospace : monospace;
+}
 
-  h1, h2, h3, h4, h5, h6 {
-    font-weight : 700;
-    line-height : 1.25;
-    text-wrap   : balance;
-  }
+body {
+  font-family : var(--aufbau-font);
+  line-height : 1;
 
-  p {
-    hyphens: auto;
-    hyphenate-limit-chars: 6 3 3;
+  text-rendering: optimizeLegibility;
+   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-    line-height   : 1.25;
-    overflow-wrap : break-word;
-    text-align    : justify; 
-    text-wrap     : pretty;
-  }
+h1, h2, h3, h4, h5, h6 {
+  font-weight : 700;
+  line-height : 1.25;
+  text-wrap   : balance;
+}
 
-  blockquote, q {
-    quotes: none;
-    &::before, &::after { content: ''; content: none; }
-  }
+p {
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
 
-  /*//////////////////// TRANSITIONS ///////////////////*/
+  line-height   : 1.25;
+  overflow-wrap : break-word;
+  text-align    : justify; 
+  text-wrap     : pretty;
+}
 
-  @view-transition { navigation: auto; }
+blockquote, q {
+  quotes: none;
+  &::before, &::after { content: ''; content: none; }
+}
 
-  @media (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) { animation: none; }
-  }
+/*//////////////////// TRAIT CLASSES ///////////////////*/
 
-  /*//////////////////// TRAIT CLASSES ///////////////////*/
+.hidden  { display: none; }
+.numeric { font-variant-numeric: tabular-nums; }
 
-  .hidden  { display: none; }
-  .numeric { font-variant-numeric: tabular-nums; }
-
-  .flow-y {
-    display         : flex;
-    flex-direction  : column;
-    align-items     : center;
-    justify-content : center;
-  }
+.flow-y {
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  justify-content : center;
+}
