@@ -22,6 +22,42 @@ const REGISTRIES = { '@jsr': 'https://npm.jsr.io' };
 
 // :::::: PATHS
 
+/*
+// Curried path builder
+const joinedPath = (...args) => (...segments) => join(...args, ...segments);
+const removePath = (...args) => (...segments) => rm(joinedPath(...args)(...segments), { force: true, recursive: true });
+
+const joinedPath = (...args) => (...segments) => join(...segments) (...args);
+const removePath = (...segments) => (path) => rm(path, { force: true, recursive: true });
+*/
+/*
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
+const joinedPath = (...base) => (...sub) => join(...base, ...sub);
+// Curried path remover: creates a remover function bound to base segments
+const removePath = (...base) => {
+  const getPath = joinedPath(...base);
+  return (...sub) => rm(getPath(...sub), { force: true, recursive: true });
+};
+// Usage:
+const removeInDist = removePath('project', 'dist');
+// Removes 'project/dist/cache' recursively
+await removeInDist('cache'); 
+// Removes 'project/dist' completely if no arguments are passed
+await removeInDist(); 
+
+
+import { rm } from 'node:fs/promises';
+// Higher-order function: wraps any path-generating function into a remover
+const createRemover = (pathFn) => (...sub) => rm(pathFn(...sub), { force: true, recursive: true });
+// Usage:
+const distPath       = joinedPath('project', 'dist');
+const removeDistPath = createRemover(distPath);
+// Removes 'project/dist/temp'
+await removeDistPath('temp'); 
+*/
+
+
 const directoryOf  = path => dirname(path);
 const extensionOf  = path => extname(path);
 const joinPath     = (...parts) => join(...parts);
