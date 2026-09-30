@@ -2,6 +2,8 @@
 // reads a rendered controls container back into a typed values object. pure and
 // dependency-free: it only touches standard element props and querySelector.
 
+import { flattenSpec } from './control.js';
+
 // one control element -> its typed value, per the spec type
 function coerce (spec, element) {
   switch (spec.type) {
@@ -18,11 +20,12 @@ function coerce (spec, element) {
   }
 }
 
-// reads a built controls container back into a typed values object, keyed by spec
+// reads a built controls container back into a typed values object, keyed by
+// spec. flat: the fields of sections read back next to all the others
 export function readValues (container, spec) {
   const out = {};
-  for (const [key, s] of Object.entries(spec)) {
-    const element = container.querySelector?.(`[name="${key}"]`);
+  for (const [key, s] of Object.entries(flattenSpec(spec))) {
+    const element = container.querySelector?.(`[name="${key}"]:not(fieldset)`);
     if (element) out[key] = coerce(s, element);
   }
   return out;

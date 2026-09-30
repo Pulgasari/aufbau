@@ -2,7 +2,7 @@
 // html-string renderer. pure and dependency-free (no dom, no @domina), so it
 // also runs at build time / server side to emit markup the app hydrates later.
 
-import { normalizeOption, toControl } from './control.js';
+import { isSection, normalizeOption, sectionFields, toControl } from './control.js';
 
 const escAttr = value => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const escText = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -17,8 +17,17 @@ export function fieldHTML (key, spec, value) {
   return `<label class="aufbau-field"><span class="aufbau-field-label">${escText(spec.label ?? key)}</span><${tag}${attrStr(attrs)}>${inner}</${tag}></label>`;
 }
 
+// a section as an html string: a fieldset named by its key
+export function sectionHTML (key, section, values = {}) {
+  return `<fieldset class="aufbau-section" name="${escAttr(key)}"><legend>${escText(key)}</legend>${entriesHTML(sectionFields(section), values)}</fieldset>`;
+}
+
+const entriesHTML = (spec, values) => Object.entries(spec)
+  .map(([key, entry]) => isSection(entry) ? sectionHTML(key, entry, values) : fieldHTML(key, entry, values[key]))
+  .join('');
+
 // a whole spec as an html string, optionally wrapped in one element
 export function renderHTML (spec, { values = {}, wrap = 'div' } = {}) {
-  const body = Object.entries(spec).map(([key, s]) => fieldHTML(key, s, values[key])).join('');
+  const body = entriesHTML(spec, values);
   return wrap ? `<${wrap}>${body}</${wrap}>` : body;
 }
