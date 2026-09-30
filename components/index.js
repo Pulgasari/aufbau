@@ -8,7 +8,7 @@ this file is side effect free: nothing is defined until it is used.
                   out), so the page needs nothing else
   load(name)      one component by its canonical name, e.g. 'pick-icon'
   registerAll()   every component at once
-  configure()     a prefix or a map of new tags, before the first one loads
+  configure()     a prefix or a rename map of new tags, before the first one loads
 
 */// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -45,9 +45,9 @@ function scan (node) {
   node.querySelectorAll('*').forEach(element => request(element.localName));
 }
 
-function autoloader ({ elements = true, names, prefix, root = document } = {}) {
+function autoloader ({ elements = true, prefix, rename, root = document } = {}) {
   if (typeof window === 'undefined') return () => {};
-  if (names || prefix != null) configure({ names, prefix });
+  if (rename || prefix != null) configure({ prefix, rename });
 
   // the components bring the elements they use themselves, the page's own aufbau-* tags need the elements' autoloader
   let stopElements = null;
@@ -88,7 +88,7 @@ autoloader();
 
 // renamed
 autoloader({ prefix: 'x-' });                          // <x-pick-icon>
-autoloader({ names: { 'pick-icon': 'icon-field' } });  // <icon-field>
+autoloader({ rename: { 'pick-icon': 'icon-field' } });  // <icon-field>
 
 // hand picked
 import '@aufbau/components/pick/language.js';

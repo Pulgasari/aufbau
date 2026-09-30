@@ -2,7 +2,7 @@
 // every component tag goes through here, so a page can rename them:
 //
 //   configure({ prefix: 'x-' })                         pick-icon -> x-pick-icon
-//   configure({ names: { 'pick-icon': 'icon-field' } }) pick-icon -> icon-field
+//   configure({ rename: { 'pick-icon': 'icon-field' } }) pick-icon -> icon-field
 //
 // only the components are renamed. the elements inside keep their aufbau-*
 // tags, the skin selects them by name. a component that uses another one asks
@@ -20,10 +20,10 @@ const renamed = new Map;
 let   prefix  = '';
 let   defined = false;
 
-export function configure ({ names = {}, prefix: next } = {}) {
+export function configure ({ prefix: next, rename = {} } = {}) {
   if (defined) console.warn('[@aufbau/components] configure() after a component was defined, its tag stays as it is.');
   if (next != null) prefix = String(next);
-  for (const [name, tag] of Object.entries(names)) renamed.set(name, tag);
+  for (const [name, tag] of Object.entries(rename)) renamed.set(name, tag);
 }
 
 /** the tag a canonical name is defined under */

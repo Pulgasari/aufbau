@@ -44,7 +44,7 @@ components can be renamed, the elements inside keep their `aufbau-*` tags:
 
 ```js
 autoloader({ prefix: 'x-' });                          // <x-pick-icon>
-autoloader({ names: { 'pick-icon': 'icon-field' } });  // <icon-field>
+autoloader({ rename: { 'pick-icon': 'icon-field' } });  // <icon-field>
 ```
 
 ## htx
