@@ -2,19 +2,42 @@
 // shorthand tags for htx, like @aufbau/elements/htx. `args` names the
 // attributes positional values fill, in order.
 //
-//   <$pickIcon 'lucide:star' name="icon" />        <pick-icon value="lucide:star" name="icon">
-//   <$pickLanguage 'de' languages="de en fr" />    <pick-language value="de" languages="de en fr">
-//   <$writeMd ${notes} preview="side" />           <write-md value="…" preview="side">
+//   <$inputIcon 'lucide:star' name="icon" />      <input-icon value="lucide:star" name="icon">
+//   <$inputLanguage 'de' languages="de en fr" />  <input-language value="de" languages="de en fr">
+//   <$writeMd ${notes} preview="side" />          <write-md value="…" preview="side">
 //
 // the tags are read when this module is evaluated, a configure() with a prefix
-// or new names has to come first.
+// or a rename map has to come first.
 
 import { tagOf } from '../core/names.js';
 
 export const
-$pickIcon     = { tag: tagOf('pick-icon'),     args: 'value' },
-$pickLanguage = { tag: tagOf('pick-language'), args: 'value' },
-$writeMd      = { tag: tagOf('write-md'),      args: 'value' };
+$inputBool     = { tag: tagOf('input-bool'),     args: 'value' },
+$inputChips    = { tag: tagOf('input-chips'),    args: 'value' },
+$inputColor    = { tag: tagOf('input-color'),    args: 'value' },
+$inputCountry  = { tag: tagOf('input-country'),  args: 'value' },
+$inputCurrency = { tag: tagOf('input-currency'), args: 'value' },
+$inputDate     = { tag: tagOf('input-date'),     args: 'value' },
+$inputEmail    = { tag: tagOf('input-email'),    args: 'value' },
+$inputEmoji    = { tag: tagOf('input-emoji'),    args: 'value' },
+$inputFont     = { tag: tagOf('input-font'),     args: 'value' },
+$inputHotkey   = { tag: tagOf('input-hotkey'),   args: 'value' },
+$inputIcon     = { tag: tagOf('input-icon'),     args: 'value' },
+$inputItem     = { tag: tagOf('input-item'),     args: 'value' },
+$inputLanguage = { tag: tagOf('input-language'), args: 'value' },
+$inputLocale   = { tag: tagOf('input-locale'),   args: 'value' },
+$inputNumber   = { tag: tagOf('input-number'),   args: 'value' },
+$inputPassword = { tag: tagOf('input-password'), args: 'value' },
+$inputPhone    = { tag: tagOf('input-phone'),    args: 'value' },
+$inputSearch   = { tag: tagOf('input-search'),   args: 'value' },
+$inputSlug     = { tag: tagOf('input-slug'),     args: 'value' },
+$inputText     = { tag: tagOf('input-text'),     args: 'value' },
+$inputTime     = { tag: tagOf('input-time'),     args: 'value' },
+$inputTimezone = { tag: tagOf('input-timezone'), args: 'value' },
+$inputUnit     = { tag: tagOf('input-unit'),     args: 'value' },
+$inputUrl      = { tag: tagOf('input-url'),      args: 'value' },
+$inputYear     = { tag: tagOf('input-year'),     args: 'value' },
+$writeMd       = { tag: tagOf('write-md'),       args: 'value' };
 
 /* :::::: USAGE
 

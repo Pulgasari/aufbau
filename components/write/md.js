@@ -70,7 +70,7 @@ export class WriteMd extends AufbauComponent {
     `;
   }
 
-  onRender () {
+  bind () {
     const toggle = this.toggle;
 
     // the switch is no value of the component

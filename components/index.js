@@ -6,7 +6,7 @@ this file is side effect free: nothing is defined until it is used.
   autoloader()    defines each component the first time its tag shows up. starts
                   the autoloader of the elements too (elements: false leaves it
                   out), so the page needs nothing else
-  load(name)      one component by its canonical name, e.g. 'pick-icon'
+  load(name)      one component by its canonical name, e.g. 'input-icon'
   registerAll()   every component at once
   configure()     a prefix or a rename map of new tags, before the first one loads
 
@@ -87,10 +87,10 @@ import { autoloader } from '@aufbau/components';
 autoloader();
 
 // renamed
-autoloader({ prefix: 'x-' });                          // <x-pick-icon>
-autoloader({ rename: { 'pick-icon': 'icon-field' } });  // <icon-field>
+autoloader({ prefix: 'x-' });                           // <x-input-icon>
+autoloader({ rename: { 'input-icon': 'icon-field' } });  // <icon-field>
 
 // hand picked
-import '@aufbau/components/pick/language.js';
+import '@aufbau/components/input/language.js';
 
 */

@@ -5,8 +5,8 @@ export const localeOf = element =>
   element.closest('[lang]')?.lang || document.documentElement.lang || navigator.language;
 
 /** Intl.DisplayNames or null where the locale or the type is not supported */
-export function displayNames (locale, type) {
-  try { return new Intl.DisplayNames([locale], { fallback: 'code', type }); }
+export function displayNames (locale, type, options = {}) {
+  try { return new Intl.DisplayNames([locale], { fallback: 'code', type, ...options }); }
   catch { return null; }
 }
 

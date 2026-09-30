@@ -48,6 +48,16 @@ export class AufbauComponent extends AufbauElement {
    */
   get initialValue () { return this._initialValue ??= this.getAttribute('value') ?? ''; }
 
+  /**
+   * hook, listeners on the inner elements. runs once the markup is there: after
+   * the first render and again on every reconnect, the disconnect released them
+   * and a cached markup is not rendered anew
+   */
+  bind () {}
+
+  onMount  () { if (this._markup !== undefined) this.bind(); }
+  onRender () { this.bind(); }
+
   onAttributeChange (name, oldValue, newValue) {
     if (name === 'value' && this.control) this.control.value = newValue ?? '';
   }

@@ -1,8 +1,8 @@
 // @aufbau/components/core/names.js
 // every component tag goes through here, so a page can rename them:
 //
-//   configure({ prefix: 'x-' })                         pick-icon -> x-pick-icon
-//   configure({ rename: { 'pick-icon': 'icon-field' } }) pick-icon -> icon-field
+//   configure({ prefix: 'x-' })                           input-icon -> x-input-icon
+//   configure({ rename: { 'input-icon': 'icon-field' } }) input-icon -> icon-field
 //
 // only the components are renamed. the elements inside keep their aufbau-*
 // tags, the skin selects them by name. a component that uses another one asks
@@ -11,8 +11,31 @@
 
 // the canonical names, <group>-<name> maps to ./<group>/<name>.js
 export const COMPONENTS = [
-  'pick-icon',
-  'pick-language',
+  'input-bool',
+  'input-chips',
+  'input-color',
+  'input-country',
+  'input-currency',
+  'input-date',
+  'input-email',
+  'input-emoji',
+  'input-font',
+  'input-hotkey',
+  'input-icon',
+  'input-item',
+  'input-language',
+  'input-locale',
+  'input-number',
+  'input-password',
+  'input-phone',
+  'input-search',
+  'input-slug',
+  'input-text',
+  'input-time',
+  'input-timezone',
+  'input-unit',
+  'input-url',
+  'input-year',
   'write-md',
 ];
 

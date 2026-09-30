@@ -6,7 +6,7 @@
   "main"   : "./index.js",
   "module" : "./index.js",
   "sideEffects": [
-    "./pick/*.js",
+    "./input/*.js",
     "./write/*.js"
   ],
   "exports": {
@@ -19,7 +19,7 @@
     "adapters/*.js",
     "core/*.js",
     "data/*.js",
-    "pick/*.js",
+    "input/*.js",
     "write/*.js",
     "README.md"
   ],
