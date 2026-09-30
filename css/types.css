@@ -37,9 +37,11 @@ type(*)
 :root {
   --syntax-density  : "compact | normal | comfortable | touch";
   --syntax-geometry : "sharp | soft | round | pill";
-  
+
+  /*
   --type-density  : type(compact | normal | comfortable | touch);
   --type-geometry : type(sharp | soft | round | pill);
+  */
 }
 
 
