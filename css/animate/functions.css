@@ -28,16 +28,28 @@ which a page sets to 0 for reduced motion.
       style(--name: vibrate)     : 100ms;
       style(--name: glitch)      : 300ms;
       style(--name: fade)        : 300ms;
+      style(--name: glide)       : 300ms;
+      style(--name: focus)       : 350ms;
       style(--name: pop)         : 350ms;
       style(--name: slide)       : 350ms;
       style(--name: zoom)        : 350ms;
+      style(--name: stamp)       : 400ms;
+      style(--name: reveal)      : 500ms;
+      style(--name: tilt-in)     : 500ms;
+      style(--name: unfold)      : 300ms;
+      style(--name: iris)        : 600ms;
       style(--name: shake)       : 500ms;
       style(--name: whip)        : 600ms;
       style(--name: flip)        : 700ms;
       style(--name: jump)        : 700ms;
       style(--name: rotate-in)   : 700ms;
+      style(--name: rubber)      : 800ms;
       style(--name: bounce)      : 800ms;
       style(--name: wobble)      : 800ms;
+      style(--name: tada)        : 1s;
+      style(--name: heartbeat)   : 1200ms;
+      style(--name: ping)        : 1200ms;
+      style(--name: float)       : 3s;
       style(--name: hue)         : 8s;
       style(--name: shimmer)     : 1500ms;
       style(--name: drift)       : 2s;
@@ -75,9 +87,17 @@ which a page sets to 0 for reduced motion.
       style(--name: progress) : linear;
       style(--name: pulse)    : ease-in-out;
       style(--name: blink)    : ease-in-out;
+      style(--name: float)    : ease-in-out;
+      style(--name: ping)     : cubic-bezier(0, 0, 0.2, 1);
       style(--name: pop)      : cubic-bezier(0.2, 0, 0, 1);
       style(--name: fade)     : cubic-bezier(0, 0, 0.2, 1);
+      style(--name: focus)    : cubic-bezier(0, 0, 0.2, 1);
+      style(--name: glide)    : cubic-bezier(0, 0, 0.2, 1);
+      style(--name: iris)     : cubic-bezier(0.4, 0, 0.2, 1);
+      style(--name: reveal)   : cubic-bezier(0.4, 0, 0.2, 1);
       style(--name: slide)    : cubic-bezier(0, 0, 0.2, 1);
+      style(--name: tilt-in)  : cubic-bezier(0.2, 0, 0, 1);
+      style(--name: unfold)   : cubic-bezier(0.2, 0, 0, 1);
       style(--name: zoom)     : cubic-bezier(0, 0, 0.2, 1);
       else                    : ease);
   );
@@ -101,7 +121,7 @@ animation: --animation(pulse, auto, auto, infinite), --animation(spin, slow)
 @function --animate-once(
   --name  <custom-ident>                                                                                                   : none,
   --speed type(auto | instant | fast | normal | slow | lazy | <time>)                                                      : auto,
-  --kind  type(auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring) : auto,                                                                                      : 1
+  --kind  type(auto | linear | ease | ease-in | ease-out | ease-in-out | smooth | snappy | enter | exit | bounce | spring) : auto
 ) {
   result: --animation(var(--name), var(--speed), var(--kind), 1);
 }

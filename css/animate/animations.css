@@ -15,10 +15,10 @@ stagger    <time>, added per sibling: lists play one item after the other
 direction  normal | reverse | alternate | alternate-reverse
 state      running | paused
 timeline   auto | view | scroll            (view: plays while scrolling into view)
-from       left | right | top | bottom     (slide, drift)
-distance   auto | <length-percentage>      (shake, jump, bounce, whip, slide, drift)
-angle      <angle>                         (wobble)
-scale      <number>                        (pulse)
+from       left | right | top | bottom     (slide, glide, drift, reveal)
+distance   auto | <length-percentage>      (shake, jump, bounce, whip, float, slide, glide, drift)
+angle      <angle>                         (wobble, tada)
+scale      <number>                        (pulse, heartbeat, stamp, ping)
 opacity    <number>                        (blink)
 turns      <number>                        (flip)
 
@@ -86,6 +86,11 @@ durations follow the --motion token.
       else                    : 0.75rem);
     else: var(--animate-distance));
   --animate-offset: --slide-offset(var(--animate-from), var(--animate-length));
+  --animate-clip  : if(
+    style(--animate-from: right)  : inset(0 0 0 100%);
+    style(--animate-from: top)    : inset(0 0 100% 0);
+    style(--animate-from: bottom) : inset(100% 0 0 0);
+    else                          : inset(0 100% 0 0));
 
   animation-name            : var(--animate);
   animation-duration        : --animate-time(var(--animate-duration), var(--animate));
@@ -102,6 +107,12 @@ durations follow the --motion token.
 :where([data-animate="shimmer"]) {
   background-image : linear-gradient(100deg, transparent 30%, color-mix(in oklch, currentColor 12%, transparent) 50%, transparent 70%);
   background-size  : 200% 100%;
+}
+
+/* unfold animates the height from 0, the content stays inside while it grows */
+:where([data-animate="unfold"]) {
+  interpolate-size : allow-keywords;
+  overflow         : clip;
 }
 
 /* reduced motion: the durations collapse through the token */

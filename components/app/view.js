@@ -9,7 +9,8 @@
 //
 // activate() switches to it inside a view transition, so does setting `active`
 // from outside. transition-on / transition-off name a one-way keyframe of
-// aufbau's animate/keyframes.css (fade, slide, zoom, pop, rotate-in) or none,
+// aufbau's animate/keyframes.css (fade, glide, slide, zoom, pop, focus, reveal,
+// iris, tilt-in, rotate-in) or none,
 // the app-root's `transition` is the default for both. `lazy` renders the
 // <template> child on the first activation. `route` puts the view into the
 // address, see <app-root routing>.
@@ -167,14 +168,19 @@ export const transitionStyles = `
     &::view-transition-group(${IN}),
     &::view-transition-group(${OUT}) { animation-duration: var(--app-view-duration, 0.25s); }
 
+    /* --animate-offset is registered without inheritance, the keyframes' fallback never
+       reaches the pseudo elements: the coming view slides in from the end, the leaving one
+       out to the start, a glide only a short way */
     &::view-transition-new(${IN}) {
-      animation: var(--app-view-duration, 0.25s) ease both;
-      animation-name: var(--app-view-on, fade);
+      --animate-offset : if(style(--app-view-on: glide): 2rem 0; else: 100% 0);
+      animation        : var(--app-view-duration, 0.25s) ease both;
+      animation-name   : var(--app-view-on, fade);
     }
 
     &::view-transition-old(${OUT}) {
-      animation: var(--app-view-duration, 0.25s) ease both reverse;
-      animation-name: var(--app-view-off, fade);
+      --animate-offset : if(style(--app-view-off: glide): -2rem 0; else: -100% 0);
+      animation        : var(--app-view-duration, 0.25s) ease both reverse;
+      animation-name   : var(--app-view-off, fade);
     }
   }
 `;
