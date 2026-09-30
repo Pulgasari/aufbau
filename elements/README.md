@@ -511,6 +511,10 @@ combobox, cycle, radiogruppe oder segmented control.
 option ein icon hat. das label wird dann accessible name und tooltip. die
 popover-liste zeigt immer labels.
 
+`stepper` setzt einen button davor und einen dahinter, die zur vorherigen und
+nächsten option schalten, an beiden enden rundherum. bei jedem look, nie mit
+`multiple`. parts: `step` mit `previous` bzw. `next`.
+
 ```html
 <aufbau-picker name="view" look="segments" value="month">
   <aufbau-option value="day">Tag</aufbau-option>
@@ -526,6 +530,13 @@ popover-liste zeigt immer labels.
 <aufbau-picker name="layout" look="cycle" icons-only value="grid">
   <aufbau-option value="list" icon="lucide:list">Liste</aufbau-option>
   <aufbau-option value="grid" icon="lucide:layout-grid">Raster</aufbau-option>
+</aufbau-picker>
+
+<!-- mit buttons zum durchschalten davor und danach -->
+<aufbau-picker name="month" look="combobox" stepper value="9">
+  <aufbau-option value="8">August</aufbau-option>
+  <aufbau-option value="9">September</aufbau-option>
+  <aufbau-option value="10">Oktober</aufbau-option>
 </aufbau-picker>
 
 <!-- mehrfachauswahl, ein FormData-eintrag pro wert -->
