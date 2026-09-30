@@ -83,3 +83,51 @@ test('readValues coerces each control back to a typed value', () => {
     name  : 'hi',
   });
 });
+
+test('an array entry is a section: key as legend, records merged, values flat', () => {
+  const spec = {
+    title      : { type: 'text' },
+    appearance : [{ palette: { values: ['oled', 'zombie'] } }, { density: { values: ['compact', 'touch'] } }],
+  };
+
+  const markup = renderHTML(spec, { values: { density: 'touch' }, wrap: false });
+  assert.match(markup, /<fieldset class="aufbau-section" name="appearance"><legend>appearance<\/legend>/);
+  assert.match(markup, /name="palette"/);
+  assert.match(markup, /name="density" value="touch"/);
+
+  const controls = {
+    '[name="title"]:not(fieldset)'   : { value: 'x' },
+    '[name="palette"]:not(fieldset)' : { value: 'oled' },
+    '[name="density"]:not(fieldset)' : { value: 'touch' },
+  };
+  const container = { querySelector: selector => controls[selector] ?? null };
+  assert.deepEqual(readValues(container, spec), { title: 'x', palette: 'oled', density: 'touch' });
+});
+
+test('sections nest', () => {
+  const spec   = { outer: [{ inner: [{ deep: { type: 'text' } }] }] };
+  const markup = renderHTML(spec, { wrap: false });
+  assert.match(markup, /name="outer".*name="inner".*name="deep"/);
+});
+
+test('readValues nests the values by section on request', () => {
+  const spec = {
+    title      : { type: 'text' },
+    appearance : [{ palette: { values: ['oled'] } }, { layout: [{ density: { values: ['touch'] } }] }],
+  };
+  const controls = {
+    '[name="title"]:not(fieldset)'   : { value: 'x' },
+    '[name="palette"]:not(fieldset)' : { value: 'oled' },
+    '[name="density"]:not(fieldset)' : { value: 'touch' },
+  };
+  const container = { querySelector: selector => controls[selector] ?? null };
+
+  assert.deepEqual(readValues(container, spec, { nested: true }), { title: 'x', appearance: { palette: 'oled', layout: { density: 'touch' } } });
+  assert.deepEqual(readValues(container, spec), { title: 'x', palette: 'oled', density: 'touch' });
+});
+
+test('section fields take their value from a nested values object too', () => {
+  const spec   = { appearance: [{ density: { values: ['compact', 'touch'] } }] };
+  const markup = renderHTML(spec, { values: { appearance: { density: 'touch' } }, wrap: false });
+  assert.match(markup, /name="density" value="touch"/);
+});

@@ -15,6 +15,9 @@ looks:
 `icons-only` hides the labels of inline options and of the cycle button wherever the
 option has an icon. the label then becomes the accessible name and the tooltip.
 popover lists always show labels.
+
+`stepper` adds a button before and after, stepping to the previous and the next
+option, around at both ends. with every look, never with `multiple`.
 */
 
 import { importFile } from '@aufbau/import';
@@ -45,11 +48,13 @@ export default class AufbauPicker extends AufbauControl {
     placeholder : 'select…',
     searchable  : Boolean,
     src         : String,
+    stepper     : Boolean,
   };
 
   // the ui lives in the shadow root, the <aufbau-option> children stay where the
   // author put them and are only read. parts: field, caret, listbox, option,
-  // trigger, icon, label. options carry the extra part token `selected`
+  // trigger, icon, label, step (with the token previous or next). options carry
+  // the extra part token `selected`
   static shadow = true;
 
   static styles = `
@@ -100,6 +105,8 @@ export default class AufbauPicker extends AufbauControl {
     }
 
     [part~="caret"] { flex: none; transition: rotate 0.15s ease; }
+
+    [part~="step"] { flex: none; justify-content: center; }
 
     /* top layer, positioned by core/placement.js */
     [part~="listbox"] {
@@ -224,8 +231,10 @@ export default class AufbauPicker extends AufbauControl {
     const options = this.options.filter(option => !option.disabled);
     if (!options.length) return this;
 
+    // from no selection the first step lands on the first or the last option
     const index = options.findIndex(option => option.value === this.value);
-    const next  = options[(index + step + options.length) % options.length];
+    const from  = index < 0 ? (step > 0 ? -1 : 0) : index;
+    const next  = options[(((from + step) % options.length) + options.length) % options.length];
     return this.select(next.value);
   }
 
@@ -240,9 +249,15 @@ export default class AufbauPicker extends AufbauControl {
       if (this.root.contains(item) && !isInactive(item)) this.select(item.dataset.value);
     });
 
-    // clicks from inside arrive retargeted to the host, the composed path still knows where they came from
+    this.on('click', '[data-step]', (event, button) => {
+      if (this.root.contains(button)) this.cycle(Number(button.dataset.step));
+    });
+
+    // clicks from inside arrive retargeted to the host, the composed path still knows where they came from.
+    // a step button steps, it does not open the list
     this.on('click', (event) => {
-      if (this.look !== 'combobox' || event.composedPath().includes(this.listbox)) return;
+      const path = event.composedPath();
+      if (this.look !== 'combobox' || path.includes(this.listbox) || path.some(node => node.dataset?.step)) return;
       this.toggle();
     });
 
@@ -428,6 +443,19 @@ export default class AufbauPicker extends AufbauControl {
 
   /** structure only, selection state is applied in sync() */
   render () {
+    const body = this.renderBody();
+    if (!this.getAttr('stepper') || this.isMultiple) return body;
+
+    const step = (direction, delta, icon) => html`
+      <button type="button" part="step ${direction}" data-step="${delta}" aria-label="${direction}">
+        <aufbau-icon icon="${icon}"></aufbau-icon>
+      </button>
+    `;
+
+    return html`${step('previous', -1, 'lucide:chevron-left')}${body}${step('next', 1, 'lucide:chevron-right')}`;
+  }
+
+  renderBody () {
     const { iconsOnly, placeholder, searchable } = this.getAttr();
     const look     = this.look;
     const multiple = this.isMultiple;
@@ -508,6 +536,9 @@ export default class AufbauPicker extends AufbauControl {
 
     if (look === 'combobox') this.syncField(selected);
     if (look === 'cycle')    this.syncTrigger(selected);
+
+    const locked = this.isDisabled || this.getAttr('readonly');
+    for (const button of this.root.querySelectorAll('[data-step]')) button.disabled = Boolean(locked);
   }
 
   syncField (selected) {

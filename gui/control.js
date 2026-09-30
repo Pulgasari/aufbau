@@ -44,5 +44,28 @@ function toControl (key, spec, value) {
   return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type, value }) };
 }
 
-export { normalizeOption, toControl };
+// :::::: SECTIONS
+// a key whose entry is an array is a section: the key names it, the records in
+// the array hold its fields, merged in order. sections nest. the values are
+// flat by default, readValues(…, { nested: true }) gives each section an object
+// of its own.
+//
+//   { appearance: [{ palette: { values: […] } }, { density: { values: […] } }] }
+
+const isSection = entry => Array.isArray(entry);
+
+/** the fields of a section, its records merged */
+const sectionFields = section => Object.assign({}, ...section.filter(record => record && typeof record === 'object'));
+
+/** every field of a spec with the sections resolved, key -> descriptor */
+const flattenSpec = spec => Object.fromEntries(Object.entries(spec).flatMap(([key, entry]) =>
+  isSection(entry) ? Object.entries(flattenSpec(sectionFields(entry))) : [[key, entry]]));
+
+/** the values a section's fields read from: nested under its key, with the flat ones as fallback */
+const sectionValues = (values, key) => {
+  const own = values?.[key];
+  return own && typeof own === 'object' && !Array.isArray(own) ? { ...values, ...own } : values;
+};
+
+export { flattenSpec, isSection, normalizeOption, sectionFields, sectionValues, toControl };
 export default toControl;

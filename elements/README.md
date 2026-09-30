@@ -124,6 +124,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-crumbs>`](#aufbau-crumbs) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
+[`<aufbau-embed>`](#aufbau-embed) ·
 [`<aufbau-filter>`](#aufbau-filter) ·
 [`<aufbau-flag>`](#aufbau-flag) ·
 [`<aufbau-icon>`](#aufbau-icon) ·
@@ -283,6 +284,35 @@ element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
   <a href="#delete">Löschen</a>
 </aufbau-dropdown>
 ```
+
+## aufbau-embed
+
+inhalt von dritten (video, song, post) hinter einem klick. bis dahin ist das
+element ein lokaler platzhalter, beim anbieter wird nichts angefragt, auch kein
+vorschaubild: das einzige bild ist das `poster` der seite selbst.
+
+```html
+<aufbau-embed src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></aufbau-embed>
+<aufbau-embed src="https://open.spotify.com/album/…" remember></aufbau-embed>
+<aufbau-embed src="https://example.com/widget" height="400px" label="Widget"></aufbau-embed>
+```
+
+erkannt werden youtube (über youtube-nocookie), vimeo, spotify, soundcloud,
+bandcamp (die `EmbeddedPlayer`-url, eine albumseite lässt sich nicht einbetten)
+und mastodon-posts. jede andere url wird so eingebettet, wie sie ist. eine url,
+die sich nicht einbetten lässt, macht den platzhalter zum link.
+
+| attribut   | |
+|---|---|
+| `consent`  | `click` (default) oder `auto`, auch über `<aufbau-config embed-consent="auto">`, etwa wenn die seite selbst schon gefragt hat |
+| `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
+| `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
+| `height`   | eine feste höhe statt eines verhältnisses |
+| `poster`   | ein bild der seite für den platzhalter |
+| `label`    | name auf dem platzhalter und des frames |
+
+`activate()` lädt von außen, danach `:state(active)` und das event `activate`
+mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
 
 ## aufbau-flag
 
@@ -511,6 +541,10 @@ combobox, cycle, radiogruppe oder segmented control.
 option ein icon hat. das label wird dann accessible name und tooltip. die
 popover-liste zeigt immer labels.
 
+`stepper` setzt einen button davor und einen dahinter, die zur vorherigen und
+nächsten option schalten, an beiden enden rundherum. bei jedem look, nie mit
+`multiple`. parts: `step` mit `previous` bzw. `next`.
+
 ```html
 <aufbau-picker name="view" look="segments" value="month">
   <aufbau-option value="day">Tag</aufbau-option>
@@ -526,6 +560,13 @@ popover-liste zeigt immer labels.
 <aufbau-picker name="layout" look="cycle" icons-only value="grid">
   <aufbau-option value="list" icon="lucide:list">Liste</aufbau-option>
   <aufbau-option value="grid" icon="lucide:layout-grid">Raster</aufbau-option>
+</aufbau-picker>
+
+<!-- mit buttons zum durchschalten davor und danach -->
+<aufbau-picker name="month" look="combobox" stepper value="9">
+  <aufbau-option value="8">August</aufbau-option>
+  <aufbau-option value="9">September</aufbau-option>
+  <aufbau-option value="10">Oktober</aufbau-option>
 </aufbau-picker>
 
 <!-- mehrfachauswahl, ein FormData-eintrag pro wert -->

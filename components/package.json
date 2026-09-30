@@ -1,0 +1,35 @@
+{
+  "name": "@aufbau/components",
+  "version": "0.1.0",
+  "description": "Ready to use components composed of @aufbau/elements",
+  "type"   : "module",
+  "main"   : "./index.js",
+  "module" : "./index.js",
+  "sideEffects": [
+    "./input/*.js",
+    "./write/*.js"
+  ],
+  "exports": {
+    "."     : "./index.js",
+    "./htx" : "./adapters/htx.js",
+    "./*"   : "./*"
+  },
+  "files": [
+    "index.js",
+    "adapters/*.js",
+    "core/*.js",
+    "data/*.js",
+    "input/*.js",
+    "write/*.js",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@aufbau/elements": "^1.0.0"
+  },
+  "keywords": [
+    "aufbau",
+    "custom-elements",
+    "web-components"
+  ],
+  "license": "MIT"
+}

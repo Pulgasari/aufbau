@@ -41,6 +41,29 @@ a `values` array turns any field into an `aufbau-picker` regardless of type.
 options are bare (`'live'`) or `[value, label]` pairs. `look`, `min`, `max`,
 `step`, `unit` and `default` ride through when set.
 
+## sections
+
+a key whose entry is an array is a section: the key names it, the records in
+the array hold its fields, merged in order. it renders as
+`<fieldset class="aufbau-section" name="key"><legend>key</legend>…</fieldset>`.
+sections nest. the values are flat by default, `{ nested: true }` gives each
+section an object of its own under its key. initial `values` may be either.
+
+```javascript
+const spec = {
+  title      : { type: 'text' },
+  appearance : [
+    { palette : { values: ['oled', 'zombie'], look: 'combobox' } },
+    { density : { values: ['compact', 'touch'], look: 'segments' } },
+  ],
+};
+
+readValues(panel, spec);                   // { title: '…', palette: 'oled', density: 'touch' }
+readValues(panel, spec, { nested: true }); // { title: '…', appearance: { palette: 'oled', density: 'touch' } }
+
+render(spec, { nested: true, onChange: values => save(values) });   // onChange gets them nested too
+```
+
 ## api
 
 ```javascript
