@@ -11,6 +11,7 @@
 // htx under its new name: html.define({ xInputColor: { args: 'value' } }).
 
 export const
+appView         = { args: 'name' },
 embedBandcamp   = { args: 'src' },
 embedMastodon   = { args: 'src' },
 embedSoundcloud = { args: 'src' },
