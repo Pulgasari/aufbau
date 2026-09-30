@@ -1,3 +1,15 @@
+/*
+- https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/type
+
+Quotes:
+
+"Note: The @property at-rule syntax descriptor value uses the same <syntax>
+to define the permitted data types for registered custom properties, 
+however, this always takes the form of a string."      
+
+*/
+
+
 :root {
   --syntax-density  : "compact | normal | comfortable | touch";
   --syntax-geometry : "sharp | soft | round | pill";
