@@ -1,0 +1,27 @@
+:root {
+  --syntax-density  : "compact | normal | comfortable | touch";
+  --syntax-geometry : "sharp | soft | round | pill";
+  
+  --type-density  : type(compact | normal | comfortable | touch);
+  --type-geometry : type(sharp | soft | round | pill);
+}
+
+
+@function --type(
+  --ident <custom-ident>,
+){
+  result: if(
+    style(--ident: density)  : var(--type-density);
+    style(--ident: geometry) : var(--type-geometry);
+  );
+}
+
+
+
+
+
+@property --density  { inherits: true; initial-value: normal;     syntax: var(--type-density); }
+@property --geometry { inherits: true; initial-value: soft;       syntax: --type(geometry); }
+@property --palette  { inherits: true; initial-value: zombie;     syntax: "<color> | <custom-ident>"; }
+@property --scheme   { inherits: true; initial-value: auto;       syntax: "auto | light | dark"; }
+@property --skin     { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
