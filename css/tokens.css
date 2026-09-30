@@ -30,7 +30,7 @@
 @property --scheme   { inherits: true; initial-value: auto;       syntax: "auto | light | dark"; }
 @property --skin     { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
 
-/* density and geometry are set but not read yet, the tokens they drive follow */
+/* density is set but not read yet, geometry drives --radius-control (below) */
 :root {
   --density  : normal;
   --geometry : soft;
@@ -52,6 +52,19 @@
 [data-scheme] {
   --scheme     : attr(data-scheme type(auto | light | dark), auto);
   color-scheme : if(style(--scheme: light): light; style(--scheme: dark): dark; else: light dark);
+}
+
+/*//////////// GEOMETRY ////////////*/
+
+/* the corners of controls by --geometry: sharp, soft, round, pill. declared again
+   where an area sets its own geometry, an unregistered property resolves its if()
+   where it is declared. read by buttons for now, fields and surfaces follow */
+:root, [data-geometry] {
+  --radius-control: if(
+    style(--geometry: sharp) : 0;
+    style(--geometry: round) : 0.75em;
+    style(--geometry: pill)  : 999px;
+    else                     : 0.25em);
 }
 
 /*//////////// COLORS ////////////*/
