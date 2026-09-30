@@ -9,6 +9,7 @@
 @import url('./tokens.css')              layer(aufbau.tokens);
 @import url('./palettes.css')            layer(aufbau.tokens);
 @import url('./themes.css')              layer(aufbau.tokens);
+@import url('./reset.css')               layer(aufbau.reset);
 @import url('./animate/keyframes.css')   layer(aufbau.utilities);
 @import url('./animate/animations.css')  layer(aufbau.utilities);
 
@@ -72,23 +73,16 @@
   }
 
   div    { min-height: 0; }
+  img    { max-width: 100%; object-fit: cover; vertical-align: bottom; }
   svg    { max-width : 100%; }
-  ol, ul { list-style: none; }
-
-  img {
-    /*display: inline-block;*/
-    max-width      : 100%;
-    object-fit     : cover;
-    vertical-align : bottom
-  }
+  ol, ul { list-style: none; } /* TODO: nich gut wegen a11y ??; */
+  table  { border-collapse: collapse; border-spacing: 0; }
+  
 
    input:focus { border: none; outline: none; }
   select:focus { border: none; outline: none; }
 
-  table {
-  	border-collapse : collapse;
-  	border-spacing  : 0;
-  }
+  
 
   /*//////////////////////// TYPO ////////////////////////*/
 
