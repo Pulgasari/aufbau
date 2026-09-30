@@ -11,6 +11,12 @@
 
 // the canonical names, <group>-<name> maps to ./<group>/<name>.js
 export const COMPONENTS = [
+  'embed-bandcamp',
+  'embed-mastodon',
+  'embed-soundcloud',
+  'embed-spotify',
+  'embed-vimeo',
+  'embed-youtube',
   'input-bool',
   'input-chips',
   'input-color',

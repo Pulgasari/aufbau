@@ -12,6 +12,13 @@
 import { tagOf } from '../core/names.js';
 
 export const
+$embedBandcamp   = { tag: tagOf('embed-bandcamp'),   args: 'src' },
+$embedMastodon   = { tag: tagOf('embed-mastodon'),   args: 'src' },
+$embedSoundcloud = { tag: tagOf('embed-soundcloud'), args: 'src' },
+$embedSpotify    = { tag: tagOf('embed-spotify'),    args: 'src' },
+$embedVimeo      = { tag: tagOf('embed-vimeo'),      args: 'src' },
+$embedYoutube    = { tag: tagOf('embed-youtube'),    args: 'src' },
+
 $inputBool     = { tag: tagOf('input-bool'),     args: 'value' },
 $inputChips    = { tag: tagOf('input-chips'),    args: 'value' },
 $inputColor    = { tag: tagOf('input-color'),    args: 'value' },
