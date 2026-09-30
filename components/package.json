@@ -37,5 +37,10 @@
     "custom-elements",
     "web-components"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "aufbau": {
+    "bundle": {
+      "keep": ["./"]
+    }
+  }
 }

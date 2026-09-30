@@ -41,7 +41,12 @@ export class AppView extends AufbauElement {
     return `${tagOf('app-view')} {
       display: block;
 
-      &:not([active]) { content-visibility: hidden; }
+      /* out of the flow as well: in a flex or grid layout a hidden view would
+         still take its share of the space */
+      &:not([active]) {
+        content-visibility : hidden;
+        position           : absolute;
+      }
     }
     ${transitionStyles}`;
   }
