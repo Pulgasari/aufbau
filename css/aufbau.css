@@ -13,17 +13,19 @@
 @import url('./animate/keyframes.css')   layer(aufbau.utilities);
 @import url('./animate/animations.css')  layer(aufbau.utilities);
 
+/* the reset lives in reset.css now, imported above. the former inline copy:
+
 @layer aufbau.reset {
-  /*////////////////////// SPECIAL ///////////////////////*/
+  /* ////////////////////// SPECIAL ///////////////////////* /
 
   :root {
     interpolate-size     : allow-keywords;
-    transition-behavior  : allow-discrete; /* or * ??? */
+    transition-behavior  : allow-discrete; /* or * ??? * /
   }
 
-  /*/////////////////////// RESET ////////////////////////*/
+  /* /////////////////////// RESET ////////////////////////* /
 
-  /* margin and padding start at 0 through the shorthands (tokens.css) */
+  /* margin and padding start at 0 through the shorthands (tokens.css) * /
   *, *::before, *::after { box-sizing: border-box; }
   * { user-select: none; }
 
@@ -69,13 +71,13 @@
     /*
     text-box-edge: text text;
     text-box-trim: trim-both;
-    */
+    * /
   }
 
   div    { min-height: 0; }
   img    { max-width: 100%; object-fit: cover; vertical-align: bottom; }
   svg    { max-width : 100%; }
-  ol, ul { list-style: none; } /* TODO: nich gut wegen a11y ??; */
+  ol, ul { list-style: none; } /* TODO: nich gut wegen a11y ??; * /
   table  { border-collapse: collapse; border-spacing: 0; }
   
 
@@ -84,7 +86,7 @@
 
   
 
-  /*//////////////////////// TYPO ////////////////////////*/
+  /* //////////////////////// TYPO ////////////////////////* /
 
   :root {
     --aufbau-font           : sans;
@@ -121,7 +123,7 @@
     &::before, &::after { content: ''; content: none; }
   }
 
-  /*//////////////////// TRANSITIONS ///////////////////*/
+  /* //////////////////// TRANSITIONS ///////////////////* /
 
   @view-transition { navigation: auto; }
 
@@ -130,7 +132,7 @@
     ::view-transition-new(root) { animation: none; }
   }
 
-  /*//////////////////// TRAIT CLASSES ///////////////////*/
+  /* //////////////////// TRAIT CLASSES ///////////////////* /
 
   .hidden  { display: none; }
   .numeric { font-variant-numeric: tabular-nums; }
@@ -142,3 +144,4 @@
     justify-content : center;
   }
 }
+*/
