@@ -109,12 +109,23 @@ autoloader({ rename: { 'input-icon': 'icon-field' } });  // <icon-field>
 
 ## htx
 
+the components are real tags, so htx only learns what their positional values
+fill. the adapter exports them under the camelCase of the tag, which htx (from
+0.2) reads as its kebab-case. the elements keep their `$` shorthands.
+
 ```js
 import * as components from '@aufbau/components/htx';
 import * as elements   from '@aufbau/elements/htx';
 
 html.define({ ...elements, ...components });
+
+html`<input-color 'red' name="color" />`   // <input-color value="red" name="color">
+html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
+html`<$icon 'lucide:star' />`              // <aufbau-icon icon="lucide:star">
 ```
+
+the templates spell the canonical tag, a renamed component renders under its
+new one. configure() has to run before the adapter is imported.
 
 ## notes for later
 
