@@ -135,14 +135,17 @@ export default class AufbauEmbed extends AufbauElement {
     ratio    : String,   // e.g. '4 / 3', wins over the provider's
     remember : Boolean,
     src      : String,
+    width    : String,   // a css length, at most the available width
   };
 
   static styles = `aufbau-embed {
-    aspect-ratio : var(--embed-ratio, 16 / 9);
-    background   : center / cover no-repeat var(--embed-poster, none);
-    block-size   : var(--embed-height, auto);
-    display      : block;
-    inline-size  : 100%;
+    aspect-ratio    : var(--embed-ratio, 16 / 9);
+    background      : center / cover no-repeat var(--embed-poster, none);
+    block-size      : var(--embed-height, auto);
+    container-type  : size;
+    display         : block;
+    inline-size     : var(--embed-width, 100%);
+    max-inline-size : 100%;
 
     > iframe {
       block-size  : 100%;
@@ -170,6 +173,12 @@ export default class AufbauEmbed extends AufbauElement {
 
       > aufbau-icon { font-size: 2em; }
       > small       { font-size: 0.75em; }
+    }
+
+    /* a slim player, e.g. 42px: the placeholder is one line */
+    @container (max-height: 80px) {
+      > :is(button, a) { flex-direction: row; gap: 0.5em; }
+      > :is(button, a) > aufbau-icon { font-size: 1em; }
     }
   }`;
 
@@ -244,13 +253,14 @@ export default class AufbauEmbed extends AufbauElement {
 
   sync () {
     const embed = this.embed;
-    const { height, poster, ratio } = this.getAttr();
+    const { height, poster, ratio, width } = this.getAttr();
     const fixed = height || (!ratio && embed?.height);
 
     this.states.toggle('active', this.active);
     this.style.setProperty('--embed-ratio', fixed ? 'auto' : (ratio || embed?.ratio || '16 / 9'));
     if (fixed) this.style.setProperty('--embed-height', fixed); else this.style.removeProperty('--embed-height');
     if (poster) this.style.setProperty('--embed-poster', `url(${JSON.stringify(poster)})`); else this.style.removeProperty('--embed-poster');
+    if (width)  this.style.setProperty('--embed-width', width); else this.style.removeProperty('--embed-width');
   }
 }
 
