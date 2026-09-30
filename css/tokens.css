@@ -28,25 +28,32 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 
 /*
 in my tests these work at least in @property
-*/
+
 :root {
   --syntax-density  : "compact | normal | comfortable | touch";
   --syntax-geometry : "sharp | soft | round | pill";
   --syntax-palette  : "<color> | <custom-ident>";
   --syntax-scheme   : "auto | light | dark";
   --syntax-skin     : "monochrome";
-  /*
+
   --type-density  : type(compact | normal | comfortable | touch);
   --type-geometry : type(sharp | soft | round | pill);
-  */
 }
-
 
 @property --density  { inherits: true; initial-value: normal;     syntax: var(--syntax-density); }
 @property --geometry { inherits: true; initial-value: soft;       syntax: var(--syntax-geometry); }
 @property --palette  { inherits: true; initial-value: zombie;     syntax: var(--syntax-palette); }
 @property --scheme   { inherits: true; initial-value: auto;       syntax: var(--syntax-scheme); }
 @property --skin     { inherits: true; initial-value: monochrome; syntax: var(--syntax-skin); }
+*/
+
+/* the syntax as a string: in chrome 141 a var() in the descriptor dropped the rule
+   in my tests (style() and attr() work unregistered as well, which can hide it) */
+@property --density  { inherits: true; initial-value: normal;     syntax: "compact | normal | comfortable | touch"; }
+@property --geometry { inherits: true; initial-value: soft;       syntax: "sharp | soft | round | pill"; }
+@property --palette  { inherits: true; initial-value: zombie;     syntax: "<color> | <custom-ident>"; }
+@property --scheme   { inherits: true; initial-value: auto;       syntax: "auto | light | dark"; }
+@property --skin     { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
 
 /* density is set but not read yet, geometry drives --radius-control (below) */
 :root {

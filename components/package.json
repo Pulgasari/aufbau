@@ -7,6 +7,7 @@
   "module" : "./index.js",
   "sideEffects": [
     "./app/*.js",
+    "./div/*.js",
     "./embed/*.js",
     "./input/*.js",
     "./write/*.js"
@@ -22,6 +23,7 @@
     "app/*.js",
     "core/*.js",
     "data/*.js",
+    "div/*.js",
     "embed/*.js",
     "input/*.js",
     "write/*.js",
@@ -35,5 +37,10 @@
     "custom-elements",
     "web-components"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "aufbau": {
+    "bundle": {
+      "keep": ["./"]
+    }
+  }
 }

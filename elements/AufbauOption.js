@@ -23,6 +23,11 @@ export default class AufbauOption extends AufbauElement {
   get label () { return this.getAttr('label') || this.textContent.trim(); }
   get value () { return this.getAttribute('value') ?? this.label; }
 
+  // written through to the attribute: a framework sets `value` as a property
+  // where the element has one, and a getter alone swallowed it
+  set label (label) { this.setAttribute('label', label); }
+  set value (value) { this.setAttribute('value', value); }
+
   toJSON () {
     const { disabled, icon, selected } = this.getAttr();
     return { disabled, icon, label: this.label, selected, value: this.value };
