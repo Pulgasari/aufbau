@@ -1,0 +1,111 @@
+/* reset.css */
+
+/*////////////////////// SPECIAL ///////////////////////*/
+
+:root {
+  interpolate-size     : allow-keywords;
+  transition-behavior  : allow-discrete; /* or * ??? */
+}
+
+/*/////////////////////// CLEAR ////////////////////////*/
+
+/* margin and padding start at 0 through the shorthands (tokens.css) */
+*, *::before, *::after { box-sizing: border-box; }
+* { user-select: none; }
+
+/*A*/ a, abbr, acronym, address, applet, article, aside, audio,
+/*B*/ b, big, blockquote, body, /*C*/ canvas, caption, center, cite, code,
+/*D*/ dd, del, details, dfn, div, dl, dt, /*E*/ em, embed,
+/*F*/ fieldset, figure, figcaption, footer, form,
+/*H*/ h1, h2, h3, h4, h5, h6, header, hgroup, html, /*I*/ i, iframe, img, ins,
+/*K*/ kbd, /*L*/ label, legend, /*M*/ mark, menu, /*N*/ nav,
+/*O*/ object, output, /*P*/ p, pre, /*Q*/ q, /*R*/ ruby,
+/*S*/ s, samp, section, small, span, strike, strong, sub, summary, sup,
+/*T*/ table, tbody, tfoot, thead, td, th, tr, tt, time, 
+/*U*/ u, /*V*/ var, video {
+  border         : 0;
+  border-color   : currentcolor; 
+  border-style   : solid; 
+  border-width   : 0;
+  font-size      : 100%;
+  vertical-align : baseline;
+}
+
+a      { text-decoration: none; }
+div    { min-height: 0; }
+img    { max-width: 100%; object-fit: cover; vertical-align: bottom; }
+svg    { max-width : 100%; }
+ol, ul { list-style: none; } /* TODO: nich gut wegen a11y ??; */
+table  { border-collapse: collapse; border-spacing: 0; }
+
+button {
+  align-items     : center;
+  cursor          : pointer; 
+  display         : inline-flex;
+  flex-direction  : row;
+  justify-content : center;
+  text-box        : trim-both cap alphabetic; /* text-box-edge: text text; text-box-trim: trim-both; */
+}
+
+ input:focus { border: none; outline: none; }
+select:focus { border: none; outline: none; }
+
+  
+
+  /*//////////////////////// TYPO ////////////////////////*/
+
+  :root {
+    --aufbau-font           : sans;
+    --aufbau-font-monospace : monospace;
+  }
+
+  body { 
+    font-family : var(--aufbau-font);
+    line-height : 1;
+
+    text-rendering: optimizeLegibility;
+     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight : 700;
+    line-height : 1.25;
+    text-wrap   : balance;
+  }
+
+  p {
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 3;
+
+    line-height   : 1.25;
+    overflow-wrap : break-word;
+    text-align    : justify; 
+    text-wrap     : pretty;
+  }
+
+  blockquote, q {
+    quotes: none;
+    &::before, &::after { content: ''; content: none; }
+  }
+
+  /*//////////////////// TRANSITIONS ///////////////////*/
+
+  @view-transition { navigation: auto; }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  /*//////////////////// TRAIT CLASSES ///////////////////*/
+
+  .hidden  { display: none; }
+  .numeric { font-variant-numeric: tabular-nums; }
+
+  .flow-y {
+    display         : flex;
+    flex-direction  : column;
+    align-items     : center;
+    justify-content : center;
+  }
