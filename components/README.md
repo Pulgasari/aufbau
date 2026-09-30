@@ -64,6 +64,33 @@ hits as a wrapping row).
 | `input-year`     | `2026`                             | `aufbau-input type=year`, stepper          |
 | `write-md`       | markdown                           | `aufbau-writer`, `aufbau-reader`           |
 
+### app
+
+the frame of an app: `app-root` holds the views and sets the look of its area,
+`app-view` is one screen of it.
+
+```html
+<app-root palette="zombie" scheme="dark" density="touch" skin="monochrome" loading>
+  <app-view name="library" route="/" active>…</app-view>
+  <app-view name="reader" route="/reader" transition-on="slide">…</app-view>
+  <app-view name="settings" route="/settings" lazy><template>…</template></app-view>
+</app-root>
+```
+
+- `app-root`: palette, scheme, density and geometry hold for its area (data-*
+  on it). the skin is the document's: `skin` sets it on `<html>` and swaps the
+  elements' skin. every attribute is a property too, `root.palette = 'oled'`.
+  `loading` shows a screen until `ready()` (the palette's background and a
+  spinner, or a child with `[data-loading]`). `routing="hash | path | none"`,
+  `transition` is the default view transition. `show(name)`, event `navigate`.
+- `app-view`: one of the views of a parent is active, the others are `inert`
+  and `content-visibility: hidden`, so their dom, form values and scroll stay.
+  `activate()` or setting `active` switches inside a view transition,
+  `transition-on` / `transition-off` name a one-way keyframe (fade, slide, zoom,
+  pop, rotate-in) or none. `lazy` renders the `<template>` child on the first
+  activation, `route` puts the view into the address. events `activate`,
+  `deactivate`.
+
 ### embed
 
 third party content behind a click, one component per provider over
@@ -124,8 +151,8 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 html`<$icon 'lucide:star' />`              // <aufbau-icon icon="lucide:star">
 ```
 
-the templates spell the canonical tag, a renamed component renders under its
-new one. configure() has to run before the adapter is imported.
+the adapter knows the canonical tags. a component renamed by configure() is
+defined for htx under its new name: `html.define({ xInputColor: { args: 'value' } })`.
 
 ## notes for later
 
