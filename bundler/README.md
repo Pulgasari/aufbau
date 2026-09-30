@@ -1,8 +1,6 @@
 # @aufbau/bundler
 
-turns a project that loads its code live (importmap, package origins, cdns) into
-one self-contained directory, e.g. the www/ of a capacitor app. early: see
-[concept.md](concept.md) for the steps and what comes next.
+turns an aufbau-project into a self-contained directory.
 
 ## usage
 

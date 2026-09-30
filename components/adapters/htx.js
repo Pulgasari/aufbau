@@ -12,6 +12,18 @@
 // module is evaluated, a configure() with a prefix or a rename map has to come
 // first.
 
+/*
+shorthand tags for htx, like @aufbau/elements/htx. 
+`args` names the attributes positional values fill, in order.
+
+  <$inputIcon 'lucide:star' name="icon" />      <input-icon value="lucide:star" name="icon">
+  <$inputLanguage 'de' languages="de en fr" />  <input-language value="de" languages="de en fr">
+  <$writeMd ${notes} preview="side" />          <write-md value="…" preview="side">
+
+the tags are read when this module is evaluated, 
+a configure() with a prefix or a rename map has to come first.
+*/
+
 import { tagOf } from '../core/names.js';
 
 export const
@@ -50,9 +62,10 @@ writeMd         = { tag: tagOf('write-md'),         args: 'value' };
 
 /* :::::: USAGE
 
+import htx from '@htx/js';
 import * as components from '@aufbau/components/htx';
 import * as elements   from '@aufbau/elements/htx';
 
-html.define({ ...elements, ...components });
+htx.define({ ...elements, ...components });
 
 */
