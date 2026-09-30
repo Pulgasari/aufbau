@@ -13,6 +13,8 @@
 export const COMPONENTS = [
   'app-root',
   'app-view',
+  'div-x',
+  'div-y',
   'embed-bandcamp',
   'embed-mastodon',
   'embed-soundcloud',

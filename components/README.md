@@ -91,6 +91,17 @@ the frame of an app: `app-root` holds the views and sets the look of its area,
   activation, `route` puts the view into the address. events `activate`,
   `deactivate`.
 
+### div
+
+`div-x` is a row, `div-y` a column: flex containers along their axis.
+`scrollable` lets them scroll along it instead of growing.
+
+```html
+<div-y>
+  <div-x scrollable>…</div-x>
+</div-y>
+```
+
 ### embed
 
 third party content behind a click, one component per provider over
