@@ -5,7 +5,31 @@ Quotes:
 
 "Note: The @property at-rule syntax descriptor value uses the same <syntax>
 to define the permitted data types for registered custom properties, 
-however, this always takes the form of a string."      
+however, this always takes the form of a string." 
+
+----- snippets
+
+// single value
+type(<color>)
+type(auto)
+
+// "|" combinator for multiple types
+type(<length> | <percentage>)
+
+// Space-separated list of values
+type(<color>+)
+
+// Comma-separated list of values
+type(<length>#)
+
+// multiple keywords
+type(red | blue | green)
+
+// combination of data type and keyword
+type(<percentage> | auto)
+
+// universal syntax value
+type(*)
 
 */
 
