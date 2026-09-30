@@ -8,7 +8,8 @@ set by animations.css, each with a fallback here so the file works on its own:
 --animate-scale      how far pulse grows
 --animate-opacity    how far blink fades
 --animate-turns      how often flip turns
---animate-offset     where slide and drift start (see --slide-offset())
+--animate-offset     where slide, glide and drift start (see --slide-offset())
+--animate-clip       where reveal starts, an inset() by --animate-from
 
 one-way keyframes run from a start state into the element at rest,
 repeated they jump back each time. 
@@ -32,6 +33,37 @@ keep animations on the same element from overriding each other.
    60% { opacity: 1; scale: 1.1; }
   100% { opacity: 1; scale: 1;   }
 }
+
+/* the entrance of most ui: fades in over a short way, from --animate-from */
+@keyframes glide { from { opacity: 0; translate: var(--animate-offset, -0.75rem 0); } }
+
+/* out of focus into focus */
+@keyframes focus { from { filter: blur(var(--animate-blur, 0.5rem)); opacity: 0; } }
+
+/* lands from above, a little too big: badges, notifications, stamps */
+@keyframes stamp {
+    0% { opacity: 0; scale: var(--animate-scale, 1.6); animation-timing-function: ease-in; }
+   70% { opacity: 1; scale: 0.95; }
+  100% { opacity: 1; scale: 1; }
+}
+
+/* uncovered from the --animate-from edge, the element does not move */
+@keyframes reveal {
+  from { clip-path: var(--animate-clip, inset(0 100% 0 0)); }
+  to   { clip-path: inset(0); }
+}
+
+/* opens as a circle from the center */
+@keyframes iris {
+  from { clip-path: circle(0 at 50% 50%); }
+  to   { clip-path: circle(75% at 50% 50%); }
+}
+
+/* tips in towards the viewer */
+@keyframes tilt-in { from { opacity: 0; transform: perspective(40rem) rotateX(-60deg); transform-origin: 50% 0; } }
+
+/* grows open from no height, needs interpolate-size (animations.css sets it) */
+@keyframes unfold { from { block-size: 0; opacity: 0; } }
 
 /*//////////// CYCLIC ////////////*/
 
@@ -60,12 +92,24 @@ with a pattern tile as the distance it repeats without a seam.
   100% { rotate: calc(var(--animate-turns, 1) * 1turn); }
 }
 
+/* hovers up and down, for idle states and hints */
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 calc(-0.5 * var(--animate-length, 0.75rem)); }
+}
+
 @keyframes glitch {
   0%, 100% { translate: 0 0;      skew: 0deg;  }
   20%      { translate: -2px 1px; skew: 8deg;  }
   40%      { translate: 2px -1px; skew: -6deg; }
   60%      { translate: -1px 0;   skew: 0deg;  }
   80%      { translate: 1px 1px;  skew: 4deg;  }
+}
+
+/* two beats, then a rest */
+@keyframes heartbeat {
+  0%, 28%, 70%, 100% { scale: 1; }
+  14%, 42%           { scale: var(--animate-scale, 1.15); }
 }
 
 @keyframes hue { to { filter: hue-rotate(1turn); } }
@@ -76,6 +120,12 @@ with a pattern tile as the distance it repeats without a seam.
   35%      { scale: 1 1;    translate: 0 calc(-1   * var(--animate-length, 0.75rem)); }
   50%      { scale: 1 1;    translate: 0 calc(-1.1 * var(--animate-length, 0.75rem)); }
   80%      { scale: 1 1.08; translate: 0 0; }
+}
+
+/* widens and fades, for a live dot or an unread marker. meant for an element of
+   its own, a ring behind the dot: the element pinging disappears each round */
+@keyframes ping {
+  75%, 100% { opacity: 0; scale: var(--animate-scale, 2); }
 }
 
 /*
@@ -90,6 +140,16 @@ background-position: calc(var(--animate-progress) * 20px) 0
 
 @keyframes pulse { 50% { scale: var(--animate-scale, 1.15); } }
 
+/* squashed and stretched, the way a rubber band snaps back */
+@keyframes rubber {
+  0%, 100% { scale: 1 1; }
+  30%      { scale: 1.25 0.75; }
+  40%      { scale: 0.75 1.25; }
+  50%      { scale: 1.15 0.85; }
+  65%      { scale: 0.95 1.05; }
+  75%      { scale: 1.05 0.95; }
+}
+
 @keyframes shake {
   0%, 100% { translate: 0 0; }
   20%, 60% { translate: calc(      var(--animate-length, 0.75rem) / 2) 0; }
@@ -103,6 +163,14 @@ background-position: calc(var(--animate-progress) * 20px) 0
 }
 
 @keyframes spin { to { rotate: 1turn; } }
+
+/* asks for attention: shrinks, then turns back and forth while a little bigger */
+@keyframes tada {
+  0%, 100%           { rotate: 0deg; scale: 1; }
+  10%, 20%           { rotate: calc(-0.2 * var(--animate-angle, 15deg)); scale: 0.9; }
+  30%, 50%, 70%, 90% { rotate: calc( 0.2 * var(--animate-angle, 15deg)); scale: 1.1; }
+  40%, 60%, 80%      { rotate: calc(-0.2 * var(--animate-angle, 15deg)); scale: 1.1; }
+}
 
 @keyframes vibrate {
   0%, 100%      { translate:  0    0;   }
