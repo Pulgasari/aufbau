@@ -124,8 +124,8 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 html`<$icon 'lucide:star' />`              // <aufbau-icon icon="lucide:star">
 ```
 
-the templates spell the canonical tag, a renamed component renders under its
-new one. configure() has to run before the adapter is imported.
+the adapter knows the canonical tags. a component renamed by configure() is
+defined for htx under its new name: `html.define({ xInputColor: { args: 'value' } })`.
 
 ## notes for later
 
