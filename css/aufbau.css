@@ -1,17 +1,15 @@
-/* @aufbau/css/aufbau.css
-   the one stylesheet a page links. the layers in their order, lowest first:
-   tokens (axes, palettes, shorthands), reset (this file), elements (the
-   structure of @aufbau/elements), skin (its decoration, elements/core/skin.js),
-   utilities. any unlayered rule of the page wins over all of them. skins and
-   looks still come on their own. */
+/* aufbau.css */
 
+/*////// 1. LAYERS //////*/
 @layer aufbau.tokens, aufbau.reset, aufbau.elements, aufbau.skin, aufbau.utilities;
 
+/*////// 2. IMPORTS //////*/
 @import url('./functions.css');
 @import url('./animate/functions.css');
 @import url('./tokens.css')              layer(aufbau.tokens);
 @import url('./palettes.css')            layer(aufbau.tokens);
 @import url('./themes.css')              layer(aufbau.tokens);
+@import url('./reset.css')               layer(aufbau.reset);
 @import url('./animate/keyframes.css')   layer(aufbau.utilities);
 @import url('./animate/animations.css')  layer(aufbau.utilities);
 
@@ -75,23 +73,16 @@
   }
 
   div    { min-height: 0; }
+  img    { max-width: 100%; object-fit: cover; vertical-align: bottom; }
   svg    { max-width : 100%; }
-  ol, ul { list-style: none; }
-
-  img {
-    /*display: inline-block;*/
-    max-width      : 100%;
-    object-fit     : cover;
-    vertical-align : bottom
-  }
+  ol, ul { list-style: none; } /* TODO: nich gut wegen a11y ??; */
+  table  { border-collapse: collapse; border-spacing: 0; }
+  
 
    input:focus { border: none; outline: none; }
   select:focus { border: none; outline: none; }
 
-  table {
-  	border-collapse : collapse;
-  	border-spacing  : 0;
-  }
+  
 
   /*//////////////////////// TYPO ////////////////////////*/
 
