@@ -7,8 +7,8 @@ import createElement  from '@domina/methods/createElement.js';
 import createFragment from '@domina/methods/createFragment.js';
 import onEvent        from '@domina/methods/onEvent.js';
 
-import { isSection, normalizeOption, sectionFields, toControl } from './control.js';
-import { readValues }                                           from './read.js';
+import { isSection, normalizeOption, sectionFields, sectionValues, toControl } from './control.js';
+import { readValues }                                                          from './read.js';
 
 // one field as dom: <label><span>label</span><aufbau-control/></label>
 function fieldElement (key, spec, value) {
@@ -32,10 +32,11 @@ function fieldElement (key, spec, value) {
   return field;
 }
 
-// a section as dom: <fieldset name="key"><legend>key</legend>fields</fieldset>
+// a section as dom: <fieldset name="key"><legend>key</legend>fields</fieldset>.
+// the values of its fields are looked up under its key first, then flat
 function sectionElement (key, section, values = {}) {
   const fieldset = createElement('fieldset', { className: 'aufbau-section', name: key });
-  fieldset.append(createElement('legend', { textContent: key }), ...entryElements(sectionFields(section), values));
+  fieldset.append(createElement('legend', { textContent: key }), ...entryElements(sectionFields(section), sectionValues(values, key)));
   return fieldset;
 }
 
@@ -43,8 +44,9 @@ const entryElements = (spec, values) => Object.entries(spec)
   .map(([key, entry]) => isSection(entry) ? sectionElement(key, entry, values) : fieldElement(key, entry, values[key]));
 
 // a whole spec as a dom container (or fragment when wrap is false). onChange
-// fires on change/input with (values, name, event).
-function renderElement (spec, { values = {}, wrap = 'div', onChange } = {}) {
+// fires on change/input with (values, name, event), the values nested by
+// section when `nested` is set. `values` may be flat or nested either way.
+function renderElement (spec, { nested = false, values = {}, wrap = 'div', onChange } = {}) {
   const container = wrap ? createElement(wrap) : createFragment();
   container.append(...entryElements(spec, values));
 
@@ -54,7 +56,7 @@ function renderElement (spec, { values = {}, wrap = 'div', onChange } = {}) {
     // element that carries no name, which would otherwise read back as null
     // a fieldset carries the name of its section, it is no field
     const nameOf  = event => event.target?.closest?.('[name]:not(fieldset)')?.getAttribute('name') ?? null;
-    const handler = event => onChange(readValues(container, spec), nameOf(event), event);
+    const handler = event => onChange(readValues(container, spec, { nested }), nameOf(event), event);
     onEvent(container, ['change', 'input'], handler);
   }
   return container;

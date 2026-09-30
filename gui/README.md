@@ -46,8 +46,8 @@ options are bare (`'live'`) or `[value, label]` pairs. `look`, `min`, `max`,
 a key whose entry is an array is a section: the key names it, the records in
 the array hold its fields, merged in order. it renders as
 `<fieldset class="aufbau-section" name="key"><legend>key</legend>…</fieldset>`.
-sections nest. the values stay flat, a section groups fields on screen, not in
-the values object.
+sections nest. the values are flat by default, `{ nested: true }` gives each
+section an object of its own under its key. initial `values` may be either.
 
 ```javascript
 const spec = {
@@ -58,7 +58,10 @@ const spec = {
   ],
 };
 
-readValues(panel, spec); // { title: '…', palette: 'oled', density: 'touch' }
+readValues(panel, spec);                   // { title: '…', palette: 'oled', density: 'touch' }
+readValues(panel, spec, { nested: true }); // { title: '…', appearance: { palette: 'oled', density: 'touch' } }
+
+render(spec, { nested: true, onChange: values => save(values) });   // onChange gets them nested too
 ```
 
 ## api

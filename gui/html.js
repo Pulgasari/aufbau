@@ -2,7 +2,7 @@
 // html-string renderer. pure and dependency-free (no dom, no @domina), so it
 // also runs at build time / server side to emit markup the app hydrates later.
 
-import { isSection, normalizeOption, sectionFields, toControl } from './control.js';
+import { isSection, normalizeOption, sectionFields, sectionValues, toControl } from './control.js';
 
 const escAttr = value => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const escText = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -19,7 +19,7 @@ export function fieldHTML (key, spec, value) {
 
 // a section as an html string: a fieldset named by its key
 export function sectionHTML (key, section, values = {}) {
-  return `<fieldset class="aufbau-section" name="${escAttr(key)}"><legend>${escText(key)}</legend>${entriesHTML(sectionFields(section), values)}</fieldset>`;
+  return `<fieldset class="aufbau-section" name="${escAttr(key)}"><legend>${escText(key)}</legend>${entriesHTML(sectionFields(section), sectionValues(values, key))}</fieldset>`;
 }
 
 const entriesHTML = (spec, values) => Object.entries(spec)
