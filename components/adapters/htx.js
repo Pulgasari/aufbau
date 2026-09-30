@@ -7,23 +7,8 @@
 //   <input-language 'de' languages="de en fr" />   <input-language value="de" languages="de en fr">
 //   <embed-youtube 'dQw4w9WgXcQ' />                <embed-youtube src="dQw4w9WgXcQ">
 //
-// the templates always spell the canonical tag. the tags are read when this
-// module is evaluated, a configure() with a prefix or a rename map has to come
-// first.
-
-/*
-shorthand tags for htx, like @aufbau/elements/htx. 
-`args` names the attributes positional values fill, in order.
-
-  <$inputIcon 'lucide:star' name="icon" />      <input-icon value="lucide:star" name="icon">
-  <$inputLanguage 'de' languages="de en fr" />  <input-language value="de" languages="de en fr">
-  <$writeMd ${notes} preview="side" />          <write-md value="…" preview="side">
-
-the tags are read when this module is evaluated, 
-a configure() with a prefix or a rename map has to come first.
-*/
-
-import { tagOf } from '../core/names.js';
+// the canonical tags only. a component renamed by configure() is defined for
+// htx under its new name: html.define({ xInputColor: { args: 'value' } }).
 
 export const
 embedBandcamp   = { args: 'src' },
