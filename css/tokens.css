@@ -38,13 +38,20 @@
   --scheme   : auto;
   --skin     : monochrome;
 
-  &[data-density]  { --density  : attr(data-density  type(compact | normal | comfortable | touch), normal); }
-  &[data-geometry] { --geometry : attr(data-geometry type(sharp | soft | round | pill), soft); }
-  &[data-palette]  { --palette  : attr(data-palette  type(<color> | <custom-ident>), zombie); }
-  &[data-scheme]   { --scheme   : attr(data-scheme   type(auto | light | dark), auto); }
-  &[data-skin]     { --skin     : attr(data-skin     type(<custom-ident>), monochrome); }
+  &[data-palette] { --palette : attr(data-palette type(<color> | <custom-ident>), zombie); }
+  &[data-skin]    { --skin    : attr(data-skin    type(<custom-ident>), monochrome); }
 
   color-scheme: if(style(--scheme: light): light; style(--scheme: dark): dark; else: light dark);
+}
+
+/* density, geometry and scheme hold for an area as well, e.g. <app-root data-scheme="dark">.
+   the palette of an area is palettes.css's, the skin is the document's alone */
+[data-density]  { --density  : attr(data-density  type(compact | normal | comfortable | touch), normal); }
+[data-geometry] { --geometry : attr(data-geometry type(sharp | soft | round | pill), soft); }
+
+[data-scheme] {
+  --scheme     : attr(data-scheme type(auto | light | dark), auto);
+  color-scheme : if(style(--scheme: light): light; style(--scheme: dark): dark; else: light dark);
 }
 
 /*//////////// COLORS ////////////*/
