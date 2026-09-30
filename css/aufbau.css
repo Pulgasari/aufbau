@@ -1,12 +1,9 @@
-/* @aufbau/css/aufbau.css
-   the one stylesheet a page links. the layers in their order, lowest first:
-   tokens (axes, palettes, shorthands), reset (this file), elements (the
-   structure of @aufbau/elements), skin (its decoration, elements/core/skin.js),
-   utilities. any unlayered rule of the page wins over all of them. skins and
-   looks still come on their own. */
+/* aufbau.css */
 
+/*////// 1. LAYERS //////*/
 @layer aufbau.tokens, aufbau.reset, aufbau.elements, aufbau.skin, aufbau.utilities;
 
+/*////// 2. IMPORTS //////*/
 @import url('./functions.css');
 @import url('./animate/functions.css');
 @import url('./tokens.css')              layer(aufbau.tokens);
