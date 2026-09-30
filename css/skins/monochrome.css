@@ -173,6 +173,17 @@ aufbau-upload::part(file),
   border-radius: calc(var(--radius) * 0.8);
 }
 
+aufbau-embed {
+  border        : var(--border);
+  border-radius : var(--radius);
+  overflow      : hidden;
+
+  > :is(button, a) { background-color: var(--sunken); }
+  > :is(button, a):hover { background-color: var(--hover); }
+  > :is(button, a):focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+  > :is(button, a) > small { color: var(--color-muted); }
+}
+
 aufbau-modal::part(header) { border-block-end: var(--border); }
 
 /* the segments share one frame, the element draws the dividers from --picker-divider */

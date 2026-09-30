@@ -9,6 +9,7 @@
     "./AufbauCrumbs"   : "./AufbauCrumbs.js",
     "./AufbauDatalist" : "./AufbauDatalist.js",
     "./AufbauDropdown" : "./AufbauDropdown.js",
+    "./AufbauEmbed"    : "./AufbauEmbed.js",
     "./AufbauFilter"   : "./AufbauFilter.js",
     "./AufbauFlag"     : "./AufbauFlag.js",
     "./AufbauIcon"     : "./AufbauIcon.js",

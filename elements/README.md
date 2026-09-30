@@ -124,6 +124,7 @@ customElements.define('aufbau-flag', AufbauFlag);
 [`<aufbau-crumbs>`](#aufbau-crumbs) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
+[`<aufbau-embed>`](#aufbau-embed) ·
 [`<aufbau-filter>`](#aufbau-filter) ·
 [`<aufbau-flag>`](#aufbau-flag) ·
 [`<aufbau-icon>`](#aufbau-icon) ·
@@ -283,6 +284,35 @@ element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
   <a href="#delete">Löschen</a>
 </aufbau-dropdown>
 ```
+
+## aufbau-embed
+
+inhalt von dritten (video, song, post) hinter einem klick. bis dahin ist das
+element ein lokaler platzhalter, beim anbieter wird nichts angefragt, auch kein
+vorschaubild: das einzige bild ist das `poster` der seite selbst.
+
+```html
+<aufbau-embed src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></aufbau-embed>
+<aufbau-embed src="https://open.spotify.com/album/…" remember></aufbau-embed>
+<aufbau-embed src="https://example.com/widget" height="400px" label="Widget"></aufbau-embed>
+```
+
+erkannt werden youtube (über youtube-nocookie), vimeo, spotify, soundcloud,
+bandcamp (die `EmbeddedPlayer`-url, eine albumseite lässt sich nicht einbetten)
+und mastodon-posts. jede andere url wird so eingebettet, wie sie ist. eine url,
+die sich nicht einbetten lässt, macht den platzhalter zum link.
+
+| attribut   | |
+|---|---|
+| `consent`  | `click` (default) oder `auto`, auch über `<aufbau-config embed-consent="auto">`, etwa wenn die seite selbst schon gefragt hat |
+| `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
+| `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
+| `height`   | eine feste höhe statt eines verhältnisses |
+| `poster`   | ein bild der seite für den platzhalter |
+| `label`    | name auf dem platzhalter und des frames |
+
+`activate()` lädt von außen, danach `:state(active)` und das event `activate`
+mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
 
 ## aufbau-flag
 
