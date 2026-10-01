@@ -21,26 +21,27 @@ https://caniuse.com/wf-function
 /* every color parameter also takes the palette by name: bg, fg, ink for
    --color-bg, --color-fg, --color-ink, cc for currentColor.
    --darker(bg) instead of --darker(var(--color-bg)). the names are listed by
-   hand in each type(), there are only these few */
-@function --resolve-color-argument(
-  --arg type(<color> | bg | fg | ink | cc) : cc
+   hand in each type(), there are only these few. --color() resolves one, on
+   its own as well: color: --color(ink) */
+@function --color(
+  --value type(<color> | bg | fg | ink | cc) : cc
 ) returns <color> {
   result: if(
-    style(--arg: bg)  : var(--color-bg);
-    style(--arg: fg)  : var(--color-fg);
-    style(--arg: ink) : var(--color-ink);
-    style(--arg: cc)  : currentColor;
-    else              : var(--arg);
+    style(--value: bg)  : var(--color-bg);
+    style(--value: fg)  : var(--color-fg);
+    style(--value: ink) : var(--color-ink);
+    style(--value: cc)  : currentColor;
+    else                : var(--value);
   );
 }
 
 /* transparency */
 @function --alpha(
-  --color   type(<color> | bg | fg | ink | cc) : cc,
+  --base    type(<color> | bg | fg | ink | cc) : cc,
   --opacity <percentage>                       : 50%,
   --mode                                       : oklch
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: color-mix(in var(--mode), var(--C) var(--opacity), transparent);
 }
 
@@ -51,75 +52,75 @@ https://caniuse.com/wf-function
   --amount <percentage>                       : 50%,
   --mode                                      : oklch
 ) returns <color> {
-  --F: --resolve-color-argument(var(--from));
-  --T: --resolve-color-argument(var(--to));
+  --F: --color(var(--from));
+  --T: --color(var(--to));
   result: color-mix(in var(--mode), var(--F), var(--T) var(--amount));
 }
 
 /* lightness down or up in oklch, hue and chroma stay */
 @function --darker(
-  --color  type(<color> | bg | fg | ink | cc) : cc,
+  --base   type(<color> | bg | fg | ink | cc) : cc,
   --amount <number>                           : 0.1
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: oklch(from var(--C) max(0, l - var(--amount)) c h / alpha);
 }
 
 @function --lighter(
-  --color  type(<color> | bg | fg | ink | cc) : cc,
+  --base   type(<color> | bg | fg | ink | cc) : cc,
   --amount <number>                           : 0.1
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: oklch(from var(--C) min(1, l + var(--amount)) c h / alpha);
 }
 
 /* towards the background or the foreground: lighter or darker depending on the
    scheme, so a tint reads the same in light and dark */
 @function --tint(
-  --color  type(<color> | bg | fg | ink | cc) : ink,
+  --base   type(<color> | bg | fg | ink | cc) : ink,
   --amount <percentage>                       : 20%
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: color-mix(in oklch, var(--C), var(--color-bg) var(--amount));
 }
 
 @function --shade(
-  --color  type(<color> | bg | fg | ink | cc) : ink,
+  --base   type(<color> | bg | fg | ink | cc) : ink,
   --amount <percentage>                       : 20%
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: color-mix(in oklch, var(--C), var(--color-fg) var(--amount));
 }
 
 /* a fixed lightness, 0 black to 1 white: --tone(ink, 0.95) is a pale
    background in the ink's hue */
 @function --tone(
-  --color     type(<color> | bg | fg | ink | cc) : ink,
+  --base      type(<color> | bg | fg | ink | cc) : ink,
   --lightness <number>                           : 0.5
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: oklch(from var(--C) var(--lightness) c h / alpha);
 }
 
 /* chroma times --factor, 0 is grey, above 1 more vivid */
 @function --saturate(
-  --color  type(<color> | bg | fg | ink | cc) : cc,
+  --base   type(<color> | bg | fg | ink | cc) : cc,
   --factor <number>                           : 1.5
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: oklch(from var(--C) l calc(c * var(--factor)) h / alpha);
 }
 
-@function --grayscale(--color type(<color> | bg | fg | ink | cc) : cc) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+@function --grayscale(--base type(<color> | bg | fg | ink | cc) : cc) returns <color> {
+  --C: --color(var(--base));
   result: oklch(from var(--C) l 0 h / alpha);
 }
 
 @function --hue-shift(
-  --color type(<color> | bg | fg | ink | cc) : ink,
+  --base  type(<color> | bg | fg | ink | cc) : ink,
   --angle <angle>                            : 30deg
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: oklch(from var(--C) l c calc(h + var(--angle) / 1deg) / alpha);
 }
 
@@ -142,7 +143,7 @@ https://caniuse.com/wf-function
   --background type(<color> | bg | fg | ink | cc) : ink,
   --threshold  <number>                           : 0.62
 ) returns <color> {
-  --C: --resolve-color-argument(var(--background));
+  --C: --color(var(--background));
   result: oklch(from var(--C) clamp(0, (var(--threshold) - l) * 1000, 1) 0 0);
 }
 
@@ -162,10 +163,10 @@ https://caniuse.com/wf-function
 
 /* one color, its interaction states: hover, active, focus, disabled */
 @function --state(
-  --color type(<color> | bg | fg | ink | cc)               : ink,
+  --base  type(<color> | bg | fg | ink | cc)               : ink,
   --state type(normal | hover | active | focus | disabled) : normal
 ) returns <color> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: if(
     style(--state: hover)    : color-mix(in oklch, var(--C), var(--color-fg) 12%);
     style(--state: active)   : color-mix(in oklch, var(--C), var(--color-fg) 24%);
@@ -293,11 +294,11 @@ https://caniuse.com/wf-function
 
 /* a focus ring as box-shadow, with a gap in the background color */
 @function --ring(
-  --color  type(<color> | bg | fg | ink | cc) : ink,
+  --base   type(<color> | bg | fg | ink | cc) : ink,
   --width  <length>                           : 2px,
   --offset <length>                           : 2px
 ) {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   result: 0 0 0 var(--offset) var(--color-bg), 0 0 0 calc(var(--offset) + var(--width)) var(--C);
 }
 
@@ -340,13 +341,13 @@ https://caniuse.com/wf-function
    the ends also turn ±20° on the wheel, fade: the color into transparent.
    interpolated in oklch, so two hues do not pass through grey */
 @function --gradient(
-  --color  type(<color> | bg | fg | ink | cc)   : ink,
+  --base   type(<color> | bg | fg | ink | cc)   : ink,
   --style  type(tonal | vivid | fade)    : tonal,
   --shape  type(linear | radial | conic) : linear,
   --angle  <angle>                       : 135deg,
   --spread <number>                      : 0.08
 ) returns <image> {
-  --C: --resolve-color-argument(var(--color));
+  --C: --color(var(--base));
   --start: if(
     style(--style: vivid) : oklch(from var(--C) min(1, l + var(--spread)) c calc(h - 20) / alpha);
     style(--style: fade)  : var(--C);
