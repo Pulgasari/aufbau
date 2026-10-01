@@ -297,28 +297,41 @@ aufbau-button,
 aufbau-input,
 aufbau-picker[look="combobox"],
 aufbau-toggle[look="button"],
-aufbau-writer,
+
 aufbau-dropdown > *,
 aufbau-dropdown::part(trigger),
 aufbau-picker[look="cycle"]::part(trigger),
-aufbau-upload::part(zone) {
-  padding: 0.35em 0.55em;
+aufbau-upload::part(file),
+aufbau-upload::part(zone),
+aufbau-writer {
+  --pad: small;
 }
 
-aufbau-picker::part(listbox),
-aufbau-dropdown::part(menu)       { padding: 0.2em; }
-aufbau-picker::part(option)       { padding: 0.35em 0.55em; }
+@prop --pad {
+   tiny : 
+      aufbau-input    > button,
+      aufbau-dropdown >> menu,
+      aufbau-picker   >> :is(listbox, option,step),
+}
+
+aufbau-input > button             { --pad: tiny; }
+aufbau-dropdown::part(menu)       { --pad: tiny; }
+aufbau-picker::part(listbox)      { --pad: tiny; }
+aufbau-picker::part(option)       { --pad: tiny; }
+aufbau-picker::part(step)         { --pad: tiny; }
 aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
-aufbau-input > button             { padding: 0.15em; }
-aufbau-picker::part(step)         { padding: 0.15em; }
-aufbau-upload::part(file)         { padding: 0.2em 0.4em; }
-:is(aufbau-code, aufbau-writer) [data-action] { padding: 0.2em; }
-aufbau-code > figure > header     { padding: 0.3em 0.6em; }
-aufbau-code > figure > pre        { padding: 0.75em; }
-aufbau-modal::part(dialog)        { padding: 1rem; }
-aufbau-modal::part(header)        { margin: -0.25em -0.25em 0.75em; padding: 0 0.25em 0.5em; }
-aufbau-slider > output > input    { padding-block-end: 0.1em; }
-aufbau-toast                      { padding: 0.6em 0.75em; }
+
+
+   
+aufbau-code   [data-action]   { --pad: tiny; }
+aufbau-writer [data-action]   { --pad: tiny; }
+aufbau-code > figure > header { --pad: small; }
+aufbau-code > figure > pre    { --pad: normal; }
+aufbau-modal::part(dialog)    { --pad: normal; }
+   
+aufbau-modal::part(header)     { margin: -0.25em -0.25em 0.75em; padding: 0 0.25em 0.5em; }
+aufbau-slider > output > input { padding-block-end: 0.1em; }
+aufbau-toast                      { --pad: normal; }
 aufbau-toc a                      { display: block; padding-block: 0.15em; padding-inline-start: 0.5em; }
 
 aufbau-table {
