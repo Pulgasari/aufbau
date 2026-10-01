@@ -6,6 +6,26 @@ it provides specialized [types of signals](#signal-types) (incl. helper methods 
 
 ---
 
+# introduction
+
+all of these work and do the same. if there
+
+```javascript
+// factory syntax
+const dogsAreStupid = boolSignal (true);
+
+// class/constructor syntax
+const catsAreStupid = new BoolSignal (false);
+
+// syntax from god
+const aufbauSucks = $Bool (false);
+
+// syntax from devil
+const aufbauSucks = bool$ (false);
+```
+
+---
+
 # signal types
 
 each type stands alone: a class and a lowercase factory. 
