@@ -22,7 +22,8 @@
 // the handle opens and closes the drawer by dragging or a tap; dragging a
 // bottom sheet further up expands it. there is no swipe from the screen edge on
 // purpose: android takes those for back and home. escape and the scrim close a
-// drawer, the rest of the app is inert while one is open.
+// drawer, the rest of the app is inert while one is open. one drawer at a time:
+// opening one closes the others.
 //
 // methods: show(), hide(), toggle(force), expand(force)
 // events:  toggle { open, expanded }
@@ -250,6 +251,7 @@ export class AppArea extends AufbauElement {
 
   toggle (force = !this.open) {
     if (!this.docked || Boolean(force) === this.open) return this;
+    if (force) this.closeOtherDrawers();
     this.toggleAttribute('open', Boolean(force));
     if (!force) this.toggleAttribute('expanded', false);
     return this;
@@ -257,6 +259,7 @@ export class AppArea extends AufbauElement {
 
   expand (force = !this.expanded) {
     if (!this.docked) return this;
+    if (force && !this.open) this.closeOtherDrawers();
     this.toggleAttribute('expanded', Boolean(force));
     if (force) this.toggleAttribute('open', true);
     return this;
@@ -314,6 +317,14 @@ export class AppArea extends AufbauElement {
     this.track(stop);
     this._media = stop;
     set(Boolean(query?.matches));
+  }
+
+  // one drawer at a time: each makes the rest of the root inert, two open ones
+  // would leave nothing to touch. closed before this one opens, so their inert
+  // is undone before this one sets its own
+  closeOtherDrawers () {
+    if (!this.isOverlay) return;
+    for (const area of this.appRoot?.areas ?? []) if (area !== this && area.isOverlay && area.open) area.hide();
   }
 
   // while a drawer is open, the rest of the root is out of reach for focus and pointer
