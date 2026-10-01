@@ -24,7 +24,7 @@ export const GEOMETRIES = ['sharp', 'soft', 'round', 'pill'];
 export const LAYOUTS    = ['landing', 'mobile-basic', 'three-panels'];
 export const LOOKS      = ['flat', 'rounded'];
 export const MODES      = ['auto', 'dark', 'light'];
-export const SKINS      = ['monochrome'];
+export const SKINS      = ['andromeda', 'monochrome'];
 
 // the properties tokens.css, palettes.css and themes.css read, mirrored as data-* for selectors
 const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };
