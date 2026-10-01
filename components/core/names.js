@@ -41,6 +41,7 @@ export const COMPONENTS = [
   'input-locale',
   'input-number',
   'input-password',
+  'input-pattern',
   'input-phone',
   'input-search',
   'input-slug',

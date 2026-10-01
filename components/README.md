@@ -53,6 +53,7 @@ hits as a wrapping row).
 | `input-locale`   | bcp 47 with region: `de-AT`        | a working set, `Intl.DisplayNames`         |
 | `input-number`   | a number                           | `aufbau-input type=number`                 |
 | `input-password` | a password                         | `aufbau-input`, a toggle to show it        |
+| `input-pattern`  | `dots 8%` (`opacity`, `colors`)    | `@aufbau/patterns`, masked swatches        |
 | `input-phone`    | a phone number                     | `aufbau-input type=phone`                  |
 | `input-search`   | a query, `search` event debounced  | `aufbau-input`                             |
 | `input-slug`     | `ueber-uns`, follows `source`      | `aufbau-input`                             |

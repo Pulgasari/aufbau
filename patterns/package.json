@@ -10,5 +10,10 @@
     "./motion": "./motion.js",
     "./*": "./lib/*.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "aufbau": {
+    "bundle": {
+      "keep": ["./lib/"]
+    }
+  }
 }
