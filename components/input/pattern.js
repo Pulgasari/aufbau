@@ -10,8 +10,9 @@
 //   <input-pattern name="background" value="dots 8%" opacity></input-pattern>
 //   <input-pattern name="tiles" patterns="dots grid waves" colors></input-pattern>
 //
-// the swatches paint each pattern as a mask over the text color, so the picker
-// follows the theme. without `colors` the value is meant to be painted the same
+// the current pattern shows as a swatch beside the opacity, a click on it opens
+// the others. the swatches paint each pattern as a mask over the text color,
+// so the picker follows the theme. without `colors` the value is meant to be painted the same
 // way where it is used: patternStyle() turns it into the custom properties for
 // that, the css below them is the page's.
 //
@@ -86,6 +87,8 @@ export async function patternStyle (value, { name = 'pattern', opacity = 1 } = {
 // the swatch of no pattern is data-pattern="none", an empty attribute would not render
 const idOf = button => button.dataset.pattern === 'none' ? '' : button.dataset.pattern;
 
+let instances = 0;
+
 export class InputPattern extends AufbauComponent {
 
   static attr = {
@@ -96,18 +99,33 @@ export class InputPattern extends AufbauComponent {
 
   static control = ':scope > aufbau-input[data-carrier]';
 
+  // one row: the current pattern as a swatch, then the opacity and the colors.
+  // the swatch opens the others in a popover, anchored below it
   static styles () {
     return `${tagOf('input-pattern')} {
-      display        : flex;
-      flex-direction : column;
-      gap            : var(--aufbau-control-gap, 0.5em);
+      align-items : center;
+      display     : flex;
+      flex-wrap   : wrap;
+      gap         : var(--aufbau-control-gap, 0.5em);
 
       > aufbau-input[data-carrier] { display: none; }
+      > aufbau-slider              { flex: 1 1 8em; }
+      > .colors                    { display: flex; gap: var(--aufbau-control-gap, 0.5em); }
 
-      > [role="radiogroup"] {
-        display               : grid;
+      > [popover] {
+        background-color      : var(--color-bg, Canvas);
+        border                : var(--border, 1px solid color-mix(in oklab, currentColor 25%, transparent));
+        border-radius         : var(--radius, 0.5em);
+        color                 : inherit;
         gap                   : 0.375em;
-        grid-template-columns : repeat(auto-fill, minmax(var(--pattern-swatch-size, 2.75em), 1fr));
+        grid-template-columns : repeat(var(--pattern-columns, 5), var(--pattern-swatch-size, 2.75em));
+        inset                 : auto;
+        margin                : 0.25em 0;
+        padding               : 0.5em;
+        position-area         : block-end span-inline-end;
+        position-try-fallbacks: flip-block, flip-inline;
+
+        &:popover-open { display: grid; }
       }
 
       [data-pattern] {
@@ -117,6 +135,8 @@ export class InputPattern extends AufbauComponent {
         border-radius : var(--radius-control, 0.375em);
         color         : inherit;
         cursor        : pointer;
+        flex          : none;
+        inline-size   : var(--pattern-swatch-size, 2.75em);
         overflow      : hidden;
         padding       : 0;
         position      : relative;
@@ -139,8 +159,6 @@ export class InputPattern extends AufbauComponent {
         &[aria-checked="true"] { outline: 2px solid var(--color-ink, currentColor); outline-offset: 1px; }
         &:focus-visible        { outline: 2px solid var(--color-focus, currentColor); outline-offset: 1px; }
       }
-
-      > .colors { display: flex; gap: var(--aufbau-control-gap, 0.5em); }
     }`;
   }
 
@@ -149,7 +167,13 @@ export class InputPattern extends AufbauComponent {
     return listOf(this.getAttr('patterns'), known).filter(id => known.includes(id));
   }
 
-  get parts () { return parsePattern(this.value); }
+  get parts ()   { return parsePattern(this.value); }
+  get popover () { return this.querySelector(':scope > [popover]'); }
+  get current () { return this.querySelector(':scope > [data-current]'); }
+
+  // a value set from outside shows at once: the swatch and the opacity follow
+  get value ()      { return super.value; }
+  set value (value) { super.value = value; this.update(); }
 
   render () {
     const { colors, opacity, required } = this.getAttr();
@@ -157,17 +181,21 @@ export class InputPattern extends AufbauComponent {
     const names  = Object.fromEntries(list().map(pattern => [pattern.id, pattern.name]));
     const swatch = (id, label) => html`<button type="button" role="radio" ${attrs({ 'aria-label': label, 'data-pattern': id, title: label })}><span></span></button>`;
 
+    // the popover and its anchor need names of their own, one per instance
+    this._uid ??= `input-pattern-${++instances}`;
+
     return html`
-      <div role="radiogroup">
-        ${!required && swatch('none', 'none')}
-        ${this.ids.map(id => swatch(id, names[id] ?? id))}
-      </div>
+      <button type="button" data-current ${attrs({ 'aria-label': 'pattern', 'data-pattern': parts.id || 'none', popovertarget: this._uid, style: `anchor-name: --${this._uid}` })}><span></span></button>
       ${opacity && html`<aufbau-slider data-opacity type="number" min="0" max="100" step="1" ${attrs({ value: Math.round((parts.opacity ?? 0.1) * 100) })}></aufbau-slider>`}
       ${colors && html`
         <div class="colors">
           <aufbau-input data-fg type="color" look="swatch" ${attrs({ value: parts.fg ?? '#000000' })}></aufbau-input>
           <aufbau-input data-bg type="color" look="swatch" ${attrs({ value: parts.bg ?? '#ffffff' })}></aufbau-input>
         </div>`}
+      <div popover role="radiogroup" ${attrs({ 'aria-label': 'patterns', id: this._uid, style: `position-anchor: --${this._uid}` })}>
+        ${!required && swatch('none', 'none')}
+        ${this.ids.map(id => swatch(id, names[id] ?? id))}
+      </div>
       <aufbau-input type="text" data-carrier ${attrs({ value: this.initialValue })}></aufbau-input>
     `;
   }
@@ -176,17 +204,17 @@ export class InputPattern extends AufbauComponent {
     const helpers = this.querySelectorAll('aufbau-slider[data-opacity], aufbau-input[data-fg], aufbau-input[data-bg]');
     for (const helper of helpers) this.mute(helper);
 
-    this.on('click', '[data-pattern]', (event, button) => this.pick(idOf(button)));
-    this.on('keydown', '[data-pattern]', (event, button) => this.step(event, button));
+    // a click picks and closes, the arrows pick and stay
+    this.on('click', '[popover] [data-pattern]', (event, button) => { this.pick(idOf(button)); this.popover?.hidePopover(); this.current?.focus(); });
+    this.on('keydown', '[popover] [data-pattern]', (event, button) => this.step(event, button));
+
+    // opened, the focus goes to the checked swatch
+    this.on(this.popover, 'toggle', event => { if (event.newState === 'open') this.popover.querySelector('[tabindex="0"]')?.focus(); });
 
     for (const helper of helpers) this.on(helper, 'change', () => this.pick(this.parts.id || this.ids[0] || ''));
 
     this.paintSwatches();
   }
-
-  // a value set from outside shows at once: the swatch and the opacity follow
-  get value ()      { return super.value; }
-  set value (value) { super.value = value; this.update(); }
 
   sync () {
     super.sync();
@@ -194,15 +222,23 @@ export class InputPattern extends AufbauComponent {
     const slider = this.querySelector('aufbau-slider[data-opacity]');
     if (slider && opacity != null && !slider.contains(document.activeElement)) slider.value = Math.round(opacity * 100);
 
-    const buttons = [...this.querySelectorAll('[data-pattern]')];
-    const current = buttons.find(button => idOf(button) === id) ?? buttons[0];
+    const buttons = [...this.querySelectorAll('[popover] [data-pattern]')];
+    const checked = buttons.find(button => idOf(button) === id) ?? buttons[0];
     for (const button of buttons) {
-      button.setAttribute('aria-checked', String(button === current && idOf(button) === id));
-      button.tabIndex = button === current ? 0 : -1;
+      button.setAttribute('aria-checked', String(button === checked && idOf(button) === id));
+      button.tabIndex = button === checked ? 0 : -1;
+    }
+
+    const current = this.current;
+    if (current && idOf(current) !== id) {
+      current.dataset.pattern = id || 'none';
+      current.title = checked?.title ?? '';
+      current.firstElementChild.style.removeProperty('--swatch');
+      this.paintSwatches();
     }
   }
 
-  /** commits a pattern with the helpers' current opacity and colors */
+  // commits a pattern with the helpers' current opacity and colors
   pick (id) {
     const { colors, opacity } = this.getAttr();
     const slider = this.querySelector('aufbau-slider[data-opacity]');
@@ -224,7 +260,7 @@ export class InputPattern extends AufbauComponent {
     if (!(event.key in keys)) return;
     event.preventDefault();
 
-    const buttons = [...this.querySelectorAll('[data-pattern]')];
+    const buttons = [...this.querySelectorAll('[popover] [data-pattern]')];
     const next    = buttons[(buttons.indexOf(button) + keys[event.key] + buttons.length) % buttons.length];
     next.focus();
     this.pick(idOf(next));
@@ -235,7 +271,7 @@ export class InputPattern extends AufbauComponent {
     for (const span of this.querySelectorAll('[data-pattern] > span')) {
       const id = idOf(span.parentElement);
       if (!id || span.style.getPropertyValue('--swatch')) continue;
-      use(id).image().then(image => span.style.setProperty('--swatch', image)).catch(() => {});
+      use(id).image().then(image => { if (idOf(span.parentElement) === id) span.style.setProperty('--swatch', image); }).catch(() => {});
     }
   }
 }

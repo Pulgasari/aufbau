@@ -6,6 +6,7 @@
 //   const config = document.querySelector('app-config');
 //   config.spec   = { open: { type: 'enum', values: ['auto', 'single'], label: 'Open with' } };
 //   config.values = { open: 'auto' };
+//   config.controls = { enum: { look: 'segments' } };   // optional, before the spec
 //   config.addEventListener('config', event => save(event.detail.key, event.detail.values));
 //
 // spec and values are properties. a new spec rebuilds the form, new values
@@ -49,6 +50,10 @@ export class AppConfig extends AufbauElement {
   get spec ()       { return this._spec ?? {}; }
   set spec (spec)   { this._spec = spec; this.build(); }
 
+  // how fields render, per type or key (@aufbau/gui's controls). set before the spec
+  get controls ()         { return this._controls ?? null; }
+  set controls (controls) { this._controls = controls; if (this._built) this.build(); }
+
   get values ()     { return this._values ?? {}; }
   set values (next) { this._values = next; if (!this._built) this.build(); else this.fill(); }
 
@@ -59,6 +64,7 @@ export class AppConfig extends AufbauElement {
     if (!this.isConnected) return;
 
     const form = gui.render(this.spec, {
+      controls : this.controls,
       values   : { ...this.values },
       onChange : (values, key) => {
         if (key == null) return;
