@@ -1,12 +1,15 @@
 // <app-root>
-// the frame of an app. it holds its views and sets the look of its area.
+// the frame of an app. it holds its views and areas and sets the look below it.
 //
 //   <app-root palette="zombie" scheme="dark" density="touch" skin="monochrome" loading>
 //     <app-view name="library" route="/" active>…</app-view>
 //     <app-view name="reader" route="/reader">…</app-view>
 //   </app-root>
 //
-// palette, scheme, density and geometry hold for the area of the root, as
+// with <app-area>s the root becomes a grid: the main area in the middle, the
+// docked ones at start, end and bottom (area.js). root.area(name) finds one.
+//
+// palette, scheme, density and geometry hold for everything below the root, as
 // data-* on it (tokens.css, palettes.css). the skin is one stylesheet for the
 // whole document, so `skin` is set on <html> and swaps the elements' skin.
 // every attribute is a property as well: root.palette = 'oled'.
@@ -22,14 +25,15 @@
 //
 // events: ready, navigate { from, to }.
 
+import './area.js';
 import './view.js';
 
 import { AufbauElement } from '@aufbau/elements/core/index.js';
 import { setSkin }       from '@aufbau/elements/core/skin.js';
 import { define, tagOf } from '../core/names.js';
 
-// set on the root as data-*, the css of the area reads them
-const AREA = ['density', 'geometry', 'palette', 'scheme'];
+// set on the root as data-*, the css below it reads them
+const LOOK = ['density', 'geometry', 'palette', 'scheme'];
 
 const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -49,8 +53,21 @@ export class AppRoot extends AufbauElement {
 
   static styles () {
     const tag = tagOf('app-root');
+    const area = tagOf('app-area');
     return `${tag} {
       display: block;
+
+      /* with areas the root is a grid: the docked ones around the main one */
+      &:has(> ${area}) {
+        display       : grid;
+        grid-template :
+          "start main   end" minmax(0, 1fr)
+          "start bottom end" auto
+          / auto minmax(0, 1fr) auto;
+      }
+
+      /* a bottom drawer that peeks covers the end of the app, which keeps clear of it */
+      &:has(> ${area}[dock="bottom"][peek]:state(overlay)) { padding-block-end: var(--area-peek, 1.75rem); }
 
       &:not([loading]) > [data-loading] { display: none; }
 
@@ -94,6 +111,12 @@ export class AppRoot extends AufbauElement {
 
   get view () { return this.views.find(view => view.active) ?? null; }
 
+  /** the areas of this root */
+  get areas () { return [...this.children].filter(element => element.localName === tagOf('app-area')); }
+
+  /** an area by its name */
+  area (name) { return this.areas.find(area => area.getAttr('name') === name) ?? null; }
+
   /** activates a view by its name */
   show (name, options) { return this.views.find(view => view.getAttr('name') === name)?.activate(options); }
 
@@ -121,7 +144,7 @@ export class AppRoot extends AufbauElement {
   }
 
   sync () {
-    for (const name of AREA) {
+    for (const name of LOOK) {
       const value = this.getAttr(name);
       if (value) this.dataset[name] = value;
       else delete this.dataset[name];
