@@ -13,6 +13,11 @@ const numberOf = value => {
   return m ? Number(m[1]) : null;
 };
 
+// attributes of a spec: false and nullish leave one out, true sets it bare
+const flagged = (attrs = {}) => Object.fromEntries(Object.entries(attrs)
+  .filter(([, value]) => value != null && value !== false)
+  .map(([name, value]) => [name, value === true ? '' : value]));
+
 // [value, label] from either a bare option or an explicit pair
 const normalizeOption = option => (Array.isArray(option) ? option : [option, option]);
 
@@ -23,6 +28,10 @@ function toControl (key, spec, value) {
   value ??= spec.default;
   const attrs = { name: key };
   const { max, min, step, type, unit, values } = spec;
+
+  // any other element by its tag, a component of @aufbau/components say. its
+  // attrs ride along, true as a bare attribute; it has to read and write `value`
+  if (spec.tag) return { tag: spec.tag, attrs: pruned({ ...flagged(spec.attrs), ...attrs, value }) };
 
   // `look` (combobox for a long list, segments/radio for a short one) rides
   // through when the spec sets it; pruned drops it when it does not

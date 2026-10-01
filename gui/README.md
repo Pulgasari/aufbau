@@ -41,6 +41,16 @@ a `values` array turns any field into an `aufbau-picker` regardless of type.
 options are bare (`'live'`) or `[value, label]` pairs. `look`, `min`, `max`,
 `step`, `unit` and `default` ride through when set.
 
+`tag` takes any other element, a component of `@aufbau/components` for one.
+`attrs` go along, `true` as a bare attribute. the element reads and writes
+`value` and fires `change`:
+
+```javascript
+const spec = {
+  background : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Background' },
+};
+```
+
 ## sections
 
 a key whose entry is an array is a section: the key names it, the records in
