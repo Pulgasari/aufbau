@@ -107,3 +107,6 @@ blockquote, q {
   align-items     : center;
   justify-content : center;
 }
+
+.col { display: flex; flex-direction: column; }
+.row { display: flex; flex-direction: row; }
