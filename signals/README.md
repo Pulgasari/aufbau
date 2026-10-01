@@ -18,7 +18,8 @@ const dogsAreStupid = boolSignal (true);
 const catsAreStupid = new BoolSignal (false);
 
 // syntax from god
-const aufbauSucks = $Bool (false);
+const aufbauSucks = new $Bool (false);
+const aufbauSucks = $bool (false);
 
 // syntax from devil
 const aufbauSucks = bool$ (false);
