@@ -11,6 +11,10 @@
 
 // the canonical names, <group>-<name> maps to ./<group>/<name>.js
 export const COMPONENTS = [
+  'app-area',
+  'app-config',
+  'app-float',
+  'app-panel',
   'app-root',
   'app-view',
   'div-x',

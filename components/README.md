@@ -66,23 +66,43 @@ hits as a wrapping row).
 
 ### app
 
-the frame of an app: `app-root` holds the views and sets the look of its area,
-`app-view` is one screen of it.
+the frame of an app: `app-root` holds areas and views and sets the look below
+it, `app-area` is a region of it, `app-view` one screen. `app-panel`,
+`app-config` and `app-float` are what goes into them.
 
 ```html
 <app-root palette="zombie" scheme="dark" density="touch" skin="monochrome" loading>
-  <app-view name="library" route="/" active>…</app-view>
-  <app-view name="reader" route="/reader" transition-on="slide">…</app-view>
-  <app-view name="settings" route="/settings" lazy><template>…</template></app-view>
+  <app-area name="main">
+    <app-view name="library" route="/" active>…</app-view>
+    <app-view name="reader" route="/reader" transition-on="slide">…</app-view>
+    <app-float anchor="bottom-end">…</app-float>
+  </app-area>
+  <app-area name="menu" dock="start"><app-panel heading="Menu">…</app-panel></app-area>
+  <app-area name="config" dock="end"><app-panel heading="Settings"><app-config></app-config></app-panel></app-area>
+  <app-area name="context" dock="bottom" peek>…</app-area>
 </app-root>
 ```
 
-- `app-root`: palette, scheme, density and geometry hold for its area (data-*
-  on it). the skin is the document's: `skin` sets it on `<html>` and swaps the
-  elements' skin. every attribute is a property too, `root.palette = 'oled'`.
-  `loading` shows a screen until `ready()` (the palette's background and a
-  spinner, or a child with `[data-loading]`). `routing="hash | path | none"`,
-  `transition` is the default view transition. `show(name)`, event `navigate`.
+- `app-root`: palette, scheme, density and geometry hold for everything below
+  it (data-* on it). the skin is the document's: `skin` sets it on `<html>` and
+  swaps the elements' skin. every attribute is a property too, `root.palette =
+  'oled'`. `loading` shows a screen until `ready()` (the palette's background
+  and a spinner, or a child with `[data-loading]`). `routing="hash | path |
+  none"`, `transition` is the default view transition. `show(name)`,
+  `area(name)`, event `navigate`. with areas it is a grid: the main one in the
+  middle, the docked ones at start, end and bottom. views without areas work as
+  before.
+- `app-area`: `name` says what it is, `dock="start | end | bottom"` where it
+  sits; without dock it is the main area, which holds the views. a docked area
+  is a sidebar or a sheet on wide screens and a drawer below `breakpoint`
+  (48rem), `overlay="always | never"` forces either. `open`, `expanded` (wider
+  or taller, full screen as a drawer), `peek` (a closed bottom drawer keeps its
+  handle on screen). the handle drags and taps it open and shut, up again
+  expands; escape and the scrim close a drawer and the rest of the app is inert
+  meanwhile. no swipe from the screen edge: android takes those for back and
+  home. `show()`, `hide()`, `toggle()`, `expand()`, event `toggle`, state
+  `:state(overlay)`. its chrome (scrim, handle) is in a shadow root, the
+  children stay the author's.
 - `app-view`: one of the views of a parent is active, the others are `inert`
   and `content-visibility: hidden`, so their dom, form values and scroll stay.
   `activate()` or setting `active` switches inside a view transition,
@@ -90,6 +110,16 @@ the frame of an app: `app-root` holds the views and sets the look of its area,
   pop, rotate-in) or none. `lazy` renders the `<template>` child on the first
   activation, `route` puts the view into the address. events `activate`,
   `deactivate`.
+- `app-panel`: a header with `heading`, slots `start` and `actions`, and the
+  buttons to close and expand what it sits in: an area is hidden or expanded,
+  an `aufbau-modal` closed. `controls="close expand"` names the buttons there
+  may be; they only show where they can act.
+- `app-config`: a settings form from an `@aufbau/gui` spec. `spec` and `values`
+  are properties, event `config { key, values }`. content only, the frame is
+  the app's.
+- `app-float`: floats over its positioned ancestor (an area or a view) on one
+  of nine anchors (`top-start` … `bottom-end`), its children stack in
+  `direction="up | down | start | end"`.
 
 ### div
 
