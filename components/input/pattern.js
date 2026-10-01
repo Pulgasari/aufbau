@@ -184,9 +184,16 @@ export class InputPattern extends AufbauComponent {
     this.paintSwatches();
   }
 
+  // a value set from outside shows at once: the swatch and the opacity follow
+  get value ()      { return super.value; }
+  set value (value) { super.value = value; this.update(); }
+
   sync () {
     super.sync();
-    const id      = this.parts.id;
+    const { id, opacity } = this.parts;
+    const slider = this.querySelector('aufbau-slider[data-opacity]');
+    if (slider && opacity != null && !slider.contains(document.activeElement)) slider.value = Math.round(opacity * 100);
+
     const buttons = [...this.querySelectorAll('[data-pattern]')];
     const current = buttons.find(button => idOf(button) === id) ?? buttons[0];
     for (const button of buttons) {

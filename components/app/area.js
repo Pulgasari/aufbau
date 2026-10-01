@@ -336,7 +336,8 @@ export class AppArea extends AufbauElement {
   /*
   the sheet follows the pointer along its axis, released it opens, closes or
   (bottom) expands by distance. a release without movement is a tap and toggles.
-  only a drawer follows the pointer, a docked bottom sheet just switches.
+  only a drawer follows the pointer, a docked bottom sheet just switches. the
+  sheet stays between closed and open: pulled further it would lift off its edge.
   */
   drag (start) {
     const sheet  = this.shadowRoot.querySelector('[part="sheet"]');
@@ -347,6 +348,12 @@ export class AppArea extends AufbauElement {
     const origin = axis === 'y' ? start.clientY : start.clientX;
     let   delta  = 0;
 
+    // the offset of the closed sheet in px: off screen, but for the handle of a peeking one
+    const size   = axis === 'y' ? sheet.offsetHeight : sheet.offsetWidth;
+    const peek   = dock === 'bottom' && this.getAttr('peek') ? handle.offsetHeight : 0;
+    const closed = (size - peek) * sign;
+    const from   = this.open ? 0 : closed;
+
     handle.setPointerCapture(start.pointerId);
     this.states.add('dragging');
 
@@ -354,10 +361,8 @@ export class AppArea extends AufbauElement {
       delta = (axis === 'y' ? event.clientY : event.clientX) - origin;
       if (!this.isOverlay) return;
 
-      // only towards closing while open, only towards opening while closed
-      const along = this.open ? Math.max(0, delta * sign) * sign : Math.min(0, delta * sign) * sign;
-      const base  = this.open ? '0px' : dock === 'bottom' ? `calc(100% - var(--area-peek))` : `${sign * 100}%`;
-      sheet.style.translate = axis === 'y' ? `0 calc(${base} + ${along}px)` : `calc(${base} + ${along}px) 0`;
+      const offset = Math.min(Math.max(from + delta, Math.min(0, closed)), Math.max(0, closed));
+      sheet.style.translate = axis === 'y' ? `0 ${offset}px` : `${offset}px 0`;
     };
 
     const end = () => {

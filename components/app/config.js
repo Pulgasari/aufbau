@@ -8,8 +8,9 @@
 //   config.values = { open: 'auto' };
 //   config.addEventListener('config', event => save(event.detail.key, event.detail.values));
 //
-// spec and values are properties, setting either rebuilds the form. the form is
-// built from the values of that moment, later changes come from the user.
+// spec and values are properties. a new spec rebuilds the form, new values
+// only reach the controls whose value differs: the form stays, focus and an
+// open picker with it. so values can follow the app's state while it is open.
 // events: config { key, values }. not `change`: that one already bubbles out of
 // every control inside.
 
@@ -49,7 +50,7 @@ export class AppConfig extends AufbauElement {
   set spec (spec)   { this._spec = spec; this.build(); }
 
   get values ()     { return this._values ?? {}; }
-  set values (next) { this._values = next; this.build(); }
+  set values (next) { this._values = next; if (!this._built) this.build(); else this.fill(); }
 
   onMount () { this.build(); }
 
@@ -67,6 +68,19 @@ export class AppConfig extends AufbauElement {
     });
 
     this.replaceChildren(form);
+    this._built = true;
+  }
+
+  // the values into the controls that show something else. a toggle holds its
+  // value in `checked`, every other control in `value`
+  fill () {
+    for (const [key, value] of Object.entries(this.values)) {
+      const control = this.querySelector(`[name="${CSS.escape(key)}"]:not(fieldset)`);
+      if (!control) continue;
+
+      if (control.localName === 'aufbau-toggle') control.toggleAttribute('checked', Boolean(value));
+      else if (String(control.value ?? '') !== String(value ?? '')) control.value = value ?? '';
+    }
   }
 }
 
