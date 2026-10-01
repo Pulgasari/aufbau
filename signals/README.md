@@ -22,6 +22,7 @@ const aufbauSucks = new $Bool (false);
 const aufbauSucks = $bool (false);
 
 // syntax from devil
+const aufbauSucks = new Bool$ (false);
 const aufbauSucks = bool$ (false);
 ```
 
