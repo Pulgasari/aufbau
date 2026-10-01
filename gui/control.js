@@ -25,6 +25,13 @@ const normalizeOption = option => (Array.isArray(option) ? option : [option, opt
 // `type` selects the widget, defaulting to aufbau-input (which validates the
 // type itself and falls back to text for anything it does not know).
 function toControl (key, spec, value) {
+  const control = baseControl(key, spec, value);
+  // the spec's attrs ride along on any control, the field's own name and value win
+  if (spec.attrs && !spec.tag) control.attrs = { ...flagged(spec.attrs), ...control.attrs };
+  return control;
+}
+
+function baseControl (key, spec, value) {
   value ??= spec.default;
   const attrs = { name: key };
   const { max, min, step, type, unit, values } = spec;
@@ -53,6 +60,25 @@ function toControl (key, spec, value) {
   return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type, value }) };
 }
 
+// :::::: CONTROLS
+// how fields render, said once for a whole spec instead of in every field: per
+// type as a default, per key as an override. the order is type < the field's
+// own entries < key, attrs merge along the same order.
+//
+//   render(spec, { controls: { enum: { look: 'segments' }, palette: { attrs: { stepper: true } } } })
+
+function withControls (spec, controls) {
+  if (!controls) return spec;
+
+  return Object.fromEntries(Object.entries(spec).map(([key, entry]) => {
+    if (isSection(entry)) return [key, [withControls(sectionFields(entry), controls)]];
+
+    const byType = controls[entry.type] ?? {};
+    const byKey  = controls[key] ?? {};
+    return [key, { ...byType, ...entry, ...byKey, attrs: { ...byType.attrs, ...entry.attrs, ...byKey.attrs } }];
+  }));
+}
+
 // :::::: SECTIONS
 // a key whose entry is an array is a section: the key names it, the records in
 // the array hold its fields, merged in order. sections nest. the values are
@@ -76,5 +102,5 @@ const sectionValues = (values, key) => {
   return own && typeof own === 'object' && !Array.isArray(own) ? { ...values, ...own } : values;
 };
 
-export { flattenSpec, isSection, normalizeOption, sectionFields, sectionValues, toControl };
+export { flattenSpec, isSection, normalizeOption, sectionFields, sectionValues, toControl, withControls };
 export default toControl;

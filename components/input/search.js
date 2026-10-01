@@ -4,6 +4,9 @@
 //
 //   <input-search name="q" debounce="300"></input-search>
 //   element.addEventListener('search', event => filter(event.detail.query));
+//
+// a search icon at the start and a clear button at the end by default, both
+// can be set like on any input: icon="false", actions="paste clear"
 
 import { InputComponent } from '../core/InputComponent.js';
 import { define }         from '../core/names.js';
@@ -11,7 +14,9 @@ import { define }         from '../core/names.js';
 export class InputSearch extends InputComponent {
 
   static attr = {
+    actions     : { type: String, default: 'clear' },
     debounce    : { type: Number, default: 250 },
+    icon        : { type: String, default: 'lucide:search' },
     placeholder : 'search…',
   };
 

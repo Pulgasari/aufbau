@@ -41,6 +41,19 @@ a `values` array turns any field into an `aufbau-picker` regardless of type.
 options are bare (`'live'`) or `[value, label]` pairs. `look`, `min`, `max`,
 `step`, `unit` and `default` ride through when set.
 
+`controls` says once how fields render, instead of in every field: per type
+as a default, per key as an override (type < the field itself < key), `attrs`
+merging the same way:
+
+```javascript
+render(spec, {
+  controls: {
+    enum    : { look: 'segments' },
+    palette : { look: 'combobox', attrs: { stepper: true } },
+  },
+});
+```
+
 `tag` takes any other element, a component of `@aufbau/components` for one.
 `attrs` go along, `true` as a bare attribute. the element reads and writes
 `value` and fires `change`:

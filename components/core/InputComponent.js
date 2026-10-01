@@ -11,7 +11,9 @@ import { define }          from './names.js';
 export class InputComponent extends AufbauComponent {
 
   static attr = {
+    actions      : String,
     autocomplete : String,
+    icon         : String,
     look         : { type: String, default: 'field', values: ['field', 'stepper', 'swatch'] },
     max          : String,
     maxlength    : Number,
@@ -23,7 +25,7 @@ export class InputComponent extends AufbauComponent {
   };
 
   static control = 'aufbau-input';
-  static forward = ['autocomplete', 'look', 'max', 'maxlength', 'min', 'minlength', 'pattern', 'placeholder', 'step'];
+  static forward = ['actions', 'autocomplete', 'icon', 'look', 'max', 'maxlength', 'min', 'minlength', 'pattern', 'placeholder', 'step'];
 
   // the aufbau-input type, fixed per component
   static type = 'text';

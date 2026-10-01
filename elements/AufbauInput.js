@@ -1,8 +1,13 @@
 // <aufbau-input>
 // a single value of a single type. `type` is the value domain and nothing else:
 // type="range" lives in <aufbau-slider>, type="file" in <aufbau-upload>.
+//
+// one layout for all of them: the icon at the start, the text in the middle,
+// the actions at the end. `actions` picks them: copy, paste, clear. clear only
+// shows while there is something to clear.
 
 import { AufbauControl, TYPE_NAMES, valueType } from './core/index.js';
+import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { attrs, html } from './core/html.js';
 import { setAttr } from '@domina/methods/setAttr.js';
 import { setValue } from '@domina/methods/setValue.js';
@@ -15,6 +20,7 @@ export default class AufbauInput extends AufbauControl {
   static reflect = ['look'];
 
   static attr = {
+    actions      : String,
     autocomplete : String,
     icon         : String,
     list         : String,
@@ -46,11 +52,16 @@ export default class AufbauInput extends AufbauControl {
       margin          : 0;
       min-inline-size : 0;
       padding         : 0;
+      text-align      : center;
 
       &:focus { outline: none; }
     }
 
     > aufbau-icon { flex: none; opacity: 0.65; }
+
+    > [data-action]         { opacity: 0.65; }
+    > [data-action]:hover   { opacity: 1; }
+    > [data-action][hidden] { display: none; }
 
     > button {
       align-items     : center;
@@ -102,7 +113,12 @@ export default class AufbauInput extends AufbauControl {
   /** the value parsed into its type: a Number for number, epoch ms for date, … */
   get typedValue () { return this.valueType.parse(this.getAttribute('value')); }
 
+  // the actions' contract (core/actions.js): the text and the field it lives in
+  actionText   () { return this.getAttribute('value') ?? ''; }
+  actionTarget () { return this.isDisabled || this.getAttr('readonly') ? null : this.focusTarget; }
+
   onMount () {
+    bindActions(this);
     this.on('input',  'input', (event, input) => this.commit(input.value));
     this.on('change', 'input', (event, input) => this.commit(input.value));
 
@@ -128,7 +144,7 @@ export default class AufbauInput extends AufbauControl {
   get focusTarget () { return this.$(':scope > input'); }
 
   render () {
-    const { autocomplete, icon, look, max, maxlength, min, minlength, pattern, placeholder, step } = this.getAttr();
+    const { actions, autocomplete, icon, look, max, maxlength, min, minlength, pattern, placeholder, step } = this.getAttr();
 
     const domain   = this.valueType;
     const iconName = icon === 'false' ? null : (icon || domain.icon);
@@ -142,8 +158,9 @@ export default class AufbauInput extends AufbauControl {
     // applied in sync(): rebuilding on every keystroke would drop the caret out of the field
     return html`
       ${stepper && stepButton(-1, 'lucide:minus')}
-      <input ${attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: domain.input })} />
       ${iconName && html`<aufbau-icon icon="${iconName}"></aufbau-icon>`}
+      <input ${attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: domain.input })} />
+      ${actionButtons(parseActions(actions))}
       ${stepper && stepButton(1, 'lucide:plus')}
     `;
   }
@@ -166,6 +183,9 @@ export default class AufbauInput extends AufbauControl {
 
     if (look === 'swatch') this.style.setProperty('--input-swatch', this.valueType.format(value));
     else this.style.removeProperty('--input-swatch');
+
+    const clear = this.querySelector(':scope > [data-action="clear"]');
+    if (clear) clear.hidden = !value;
   }
 }
 
