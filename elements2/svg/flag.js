@@ -1,9 +1,9 @@
-// <aufbau-flag>
-// the host is the flag, painted as a background image. no inner <aufbau-icon>:
+// <svg-flag>
+// the host is the flag, painted as a background image. no inner <svg-icon>:
 // a flag is always multicolour art, so the mask path of the icon has nothing to offer.
 
 import { AufbauElement } from '../core/index.js';
-import { iconUrl }       from './AufbauIcon.js';
+import { iconUrl }       from './icon.js';
 
 // circle-flags ships 1:1 art, flagpack ships 4:3
 const VARIANTS = {
@@ -22,7 +22,7 @@ const regionName = (code) => {
   catch { return code.toUpperCase(); }
 };
 
-export default class AufbauFlag extends AufbauElement {
+export default class SvgFlag extends AufbauElement {
   static internals = { role: 'img' };
 
   static reflect = ['variant'];
@@ -37,7 +37,7 @@ export default class AufbauFlag extends AufbauElement {
 
   // the variant can come from config, so the ratio is fed through a custom
   // property from sync() rather than selected by attribute
-  static styles = `aufbau-flag {
+  static styles = `svg-flag {
     aspect-ratio   : var(--flag-ratio, 1);
     background     : var(--flag-url, none) center / contain no-repeat;
     display        : inline-block;
@@ -59,4 +59,4 @@ export default class AufbauFlag extends AufbauElement {
   }
 }
 
-AufbauFlag.init();
+SvgFlag.init();

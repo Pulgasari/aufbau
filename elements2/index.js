@@ -3,7 +3,7 @@
 entry point. side effect free: nothing is defined until it is used.
 
   autoloader()    defines each element the first time its tag shows up
-  load(tag)       one element by its tag, e.g. 'aufbau-icon' or 'input-icon'
+  load(tag)       one element by its tag, e.g. 'svg-icon' or 'input-icon'
   registerAll()   every element at once
 
 a tag maps onto its module:
@@ -22,8 +22,6 @@ const TAGS = [
   'aufbau-dropdown',
   'aufbau-embed',
   'aufbau-filter',
-  'aufbau-flag',
-  'aufbau-icon',
   'aufbau-index',
   'aufbau-input',
   'aufbau-item',
@@ -64,6 +62,9 @@ const TAGS = [
   'embed-spotify',
   'embed-vimeo',
   'embed-youtube',
+
+  'svg-flag',
+  'svg-icon',
 
   'input-bool',
   'input-chips',
@@ -179,7 +180,7 @@ import { registerAll } from '@aufbau/elements2';
 await registerAll();
 
 // hand picked
-import '@aufbau/elements2/aufbau/AufbauFlag.js';
+import '@aufbau/elements2/svg/flag.js';
 import '@aufbau/elements2/input/language.js';
 
 */

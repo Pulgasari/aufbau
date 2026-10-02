@@ -271,10 +271,10 @@ export default class AufbauToast extends AufbauElement {
 
     // the message attribute wins, otherwise the children show
     return html`
-      <aufbau-icon part="icon" icon="${icon || ICONS[type] || ICONS.info}"></aufbau-icon>
+      <svg-icon part="icon" icon="${icon || ICONS[type] || ICONS.info}"></svg-icon>
       ${heading && html`<strong part="heading">${heading}</strong>`}
       <div part="message">${message || html`<slot></slot>`}</div>
-      ${dismissible && html`<button type="button" part="close" aria-label="close"><aufbau-icon icon="lucide:x"></aufbau-icon></button>`}
+      ${dismissible && html`<button type="button" part="close" aria-label="close"><svg-icon icon="lucide:x"></svg-icon></button>`}
     `;
   }
 

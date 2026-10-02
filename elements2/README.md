@@ -10,6 +10,7 @@ them, in one package.
 | `div/`      | `div-x`, `div-y`  | flex rows and columns |
 | `embed/`    | `embed-*`         | click to load embeds of youtube, bandcamp, … |
 | `input/`    | `input-*`         | one form control per value domain |
+| `svg/`      | `svg-*`           | icons and flags: a box painted by an svg |
 | `write/`    | `write-*`         | editors |
 | `core/`     |                   | the base classes, the config, the skin, the helpers |
 | `data/`     |                   | the lists the inputs pick from |
@@ -33,12 +34,12 @@ import { registerAll } from '@aufbau/elements2';
 await registerAll();
 
 // hand picked
-import '@aufbau/elements2/aufbau/AufbauFlag.js';
+import '@aufbau/elements2/svg/flag.js';
 import '@aufbau/elements2/input/language.js';
 ```
 
 ```html
-<aufbau-flag code="de"></aufbau-flag>
+<svg-flag code="de"></svg-flag>
 <input-language name="lang" value="de"></input-language>
 <write-md name="notes" preview="side"></write-md>
 ```
@@ -61,7 +62,7 @@ import * as elements from '@aufbau/elements2/htx';
 
 html.define(elements);
 
-html`<$icon 'lucide:star' />`              // <aufbau-icon icon="lucide:star">
+html`<svg-icon 'lucide:star' />`          // <svg-icon icon="lucide:star">
 html`<input-color 'red' name="color" />`   // <input-color value="red" name="color">
 html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 ```
@@ -105,8 +106,8 @@ aussieht) und `range`/`multiple` (wie viele). ausführlich in
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-embed>`](#aufbau-embed) ·
 [`<aufbau-filter>`](#aufbau-filter) ·
-[`<aufbau-flag>`](#aufbau-flag) ·
-[`<aufbau-icon>`](#aufbau-icon) ·
+[`<svg-flag>`](#svg-flag) ·
+[`<svg-icon>`](#svg-icon) ·
 [`<aufbau-input>`](#aufbau-input) ·
 [`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
@@ -184,11 +185,11 @@ gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 ></aufbau-config>
 
 <!-- Uses global default ("square") set via <aufbau-config> -->
-<aufbau-flag code="de"></aufbau-flag>
-<aufbau-flag code="us"></aufbau-flag>
+<svg-flag code="de"></svg-flag>
+<svg-flag code="us"></svg-flag>
 
 <!-- Local attribute overrides the global default for this specific element -->
-<aufbau-flag code="fr" variant="circle"></aufbau-flag>
+<svg-flag code="fr" variant="circle"></svg-flag>
 ```
 
 ```html
@@ -294,26 +295,26 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 `activate()` lädt von außen, danach `:state(active)` und das event `activate`
 mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
 
-## aufbau-flag
+## svg-flag
 
 ```html
-<aufbau-flag code="de" variant="circle"></aufbau-flag>
-<aufbau-flag code="us"></aufbau-flag>
+<svg-flag code="de" variant="circle"></svg-flag>
+<svg-flag code="us"></svg-flag>
 ```
 
 der accessible name ist der ländername in der seitensprache (`de` → „Deutschland“),
 `label` überschreibt ihn.
 
-## aufbau-icon
+## svg-icon
 
 reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
 [`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
 
 ```html
-<aufbau-icon icon="lucide:save"></aufbau-icon>
-<aufbau-icon icon="save" size="2em" color="tomato"></aufbau-icon>
-<aufbau-icon icon="logos:deno" mode="image"></aufbau-icon>   <!-- mehrfarbig -->
-<aufbau-icon icon="info" label="Hinweis"></aufbau-icon>      <!-- sonst aria-hidden -->
+<svg-icon icon="lucide:save"></svg-icon>
+<svg-icon icon="save" size="2em" color="tomato"></svg-icon>
+<svg-icon icon="logos:deno" mode="image"></svg-icon>   <!-- mehrfarbig -->
+<svg-icon icon="info" label="Hinweis"></svg-icon>      <!-- sonst aria-hidden -->
 ```
 
 ## aufbau-index
@@ -454,10 +455,10 @@ hat und sonst gar nichts passieren würde.
 
 <!-- 4. Endloser Marquee-Ticker für Logos -->
 <aufbau-loop mode="marquee" speed="15s" pause-on-hover>
-  <aufbau-icon icon="logos:preact"></aufbau-icon>
-  <aufbau-icon icon="logos:javascript"></aufbau-icon>
-  <aufbau-icon icon="logos:css-3"></aufbau-icon>
-  <aufbau-icon icon="logos:html-5"></aufbau-icon>
+  <svg-icon icon="logos:preact"></svg-icon>
+  <svg-icon icon="logos:javascript"></svg-icon>
+  <svg-icon icon="logos:css-3"></svg-icon>
+  <svg-icon icon="logos:html-5"></svg-icon>
 </aufbau-loop>
 ```
 

@@ -120,9 +120,9 @@ export default class AufbauDropdown extends AufbauElement {
 
     return html`
       <button type="button" part="trigger" aria-haspopup="menu" aria-expanded="false">
-        ${icon && html`<aufbau-icon part="icon" icon="${icon}"></aufbau-icon>`}
+        ${icon && html`<svg-icon part="icon" icon="${icon}"></svg-icon>`}
         <span part="label">${label}</span>
-        <aufbau-icon part="caret" icon="lucide:chevron-down"></aufbau-icon>
+        <svg-icon part="caret" icon="lucide:chevron-down"></svg-icon>
       </button>
       <div part="menu" role="menu" popover="auto"><slot></slot></div>
     `;

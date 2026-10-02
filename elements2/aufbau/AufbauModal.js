@@ -180,7 +180,7 @@ export default class AufbauModal extends AufbauElement {
       <dialog part="dialog">
         <header part="header">
           <strong part="heading"></strong>
-          <button type="button" part="close" aria-label="close"><aufbau-icon icon="lucide:x"></aufbau-icon></button>
+          <button type="button" part="close" aria-label="close"><svg-icon icon="lucide:x"></svg-icon></button>
         </header>
         <slot></slot>
       </dialog>

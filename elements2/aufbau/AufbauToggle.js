@@ -14,7 +14,7 @@ export default class AufbauToggle extends AufbauControl {
 
   static attr = {
     checked       : Boolean,
-    // set either one to swap the css drawn track/mark for an <aufbau-icon>,
+    // set either one to swap the css drawn track/mark for an <svg-icon>,
     // e.g. icon="famicons:toggle-outline" icon-checked="famicons:toggle"
     icon          : String,
     iconChecked   : String,
@@ -37,7 +37,7 @@ export default class AufbauToggle extends AufbauControl {
     position    : relative;
     user-select : none;
 
-    > aufbau-icon { --icon-size: var(--toggle-size); flex: none; }
+    > svg-icon { --icon-size: var(--toggle-size); flex: none; }
     > span        { line-height: 1.2; }
 
     &::before,
@@ -159,7 +159,7 @@ export default class AufbauToggle extends AufbauControl {
 
     // the label is the content of the control, so it names it without any aria wiring
     return html`
-      ${(icon || iconChecked) && html`<aufbau-icon></aufbau-icon>`}
+      ${(icon || iconChecked) && html`<svg-icon></svg-icon>`}
       ${label && html`<span>${label}</span>`}
     `;
   }
@@ -182,7 +182,7 @@ export default class AufbauToggle extends AufbauControl {
     }
 
     // one of the two may be missing, fall back to whichever was given
-    const iconElement = this.$(':scope > aufbau-icon');
+    const iconElement = this.$(':scope > svg-icon');
     if (iconElement) iconElement.setAttribute('icon', (checked ? iconChecked || icon : icon || iconChecked) ?? '');
   }
 }

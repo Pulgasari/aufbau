@@ -110,7 +110,7 @@ export default class AufbauValue extends AufbauElement {
         font-variant-numeric: tabular-nums;
       }
 
-      > span > aufbau-icon { align-self: center; }
+      > span > svg-icon { align-self: center; }
 
       > span > button {
         align-self  : center;
@@ -210,7 +210,7 @@ export default class AufbauValue extends AufbauElement {
       : html`<span>${text}</span>`;
 
     return html`
-      ${icon && html`<aufbau-icon icon="${icon}"></aufbau-icon>`}
+      ${icon && html`<svg-icon icon="${icon}"></svg-icon>`}
       ${body}
       ${copy && actionButtons(['copy'])}
     `;

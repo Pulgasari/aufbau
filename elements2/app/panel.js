@@ -19,7 +19,7 @@
 // slots: start (before the heading), actions (after it), default
 // parts: header, heading, close, expand, body
 
-import '../aufbau/AufbauIcon.js';
+import '../svg/icon.js';
 
 import { AufbauElement } from '../core/index.js';
 
@@ -92,8 +92,8 @@ export class AppPanel extends AufbauElement {
         <slot name="start"></slot>
         <strong part="heading"></strong>
         <slot name="actions"></slot>
-        <button type="button" part="expand" aria-label="expand"><aufbau-icon icon="lucide:maximize-2"></aufbau-icon></button>
-        <button type="button" part="close" aria-label="close"><aufbau-icon icon="lucide:x"></aufbau-icon></button>
+        <button type="button" part="expand" aria-label="expand"><svg-icon icon="lucide:maximize-2"></svg-icon></button>
+        <button type="button" part="close" aria-label="close"><svg-icon icon="lucide:x"></svg-icon></button>
       </header>
       <div part="body"><slot></slot></div>
     `;
@@ -145,7 +145,7 @@ export class AppPanel extends AufbauElement {
     $('[part="close"]').hidden  = !(wanted.has('close') && (written || docked || this.container?.localName === 'aufbau-modal'));
     $('[part="expand"]').hidden = !(wanted.has('expand') && docked);
     $('[part="expand"]').setAttribute('aria-label', expanded ? 'collapse' : 'expand');
-    $('[part="expand"] aufbau-icon').setAttribute('icon', expanded ? 'lucide:minimize-2' : 'lucide:maximize-2');
+    $('[part="expand"] svg-icon').setAttribute('icon', expanded ? 'lucide:minimize-2' : 'lucide:maximize-2');
   }
 }
 

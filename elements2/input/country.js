@@ -5,7 +5,7 @@
 //   <input-country name="country" value="DE"></input-country>
 //   <input-country countries="DE AT CH" look="segments"></input-country>
 //
-// the flags are circle-flags (circle-flags:<code>), the set <aufbau-flag> uses.
+// the flags are circle-flags (circle-flags:<code>), the set <svg-flag> uses.
 
 import { displayNames, nameOfCode }          from '../core/locale.js';
 import { byLabel, listOf, OptionsComponent } from '../core/OptionsComponent.js';

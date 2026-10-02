@@ -1,13 +1,13 @@
-// <aufbau-icon>
+// <svg-icon>
 // pure css, no markup: the host is a box masked (or painted) by the icon svg.
 //
 // `icon` takes an iconify id ('lucide:save', 'lucide/save') or an alias ('save').
-// aliases come from AufbauIcon.register(). the aufbau default list lives in
+// aliases come from SvgIcon.register(). the aufbau default list lives in
 // @aufbau/icons and is loaded lazily the first time an unknown alias shows up,
 // so elements carry no icon data and pages that only use full ids never load it.
 //
 // the svg itself comes from the iconify api unless it was handed over with
-// AufbauIcon.provide() first. that is the hook for offline bundles, see the
+// SvgIcon.provide() first. that is the hook for offline bundles, see the
 // bundling notes in @aufbau/icons/README.md.
 
 import { AufbauElement } from '../core/index.js';
@@ -26,7 +26,7 @@ let defaultsLoaded = false;
 const warnOnce = (key, message) => {
   if (warned.has(key)) return;
   warned.add(key);
-  console.warn(`[aufbau-icon] ${message}`);
+  console.warn(`[svg-icon] ${message}`);
 };
 
 /** 'set:name' | 'set/name' | alias -> 'set:name', or null when it is an alias not (yet) known */
@@ -47,7 +47,7 @@ export function iconUrl (id) {
   return collection && name ? `${API}/${encodeURIComponent(collection)}:${encodeURIComponent(name)}.svg` : null;
 }
 
-export default class AufbauIcon extends AufbauElement {
+export default class SvgIcon extends AufbauElement {
   static attr = {
     color : String,
     icon  : String,
@@ -61,7 +61,7 @@ export default class AufbauIcon extends AufbauElement {
 
   // without the mask nothing is ever visible, so this is structure, not theming.
   // no url yet (alias still loading) masks everything away instead of showing a solid box
-  static styles = `aufbau-icon {
+  static styles = `svg-icon {
     background-color : var(--icon-color, currentColor);
     block-size       : var(--icon-size, 1em);
     display          : inline-block;
@@ -108,7 +108,7 @@ export default class AufbauIcon extends AufbauElement {
 
     // an unknown alias: fetch the defaults once, then try again. until then nothing is painted
     if (icon && !id && !defaultsLoaded) {
-      AufbauIcon.loadDefaults().then(() => this.update());
+      SvgIcon.loadDefaults().then(() => this.update());
       return;
     }
 
@@ -131,4 +131,4 @@ export default class AufbauIcon extends AufbauElement {
   }
 }
 
-AufbauIcon.init();
+SvgIcon.init();

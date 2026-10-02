@@ -227,7 +227,7 @@ export default class AufbauSlider extends AufbauControl {
       : html`<span data-index="${index}"></span>`;
 
     const stepButton = (direction, glyph) => html`
-      <button type="button" data-step="${direction}"><aufbau-icon icon="${glyph}"></aufbau-icon></button>
+      <button type="button" data-step="${direction}"><svg-icon icon="${glyph}"></svg-icon></button>
     `;
 
     return html`

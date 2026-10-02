@@ -62,7 +62,7 @@ export default class AufbauInput extends AufbauControl {
       &:focus { outline: none; }
     }
 
-    > aufbau-icon { flex: none; opacity: 0.65; }
+    > svg-icon { flex: none; opacity: 0.65; }
 
     > [data-action]         { opacity: 0.65; }
     > [data-action]:hover   { opacity: 1; }
@@ -156,14 +156,14 @@ export default class AufbauInput extends AufbauControl {
     const stepper  = look === 'stepper';
 
     const stepButton = (direction, glyph) => html`
-      <button type="button" data-step="${direction}"><aufbau-icon icon="${glyph}"></aufbau-icon></button>
+      <button type="button" data-step="${direction}"><svg-icon icon="${glyph}"></svg-icon></button>
     `;
 
     // markup is in visual order. value and disabled are absent on purpose, both are
     // applied in sync(): rebuilding on every keystroke would drop the caret out of the field
     return html`
       ${stepper && stepButton(-1, 'lucide:minus')}
-      ${iconName && html`<aufbau-icon icon="${iconName}"></aufbau-icon>`}
+      ${iconName && html`<svg-icon icon="${iconName}"></svg-icon>`}
       <input ${attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: domain.input })} />
       ${actionButtons(parseActions(actions))}
       ${stepper && stepButton(1, 'lucide:plus')}

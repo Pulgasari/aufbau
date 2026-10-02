@@ -171,14 +171,14 @@ export default class AufbauEmbed extends AufbauElement {
       text-align      : center;
       text-decoration : none;
 
-      > aufbau-icon { font-size: 2em; }
+      > svg-icon { font-size: 2em; }
       > small       { font-size: 0.75em; }
     }
 
     /* a slim player, e.g. 42px: the placeholder is one line */
     @container (max-height: 80px) {
       > :is(button, a) { flex-direction: row; gap: 0.5em; }
-      > :is(button, a) > aufbau-icon { font-size: 1em; }
+      > :is(button, a) > svg-icon { font-size: 1em; }
     }
   }`;
 
@@ -236,7 +236,7 @@ export default class AufbauEmbed extends AufbauElement {
     // nothing to frame: the placeholder leads to the page itself
     if (!embed.src) return html`
       <a href="${embed.link}" target="_blank" rel="noopener noreferrer">
-        <aufbau-icon icon="lucide:external-link"></aufbau-icon>
+        <svg-icon icon="lucide:external-link"></svg-icon>
         <strong>${name}</strong>
         <small>opens ${embed.host}</small>
       </a>
@@ -244,7 +244,7 @@ export default class AufbauEmbed extends AufbauElement {
 
     return html`
       <button type="button" aria-label="${`load ${name} from ${embed.host}`}">
-        <aufbau-icon icon="lucide:play"></aufbau-icon>
+        <svg-icon icon="lucide:play"></svg-icon>
         <strong>${name}</strong>
         <small>loads content from ${embed.host}</small>
       </button>

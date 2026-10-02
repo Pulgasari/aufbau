@@ -77,7 +77,7 @@ export default class AufbauButton extends AufbauElement {
 
     // an explicit label/text wins, otherwise the children show
     return html`
-      ${icon && html`<aufbau-icon part="icon" icon="${icon}"></aufbau-icon>`}
+      ${icon && html`<svg-icon part="icon" icon="${icon}"></svg-icon>`}
       <span part="label">${content || html`<slot></slot>`}</span>
     `;
   }

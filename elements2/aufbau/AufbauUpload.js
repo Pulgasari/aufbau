@@ -62,7 +62,7 @@ export default class AufbauUpload extends AufbauControl {
       padding         : 1.5em 1em;
       text-align      : center;
 
-      > aufbau-icon { --icon-size: 1.75em; }
+      > svg-icon { --icon-size: 1.75em; }
     }
 
     :host([look="button"]) [part~="zone"] {
@@ -223,7 +223,7 @@ export default class AufbauUpload extends AufbauControl {
     return html`
       <input type="file" hidden ${attrs({ accept, multiple, webkitdirectory: directory })} />
       <button type="button" part="zone">
-        <aufbau-icon part="icon" icon="lucide:upload"></aufbau-icon>
+        <svg-icon part="icon" icon="lucide:upload"></svg-icon>
         <span part="text"><slot>${text}</slot></span>
       </button>
       ${this.files.length > 0 && html`
@@ -233,7 +233,7 @@ export default class AufbauUpload extends AufbauControl {
               <span part="name">${file.name}</span>
               <small part="size">${formatSize(file.size)}</small>
               <button type="button" part="remove" data-remove="${index}" aria-label="remove ${file.name}">
-                <aufbau-icon icon="lucide:x"></aufbau-icon>
+                <svg-icon icon="lucide:x"></svg-icon>
               </button>
             </li>
           `)}

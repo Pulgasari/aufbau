@@ -27,13 +27,13 @@ export const parseActions = (tokens) => {
 
 export const actionButtons = (actions) => html`${actions.map(action => html`
   <button type="button" data-action="${action}" aria-label="${action}" title="${action}">
-    <aufbau-icon icon="${ICONS[action]}"></aufbau-icon>
+    <svg-icon icon="${ICONS[action]}"></svg-icon>
   </button>
 `)}`;
 
 // brief confirmation on the button itself, then back to its own icon
 const flash = (button, ok) => {
-  const icon = button.querySelector('aufbau-icon');
+  const icon = button.querySelector('svg-icon');
   if (!icon) return;
   icon.setAttribute('icon', ok ? ICONS.done : ICONS.fail);
   clearTimeout(button._flash);

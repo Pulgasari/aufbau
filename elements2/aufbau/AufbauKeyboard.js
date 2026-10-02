@@ -323,7 +323,7 @@ export default class AufbauKeyboard extends AufbauElement {
       'aria-label'   : icon ? name : false,
       'aria-pressed' : pressed == null ? false : String(Boolean(pressed)),
       'data-key'     : name,
-    })}>${icon ? html`<aufbau-icon icon="${icon}"></aufbau-icon>` : (label ?? name)}</button>`;
+    })}>${icon ? html`<svg-icon icon="${icon}"></svg-icon>` : (label ?? name)}</button>`;
   }
 
   row (chars, { edges = null } = {}) {

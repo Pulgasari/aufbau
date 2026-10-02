@@ -448,7 +448,7 @@ export default class AufbauPicker extends AufbauControl {
 
     const step = (direction, delta, icon) => html`
       <button type="button" part="step ${direction}" data-step="${delta}" aria-label="${direction}">
-        <aufbau-icon icon="${icon}"></aufbau-icon>
+        <svg-icon icon="${icon}"></svg-icon>
       </button>
     `;
 
@@ -461,7 +461,7 @@ export default class AufbauPicker extends AufbauControl {
     const multiple = this.isMultiple;
     const options  = this.options;
 
-    const icon = entry => entry.icon && html`<aufbau-icon icon="${entry.icon}"></aufbau-icon>`;
+    const icon = entry => entry.icon && html`<svg-icon icon="${entry.icon}"></svg-icon>`;
 
     const listbox = html`
       <div part="listbox" role="listbox" popover="manual" ${attrs({ 'aria-multiselectable': multiple && 'true' })}>
@@ -476,14 +476,14 @@ export default class AufbauPicker extends AufbauControl {
 
     if (look === 'combobox') return html`
       <input type="text" part="field" role="combobox" aria-haspopup="listbox" aria-expanded="false" ${attrs({ placeholder, readonly: !searchable })} />
-      <aufbau-icon part="caret" icon="lucide:chevron-down"></aufbau-icon>
+      <svg-icon part="caret" icon="lucide:chevron-down"></svg-icon>
       ${listbox}
     `;
 
     // content is filled in sync(), a click must not rebuild the button it lands on
     if (look === 'cycle') return html`
       <button type="button" part="trigger" aria-haspopup="listbox" aria-expanded="false">
-        <aufbau-icon part="icon" hidden></aufbau-icon>
+        <svg-icon part="icon" hidden></svg-icon>
         <span part="label"></span>
       </button>
       ${listbox}
@@ -554,7 +554,7 @@ export default class AufbauPicker extends AufbauControl {
 
     const current = this.options.find(entry => selected.has(entry.value));
     const name    = current ? (current.label || current.value) : this.getAttr('placeholder');
-    const icon    = button.querySelector('aufbau-icon');
+    const icon    = button.querySelector('svg-icon');
     const text    = button.querySelector('span');
 
     setAttr(icon, { hidden: !current?.icon, icon: current?.icon || false });

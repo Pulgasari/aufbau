@@ -120,7 +120,7 @@ export default class AufbauAudio extends AufbauElement {
       ${cover && full && html`<img src="${cover}" alt="" />`}
       <strong>${label}</strong>
       ${artist && html`<span>${artist}</span>`}
-      <button type="button" aria-label="play"><aufbau-icon icon="lucide:play"></aufbau-icon></button>
+      <button type="button" aria-label="play"><svg-icon icon="lucide:play"></svg-icon></button>
       ${full && html`
         <time>0:00</time>
         <input type="range" min="0" max="100" step="0.1" value="0" ${attrs({ 'aria-label': 'seek' })} />
@@ -153,7 +153,7 @@ export default class AufbauAudio extends AufbauElement {
     const button  = this.$(':scope > button');
 
     button?.setAttribute('aria-label', playing ? 'pause' : 'play');
-    button?.querySelector('aufbau-icon')?.setAttribute('icon', playing ? 'lucide:pause' : 'lucide:play');
+    button?.querySelector('svg-icon')?.setAttribute('icon', playing ? 'lucide:pause' : 'lucide:play');
     this.states.toggle('playing', playing);
   }
 

@@ -6,7 +6,6 @@
 //
 // the aufbau-* elements get a $ shorthand:
 //
-//   <$icon 'lucide:search' '1.5em' />         <aufbau-icon icon="lucide:search" size="1.5em">
 //   <$btn variant="primary">Save</$btn>       <aufbau-button variant="primary">Save</aufbau-button>
 //   <$option 'de' 'Deutsch' />                <aufbau-option value="de">Deutsch</aufbau-option>
 //
@@ -15,6 +14,7 @@
 //
 //   <input-color 'red' name="color" />        <input-color value="red" name="color">
 //   <embed-youtube 'dQw4w9WgXcQ' />           <embed-youtube src="dQw4w9WgXcQ">
+//   <svg-icon 'lucide:search' '1.5em' />      <svg-icon icon="lucide:search" size="1.5em">
 
 export const
 $audio    = { tag: 'aufbau-audio',     args: 'src' },
@@ -25,8 +25,6 @@ $datalist = 'aufbau-datalist',
 $dropdown = { tag: 'aufbau-dropdown',  args: 'label' },
 $embed    = { tag: 'aufbau-embed',     args: 'src' },
 $filter   = { tag: 'aufbau-filter',    args: 'target' },
-$flag     = { tag: 'aufbau-flag',      args: 'code' },
-$icon     = { tag: 'aufbau-icon',      args: ['icon', 'size'] },
 $index    = 'aufbau-index',
 $input    = { tag: 'aufbau-input',     args: 'type' },
 $item     = 'aufbau-item',
@@ -84,6 +82,8 @@ inputTimezone   = { args: 'value' },
 inputUnit       = { args: 'value' },
 inputUrl        = { args: 'value' },
 inputYear       = { args: 'value' },
+svgFlag         = { args: 'code' },
+svgIcon         = { args: ['icon', 'size'] },
 writeMd         = { args: 'value' };
 
 /* :::::: USAGE

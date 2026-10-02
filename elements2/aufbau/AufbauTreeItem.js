@@ -2,7 +2,7 @@
 // one node of an <aufbau-tree>. the row (chevron, icon, label) lives in the
 // shadow root, the child items stay the author's and are projected below it:
 //
-//   <aufbau-tree-item label="src" expanded>      shadow: <div part="row"><aufbau-icon part="icon"><span part="label">
+//   <aufbau-tree-item label="src" expanded>      shadow: <div part="row"><svg-icon part="icon"><span part="label">
 //     <aufbau-tree-item label="index.js">                <slot>
 //   </aufbau-tree-item>
 //
@@ -95,7 +95,7 @@ export default class AufbauTreeItem extends AufbauElement {
 
   // structure only, label and icon are applied in sync()
   render () {
-    return html`<div part="row"><aufbau-icon part="icon"></aufbau-icon><span part="label"></span></div><slot></slot>`;
+    return html`<div part="row"><svg-icon part="icon"></svg-icon><span part="label"></span></div><slot></slot>`;
   }
 
   expand   (expanded = true) { return this.setExpanded(expanded); }
