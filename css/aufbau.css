@@ -6,7 +6,7 @@
 /*////// 2. IMPORTS //////*/
 @import url('./functions.css');
 @import url('./animate/functions.css');
-@import url('./tokens.css')              layer(aufbau.tokens);
+@import url('./gestalt.css')             layer(aufbau.tokens);
 @import url('./palettes.css')            layer(aufbau.tokens);
 @import url('./themes.css')              layer(aufbau.tokens);
 @import url('./reset.css')               layer(aufbau.reset);
