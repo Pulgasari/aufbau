@@ -1,17 +1,18 @@
-/* @aufbau/css/skins/andromeda.css
-   the second skin, a copy of monochrome to start from. it does not do much of
-   its own yet: the tokens are the place where it begins to diverge.
+/* @aufbau/css/skins/andromeda.css */
 
-   a skin is adopted as one constructed stylesheet (elements/core/skin.js), and
-   a constructed stylesheet drops @import, so it cannot build on monochrome and
-   has to stand on its own.
-
-   loaded by elements/core/skin.js into @layer aufbau.skin. */
+/*
+skin: andromeda
+loaded by elements/core/skin.js into @layer aufbau.skin. 
+*/
 
 /*//////////// TOKENS ////////////*/
 
-/* unregistered on purpose: a registered <color> would resolve currentColor once
-   on :root, unregistered it resolves where the token is used */
+/* 
+unregistered on purpose:
+a registered <color> would resolve currentColor once on :root, 
+unregistered it resolves where the token is used.
+*/
+
 :root {
   --line         : color-mix(in oklab, currentColor 35%, transparent);
   --hover        : color-mix(in oklab, currentColor  8%, transparent);
@@ -307,6 +308,7 @@ aufbau-writer {
   --pad: small;
 }
 
+/*
 @prop --pad {
    tiny : 
       aufbau-input    > button,
@@ -320,7 +322,7 @@ aufbau-picker::part(listbox)      { --pad: tiny; }
 aufbau-picker::part(option)       { --pad: tiny; }
 aufbau-picker::part(step)         { --pad: tiny; }
 aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
-
+*/
 
    
 aufbau-code   [data-action]   { --pad: tiny; }
