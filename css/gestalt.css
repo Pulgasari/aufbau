@@ -33,6 +33,11 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 @property --skin     { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
 
 :root {
+  /* a11y */
+  --a11y-contrast : off;
+  --a11y-motion   : off;
+
+  /* gestalt */
   --density  : normal;
   --geometry : soft;
   --palette  : zombie;
