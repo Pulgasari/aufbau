@@ -6,11 +6,16 @@
 // the actions at the end. `actions` picks them: copy, paste, clear. clear only
 // shows while there is something to clear.
 
-import { AufbauControl, TYPE_NAMES, valueType } from './core/index.js';
+// :::::: IMPORT
+
+import { AufbauControl, TYPE_NAMES, valueType }     from './core/index.js';
 import { actionButtons, bindActions, parseActions } from './core/actions.js';
-import { attrs, html } from './core/html.js';
-import { setAttr } from '@domina/methods/setAttr.js';
-import { setValue } from '@domina/methods/setValue.js';
+import { attrs, html }                              from './core/html.js';
+
+import setAttr  from '@domina/methods/setAttr.js';
+import setValue from '@domina/methods/setValue.js';
+
+// :::::: 
 
 // value domains that <aufbau-input> deliberately does not carry
 const MOVED = { file: 'aufbau-upload', range: 'aufbau-slider' };
