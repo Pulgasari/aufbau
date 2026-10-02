@@ -1,37 +1,59 @@
 @property --density  { syntax: "<custom-ident>"; inherits: true; initial-value: compact; }
 @property --geometry { syntax: "sharp | soft | round | pill"; inherits: true; initial-value: sharp; }     
 
-/*
----------- density ----------
 
----------- geometry ----------
+/*//////////// CONFIG ////////////*/
+:root {
+  --density  : compact;
+  --geometry : sharp;
+  
+  --factor-radius : 0.10rem;
+  --factor-space  : 0.25rem;
+
+  --mode-of-radius: : auto;
+}
+
+/* ::: GEOMETRY ::: */
+/*
 type(sharp | soft | round | pill)
 
 sharp = keinerlei rundungen
 soft  = minimale rundung, quasi überall gleich
 round = abgerundet
 pill  = 
-
-aber im neuen system am besten irgendwie relativ
 */
 
-@function --rad(--n <number> : 0.1) 
-returns <color> { 
+@container style(--geometry: sharp) { body { --mode-of-radius:  off; } }
+@container style(--geometry: soft)  { body { --mode-of-radius:   on; } }
+@container style(--geometry: round) { body { --mode-of-radius: auto; } }
+@container style(--geometry: pill)  { body { --mode-of-radius: auto; } }
+
+@container style(--mode-of-radius: auto) {
+  * { border-radius: calc(var(--depth) * var(--factor-radius)); }
+}
+
+/*//////////// NODE DEPTH ////////////*/
+/* automatic calculation node depth */
+* > * {
+  --depth           : calc(var(--depth-of-parent, 0) + 1);
+  --depth-of-parent : var(--depth);
+}
+body  {
+  --depth           :  0;
+  --depth-of-parent : -1;
+}
+
+
+
+/*
+@function --radius(
+  --n <number> : 0.1
+) returns <color> { 
   result: --if(
     style(--geometry: sharp)    : 0;
-    style(--geometry: sharpish) : 0.1rem;
-    style(--geometry: rounded)  : if(
-      /* hier müsste es jetzt iwie relativ zum parent werden
-         sodass falls dieser schon radius hat hier um faktor 1 wächst */
-    )
+    style(--geometry: soft)     : var(--factor-radius, 0.1rem);
+    style(--geometry: rounded)  : calc(var(--depth) * var(--factor-radius));
+    else: var(--n);
   );
 }
-
-:root {
-  --density  : compact;
-  --geometry : sharp;
-}
-
-button {
-  border-radius: --rad();
-}
+*/
