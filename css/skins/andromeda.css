@@ -38,7 +38,7 @@ aufbau-dropdown::part(trigger),
 aufbau-picker[look="cycle"]::part(trigger),
 aufbau-upload::part(zone) {
   border        : var(--border);
-  border-radius : var(--radius);
+  /*border-radius : var(--radius);*/
 }
 
 /*//////////// SURFACE ////////////*/
@@ -49,7 +49,6 @@ aufbau-modal::part(dialog),
 aufbau-picker::part(listbox) {
   background-color : var(--color-bg);
   border           : var(--border);
-  border-radius    : var(--radius);
   color            : var(--color-fg);
 }
 
@@ -171,10 +170,10 @@ aufbau-embed {
   border-radius : var(--radius);
   overflow      : hidden;
 
-  > :is(button, a) { background-color: var(--sunken); }
-  > :is(button, a):hover { background-color: var(--hover); }
+  > :is(button, a)               { background-color: var(--sunken); }
+  > :is(button, a):hover         { background-color: var(--hover); }
   > :is(button, a):focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
-  > :is(button, a) > small { color: var(--color-muted); }
+  > :is(button, a) > small       { color: var(--color-muted); }
 }
 
 aufbau-modal::part(header) { border-block-end: var(--border); }
@@ -194,7 +193,7 @@ aufbau-picker[look="radio"] {
 }
 
 aufbau-slider > div > input {
-  &::-webkit-slider-runnable-track { background: none; }
+  &::-webkit-slider-runnable-track { backgrounad: none; }
   &::-moz-range-track              { background: none; }
 
   &::-webkit-slider-thumb {
