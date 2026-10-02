@@ -1,5 +1,9 @@
 /* @aufbau/css/tokens.css
 
+document.body.style.setProperty('--bg', 'var(--color-bg)');
+document.body.style.setProperty('--fg', 'var(--color-fg)');
+document.body.style.setProperty('--ink', 'var(--color-ink)');
+
 the axes of the design system and the shorthand properties.
 
 axes, each writes its own raw tokens:
