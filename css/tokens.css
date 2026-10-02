@@ -121,6 +121,10 @@ pill  =
 @container style(--geometry: round) { body { --mode-of-radius: auto; } }
 @container style(--geometry: pill)  { body { --mode-of-radius: auto; } }
 
+@container style(--mode-of-radius: on) {
+  * { border-radius: var(--factor-radius); }
+}
+
 @container style(--mode-of-radius: auto) {
   * { border-radius: calc(var(--depth) * var(--factor-radius)); }
 }
