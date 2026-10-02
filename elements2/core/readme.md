@@ -1,0 +1,366 @@
+# @aufbau/elements2/core
+
+Lightweight, zero-dependency abstraction layer for Web Components. Provides a unified lifecycle, schema-driven attribute parsing with proxy destructuring, universal event handling with auto-cleanup, and DOM querying helpers.
+
+---
+
+## todo
+
+### config
+
+- hljs connection um eigenes syntax highlighting einspeisen zu können
+
+---
+
+## Architecture
+
+`AufbauCore` is a plain class on top of `HTMLElement`. every aufbau element is
+autonomous; customized built-ins (`is="…"`) are not supported, safari never
+shipped them.
+
+```javascript
+import { AufbauCore } from './core/AufbauCore.js';
+
+export class AufbauElement extends AufbauCore {}
+```
+
+### internals and states
+
+```javascript
+class AufbauTreeItem extends AufbauElement {
+  // default semantics, applied in the constructor. `true` only attaches up front
+  static internals = { role: 'treeitem' };
+
+  sync () {
+    this.internals.ariaExpanded = String(this.getAttr('expanded'));   // ElementInternals, attached once
+    this.states.toggle('empty', !this.children.length);               // styled as :state(empty)
+  }
+}
+```
+
+`this.internals` attaches lazily on first access and is `null` where the browser
+has no ElementInternals. `this.states` wraps its CustomStateSet with `add`,
+`delete`, `has` and `toggle(name, force)`; every call is a guarded no-op in
+browsers without custom states.
+
+### children and shadow root
+
+the one rule: **an element never renders over children the author owns.** a
+native `<details>` or `<select>` keeps its own ui in a hidden shadow root and
+leaves its children alone, so it does not matter who manages them (plain html,
+preact, anything). aufbau elements follow the same model:
+
+- no own structure (icon, flag, index, item, progress, waveform): render nothing,
+  the host plus css and pseudo elements is the whole element. index and item are
+  layout around the author's children, deliberately without shadow root
+- own structure, children the author owns (button, dropdown, loop, modal,
+  picker, toast, tree-item, upload):
+  `static shadow = true`, render() goes into the shadow root, children are
+  projected through `<slot>` or only read (picker options)
+- children are the element's input (reader: markdown, code: code, value: the
+  value, writer: the default value): `static source`. the children stay
+  untouched and are the source, a bare shadow root only projects the output
+  element, which is ours and lives in the light dom as well, so page css reaches
+  everything shown (`aufbau-reader article`). changes to the children re-render
+  (`onSourceChange()`), so a framework can keep rendering them.
+  `this.sourceText` reads them raw, `dedent()` from ./utils.js strips the html
+  indentation
+- no shadow root possible (datalist: `list=` resolves ids in the document): the
+  children are only read, the element appends one node of its own and fills it
+- styling reaches inside through custom properties and `::part()`. states that
+  the skin needs on a part are exposed as extra part tokens (`part="option
+  selected"`), `::part()` accepts no attribute selectors
+
+`this.on(type, selector, fn)` delegates on the host and on the shadow root, so
+it catches the author's children as well as the own parts. `this.focused` is the
+focused element inside the element's own tree.
+
+### skeleton
+
+every element takes the `skeleton` attribute, and `this.setSkeleton(on)` shows
+the same placeholder while an element loads by itself. it is css on the host
+alone (`:state(skeleton)`): lines painted by a gradient, a slow pulse, the
+content invisible but untouched. the shape:
+
+```javascript
+static skeleton = { lines: 4, line: '1em', gap: '0.5em', width: '100%', radius: '0.25em' };
+static skeleton () { return { lines: this.getAttr('rows') }; }   // or computed
+```
+
+the method is not called `skeleton()` on purpose: htx and preact set a prop as
+a property when the element has one of that name, `<aufbau-item skeleton>`
+would have replaced the method instead of setting the attribute.
+
+### reflect
+
+```javascript
+static reflect = ['look'];
+```
+
+writes the resolved value of those attributes back onto the host on every
+update: the default, a value from `<aufbau-config>`, or the fallback for an
+invalid one. css can then select every state as `[look="…"]`. meant for
+presentation enums, never for values.
+
+---
+
+## Component Lifecycle & Registration
+
+### `static init(options)`
+Registers the Custom Element safely with the browser. 
+- Auto-derives the kebab-case tag name from the class name (`AufbauAudio` -> `aufbau-audio`).
+- Automatically maps `static attr` keys to native `observedAttributes`.
+- Prevents duplicate registration errors during Hot Module Replacement (HMR).
+
+```javascript
+// Explicit tag or automatic class-name derivation
+AufbauAudio.init(); 
+
+// Customized built-in element registration
+AufbauDatalist.init({ extends: 'datalist' });
+```
+
+### Lifecycle Hooks
+Override these methods in subclasses instead of native callbacks.
+
+- `onMount()`: Invoked when element is added to DOM (`connectedCallback`).
+- `onUnmount()`: Invoked when element is removed from DOM (`disconnectedCallback`).
+- `onAttributeChange(name, oldValue, newValue)`: Invoked when an observed attribute changes.
+- `update()`: Triggered automatically on mount, config changes, and attribute updates.
+
+```javascript
+export default class MyElement extends AufbauElement {
+  onMount() {
+    // Setup listeners or initial state
+  }
+
+  onUnmount() {
+    // Teardown non-event resources
+  }
+
+  update() {
+    // Render or re-sync UI
+  }
+}
+```
+
+---
+
+## Attribute System (`static attr`, `getAttr`, `setAttr`)
+
+### Schema Tiers (`static attr`)
+Attributes can be defined in three levels of specificity.
+
+```javascript
+export default class AufbauAudio extends AufbauElement {
+  static attr = {
+    // 1. Minimal: Constructor function
+    src: String,
+    
+    // 2. Basic: Inferred type & default value
+    volume: 50,          // Number, fallback: 50
+    autoplay: false,     // Boolean, fallback: false
+    
+    // 3. Full: Validation enum, explicit fallback, and transformation callback
+    layout: {
+      type: String,
+      default: 'card',
+      values: ['card', 'compact', 'full']
+    },
+    playbackRate: {
+      type: Number,
+      default: 1.0,
+      fn: (val) => Math.max(0.5, Math.min(2.0, val))
+    }
+  };
+}
+```
+
+### `getAttr(nameOrType, type, fallback)`
+Reads and parses attributes according to the defined schema. Supports Proxy-based destructuring.
+
+```javascript
+// 1. Destructure all attributes with automatic type casting & fallbacks
+const { src, volume, autoplay, layout } = this.getAttr();
+
+// 2. Query single attribute via schema
+const currentVolume = this.getAttr('volume');
+
+// 3. Query single attribute with manual type override
+const rawVolumeString = this.getAttr('volume', String);
+```
+
+### `setAttr(map)`
+Updates DOM attributes. Handles Boolean mapping automatically (`false`/`null` removes attribute, `true` sets empty attribute `""`, primitives convert to String).
+
+```javascript
+this.setAttr({
+  volume: 80,
+  autoplay: true,
+  disabled: false // Removes 'disabled' attribute from DOM
+});
+```
+
+---
+
+## Universal Event System (`on`, `off`, `emit`)
+
+### `on(...args)`
+Universal listener supporting self-events, DOM selector delegation, and external targets (e.g. `Audio`, `window`). Returns an unsubscribe function.
+
+```javascript
+onMount() {
+  // Listen on self
+  this.on('click', (e) => this.handleClick(e));
+
+  // Listen on child selector matching
+  this.on('.btn-play', 'click', () => this.togglePlay());
+
+  // Listen on external EventTarget
+  this.on(window, 'resize', () => this.handleResize());
+  this.on(this._audio, 'timeupdate', () => this.syncProgress());
+}
+```
+
+### `off(type, listener, options)`
+Removes event listener from the element.
+
+```javascript
+this.off('click', this.handleClick);
+```
+
+### `emit(eventName, detail, options)`
+Dispatches a custom event configured with `bubbles: true` and `composed: true`.
+
+```javascript
+this.emit('aufbau-audio-change', { state: 'playing' });
+```
+
+---
+
+## DOM Query Helpers (`$`, `$$`)
+
+### `this.$`
+Queries a single element inside Shadow DOM or Light DOM. Supports property access for element IDs.
+
+```javascript
+// Selector query
+const button = this.$('.btn-play');
+
+// ID lookup via Proxy (looks up #player-container or #playerContainer)
+const container = this.$.playerContainer;
+```
+
+### `this.$$`
+Queries all matching elements and returns them as a standard JavaScript `Array`.
+
+```javascript
+const items = this.$$('aufbau-tree-item');
+items.forEach(item => item.classList.add('active'));
+```
+
+---
+
+## Global Config Store
+
+### `getConfig(attrName, configKey, defaultValue)`
+Retrieves configuration following a fallback precedence: Local DOM Attribute -> Global `AufbauConfigStore` -> Default Value.
+
+```javascript
+const theme = this.getConfig('theme', 'globalTheme', 'dark');
+```
+
+---
+
+## Comparison: Vanilla Web Components vs. Aufbau Core
+
+### Vanilla Web Component (Boilerplate & Manual Work)
+
+```javascript
+class VanillaAudio extends HTMLElement {
+  static get observedAttributes() {
+    return ['src', 'volume', 'autoplay'];
+  }
+
+  constructor() {
+    super();
+    this._onResize = this._onResize.bind(this);
+  }
+
+  connectedCallback() {
+    window.addEventListener('resize', this._onResize);
+    this.render();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('resize', this._onResize);
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.render();
+    }
+  }
+
+  get volume() {
+    const val = parseFloat(this.getAttribute('volume'));
+    return Number.isNaN(val) ? 50 : val;
+  }
+
+  get autoplay() {
+    return this.hasAttribute('autoplay');
+  }
+
+  render() {
+    const src = this.getAttribute('src') || '';
+    const isAutoplay = this.autoplay;
+    const vol = this.volume;
+
+    this.innerHTML = `<div class="player">${src} (${vol}%)</div>`;
+    
+    const btn = this.querySelector('.btn-play');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('play-toggle', {
+          bubbles: true,
+          composed: true,
+          detail: { playing: true }
+        }));
+      });
+    }
+  }
+}
+
+if (!customElements.get('vanilla-audio')) {
+  customElements.define('vanilla-audio', VanillaAudio);
+}
+```
+
+### Aufbau Core Equivalent (Declarative & Clean)
+
+```javascript
+import { AufbauElement } from './core/AufbauCore.js';
+
+export default class AufbauAudio extends AufbauElement {
+  static attr = {
+    src: String,
+    volume: 50,
+    autoplay: Boolean
+  };
+
+  onMount() {
+    this.on(window, 'resize', () => this.update());
+    this.on('.btn-play', 'click', () => {
+      this.emit('play-toggle', { playing: true });
+    });
+  }
+
+  update() {
+    const { src = '', volume, autoplay } = this.getAttr();
+
+    this.innerHTML = `<div class="player">${src} (${volume}%)</div>`;
+  }
+}
+
+AufbauAudio.init();
+```
