@@ -1,15 +1,19 @@
 /* @aufbau/css/palettes.css
-   --palette names a preset or is a color, it resolves to --color-bg,
-   --color-fg and --color-ink. a color derives all three, in light and dark.
 
-   two ways to the same table, until one of them proves itself:
-   - container queries on body, for the page. gestalt.palettes() reads the
-     preset names off them
-   - --palette-color() on any [data-palette] below the root, a palette for
-     one area of the page. a container query asks the parent, a function
-     is evaluated on the element itself */
+--palette names a preset or is a color,
+it resolves to --color-bg, --color-fg and --color-ink.
+a color derives all three, in light and dark.
 
+two ways to the same table, until one of them proves itself:
 
+(1) container queries on body, for the page.
+    gestalt.palettes() reads the preset names off them
+
+(2) --palette-color() on any [data-palette] below the root,
+    a palette for one area of the page. 
+    a container query asks the parent,
+    a function is evaluated on the element itself.
+*/
 
 /*//////////// DERIVED ////////////*/
 
@@ -63,6 +67,7 @@ body {
   --name type(<color> | <custom-ident>) : zombie,
   --role type(bg | fg | ink)            : bg
 ) returns <color> {
+   
   --role-bg: if(
     style(--name: amethyst)  : #160f1f;
     style(--name: beton)     : #3a3a3a;
@@ -89,6 +94,7 @@ body {
     style(--name: zombie)    : #282a36;
     else : --palette-derived(var(--name), bg);
   );
+   
   --role-fg: if(
     style(--name: amethyst)  : #ece0f5;
     style(--name: beton)     : #dcdcdc;
@@ -115,6 +121,7 @@ body {
     style(--name: zombie)    : #f8f8f2;
     else : --palette-derived(var(--name), fg);
   );
+   
   --role-ink: if(
     style(--name: amethyst)  : #a855f7;
     style(--name: beton)     : #9ad1d4;
@@ -141,14 +148,22 @@ body {
     style(--name: zombie)    : #ff79c6;
     else : --palette-derived(var(--name), ink);
   );
-  result: if(style(--role: fg): var(--role-fg); style(--role: ink): var(--role-ink); else: var(--role-bg));
+   
+  result: if(
+    style(--role: fg)  : var(--role-fg); 
+    style(--role: ink) : var(--role-ink); 
+    else               : var(--role-bg)
+  );
+   
 }
 
 body [data-palette] {
   --palette   : attr(data-palette type(<color> | <custom-ident>), zombie);
+
   --color-bg  : --palette-color(var(--palette), bg);
   --color-fg  : --palette-color(var(--palette), fg);
   --color-ink : --palette-color(var(--palette), ink);
+   
   --bg        : var(--color-bg);
   --fg        : var(--color-fg);
   --ink       : var(--color-ink);
