@@ -4,6 +4,11 @@ document.body.style.setProperty('--bg', 'var(--color-bg)');
 document.body.style.setProperty('--fg', 'var(--color-fg)');
 document.body.style.setProperty('--ink', 'var(--color-ink)');
 
+document.body.style.setProperty('background-color', 'var(--color-bg)');
+document.body.style.setProperty('color', 'var(--color-fg)');
+document.body.style.setProperty('accent-color', 'var(--color-ink)');
+
+
 the axes of the design system and the shorthand properties.
 
 axes, each writes its own raw tokens:
