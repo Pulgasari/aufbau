@@ -12,25 +12,3 @@
 @import url('./reset.css')               layer(aufbau.reset);
 @import url('./animate/keyframes.css')   layer(aufbau.utilities);
 @import url('./animate/animations.css')  layer(aufbau.utilities);
-
-/*
-:root {
-  --mode-of-radius: : auto;
-  
-  --factor-radius : 0.10rem;
-  --factor-space  : 0.25rem;
-}
-
-* > * {
-  --depth           : calc(var(--depth-of-parent, 0) + 1);
-  --depth-of-parent : var(--depth);
-}
-body  {
-  --depth           :  0;
-  --depth-of-parent : -1;
-}
-
-@container style(--mode-of-radius: auto) {
-  * { border-radius: calc(var(--depth) * var(--factor-radius)); }
-}
-*/
