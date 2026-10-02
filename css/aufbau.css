@@ -13,6 +13,14 @@
 @import url('./animate/keyframes.css')   layer(aufbau.utilities);
 @import url('./animate/animations.css')  layer(aufbau.utilities);
 
+/*
+body  { --depth: calc(var(--parent-depth, 0) + 1); }
+* > * { --parent-depth: var(--depth); }
+
+.node { border-radius: calc(var(--depth) * 0.1rem); }
+*/
+
+
 /* the reset lives in reset.css now, imported above. the former inline copy:
 
 @layer aufbau.reset {
