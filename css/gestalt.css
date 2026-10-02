@@ -48,7 +48,11 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 [data-scheme]   { --scheme   : attr(data-scheme   type(auto | light | dark), auto); }
 
 :root, [data-scheme] {
-  color-scheme : if(style(--scheme: light): light; style(--scheme: dark): dark; else: light dark);
+  color-scheme : if(
+    style(--scheme: light) : light; 
+    style(--scheme: dark)  : dark; 
+    else                   : light dark
+  );
 }
 
 /*//////////// GEOMETRY ////////////*/
@@ -58,7 +62,8 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
     style(--geometry: sharp) : 0;
     style(--geometry: round) : 0.75em;
     style(--geometry: pill)  : 999px;
-    else                     : 0.25em);
+    else                     : 0.25em
+  );
 }
 
 /*//////////// COLORS ////////////*/
