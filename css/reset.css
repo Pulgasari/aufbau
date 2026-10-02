@@ -9,8 +9,7 @@
 
 /*/////////////////////// CLEAR ////////////////////////*/
 
-/* margin and padding start at 0 through the shorthands (tokens.css) */
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 * { user-select: none; }
 
 /*A*/ a, abbr, acronym, address, applet, article, aside, audio,
