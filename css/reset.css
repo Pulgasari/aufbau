@@ -7,6 +7,8 @@
   transition-behavior  : allow-discrete; /* or * ??? */
 }
 
+html { -webkit-tap-highlight-color: transparent; }
+
 /*/////////////////////// CLEAR ////////////////////////*/
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
