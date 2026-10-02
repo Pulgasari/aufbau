@@ -35,17 +35,12 @@ export class InputComponent extends AufbauComponent {
   }
 }
 
-/**
- * a component that is an <aufbau-input> of one type and nothing more. `look`
- * sets the default look, e.g. stepper for a year
- */
+
+// a component that is an <aufbau-input> of one type and nothing more. 
+// `look` sets the default look, e.g. stepper for a year
 export function defineInput (name, type, { look } = {}) {
-  class Input extends InputComponent {
-    static type = type;
-  }
-
-  if (look) Input.attr = { look: { type: String, default: look, values: ['field', 'stepper', 'swatch'] } };
-
+  class Input extends InputComponent { static type = type; }
+  if (look) Input.attr = { look: { type: String, default: look, values: ['field', 'stepper', 'swatch'] } };     
   return define(name, Input);
 }
 
