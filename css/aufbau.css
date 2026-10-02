@@ -8,7 +8,7 @@
 @import url('./animate/functions.css');
 @import url('./gestalt.css')             layer(aufbau.tokens);
 @import url('./palettes.css')            layer(aufbau.tokens);
-@import url('./themes.css')              layer(aufbau.tokens);
+/*@import url('./themes.css')              layer(aufbau.tokens);*/
 @import url('./reset.css')               layer(aufbau.reset);
 @import url('./animate/keyframes.css')   layer(aufbau.utilities);
 @import url('./animate/animations.css')  layer(aufbau.utilities);
