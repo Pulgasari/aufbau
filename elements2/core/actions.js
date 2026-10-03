@@ -1,5 +1,6 @@
 // @aufbau/elements2/core/actions.js
-// copy / paste / clear buttons for text holding elements (<aufbau-code>, <aufbau-writer>).
+// copy / paste / clear / reveal buttons for text holding elements (<aufbau-code>,
+// <aufbau-writer>, the field look of the input-* elements).
 //
 // the host picks the set with an `actions` token list and implements nothing
 // but where the text lives: actionTarget() returns the editable node. edits go
@@ -9,14 +10,16 @@
 
 import { html } from './html.js';
 
-export const ACTIONS = ['copy', 'paste', 'clear'];
+export const ACTIONS = ['copy', 'paste', 'clear', 'reveal'];
 
 const ICONS = {
-  clear : 'lucide:eraser',
-  copy  : 'lucide:copy',
-  done  : 'lucide:check',
-  fail  : 'lucide:x',
-  paste : 'lucide:clipboard-paste',
+  clear  : 'lucide:eraser',
+  copy   : 'lucide:copy',
+  done   : 'lucide:check',
+  fail   : 'lucide:x',
+  paste  : 'lucide:clipboard-paste',
+  reveal : 'lucide:eye',
+  veil   : 'lucide:eye-off',
 };
 
 /** 'copy paste' -> ['copy', 'paste'], unknown tokens dropped, order kept canonical */
@@ -26,7 +29,7 @@ export const parseActions = (tokens) => {
 };
 
 export const actionButtons = (actions) => html`${actions.map(action => html`
-  <button type="button" data-action="${action}" aria-label="${action}" title="${action}">
+  <button type="button" part="action ${action}" data-action="${action}" aria-label="${action}" title="${action}">
     <svg-icon icon="${ICONS[action]}"></svg-icon>
   </button>
 `)}`;
@@ -100,6 +103,16 @@ export const runAction = {
     node.focus();
     selectAll(node);
     if (!document.execCommand('delete')) fallback(node, '');
+  },
+
+  // a password field shows its text while the button is on
+  reveal (host, button) {
+    const node = host.revealTarget?.() ?? host.actionTarget();
+    if (!node || !('type' in node)) return;
+    const shown = node.type === 'password';
+    node.type = shown ? 'text' : 'password';
+    button.setAttribute('aria-pressed', String(shown));
+    button.querySelector('svg-icon')?.setAttribute('icon', shown ? ICONS.veil : ICONS.reveal);
   },
 };
 

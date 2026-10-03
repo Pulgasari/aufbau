@@ -1,10 +1,12 @@
 // <input-date>
-// a date, as an iso date: '2026-09-30'.
+// a date: '2026-10-03'. looks: field, stepper, slider; `range` for from..to
 //
-//   <input-date name="date"></input-date>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="date">'s.
+//   <input-date name="from"></input-date>
+//   <input-date name="trip" range></input-date>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-date', 'date');
+export class InputDate extends InputValue { static type = 'date'; }
+
+InputDate.init('input-date');
+export default InputDate;

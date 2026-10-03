@@ -5,20 +5,11 @@
 //
 //   <input-slug name="slug" source="[name='title']"></input-slug>
 
-import { InputComponent } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
+import { slugify }    from '../core/valueTypes.js';
 
-const SPELLED = { ä: 'ae', ö: 'oe', ß: 'ss', ü: 'ue' };
-
-/** 'Über uns!' -> 'ueber-uns' */
-export const slugify = value => String(value ?? '')
-  .toLowerCase()
-  .replace(/[äöüß]/g, char => SPELLED[char])
-  .normalize('NFKD')
-  .replace(/[̀-ͯ]/g, '')
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-+|-+$/g, '');
-
-export class InputSlug extends InputComponent {
+export class InputSlug extends InputValue {
+  static type = 'slug';
 
   static attr = {
     source : String,   // a selector, searched in the form first, then in the document
@@ -27,28 +18,19 @@ export class InputSlug extends InputComponent {
   get sourceElement () {
     const selector = this.getAttr('source');
     if (!selector) return null;
-    const scope = this.closest('form') ?? document;
-    return scope.querySelector(selector) ?? document.querySelector(selector);
+    return (this.closest('form') ?? document).querySelector(selector) ?? document.querySelector(selector);
   }
 
-  bind () {
-    this.on(this.control, 'change', event => {
-      if (event.target !== this.control) return;
-      const slug = slugify(this.value);
-      if (slug !== this.value) this.control.commit(slug);
-    });
+  onMount () {
+    super.onMount();
 
-    // typing in the slug itself ends the following. only typing reaches the
-    // inner <input>, a commit is announced by the control itself
-    this.on(this.control, 'input', event => { if (event.target !== this.control) this._edited = true; });
+    // typing in the slug itself ends the following
+    this.on(this.root, 'keydown', event => { if (event.key !== 'Tab') this._edited = true; });
 
     const source = this.sourceElement;
-    if (source) this.on(source, 'input', () => {
-      if (!this._edited) this.control.commit(slugify(source.value));
-    });
+    if (source) this.on(source, 'input', () => { if (!this._edited) this.commit(slugify(source.value)); });
   }
 }
 
 InputSlug.init('input-slug');
-
 export default InputSlug;

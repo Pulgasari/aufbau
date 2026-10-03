@@ -109,6 +109,9 @@ const durationUnit     = (raw) => { const match = DURATION_PATTERN.exec(String(r
 /*
   input      native <input type> to fall back on
   icon       default leading icon, overridable per element
+  look       default look of an input-* element of that type
+  actions    default actions of the field look (copy, paste, clear, reveal)
+  normalize  typed text -> its canonical form, applied when the field is left
   parse      raw attribute string -> value
   format     value -> attribute/field string
   toNumber   value -> position on a numeric axis (sliders)
@@ -129,7 +132,34 @@ const text = {
   bounds     : [0, 100],
 };
 
+const SCHEME  = /^[a-z][a-z0-9+.-]*:/i;
+const SPELLED = { ä: 'ae', ö: 'oe', ß: 'ss', ü: 'ue' };
+
+/** 'example.com' -> 'https://example.com', a url with a scheme stays as it is */
+export const normalizeUrl = value => {
+  const url = String(value ?? '').trim();
+  return !url || SCHEME.test(url) ? url : `https://${url.replace(/^\/+/, '')}`;
+};
+
+/** 'Über uns!' -> 'ueber-uns' */
+export const slugify = value => String(value ?? '')
+  .toLowerCase()
+  .replace(/[äöüß]/g, char => SPELLED[char])
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '');
+
 const VALUE_TYPES = {
+
+  // on or off. 'true' when on, empty when off
+  bool : {
+    ...text,
+    input  : 'checkbox',
+    look   : 'switch',
+    parse  : (raw)   => raw === 'true',
+    format : (value) => value === true || value === 'true' ? 'true' : '',
+  },
 
   color : {
     ...text,
@@ -141,6 +171,7 @@ const VALUE_TYPES = {
     fromNumber : fromHue,
     step       : 1,
     bounds     : [0, 360],
+    look       : 'swatch',
   },
 
   date : {
@@ -199,8 +230,9 @@ const VALUE_TYPES = {
 
   password : {
     ...text,
-    input : 'password',
-    icon  : 'lucide:lock',
+    input   : 'password',
+    icon    : 'lucide:lock',
+    actions : 'reveal',
   },
 
   // named `phone` on purpose, mapped onto the native `tel` input
@@ -208,6 +240,20 @@ const VALUE_TYPES = {
     ...text,
     input : 'tel',
     icon  : 'lucide:phone',
+  },
+
+  search : {
+    ...text,
+    input   : 'search',
+    icon    : 'lucide:search',
+    actions : 'clear',
+  },
+
+  // lowercase latin letters, digits and dashes
+  slug : {
+    ...text,
+    icon      : 'lucide:link-2',
+    normalize : slugify,
   },
 
   text : { ...text },
@@ -226,8 +272,9 @@ const VALUE_TYPES = {
 
   url : {
     ...text,
-    input : 'url',
-    icon  : 'lucide:link',
+    input     : 'url',
+    icon      : 'lucide:link',
+    normalize : normalizeUrl,
   },
 
   // a calendar year, a plain integer on its own axis (no month/day, unlike `date`)
@@ -241,6 +288,7 @@ const VALUE_TYPES = {
     fromNumber : (value) => Math.round(value),
     step       : 1,
     bounds     : [1900, 2100],
+    look       : 'stepper',
   },
 };
 

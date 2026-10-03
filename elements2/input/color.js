@@ -1,10 +1,11 @@
 // <input-color>
-// a color, as a hex string: '#ff8800'.
+// a color as hex: '#3355ff'. looks: swatch, field, slider (the hue)
 //
-//   <input-color name="color"></input-color>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="color">'s.
+//   <input-color name="accent" value="#3355ff"></input-color>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-color', 'color', { look: 'swatch' });
+export class InputColor extends InputValue { static type = 'color'; }
+
+InputColor.init('input-color');
+export default InputColor;

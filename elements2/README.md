@@ -9,10 +9,11 @@ them, in one package.
 | `app/`      | `app-*`           | the frame of an app: root, views, areas, panels |
 | `div/`      | `div-x`, `div-y`  | flex rows and columns |
 | `embed/`    | `embed-*`         | click to load embeds of youtube, bandcamp, … |
-| `input/`    | `input-*`         | one form control per value domain |
+| `input/`    | `input-*`         | one form control per kind of value, drawn by a look |
 | `svg/`      | `svg-*`           | icons and flags: a box painted by an svg |
 | `write/`    | `write-*`         | editors |
-| `core/`     |                   | the base classes, the config, the skin, the helpers |
+| `core/`     |                   | the base classes, the value and list types, the config, the skin, the helpers |
+| `looks/`    |                   | the looks of the input-* elements: render modules, no elements |
 | `data/`     |                   | the lists the inputs pick from |
 | `adapters/` |                   | htx |
 
@@ -816,60 +817,122 @@ counter, der `maxlength` erreicht hat.
 
 ---
 
-# app-*, div-*, embed-*, input-*, write-*
+# input-*
 
-composed of the `aufbau-*` elements. those are the primitives, these bring the
-domain: a data source, a fixed value format, the language they are shown in.
+every value a form can hold, one element per kind of value. four questions,
+each answered in one place:
 
-## how a component is built
+| question  | answered by | values |
+|-----------|-------------|--------|
+| what      | the tag, or `type` on `<input-value>` | `number`, `date`, `color`, `language`, `bool`, … |
+| how many  | `range`, `multiple` | one value, two (`from..to`), any number (`a,b,c`) |
+| from      | option children, `src`, or a list type | free or from a list |
+| how       | `look` | `field`, `stepper`, `slider`, `segments`, `switch`, … |
 
-- a composition of elements in the **light dom**. the skin is adopted by the
-  document and selects the elements by tag, a shadow root would shut it out. a
-  component draws no chrome of its own.
-- **one inner element holds the value** (`static control`). the component hands
-  it its attributes (`name`, `required`, `disabled`, `persist`, … plus `static
-  forward`), so the form sees exactly one control. validity, reset, persist and
-  the `input`/`change` events are that element's. helper elements (a search
-  field, a tab switch) are muted with `mute()`.
-- **the value is a string with a fixed format**, the same in the attribute and in
-  FormData.
-- listeners on the inner elements go into `bind()`. it runs after the first
-  render and again on every reconnect, a disconnect releases them.
+```html
+<input-number name="count" look="stepper" min="0" max="10"></input-number>
+<input-number name="price" range look="slider" max="500"></input-number>
+<input-date   name="trip"  range></input-date>
+<input-text   name="tags"  multiple></input-text>
+<input-bool   name="dark"  checked label="dark mode"></input-bool>
+<input-language name="lang" languages="de en fr" look="segments"></input-language>
 
-three bases in `core/`: `InputComponent` (one `aufbau-input` of a type),
-`OptionsComponent` (an `aufbau-picker` with options built from data, rebuilt
-when they or the language change), `SearchComponent` (a search field and the
-hits as a wrapping row).
+<input-value name="viewmode" look="cycle">
+  <input-option value="grid" icon="lucide:grid-2x2">grid</input-option>
+  <input-option value="list" icon="lucide:list">list</input-option>
+</input-value>
+```
 
-| component        | value                              | built on / source                          |
-| ---------------- | ---------------------------------- | ------------------------------------------ |
-| `input-bool`     | `value` or `on` when checked       | `aufbau-toggle`                            |
-| `input-chips`    | `red,green` (`separator`)          | `aufbau-input`, chips as `aufbau-button`   |
-| `input-color`    | `#ff8800`                          | `aufbau-input type=color`, swatch          |
-| `input-country`  | iso 3166-1: `DE`                   | `Intl.DisplayNames`, circle-flags          |
-| `input-currency` | iso 4217: `EUR`                    | `Intl.supportedValuesOf`                   |
-| `input-date`     | `2026-09-30`                       | `aufbau-input type=date`                   |
-| `input-email`    | an address                         | `aufbau-input type=email`                  |
-| `input-emoji`    | the character: `😀`                | search over the unicode names              |
-| `input-font`     | webfonts id: `manrope`             | `@aufbau/webfonts`                         |
-| `input-hotkey`   | `Ctrl+Shift+K`                     | recorded from the keyboard                 |
-| `input-icon`     | iconify id: `bx:search`            | iconify search api                         |
-| `input-item`     | one of the options (`multiple`)    | `aufbau-picker`, children or `src`         |
-| `input-language` | bcp 47: `de`, `pt-BR`              | iso 639-1, `Intl.DisplayNames`             |
-| `input-locale`   | bcp 47 with region: `de-AT`        | a working set, `Intl.DisplayNames`         |
-| `input-number`   | a number                           | `aufbau-input type=number`                 |
-| `input-password` | a password                         | `aufbau-input`, a toggle to show it        |
-| `input-pattern`  | `dots 8%` (`opacity`, `colors`)    | `@aufbau/patterns`, masked swatches        |
-| `input-phone`    | a phone number                     | `aufbau-input type=phone`                  |
-| `input-search`   | a query, `search` event debounced  | `aufbau-input`                             |
-| `input-slug`     | `ueber-uns`, follows `source`      | `aufbau-input`                             |
-| `input-text`     | a line of text                     | `aufbau-input`                             |
-| `input-time`     | `14:30`                            | `aufbau-input type=time`                   |
-| `input-timezone` | iana: `Europe/Berlin`              | `Intl.supportedValuesOf`                   |
-| `input-unit`     | `kilometer`                        | `Intl.supportedValuesOf`                   |
-| `input-url`      | `https://…`, scheme added          | `aufbau-input type=url`                    |
-| `input-year`     | `2026`                             | `aufbau-input type=year`, stepper          |
-| `write-md`       | markdown                           | `aufbau-writer`, `aufbau-reader`           |
+the presets (`input-number`, `input-language`, …) are `<input-value>` with a
+fixed type, `<input-number>` is `<input-value type="number">`.
+
+## how it is built
+
+- **one element, one control.** `core/InputValue.js` is form associated:
+  FormData, validity, reset, `persist`, `disabled` from a fieldset. no inner
+  element holds the value, nothing is forwarded.
+- **the value is a string with a fixed format**, the same in the attribute, in
+  `value` and in FormData. `range` joins with `..`, `multiple` with `,` and
+  submits one entry per value. `typedValue` is the value in its type: a number,
+  epoch ms, an array for range and multiple.
+- **a look is a render module, no element** (`looks/`). it draws into the
+  element's shadow root and shares one protocol of data attributes with the
+  base (`data-index`, `data-axis`, `data-step`, `data-value`, …), so a look only
+  renders and syncs. switching `look` at runtime redraws, the value stays.
+- **the type decides which looks fit.** a look that does not fit the value is
+  not drawn, the type's own default is. the drawn look is written onto the host
+  where the author gave none, so `[look="slider"]` always matches.
+
+| look       | fits                                  | parts |
+|------------|---------------------------------------|-------|
+| `field`    | one free value                        | icon, input, action |
+| `fields`   | two free values (`range`)             | icon, input, separator |
+| `stepper`  | one value of a steppable type         | button (decrement, increment), input |
+| `swatch`   | one color                             | swatch, input |
+| `slider`   | one or two values of an axis type     | track, fill, thumb, input, output, unit |
+| `chips`    | any number of free values             | chip, label, remove, input |
+| `combobox` | one or more from a list               | icon, input, caret, listbox, option, label |
+| `cycle`    | one from a list                       | button, icon, label, listbox, option |
+| `radio`    | one or more from a list               | option, mark, icon, label |
+| `segments` | one or more from a list               | segment, icon, label |
+| `switch`   | a bool                                | control, track, thumb, label |
+| `checkbox` | a bool                                | control, check, mark, label |
+| `button`   | a bool                                | control, icon, label |
+
+the frame of every look is the part `box`, never the host: page css such as a
+reset with `* { padding: 0 }` beats every `:host` rule.
+
+```css
+input-number::part(input)    {}
+[look="slider"]::part(thumb) {}   /* every slider, whatever its type */
+input-value::part(selected)  {}   /* the selected option or segment */
+```
+
+| element          | value                               | default look |
+|------------------|-------------------------------------|--------------|
+| `input-value`    | any, by `type`                      | by type      |
+| `input-bool`     | `true`, nothing submitted when off  | switch       |
+| `input-chips`    | `red,green`, `input-text multiple`  | chips        |
+| `input-color`    | `#ff8800`                           | swatch       |
+| `input-country`  | iso 3166-1: `DE`                    | combobox     |
+| `input-currency` | iso 4217: `EUR`                     | combobox     |
+| `input-date`     | `2026-09-30`                        | field        |
+| `input-datetime` | `2026-09-30T14:30`                  | field        |
+| `input-duration` | `2s`, `150ms`                       | field        |
+| `input-email`    | an address                          | field        |
+| `input-font`     | webfonts id: `manrope`              | combobox     |
+| `input-hotkey`   | `Ctrl+Shift+K`, recorded            | field        |
+| `input-language` | bcp 47: `de`, `pt-BR`               | combobox     |
+| `input-locale`   | bcp 47 with region: `de-AT`         | combobox     |
+| `input-number`   | a number                            | field        |
+| `input-password` | a password, `reveal` shows it       | field        |
+| `input-phone`    | a phone number                      | field        |
+| `input-search`   | a query, `search` event debounced   | field        |
+| `input-slug`     | `ueber-uns`, follows `source`       | field        |
+| `input-text`     | a line of text                      | field        |
+| `input-time`     | `14:30`                             | field        |
+| `input-timezone` | iana: `Europe/Berlin`               | combobox     |
+| `input-unit`     | `kilometer`                         | combobox     |
+| `input-url`      | `https://…`, scheme added           | field        |
+| `input-year`     | `2026`                              | stepper      |
+
+the list types (`core/listTypes.js`) take their own attributes: `countries`,
+`currencies`, `categories`, `languages`, `locales`, `zones`, `units`, and
+`flags="false"`, `native="false"`. their names are in the language of the
+nearest `[lang]`, then the document, then the browser.
+
+still composed of the `aufbau-*` elements, to be moved onto `InputValue`:
+`input-emoji`, `input-icon` (a search and the hits), `input-pattern`.
+
+---
+
+# app-*, div-*, embed-*, write-*
+
+composed of the `aufbau-*` elements, in the light dom: the skin is adopted by
+the document and selects the elements by tag. one inner element holds the value
+(`static control`), the component hands it its attributes (`static forward`).
+listeners on the inner elements go into `bind()`, helper elements are muted
+with `mute()`.
 
 ### app
 
@@ -965,22 +1028,15 @@ from bandcamp's own embed code; a page url turns the placeholder into a link.
 <embed-bandcamp src="3119776030" look="slim"></embed-bandcamp>
 ```
 
-the list components (country, currency, font, item, language, locale,
-timezone, unit) take the looks of `aufbau-picker`: `look="combobox | cycle |
-radio | segments"`, plus `searchable` and `stepper`.
-
-the language a component shows its names in is the nearest `[lang]`, then the
-document, then the browser.
-
 
 ## notes for later
 
-- one `input-*` per value domain. where a domain could be typed or picked
-  (date, color, year, time) the typed field is what there is for now, a picker
-  look (calendar, swatches) would come as `look`.
+- more looks: a calendar for date, swatches for color, a grid for long lists,
+  checkboxes for a bool list.
+- `aufbau-input`, `-slider`, `-picker` and `-toggle` stay only as long as
+  `input-emoji`, `input-icon`, `input-pattern`, `write-md` and @aufbau/gui use them.
 - `input-icon` and `input-emoji` show the hits as a wrapping segments row. a
-  grid look for `<aufbau-picker>` would suit them better, that is a change in
-  the elements.
+  grid look would suit them better.
 - `input-emoji` knows single code points only (1150), no zwj sequences, skin
   tones or flags. the names are english unicode names, not the cldr keywords.
 - `input-phone` could take an `input-country` for the prefix.

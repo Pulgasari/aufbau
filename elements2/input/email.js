@@ -1,10 +1,11 @@
 // <input-email>
-// an email address.
+// an email address. `multiple` for several, as chips
 //
-//   <input-email name="email"></input-email>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="email">'s.
+//   <input-email name="mail" autocomplete="email"></input-email>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-email', 'email');
+export class InputEmail extends InputValue { static type = 'email'; }
+
+InputEmail.init('input-email');
+export default InputEmail;

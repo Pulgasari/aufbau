@@ -1,10 +1,11 @@
 // <input-year>
-// a calendar year, as an integer: '2026'.
+// a calendar year. looks: stepper, field, slider; `range` for from..to
 //
-//   <input-year name="year"></input-year>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="year">'s.
+//   <input-year name="year" value="2026"></input-year>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-year', 'year', { look: 'stepper' });
+export class InputYear extends InputValue { static type = 'year'; }
+
+InputYear.init('input-year');
+export default InputYear;

@@ -11,7 +11,7 @@ const unwrap = (data) =>
   : isPlainObject(data) ? (data.items ?? data.data ?? data.results ?? Object.values(data))
   : [];
 
-const OPTION_SELECTOR = 'aufbau-option, option, [data-value]';
+const OPTION_SELECTOR = 'input-option, aufbau-option, option, [data-value]';
 
 /** { value, label, icon, disabled } from anything an author might hand us */
 export const toOption = (entry, { key = 'value', labelKey = 'label' } = {}) => {

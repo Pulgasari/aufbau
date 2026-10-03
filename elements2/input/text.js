@@ -1,10 +1,12 @@
 // <input-text>
-// a single line of text.
+// a line of text. `multiple` for several, as chips
 //
-//   <input-text name="text"></input-text>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="text">'s.
+//   <input-text name="title" placeholder="title"></input-text>
+//   <input-text name="tags" multiple></input-text>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-text', 'text');
+export class InputText extends InputValue { static type = 'text'; }
+
+InputText.init('input-text');
+export default InputText;

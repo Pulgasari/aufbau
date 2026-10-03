@@ -29,6 +29,7 @@
     "div/*.js",
     "embed/*.js",
     "input/*.js",
+    "looks/*.js",
     "write/*.js",
     "CONTROLS.md",
     "CSS-CONFIG.md",

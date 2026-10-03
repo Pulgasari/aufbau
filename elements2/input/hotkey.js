@@ -5,7 +5,7 @@
 //
 //   <input-hotkey name="save" value="Ctrl+S"></input-hotkey>
 
-import { InputComponent } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
 const MODIFIERS = ['Control', 'Alt', 'Shift', 'Meta'];
 const NAMES     = { ' ': 'Space', Escape: 'Esc' };
@@ -32,32 +32,31 @@ export function hotkeyOf (event) {
 
 const bare = event => !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey;
 
-export class InputHotkey extends InputComponent {
+export class InputHotkey extends InputValue {
+  static type = 'text';
 
   static attr = {
+    icon        : 'lucide:keyboard',
     placeholder : 'press a key…',
   };
 
-  bind () {
-    const control = this.control;
+  onMount () {
+    super.onMount();
 
     // nothing is typed into the field, only recorded
-    this.on(control, 'beforeinput', event => event.preventDefault());
+    this.on(this.root, 'beforeinput', event => event.preventDefault(), { capture: true });
 
-    this.on(control, 'keydown', event => {
-      if (control.isDisabled || control.getAttr?.('readonly')) return;
+    this.on(this.root, 'keydown', event => {
+      if (this.isLocked || !event.target.matches?.('input[data-index]')) return;
       if (event.key === 'Tab' && bare(event)) return;
-
       event.preventDefault();
 
-      if ((event.key === 'Backspace' || event.key === 'Delete') && bare(event)) return control.commit('');
-
+      if ((event.key === 'Backspace' || event.key === 'Delete') && bare(event)) return this.commit('');
       const hotkey = hotkeyOf(event);
-      if (hotkey) control.commit(hotkey);
+      if (hotkey) this.commit(hotkey);
     });
   }
 }
 
 InputHotkey.init('input-hotkey');
-
 export default InputHotkey;

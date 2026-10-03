@@ -1,10 +1,11 @@
 // <input-phone>
-// a phone number, the native tel input.
+// a phone number, typed on the phone keypad
 //
-//   <input-phone name="phone"></input-phone>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="phone">'s.
+//   <input-phone name="phone" autocomplete="tel"></input-phone>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-phone', 'phone');
+export class InputPhone extends InputValue { static type = 'phone'; }
+
+InputPhone.init('input-phone');
+export default InputPhone;

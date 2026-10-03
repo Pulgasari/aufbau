@@ -27,7 +27,9 @@ import '../aufbau/AufbauSlider.js';
 import { attrs, html }     from '../core/html.js';
 import { list, use }       from '@aufbau/patterns';
 import { AufbauComponent } from '../core/AufbauComponent.js';
-import { listOf }          from '../core/OptionsComponent.js';
+
+/** a space separated attribute as a list, the fallback when it is empty */
+const listOf = (value, fallback) => value?.trim() ? value.trim().split(/\s+/) : fallback;
 
 // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::::
 

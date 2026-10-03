@@ -13,9 +13,17 @@ import '../aufbau/AufbauPicker.js';
 
 import { attrs, html }     from './html.js';
 import { AufbauComponent } from './AufbauComponent.js';
-import { optionElement }   from './OptionsComponent.js';
 
 const DEBOUNCE = 250;
+
+/** an <aufbau-option> from { value, label, icon } */
+function optionElement ({ icon, label, value }) {
+  const option = document.createElement('aufbau-option');
+  option.setAttribute('value', value);
+  if (icon) option.setAttribute('icon', icon);
+  option.textContent = label ?? value;
+  return option;
+}
 
 export class SearchComponent extends AufbauComponent {
 

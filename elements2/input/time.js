@@ -1,10 +1,11 @@
 // <input-time>
-// a time of day, as 'hh:mm'.
+// a time of day: '14:30'. looks: field, stepper, slider; `range` for from..to
 //
-//   <input-time name="time"></input-time>
-//
-// a thin component: the value, the looks and the form behaviour are <aufbau-input type="time">'s.
+//   <input-time name="opens" step="900000"></input-time>
 
-import { defineInput } from '../core/InputComponent.js';
+import { InputValue } from '../core/InputValue.js';
 
-export default defineInput('input-time', 'time');
+export class InputTime extends InputValue { static type = 'time'; }
+
+InputTime.init('input-time');
+export default InputTime;
