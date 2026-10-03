@@ -1,3 +1,6 @@
+import { dom } from './shared.js';
+
+
 class AufbauElement {
   #mounted = false;
   
@@ -45,4 +48,18 @@ class AufbauElement {
     customElements.define(tag, this);
   }
 
->
+  //
+  getToken  (name, fallback) { return dom.getStyleToken  (name, this) ?? fallback; }
+  setToken  (name, value)    { return dom.setStyleToken  (name, value, this); }
+  getTokens (names)          { return dom.getStyleTokens (names, this); }
+  setTokens (map)            { return dom.setStyleTokens (map, this); }
+  
+  // reflect every `var`-flagged attribute onto its css custom property
+  applyVars () {
+    for (const [name, entry] of Object.entries(this.schema)) {
+      const key = entry.var === true ? name : entry.var;
+      if (entry.var) this.setVar(key, this.getAttr(name));
+    }
+  }
+
+}
