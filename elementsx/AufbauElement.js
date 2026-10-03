@@ -48,7 +48,22 @@ class AufbauElement {
     customElements.define(tag, this);
   }
 
-  //
+  // :::::: ACCESS CHILDREN
+  get trees () { return this.shadowRoot ? [this.shadowRoot, this] : [this]; }
+
+  $ (selector) {
+    for (const tree of this.trees) {
+      const found = tree.querySelector(selector);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  $$ (selector) { return this.trees.flatMap(tree => [...tree.querySelectorAll(selector)]); }
+  part  (name) { return     this.root.querySelector   (`[part~="${name}"]`);  }
+  parts (name) { return [...this.root.querySelectorAll(`[part~="${name}"]`)]; }
+
+  // :::::: ACCESS STYLE-TOKENS (CSS CUSTOM PROPERTIES)
   getToken  (name, fallback) { return dom.getStyleToken  (name, this) ?? fallback; }
   setToken  (name, value)    { return dom.setStyleToken  (name, value, this); }
   getTokens (names)          { return dom.getStyleTokens (names, this); }
