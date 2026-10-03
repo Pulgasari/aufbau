@@ -2,7 +2,7 @@ import { AufbauElement } from '@aufbau/element';
 import { importFile }    from '@aufbau/import';
 import { attrs, html }   from '../lib/html.js';
 
-const ITEM = 'data-tree-item';
+const ITEM = 'data-node';
 
 export default class DataTree extends AufbauElement {
   static internals = { role: 'tree' };
@@ -70,13 +70,13 @@ export default class DataTree extends AufbauElement {
     if (!Array.isArray(nodes)) return html``;
 
     return html`${nodes.map(node => html`
-      <data-tree-item ${attrs({
+      <data-node ${attrs({
         expanded : Boolean(node.expanded),
         icon     : node.icon,
         label    : node.label ?? node.name ?? '',
         selected : Boolean(node.selected),
         value    : node.value ?? node.id ?? node.path,
-      })}>${this.renderNodes(node.children)}</data-tree-item>
+      })}>${this.renderNodes(node.children)}</data-node>
     `)}`;
   }
 

@@ -79,7 +79,7 @@ export class AppPanel extends AufbauElement {
   }
 
   // the area or modal the panel sits in, the nearer one
-  get container () { return this.parentElement?.closest(`app-area, app-modal`) ?? null; }
+  get container () { return this.parentElement?.closest(`app-area, pop-modal`) ?? null; }
 
   get area () {
     const container = this.container;
@@ -114,7 +114,7 @@ export class AppPanel extends AufbauElement {
     const area     = this.area;
     const docked   = Boolean(area?.docked);
     const expanded = Boolean(area?.expanded);
-    const modal    = this.container?.localName === 'app-modal';
+    const modal    = this.container?.localName === 'pop-modal';
 
     this.$heading.text(heading ?? '');
     this.$close.attr({ hidden: !(wanted.has('close') && (written || docked || modal)) });

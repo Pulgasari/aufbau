@@ -1,7 +1,8 @@
 const MARGIN = 8;
 const OFFSET = 4;
 
-export function place (popup, anchor, { placement = 'bottom-start', maxSize = 240 } = {}) {
+// matchWidth: at least as wide as the anchor
+export function place (popup, anchor, { matchWidth = true, maxSize = 240, placement = 'bottom-start' } = {}) {
   const rect       = anchor.getBoundingClientRect();
   const viewport   = { height: window.innerHeight, width: window.innerWidth };
   const estimated  = Math.min(popup.scrollHeight || maxSize, maxSize);
@@ -16,7 +17,7 @@ export function place (popup, anchor, { placement = 'bottom-start', maxSize = 24
   const style = popup.style;
   style.position      = 'fixed';
   style.margin        = '0';
-  style.minInlineSize = `${rect.width}px`;
+  style.minInlineSize = matchWidth ? `${rect.width}px` : '';
 
   const width = popup.offsetWidth;
   const left  = placement.endsWith('end') ? rect.right - width : rect.left;

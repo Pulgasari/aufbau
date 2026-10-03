@@ -5,7 +5,7 @@ const parsePx = value => { const number = parseFloat(value); return Number.isFin
 
 const RELAYOUT = new Set(['item-look', 'item-shape', 'item-size', 'viewmode']);
 
-export default class AufbauIndex extends AufbauElement {
+export default class DataIndex extends AufbauElement {
   static reflect = ['viewmode'];
 
   static attr = {
@@ -19,7 +19,7 @@ export default class AufbauIndex extends AufbauElement {
     viewmode          : { type: String, default: 'grid', values: ['grid', 'list', 'gallery', 'masonry'] },
   };
 
-  static styles = `aufbau-index {
+  static styles = `data-index {
     display               : grid;
     gap                   : var(--index-gap, 1rem);
     grid-template-columns : repeat(auto-fill, minmax(var(--item-size, 200px), 1fr));
@@ -53,13 +53,13 @@ export default class AufbauIndex extends AufbauElement {
       }
     }
 
-    &:is([item-shape="circle"], [item-shape="square"], [item-look~="circle"], [item-look~="square"]) > aufbau-item {
+    &:is([item-shape="circle"], [item-shape="square"], [item-look~="circle"], [item-look~="square"]) > data-item {
       aspect-ratio: 1 / 1;
     }
 
-    &[eager] aufbau-item { content-visibility: visible; }
+    &[eager] data-item { content-visibility: visible; }
 
-    &:state(relayout) aufbau-item { contain-intrinsic-block-size: var(--item-intrinsic-size, var(--item-size, 200px)); }
+    &:state(relayout) data-item { contain-intrinsic-block-size: var(--item-intrinsic-size, var(--item-size, 200px)); }
   }`;
 
   constructor () {
@@ -90,8 +90,8 @@ export default class AufbauIndex extends AufbauElement {
   get learns () { return !this.getAttr('itemIntrinsicSize'); }
 
   sample (item) {
-    if (!this.learns || item.localName !== 'aufbau-item' || item.hasAttribute('intrinsic-size')) return;
-    if (item.parentElement?.closest('aufbau-index') !== this) return;
+    if (!this.learns || item.localName !== 'data-item' || item.hasAttribute('intrinsic-size')) return;
+    if (item.parentElement?.closest('data-index') !== this) return;
 
     (this._pending ??= new Set).add(item);
     if (this._frame) return;
@@ -175,5 +175,5 @@ export default class AufbauIndex extends AufbauElement {
   }
 }
 
-AufbauIndex.init();
+DataIndex.init();
 

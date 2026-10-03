@@ -31,6 +31,7 @@
   "duplicate"         : "mdi:content-duplicate",
   "edit"              : "mdi:pencil-outline",
   "enter"             : "material-symbols:keyboard-return",
+  "export"            : "mdi:export",
   "external"          : "mdi:open-in-new",
   "file"              : "material-symbols:description",
   "folder"            : "material-symbols:folder",

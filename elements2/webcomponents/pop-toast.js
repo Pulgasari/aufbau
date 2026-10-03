@@ -47,7 +47,7 @@ export function toToastOptions (input, options = {}) {
 }
 
 const STACK_STYLES = `
-  [data-aufbau-toasts] {
+  [data-pop-toasts] {
     background      : none;
     border          : 0;
     display         : flex;
@@ -64,7 +64,7 @@ const STACK_STYLES = `
   }
 `;
 
-export default class AufbauToast extends AufbauElement {
+export default class PopToast extends AufbauElement {
   static attr = {
     dismissible : Boolean,
     duration    : 4000,
@@ -116,10 +116,10 @@ export default class AufbauToast extends AufbauElement {
   // :::::: IMPERATIVE API ::::::::::::::::::::::::::::::::::::::
 
   static get stack () {
-    let stack = document.querySelector('[data-aufbau-toasts]');
+    let stack = document.querySelector('[data-pop-toasts]');
     if (!stack) {
       stack = document.createElement('section');
-      setAttr(stack, { ariaLive: 'polite', dataAufbauToasts: true, popover: 'manual' });
+      setAttr(stack, { ariaLive: 'polite', dataPopToasts: true, popover: 'manual' });
       document.body.append(stack);
     }
     return stack;
@@ -127,7 +127,7 @@ export default class AufbauToast extends AufbauElement {
 
   static notify (input, options) {
     const { dismissible = true, duration, heading, icon, message, title, type } = toToastOptions(input, options);
-    const toast = document.createElement('aufbau-toast');
+    const toast = document.createElement('pop-toast');
     const stack = this.stack;
 
     setAttr(toast, { dismissible, duration, heading: heading ?? title, icon, message, type });
@@ -150,7 +150,7 @@ export default class AufbauToast extends AufbauElement {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onConnected () {
-    adoptBaseStyles('aufbau-toast-stack', STACK_STYLES);   // deduplicated by key
+    adoptBaseStyles('pop-toast-stack', STACK_STYLES);   // deduplicated by key
 
     this.on('click', '[part~="close"]', () => this.dismiss());
 
@@ -189,7 +189,7 @@ export default class AufbauToast extends AufbauElement {
     if (this._dismissing) return this;
     this._dismissing = true;
     this.stopTimer();
-    this.emit('aufbau-toast-dismiss');
+    this.emit('pop-toast-dismiss');
 
     const remove = () => this.remove();
     if (!this.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) { remove(); return this; }
@@ -261,6 +261,6 @@ export default class AufbauToast extends AufbauElement {
   }
 }
 
-export const notify = (input, options) => AufbauToast.notify(input, options);
+export const notify = (input, options) => PopToast.notify(input, options);
 
-AufbauToast.init();
+PopToast.init();

@@ -14,28 +14,18 @@ a tag maps onto its module:
 */// :::: TAGS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const TAGS = [
-  'aufbau-audio',
   'aufbau-code',
-  'aufbau-datalist',
-  'aufbau-dropdown',
   'aufbau-embed',
-  'aufbau-filter',
-  'aufbau-index',
-  'aufbau-item',
   'aufbau-loop',
   'aufbau-progress',
   'aufbau-reader',
   'aufbau-skeleton',
-  'aufbau-toast',
   'aufbau-value',
-  'aufbau-video',
-  'aufbau-waveform',
 
   'app-area',
   'app-config',
   'app-float',
   'app-keyboard',
-  'app-modal',
   'app-panel',
   'app-root',
   'app-view',
@@ -44,9 +34,13 @@ const TAGS = [
   'btn-push',
   'btn-tap',
 
+  'data-filter',
+  'data-index',
+  'data-item',
+  'data-list',
+  'data-node',
   'data-table',
   'data-tree',
-  'data-tree-item',
 
   'div-x',
   'div-y',
@@ -57,12 +51,6 @@ const TAGS = [
   'embed-spotify',
   'embed-vimeo',
   'embed-youtube',
-
-  'nav-crumbs',
-  'nav-toc',
-
-  'svg-flag',
-  'svg-icon',
 
   'input-bool',
   'input-chips',
@@ -94,6 +82,24 @@ const TAGS = [
   'input-url',
   'input-value',
   'input-year',
+
+  'media-audio',
+  'media-file',
+  'media-video',
+  'media-wave',
+
+  'nav-crumbs',
+  'nav-toc',
+
+  'pop-menu',
+  'pop-modal',
+  'pop-over',
+  'pop-prompt',
+  'pop-tip',
+  'pop-toast',
+
+  'svg-flag',
+  'svg-icon',
 
   'write-md',
   'write-text',

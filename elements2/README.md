@@ -61,32 +61,39 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 
 # elements
 
-the building blocks. the controls that hold a value are the input-* elements below.
+the building blocks, in families by what they are for: `btn-` buttons, `data-`
+collections, `media-` files and players, `nav-` navigation, `pop-` everything that
+opens over the page, `svg-` icons. the controls that hold a value are the input-*
+elements below.
 
 [`<app-keyboard>`](#app-keyboard) ·
-[`<app-modal>`](#app-modal) ·
-[`<aufbau-audio>`](#aufbau-audio) ·
 [`<aufbau-code>`](#aufbau-code) ·
-[`<aufbau-datalist>`](#aufbau-datalist) ·
-[`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-embed>`](#aufbau-embed) ·
-[`<aufbau-index>`](#aufbau-index) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
-[`<aufbau-toast>`](#aufbau-toast) ·
 [`<aufbau-value>`](#aufbau-value) ·
-[`<aufbau-video>`](#aufbau-video) ·
-[`<aufbau-waveform>`](#aufbau-waveform) ·
 [`<btn-push>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-tap>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-icon>`](#btn-push-btn-tap-btn-icon) ·
+[`<data-index>`](#data-index) ·
+[`<data-list>`](#data-list) ·
 [`<data-table>`](#data-table) ·
 [`<data-tree>`](#data-tree) ·
 [`<input-file>`](#input-file) ·
+[`<media-audio>`](#media-audio) ·
+[`<media-file>`](#media-file) ·
+[`<media-video>`](#media-video) ·
+[`<media-wave>`](#media-wave) ·
 [`<nav-crumbs>`](#nav-crumbs) ·
 [`<nav-toc>`](#nav-toc) ·
+[`<pop-menu>`](#pop-menu) ·
+[`<pop-modal>`](#pop-modal) ·
+[`<pop-over>`](#pop-over) ·
+[`<pop-prompt>`](#pop-prompt) ·
+[`<pop-tip>`](#pop-tip) ·
+[`<pop-toast>`](#pop-toast) ·
 [`<svg-flag>`](#svg-flag) ·
 [`<svg-icon>`](#svg-icon) ·
 [`<write-text>`](#write-text) ·
@@ -120,48 +127,6 @@ noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
 wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
 hat und sonst gar nichts passieren würde.
 
-## app-modal
-
-modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
-fokus bleibt drin und kehrt danach zurück. der dialog liegt im shadow root, die
-kinder bleiben unangetastet und werden per `<slot>` hineinprojiziert. `open`
-spiegelt den zustand in beide richtungen, ein `<form method="dialog">` schliesst
-ihn und liefert den `returnValue`. styling über `::part(dialog|header|heading|close)`.
-
-```html
-<app-modal id="settings" heading="Einstellungen">
-  <p>…</p>
-  <form method="dialog">
-    <button value="cancel">Abbrechen</button>
-    <button value="save">Speichern</button>
-  </form>
-</app-modal>
-```
-
-```js
-const result = await document.querySelector('#settings').show();   // 'save' | 'cancel' | ''
-
-if (await AppModal.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
-```
-
-`dismissible` (default an) erlaubt schliessen per button, escape und klick auf
-den backdrop. öffnen und schliessen blenden über `@starting-style` und diskrete
-transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
-die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
-abdunklung über `--modal-backdrop`.
-
-## aufbau-audio
-
-```html
-<aufbau-audio 
-  src="/media/track.mp3" 
-  label="Cyberpunk Theme" 
-  artist="Synthwave Studio" 
-  cover="/media/cover.jpg"
-  layout="card">
-</aufbau-audio>
-```
-
 ## aufbau-code
 
 ```html
@@ -181,42 +146,6 @@ console.log(greet('aufbau'));
 `actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
 `clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
 gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
-
-## aufbau-datalist
-
-```html
-<!-- 1. JSONC mit Kommentaren -->
-<aufbau-datalist id="cities" src="/data/cities.jsonc" key="name"></aufbau-datalist>
-
-<!-- 2. Lesbares YAML -->
-<aufbau-datalist id="tags" src="/config/tags.yaml"></aufbau-datalist>
-
-<!-- 3. Riesen CSV/TSV Tabellen (geparst via PapaParse) -->
-<aufbau-datalist id="countries" src="/data/countries.csv" key="CountryName"></aufbau-datalist>
-
-<!-- 4. TOML Config -->
-<aufbau-datalist id="presets" src="/settings/presets.toml" key="title"></aufbau-datalist>
-```
-
-autonom statt `<datalist is="…">`, safari kennt keine customized built-ins. das
-element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
-`<input list="cities">` zeigt also weiter auf denselben namen. authored
-`<option>`-kinder bleiben erhalten und stehen vor den geladenen.
-
-```html
-<!-- Und deine inputs nutzen das einfach nativ -->
-<input list="cities" placeholder="Select City…">
-<input list="countries" placeholder="Select Country…">
-```
-
-## aufbau-dropdown
-
-```html
-<aufbau-dropdown label="Optionen">
-  <a href="#edit">Bearbeiten</a>
-  <a href="#delete">Löschen</a>
-</aufbau-dropdown>
-```
 
 ## aufbau-embed
 
@@ -248,87 +177,12 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 `activate()` lädt von außen, danach `:state(active)` und das event `activate`
 mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
 
-## aufbau-index
-
-layout-container für eine reihe von items — media-grid, gallery-rail oder liste.
-reines layout: es rendert nichts eigenes, die children bleiben wie ausgezeichnet.
-`viewmode` schaltet über css um, `item-size` / `item-shape` / `gap` sind die
-knöpfe. `item-look` ist die kurzform für `item-size` + `item-shape` in einem.
-
-`viewmode`: `grid` (default), `list`, `gallery`, `masonry`.
-
-```html
-<!-- Grid view with rounded items -->
-<aufbau-index viewmode="grid" item-size="180px" item-shape="rounded" gap="1.5rem">
-  <aufbau-item>Standard Item 1</aufbau-item>
-  <aufbau-item>Standard Item 2</aufbau-item>
-  <!-- Individual child overrides default index shape -->
-  <aufbau-item shape="circle">I am a circle!</aufbau-item>
-</aufbau-index>
-
-<!-- item-look kurzform: größe + form in einem attribut -->
-<aufbau-index viewmode="grid" item-look="180px squircle" gap="1rem">
-  <aufbau-item><img src="cover1.jpg" alt="" /></aufbau-item>
-  <aufbau-item><img src="cover2.jpg" alt="" /></aufbau-item>
-</aufbau-index>
-
-<!-- Vertikale Liste -->
-<aufbau-index viewmode="list" gap="0.5rem">
-  <aufbau-item>Row 1</aufbau-item>
-  <aufbau-item>Row 2</aufbau-item>
-</aufbau-index>
-
-<!-- Horizontal Gallery view -->
-<aufbau-index viewmode="gallery" item-size="300px" item-shape="squircle">
-  <aufbau-item><img src="photo1.jpg" alt="Photo 1" /></aufbau-item>
-  <aufbau-item><img src="photo2.jpg" alt="Photo 2" /></aufbau-item>
-</aufbau-index>
-```
-
-und zusammen mit [`<aufbau-filter>`](#aufbau-filter) wird die suche direkt an
-das layout gehängt:
-
-```html
-<aufbau-filter target="aufbau-index aufbau-item" placeholder="Search items..."></aufbau-filter>
-<aufbau-index viewmode="grid" item-look="200px squircle">
-  <aufbau-item>Apple</aufbau-item>
-  <aufbau-item>Banana</aufbau-item>
-</aufbau-index>
-```
-
-### render skipping
-
-`<aufbau-item>` hat `content-visibility: auto`: items ausserhalb des viewports
-werden weder gelayoutet noch gezeichnet. damit die scrollhöhe stimmt, braucht ein
-übersprungenes item eine ersatzhöhe (`contain-intrinsic-block-size: auto <schätzung>`).
-`auto` heisst: einmal gerendert, merkt sich der browser die echte grösse. die
-schätzung gilt also nur für items, die noch nie sichtbar waren. quelle, erster treffer gewinnt:
-
-1. `intrinsic-size` am item
-2. `item-intrinsic-size` am index
-3. gelernt: mittelwert der bisher gerenderten items (masonry, listen, variable höhen)
-4. `item-size` als grobe näherung
-
-quadratische items (`shape="circle|square"`) brauchen nichts davon, die höhe
-folgt über `aspect-ratio` aus der spaltenbreite. bei wechsel von `viewmode`,
-`item-size`, `item-shape` oder `item-look` wird neu gelernt und die gemerkten
-grössen verworfen.
-
-`eager` (am index oder item) schaltet das skipping ab. nötig, wenn ein item
-bewusst über seinen rand hinaus zeichnet, denn skipping impliziert paint containment.
-
-```html
-<aufbau-index viewmode="list" item-intrinsic-size="3.5rem">…</aufbau-index>
-<aufbau-index viewmode="masonry">…</aufbau-index>          <!-- lernt selbst -->
-<aufbau-item intrinsic-size="480px">großer teaser</aufbau-item>
-```
-
 ## aufbau-loop
 
 ```html
 <!-- 3. Auto-Schaltendes Video-/Image-Carousel (alle 4 Sekunden) -->
 <aufbau-loop mode="carousel" interval="4000" pause-on-hover>
-  <aufbau-video youtube-id="dQw4w9WgXcQ"></aufbau-video>
+  <media-video youtube-id="dQw4w9WgXcQ"></media-video>
   <img src="/assets/slide1.jpg" alt="Slide 1" />
   <img src="/assets/slide2.jpg" alt="Slide 2" />
 </aufbau-loop>
@@ -390,38 +244,12 @@ platzhalter, solange inhalt lädt. nur der host malt, nichts wird gerendert.
 ```
 
 jedes andere element kann dasselbe an seiner eigenen stelle: das attribut
-`skeleton` (`<aufbau-item skeleton>`), solange die app lädt. reader, table und
+`skeleton` (`<data-item skeleton>`), solange die app lädt. reader, table und
 tree zeigen ihn von selbst, während sie `src` laden. hat das element schon
 markup, wird jedes blatt davon ein grauer block in seiner eigenen größe; ist es
 noch leer, füllen zeilen die box. aussehen über `--skeleton-color`,
 `--skeleton-radius`, für die zeilen `--skeleton-line`, `--skeleton-gap`,
 `--skeleton-lines`.
-
-## aufbau-toast
-
-meist imperativ über `notify()`. errors werden erkannt, auch als rohes objekt aus
-einem `catch`. `dismissible` (default bei `notify()`) erlaubt schliessen per button
-und wegwischen per touch. hover und fokus halten den countdown an.
-
-```js
-import { notify } from '@aufbau/elements2/webcomponents/aufbau-toast.js';
-
-notify('Gespeichert');
-notify({ success: 'Export fertig', heading: 'Dateien' });
-notify({ error: 'Upload fehlgeschlagen' });
-
-try { await save(); }
-catch (error) { notify(error); }          // type error, message aus dem error
-
-AufbauToast.error('…');                   // + info, success, warning, warn
-notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
-```
-
-```html
-<aufbau-toast type="warning" heading="Achtung" dismissible>
-  Speicher fast voll. <a href="/storage">Aufräumen</a>
-</aufbau-toast>
-```
 
 ## aufbau-value
 
@@ -463,27 +291,6 @@ die seite sie liest. `copy` legt das in die zwischenablage, was auf dem schirm
 steht, und meldet es als `aufbau-value-copy`; der wert dahinter ist
 `el.machine`.
 
-## aufbau-video
-
-```html
-<aufbau-video youtube-id="dQw4w9WgXcQ"></aufbau-video>
-```
-
-## aufbau-waveform
-
-```html
-<aufbau-waveform src="/media/track.mp3" bars="60" interactive></aufbau-waveform>
-
-<!-- vorberechnete peaks, fortschritt und markierter bereich (trim-editoren) -->
-<aufbau-waveform peaks="0.2 0.8 0.5 0.9" progress="40" range-start="20" range-end="60"></aufbau-waveform>
-```
-
-keine kinder: der host malt seine farben als hintergrund-ebenen und wird von
-einem svg der balken maskiert. ein fortschritts-update ist eine custom property,
-die balken werden nur bei neuen peaks neu gezeichnet. farben über
-`--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
-`--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
-
 ## btn-push, btn-tap, btn-icon
 
 three buttons for three roles: `btn-push` is filled and does the main thing,
@@ -501,9 +308,9 @@ the command also brings an icon and a label, so `<btn-icon command="close">`
 needs nothing else:
 
 ```html
-<app-modal heading="Hallo">
+<pop-modal heading="Hallo">
   <btn-icon command="close"></btn-icon>          <!-- the nearest element above with close() -->
-</app-modal>
+</pop-modal>
 
 <btn-tap command="share" commandfor="#post">Teilen</btn-tap>   <!-- an id or a selector -->
 <btn-push command="show-modal" commandfor="settings">Öffnen</btn-push>   <!-- a native <dialog> as well -->
@@ -511,8 +318,9 @@ needs nothing else:
 
 the command becomes a method (`show-modal` -> `showModal()`, `--my-thing` ->
 `myThing()`). a target without that method gets a `command` event. the presets:
-`add` `back` `cancel` `close` `collapse` `copy` `delete` `edit` `expand` `menu`
-`more` `save` `search` `share`, more through `Btn.commands`.
+`add` `back` `bookmark` `cancel` `close` `collapse` `copy` `cut` `delete` `edit`
+`expand` `export` `heart` `import` `menu` `more` `reset` `save` `search` `share`,
+more through `Btn.commands`.
 
 ## config
 
@@ -524,8 +332,110 @@ of that tag update when it changes.
 import { setConfig } from '@aufbau/element';
 
 setConfig('svg-flag-variant', 'square');
-setConfig({ 'aufbau-code': { theme: 'nord' }, 'aufbau-toast': { duration: 5000 } });
+setConfig({ 'aufbau-code': { theme: 'nord' }, 'pop-toast': { duration: 5000 } });
 setConfig('aufbau-value-date-format', 'medium');   // the format of one type of <aufbau-value>
+```
+
+## data-index
+
+layout-container für eine reihe von items — media-grid, gallery-rail oder liste.
+reines layout: es rendert nichts eigenes, die children bleiben wie ausgezeichnet.
+`viewmode` schaltet über css um, `item-size` / `item-shape` / `gap` sind die
+knöpfe. `item-look` ist die kurzform für `item-size` + `item-shape` in einem.
+
+`viewmode`: `grid` (default), `list`, `gallery`, `masonry`.
+
+```html
+<!-- Grid view with rounded items -->
+<data-index viewmode="grid" item-size="180px" item-shape="rounded" gap="1.5rem">
+  <data-item>Standard Item 1</data-item>
+  <data-item>Standard Item 2</data-item>
+  <!-- Individual child overrides default index shape -->
+  <data-item shape="circle">I am a circle!</data-item>
+</data-index>
+
+<!-- item-look kurzform: größe + form in einem attribut -->
+<data-index viewmode="grid" item-look="180px squircle" gap="1rem">
+  <data-item><img src="cover1.jpg" alt="" /></data-item>
+  <data-item><img src="cover2.jpg" alt="" /></data-item>
+</data-index>
+
+<!-- Vertikale Liste -->
+<data-index viewmode="list" gap="0.5rem">
+  <data-item>Row 1</data-item>
+  <data-item>Row 2</data-item>
+</data-index>
+
+<!-- Horizontal Gallery view -->
+<data-index viewmode="gallery" item-size="300px" item-shape="squircle">
+  <data-item><img src="photo1.jpg" alt="Photo 1" /></data-item>
+  <data-item><img src="photo2.jpg" alt="Photo 2" /></data-item>
+</data-index>
+```
+
+und zusammen mit [`<data-filter>`](#data-filter) wird die suche direkt an
+das layout gehängt:
+
+```html
+<data-filter target="data-index data-item" placeholder="Search items..."></data-filter>
+<data-index viewmode="grid" item-look="200px squircle">
+  <data-item>Apple</data-item>
+  <data-item>Banana</data-item>
+</data-index>
+```
+
+### render skipping
+
+`<data-item>` hat `content-visibility: auto`: items ausserhalb des viewports
+werden weder gelayoutet noch gezeichnet. damit die scrollhöhe stimmt, braucht ein
+übersprungenes item eine ersatzhöhe (`contain-intrinsic-block-size: auto <schätzung>`).
+`auto` heisst: einmal gerendert, merkt sich der browser die echte grösse. die
+schätzung gilt also nur für items, die noch nie sichtbar waren. quelle, erster treffer gewinnt:
+
+1. `intrinsic-size` am item
+2. `item-intrinsic-size` am index
+3. gelernt: mittelwert der bisher gerenderten items (masonry, listen, variable höhen)
+4. `item-size` als grobe näherung
+
+quadratische items (`shape="circle|square"`) brauchen nichts davon, die höhe
+folgt über `aspect-ratio` aus der spaltenbreite. bei wechsel von `viewmode`,
+`item-size`, `item-shape` oder `item-look` wird neu gelernt und die gemerkten
+grössen verworfen.
+
+`eager` (am index oder item) schaltet das skipping ab. nötig, wenn ein item
+bewusst über seinen rand hinaus zeichnet, denn skipping impliziert paint containment.
+
+```html
+<data-index viewmode="list" item-intrinsic-size="3.5rem">…</data-index>
+<data-index viewmode="masonry">…</data-index>          <!-- lernt selbst -->
+<data-item intrinsic-size="480px">großer teaser</data-item>
+```
+
+## data-list
+
+```html
+<!-- 1. JSONC mit Kommentaren -->
+<data-list id="cities" src="/data/cities.jsonc" key="name"></data-list>
+
+<!-- 2. Lesbares YAML -->
+<data-list id="tags" src="/config/tags.yaml"></data-list>
+
+<!-- 3. Riesen CSV/TSV Tabellen (geparst via PapaParse) -->
+<data-list id="countries" src="/data/countries.csv" key="CountryName"></data-list>
+
+<!-- 4. TOML Config -->
+<data-list id="presets" src="/settings/presets.toml" key="title"></data-list>
+```
+
+autonom statt `<datalist is="…">`, safari kennt keine customized built-ins. das
+element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
+`<input list="cities">` zeigt also weiter auf denselben namen. authored
+`<option>`-kinder bleiben erhalten und stehen vor den geladenen.
+
+```html
+<!-- Und deine inputs nutzen das einfach nativ -->
+<input list="cities" placeholder="Select City…">
+<input list="countries" placeholder="Select Country…">
 ```
 
 ## data-table
@@ -543,14 +453,14 @@ setConfig('aufbau-value-date-format', 'medium');   // the format of one type of 
 ```html
 <!-- 4. Tree Explorer (Verschachtelt) -->
 <data-tree>
-  <data-tree-item label="src" expanded>
-    <data-tree-item label="components" expanded>
-      <data-tree-item label="AufbauElement.js" icon="lucide:file-code"></data-tree-item>
-      <data-tree-item label="DataTree.js" icon="lucide:file-code"></data-tree-item>
-    </data-tree-item>
-    <data-tree-item label="index.js" icon="lucide:file-code"></data-tree-item>
-  </data-tree-item>
-  <data-tree-item label="package.json" icon="lucide:file-json"></data-tree-item>
+  <data-node label="src" expanded>
+    <data-node label="components" expanded>
+      <data-node label="AufbauElement.js" icon="lucide:file-code"></data-node>
+      <data-node label="DataTree.js" icon="lucide:file-code"></data-node>
+    </data-node>
+    <data-node label="index.js" icon="lucide:file-code"></data-node>
+  </data-node>
+  <data-node label="package.json" icon="lucide:file-json"></data-node>
 </data-tree>
 
 <!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
@@ -575,6 +485,51 @@ den ganzen baum.
 
 abgelehnte dateien (falscher typ, zu gross) kommen als
 `input-file-rejected`-event und setzen die validity des elements.
+
+## media-audio
+
+```html
+<media-audio 
+  src="/media/track.mp3" 
+  label="Cyberpunk Theme" 
+  artist="Synthwave Studio" 
+  cover="/media/cover.jpg"
+  layout="card">
+</media-audio>
+```
+
+## media-file
+
+ein file, gezeigt von dem, was sein typ verlangt: `media-audio`, `media-video`,
+ein bild, ein pdf. alles andere wird ein download-link. `type` (mime) geht vor
+der endung.
+
+```html
+<media-file src="/files/song.mp3"></media-file>
+<media-file src="/files/scan.pdf" label="Rechnung"></media-file>
+<media-file src="/api/blob/42" type="image/png"></media-file>
+```
+
+## media-video
+
+```html
+<media-video youtube-id="dQw4w9WgXcQ"></media-video>
+```
+
+## media-wave
+
+```html
+<media-wave src="/media/track.mp3" bars="60" interactive></media-wave>
+
+<!-- vorberechnete peaks, fortschritt und markierter bereich (trim-editoren) -->
+<media-wave peaks="0.2 0.8 0.5 0.9" progress="40" range-start="20" range-end="60"></media-wave>
+```
+
+keine kinder: der host malt seine farben als hintergrund-ebenen und wird von
+einem svg der balken maskiert. ein fortschritts-update ist eine custom property,
+die balken werden nur bei neuen peaks neu gezeichnet. farben über
+`--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
+`--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
 
 ## nav-crumbs
 
@@ -618,6 +573,108 @@ der host ist die navigation-landmark, `label` ist sichtbare überschrift und
 accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
 jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
 überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
+
+## pop-menu
+
+```html
+<pop-menu label="Optionen">
+  <a href="#edit">Bearbeiten</a>
+  <a href="#delete">Löschen</a>
+</pop-menu>
+```
+
+## pop-modal
+
+modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
+fokus bleibt drin und kehrt danach zurück. der dialog liegt im shadow root, die
+kinder bleiben unangetastet und werden per `<slot>` hineinprojiziert. `open`
+spiegelt den zustand in beide richtungen, ein `<form method="dialog">` schliesst
+ihn und liefert den `returnValue`. styling über `::part(dialog|header|heading|close)`.
+
+```html
+<pop-modal id="settings" heading="Einstellungen">
+  <p>…</p>
+  <form method="dialog">
+    <button value="cancel">Abbrechen</button>
+    <button value="save">Speichern</button>
+  </form>
+</pop-modal>
+```
+
+```js
+const result = await document.querySelector('#settings').show();   // 'save' | 'cancel' | ''
+```
+
+`dismissible` (default an) erlaubt schliessen per button, escape und klick auf
+den backdrop. öffnen und schliessen blenden über `@starting-style` und diskrete
+transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
+die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
+abdunklung über `--modal-backdrop`.
+
+## pop-over
+
+beliebiger inhalt über der seite, nicht modal: das element selbst ist ein natives
+popover im top layer und schliesst bei klick daneben oder escape. es sitzt am
+element, das beim öffnen den fokus hatte, oder an `anchor` (id oder selector).
+
+```html
+<btn-tap command="toggle-popover" commandfor="info">Info</btn-tap>
+<pop-over id="info" placement="bottom-end">…</pop-over>
+```
+
+`show()`, `hide()`, `toggle()`, `open` spiegelt den zustand.
+
+## pop-prompt
+
+eine frage in einem `pop-modal`: nachricht, vielleicht ein textfeld, abbrechen und
+bestätigen. enter im feld bestätigt.
+
+```js
+if (await PopPrompt.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
+
+const name = await PopPrompt.prompt('Wie soll die datei heissen?', 'unbenannt');   // null bei abbrechen
+await PopPrompt.alert('Gespeichert.');
+```
+
+```html
+<pop-prompt heading="Löschen" message="Wirklich löschen?" confirm="Löschen" cancel="Behalten"></pop-prompt>
+```
+
+## pop-tip
+
+ein hinweis zu einem anderen element, solange es gehovert oder fokussiert ist.
+ohne `for` das element davor. setzt `aria-describedby` am ziel.
+
+```html
+<btn-icon command="save" id="save"></btn-icon>
+<pop-tip for="save">Speichern (strg+s)</pop-tip>
+```
+
+## pop-toast
+
+meist imperativ über `notify()`. errors werden erkannt, auch als rohes objekt aus
+einem `catch`. `dismissible` (default bei `notify()`) erlaubt schliessen per button
+und wegwischen per touch. hover und fokus halten den countdown an.
+
+```js
+import { notify } from '@aufbau/elements2/webcomponents/pop-toast.js';
+
+notify('Gespeichert');
+notify({ success: 'Export fertig', heading: 'Dateien' });
+notify({ error: 'Upload fehlgeschlagen' });
+
+try { await save(); }
+catch (error) { notify(error); }          // type error, message aus dem error
+
+PopToast.error('…');                   // + info, success, warning, warn
+notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
+```
+
+```html
+<pop-toast type="warning" heading="Achtung" dismissible>
+  Speicher fast voll. <a href="/storage">Aufräumen</a>
+</pop-toast>
+```
 
 ## svg-flag
 
@@ -842,7 +899,7 @@ it, `app-area` is a region of it, `app-view` one screen. `app-panel`,
   `deactivate`.
 - `app-panel`: a header with `heading`, slots `start` and `actions`, and the
   buttons to close and expand what it sits in: an area is hidden or expanded,
-  an `app-modal` closed. `controls="close expand"` names the buttons there
+  an `pop-modal` closed. `controls="close expand"` names the buttons there
   may be; they only show where they can act.
 - `app-config`: a settings form from an `@aufbau/gui` spec. `spec` and `values`
   are properties, event `config { key, values }`. content only, the frame is
@@ -922,7 +979,7 @@ from bandcamp's own embed code; a page url turns the placeholder into a link.
 <aufbau-include>
 <aufbau-media> (allrounder?)
 <aufbau-menu>
-<app-modal>
+<pop-modal>
 <aufbau-paginate>
 <aufbau-popup>
 <aufbau-scroller>

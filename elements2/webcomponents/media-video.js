@@ -4,7 +4,7 @@ import { html }          from '../lib/html.js';
 const YOUTUBE = 'https://www.youtube-nocookie.com/embed/';
 const ALLOW   = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
 
-export default class AufbauVideo extends AufbauElement {
+export default class MediaVideo extends AufbauElement {
   static attr = {
     autoplay  : Boolean,
     controls  : true,
@@ -16,7 +16,7 @@ export default class AufbauVideo extends AufbauElement {
     youtubeId : String,
   };
 
-  static styles = `aufbau-video {
+  static styles = `media-video {
     display: block;
 
     > video { display: block; inline-size: 100%; }
@@ -53,4 +53,4 @@ export default class AufbauVideo extends AufbauElement {
   }
 }
 
-AufbauVideo.init();
+MediaVideo.init();

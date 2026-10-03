@@ -4,7 +4,7 @@ import { place }         from '../lib/placement.js';
 
 const ENTRY = 'a, button, [role="menuitem"]';
 
-export default class AufbauDropdown extends AufbauElement {
+export default class PopMenu extends AufbauElement {
   static shadow = true;
 
   static attr = {
@@ -69,7 +69,7 @@ export default class AufbauDropdown extends AufbauElement {
     this.part('menu').on('toggle', event => {
       const open = event.newState === 'open';
       if (open !== this.getAttr('open')) this.setAttr({ open });
-      this.emit('aufbau-dropdown', { open });
+      this.emit('pop-menu', { open });
     });
 
     this.$(window).on('resize', () => this.reposition(), { passive: true });
@@ -122,4 +122,4 @@ export default class AufbauDropdown extends AufbauElement {
   }
 }
 
-AufbauDropdown.init();
+PopMenu.init();

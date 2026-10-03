@@ -18,7 +18,7 @@ const barsMask = (peaks) => {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 };
 
-export default class AufbauWaveform extends AufbauElement {
+export default class MediaWave extends AufbauElement {
   static attr = {
     bars        : 40,
     interactive : Boolean,
@@ -29,7 +29,7 @@ export default class AufbauWaveform extends AufbauElement {
     src         : String,
   };
 
-  static styles = `aufbau-waveform {
+  static styles = `media-wave {
     --waveform-played : currentColor;
     --waveform-range  : color-mix(in srgb, currentColor 60%, transparent);
     --waveform-rest   : color-mix(in srgb, currentColor 25%, transparent);
@@ -66,7 +66,7 @@ export default class AufbauWaveform extends AufbauElement {
   seek (progress) {
     const value = clamp(progress);
     this.setAttr({ progress: value });
-    this.emit('aufbau-waveform-seek', { progress: value });
+    this.emit('media-wave-seek', { progress: value });
     return this;
   }
 
@@ -153,10 +153,10 @@ export default class AufbauWaveform extends AufbauElement {
       const max = Math.max(...peaks) || 1;
       return peaks.map(peak => peak / max);
     } catch (error) {
-      console.warn(`[aufbau-waveform] could not decode audio from "${url}":`, error);
+      console.warn(`[media-wave] could not decode audio from "${url}":`, error);
       return Array(samples).fill(0.3);
     }
   }
 }
 
-AufbauWaveform.init();
+MediaWave.init();

@@ -1,9 +1,9 @@
 import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
 import { html }                           from '../lib/html.js';
 
-const PAGE_STYLES = `:root:has(app-modal:state(open)) { overflow: hidden; }`;
+const PAGE_STYLES = `:root:has(pop-modal:state(open)) { overflow: hidden; }`;
 
-export default class AppModal extends AufbauElement {
+export default class PopModal extends AufbauElement {
   static shadow = true;
   static parts  = ['close', 'dialog', 'header', 'heading'];
 
@@ -78,24 +78,6 @@ export default class AppModal extends AufbauElement {
     }
   `;
 
-  // :::::: IMPERATIVE API ::::::::::::::::::::::::::::::::::::::
-
-  static async confirm (message, { cancel = 'Cancel', confirm = 'OK', heading } = {}) {
-    const modal  = document.createElement('app-modal');
-    const text   = Object.assign(document.createElement('p'), { textContent: message });
-    const form   = Object.assign(document.createElement('form'), { method: 'dialog' });
-    const button = (label, value) => Object.assign(document.createElement('button'), { textContent: label, value });
-
-    if (heading) modal.setAttribute('heading', heading);
-    form.append(button(cancel, 'cancel'), Object.assign(button(confirm, 'confirm'), { autofocus: true }));
-    modal.append(text, form);
-    document.body.append(modal);
-
-    const result = await modal.show();
-    modal.remove();
-    return result === 'confirm';
-  }
-
   get dialog () { return this.$dialog.node; }
   get isOpen () { return Boolean(this.dialog?.open); }
 
@@ -115,7 +97,7 @@ export default class AppModal extends AufbauElement {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onConnected () {
-    adoptBaseStyles('app-modal-page', PAGE_STYLES);   // deduplicated by key
+    adoptBaseStyles('pop-modal-page', PAGE_STYLES);   // deduplicated by key
 
     this.$close.onClick(() => this.close());
 
@@ -134,7 +116,7 @@ export default class AppModal extends AufbauElement {
       const returnValue = this.dialog.returnValue;
       this.states.delete('open');
       if (this.getAttr('open')) this.setAttr({ open: false });
-      this.emit('app-modal', { open: false, returnValue });
+      this.emit('pop-modal', { open: false, returnValue });
       this._resolve?.(returnValue);
       this._closed = this._resolve = null;
     });
@@ -147,10 +129,13 @@ export default class AppModal extends AufbauElement {
           <strong part="heading"></strong>
           <button type="button" part="close" aria-label="close"><svg-icon icon="lucide:x"></svg-icon></button>
         </header>
-        <slot></slot>
+        ${this.renderBody()}
       </dialog>
     `;
   }
+
+  // what goes below the header, pop-prompt puts its message and buttons here
+  renderBody () { return html`<slot></slot>`; }
 
   sync () {
     const dialog = this.dialog;
@@ -168,10 +153,10 @@ export default class AppModal extends AufbauElement {
       dialog.returnValue = '';
       dialog.showModal();
       this.states.add('open');
-      this.emit('app-modal', { open: true });
+      this.emit('pop-modal', { open: true });
     }
     if (!open && dialog.open) dialog.close();
   }
 }
 
-AppModal.init();
+PopModal.init();

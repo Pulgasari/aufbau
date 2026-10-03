@@ -1,7 +1,7 @@
 import { AufbauElement }           from '@aufbau/element';
 import { parseLook, resolveShape } from '../lib/itemLook.js';
 
-export default class AufbauItem extends AufbauElement {
+export default class DataItem extends AufbauElement {
   static attr = {
     eager         : Boolean,
     intrinsicSize : String,
@@ -9,7 +9,7 @@ export default class AufbauItem extends AufbauElement {
     shape         : String,
   };
 
-  static styles = `aufbau-item {
+  static styles = `data-item {
     border-radius : var(--item-current-shape, var(--item-shape, 0px));
     box-sizing    : border-box;
     display       : block;
@@ -37,4 +37,4 @@ export default class AufbauItem extends AufbauElement {
   }
 }
 
-AufbauItem.init();
+DataItem.init();

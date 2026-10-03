@@ -7,7 +7,7 @@ const ICONS = {
   open   : 'lucide:folder-open',
 };
 
-export default class DataTreeItem extends AufbauElement {
+export default class DataNode extends AufbauElement {
   static internals = { role: 'treeitem' };
 
   static shadow = true;
@@ -67,7 +67,7 @@ export default class DataTreeItem extends AufbauElement {
     :host(:not([expanded])) slot { display: none; }
   `;
 
-  get items        () { return [...this.children].filter(child => child.localName === 'data-tree-item'); }
+  get items        () { return [...this.children].filter(child => child.localName === 'data-node'); }
   get hasChildren  () { return this.items.length > 0; }
   get tree         () { return this.closest('data-tree'); }
 
@@ -75,7 +75,7 @@ export default class DataTreeItem extends AufbauElement {
   get level () {
     let level = 1;
     for (let parent = this.parentElement; parent && parent.localName !== 'data-tree'; parent = parent.parentElement) {
-      if (parent.localName === 'data-tree-item') level += 1;
+      if (parent.localName === 'data-node') level += 1;
     }
     return level;
   }
@@ -98,7 +98,7 @@ export default class DataTreeItem extends AufbauElement {
   }
 
   select () {
-    this.$(this.tree).$$('data-tree-item[selected]').attr({ selected: false });
+    this.$(this.tree).$$('data-node[selected]').attr({ selected: false });
     this.setAttr({ selected: true });
     this.tree?.syncFocus();
     this.emit('data-tree-select', { element: this, label: this.getAttr('label'), value: this.getAttr('value') });
@@ -124,4 +124,4 @@ export default class DataTreeItem extends AufbauElement {
 
 }
 
-DataTreeItem.init();
+DataNode.init();

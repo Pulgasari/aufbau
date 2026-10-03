@@ -7,7 +7,7 @@ const formatTime = (seconds) => {
   return `${minutes}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 };
 
-export default class AufbauAudio extends AufbauElement {
+export default class MediaAudio extends AufbauElement {
   static reflect = ['layout'];
 
   static attr = {
@@ -20,7 +20,7 @@ export default class AufbauAudio extends AufbauElement {
     src      : String,
   };
 
-  static styles = `aufbau-audio {
+  static styles = `media-audio {
     align-items           : center;
     column-gap            : 0.75em;
     display               : grid;
@@ -88,7 +88,7 @@ export default class AufbauAudio extends AufbauElement {
     this.$(audio).on('loadedmetadata timeupdate', () => this.syncProgress());
     this.$(audio).on('play pause ended', () => {
       this.syncPlayState();
-      this.emit('aufbau-audio-play', { isPlaying: this.playing });
+      this.emit('media-audio-play', { isPlaying: this.playing });
     });
 
     this.on('click', ':scope > button', () => this.toggle());
@@ -101,7 +101,7 @@ export default class AufbauAudio extends AufbauElement {
 
   onDisconnected () { this._audio.pause(); }
 
-  play   () { if (this._audio.src) this._audio.play().catch(error => console.warn('[aufbau-audio] playback refused:', error)); return this; }
+  play   () { if (this._audio.src) this._audio.play().catch(error => console.warn('[media-audio] playback refused:', error)); return this; }
   pause  () { this._audio.pause(); return this; }
   toggle () { return this.playing ? this.pause() : this.play(); }
 
@@ -161,4 +161,4 @@ export default class AufbauAudio extends AufbauElement {
   }
 }
 
-AufbauAudio.init();
+MediaAudio.init();

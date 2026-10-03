@@ -2,14 +2,14 @@ import { AufbauElement }    from '@aufbau/element';
 import { normalizeOptions } from '../lib/options.js';
 import { importFile }       from '@aufbau/import';
 
-export default class AufbauDatalist extends AufbauElement {
+export default class DataList extends AufbauElement {
   static attr = {
     key      : 'value',
     labelKey : 'label',
     src      : String,
   };
 
-  static styles = `aufbau-datalist { display: none; }`;
+  static styles = `data-list { display: none; }`;
 
   get list () { return this._list; }
 
@@ -34,7 +34,7 @@ export default class AufbauDatalist extends AufbauElement {
         if (this._loadedSrc !== src) return this;   // superseded
         this._items = items;
       } catch (error) {
-        console.warn(`[aufbau-datalist] could not import data from "${src}":`, error);
+        console.warn(`[data-list] could not import data from "${src}":`, error);
         this._items = [];
       }
     }
@@ -59,4 +59,4 @@ export default class AufbauDatalist extends AufbauElement {
   }
 }
 
-AufbauDatalist.init();
+DataList.init();
