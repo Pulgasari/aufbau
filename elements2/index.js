@@ -8,9 +8,8 @@ entry point. side effect free: nothing is defined until it is used.
 
 a tag maps onto its module:
 
-  aufbau-<name>    ./aufbau/Aufbau<Name>.js    the building blocks, shadow dom
-  input-<type>     ./input/tags.js             every input that is a type, in one module
-  <group>-<name>   ./<group>/<name>.js         everything else
+  <tag>          ./webcomponents/<tag>.js
+  input-<type>   ./webcomponents/input/tags.js, every input that is a type
 
 */// :::: TAGS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -97,15 +96,10 @@ const TAGS = [
 
 const known = new Set(TAGS);
 
-const OWN_MODULE = new Set(['input-option']);
-
-const pascal = text => text.replace(/(?:^|-)(\w)/g, (match, letter) => letter.toUpperCase());
-
+// the inputs that are a type and nothing more share one module
 function pathOf (tag) {
-  const [group, ...rest] = tag.split('-');
-  if (group === 'aufbau')                        return `./aufbau/${pascal(tag)}.js`;
-  if (group === 'input' && !OWN_MODULE.has(tag)) return './input/tags.js';
-  return `./${group}/${rest.join('-')}.js`;
+  if (tag.startsWith('input-') && tag !== 'input-option') return './webcomponents/input/tags.js';
+  return `./webcomponents/${tag}.js`;
 }
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::

@@ -6,13 +6,8 @@
   "main"   : "./index.js",
   "module" : "./index.js",
   "sideEffects": [
-    "./app/*.js",
-    "./aufbau/*.js",
-    "./div/*.js",
-    "./embed/*.js",
-    "./input/*.js",
-    "./svg/*.js",
-    "./write/*.js"
+    "./webcomponents/*.js",
+    "./webcomponents/input/tags.js"
   ],
   "exports": {
     "."     : "./index.js",
@@ -23,16 +18,10 @@
     "index.js",
     "index.d.ts",
     "adapters",
-    "app",
-    "aufbau",
     "base",
     "data",
-    "div",
-    "embed",
-    "input",
     "lib",
-    "svg",
-    "write",
+    "webcomponents",
     "README.md"
   ],
   "peerDependencies": {

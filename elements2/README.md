@@ -3,23 +3,13 @@
 official **aufbau** custom elements: the building blocks and what is composed of
 them, in one package.
 
-| folder      | tags              | what it is |
-|-------------|-------------------|------------|
-| `aufbau/`   | `aufbau-*`        | the building blocks: a button, a modal, a writer, … one file each (`Aufbau<Name>.js`) |
-| `app/`      | `app-*`           | the frame of an app: root, views, areas, panels |
-| `div/`      | `div-x`, `div-y`  | flex rows and columns |
-| `embed/`    | `embed-*`         | click to load embeds of youtube, bandcamp, … |
-| `input/`    | `input-*`         | one form control per kind of value, drawn by a look: types/, looks/ |
-| `svg/`      | `svg-*`           | icons and flags: a box painted by an svg |
-| `write/`    | `write-*`         | editors |
-| `base/`     |                   | AufbauElement and AufbauControlElement, what every element builds on |
-| `lib/`      |                   | helpers without an element: config, html, styles, skin, schema, persist, … |
-| `data/`     |                   | the lists the inputs pick from |
-| `adapters/` |                   | htx |
-
-every tag maps onto its module: `aufbau-<name>` onto `./aufbau/Aufbau<Name>.js`,
-`<group>-<name>` onto `./<group>/<name>.js`. the tags are fixed, there is no
-renaming.
+| folder           | what it is |
+|------------------|------------|
+| `webcomponents/` | every element, one file each named like its tag: `aufbau-keyboard.js`, `div-x.js`, … the inputs that are a type are all in `input/tags.js` |
+| `base/`          | AufbauElement and AufbauControlElement, what every element builds on |
+| `lib/`           | helpers without an element: config, html, styles, skin, schema, persist, … |
+| `data/`          | the lists the inputs pick from |
+| `adapters/`      | htx |
 
 **preview:** [https://code.pulgasari.dev/aufbau/elements/](https://code.pulgasari.dev/aufbau/elements/)
 
@@ -35,8 +25,8 @@ import { registerAll } from '@aufbau/elements2';
 await registerAll();
 
 // hand picked
-import '@aufbau/elements2/svg/flag.js';
-import '@aufbau/elements2/input/language.js';
+import '@aufbau/elements2/webcomponents/svg-flag.js';
+import '@aufbau/elements2/webcomponents/input/tags.js';
 ```
 
 ```html
@@ -509,7 +499,7 @@ einem `catch`. `dismissible` (default bei `notify()`) erlaubt schliessen per but
 und wegwischen per touch. hover und fokus halten den countdown an.
 
 ```js
-import { notify } from '@aufbau/elements2/aufbau/AufbauToast.js';
+import { notify } from '@aufbau/elements2/webcomponents/aufbau-toast.js';
 
 notify('Gespeichert');
 notify({ success: 'Export fertig', heading: 'Dateien' });
@@ -570,7 +560,7 @@ abgelehnte dateien (falscher typ, zu gross) kommen als
 
 ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
 selbst baut, mitsamt der coercion. `type` ist dasselbe vokabular wie bei den
-inputs (`input/types/`): derselbe wert wird mit `<input-date>`
+inputs (`webcomponents/input/types/`): derselbe wert wird mit `<input-date>`
 bearbeitet und mit `<aufbau-value type="date">` angezeigt, und
 jeder typ, den die controls lernen, ist einer, den das hier anzeigen kann. das
 icon pro typ kommt aus derselben tabelle.
@@ -682,13 +672,12 @@ fixed type, `<input-number>` is `<input-value type="number">`.
 
 ## how it is built
 
-everything of the inputs is in `input/`, one file per thing, named like it:
+everything of the inputs is in `webcomponents/input/`, one file per thing, named like it:
 
 ```
-input/
+webcomponents/input/
   Input.js       the base: value, form, drawing the look
   tags.js        every input-* that is a type: <input-number> is <input-value type="number">
-  option.js      <input-option>
   values.js      one string, two (range) or many (multiple)
   options.js     where options come from: children, src, the list type
   types/         what a value is, one file per type (number.js, language.js, …)
