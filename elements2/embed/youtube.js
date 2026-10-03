@@ -1,6 +1,6 @@
-import { EmbedComponent, urlOf } from '../base/EmbedComponent.js';
+import { Embed, urlOf } from './Embed.js';
 
-export class EmbedYoutube extends EmbedComponent {
+export class EmbedYoutube extends Embed {
 
   static attr = {
     start : String,

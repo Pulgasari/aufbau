@@ -1,7 +1,7 @@
 import './area.js';
 import './view.js';
 
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 import { setSkin }       from '../lib/skin.js';
 
 // set on the root as data-*, the css below it reads them

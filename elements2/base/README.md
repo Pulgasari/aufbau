@@ -8,14 +8,12 @@ element's own tree.
 
 ## Architecture
 
-`AufbauCore` is a plain class on top of `HTMLElement`. every aufbau element is
+`AufbauElement` is a plain class on top of `HTMLElement`. every aufbau element is
 autonomous; customized built-ins (`is="…"`) are not supported, safari never
 shipped them.
 
 ```javascript
-import { AufbauCore } from './AufbauCore.js';
-
-export class AufbauElement extends AufbauCore {}
+import { AufbauElement } from './AufbauElement.js';
 ```
 
 ### internals and states
@@ -333,7 +331,7 @@ if (!customElements.get('vanilla-audio')) {
 ### Aufbau Core Equivalent (Declarative & Clean)
 
 ```javascript
-import { AufbauElement } from './AufbauCore.js';
+import { AufbauElement } from './AufbauElement.js';
 
 export default class AufbauAudio extends AufbauElement {
   static attr = {

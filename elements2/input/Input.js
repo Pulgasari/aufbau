@@ -2,7 +2,7 @@ import '../svg/icon.js';
 
 import { isArray } from '@pulgasari/is';
 
-import { AufbauControl }            from '../base/AufbauControl.js';
+import { AufbauControlElement }            from '../base/AufbauControlElement.js';
 import { html }                     from '../lib/html.js';
 import { LOOKS, lookFor, sheetOf }  from './looks/index.js';
 import { OptionSource }             from './options.js';
@@ -64,7 +64,7 @@ const STYLES = `
   }
 `;
 
-export class Input extends AufbauControl {
+export class Input extends AufbauControlElement {
 
   static shadow = { delegatesFocus: true };
 

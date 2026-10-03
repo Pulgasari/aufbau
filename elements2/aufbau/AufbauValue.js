@@ -2,8 +2,8 @@
 
 // :::::: IMPORTS
 
-import { configKeys }                 from '../base/AufbauConfig.js';
-import { AufbauElement }              from '../base/index.js';
+import { configKeys }                 from '../lib/config.js';
+import { AufbauElement }              from '../base/AufbauElement.js';
 import { TYPES, typeOf }              from '../input/types/index.js';
 import { actionButtons, bindActions } from '../lib/actions.js';
 import { attrs, html }                from '../lib/html.js';

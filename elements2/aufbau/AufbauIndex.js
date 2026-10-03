@@ -1,4 +1,4 @@
-import { AufbauElement }           from '../base/index.js';
+import { AufbauElement }           from '../base/AufbauElement.js';
 import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 const parsePx = value => { const number = parseFloat(value); return Number.isFinite(number) ? number : null; };

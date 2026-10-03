@@ -1,6 +1,6 @@
 // <aufbau-table>
 
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 import { importFile }    from '@aufbau/import';
 import { sortElements }  from '@domina/methods/sortElements.js';
 import { html }          from '../lib/html.js';

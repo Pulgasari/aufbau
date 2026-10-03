@@ -1,9 +1,7 @@
 // :::::: IMPORTS
 
 import { CanonicalMap } from '@pulgasari/canonicalmap';
-import { Logger }       from '@pulgasari/logger';
 import { isArray, isPlainObject, isString } from '@pulgasari/is';
-import { toJson }       from '@pulgasari/coerce';
 import { str }          from '@pulgasari/str';
 import { emitEvent } from '@domina/methods/emitEvent.js';
 import { onEvent } from '@domina/methods/onEvent.js';
@@ -11,17 +9,15 @@ const { toKebabCase } = str;
 
 // ::::::
 
-const log = new Logger({ prefix: 'aufbau-config' });
 const AufbauConfigStore = new CanonicalMap; // merged, read-only view of all sources. never write directly, use setConfig()
 const CONFIG_EVENT = 'aufbau-config-changed';
 const DEFAULTS     = Symbol('defaults');
-const RESERVED     = new Set(['id', 'class', 'style', 'hidden', 'is', 'src']); // attributes that configure the element itself, not the store
 const RUNTIME      = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
-const sources      = new Map; // one source map per <aufbau-config> element, merged in connect order
-const newSource    = ()      => new CanonicalMap;
+const sources      = new Map;
+export const createSource = () => new CanonicalMap;
 const toValue      = (value) => value == null ? null : String(value);
 
-function flatten (input, prefix = '', out = newSource()) {
+export function flatten (input, prefix = '', out = createSource()) {
   for (const [key, value] of Object.entries(input ?? {})) {
     const path = prefix ? `${prefix}-${key}` : key;
     if (isPlainObject(value)) flatten(value, path, out);
@@ -85,7 +81,7 @@ export function getConfig (key, fallback) {
 // Internal helper to resolve target source storage
 function getSource (options = {}) {
   const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
-  const entries = sources.get(owner) ?? newSource();
+  const entries = sources.get(owner) ?? createSource();
   sources.set(owner, entries);
   return entries;
 }
@@ -123,62 +119,15 @@ export function resolveConfig (tag, name, keys = true) {
   return undefined;
 }
 
-// :::::: ELEMENT ::::::::::::::::::::::::::::::::::::::::::::::
-
-export class AufbauConfig extends HTMLElement {
-  connectedCallback () {
-    this.hidden = true; // never rendered
-    this._observer = new MutationObserver(() => this.sync());
-    this._observer.observe(this, { attributes: true, characterData: true, childList: true, subtree: true });
-    this.sync();
-  }
-
-  disconnectedCallback () {
-    this._observer?.disconnect();
-    sources.delete(this);
-    commitConfig(); // a removed config element must revoke its values
-  }
-
-  sync () {
-    const entries = newSource();
-
-    // 1. remote defaults, lowest precedence
-    if (this._remote) entries.merge(this._remote);
-
-    const body   = this.textContent.trim();
-    const parsed = body ? toJson(body, null) : null;
-
-    if (body && !isPlainObject(parsed)) log.warn('inline body is not a valid json object, ignored.');
-    else if (parsed) entries.merge(flatten(parsed));
-
-    // 3. attributes win, most explicit form
-    for (const { name, value } of this.attributes) {
-      if (RESERVED.has(entries.key(name))) continue;
-      entries.set(name, value);
-    }
-
-    sources.set(this, entries);
-    commitConfig();
-
-    const src = this.getAttribute('src');
-    if (src && src !== this._src) this.loadSrc(src);
-  }
-
-  async loadSrc (src) {
-    this._src = src;
-    try {
-      const response = await fetch(src);
-      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-      this._remote = flatten(await response.json());
-      this.sync();
-    } catch (error) {
-      log.warn(`could not load "${src}":`, error);
-    }
-  }
+// the values of one <aufbau-config> element, merged in connect order
+export function setConfigSource (owner, entries) {
+  sources.set(owner, entries);
+  commitConfig();
 }
 
-if (typeof window !== 'undefined' && !customElements.get('aufbau-config')) {
-  customElements.define('aufbau-config', AufbauConfig);
+export function removeConfigSource (owner) {
+  sources.delete(owner);
+  commitConfig();
 }
 
 export {
@@ -189,6 +138,4 @@ export {
   setConfig,
   setConfigObject,
   setConfigValue,
-}
-
-export default AufbauConfig;
+};

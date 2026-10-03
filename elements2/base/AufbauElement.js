@@ -4,7 +4,7 @@ import { BASE, schemaOf }   from '../lib/schema.js';
 import { applySkin }        from '../lib/skin.js';
 import { adoptClassStyles } from '../lib/styles.js';
 import { decorate, decorateAll } from '../lib/utils.js';
-import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
+import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from '../lib/config.js';
 
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';
 import { emitEvent }      from '@domina/methods/emitEvent.js';
@@ -76,7 +76,7 @@ const SKELETON_STYLES = `
 
 const SKELETON_VARS = { gap: 'gap', line: 'line', lines: 'lines', radius: 'radius', width: 'width' };
 
-export class AufbauCore extends HTMLElement {
+export class AufbauElement extends HTMLElement {
 
   static attr = { skeleton: Boolean };
 
@@ -467,5 +467,5 @@ export class AufbauCore extends HTMLElement {
 
 }
 
-export default AufbauCore;
+export default AufbauElement;
 

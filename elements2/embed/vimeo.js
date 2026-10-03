@@ -1,6 +1,6 @@
-import { EmbedComponent, urlOf } from '../base/EmbedComponent.js';
+import { Embed, urlOf } from './Embed.js';
 
-export class EmbedVimeo extends EmbedComponent {
+export class EmbedVimeo extends Embed {
   toUrl (src) { return urlOf(src) ?? `https://vimeo.com/${encodeURIComponent(src)}`; }
 }
 

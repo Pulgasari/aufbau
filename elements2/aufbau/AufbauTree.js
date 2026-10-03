@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 import { importFile }    from '@aufbau/import';
 import { attrs, html }   from '../lib/html.js';
 

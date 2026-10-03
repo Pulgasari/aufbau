@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 import { onVisible }     from '@domina/observer';
 
 export default class AufbauLoop extends AufbauElement {

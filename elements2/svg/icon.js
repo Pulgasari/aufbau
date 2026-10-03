@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 
 const API      = 'https://api.iconify.design';
 const DEFAULTS = '@aufbau/icons/aliases.js';

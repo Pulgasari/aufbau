@@ -1,8 +1,8 @@
-import { EmbedComponent, urlOf } from '../base/EmbedComponent.js';
+import { Embed, urlOf } from './Embed.js';
 
 const TYPES = ['album', 'artist', 'episode', 'playlist', 'show', 'track'];
 
-export class EmbedSpotify extends EmbedComponent {
+export class EmbedSpotify extends Embed {
 
   static attr = {
     type : { type: String, default: 'track', values: TYPES },

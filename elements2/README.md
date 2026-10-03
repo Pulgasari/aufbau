@@ -5,15 +5,15 @@ them, in one package.
 
 | folder      | tags              | what it is |
 |-------------|-------------------|------------|
-| `aufbau/`   | `aufbau-*`        | the building blocks: a picker, a writer, an input. shadow dom, one file each (`Aufbau<Name>.js`) |
+| `aufbau/`   | `aufbau-*`        | the building blocks: a button, a modal, a writer, … one file each (`Aufbau<Name>.js`) |
 | `app/`      | `app-*`           | the frame of an app: root, views, areas, panels |
 | `div/`      | `div-x`, `div-y`  | flex rows and columns |
 | `embed/`    | `embed-*`         | click to load embeds of youtube, bandcamp, … |
 | `input/`    | `input-*`         | one form control per kind of value, drawn by a look: types/, looks/ |
 | `svg/`      | `svg-*`           | icons and flags: a box painted by an svg |
 | `write/`    | `write-*`         | editors |
-| `base/`     |                   | the element classes every element builds on, and the config |
-| `lib/`      |                   | helpers without an element: html, styles, skin, schema, persist, placement, … |
+| `base/`     |                   | AufbauElement and AufbauControlElement, what every element builds on |
+| `lib/`      |                   | helpers without an element: config, html, styles, skin, schema, persist, … |
 | `data/`     |                   | the lists the inputs pick from |
 | `adapters/` |                   | htx |
 
@@ -49,8 +49,8 @@ the entry is side effect free and does not re-export the base classes. they
 and the config come from their subpaths:
 
 ```js
-import { AufbauElement }        from '@aufbau/elements2/base/index.js';
-import { setConfig, getConfig } from '@aufbau/elements2/base/AufbauConfig.js';
+import { AufbauElement }        from '@aufbau/elements2/base/AufbauElement.js';
+import { setConfig, getConfig } from '@aufbau/elements2/lib/config.js';
 ```
 
 ## htx
@@ -801,10 +801,7 @@ still composed of the `aufbau-*` elements, to be moved onto `InputValue`:
 # app-*, div-*, embed-*, write-*
 
 composed of the `aufbau-*` elements, in the light dom: the skin is adopted by
-the document and selects the elements by tag. one inner element holds the value
-(`static control`), the component hands it its attributes (`static forward`).
-listeners on the inner elements go into `bind()`, helper elements are muted
-with `mute()`.
+the document and selects the elements by tag.
 
 ### app
 

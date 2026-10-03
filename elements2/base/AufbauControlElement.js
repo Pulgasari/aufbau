@@ -1,12 +1,13 @@
-import { AufbauCore }     from './AufbauCore.js';
+import { Logger } from '@pulgasari/logger';
+
 import { resolvePersist } from '../lib/persist.js';
-import { Logger }         from '@pulgasari/logger';
+import { AufbauElement }  from './AufbauElement.js';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
 
 const log = new Logger({ prefix: 'aufbau-control' });
 
-export class AufbauControl extends AufbauCore {
+export class AufbauControlElement extends AufbauElement {
 
   static formAssociated = true;
 
@@ -217,4 +218,4 @@ export class AufbauControl extends AufbauCore {
   }
 }
 
-export default AufbauControl;
+export default AufbauControlElement;

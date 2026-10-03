@@ -1,6 +1,6 @@
 import '../input/tags.js';
 
-import { AufbauElement }  from '../base/index.js';
+import { AufbauElement }  from '../base/AufbauElement.js';
 import { html }           from '../lib/html.js';
 import { filterElements } from '@domina/methods/filterElements.js';
 

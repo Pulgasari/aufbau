@@ -1,4 +1,4 @@
-import { AufbauControl }  from '../base/index.js';
+import { AufbauControlElement }  from '../base/AufbauControlElement.js';
 import { attrs, html }    from '../lib/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
@@ -19,7 +19,7 @@ const matches = (file, accept) => {
   );
 };
 
-export default class AufbauUpload extends AufbauControl {
+export default class AufbauUpload extends AufbauControlElement {
   static reflect = ['look'];
 
   static attr = {

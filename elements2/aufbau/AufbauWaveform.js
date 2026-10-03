@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 
 const clamp = value => Math.min(100, Math.max(0, value));
 

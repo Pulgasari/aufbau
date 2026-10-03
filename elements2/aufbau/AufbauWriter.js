@@ -1,11 +1,11 @@
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
-import { AufbauControl } from '../base/index.js';
+import { AufbauControlElement } from '../base/AufbauControlElement.js';
 import { dedent }        from '../lib/utils.js';
 import { attrs, html }   from '../lib/html.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setValue }      from '@domina/methods/setValue.js';
 
-export default class AufbauWriter extends AufbauControl {
+export default class AufbauWriter extends AufbauControlElement {
   static reflect = ['look', 'resize'];
 
   static attr = {

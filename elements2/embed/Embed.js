@@ -1,11 +1,11 @@
 import '../aufbau/AufbauEmbed.js';
 
-import { AufbauElement } from './index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 import setAttr           from '@domina/methods/setAttr.js';
 
 const FORWARD = ['consent', 'height', 'label', 'poster', 'ratio', 'remember', 'width'];
 
-export class EmbedComponent extends AufbauElement {
+export class Embed extends AufbauElement {
 
   static attr = {
     consent  : String,
@@ -46,4 +46,4 @@ export class EmbedComponent extends AufbauElement {
 
 export const urlOf = src => { try { return new URL(src).href; } catch { return null; } };
 
-export default EmbedComponent;
+export default Embed;

@@ -1,6 +1,6 @@
-import { EmbedComponent } from '../base/EmbedComponent.js';
+import { Embed } from './Embed.js';
 
-export class EmbedMastodon extends EmbedComponent {}
+export class EmbedMastodon extends Embed {}
 
 EmbedMastodon.init('embed-mastodon');
 

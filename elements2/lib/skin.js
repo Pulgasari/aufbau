@@ -1,7 +1,7 @@
 import adoptStylesheet   from '@domina/methods/adoptStylesheet.js';
 import releaseStylesheet from '@domina/methods/releaseStylesheet.js';
 
-import { getConfig, onConfigChange, setConfig } from '../base/AufbauConfig.js';
+import { getConfig, onConfigChange, setConfig } from '../lib/config.js';
 import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
 
 const CONFIG_KEY   = 'elements-skin';

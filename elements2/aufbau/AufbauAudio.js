@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 import { attrs, html }   from '../lib/html.js';
 
 const formatTime = (seconds) => {

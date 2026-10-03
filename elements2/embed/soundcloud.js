@@ -1,6 +1,6 @@
-import { EmbedComponent } from '../base/EmbedComponent.js';
+import { Embed } from './Embed.js';
 
-export class EmbedSoundcloud extends EmbedComponent {}
+export class EmbedSoundcloud extends Embed {}
 
 EmbedSoundcloud.init('embed-soundcloud');
 

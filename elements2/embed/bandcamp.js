@@ -1,4 +1,4 @@
-import { EmbedComponent } from '../base/EmbedComponent.js';
+import { Embed } from './Embed.js';
 
 const PLAYER = 'https://bandcamp.com/EmbeddedPlayer/';
 
@@ -39,7 +39,7 @@ function hexOf (element, color) {
   return [red, green, blue].map(channel => channel.toString(16).padStart(2, '0')).join('');
 }
 
-export class EmbedBandcamp extends EmbedComponent {
+export class EmbedBandcamp extends Embed {
 
   static attr = {
     bgcol   : String,   // hex without #, --color-bg by default

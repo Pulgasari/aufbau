@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/index.js';
+import { AufbauElement } from '../base/AufbauElement.js';
 
 const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
