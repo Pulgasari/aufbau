@@ -18,12 +18,14 @@
     "index.js",
     "index.d.ts",
     "adapters",
-    "base",
     "data",
     "lib",
     "webcomponents",
     "README.md"
   ],
+  "dependencies": {
+    "@aufbau/element": "^0.1.0"
+  },
   "peerDependencies": {
     "@aufbau/gui": "^0.1.0",
     "@aufbau/import": "^1.0.0"

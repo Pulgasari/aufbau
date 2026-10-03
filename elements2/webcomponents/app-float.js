@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 
 export class AppFloat extends AufbauElement {
 

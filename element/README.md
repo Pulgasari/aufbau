@@ -1,6 +1,8 @@
-# @aufbau/elements2/base
+# @aufbau/element
 
-`AufbauElement` is what every element builds on. two mixins add to it:
+the base of the [@aufbau custom elements](../elements2/README.md): attribute schema,
+rendering, selections, config and skin. `AufbauElement` is what every element
+builds on, two mixins add to it:
 
 | | |
 |---|---|
@@ -14,7 +16,7 @@ class WriteText extends withSource(withControl(AufbauElement)) {}
 ## AufbauElement
 
 ```js
-import { AufbauElement } from '@aufbau/elements2/base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 
 class MyThing extends AufbauElement {
   static shadow  = true;                       // or { delegatesFocus: true }
@@ -145,3 +147,16 @@ this.sourceNodes            // the children, the output left out
 this.output                 // the element render() writes into
 onSourceChange ()           // the children changed, rebuilds by default
 ```
+
+## config, skin, storage
+
+```js
+import { getConfig, onConfigChange, setConfig, setSkin } from '@aufbau/element';
+
+setConfig({ code: { theme: 'nord' } });   // or setConfig('code-theme', 'nord')
+getConfig('code-theme');
+onConfigChange(event => event.detail.changed);
+setSkin('monochrome');                    // 'none' removes it
+```
+
+`store` and `session` are the local and session storage that `persist` writes to.

@@ -1,8 +1,7 @@
 import './app-area.js';
 import './app-view.js';
 
-import { AufbauElement } from '../base/AufbauElement.js';
-import { setSkin }       from '../lib/skin.js';
+import { AufbauElement, setSkin } from '@aufbau/element';
 
 // set on the root as data-*, the css below it reads them
 const LOOK = ['density', 'geometry', 'palette', 'scheme'];

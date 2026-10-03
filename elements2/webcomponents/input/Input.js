@@ -2,7 +2,7 @@ import '../svg-icon.js';
 
 import { isArray } from '@pulgasari/is';
 
-import { AufbauControlElement }    from '../../base/AufbauControlElement.js';
+import { AufbauControlElement }    from '@aufbau/element';
 import { html }                    from '../../lib/html.js';
 import { LOOKS, lookFor, sheetOf } from './looks/index.js';
 import { OptionSource }            from './options.js';

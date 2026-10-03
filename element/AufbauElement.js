@@ -1,9 +1,9 @@
 // :::::: IMPORTS
 
-import { BASE, schemaOf }                                        from '../lib/schema.js';
-import { applySkin }                                             from '../lib/skin.js';
-import { adoptClassStyles }                                      from '../lib/styles.js';
-import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from '../lib/config.js';
+import { BASE, schemaOf }                                        from './lib/schema.js';
+import { applySkin }                                             from './lib/skin.js';
+import { adoptClassStyles }                                      from './lib/styles.js';
+import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './lib/config.js';
 
 import { hasAttr } from '@domina/methods/hasAttr.js';
 import { setAttr } from '@domina/methods/setAttr.js';

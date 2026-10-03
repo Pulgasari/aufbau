@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 
 // how far a drag has to go before it switches, in px
 const DRAG_THRESHOLD = 64;

@@ -1,6 +1,6 @@
 import { Logger } from '@pulgasari/logger';
 
-import { resolvePersist } from '../lib/persist.js';
+import { resolvePersist } from './lib/persist.js';
 import { AufbauElement }  from './AufbauElement.js';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';

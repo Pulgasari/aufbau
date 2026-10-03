@@ -1,6 +1,5 @@
-import { AufbauElement } from '../base/AufbauElement.js';
-import { attrs, html }   from '../lib/html.js';
-import { store }         from '../lib/persist.js';
+import { AufbauElement, store } from '@aufbau/element';
+import { attrs, html }          from '../lib/html.js';
 
 const ALLOW = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
 

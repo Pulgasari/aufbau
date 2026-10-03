@@ -1,0 +1,35 @@
+{
+  "name": "@aufbau/element",
+  "version": "0.1.0",
+  "description": "The base of the @aufbau custom elements: attribute schema, rendering, selections, config, and mixins for form controls and source elements",
+  "type"   : "module",
+  "main"   : "./index.js",
+  "module" : "./index.js",
+  "types"  : "./index.d.ts",
+  "exports": {
+    "."   : { "types": "./index.d.ts", "default": "./index.js" },
+    "./*" : "./*"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "AufbauElement.js",
+    "Selection.js",
+    "withControl.js",
+    "withSource.js",
+    "lib",
+    "README.md"
+  ],
+  "keywords": [
+    "aufbau",
+    "custom-elements",
+    "esm",
+    "web-components"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulgasari/aufbau.git",
+    "directory": "element"
+  }
+}

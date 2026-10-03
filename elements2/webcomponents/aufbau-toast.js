@@ -2,9 +2,8 @@ import { isPlainObject, isString } from '@pulgasari/is';
 import { createShift, shift }      from '@pulgasari/shift';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
-import { AufbauElement }   from '../base/AufbauElement.js';
-import { html }            from '../lib/html.js';
-import { adoptBaseStyles } from '../lib/styles.js';
+import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
+import { html }                           from '../lib/html.js';
 
 const ICONS = {
   error   : 'lucide:alert-circle',

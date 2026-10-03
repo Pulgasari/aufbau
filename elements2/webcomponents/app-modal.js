@@ -1,6 +1,5 @@
-import { AufbauElement }   from '../base/AufbauElement.js';
-import { html }            from '../lib/html.js';
-import { adoptBaseStyles } from '../lib/styles.js';
+import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
+import { html }                           from '../lib/html.js';
 
 const PAGE_STYLES = `:root:has(app-modal:state(open)) { overflow: hidden; }`;
 

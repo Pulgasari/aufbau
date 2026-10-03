@@ -1,4 +1,4 @@
-import { AufbauSourceElement }  from '../base/AufbauSourceElement.js';
+import { AufbauSourceElement }  from '@aufbau/element';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from '../lib/html.js';
 import { dedent }               from '../lib/dedent.js';

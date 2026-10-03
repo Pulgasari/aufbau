@@ -1,4 +1,4 @@
-import { AufbauElement }    from '../base/AufbauElement.js';
+import { AufbauElement }    from '@aufbau/element';
 import { normalizeOptions } from '../lib/options.js';
 import { importFile }       from '@aufbau/import';
 

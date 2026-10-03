@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 import { html }          from '../lib/html.js';
 import { place }         from '../lib/placement.js';
 

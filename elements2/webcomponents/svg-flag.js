@@ -1,4 +1,4 @@
-import { AufbauElement } from '../base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 import { iconUrl }       from './svg-icon.js';
 
 // circle-flags ships 1:1 art, flagpack ships 4:3

@@ -1,13 +1,13 @@
 # @aufbau/elements2
 
 official **aufbau** custom elements: the building blocks and what is composed of
-them, in one package.
+them, in one package. what they build on, the base class, config and skin, is
+[`@aufbau/element`](../element/README.md).
 
 | folder           | what it is |
 |------------------|------------|
 | `webcomponents/` | every element, one file each named like its tag: `aufbau-keyboard.js`, `div-x.js`, … the inputs that are a type are all in `input/tags.js` |
-| `base/`          | AufbauElement and AufbauControlElement, what every element builds on |
-| `lib/`           | helpers without an element: config, html, styles, skin, schema, persist, … |
+| `lib/`           | helpers of the elements: html, actions, locale, options, placement, … |
 | `data/`          | the lists the inputs pick from |
 | `adapters/`      | htx |
 
@@ -35,12 +35,11 @@ import '@aufbau/elements2/webcomponents/input/tags.js';
 <write-md name="notes" preview="side"></write-md>
 ```
 
-the entry is side effect free and does not re-export the base classes. they
-and the config come from their subpaths:
+the entry is side effect free. the base class and the config come from
+`@aufbau/element`:
 
 ```js
-import { AufbauElement }        from '@aufbau/elements2/base/AufbauElement.js';
-import { setConfig, getConfig } from '@aufbau/elements2/lib/config.js';
+import { AufbauElement, getConfig, setConfig } from '@aufbau/element';
 ```
 
 ## htx
@@ -517,7 +516,7 @@ defaults for every element of a kind, set once from script. an attribute on
 the element wins.
 
 ```js
-import { setConfig } from '@aufbau/elements2/lib/config.js';
+import { setConfig } from '@aufbau/element';
 
 setConfig({ code: { theme: 'nord' }, flag: { variant: 'square' }, toast: { duration: 5000 } });
 setConfig('value-date-format', 'medium');

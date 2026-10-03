@@ -4,7 +4,7 @@ import './write-text.js';
 import setAttr      from '@domina/methods/setAttr.js';
 import { debounce } from '@pulgasari/timing';
 
-import { AufbauElement } from '../base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 import { attrs, html }   from '../lib/html.js';
 
 const DEBOUNCE = 150;

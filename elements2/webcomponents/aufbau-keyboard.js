@@ -4,7 +4,7 @@
 
 import { observe }       from '@domina/observer';
 
-import { AufbauElement } from '../base/AufbauElement.js';
+import { AufbauElement } from '@aufbau/element';
 import { attrs, html }   from '../lib/html.js';
 
 // :::::: LAYOUTS

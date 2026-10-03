@@ -4,11 +4,10 @@ import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 
-import { AufbauSourceElement }                      from '../base/AufbauSourceElement.js';
-import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
-import { getConfig, setConfig }                     from '../lib/config.js';
-import { dedent }                                   from '../lib/dedent.js';
-import { attrs, html }                              from '../lib/html.js';
+import { AufbauSourceElement, getConfig, setConfig } from '@aufbau/element';
+import { actionButtons, bindActions, parseActions }  from '../lib/actions.js';
+import { dedent }                                    from '../lib/dedent.js';
+import { attrs, html }                               from '../lib/html.js';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;

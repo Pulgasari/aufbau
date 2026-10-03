@@ -1,4 +1,4 @@
-import { AufbauControlElement } from '../base/AufbauControlElement.js';
+import { AufbauControlElement } from '@aufbau/element';
 import { attrs, html }          from '../lib/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];

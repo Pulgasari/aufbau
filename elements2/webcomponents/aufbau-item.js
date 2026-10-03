@@ -1,4 +1,4 @@
-import { AufbauElement }           from '../base/AufbauElement.js';
+import { AufbauElement }           from '@aufbau/element';
 import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 export default class AufbauItem extends AufbauElement {

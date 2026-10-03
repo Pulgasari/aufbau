@@ -2,11 +2,10 @@
 
 // :::::: IMPORTS
 
-import { configKeys }                 from '../lib/config.js';
-import { AufbauSourceElement }        from '../base/AufbauSourceElement.js';
-import { TYPES, typeOf }              from './input/types/index.js';
-import { actionButtons, bindActions } from '../lib/actions.js';
-import { attrs, html }                from '../lib/html.js';
+import { AufbauSourceElement, configKeys } from '@aufbau/element';
+import { TYPES, typeOf }                   from './input/types/index.js';
+import { actionButtons, bindActions }      from '../lib/actions.js';
+import { attrs, html }                     from '../lib/html.js';
 
 // :::::: CONSTANTS
 
