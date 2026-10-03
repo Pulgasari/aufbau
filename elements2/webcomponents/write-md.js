@@ -1,4 +1,4 @@
-import './aufbau-reader.js';
+import './output-md.js';
 import './write-text.js';
 
 import setAttr      from '@domina/methods/setAttr.js';
@@ -42,14 +42,14 @@ export class WriteMd extends AufbauElement {
       > div              { display: grid; gap: inherit; }
 
       &:not([preview="toggle"]) > [role="tablist"]           { display: none; }
-      &[preview="none"] aufbau-reader                        { display: none; }
+      &[preview="none"] output-md                        { display: none; }
       &[preview="side"] > div                                { grid-template-columns: 1fr 1fr; }
       &[preview="toggle"]:state(preview) write-text       { display: none; }
-      &[preview="toggle"]:not(:state(preview)) aufbau-reader { display: none; }
+      &[preview="toggle"]:not(:state(preview)) output-md { display: none; }
     }`;
   }
 
-  get reader () { return this.querySelector('aufbau-reader'); }
+  get reader () { return this.querySelector('output-md'); }
   get writer () { return this.querySelector('write-text'); }
 
   get value () { return this.writer?.value ?? this.getAttribute('value') ?? ''; }
@@ -70,7 +70,7 @@ export class WriteMd extends AufbauElement {
       </div>
       <div>
         <write-text ${attrs({ value: this.firstValue })}></write-text>
-        <aufbau-reader></aufbau-reader>
+        <output-md></output-md>
       </div>
     `;
   }

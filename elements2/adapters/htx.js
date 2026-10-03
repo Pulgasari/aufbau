@@ -1,8 +1,7 @@
 export const
-$code     = { tag: 'aufbau-code',      args: 'lang' },
+// NOTE provisional names, see the readme
 $loop     = 'aufbau-loop',
 $progress = { tag: 'aufbau-progress',  args: 'value' },
-$reader   = 'aufbau-reader',
 $skeleton = { tag: 'aufbau-skeleton',  args: 'shape' },
 
 appKeyboard     = { args: 'layout' },
@@ -60,6 +59,7 @@ mediaVideo      = { args: 'src' },
 mediaWave       = { args: 'src' },
 navCrumbs       = { args: 'path' },
 navToc          = { args: 'target' },
+outputMd        = { args: 'src' },
 outputValue     = { args: 'type' },
 popMenu         = { args: 'label' },
 popModal        = { args: 'heading' },
@@ -69,6 +69,7 @@ popTip          = { args: 'for' },
 popToast        = { args: 'message' },
 svgFlag         = { args: 'code' },
 svgIcon         = { args: ['icon', 'size'] },
+writeCode       = { args: 'lang' },
 writeMd         = { args: 'value' },
 writeText       = { args: 'value' };
 

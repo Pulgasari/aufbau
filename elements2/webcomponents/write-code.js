@@ -1,4 +1,4 @@
-// <aufbau-code>
+// <write-code>
 
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
@@ -26,10 +26,10 @@ const getHljs = () => (
 
 // ::: languages
 
-// built in, the config aufbau-code-languages-<name> adds more
+// built in, the config write-code-languages-<name> adds more
 const languages = new Map([['poo', '@poo/hljs']]);
 
-const languageSource = name => languages.get(name) ?? getConfig(`aufbau-code-languages-${name}`);
+const languageSource = name => languages.get(name) ?? getConfig(`write-code-languages-${name}`);
 
 const resolved = new Map;
 
@@ -44,7 +44,7 @@ function useLanguage (hljs, name) {
     const definition = isFn(source) ? source : (await import(source)).default;
     if (!isFn(definition)) throw new Error('module has no default export returning a language definition');
     hljs.registerLanguage(name, definition);
-  })().catch(error => console.warn(`[aufbau-code] could not register language "${name}":`, error));
+  })().catch(error => console.warn(`[write-code] could not register language "${name}":`, error));
 
   resolved.set(name, pending);
   return pending;
@@ -55,7 +55,7 @@ const FALLBACK_THEMES = ['dracula', 'github', 'github-dark'];
 const THEME_PATHS = { dracula: 'base16/dracula' };
 
 const loadTheme = (theme) => adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
-  scope : `aufbau-code[${THEME_ATTR}="${theme}"]`,
+  scope : `write-code[${THEME_ATTR}="${theme}"]`,
   key   : `hljs:${theme}`,
 });
 
@@ -105,7 +105,7 @@ function setCaret (root, offset) {
   selection.addRange(range);
 }
 
-export default class AufbauCode extends AufbauSourceElement {
+export default class WriteCode extends AufbauSourceElement {
   static attr = {
     actions  : { type: String, default: 'copy paste clear' },
     code     : String,
@@ -117,7 +117,7 @@ export default class AufbauCode extends AufbauSourceElement {
   };
 
   static output = 'figure';
-  static styles = `aufbau-code {
+  static styles = `write-code {
     display  : block;
     font     : inherit;
     overflow : hidden;
@@ -192,7 +192,7 @@ j
         return found;
       })
       .catch(error => {
-        console.warn('[aufbau-code] theme index unreachable, using fallback list:', error);
+        console.warn('[write-code] theme index unreachable, using fallback list:', error);
         return [...FALLBACK_THEMES];
       }));
   }
@@ -236,7 +236,7 @@ j
       if (caret !== null) setCaret(node, caret);
       this._highlighted = source;
     } catch (error) {
-      console.warn('[aufbau-code] could not highlight the edit:', error);
+      console.warn('[write-code] could not highlight the edit:', error);
     }
   }
 
@@ -295,7 +295,7 @@ j
       hljs.highlightElement($code);
       this._highlighted = source;
     } catch (error) {
-      console.warn('[aufbau-code] failed to lazy load highlight.js:', error);
+      console.warn('[write-code] failed to lazy load highlight.js:', error);
     }
   }
 
@@ -311,4 +311,4 @@ j
   }
 }
 
-AufbauCode.init();
+WriteCode.init();

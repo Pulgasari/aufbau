@@ -2,6 +2,7 @@ import { AufbauElement } from '@aufbau/element';
 
 const clamp = value => Math.min(100, Math.max(0, value));
 
+// NOTE provisional name, no better one found yet and not happy with it
 export default class AufbauProgress extends AufbauElement {
   static internals = { role: 'progressbar' };
 

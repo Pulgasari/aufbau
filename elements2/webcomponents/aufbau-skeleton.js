@@ -1,6 +1,7 @@
 import { AufbauElement } from '@aufbau/element';
 
 // a placeholder and nothing else: lines, a block or a circle
+// NOTE provisional name, no better one found yet and not happy with it
 export default class AufbauSkeleton extends AufbauElement {
   static internals = { ariaHidden: 'true' };
 

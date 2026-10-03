@@ -14,10 +14,8 @@ a tag maps onto its module:
 */// :::: TAGS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const TAGS = [
-  'aufbau-code',
   'aufbau-loop',
   'aufbau-progress',
-  'aufbau-reader',
   'aufbau-skeleton',
 
   'app-area',
@@ -90,6 +88,7 @@ const TAGS = [
   'nav-crumbs',
   'nav-toc',
 
+  'output-md',
   'output-value',
 
   'pop-menu',
@@ -102,6 +101,7 @@ const TAGS = [
   'svg-flag',
   'svg-icon',
 
+  'write-code',
   'write-md',
   'write-text',
 ];

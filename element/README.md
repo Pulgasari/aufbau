@@ -175,8 +175,8 @@ onSourceChange ()           // the children changed, rebuilds by default
 ```js
 import { getConfig, onConfigChange, setConfig, setSkin } from '@aufbau/element';
 
-setConfig('aufbau-code-theme', 'nord');   // or setConfig({ 'aufbau-code': { theme: 'nord' } })
-getConfig('aufbau-code-theme');
+setConfig('write-code-theme', 'nord');   // or setConfig({ 'write-code': { theme: 'nord' } })
+getConfig('write-code-theme');
 onConfigChange(event => event.detail.changed);
 setSkin('monochrome');                    // 'none' removes it
 ```

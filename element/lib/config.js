@@ -11,7 +11,7 @@ export const CONFIG_EVENT = 'aufbau-config-changed';
 const config   = new CanonicalMap(null, ['kebab', 'camel', 'snake']);
 const elements = new Map;   // tag -> the connected elements of it
 
-// { aufbau: { code: { theme: 'nord' } } } -> aufbau-code-theme
+// { write: { code: { theme: 'nord' } } } -> write-code-theme
 function flatten (input, prefix = '', out = new Map) {
   for (const [key, value] of Object.entries(input)) {
     const path = prefix ? `${prefix}-${key}` : key;
@@ -30,7 +30,7 @@ function notify (changed) {
   if (typeof window !== 'undefined') emitEvent(window, CONFIG_EVENT, { changed });
 }
 
-// setConfig('aufbau-code-theme', 'nord') or setConfig({ 'aufbau-code': { theme: 'nord' } }). null removes
+// setConfig('write-code-theme', 'nord') or setConfig({ 'write-code': { theme: 'nord' } }). null removes
 export function setConfig (keyOrEntries, value) {
   const entries = isPlainObject(keyOrEntries) ? flatten(keyOrEntries) : new Map([[keyOrEntries, value]]);
   const changed = [];

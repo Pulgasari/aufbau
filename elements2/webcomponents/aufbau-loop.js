@@ -1,6 +1,7 @@
 import { AufbauElement } from '@aufbau/element';
 import { onVisible }     from '@domina/observer';
 
+// NOTE provisional name, no better one found yet and not happy with it
 export default class AufbauLoop extends AufbauElement {
   static reflect = ['direction', 'mode'];
 

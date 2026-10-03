@@ -5,7 +5,7 @@ import { dedent }               from '../lib/dedent.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
 
-export default class AufbauReader extends AufbauSourceElement {
+export default class OutputMd extends AufbauSourceElement {
   static attr = {
     format : { type: String, default: 'markdown', values: ['html', 'markdown'] },
     raw    : String,
@@ -16,7 +16,7 @@ export default class AufbauReader extends AufbauSourceElement {
 
   static output = 'article';
 
-  static styles = `aufbau-reader {
+  static styles = `output-md {
     --skeleton-lines : 4;
 
     display: block;
@@ -56,7 +56,7 @@ export default class AufbauReader extends AufbauSourceElement {
       this.finish('ready');
     } catch (error) {
       if (this._source !== source) return this;
-      console.warn(`[aufbau-reader] could not render ${src ? `"${src}"` : 'inline content'}:`, error);
+      console.warn(`[output-md] could not render ${src ? `"${src}"` : 'inline content'}:`, error);
       this._html = null;
       this.finish('error');
     }
@@ -81,7 +81,7 @@ export default class AufbauReader extends AufbauSourceElement {
   finish (state) {
     this.setState(state);
     super.update();
-    if (state !== 'loading') this.emit('aufbau-reader-rendered', { state, src: this.getAttr('src') });
+    if (state !== 'loading') this.emit('output-md-rendered', { state, src: this.getAttr('src') });
     return this;
   }
 
@@ -92,4 +92,4 @@ export default class AufbauReader extends AufbauSourceElement {
   }
 }
 
-AufbauReader.init();
+OutputMd.init();

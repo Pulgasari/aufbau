@@ -64,18 +64,19 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 the building blocks, in families by what they are for: `btn-` buttons, `data-`
 collections, `embed-` content of other sites, `media-` files and players, `nav-`
 navigation, `output-` values shown, `pop-` everything that opens over the page,
-`svg-` icons. the controls that hold a value are the input-*
+`svg-` icons, `write-` editors. the controls that hold a value are the input-*
 elements below.
 
+`aufbau-loop`, `aufbau-progress` and `aufbau-skeleton` keep their `aufbau-` names
+for now: no better name found yet, and not happy with these.
+
 [`<app-keyboard>`](#app-keyboard) ·
-[`<aufbau-code>`](#aufbau-code) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
-[`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
+[`<btn-icon>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-push>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-tap>`](#btn-push-btn-tap-btn-icon) ·
-[`<btn-icon>`](#btn-push-btn-tap-btn-icon) ·
 [`<data-index>`](#data-index) ·
 [`<data-list>`](#data-list) ·
 [`<data-table>`](#data-table) ·
@@ -88,6 +89,7 @@ elements below.
 [`<media-wave>`](#media-wave) ·
 [`<nav-crumbs>`](#nav-crumbs) ·
 [`<nav-toc>`](#nav-toc) ·
+[`<output-md>`](#output-md) ·
 [`<output-value>`](#output-value) ·
 [`<pop-menu>`](#pop-menu) ·
 [`<pop-modal>`](#pop-modal) ·
@@ -97,6 +99,7 @@ elements below.
 [`<pop-toast>`](#pop-toast) ·
 [`<svg-flag>`](#svg-flag) ·
 [`<svg-icon>`](#svg-icon) ·
+[`<write-code>`](#write-code) ·
 [`<write-text>`](#write-text) ·
 
 ## app-keyboard
@@ -128,26 +131,6 @@ noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
 wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
 hat und sonst gar nichts passieren würde.
 
-## aufbau-code
-
-```html
-<!-- 1. Code-Block mit Inline-Text -->
-<aufbau-code lang="javascript">
-const greet = (name) => `Hello, ${name}!`;
-console.log(greet('aufbau'));
-</aufbau-code>
-
-<!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
-<aufbau-code lang="css" code="body { margin: 0; background: #000; }" no-copy></aufbau-code>
-
-<!-- 3. editierbar: copy, paste und clear im header -->
-<aufbau-code lang="json" editable>{ "a": 1 }</aufbau-code>
-```
-
-`actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
-`clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
-gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
-
 ## aufbau-loop
 
 ```html
@@ -176,33 +159,6 @@ gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 <!-- 2. Standard Progress-Bar mit Prozentanzeige -->
 <aufbau-progress value="75" max="100" show-text unit="%"></aufbau-progress>
 ```
-
-## aufbau-reader
-
-lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
-über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
-selbst von einem cdn.
-
-`src`, `raw` oder die kinder als quelle. die kinder bleiben unangetastet und
-werden bei änderung neu gerendert, die ausgabe ist ein `<article>` im light dom.
-einrückung aus dem html wird entfernt.
-
-```html
-<!-- markdown-datei -->
-<aufbau-reader src="/docs/getting-started.md"></aufbau-reader>
-
-<!-- inline markdown -->
-<aufbau-reader raw="# Dynamic Title&#10;This is **inline** markdown content."></aufbau-reader>
-
-<!-- oder direkt als kindinhalt -->
-<aufbau-reader>
-# Titel
-Text mit **markdown**.
-</aufbau-reader>
-```
-
-der ladezustand steht als `:state(loading|ready|error|idle)` am element und ist
-damit direkt per css ansprechbar.
 
 ## aufbau-skeleton
 
@@ -263,7 +219,7 @@ of that tag update when it changes.
 import { setConfig } from '@aufbau/element';
 
 setConfig('svg-flag-variant', 'square');
-setConfig({ 'aufbau-code': { theme: 'nord' }, 'pop-toast': { duration: 5000 } });
+setConfig({ 'write-code': { theme: 'nord' }, 'pop-toast': { duration: 5000 } });
 setConfig('output-value-date-format', 'medium');   // the format of one type of <output-value>
 ```
 
@@ -535,6 +491,33 @@ accessible name (hiess vorher `title`, das legte einen tooltip über die ganze t
 jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
 überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
 
+## output-md
+
+lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
+über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
+selbst von einem cdn.
+
+`src`, `raw` oder die kinder als quelle. die kinder bleiben unangetastet und
+werden bei änderung neu gerendert, die ausgabe ist ein `<article>` im light dom.
+einrückung aus dem html wird entfernt.
+
+```html
+<!-- markdown-datei -->
+<output-md src="/docs/getting-started.md"></output-md>
+
+<!-- inline markdown -->
+<output-md raw="# Dynamic Title&#10;This is **inline** markdown content."></output-md>
+
+<!-- oder direkt als kindinhalt -->
+<output-md>
+# Titel
+Text mit **markdown**.
+</output-md>
+```
+
+der ladezustand steht als `:state(loading|ready|error|idle)` am element und ist
+damit direkt per css ansprechbar.
+
 ## output-value
 
 ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
@@ -703,9 +686,29 @@ reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
 <svg-icon icon="info" label="Hinweis"></svg-icon>      <!-- sonst aria-hidden -->
 ```
 
+## write-code
+
+```html
+<!-- 1. Code-Block mit Inline-Text -->
+<write-code lang="javascript">
+const greet = (name) => `Hello, ${name}!`;
+console.log(greet('aufbau'));
+</write-code>
+
+<!-- 2. Code-Block via Attribut (ohne Copy-Button) -->
+<write-code lang="css" code="body { margin: 0; background: #000; }" no-copy></write-code>
+
+<!-- 3. editierbar: copy, paste und clear im header -->
+<write-code lang="json" editable>{ "a": 1 }</write-code>
+```
+
+`actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
+`clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
+gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
+
 ## write-text
 
-mehrzeiliger text, das gegenstück zu [`<aufbau-reader>`](#aufbau-reader).
+mehrzeiliger text, das gegenstück zu [`<output-md>`](#output-md).
 
 ```html
 <write-text name="bio" placeholder="Kurz über dich..." counter maxlength="280"></write-text>
@@ -720,7 +723,7 @@ mehrzeiliger text, das gegenstück zu [`<aufbau-reader>`](#aufbau-reader).
 <write-text name="log" readonly actions="copy"></write-text>
 ```
 
-`actions` wie bei [`<aufbau-code>`](#aufbau-code), default `copy paste clear`.
+`actions` wie bei [`<write-code>`](#write-code), default `copy paste clear`.
 bei `readonly` sind paste und clear deaktiviert. `:state(full)` markiert einen
 counter, der `maxlength` erreicht hat.
 
