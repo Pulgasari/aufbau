@@ -102,7 +102,7 @@ export function resolveEmbed (source) {
 export default class AufbauEmbed extends AufbauElement {
 
   static attr = {
-    consent  : { type: String, default: 'click', values: ['auto', 'click'], config: true },
+    consent  : { type: String, default: 'click', values: ['auto', 'click'] },
     height   : String,
     label    : String,
     poster   : String,

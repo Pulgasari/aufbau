@@ -1,6 +1,6 @@
 type Handler = (this: AufbauElement, event: Event, node: Element) => void;
 
-type AttrEntry = Function | { type?: Function, default?: unknown, values?: unknown[], fn?: Function, config?: boolean | string[], var?: boolean | string } | unknown;
+type AttrEntry = Function | { type?: Function, default?: unknown, values?: unknown[], fn?: Function, var?: boolean | string } | unknown;
 
 export declare class Selection implements Iterable<Element> {
   readonly node  : Element | null;
@@ -81,11 +81,10 @@ export declare class AufbauElement extends HTMLElement {
   track<T extends () => unknown> (stop: T): T;
 
   getAttr (): Record<string, any>;
-  getAttr (name: string, type?: Function, fallback?: unknown): any;
+  getAttr (name: string): any;
   hasAttr (name: string): boolean;
   setAttr (map: Record<string, unknown>): this;
 
-  getConfig (name: string, fallback?: unknown, keys?: boolean | string[]): unknown;
 
   setSkeleton (on?: boolean): this;
   setVar      (name: string, value: unknown): this;
@@ -141,11 +140,10 @@ export declare const AufbauSourceElement  : typeof AufbauElement & Constructor<A
 
 export declare const CONFIG_EVENT : string;
 
-export declare function configKeys     (tag: string, name: string): string[];
-export declare function getConfig      (key: string, fallback?: unknown): unknown;
-export declare function onConfigChange (listener: (event: CustomEvent<{ changed: string[], config: Record<string, string> }>) => void): () => void;
-export declare function setConfig      (key: string, value: unknown, options?: { layer?: 'defaults' }): void;
-export declare function setConfig      (entries: Record<string, unknown>, options?: { layer?: 'defaults' }): void;
+export declare function getConfig      (key: string, fallback?: string): string | undefined;
+export declare function onConfigChange (listener: (event: CustomEvent<{ changed: string[] }>) => void): () => void;
+export declare function setConfig      (key: string, value: unknown): void;
+export declare function setConfig      (entries: Record<string, unknown>): void;
 
 type StyleObject = { [selectorOrProperty: string]: StyleObject | string | number | (string | number)[] | null | undefined | false };
 type Styles      = string | StyleObject | { toString (): string } | null | undefined | false | Styles[];

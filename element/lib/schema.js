@@ -1,66 +1,56 @@
-import { toArray }                      from '@pulgasari/coerce';
+import { CanonicalMap }                 from '@pulgasari/canonicalmap';
 import { isArray, isFn, isPlainObject } from '@pulgasari/is';
-import { toKebabCase }                  from '@pulgasari/str';
+import { toCamelCase, toKebabCase }     from '@pulgasari/str';
 
-// true stays true, nothing is null, anything else is converted
-function optional (value, convert) {
-  if (value === true) return true;
-  if (!value) return null;
-  return convert(value);
-}
+// the one place where an attribute's names are worked out. an entry knows them all:
+// name (itemSize) for js, attribute (item-size) for the dom, var (--item-size) for css.
+// the schema is a CanonicalMap, so itemSize, item-size and item_size find the same entry
+
+const TYPES  = { boolean: Boolean, number: Number, string: String };
+const typeOf = value => TYPES[typeof value] ?? String;
 
 const cache = new WeakMap;
 
-export const BASE = Object.freeze({ type: String, fallback: undefined, values: null, fn: null, config: null, var: null });
+function entryOf (key, spec) {
+  const entry = { name: toCamelCase(key), attribute: toKebabCase(key), type: String, fallback: undefined, values: null, fn: null, var: null };
 
-const TYPES  = { number: Number, boolean: Boolean, string: String };
-const typeOf = (value) => TYPES[typeof value] ?? String;
+  if (isFn(spec)) entry.type = spec;
+  else if (isPlainObject(spec)) {
+    entry.type     = spec.type ?? typeOf(spec.default);
+    entry.fallback = spec.default;
+    entry.values   = isArray(spec.values) ? spec.values : null;
+    entry.fn       = isFn(spec.fn) ? spec.fn : null;
+    entry.var      = spec.var === true ? `--${entry.attribute}` : (spec.var ?? null);
+  }
+  else if (spec != null) {
+    entry.type     = typeOf(spec);
+    entry.fallback = spec;
+  }
 
-export const parseSchemaEntry = (entry) => {
+  return Object.freeze(entry);
+}
 
-  // shorthand, bare constructor: `src: String`
-  if (isFn(entry)) return { ...BASE, type: entry };
+// a name outside the schema: a string attribute, nothing more
+export const looseEntry = key => entryOf(key);
 
-  // full form: `{ type, default, values, fn, config }`
-  if (isPlainObject(entry)) return {
-    ...BASE,
-    type     : entry.type ?? typeOf(entry.default),
-    fallback : entry.default,
-    values   : isArray (entry.values) ? entry.values : null,
-    fn       : isFn    (entry.fn)     ? entry.fn     : null,
-    config   : optional(entry.config, toArray),
-    var      : optional(entry.var, String),
-  };
-
-  // shorthand, bare default value: `volume: 50`
-  if (entry != null) return { ...BASE, type: typeOf(entry), fallback: entry };
-
-  return { ...BASE };
-};
-
-const attrOwners = (Class) => {
+function attrOwners (Class) {
   const owners = [];
   for (let c = Class; isFn(c); c = Object.getPrototypeOf(c)) {
     if (Object.hasOwn(c, 'attr') && c.attr) owners.unshift(c);
   }
   return owners;
-};
+}
 
-const entriesOf = (attr) =>
-    isArray       (attr) ? attr.map(name => [name, String])
-  : isPlainObject (attr) ? Object.entries(attr)
-  : [];
+// attr: { name: spec } or a list of names
+export function schemaOf (Class) {
+  if (cache.has(Class)) return cache.get(Class);
 
-export const schemaOf = (Class) => {
-  const hit = cache.get(Class); if (hit) return hit;
-
-  const parsed = {};
-  for (const owner of attrOwners(Class)) {
-    for (const [name, entry] of entriesOf(owner.attr)) {
-      parsed[toKebabCase(name)] = parseSchemaEntry(entry);
-    }
+  const schema = new CanonicalMap(null, ['kebab', 'camel', 'snake']);
+  for (const { attr } of attrOwners(Class)) {
+    const specs = isArray(attr) ? attr.map(name => [name, String]) : Object.entries(attr);
+    for (const [key, spec] of specs) schema.set(key, entryOf(key, spec));
   }
 
-  cache.set(Class, parsed);
-  return parsed;
-};
+  cache.set(Class, schema);
+  return schema;
+}

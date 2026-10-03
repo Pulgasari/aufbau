@@ -86,13 +86,13 @@ export default class AufbauKeyboard extends AufbauElement {
   static layouts = LAYOUTS;
 
   static attr = {
-    layout : { type: String, default: 'de', values: Object.keys(LAYOUTS), config: true },
+    layout : { type: String, default: 'de', values: Object.keys(LAYOUTS) },
 
     rows   : { type: String, default: 'symbols keys' },
 
     target : String,
 
-    'native-keyboard' : { type: String, default: 'hide', values: ['hide', 'keep'], config: true },
+    'native-keyboard' : { type: String, default: 'hide', values: ['hide', 'keep'] },
 
     alt   : Boolean,
     caps  : Boolean,

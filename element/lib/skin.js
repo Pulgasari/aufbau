@@ -9,8 +9,6 @@ const DEFAULT_SKIN = 'monochrome';
 const SKIN_BASE    = new URL('../../css/skins/', import.meta.url);
 const SKIN_KEY     = 'aufbau:skin';
 
-setConfig({ [CONFIG_KEY]: DEFAULT_SKIN }, { layer: 'defaults' });
-
 const skinUrl = (skin) =>
   /^(https?:|\/|\.)/.test(skin) ? new URL(skin, location.href).href
                                 : new URL(`${skin}.css`, SKIN_BASE).href;

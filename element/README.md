@@ -113,7 +113,6 @@ this.states.toggle('open', true)                   // :state(open)
 this.setVar('--item-size', '200px')                // a custom property on the host
 this.setVar({ '--embed-ratio': '16 / 9', '--embed-height': null })    // null and false remove
 this.setSkeleton(true)
-this.getConfig('theme', 'github')                  // attribute, then setConfig(), then fallback
 ```
 
 ### styles
@@ -177,10 +176,15 @@ onSourceChange ()           // the children changed, rebuilds by default
 ```js
 import { getConfig, onConfigChange, setConfig, setSkin } from '@aufbau/element';
 
-setConfig({ code: { theme: 'nord' } });   // or setConfig('code-theme', 'nord')
-getConfig('code-theme');
+setConfig('aufbau-code-theme', 'nord');   // or setConfig({ 'aufbau-code': { theme: 'nord' } })
+getConfig('aufbau-code-theme');
 onConfigChange(event => event.detail.changed);
 setSkin('monochrome');                    // 'none' removes it
 ```
+
+an attribute is read from the element, else from the config `tag-attribute`, else
+its default: `<app-panel>` without `controls` uses `setConfig('app-panel-controls', …)`.
+when a key changes, the connected elements whose tag it starts with update.
+null removes a key.
 
 `store` and `session` are the local and session storage that `persist` writes to.

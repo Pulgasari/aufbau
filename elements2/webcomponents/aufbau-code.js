@@ -4,10 +4,10 @@ import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 
-import { AufbauSourceElement, getConfig, setConfig } from '@aufbau/element';
-import { actionButtons, bindActions, parseActions }  from '../lib/actions.js';
-import { dedent }                                    from '../lib/dedent.js';
-import { attrs, html }                               from '../lib/html.js';
+import { AufbauSourceElement, getConfig }           from '@aufbau/element';
+import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
+import { dedent }                                   from '../lib/dedent.js';
+import { attrs, html }                              from '../lib/html.js';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
@@ -26,11 +26,10 @@ const getHljs = () => (
 
 // ::: languages
 
-const languages = new Map;
+// built in, the config aufbau-code-languages-<name> adds more
+const languages = new Map([['poo', '@poo/hljs']]);
 
-setConfig({ 'code-languages-poo': '@poo/hljs' }, { layer: 'defaults' });
-
-const languageSource = (name) => languages.get(name) ?? getConfig(`code-languages-${name}`);
+const languageSource = name => languages.get(name) ?? getConfig(`aufbau-code-languages-${name}`);
 
 const resolved = new Map;
 
@@ -54,8 +53,6 @@ function useLanguage (hljs, name) {
 const FALLBACK_THEMES = ['dracula', 'github', 'github-dark'];
 
 const THEME_PATHS = { dracula: 'base16/dracula' };
-
-setConfig({ 'code-theme': 'github-dark' }, { layer: 'defaults' });
 
 const loadTheme = (theme) => adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
   scope : `aufbau-code[${THEME_ATTR}="${theme}"]`,
@@ -116,7 +113,7 @@ export default class AufbauCode extends AufbauSourceElement {
     lang     : String,
     language : String,
     noCopy   : Boolean,
-    theme    : { type: String, config: true }
+    theme    : { type: String, default: 'github-dark' },
   };
 
   static output = 'figure';

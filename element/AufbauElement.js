@@ -1,25 +1,22 @@
 // :::::: IMPORTS
 
-import { BASE, schemaOf }                         from './lib/schema.js';
-import { applySkin }                              from './lib/skin.js';
-import { adoptClassStyles }                       from './lib/styles.js';
-import { CONFIG_EVENT, configKeys, resolveConfig } from './lib/config.js';
+import { followConfig, getConfig } from './lib/config.js';
+import { looseEntry, schemaOf }    from './lib/schema.js';
+import { applySkin }               from './lib/skin.js';
+import { adoptClassStyles }        from './lib/styles.js';
 
 import { hasAttr }       from '@domina/methods/hasAttr.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setStyleToken } from '@domina/methods/setStyleToken.js';
 
-import { CanonicalMap }                           from '@pulgasari/canonicalmap';
-import { coerce, toBoolean }                      from '@pulgasari/coerce';
-import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
-import { toCamelCase, toKebabCase }               from '@pulgasari/str';
-import { Logger }                                 from '@pulgasari/logger';
+import { coerce, toBoolean }             from '@pulgasari/coerce';
+import { isFn, isPlainObject, isString } from '@pulgasari/is';
+import { Logger }                        from '@pulgasari/logger';
+import { toCamelCase, toKebabCase }      from '@pulgasari/str';
 
 import { Selection, SHORTHANDS } from './Selection.js';
 
-const isBlank   = sth => sth === undefined || sth === null || sth === false || sth === '';
-const isDefined = sth => sth !== undefined;
-const log       = new Logger({ prefix: 'aufbau-core' });
+const log = new Logger({ prefix: 'aufbau-core' });
 
 const disposer = () => {
   const entries = new Set;
@@ -135,7 +132,7 @@ export class AufbauElement extends HTMLElement {
     this._mounted = true;
     adoptClassStyles(this.constructor, this.root === this ? this.getRootNode() : this.root);
     applySkin();
-    this.$(window).on(CONFIG_EVENT, event => { if (this._mounted && this.observesConfig(event.detail?.changed)) this.update(); });
+    this.track(followConfig(this));
     this.onConnected();
     this.update();
   }
@@ -153,6 +150,7 @@ export class AufbauElement extends HTMLElement {
 
   attributeChangedCallback (name, oldValue, newValue) {
     if (this._reflecting) return;
+    this._reflected?.delete(name);   // written by the author now
     if (oldValue !== newValue && this._mounted) {
       this.onAttributeChanged(name, oldValue, newValue);
       this.update();
@@ -169,7 +167,7 @@ export class AufbauElement extends HTMLElement {
       Object.defineProperty(this.prototype, '$' + toCamelCase(name), { configurable: true, get () { return this.part(name); } });
     }
 
-    const observed = Object.keys(schemaOf(this));
+    const observed = [...schemaOf(this).values()].map(entry => entry.attribute);
     if (observed.length && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
       Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
     }
@@ -214,68 +212,35 @@ export class AufbauElement extends HTMLElement {
   }
 
   reflectAttrs () {
-    const names = this.constructor.reflect;
-    if (!isArray(names)) return this;
-
-    for (const name of names) {
-      const kebab = toKebabCase(name);
+    for (const name of this.constructor.reflect ?? []) {
+      const { attribute } = this.entryOf(name);
       const value = this.getAttr(name);
+
       let text = String(value);
       if (value === true) text = '';
       if (value == null || value === false) text = null;
-
-      if (this.getAttribute(kebab) === text) continue;
+      if (this.getAttribute(attribute) === text) continue;
 
       this._reflecting = true;
-      try   { text === null ? this.removeAttribute(kebab) : this.setAttribute(kebab, text); }
+      try {
+        if (text === null) this.removeAttribute(attribute);
+        else this.setAttribute(attribute, text);
+        (this._reflected ??= new Set).add(attribute);
+      }
       finally { this._reflecting = false; }
     }
-
     return this;
   }
 
   invalidate () { this._markup = undefined; return this; }
 
-  // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
-  
+  // :::::: SCHEMA ::::::::::::::::::::::::::::::::::::::::::::::
+
   get schema () { return schemaOf(this.constructor); }
   get tag    () { return this.localName; }
 
-  // the config keys the element reacts to, null for every key. once per class,
-  // the map compares camel, kebab and snake case alike
-  get configWatchlist () {
-    const Class = this.constructor;
-    if (Object.hasOwn(Class, 'configWatchlist')) return Class.configWatchlist;
-
-    const keys = isArray(Class.observedConfig) ? [...Class.observedConfig] : [];
-    if (!keys.length) {
-      for (const [name, { config }] of Object.entries(this.schema)) {
-        if (config === true) keys.push(...configKeys(this.tag, name));
-        else if (config) keys.push(...config);
-      }
-    }
-
-    return (Class.configWatchlist = keys.length ? new CanonicalMap(keys.map(key => [key, true])) : null);
-  }
-
-  observesConfig (changed) {
-    const watchlist = this.configWatchlist;
-    if (!watchlist || !isArray(changed)) return true;
-    return changed.some(key => watchlist.has(key));
-  }
-
-  getConfig (name, fallback, keys = true) {
-    const kebab = toKebabCase(name);
-    if (this.hasAttribute(kebab)) return this.getAttribute(kebab);
-
-    const found = resolveConfig(this.tag, kebab, keys);
-    return found === undefined ? fallback : found;
-
-  }
-
-  gesturesMode () {
-    return String(this.getConfig('gestures', 'auto', [...configKeys(this.tag, 'gestures'), 'gestures']));
-  }
+  // the schema entry of a name in any case, a loose one outside the schema
+  entryOf (name) { return this.schema.get(name) ?? looseEntry(name); }
 
   // :::::: EVENTS ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -302,44 +267,43 @@ export class AufbauElement extends HTMLElement {
   hasAttr (name) { return hasAttr(this, name); }
   setAttr (map)  { setAttr(this, map); return this; }
 
-  getAttr (nameOrType, type, fallback) {
-    if (!isString(nameOrType)) return this._attrProxy(isFn(nameOrType) ? nameOrType : null);
+  // the attribute, else the config tag-attribute, else the default. getAttr() gives all of them.
+  // an attribute the element reflected itself is no attribute of the author
+  getAttr (name) {
+    if (name === undefined) return this.attrProxy();
 
-    const kebab  = toKebabCase(nameOrType);
-    const parsed = this.schema[kebab] ?? BASE;
+    const { attribute, fallback, fn, type, values } = this.entryOf(name);
+    const authored   = this.hasAttribute(attribute) && !this._reflected?.has(attribute);
+    const configured = () => getConfig(`${this.localName}-${attribute}`);
 
-    const finalType     = isFn(type)          ? type     : parsed.type;
-    const finalFallback = isDefined(fallback) ? fallback : parsed.fallback;
-    const fromConfig    = () => parsed.config ? resolveConfig(this.tag, kebab, parsed.config) : undefined;
-
-    if (finalType === Boolean) {
-      if (this.hasAttribute(kebab)) return true;
-      const configured = fromConfig();
-      return configured === undefined ? (finalFallback ?? false) : toBoolean(configured);
+    if (type === Boolean) {
+      if (authored) return true;
+      const value = configured();
+      return value === undefined ? (fallback ?? false) : toBoolean(value);
     }
 
-    const raw = this.hasAttribute(kebab) ? this.getAttribute(kebab) : fromConfig();
-    if (raw == null) return finalFallback;
+    const raw = authored ? this.getAttribute(attribute) : configured();
+    if (raw == null) return fallback;
 
-    let value = coerce(raw, finalType, finalFallback);
+    let value = coerce(raw, type, fallback);
+    if (values && !values.includes(value)) value = fallback;
 
-    if (parsed.values && !parsed.values.includes(value)) value = finalFallback;
-
-    if (parsed.fn) {
-      try   { value = parsed.fn.call(this, value, nameOrType); }
-      catch { value = finalFallback; }
+    if (fn) {
+      try   { value = fn.call(this, value, name); }
+      catch { value = fallback; }
     }
 
     return value;
   }
 
-  _attrProxy (overrideType) {
-    const names = Object.keys(this.schema);
+  // const { label, size } = this.getAttr()
+  attrProxy () {
+    const names = [...this.schema.values()].map(entry => entry.name);
 
     return new Proxy({}, {
-      get     : (target, prop) => isString(prop) ? this.getAttr(prop, overrideType) : undefined,
+      get     : (target, prop) => isString(prop) ? this.getAttr(prop) : undefined,
       has     : (target, prop) => isString(prop) && this.hasAttr(prop),
-      ownKeys : () => names.map(toCamelCase),
+      ownKeys : () => names,
       getOwnPropertyDescriptor: () => ({ configurable: true, enumerable: true }),
     });
   }
@@ -352,8 +316,8 @@ export class AufbauElement extends HTMLElement {
 
   // attributes with `var` in their schema are mirrored as custom properties
   applyVars () {
-    for (const [name, entry] of Object.entries(this.schema)) {
-      if (entry.var) this.setVar(entry.var === true ? name : entry.var, this.getAttr(name));
+    for (const entry of this.schema.values()) {
+      if (entry.var) this.setVar(entry.var, this.getAttr(entry.name));
     }
   }
 

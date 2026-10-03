@@ -25,7 +25,7 @@ export default class SvgFlag extends AufbauElement {
   static attr = {
     code    : 'de',
     label   : String,
-    variant : { type: String, default: 'circle', values: ['circle', 'square', '4x3'], config: true },
+    variant : { type: String, default: 'circle', values: ['circle', 'square', '4x3'] },
   };
 
   static styles = `svg-flag {

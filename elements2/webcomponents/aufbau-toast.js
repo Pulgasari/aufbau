@@ -211,7 +211,7 @@ export default class AufbauToast extends AufbauElement {
     this.on('pointerdown', (event) => {
       if (!this.getAttr('dismissible') || event.pointerType === 'mouse') return;
       if (event.composedPath().some(node => node.localName === 'button')) return;   // retargeted, the path still knows
-      if (this.gesturesMode() === 'false') return;
+      if (this.getAttr('gestures') === 'false') return;
       origin = event.clientX;
       offset = 0;
       this.stopTimer();

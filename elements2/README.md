@@ -218,7 +218,7 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 
 | attribut   | |
 |---|---|
-| `consent`  | `click` (default) oder `auto`, auch über `setConfig('embed-consent', 'auto')`, etwa wenn die seite selbst schon gefragt hat |
+| `consent`  | `click` (default) oder `auto`, auch über `setConfig('aufbau-embed-consent', 'auto')`, etwa wenn die seite selbst schon gefragt hat |
 | `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
 | `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
 | `height`   | eine feste höhe statt eines verhältnisses |
@@ -480,7 +480,7 @@ wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) für
 setzbar — attribut schlägt config, typ-key schlägt allgemeinen key:
 
 ```js
-setConfig({ value: { 'date-format': 'medium', locale: 'de-DE' } });
+setConfig({ 'aufbau-value': { 'date-format': 'medium', locale: 'de-DE' } });
 ```
 
 `date`, `datetime` und `time` rendern als `<time datetime="…">`, die
@@ -512,14 +512,16 @@ die balken werden nur bei neuen peaks neu gezeichnet. farben über
 
 ## config
 
-defaults for every element of a kind, set once from script. an attribute on
-the element wins.
+defaults for every element of a kind, set from script. every attribute falls
+back to the key `tag-attribute`, an attribute on the element wins. the elements
+of that tag update when it changes.
 
 ```js
 import { setConfig } from '@aufbau/element';
 
-setConfig({ code: { theme: 'nord' }, flag: { variant: 'square' }, toast: { duration: 5000 } });
-setConfig('value-date-format', 'medium');
+setConfig('svg-flag-variant', 'square');
+setConfig({ 'aufbau-code': { theme: 'nord' }, 'aufbau-toast': { duration: 5000 } });
+setConfig('aufbau-value-date-format', 'medium');   // the format of one type of <aufbau-value>
 ```
 
 ## data-table

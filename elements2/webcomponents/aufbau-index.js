@@ -135,7 +135,7 @@ export default class AufbauIndex extends AufbauElement {
 
     const min    = parsePx(this.getAttr('itemSizeMin'));
     const max    = parsePx(this.getAttr('itemSizeMax'));
-    const active = this.gesturesMode() !== 'false' && min != null && max != null && max > min;
+    const active = this.getAttr('gestures') !== 'false' && min != null && max != null && max > min;
     const token  = this._resizeToken = (this._resizeToken ?? 0) + 1;
 
     if (!active) { this._resizeValue = null; return; }

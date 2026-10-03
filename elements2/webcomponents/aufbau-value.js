@@ -2,19 +2,18 @@
 
 // :::::: IMPORTS
 
-import { AufbauSourceElement, configKeys } from '@aufbau/element';
-import { TYPES, typeOf }                   from './input/types/index.js';
-import { actionButtons, bindActions }      from '../lib/actions.js';
-import { attrs, html }                     from '../lib/html.js';
+import { AufbauSourceElement, getConfig } from '@aufbau/element';
+import { TYPES, typeOf }                  from './input/types/index.js';
+import { actionButtons, bindActions }     from '../lib/actions.js';
+import { attrs, html }                    from '../lib/html.js';
 
 // :::::: CONSTANTS
 
-const TAG           = 'aufbau-value';
-const TYPE_NAMES    = Object.keys(TYPES).filter(name => !TYPES[name].list); // the types of the inputs, the lists aside
-const TIME_TYPES    = new Set(['date', 'datetime', 'time']); // types that are an instant rather than a string, so they render as <time>       
-const NUMERIC       = /^-?\d+$/;
-const STYLES        = ['short', 'medium', 'long', 'full']; // Intl's four date/time presets. anything else falls through to the machine form     
-const CLOCK         = { short: 'short', medium: 'medium', long: 'medium', full: 'medium' };
+const TYPE_NAMES = Object.keys(TYPES).filter(name => !TYPES[name].list); // the types of the inputs, the lists aside
+const TIME_TYPES = new Set(['date', 'datetime', 'time']); // types that are an instant rather than a string, so they render as <time>
+const NUMERIC    = /^-?\d+$/;
+const STYLES     = ['short', 'medium', 'long', 'full']; // Intl's four date/time presets. anything else falls through to the machine form
+const CLOCK      = { short: 'short', medium: 'medium', long: 'medium', full: 'medium' };
 
 const INTL_OPTIONS = {
   date     : (style) => ({ dateStyle: style }),
@@ -59,18 +58,12 @@ function displayText (type, value, format, locale) {
 export default class AufbauValue extends AufbauSourceElement {
   static attr = {
     format : String,
-    locale : { type: String, config: true },
+    locale : String,
     type   : { type: String, default: 'text', values: TYPE_NAMES },
     value  : String, // the value. absent, the children are it (see get value)
     copy   : Boolean,
     icon   : String,
   };
-
-  static observedConfig = [
-    ...TYPE_NAMES.flatMap(type => configKeys(TAG, `${type}-format`)),
-    ...configKeys(TAG, 'format'),
-    ...configKeys(TAG, 'locale'),
-  ];
 
   static output = 'span';
 
@@ -139,12 +132,10 @@ export default class AufbauValue extends AufbauSourceElement {
 
   // :::::: CONFIG
 
+  // the attribute, else the config of the type (aufbau-value-date-format), else the config aufbau-value-format
   formatName () {
     const type = this.getAttr('type');
-    return this.getConfig('format', '', [
-      ...configKeys(this.tag, `${type}-format`),
-      ...configKeys(this.tag, 'format'),
-    ]);
+    return this.getAttribute('format') ?? getConfig(`${this.localName}-${type}-format`) ?? this.getAttr('format') ?? '';
   }
 
   // the icon to show before the value, '' for none
