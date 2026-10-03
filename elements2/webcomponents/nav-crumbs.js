@@ -1,7 +1,7 @@
 import { AufbauElement } from '../base/AufbauElement.js';
 import { attrs, html }   from '../lib/html.js';
 
-export default class AufbauCrumbs extends AufbauElement {
+export default class NavCrumbs extends AufbauElement {
   static internals = { role: 'navigation' };
 
   static attr = {
@@ -13,7 +13,7 @@ export default class AufbauCrumbs extends AufbauElement {
     separator : '/',
   };
 
-  static styles = `aufbau-crumbs {
+  static styles = `nav-crumbs {
     align-items : center;
     display     : flex;
     flex-wrap   : nowrap;
@@ -62,7 +62,7 @@ export default class AufbauCrumbs extends AufbauElement {
   onMount () {
     this.on('click', 'button[data-path]', (event, button) => {
       const index = Number(button.dataset.index);
-      this.emit('aufbau-crumbs', { index, path: button.dataset.path });
+      this.emit('nav-crumbs', { index, path: button.dataset.path });
     });
 
     this.on('click', 'button[data-expand]', () => { this._expanded = true; this.update(); });
@@ -108,4 +108,4 @@ export default class AufbauCrumbs extends AufbauElement {
   }
 }
 
-AufbauCrumbs.init();
+NavCrumbs.init();

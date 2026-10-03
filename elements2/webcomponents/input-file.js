@@ -19,7 +19,7 @@ const matches = (file, accept) => {
   );
 };
 
-export default class AufbauUpload extends AufbauControlElement {
+export default class InputFile extends AufbauControlElement {
   static reflect = ['look'];
 
   static attr = {
@@ -164,7 +164,7 @@ export default class AufbauUpload extends AufbauControlElement {
     this._files   = multiple ? [...this.files, ...accepted] : accepted.slice(0, 1);
     this._rejected = rejected;
 
-    if (rejected.length) this.emit('aufbau-upload-rejected', { rejected });
+    if (rejected.length) this.emit('input-file-rejected', { rejected });
 
     this.commitFiles();
     return this;
@@ -181,7 +181,7 @@ export default class AufbauUpload extends AufbauControlElement {
   commitFiles () {
     this.invalidate().update();
     this.notify();
-    this.emit('aufbau-upload', { files: this.files });
+    this.emit('input-file', { files: this.files });
     return this;
   }
 
@@ -236,4 +236,4 @@ export default class AufbauUpload extends AufbauControlElement {
   }
 }
 
-AufbauUpload.init();
+InputFile.init();

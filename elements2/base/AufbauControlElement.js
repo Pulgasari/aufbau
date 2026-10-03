@@ -24,16 +24,16 @@ export class AufbauControlElement extends AufbauElement {
   static styles = `
     [hidden] { display: none !important; }
 
-    :host, aufbau-writer {
+    :host, write-text {
       box-sizing : border-box;
       color      : inherit;
       display    : inline-block;
       font       : inherit;
     }
 
-    :host *, aufbau-writer * { box-sizing: border-box; }
+    :host *, write-text * { box-sizing: border-box; }
 
-    :host(:state(disabled)), aufbau-writer:state(disabled) { pointer-events: none; }
+    :host(:state(disabled)), write-text:state(disabled) { pointer-events: none; }
   `;
 
   static internals = true;

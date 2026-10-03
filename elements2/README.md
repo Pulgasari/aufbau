@@ -60,35 +60,65 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 
 ---
 
-# aufbau-*
+# elements
 
 the building blocks. the controls that hold a value are the input-* elements below.
 
+[`<app-modal>`](#app-modal) ·
 [`<aufbau-audio>`](#aufbau-audio) ·
 [`<aufbau-button>`](#aufbau-button) ·
 [`<aufbau-code>`](#aufbau-code) ·
-[`<aufbau-crumbs>`](#aufbau-crumbs) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-embed>`](#aufbau-embed) ·
-[`<aufbau-filter>`](#aufbau-filter) ·
-[`<svg-flag>`](#svg-flag) ·
-[`<svg-icon>`](#svg-icon) ·
+[`<aufbau-index>`](#aufbau-index) ·
 [`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
-[`<aufbau-modal>`](#aufbau-modal) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
-[`<aufbau-table>`](#aufbau-table) ·
+[`<aufbau-toast>`](#aufbau-toast) ·
 [`<aufbau-toc>`](#aufbau-toc) ·
-[`<aufbau-tree>`](#aufbau-tree) ·
-[`<aufbau-tree-item>`](#aufbau-tree-item) ·
-[`<aufbau-upload>`](#aufbau-upload) ·
 [`<aufbau-value>`](#aufbau-value) ·
 [`<aufbau-video>`](#aufbau-video) ·
 [`<aufbau-waveform>`](#aufbau-waveform) ·
-[`<aufbau-writer>`](#aufbau-writer) ·
+[`<data-table>`](#data-table) ·
+[`<data-tree>`](#data-tree) ·
+[`<input-file>`](#input-file) ·
+[`<nav-crumbs>`](#nav-crumbs) ·
+[`<svg-flag>`](#svg-flag) ·
+[`<svg-icon>`](#svg-icon) ·
+[`<write-text>`](#write-text) ·
+
+## app-modal
+
+modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
+fokus bleibt drin und kehrt danach zurück. der dialog liegt im shadow root, die
+kinder bleiben unangetastet und werden per `<slot>` hineinprojiziert. `open`
+spiegelt den zustand in beide richtungen, ein `<form method="dialog">` schliesst
+ihn und liefert den `returnValue`. styling über `::part(dialog|header|heading|close)`.
+
+```html
+<app-modal id="settings" heading="Einstellungen">
+  <p>…</p>
+  <form method="dialog">
+    <button value="cancel">Abbrechen</button>
+    <button value="save">Speichern</button>
+  </form>
+</app-modal>
+```
+
+```js
+const result = await document.querySelector('#settings').show();   // 'save' | 'cancel' | ''
+
+if (await AppModal.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
+```
+
+`dismissible` (default an) erlaubt schliessen per button, escape und klick auf
+den backdrop. öffnen und schliessen blenden über `@starting-style` und diskrete
+transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
+die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
+abdunklung über `--modal-backdrop`.
 
 ## aufbau-audio
 
@@ -133,42 +163,6 @@ console.log(greet('aufbau'));
 `actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
 `clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
 gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
-
-## config
-
-defaults for every element of a kind, set once from script. an attribute on
-the element wins.
-
-```js
-import { setConfig } from '@aufbau/elements2/lib/config.js';
-
-setConfig({ code: { theme: 'nord' }, flag: { variant: 'square' }, toast: { duration: 5000 } });
-setConfig('value-date-format', 'medium');
-```
-
-## aufbau-crumbs
-
-brotkrumen-navigation. der host ist die navigation-landmark, die trenner sind
-css (`--crumbs-separator`), die crumbs selbst bleiben normale links und buttons
-im light dom. zwei quellen:
-
-```html
-<!-- eigene kinder, unangetastet. das letzte bekommt aria-current -->
-<aufbau-crumbs>
-  <a href="/">Start</a>
-  <a href="/docs">Docs</a>
-  <span>Elements</span>
-</aufbau-crumbs>
-
-<!-- aus einem pfad. ohne href: buttons + event `aufbau-crumbs` { path, index } -->
-<aufbau-crumbs path="/home/user/docs" root="Home" max="4"></aufbau-crumbs>
-
-<!-- mit href-vorlage: echte links, {path} wird ersetzt -->
-<aufbau-crumbs path="/a/b/c" href="/files?path={path}"></aufbau-crumbs>
-```
-
-`max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
-den pfad (default `/`).
 
 ## aufbau-datalist
 
@@ -235,28 +229,6 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 
 `activate()` lädt von außen, danach `:state(active)` und das event `activate`
 mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
-
-## svg-flag
-
-```html
-<svg-flag code="de" variant="circle"></svg-flag>
-<svg-flag code="us"></svg-flag>
-```
-
-der accessible name ist der ländername in der seitensprache (`de` → „Deutschland“),
-`label` überschreibt ihn.
-
-## svg-icon
-
-reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
-[`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
-
-```html
-<svg-icon icon="lucide:save"></svg-icon>
-<svg-icon icon="save" size="2em" color="tomato"></svg-icon>
-<svg-icon icon="logos:deno" mode="image"></svg-icon>   <!-- mehrfarbig -->
-<svg-icon icon="info" label="Hinweis"></svg-icon>      <!-- sonst aria-hidden -->
-```
 
 ## aufbau-index
 
@@ -381,36 +353,6 @@ hat und sonst gar nichts passieren würde.
 </aufbau-loop>
 ```
 
-## aufbau-modal
-
-modaler dialog auf einem nativen `<dialog>`: top layer, inerte seite dahinter,
-fokus bleibt drin und kehrt danach zurück. der dialog liegt im shadow root, die
-kinder bleiben unangetastet und werden per `<slot>` hineinprojiziert. `open`
-spiegelt den zustand in beide richtungen, ein `<form method="dialog">` schliesst
-ihn und liefert den `returnValue`. styling über `::part(dialog|header|heading|close)`.
-
-```html
-<aufbau-modal id="settings" heading="Einstellungen">
-  <p>…</p>
-  <form method="dialog">
-    <button value="cancel">Abbrechen</button>
-    <button value="save">Speichern</button>
-  </form>
-</aufbau-modal>
-```
-
-```js
-const result = await document.querySelector('#settings').show();   // 'save' | 'cancel' | ''
-
-if (await AufbauModal.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
-```
-
-`dismissible` (default an) erlaubt schliessen per button, escape und klick auf
-den backdrop. öffnen und schliessen blenden über `@starting-style` und diskrete
-transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
-die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
-abdunklung über `--modal-backdrop`.
-
 ## aufbau-progress
 
 ```html
@@ -463,35 +405,6 @@ jedes andere aufbau-element kann dasselbe an seiner eigenen stelle: das attribut
 und picker zeigen ihn von selbst, während sie `src` laden. aussehen über
 `--skeleton-color`, `--skeleton-line`, `--skeleton-gap`, `--skeleton-radius`.
 
-## aufbau-table
-
-```html
-<!-- 3. Tabelle direkt aus einer CSV-Datei -->
-<aufbau-table src="/data/users.csv"></aufbau-table>
-
-<!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
-<aufbau-table src="/config/servers.yaml" columns="name, ip, status"></aufbau-table>
-```
-
-## aufbau-toc
-
-```html
-<div id="layout">
-  <!-- Content area that gets mutated by markdown import -->
-  <main id="markdown-container">
-    <!-- HTML injected via @aufbau/import -->
-  </main>
-
-  <!-- Autonomous TOC Component -->
-  <aufbau-toc target="#markdown-container" selector="h2, h3" label="Inhalt"></aufbau-toc>
-</div>
-```
-
-der host ist die navigation-landmark, `label` ist sichtbare überschrift und
-accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
-jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
-überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
-
 ## aufbau-toast
 
 meist imperativ über `notify()`. errors werden erkannt, auch als rohes objekt aus
@@ -518,43 +431,24 @@ notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
 </aufbau-toast>
 ```
 
-## aufbau-tree
+## aufbau-toc
 
 ```html
-<!-- 4. Tree Explorer (Verschachtelt) -->
-<aufbau-tree>
-  <aufbau-tree-item label="src" expanded>
-    <aufbau-tree-item label="components" expanded>
-      <aufbau-tree-item label="AufbauElement.js" icon="lucide:file-code"></aufbau-tree-item>
-      <aufbau-tree-item label="AufbauTree.js" icon="lucide:file-code"></aufbau-tree-item>
-    </aufbau-tree-item>
-    <aufbau-tree-item label="index.js" icon="lucide:file-code"></aufbau-tree-item>
-  </aufbau-tree-item>
-  <aufbau-tree-item label="package.json" icon="lucide:file-json"></aufbau-tree-item>
-</aufbau-tree>
+<div id="layout">
+  <!-- Content area that gets mutated by markdown import -->
+  <main id="markdown-container">
+    <!-- HTML injected via @aufbau/import -->
+  </main>
 
-<!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
-<aufbau-tree src="/config/file-structure.yaml"></aufbau-tree>
+  <!-- Autonomous TOC Component -->
+  <aufbau-toc target="#markdown-container" selector="h2, h3" label="Inhalt"></aufbau-toc>
+</div>
 ```
 
-tastatur wie beim wai-aria tree view: pfeil hoch/runter wandert durch die
-sichtbaren items, rechts öffnet bzw. springt ins erste kind, links schliesst bzw.
-springt zum parent, enter wählt und klappt um, leertaste wählt. ein tab-stop für
-den ganzen baum.
-
-## aufbau-upload
-
-`accept` statt `mimetype`, weil das native attribut mehr kann: mimetypes
-*und* endungen.
-
-```html
-<aufbau-upload name="avatar" accept="image/*"></aufbau-upload>
-<aufbau-upload name="belege" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload>
-<aufbau-upload name="logo" look="button" text="Datei wählen"></aufbau-upload>
-```
-
-abgelehnte dateien (falscher typ, zu gross) kommen als
-`aufbau-upload-rejected`-event und setzen die validity des elements.
+der host ist die navigation-landmark, `label` ist sichtbare überschrift und
+accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
+jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
+überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
 
 ## aufbau-value
 
@@ -617,27 +511,132 @@ die balken werden nur bei neuen peaks neu gezeichnet. farben über
 `--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
 `--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
 
-## aufbau-writer
+## config
+
+defaults for every element of a kind, set once from script. an attribute on
+the element wins.
+
+```js
+import { setConfig } from '@aufbau/elements2/lib/config.js';
+
+setConfig({ code: { theme: 'nord' }, flag: { variant: 'square' }, toast: { duration: 5000 } });
+setConfig('value-date-format', 'medium');
+```
+
+## data-table
+
+```html
+<!-- 3. Tabelle direkt aus einer CSV-Datei -->
+<data-table src="/data/users.csv"></data-table>
+
+<!-- 4. Tabelle aus YAML, beschränkt auf bestimmte Spalten -->
+<data-table src="/config/servers.yaml" columns="name, ip, status"></data-table>
+```
+
+## data-tree
+
+```html
+<!-- 4. Tree Explorer (Verschachtelt) -->
+<data-tree>
+  <data-tree-item label="src" expanded>
+    <data-tree-item label="components" expanded>
+      <data-tree-item label="AufbauElement.js" icon="lucide:file-code"></data-tree-item>
+      <data-tree-item label="DataTree.js" icon="lucide:file-code"></data-tree-item>
+    </data-tree-item>
+    <data-tree-item label="index.js" icon="lucide:file-code"></data-tree-item>
+  </data-tree-item>
+  <data-tree-item label="package.json" icon="lucide:file-json"></data-tree-item>
+</data-tree>
+
+<!-- 5. Tree Explorer (Automatisch aus YAML/JSON laden) -->
+<data-tree src="/config/file-structure.yaml"></data-tree>
+```
+
+tastatur wie beim wai-aria tree view: pfeil hoch/runter wandert durch die
+sichtbaren items, rechts öffnet bzw. springt ins erste kind, links schliesst bzw.
+springt zum parent, enter wählt und klappt um, leertaste wählt. ein tab-stop für
+den ganzen baum.
+
+## input-file
+
+`accept` statt `mimetype`, weil das native attribut mehr kann: mimetypes
+*und* endungen.
+
+```html
+<input-file name="avatar" accept="image/*"></input-file>
+<input-file name="belege" accept=".pdf,.docx" multiple max-size="5242880"></input-file>
+<input-file name="logo" look="button" text="Datei wählen"></input-file>
+```
+
+abgelehnte dateien (falscher typ, zu gross) kommen als
+`input-file-rejected`-event und setzen die validity des elements.
+
+## nav-crumbs
+
+brotkrumen-navigation. der host ist die navigation-landmark, die trenner sind
+css (`--crumbs-separator`), die crumbs selbst bleiben normale links und buttons
+im light dom. zwei quellen:
+
+```html
+<!-- eigene kinder, unangetastet. das letzte bekommt aria-current -->
+<nav-crumbs>
+  <a href="/">Start</a>
+  <a href="/docs">Docs</a>
+  <span>Elements</span>
+</nav-crumbs>
+
+<!-- aus einem pfad. ohne href: buttons + event `nav-crumbs` { path, index } -->
+<nav-crumbs path="/home/user/docs" root="Home" max="4"></nav-crumbs>
+
+<!-- mit href-vorlage: echte links, {path} wird ersetzt -->
+<nav-crumbs path="/a/b/c" href="/files?path={path}"></nav-crumbs>
+```
+
+`max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
+den pfad (default `/`).
+
+## svg-flag
+
+```html
+<svg-flag code="de" variant="circle"></svg-flag>
+<svg-flag code="us"></svg-flag>
+```
+
+der accessible name ist der ländername in der seitensprache (`de` → „Deutschland“),
+`label` überschreibt ihn.
+
+## svg-icon
+
+reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
+[`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
+
+```html
+<svg-icon icon="lucide:save"></svg-icon>
+<svg-icon icon="save" size="2em" color="tomato"></svg-icon>
+<svg-icon icon="logos:deno" mode="image"></svg-icon>   <!-- mehrfarbig -->
+<svg-icon icon="info" label="Hinweis"></svg-icon>      <!-- sonst aria-hidden -->
+```
+
+## write-text
 
 mehrzeiliger text, das gegenstück zu [`<aufbau-reader>`](#aufbau-reader).
 
 ```html
-<aufbau-writer name="bio" placeholder="Kurz über dich..." counter maxlength="280"></aufbau-writer>
+<write-text name="bio" placeholder="Kurz über dich..." counter maxlength="280"></write-text>
 
 <!-- wächst mit, zwischen 3 und 12 zeilen -->
-<aufbau-writer name="notiz" autogrow min-rows="3" max-rows="12"></aufbau-writer>
+<write-text name="notiz" autogrow min-rows="3" max-rows="12"></write-text>
 
 <!-- kindinhalt ist der startwert -->
-<aufbau-writer name="entwurf">Erster Entwurf.</aufbau-writer>
+<write-text name="entwurf">Erster Entwurf.</write-text>
 
 <!-- nur kopieren, keine anderen buttons -->
-<aufbau-writer name="log" readonly actions="copy"></aufbau-writer>
+<write-text name="log" readonly actions="copy"></write-text>
 ```
 
 `actions` wie bei [`<aufbau-code>`](#aufbau-code), default `copy paste clear`.
 bei `readonly` sind paste und clear deaktiviert. `:state(full)` markiert einen
 counter, der `maxlength` erreicht hat.
-
 
 ---
 
@@ -819,7 +818,7 @@ it, `app-area` is a region of it, `app-view` one screen. `app-panel`,
   `deactivate`.
 - `app-panel`: a header with `heading`, slots `start` and `actions`, and the
   buttons to close and expand what it sits in: an area is hidden or expanded,
-  an `aufbau-modal` closed. `controls="close expand"` names the buttons there
+  an `app-modal` closed. `controls="close expand"` names the buttons there
   may be; they only show where they can act.
 - `app-config`: a settings form from an `@aufbau/gui` spec. `spec` and `values`
   are properties, event `config { key, values }`. content only, the frame is
@@ -899,7 +898,7 @@ from bandcamp's own embed code; a page url turns the placeholder into a link.
 <aufbau-include>
 <aufbau-media> (allrounder?)
 <aufbau-menu>
-<aufbau-modal>
+<app-modal>
 <aufbau-paginate>
 <aufbau-popup>
 <aufbau-scroller>

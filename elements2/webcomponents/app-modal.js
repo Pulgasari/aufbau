@@ -2,9 +2,9 @@ import { AufbauElement }   from '../base/AufbauElement.js';
 import { html }            from '../lib/html.js';
 import { adoptBaseStyles } from '../lib/styles.js';
 
-const PAGE_STYLES = `:root:has(aufbau-modal:state(open)) { overflow: hidden; }`;
+const PAGE_STYLES = `:root:has(app-modal:state(open)) { overflow: hidden; }`;
 
-export default class AufbauModal extends AufbauElement {
+export default class AppModal extends AufbauElement {
   static shadow = true;
 
   static attr = {
@@ -81,7 +81,7 @@ export default class AufbauModal extends AufbauElement {
   // :::::: IMPERATIVE API ::::::::::::::::::::::::::::::::::::::
 
   static async confirm (message, { cancel = 'Cancel', confirm = 'OK', heading } = {}) {
-    const modal  = document.createElement('aufbau-modal');
+    const modal  = document.createElement('app-modal');
     const text   = Object.assign(document.createElement('p'), { textContent: message });
     const form   = Object.assign(document.createElement('form'), { method: 'dialog' });
     const button = (label, value) => Object.assign(document.createElement('button'), { textContent: label, value });
@@ -115,7 +115,7 @@ export default class AufbauModal extends AufbauElement {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onMount () {
-    adoptBaseStyles('aufbau-modal-page', PAGE_STYLES);   // deduplicated by key
+    adoptBaseStyles('app-modal-page', PAGE_STYLES);   // deduplicated by key
 
     this.on('click', '[part~="close"]', () => this.close());
 
@@ -137,7 +137,7 @@ export default class AufbauModal extends AufbauElement {
       const returnValue = this.dialog.returnValue;
       this.states.delete('open');
       if (this.getAttr('open')) this.setAttr({ open: false });
-      this.emit('aufbau-modal', { open: false, returnValue });
+      this.emit('app-modal', { open: false, returnValue });
       this._resolve?.(returnValue);
       this._closed = this._resolve = null;
     }, { capture: true });
@@ -174,10 +174,10 @@ export default class AufbauModal extends AufbauElement {
       dialog.returnValue = '';
       dialog.showModal();
       this.states.add('open');
-      this.emit('aufbau-modal', { open: true });
+      this.emit('app-modal', { open: true });
     }
     if (!open && dialog.open) dialog.close();
   }
 }
 
-AufbauModal.init();
+AppModal.init();

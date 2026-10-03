@@ -1,5 +1,5 @@
 import './aufbau-reader.js';
-import './aufbau-writer.js';
+import './write-text.js';
 
 import setAttr      from '@domina/methods/setAttr.js';
 import { debounce } from '@pulgasari/timing';
@@ -44,13 +44,13 @@ export class WriteMd extends AufbauElement {
       &:not([preview="toggle"]) > [role="tablist"]           { display: none; }
       &[preview="none"] aufbau-reader                        { display: none; }
       &[preview="side"] > div                                { grid-template-columns: 1fr 1fr; }
-      &[preview="toggle"]:state(preview) aufbau-writer       { display: none; }
+      &[preview="toggle"]:state(preview) write-text       { display: none; }
       &[preview="toggle"]:not(:state(preview)) aufbau-reader { display: none; }
     }`;
   }
 
   get reader () { return this.querySelector('aufbau-reader'); }
-  get writer () { return this.querySelector('aufbau-writer'); }
+  get writer () { return this.querySelector('write-text'); }
 
   get value () { return this.writer?.value ?? this.getAttribute('value') ?? ''; }
 
@@ -69,7 +69,7 @@ export class WriteMd extends AufbauElement {
         <button type="button" role="tab" data-mode="preview" aria-selected="false">preview</button>
       </div>
       <div>
-        <aufbau-writer ${attrs({ value: this.firstValue })}></aufbau-writer>
+        <write-text ${attrs({ value: this.firstValue })}></write-text>
         <aufbau-reader></aufbau-reader>
       </div>
     `;

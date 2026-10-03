@@ -5,7 +5,7 @@ import { attrs, html }                              from '../lib/html.js';
 import { setAttr }                                  from '@domina/methods/setAttr.js';
 import { setValue }                                 from '@domina/methods/setValue.js';
 
-export default class AufbauWriter extends AufbauControlElement {
+export default class WriteText extends AufbauControlElement {
   static reflect = ['look', 'resize'];
 
   static attr = {
@@ -24,7 +24,7 @@ export default class AufbauWriter extends AufbauControlElement {
 
   static source = true;
 
-  static styles = `aufbau-writer {
+  static styles = `write-text {
     display: block;
 
     > div {
@@ -165,4 +165,4 @@ export default class AufbauWriter extends AufbauControlElement {
   }
 }
 
-AufbauWriter.init();
+WriteText.init();

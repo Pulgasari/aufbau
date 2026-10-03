@@ -17,7 +17,6 @@ const TAGS = [
   'aufbau-audio',
   'aufbau-button',
   'aufbau-code',
-  'aufbau-crumbs',
   'aufbau-datalist',
   'aufbau-dropdown',
   'aufbau-embed',
@@ -26,27 +25,26 @@ const TAGS = [
   'aufbau-item',
   'aufbau-keyboard',
   'aufbau-loop',
-  'aufbau-modal',
   'aufbau-progress',
   'aufbau-reader',
   'aufbau-skeleton',
-  'aufbau-table',
   'aufbau-toast',
   'aufbau-toc',
-  'aufbau-tree',
-  'aufbau-tree-item',
-  'aufbau-upload',
   'aufbau-value',
   'aufbau-video',
   'aufbau-waveform',
-  'aufbau-writer',
 
   'app-area',
   'app-config',
   'app-float',
+  'app-modal',
   'app-panel',
   'app-root',
   'app-view',
+
+  'data-table',
+  'data-tree',
+  'data-tree-item',
 
   'div-x',
   'div-y',
@@ -57,6 +55,8 @@ const TAGS = [
   'embed-spotify',
   'embed-vimeo',
   'embed-youtube',
+
+  'nav-crumbs',
 
   'svg-flag',
   'svg-icon',
@@ -71,6 +71,7 @@ const TAGS = [
   'input-duration',
   'input-email',
   'input-emoji',
+  'input-file',
   'input-font',
   'input-hotkey',
   'input-icon',
@@ -92,13 +93,16 @@ const TAGS = [
   'input-year',
 
   'write-md',
+  'write-text',
 ];
 
 const known = new Set(TAGS);
 
+const OWN_FILE = new Set(['input-file', 'input-option']);
+
 // the inputs that are a type and nothing more share one module
 function pathOf (tag) {
-  if (tag.startsWith('input-') && tag !== 'input-option') return './webcomponents/input/tags.js';
+  if (tag.startsWith('input-') && !OWN_FILE.has(tag)) return './webcomponents/input/tags.js';
   return `./webcomponents/${tag}.js`;
 }
 

@@ -2,9 +2,9 @@ import { AufbauElement } from '../base/AufbauElement.js';
 import { importFile }    from '@aufbau/import';
 import { attrs, html }   from '../lib/html.js';
 
-const ITEM = 'aufbau-tree-item';
+const ITEM = 'data-tree-item';
 
-export default class AufbauTree extends AufbauElement {
+export default class DataTree extends AufbauElement {
   static internals = { role: 'tree' };
 
   static skeleton = { lines: 6, line: '1.1em', gap: '0.45em', width: '100%' };
@@ -13,7 +13,7 @@ export default class AufbauTree extends AufbauElement {
     src : String,
   };
 
-  static styles = `aufbau-tree { display: block; }`;
+  static styles = `data-tree { display: block; }`;
 
   // in-memory data — bypasses `src` and hand-authored markup
   set nodes (value) {
@@ -56,7 +56,7 @@ export default class AufbauTree extends AufbauElement {
       try {
         this._data = await importFile(src);
       } catch (error) {
-        console.warn(`[aufbau-tree] failed to import tree data from "${src}":`, error);
+        console.warn(`[data-tree] failed to import tree data from "${src}":`, error);
         this._data = null;
       }
       this.setSkeleton(false);
@@ -72,13 +72,13 @@ export default class AufbauTree extends AufbauElement {
     if (!Array.isArray(nodes)) return html``;
 
     return html`${nodes.map(node => html`
-      <aufbau-tree-item ${attrs({
+      <data-tree-item ${attrs({
         expanded : Boolean(node.expanded),
         icon     : node.icon,
         label    : node.label ?? node.name ?? '',
         selected : Boolean(node.selected),
         value    : node.value ?? node.id ?? node.path,
-      })}>${this.renderNodes(node.children)}</aufbau-tree-item>
+      })}>${this.renderNodes(node.children)}</data-tree-item>
     `)}`;
   }
 
@@ -127,4 +127,4 @@ export default class AufbauTree extends AufbauElement {
   }
 }
 
-AufbauTree.init();
+DataTree.init();

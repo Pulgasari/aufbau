@@ -7,7 +7,7 @@ const ICONS = {
   open   : 'lucide:folder-open',
 };
 
-export default class AufbauTreeItem extends AufbauElement {
+export default class DataTreeItem extends AufbauElement {
   static internals = { role: 'treeitem' };
 
   static shadow = true;
@@ -67,15 +67,15 @@ export default class AufbauTreeItem extends AufbauElement {
   `;
 
   get row          () { return this.part('row'); }
-  get items        () { return [...this.children].filter(child => child.localName === 'aufbau-tree-item'); }
+  get items        () { return [...this.children].filter(child => child.localName === 'data-tree-item'); }
   get hasChildren  () { return this.items.length > 0; }
-  get tree         () { return this.closest('aufbau-tree'); }
+  get tree         () { return this.closest('data-tree'); }
 
   // nesting depth, 1 for a top level item
   get level () {
     let level = 1;
-    for (let parent = this.parentElement; parent && parent.localName !== 'aufbau-tree'; parent = parent.parentElement) {
-      if (parent.localName === 'aufbau-tree-item') level += 1;
+    for (let parent = this.parentElement; parent && parent.localName !== 'data-tree'; parent = parent.parentElement) {
+      if (parent.localName === 'data-tree-item') level += 1;
     }
     return level;
   }
@@ -93,17 +93,17 @@ export default class AufbauTreeItem extends AufbauElement {
     if (!this.hasChildren || expanded === this.getAttr('expanded')) return this;
     this.setAttr({ expanded });
     this.tree?.syncFocus();   // the tab stop may have just been hidden
-    this.emit('aufbau-tree-toggle', { element: this, expanded, label: this.getAttr('label'), value: this.getAttr('value') });
+    this.emit('data-tree-toggle', { element: this, expanded, label: this.getAttr('label'), value: this.getAttr('value') });
     return this;
   }
 
   select () {
-    for (const item of this.tree?.querySelectorAll('aufbau-tree-item[selected]') ?? []) {
+    for (const item of this.tree?.querySelectorAll('data-tree-item[selected]') ?? []) {
       if (item !== this) item.removeAttribute('selected');
     }
     this.setAttr({ selected: true });
     this.tree?.syncFocus();
-    this.emit('aufbau-tree-select', { element: this, label: this.getAttr('label'), value: this.getAttr('value') });
+    this.emit('data-tree-select', { element: this, label: this.getAttr('label'), value: this.getAttr('value') });
     return this;
   }
 
@@ -127,4 +127,4 @@ export default class AufbauTreeItem extends AufbauElement {
 
 }
 
-AufbauTreeItem.init();
+DataTreeItem.init();

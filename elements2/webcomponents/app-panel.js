@@ -78,7 +78,7 @@ export class AppPanel extends AufbauElement {
   }
 
   // the area or modal the panel sits in, the nearer one
-  get container () { return this.parentElement?.closest(`app-area, aufbau-modal`) ?? null; }
+  get container () { return this.parentElement?.closest(`app-area, app-modal`) ?? null; }
 
   get area () {
     const container = this.container;
@@ -117,7 +117,7 @@ export class AppPanel extends AufbauElement {
     const $        = selector => this.shadowRoot.querySelector(selector);
 
     $('[part="heading"]').textContent = heading ?? '';
-    $('[part="close"]').hidden  = !(wanted.has('close') && (written || docked || this.container?.localName === 'aufbau-modal'));
+    $('[part="close"]').hidden  = !(wanted.has('close') && (written || docked || this.container?.localName === 'app-modal'));
     $('[part="expand"]').hidden = !(wanted.has('expand') && docked);
     $('[part="expand"]').setAttribute('aria-label', expanded ? 'collapse' : 'expand');
     $('[part="expand"] svg-icon').setAttribute('icon', expanded ? 'lucide:minimize-2' : 'lucide:maximize-2');

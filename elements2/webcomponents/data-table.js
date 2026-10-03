@@ -1,4 +1,4 @@
-// <aufbau-table>
+// <data-table>
 
 import { AufbauElement } from '../base/AufbauElement.js';
 import { importFile }    from '@aufbau/import';
@@ -6,7 +6,7 @@ import { sortElements }  from '@domina/methods/sortElements.js';
 import { html }          from '../lib/html.js';
 import { isArray }       from '@pulgasari/is';
 
-export default class AufbauTable extends AufbauElement {
+export default class DataTable extends AufbauElement {
   static skeleton = { lines: 5, line: '1.5em', width: '100%' };
 
   static attr = {
@@ -15,7 +15,7 @@ export default class AufbauTable extends AufbauElement {
     src      : String,
   };
 
-  static styles = `aufbau-table {
+  static styles = `data-table {
     display    : block;
     overflow-x : auto;
 
@@ -53,7 +53,7 @@ export default class AufbauTable extends AufbauElement {
     });
 
     this.sync();
-    this.emit('aufbau-table-sort', { key, direction: this._sortDir });
+    this.emit('data-table-sort', { key, direction: this._sortDir });
   }
 
   async update () {
@@ -65,7 +65,7 @@ export default class AufbauTable extends AufbauElement {
       try {
         this._data = await importFile(src);
       } catch (err) {
-        console.warn(`[aufbau-table] could not load table data from "${src}":`, err);
+        console.warn(`[data-table] could not load table data from "${src}":`, err);
         this._error = 'Failed to load table data.';
       }
       this.setSkeleton(false);
@@ -129,4 +129,4 @@ export default class AufbauTable extends AufbauElement {
   }
 }
 
-AufbauTable.init();
+DataTable.init();
