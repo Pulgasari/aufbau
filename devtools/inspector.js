@@ -7,7 +7,7 @@
 // (which is what makes console.log(obj) useful rather than "[object Object]"),
 // so console.log(obj) reads as an object rather than as "[object Object]".
 //
-// <aufbau-tree> was the obvious candidate and is the wrong one: renderNodes()
+// <data-tree> was the obvious candidate and is the wrong one: renderNodes()
 // recurses the whole node array at render time, so feeding it a live object
 // graph would mean materialising every reachable value up front — and a circular
 // reference would never terminate. a native <details> that builds its children

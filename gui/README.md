@@ -4,7 +4,7 @@ spec-driven ui-controls.
 
 a **spec** maps field keys to descriptors.
 
-`render()` emits the matching `aufbau-*` controls as dom-elements or an html-string.
+`render()` emits the matching `input-*` controls of `@aufbau/elements` as dom-elements or an html-string.
 
 `readValues()` reads typed values back out of a rendered container.
 
@@ -29,15 +29,15 @@ a descriptor's `type` picks the control:
 
 | type | control |
 |---|---|
-| `boolean` | `aufbau-toggle` |
-| `integer`, `number` | `aufbau-slider` (number) |
-| `angle` | `aufbau-slider` (0..360 deg) |
-| `duration` | `aufbau-slider` (unit-carrying value) |
-| `year` | `aufbau-input` (stepper) |
-| `color` | `aufbau-input` (swatch) |
-| `date`, `datetime`, `time`, `email`, `password`, `phone`, `text`, `url` | `aufbau-input` |
+| `boolean` | `input-bool` |
+| `integer`, `number` | `input-number` (slider) |
+| `angle` | `input-number` (slider, 0..360 deg) |
+| `duration` | `input-duration` (slider, unit-carrying value) |
+| `year` | `input-year` (stepper) |
+| `color` | `input-color` (swatch) |
+| `date`, `datetime`, `time`, `email`, `password`, `phone`, `text`, `url` | `input-value` of that type |
 
-a `values` array turns any field into an `aufbau-picker` regardless of type.
+a `values` array turns any field into an `input-value` with `input-option`s regardless of type.
 options are bare (`'live'`) or `[value, label]` pairs. `look`, `min`, `max`,
 `step`, `unit` and `default` ride through when set.
 
@@ -113,7 +113,7 @@ const oneHTML = field('speed', spec.speed, '2s', { format: 'html' });
 
 `render` element mode wires `onChange` to `change` and `input`, resolving the
 changed field name off the nearest named control (composite controls like
-`aufbau-picker` bubble from an inner unnamed element).
+`input-value` bubble from an inner unnamed element).
 
 ## layout
 

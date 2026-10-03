@@ -21,8 +21,8 @@ const flagged = (attrs = {}) => Object.fromEntries(Object.entries(attrs)
 // [value, label] from either a bare option or an explicit pair
 const normalizeOption = option => (Array.isArray(option) ? option : [option, option]);
 
-// a spec entry -> one aufbau control. `values` makes it a picker; otherwise
-// `type` selects the widget, defaulting to aufbau-input (which validates the
+// a spec entry -> one input-* control. `values` makes it a choice; otherwise
+// `type` selects the widget, defaulting to input-value (which validates the
 // type itself and falls back to text for anything it does not know).
 function toControl (key, spec, value) {
   const control = baseControl(key, spec, value);
@@ -36,28 +36,28 @@ function baseControl (key, spec, value) {
   const attrs = { name: key };
   const { max, min, step, type, unit, values } = spec;
 
-  // any other element by its tag, a component of @aufbau/components say. its
+  // any other element by its tag, one of @aufbau/elements say. its
   // attrs ride along, true as a bare attribute; it has to read and write `value`
   if (spec.tag) return { tag: spec.tag, attrs: pruned({ ...flagged(spec.attrs), ...attrs, value }) };
 
   // `look` (combobox for a long list, segments/radio for a short one) rides
   // through when the spec sets it; pruned drops it when it does not
-  if (values) return { tag: 'aufbau-picker', attrs: pruned({ ...attrs, value, look: spec.look }), options: values };
+  if (values) return { tag: 'input-value', attrs: pruned({ ...attrs, value, look: spec.look }), options: values };
 
   switch (type) {
-    case 'boolean'  : return { tag: 'aufbau-toggle', attrs: pruned({ ...attrs, value: 'true', checked: value ? '' : null }) };
+    case 'boolean'  : return { tag: 'input-bool',     attrs: pruned({ ...attrs, value: value ? 'true' : null }) };
     case 'integer'  :
-    case 'number'   : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min, max, step, unit, value }) };
-    case 'angle'    : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'number', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };
+    case 'number'   : return { tag: 'input-number',   attrs: pruned({ ...attrs, look: 'slider', min, max, step, unit, value }) };
+    case 'angle'    : return { tag: 'input-number',   attrs: pruned({ ...attrs, look: 'slider', min: min ?? 0, max: max ?? 360, step: step ?? 1, unit: unit ?? 'deg', value }) };
     // duration carries its own unit ("2s") so the readout is self-describing;
-    // min/max ride through (the domain parses them), step is a bare axis number
-    case 'duration' : return { tag: 'aufbau-slider', attrs: pruned({ ...attrs, type: 'duration', min, max, step: numberOf(step), value }) };
-    case 'year'     : return { tag: 'aufbau-input',  attrs: pruned({ ...attrs, type: 'year', look: 'stepper', min, max, step, value }) };
-    case 'color'    : return { tag: 'aufbau-input',  attrs: pruned({ ...attrs, type: 'color', look: 'swatch', value }) };
+    // min/max ride through (the type parses them), step is a bare axis number
+    case 'duration' : return { tag: 'input-duration', attrs: pruned({ ...attrs, look: 'slider', min, max, step: numberOf(step), value }) };
+    case 'year'     : return { tag: 'input-year',     attrs: pruned({ ...attrs, min, max, step, value }) };
+    case 'color'    : return { tag: 'input-color',    attrs: pruned({ ...attrs, value }) };
   }
 
-  // date, datetime, time, email, password, phone, text, url -> native aufbau-input
-  return { tag: 'aufbau-input', attrs: pruned({ ...attrs, type, value }) };
+  // date, datetime, time, email, password, phone, text, url -> input-value of that type
+  return { tag: 'input-value', attrs: pruned({ ...attrs, type, value }) };
 }
 
 // :::::: CONTROLS

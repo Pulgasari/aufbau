@@ -1,56 +1,75 @@
-// @aufbau/elements/htx
-// shorthand tags for htx. `args` names the attributes positional values fill,
-// in order. positionals beyond them become children, which is where the label
-// of a button, the text of a reader or the value of a value element belong.
-//
-//   <$icon 'lucide:search' '1.5em' />         <aufbau-icon icon="lucide:search" size="1.5em">
-//   <$btn variant="primary">Save</$btn>       <aufbau-button variant="primary">Save</aufbau-button>
-//   <$option 'de' 'Deutsch' />                <aufbau-option value="de">Deutsch</aufbau-option>
-//   <$code 'js' ${source} />                  <aufbau-code lang="js">…</aufbau-code>
-//   <$value 'date' ${timestamp} />            <aufbau-value type="date">…</aufbau-value>
-//
-// names only, no element is imported here. load them as usual (autoloader() or
-// the element modules).
-
 export const
-$audio    = { tag: 'aufbau-audio',     args: 'src' },
-$btn      = 'aufbau-button',
-$code     = { tag: 'aufbau-code',      args: 'lang' },
-$crumbs   = { tag: 'aufbau-crumbs',    args: 'path' },
-$datalist = 'aufbau-datalist',
-$dropdown = { tag: 'aufbau-dropdown',  args: 'label' },
-$embed    = { tag: 'aufbau-embed',     args: 'src' },
-$filter   = { tag: 'aufbau-filter',    args: 'target' },
-$flag     = { tag: 'aufbau-flag',      args: 'code' },
-$icon     = { tag: 'aufbau-icon',      args: ['icon', 'size'] },
-$index    = 'aufbau-index',
-$input    = { tag: 'aufbau-input',     args: 'type' },
-$item     = 'aufbau-item',
-$keyboard = 'aufbau-keyboard',
+// NOTE provisional names, see the readme
 $loop     = 'aufbau-loop',
-$modal    = { tag: 'aufbau-modal',     args: 'heading' },
-$option   = { tag: 'aufbau-option',    args: 'value' },
-$picker   = { tag: 'aufbau-picker',    args: 'look' },
 $progress = { tag: 'aufbau-progress',  args: 'value' },
-$reader   = 'aufbau-reader',
 $skeleton = { tag: 'aufbau-skeleton',  args: 'shape' },
-$slider   = 'aufbau-slider',
-$table    = { tag: 'aufbau-table',     args: 'src' },
-$toast    = { tag: 'aufbau-toast',     args: 'message' },
-$toc      = 'aufbau-toc',
-$toggle   = 'aufbau-toggle',
-$tree     = 'aufbau-tree',
-$treeItem = { tag: 'aufbau-tree-item', args: 'label' },
-$upload   = 'aufbau-upload',
-$value    = { tag: 'aufbau-value',     args: 'type' },
-$video    = { tag: 'aufbau-video',     args: 'src' },
-$waveform = { tag: 'aufbau-waveform',  args: 'src' },
-$writer   = 'aufbau-writer';
 
-/* :::::: USAGE
+appKeyboard     = { args: 'layout' },
+appView         = { args: 'name' },
+btnIcon         = { args: 'command' },
+btnPush         = { args: 'label' },
+btnTap          = { args: 'label' },
+dataFilter      = { args: 'target' },
+dataIndex       = {},
+dataItem        = {},
+dataList        = {},
+dataNode        = { args: 'label' },
+dataTable       = { args: 'src' },
+dataTree        = { args: 'src' },
+embedBandcamp   = { args: 'src' },
+embedContent    = { args: 'src' },
+embedMastodon   = { args: 'src' },
+embedSoundcloud = { args: 'src' },
+embedSpotify    = { args: 'src' },
+embedVimeo      = { args: 'src' },
+embedYoutube    = { args: 'src' },
+inputBool       = { args: 'value' },
+inputChips      = { args: 'value' },
+inputColor      = { args: 'value' },
+inputCountry    = { args: 'value' },
+inputCurrency   = { args: 'value' },
+inputDate       = { args: 'value' },
+inputDatetime   = { args: 'value' },
+inputDuration   = { args: 'value' },
+inputEmail      = { args: 'value' },
+inputEmoji      = { args: 'value' },
+inputFile       = { args: 'name' },
+inputFont       = { args: 'value' },
+inputHotkey     = { args: 'value' },
+inputIcon       = { args: 'value' },
+inputLanguage   = { args: 'value' },
+inputLocale     = { args: 'value' },
+inputNumber     = { args: 'value' },
+inputOption     = { args: 'value' },
+inputPassword   = { args: 'value' },
+inputPattern    = { args: 'value' },
+inputPhone      = { args: 'value' },
+inputSearch     = { args: 'value' },
+inputSlug       = { args: 'value' },
+inputText       = { args: 'value' },
+inputTime       = { args: 'value' },
+inputTimezone   = { args: 'value' },
+inputUnit       = { args: 'value' },
+inputUrl        = { args: 'value' },
+inputValue      = { args: 'type' },
+inputYear       = { args: 'value' },
+mediaAudio      = { args: 'src' },
+mediaFile       = { args: 'src' },
+mediaVideo      = { args: 'src' },
+mediaWave       = { args: 'src' },
+navCrumbs       = { args: 'path' },
+navToc          = { args: 'target' },
+outputMd        = { args: 'src' },
+outputValue     = { args: 'type' },
+popMenu         = { args: 'label' },
+popModal        = { args: 'heading' },
+popOver         = {},
+popPrompt       = { args: 'message' },
+popTip          = { args: 'for' },
+popToast        = { args: 'message' },
+svgFlag         = { args: 'code' },
+svgIcon         = { args: ['icon', 'size'] },
+writeCode       = { args: 'lang' },
+writeMd         = { args: 'value' },
+writeText       = { args: 'value' };
 
-import * as shorthands from '@aufbau/elements/htx';
-
-html.define(shorthands);
-
-*/

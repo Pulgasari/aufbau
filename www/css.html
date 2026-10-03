@@ -71,7 +71,7 @@
     }
 
     /* a code element fills its panel, the text scrolls inside */
-    .panel > aufbau-code {
+    .panel > write-code {
       height   : 100%;
       overflow : hidden;
 
@@ -96,11 +96,11 @@
       <button class="reset" id="reset-css">reset css</button>
     </nav>
     <div class="panel" data-panel="preview"><div id="stage"></div></div>
-    <div class="panel" data-panel="html" hidden><aufbau-code id="html-code" lang="html" editable actions="copy paste clear"></aufbau-code></div>
+    <div class="panel" data-panel="html" hidden><write-code id="html-code" lang="html" editable actions="copy paste clear"></write-code></div>
   </section>
 
   <section id="bottom">
-    <div class="panel"><aufbau-code id="css-code" lang="css" editable actions="copy paste clear"></aufbau-code></div>
+    <div class="panel"><write-code id="css-code" lang="css" editable actions="copy paste clear"></write-code></div>
   </section>
 
   <script type="text/plain" id="default-html">
@@ -143,9 +143,9 @@
 <blockquote>A quote, set apart from the text.</blockquote>
 
 <p class="icons">
-  <aufbau-icon icon="lucide:heart"></aufbau-icon>
-  <aufbau-icon icon="lucide:star"></aufbau-icon>
-  <aufbau-icon icon="lucide:bell"></aufbau-icon>
+  <svg-icon icon="lucide:heart"></svg-icon>
+  <svg-icon icon="lucide:star"></svg-icon>
+  <svg-icon icon="lucide:bell"></svg-icon>
 </p>
 
 <details>

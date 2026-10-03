@@ -1,36 +1,46 @@
 {
   "name": "@aufbau/elements",
-  "version": "1.0.0",
-  "description": "Reactive, zero-dependency Web Components for the @aufbau framework ecosystem",
+  "version": "2.0.0",
+  "description": "Custom elements for the @aufbau ecosystem: the aufbau-* building blocks and the app, div, embed, input and write elements composed of them",
   "type"   : "module",
   "main"   : "./index.js",
   "module" : "./index.js",
   "sideEffects": [
-    "./Aufbau*.js"
+    "./webcomponents/*.js",
+    "./webcomponents/input/tags.js"
   ],
   "exports": {
     "."     : "./index.js",
     "./htx" : "./adapters/htx.js",
-    "./*"   : "./*.js"
+    "./*"   : "./*"
   },
   "files": [
     "index.js",
-    "jsr.json",
-    "Aufbau*.js",
-    "core/*.js",
-    "adapters/*.js",
-    "README.md",
-    "LICENSE"
+    "index.d.ts",
+    "adapters",
+    "data",
+    "lib",
+    "webcomponents",
+    "README.md"
   ],
+  "dependencies": {
+    "@aufbau/element": "^0.1.0"
+  },
   "peerDependencies": {
+    "@aufbau/gui": "^0.1.0",
     "@aufbau/import": "^1.0.0"
   },
   "keywords": [
-    "web-components",
-    "custom-elements",
     "aufbau",
+    "custom-elements",
+    "esm",
     "ui-kit",
-    "esm"
+    "web-components"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "aufbau": {
+    "bundle": {
+      "keep": ["./"]
+    }
+  }
 }

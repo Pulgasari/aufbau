@@ -1,58 +1,151 @@
 /* @aufbau/elements
 
-entry point. intentionally side-effect free and lightweight:
-importing this file does NOT pull in every element.
-use autoloader() for lazy loading 
-or registerAll() to get everything at once.
+entry point. side effect free: nothing is defined until it is used.
 
-*/// :::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::::::
+  autoloader()    defines each element the first time its tag shows up
+  load(tag)       one element by its tag, e.g. 'svg-icon' or 'input-icon'
+  registerAll()   every element at once
 
-// only toPascalCase is needed here, imported straight from its leaf so the
-// loader stays lean and pulls nothing else onto its critical path.
-import { toPascalCase } from '@pulgasari/str';
+a tag maps onto its module:
 
-// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::::
+  <tag>          ./webcomponents/<tag>.js
+  input-<type>   ./webcomponents/input/tags.js, every input that is a type
 
-let   baseURL   = import.meta.url;
-let   manifest  = null;
-const PREFIX    = 'aufbau-';
+*/// :::: TAGS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// every aufbau element is autonomous, the tag name is the whole story
-const tagOf = element => element.localName?.startsWith(PREFIX) ? element.localName : null;
+const TAGS = [
+  'aufbau-loop',
+  'aufbau-progress',
+  'aufbau-skeleton',
+
+  'app-area',
+  'app-config',
+  'app-float',
+  'app-keyboard',
+  'app-panel',
+  'app-root',
+  'app-view',
+
+  'btn-icon',
+  'btn-push',
+  'btn-tap',
+
+  'data-filter',
+  'data-index',
+  'data-item',
+  'data-list',
+  'data-node',
+  'data-table',
+  'data-tree',
+
+  'div-x',
+  'div-y',
+
+  'embed-bandcamp',
+  'embed-content',
+  'embed-mastodon',
+  'embed-soundcloud',
+  'embed-spotify',
+  'embed-vimeo',
+  'embed-youtube',
+
+  'input-bool',
+  'input-chips',
+  'input-color',
+  'input-country',
+  'input-currency',
+  'input-date',
+  'input-datetime',
+  'input-duration',
+  'input-email',
+  'input-emoji',
+  'input-file',
+  'input-font',
+  'input-hotkey',
+  'input-icon',
+  'input-language',
+  'input-locale',
+  'input-number',
+  'input-option',
+  'input-password',
+  'input-pattern',
+  'input-phone',
+  'input-search',
+  'input-slug',
+  'input-text',
+  'input-time',
+  'input-timezone',
+  'input-unit',
+  'input-url',
+  'input-value',
+  'input-year',
+
+  'media-audio',
+  'media-file',
+  'media-video',
+  'media-wave',
+
+  'nav-crumbs',
+  'nav-toc',
+
+  'output-md',
+  'output-value',
+
+  'pop-menu',
+  'pop-modal',
+  'pop-over',
+  'pop-prompt',
+  'pop-tip',
+  'pop-toast',
+
+  'svg-flag',
+  'svg-icon',
+
+  'write-code',
+  'write-md',
+  'write-text',
+];
+
+const known = new Set(TAGS);
+
+const OWN_FILE = new Set(['input-file', 'input-option']);
+
+// the inputs that are a type and nothing more share one module
+function pathOf (tag) {
+  if (tag.startsWith('input-') && !OWN_FILE.has(tag)) return './webcomponents/input/tags.js';
+  return `./webcomponents/${tag}.js`;
+}
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::
 
+let   baseURL = import.meta.url;
+const loading = new Map;
+
 function load (tag) {
-  const url = new URL(`./${toPascalCase(tag)}.js`, baseURL).href;
-  return import(url).catch(err => {
-    console.warn(`[@aufbau/elements] could not load <${tag}> from "${url}":`, err);
-    return null;
-  });
+  if (!known.has(tag)) return Promise.resolve(null);
+  if (!loading.has(tag)) {
+    const url = new URL(pathOf(tag), baseURL).href;
+    loading.set(tag, import(url).catch(error => {
+      console.warn(`[@aufbau/elements] could not load <${tag}> from "${url}":`, error);
+      loading.delete(tag);
+      return null;
+    }));
+  }
+  return loading.get(tag);
 }
 
-async function registerAll () {
-  manifest ??= (await import(new URL('./jsr.json', baseURL).href, { with: { type: 'json' } })).default;    
-
-  const paths = Object.entries(manifest.exports ?? {})
-    .filter (([key])    => key.startsWith('./Aufbau'))
-    .map    (([, path]) => path);
-
-  const all = Promise.all(paths.map(path => import(new URL(path, baseURL).href)));
-  
-  return all;
-}
+const registerAll = () => Promise.all(TAGS.map(load));
 
 // :::::: AUTOLOADER ::::::::::::::::::::::::::::::::::::::::::::
 
 function request (tag) {
-  if (!tag || customElements.get(tag)) return;
-  load(tag);
+  if (known.has(tag) && !customElements.get(tag)) load(tag);
 }
 
 function scan (node) {
   if (node?.nodeType !== Node.ELEMENT_NODE) return;
-  request(tagOf(node));
-  node.querySelectorAll('*').forEach(el => request(tagOf(el)));
+  request(node.localName);
+  node.querySelectorAll('*').forEach(element => request(element.localName));
 }
 
 function autoloader ({ base, root = document } = {}) {
@@ -60,48 +153,23 @@ function autoloader ({ base, root = document } = {}) {
   if (base) baseURL = base;
 
   scan(root.documentElement ?? root);
-  
-  // 2. only walk what actually got added, no repeated full-document scans
+
   const observer = new MutationObserver(records => {
     for (const record of records) record.addedNodes.forEach(scan);
   });
-
-  observer.observe (
-    root.body ?? root.documentElement ?? root, 
-    { childList: true, subtree: true }
-  );
+  observer.observe(root.body ?? root.documentElement ?? root, { childList: true, subtree: true });
 
   return () => observer.disconnect();
 }
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-// the entry stays a lean, lazy loader and does NOT re-export the core
-// foundation. re-exporting it (export * from './core/index.js') made a bare
-// `import { autoloader }` eagerly fetch and evaluate AufbauCore/Control/skin/
-// styles/persist, and through them @domina/core and @bunker/storage, before
-// autoloader() could even run its dom scan. consumers that need the base
-// classes or the config api import them from the subpath directly:
-//   import { AufbauElement }        from '@aufbau/elements/core/index.js';
-//   import { setConfig, getConfig } from '@aufbau/elements/core/AufbauConfig.js';
-
 export {
+  TAGS,
+
   autoloader,
   load,
-  registerAll
+  pathOf,
+  registerAll,
 };
 
-/* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
-
-// lazy, browser first
-import { autoloader } from '@aufbau/elements';
-const stop = autoloader();
-
-// everything at once
-import { registerAll } from '@aufbau/elements';
-await registerAll();
-
-// hand picked
-import '@aufbau/elements/AufbauFlag.js';
-
-*/

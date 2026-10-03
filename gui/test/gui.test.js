@@ -10,26 +10,26 @@ import { fieldHTML, renderHTML } from '../html.js';
 import { readValues } from '../read.js';
 
 test('toControl maps types to the right aufbau control', () => {
-  assert.equal(toControl('a', { type: 'boolean' }).tag, 'aufbau-toggle');
-  assert.equal(toControl('a', { type: 'number'  }).tag, 'aufbau-slider');
-  assert.equal(toControl('a', { type: 'color'   }).tag, 'aufbau-input');
-  assert.equal(toControl('a', { type: 'wat'     }).tag, 'aufbau-input'); // unknown -> input fallback
+  assert.equal(toControl('a', { type: 'boolean' }).tag, 'input-bool');
+  assert.equal(toControl('a', { type: 'number'  }).tag, 'input-number');
+  assert.equal(toControl('a', { type: 'color'   }).tag, 'input-color');
+  assert.equal(toControl('a', { type: 'wat'     }).tag, 'input-value'); // unknown -> input fallback
 });
 
 test('toControl makes a picker when values are present and keeps the options', () => {
   const c = toControl('mode', { values: ['a', 'b'] });
-  assert.equal(c.tag, 'aufbau-picker');
+  assert.equal(c.tag, 'input-value');
   assert.deepEqual(c.options, ['a', 'b']);
   assert.equal(c.attrs.name, 'mode');
 });
 
 test('toControl prunes null attrs and strips the unit off a duration step', () => {
-  const toggle = toControl('a', { type: 'boolean' }); // value falsy -> checked null -> pruned
-  assert.ok(!('checked' in toggle.attrs));
+  const toggle = toControl('a', { type: 'boolean' }); // value falsy -> value null -> pruned
+  assert.ok(!('value' in toggle.attrs));
 
   const dur = toControl('speed', { type: 'duration', step: '0.5s' });
   assert.equal(dur.attrs.step, 0.5);
-  assert.equal(dur.attrs.type, 'duration');
+  assert.equal(dur.tag, 'input-duration');
 });
 
 test('toControl fills angle defaults', () => {
@@ -41,21 +41,21 @@ test('fieldHTML wraps a labelled control and escapes text', () => {
   const html = fieldHTML('title', { type: 'text', label: 'A < B' }, 'x');
   assert.match(html, /<label class="aufbau-field">/);
   assert.match(html, /<span class="aufbau-field-label">A &lt; B<\/span>/);
-  assert.match(html, /<aufbau-input name="title"/);
+  assert.match(html, /<input-value name="title"/);
 });
 
 test('fieldHTML renders picker options', () => {
   const html = fieldHTML('mode', { values: [['a', 'Label A'], 'b'] });
-  assert.match(html, /<aufbau-picker name="mode"/);
-  assert.match(html, /<aufbau-option value="a">Label A<\/aufbau-option>/);
-  assert.match(html, /<aufbau-option value="b">b<\/aufbau-option>/);
+  assert.match(html, /<input-value name="mode"/);
+  assert.match(html, /<input-option value="a">Label A<\/input-option>/);
+  assert.match(html, /<input-option value="b">b<\/input-option>/);
 });
 
 test('renderHTML wraps the whole spec, defaulting to <div>', () => {
   const html = renderHTML({ on: { type: 'boolean', label: 'On' }, n: { type: 'number' } });
   assert.ok(html.startsWith('<div>') && html.endsWith('</div>'));
-  assert.match(html, /<aufbau-toggle name="on"/);
-  assert.match(html, /<aufbau-slider name="n"/);
+  assert.match(html, /<input-bool name="on"/);
+  assert.match(html, /<input-number name="n"/);
 });
 
 test('renderHTML can skip the wrapper', () => {
@@ -70,7 +70,7 @@ test('readValues coerces each control back to a typed value', () => {
     flag  : { checked: true },
     count : { value: '3.7' },
     ratio : { value: '0.5' },
-    speed : { value: '2', typedValue: '2s' },
+    speed : { value: '2s' },
     name  : { value: 'hi' },
   };
   const container = { querySelector: sel => elements[sel.match(/\[name="(.+)"\]/)[1]] ?? null };
@@ -79,7 +79,7 @@ test('readValues coerces each control back to a typed value', () => {
     flag  : true,
     count : 4,      // rounded
     ratio : 0.5,
-    speed : '2s',   // typedValue re-attaches the unit
+    speed : '2s',   // keeps its unit
     name  : 'hi',
   });
 });

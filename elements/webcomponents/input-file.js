@@ -1,0 +1,239 @@
+import { AufbauControlElement } from '@aufbau/element';
+import { attrs, html }          from '../lib/html.js';
+
+const UNITS = ['B', 'KB', 'MB', 'GB'];
+
+const formatSize = (bytes) => {
+  let size = Number(bytes) || 0, unit = 0;
+  while (size >= 1024 && unit < UNITS.length - 1) { size /= 1024; unit++; }
+  return `${size < 10 && unit ? size.toFixed(1) : Math.round(size)} ${UNITS[unit]}`;
+};
+
+// "image/*, .pdf" -> matches image/png and report.pdf
+const matches = (file, accept) => {
+  if (!accept) return true;
+  return accept.split(',').map(part => part.trim().toLowerCase()).filter(Boolean).some(rule =>
+      rule.startsWith('.')    ? file.name.toLowerCase().endsWith(rule)
+    : rule.endsWith('/*')     ? file.type.startsWith(rule.slice(0, -1))
+    :                           file.type.toLowerCase() === rule
+  );
+};
+
+export default class InputFile extends AufbauControlElement {
+  static reflect = ['look'];
+
+  static attr = {
+    accept    : String,
+    directory : Boolean,
+    look      : { type: String, default: 'dropzone', values: ['dropzone', 'button', 'list'] },
+    maxSize   : Number,
+    multiple  : Boolean,
+    text      : 'drop files here or click to browse',
+  };
+
+  static shadow = true;
+
+  static styles = `
+    :host {
+      display        : flex;
+      flex-direction : column;
+      gap            : var(--control-gap, 0.5em);
+    }
+
+    [part~="zone"] {
+      align-items     : center;
+      background      : none;
+      color           : inherit;
+      cursor          : pointer;
+      display         : flex;
+      flex-direction  : column;
+      font            : inherit;
+      gap             : var(--control-gap, 0.5em);
+      justify-content : center;
+      margin          : 0;
+      padding         : 1.5em 1em;
+      text-align      : center;
+
+      > svg-icon { --icon-size: 1.75em; }
+    }
+
+    :host([look="button"]) [part~="zone"] {
+      flex-direction : row;
+      padding        : var(--control-pad, 0.35em 0.55em);
+    }
+
+    :host([look="list"]) [part~="zone"] { display: none; }
+
+    [part~="list"] {
+      display        : flex;
+      flex-direction : column;
+      gap            : 0.25em;
+      list-style     : none;
+      margin         : 0;
+      padding        : 0;
+    }
+
+    [part~="file"] {
+      align-items : center;
+      display     : flex;
+      gap         : var(--control-gap, 0.5em);
+    }
+
+    [part~="name"] {
+      flex            : 1 1 auto;
+      min-inline-size : 0;
+      overflow        : hidden;
+      text-overflow   : ellipsis;
+      white-space     : nowrap;
+    }
+
+    [part~="size"] {
+      flex                 : none;
+      font-size            : inherit;
+      font-variant-numeric : tabular-nums;
+      opacity              : 0.65;
+    }
+
+    [part~="remove"] {
+      align-items : center;
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      font        : inherit;
+      margin      : 0;
+      padding     : 0;
+      flex        : none;
+    }
+  `;
+
+  get multiple () { return this.getAttr('multiple'); }
+  get type     () { return 'file'; }
+
+  get files () { return this._files ??= []; }
+
+  // a file control submits FormData, one entry per file
+  get formValue () {
+    const { name } = this.getAttr();
+    if (!this.files.length || !name) return null;
+
+    const data = new FormData;
+    for (const file of this.files) data.append(name, file, file.name);
+    return data;
+  }
+
+  // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
+
+  onConnected () {
+    this.on('change', 'input[type="file"]', (event, input) => this.add([...input.files]));
+    this.on('click',  '[part~="zone"]',     () => { if (!this.disabled) this.field?.click(); });
+    this.on('click',  '[data-remove]',   (event, button) => this.remove(Number(button.dataset.remove)));
+
+    this.on('dragenter dragover', (event) => {
+      if (this.disabled) return;
+      event.preventDefault();
+      this.states.toggle('dragging', true);
+    });
+
+    this.on('dragleave', (event) => {
+      if (!this.contains(event.relatedTarget)) this.states.toggle('dragging', false);
+    });
+
+    this.on('drop', (event) => {
+      event.preventDefault();
+      this.states.toggle('dragging', false);
+      if (!this.disabled) this.add([...(event.dataTransfer?.files ?? [])]);
+    });
+  }
+
+  // :::::: FILES :::::::::::::::::::::::::::::::::::::::::::::::
+
+  add (incoming) {
+    const { accept, maxSize, multiple } = this.getAttr();
+
+    const accepted = [];
+    const rejected = [];
+
+    for (const file of incoming) {
+      if (!matches(file, accept))         rejected.push({ file, reason: 'type' });
+      else if (maxSize && file.size > maxSize) rejected.push({ file, reason: 'size' });
+      else accepted.push(file);
+    }
+
+    this._files   = multiple ? [...this.files, ...accepted] : accepted.slice(0, 1);
+    this._rejected = rejected;
+
+    if (rejected.length) this.emit('input-file-rejected', { rejected });
+
+    this.commitFiles();
+    return this;
+  }
+
+  remove (index) {
+    this._files = this.files.filter((file, at) => at !== index);
+    this.commitFiles();
+    return this;
+  }
+
+  clear () { this._files = []; this.commitFiles(); return this; }
+
+  commitFiles () {
+    this.invalidate().update();
+    this.notify();
+    this.emit('input-file', { files: this.files });
+    return this;
+  }
+
+  onFormReset () { this._files = []; this._rejected = []; this.invalidate().update(); }
+
+  validate () {
+    const internals = this.internals;
+    if (!internals) return this;
+
+    const anchor = this.part('zone').node ?? this;
+
+    if (this._rejected?.length) internals.setValidity({ typeMismatch: true }, 'one or more files were rejected.', anchor);
+    else if (this.getAttr('required') && !this.files.length) {
+      internals.setValidity({ valueMissing: true }, 'please select a file.', anchor);
+    }
+    else internals.setValidity({});
+
+    return this;
+  }
+
+  // :::::: RENDER ::::::::::::::::::::::::::::::::::::::::::::::
+
+  render () {
+    const { accept, directory, multiple, text } = this.getAttr();
+
+    // the children replace the default text of the drop zone
+    return html`
+      <input type="file" hidden ${attrs({ accept, multiple, webkitdirectory: directory })} />
+      <button type="button" part="zone">
+        <svg-icon part="icon" icon="lucide:upload"></svg-icon>
+        <span part="text"><slot>${text}</slot></span>
+      </button>
+      ${this.files.length > 0 && html`
+        <ul part="list">
+          ${this.files.map((file, index) => html`
+            <li part="file">
+              <span part="name">${file.name}</span>
+              <small part="size">${formatSize(file.size)}</small>
+              <button type="button" part="remove" data-remove="${index}" aria-label="remove ${file.name}">
+                <svg-icon icon="lucide:x"></svg-icon>
+              </button>
+            </li>
+          `)}
+        </ul>
+      `}
+    `;
+  }
+
+  sync () {
+    super.sync();
+    this.states.toggle('filled', this.files.length > 0);
+  }
+}
+
+InputFile.init();

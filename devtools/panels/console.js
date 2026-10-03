@@ -151,7 +151,7 @@ const ICONS = {
   result : 'mdi:chevron-left',
 };
 
-const icon = (name, props) => el('aufbau-icon', { icon: name, ...props });
+const icon = (name, props) => el('svg-icon', { icon: name, ...props });
 
 // the eval echo and its result are rows in the same stream, but not filterable
 // levels — they always show. trace folds into debug: a separate toggle for it

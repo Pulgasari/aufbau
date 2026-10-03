@@ -11,10 +11,10 @@
     section { gap: .75rem; padding: 1.5rem; border-radius: .75rem; scroll-margin-top: 1rem; }
 
     #form > section:nth-child(odd) { background-color: var(--zebra); }
-    
+
     #form           { padding: 0; }
     #form > section { border-radius: 0; }
-    
+
     h2      { font-size: 1.25rem; }
     h3      { font-size: .9rem; font-weight: 600; color: var(--muted); margin-top: .5rem; }
 
@@ -31,15 +31,14 @@
       > span { color: var(--muted); font-size: .8rem; font-family: ui-monospace, monospace; }
 
       /* inline controls keep their own width, fields take the row */
-      > :is(aufbau-picker, aufbau-toggle, aufbau-button, aufbau-value, aufbau-skeleton[shape="circle"]) { justify-self: start; }
+      > :is(input-bool, btn-push, btn-tap, btn-icon, output-value, aufbau-skeleton[shape="circle"]) { justify-self: start; }
     }
     .line { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
 
     /* :::::: ASIDE: filter + toc */
 
-    aside aufbau-filter { display: block; margin-bottom: .75rem; }
-    aside aufbau-toc {
-      header { display: none; }
+    aside data-filter { display: block; margin-bottom: .75rem; }
+    aside nav-toc {
       ol     { list-style: none; }
       a      { display: block; padding: .2rem .6rem; border-radius: .4rem; color: inherit; text-decoration: none; }
       a:hover                        { background: var(--panel); }
@@ -50,11 +49,11 @@
 
     .flags { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .75rem; }
     .flags figure { display: grid; justify-items: center; gap: .25rem; font-size: .75rem; color: var(--muted); }
-    .flags aufbau-flag { width: 2.5rem; }
+    .flags svg-flag { width: 2.5rem; }
 
     #table-demo td:first-child { white-space: nowrap; }
 
-    #index aufbau-item {
+    #index data-item {
       display         : grid;
       place-items     : center;
       aspect-ratio    : 1;
@@ -62,7 +61,7 @@
       color           : var(--color-fg);
       font-weight     : 600;
     }
-    #index aufbau-index[viewmode="list"] aufbau-item { aspect-ratio: auto; padding: .75rem; place-items: start; }
+    #index data-index[viewmode="list"] data-item { aspect-ratio: auto; padding: .75rem; place-items: start; }
 
     #loop aufbau-loop[mode="carousel"] { block-size: 8rem; border: 1px solid var(--line); border-radius: .75rem; }
     #loop aufbau-loop[mode="carousel"] > div { display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; }
@@ -74,10 +73,13 @@
       background: var(--panel); color: inherit; font: inherit;
     }
 
-    #skeleton aufbau-item { display: grid; grid-template-columns: 3rem 1fr; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: .75rem; }
+    #div div-x, #div div-y { gap: .5rem; padding: .5rem; border: 1px dashed var(--line); border-radius: .5rem; }
+    #div div-x > span, #div div-y > span { padding: .25rem .75rem; border-radius: .4rem; background: var(--panel); }
+
+    #skeleton data-item { display: grid; grid-template-columns: 3rem 1fr; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: .75rem; }
     #skeleton .avatar { width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--color-ink); }
 
-    aufbau-video, aufbau-audio { max-width: 32rem; }
+    media-video, media-audio, media-file { max-width: 32rem; }
 
     @media (width < 48rem) {
       .row     { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
@@ -89,235 +91,35 @@
 
   <aside>
     <h1>@aufbau/elements</h1>
-    <p>every element with its types and looks. the aside is an aufbau-filter over an aufbau-toc.</p>
-    <aufbau-filter target="#toc li" placeholder="filter elements…"></aufbau-filter>
-    <aufbau-toc id="toc" target="main" selector="h2"></aufbau-toc>
+    <p>every element with its types and looks. the aside is a data-filter over a nav-toc.</p>
+    <data-filter target="#toc li" placeholder="filter elements…"></data-filter>
+    <nav-toc id="toc" target="main" selector="h2"></nav-toc>
   </aside>
 
   <!-- the whole page is one form: every named control lands in getFormValues() at the end -->
   <main>
   <form id="form">
 
-    <!-- :::::: AUDIO -->
+    <!-- :::::: APP -->
 
-    <section id="audio">
-      <h2>aufbau-audio</h2>
-      <div class="row"><span>layout="card"</span>
-        <aufbau-audio src="assets/international.mp3" label="International"></aufbau-audio></div>
-      <div class="row"><span>layout="minimal"</span>
-        <aufbau-audio layout="minimal" src="assets/international.mp3" label="International"></aufbau-audio></div>
+    <section id="config">
+      <h2>app-config</h2>
+      <p class="hint">a form from a spec of @aufbau/gui, every field an input-* control.</p>
+      <app-config id="config-demo"></app-config>
     </section>
-
-    <!-- :::::: BUTTON -->
-
-    <section id="button">
-      <h2>aufbau-button</h2>
-      <div class="row"><span>variant</span>
-        <div class="line">
-          <aufbau-button>default</aufbau-button>
-          <aufbau-button variant="primary">primary</aufbau-button>
-          <aufbau-button variant="ghost">ghost</aufbau-button>
-          <aufbau-button disabled>disabled</aufbau-button>
-        </div></div>
-      <div class="row"><span>icon + label</span>
-        <div class="line">
-          <aufbau-button icon="lucide:bell" label="toast me" data-toast="a button said hello"></aufbau-button>
-          <aufbau-button icon="lucide:shuffle" variant="primary" id="random-theme">random theme</aufbau-button>
-        </div></div>
-      <div class="row"><span>type="submit|reset"</span>
-        <p class="hint">see the form at the end of the page.</p></div>
-    </section>
-
-    <!-- :::::: CODE -->
-
-    <section id="code">
-      <h2>aufbau-code</h2>
-      <div class="row"><span>lang="json", live</span>
-      <aufbau-code id="gestalt-code" lang="json" actions="copy"></aufbau-code></div>
-      <div class="row">
-        <span>lang="js" editable</span>
-        <aufbau-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</aufbau-code>
-      </div>
-      <div class="row">
-        <span>lang="css" no-copy</span>
-        <aufbau-code lang="css" no-copy code="body { background: var(--color-bg); color: var(--color-fg); }"></aufbau-code>
-      </div>
-    </section>
-
-    <!-- :::::: CRUMBS -->
-
-    <section id="crumbs">
-      <h2>aufbau-crumbs</h2>
-      <div class="row">
-        <span>children</span>
-        <aufbau-crumbs>
-          <a href="#">aufbau</a>
-          <a href="#">elements</a>
-          <span>crumbs</span>
-        </aufbau-crumbs>
-      </div>
-      <div class="row"><span>path + root</span>
-        <aufbau-crumbs id="crumbs-path" path="/elements/core/AufbauCore.js" root="aufbau"></aufbau-crumbs></div>
-      <div class="row"><span>max="3"</span>
-        <aufbau-crumbs path="/a/very/deep/folder/for/crumbs" root="root" max="3"></aufbau-crumbs></div>
-    </section>
-
-    <!-- :::::: DATALIST -->
-
-    <section id="datalist">
-      <h2>aufbau-datalist</h2>
-      <p class="hint">a source for native list= completion. here its options are the element names of this page.</p>
-      <aufbau-datalist id="element-names"></aufbau-datalist>
-      <div class="row">
-        <span>list="element-names"</span>
-        <aufbau-input name="datalist" list="element-names" placeholder="aufbau-…"></aufbau-input>
-      </div>
-    </section>
-
-    <!-- :::::: DROPDOWN -->
-
-    <section id="dropdown">
-      <h2>aufbau-dropdown</h2>
-      <div class="row"><span>placement</span>
-        <aufbau-picker id="dropdown-placement" look="cycle" value="bottom-start">
-          <aufbau-option>bottom-start</aufbau-option>
-          <aufbau-option>bottom-end</aufbau-option>
-          <aufbau-option>top-start</aufbau-option>
-          <aufbau-option>top-end</aufbau-option>
-        </aufbau-picker></div>
-      <div class="row"><span>entries</span>
-        <aufbau-dropdown id="dropdown-menu" label="file" icon="lucide:folder">
-          <button type="button" data-toast="open…">open</button>
-          <button type="button" data-toast="saved">save</button>
-          <button type="button" data-toast="exported" data-type="success">export</button>
-        </aufbau-dropdown></div>
-    </section>
-
-    <!-- :::::: FILTER -->
-
-    <section id="filter">
-      <h2>aufbau-filter</h2>
-      <p class="hint">filters other elements by their text. the aside uses one over the table of contents.</p>
-      <div class="row"><span>target=".flags figure"</span>
-        <aufbau-filter target="#flag-list figure" placeholder="filter countries…"></aufbau-filter></div>
-    </section>
-
-    <!-- :::::: FLAG -->
-
-    <section id="flag">
-      <h2>aufbau-flag</h2>
-      <div class="row">
-        <span>variant</span>
-        <div class="line">
-          <aufbau-flag code="de" variant="circle"></aufbau-flag>
-          <aufbau-flag code="de" variant="square"></aufbau-flag>
-          <aufbau-flag code="de" variant="4x3"></aufbau-flag>
-        </div></div>
-      <div class="flags" id="flag-list"></div>
-    </section>
-
-    <!-- :::::: ICON -->
-
-    <section id="icon">
-      <h2>aufbau-icon</h2>
-      <div class="row"><span>mode="mask"</span>
-        <div class="line">
-          <aufbau-icon icon="lucide:house"></aufbau-icon>
-          <aufbau-icon icon="lucide:search"></aufbau-icon>
-          <aufbau-icon icon="lucide:settings"></aufbau-icon>
-          <aufbau-icon icon="save"></aufbau-icon>
-          <small>the last one is an alias</small>
-        </div></div>
-      <div class="row"><span>size, color</span>
-        <div class="line">
-          <aufbau-icon icon="lucide:heart" size="1rem"></aufbau-icon>
-          <aufbau-icon icon="lucide:heart" size="2rem" color="var(--color-ink)"></aufbau-icon>
-          <aufbau-icon icon="lucide:heart" size="3rem" color="var(--color-ink)"></aufbau-icon>
-        </div></div>
-      <div class="row"><span>mode="image"</span>
-        <div class="line">
-          <aufbau-icon icon="logos:javascript" mode="image" size="2rem"></aufbau-icon>
-          <aufbau-icon icon="logos:css-3"      mode="image" size="2rem"></aufbau-icon>
-          <aufbau-icon icon="logos:html-5"     mode="image" size="2rem"></aufbau-icon>
-        </div></div>
-    </section>
-
-    <!-- :::::: INDEX + ITEM -->
-
-    <section id="index">
-      <h2>aufbau-index · aufbau-item</h2>
-      <div class="row"><span>viewmode</span>
-        <aufbau-picker id="index-viewmode" look="segments" value="grid">
-          <aufbau-option>grid</aufbau-option>
-          <aufbau-option>list</aufbau-option>
-          <aufbau-option>gallery</aufbau-option>
-          <aufbau-option>masonry</aufbau-option>
-        </aufbau-picker></div>
-      <div class="row"><span>item-size</span>
-        <aufbau-slider id="index-size" type="number" value="96" min="48" max="200" step="8" unit="px"></aufbau-slider></div>
-      <aufbau-index id="index-demo" viewmode="grid" item-size="96px" gap=".75rem">
-        <aufbau-item shape="circle"   style="--mix: 80">circle</aufbau-item>
-        <aufbau-item shape="square"   style="--mix: 60">square</aufbau-item>
-        <aufbau-item shape="rounded"  style="--mix: 40">rounded</aufbau-item>
-        <aufbau-item shape="squircle" style="--mix: 20">squircle</aufbau-item>
-        <aufbau-item shape="1rem 0"   style="--mix: 70">1rem 0</aufbau-item>
-        <aufbau-item shape="rounded"  style="--mix: 50">rounded</aufbau-item>
-        <aufbau-item shape="circle"   style="--mix: 30">circle</aufbau-item>
-        <aufbau-item shape="squircle" style="--mix: 90">squircle</aufbau-item>
-      </aufbau-index>
-    </section>
-
-    <!-- :::::: INPUT -->
-
-    <section id="input">
-      <h2>aufbau-input</h2>
-      <h3>type</h3>
-      <div class="row"><span>text</span>     <aufbau-input name="text"     type="text"     placeholder="a title" icon="lucide:type"></aufbau-input></div>
-      <div class="row"><span>email</span>    <aufbau-input name="email"    type="email"    placeholder="mail@example.com"></aufbau-input></div>
-      <div class="row"><span>password</span> <aufbau-input name="password" type="password" autocomplete="new-password"></aufbau-input></div>
-      <div class="row"><span>phone</span>    <aufbau-input name="phone"    type="phone"></aufbau-input></div>
-      <div class="row"><span>url</span>      <aufbau-input name="url"      type="url" placeholder="https://aufbau.dev"></aufbau-input></div>
-      <div class="row"><span>number</span>   <aufbau-input name="number"   type="number" value="42"></aufbau-input></div>
-      <div class="row"><span>year</span>     <aufbau-input name="year"     type="year"   value="2026"></aufbau-input></div>
-      <div class="row"><span>date</span>     <aufbau-input name="date"     type="date"></aufbau-input></div>
-      <div class="row"><span>datetime</span> <aufbau-input name="datetime" type="datetime"></aufbau-input></div>
-      <div class="row"><span>time</span>     <aufbau-input name="time"     type="time"></aufbau-input></div>
-      <div class="row"><span>duration</span> <aufbau-input name="duration" type="duration" value="90s"></aufbau-input></div>
-      <div class="row"><span>color</span>    <aufbau-input name="color"    type="color"    value="#ff79c6"></aufbau-input></div>
-      <h3>look</h3>
-      <div class="row">
-        <span>look="stepper", the page's font size</span>
-        <aufbau-input id="font-size" name="fontSize" type="number" look="stepper" value="14" min="10" max="22" step="1"></aufbau-input>
-      </div>
-      <div class="row">
-        <span>look="swatch", the theme</span>
-        <aufbau-input id="theme-swatch" name="themeColor" type="color" look="swatch" value="#ff79c6"></aufbau-input>
-      </div>
-      <h3>constraints</h3>
-      <div class="row">
-        <span>required minlength="3"</span>
-        <aufbau-input name="nickname" required minlength="3" placeholder="at least 3 characters"></aufbau-input>
-      </div>
-      <div class="row">
-        <span>pattern="[a-z]+"</span>
-        <aufbau-input name="slug" pattern="[a-z]+" placeholder="lowercase only"></aufbau-input>
-      </div>
-    </section>
-
-    <!-- :::::: KEYBOARD -->
 
     <section id="keyboard">
-      <h2>aufbau-keyboard</h2>
+      <h2>app-keyboard</h2>
       <div class="row"><span>layout</span>
-        <aufbau-picker id="keyboard-layout" look="segments" value="de">
-          <aufbau-option>de</aufbau-option>
-          <aufbau-option>en</aufbau-option>
-        </aufbau-picker></div>
+        <input-value id="keyboard-layout" look="segments" value="de">
+          <input-option>de</input-option>
+          <input-option>en</input-option>
+        </input-value></div>
       <textarea id="keyboard-target" placeholder="type with the keys below"></textarea>
-      <aufbau-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></aufbau-keyboard>
+      <app-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></app-keyboard>
     </section>
 
-    <!-- :::::: LOOP -->
+    <!-- :::::: AUFBAU -->
 
     <section id="loop">
       <h2>aufbau-loop</h2>
@@ -333,105 +135,16 @@
         <aufbau-loop id="marquee-right" mode="marquee" direction="right" speed="40s"></aufbau-loop></div>
     </section>
 
-    <!-- :::::: MODAL -->
-
-    <section id="modal">
-      <h2>aufbau-modal</h2>
-      <div class="row"><span>show() resolves on close</span>
-        <aufbau-button id="modal-open" icon="lucide:square-arrow-out-up-right">open the modal</aufbau-button></div>
-      <aufbau-modal id="modal-demo" heading="choose">
-        <p>the modal resolves with the value it closes with.</p>
-        <div class="line">
-          <aufbau-button data-close="yes" variant="primary">yes</aufbau-button>
-          <aufbau-button data-close="no">no</aufbau-button>
-        </div>
-      </aufbau-modal>
-    </section>
-
-    <!-- :::::: OPTION -->
-
-    <section id="option">
-      <h2>aufbau-option</h2>
-      <p class="hint">a data element, read by its container. options stay live, they can come and go at runtime.</p>
-      <div class="row"><span>runtime</span>
-        <div class="line">
-          <aufbau-button id="option-add" icon="lucide:plus">add an option</aufbau-button>
-          <aufbau-button id="option-drop" icon="lucide:minus">drop the last</aufbau-button>
-        </div></div>
-      <div class="row"><span>look="radio"</span>
-        <aufbau-picker id="option-picker" name="options" look="radio">
-          <aufbau-option value="one">one</aufbau-option>
-          <aufbau-option value="two">two</aufbau-option>
-          <aufbau-option value="off" disabled>disabled</aufbau-option>
-        </aufbau-picker></div>
-    </section>
-
-    <!-- :::::: PICKER -->
-
-    <section id="picker">
-      <h2>aufbau-picker</h2>
-      <div class="row"><span>look="combobox" searchable, the theme</span>
-        <aufbau-picker id="theme-picker" name="theme" look="combobox" searchable placeholder="theme…"></aufbau-picker></div>
-      <div class="row"><span>look="segments", the look</span>
-        <aufbau-picker id="look-picker" name="look" look="segments" value="flat">
-          <aufbau-option>flat</aufbau-option>
-          <aufbau-option>rounded</aufbau-option>
-        </aufbau-picker></div>
-      <div class="row"><span>look="cycle", the mode</span>
-        <aufbau-picker id="mode-picker" name="mode" look="cycle" value="auto">
-          <aufbau-option value="auto"  icon="lucide:sun-moon">auto</aufbau-option>
-          <aufbau-option value="dark"  icon="lucide:moon">dark</aufbau-option>
-          <aufbau-option value="light" icon="lucide:sun">light</aufbau-option>
-        </aufbau-picker></div>
-      <div class="row"><span>look="radio"</span>
-        <aufbau-picker name="language" look="radio" value="en">
-          <aufbau-option value="de">Deutsch</aufbau-option>
-          <aufbau-option value="en">English</aufbau-option>
-          <aufbau-option value="fr">Français</aufbau-option>
-        </aufbau-picker></div>
-      <div class="row"><span>look="radio" multiple</span>
-        <aufbau-picker name="languages" look="radio" multiple value="js,css">
-          <aufbau-option value="js">JavaScript</aufbau-option>
-          <aufbau-option value="css">CSS</aufbau-option>
-          <aufbau-option value="html">HTML</aufbau-option>
-        </aufbau-picker></div>
-      <div class="row"><span>look="segments" icons-only</span>
-        <aufbau-picker name="align" look="segments" icons-only value="left">
-          <aufbau-option value="left"   icon="lucide:align-left">left</aufbau-option>
-          <aufbau-option value="center" icon="lucide:align-center">center</aufbau-option>
-          <aufbau-option value="right"  icon="lucide:align-right">right</aufbau-option>
-        </aufbau-picker></div>
-    </section>
-
-    <!-- :::::: PROGRESS -->
-
     <section id="progress">
       <h2>aufbau-progress</h2>
       <div class="row"><span>type="standard" show-text</span>
         <aufbau-progress id="progress-demo" value="40" max="100" show-text></aufbau-progress></div>
       <div class="row"><span>value</span>
-        <aufbau-slider id="progress-value" type="number" value="40" min="0" max="100" unit="%"></aufbau-slider></div>
+        <input-number id="progress-value" look="slider" value="40" min="0" max="100" unit="%"></input-number></div>
       <div class="row"><span>type="scroll"</span>
         <p class="hint">the bar at the top of the page follows the scroll position.</p></div>
       <aufbau-progress type="scroll" target="body" style="position: fixed; inset: 0 0 auto; z-index: 10;"></aufbau-progress>
     </section>
-
-    <!-- :::::: READER -->
-
-    <section id="reader">
-      <h2>aufbau-reader</h2>
-      <div class="row"><span>markdown, children</span>
-        <aufbau-reader>## prose
-          through **the same** markdown pipeline as `src` and `raw`.
-
-          - lists
-          - [links](https://aufbau.dev)
-        </aufbau-reader></div>
-      <div class="row"><span>format="html"</span>
-        <aufbau-reader format="html"><p>plain <em>html</em>, rendered as is.</p></aufbau-reader></div>
-    </section>
-
-    <!-- :::::: SKELETON -->
 
     <section id="skeleton">
       <h2>aufbau-skeleton</h2>
@@ -449,171 +162,455 @@
       </div>
       <div class="row">
         <span>the skeleton attribute</span>
-        <aufbau-toggle id="skeleton-toggle" look="switch" label="loading"></aufbau-toggle>
+        <input-bool id="skeleton-toggle" label="loading"></input-bool>
       </div>
-      <aufbau-item id="skeleton-card">
+      <data-item id="skeleton-card">
         <div class="avatar"></div>
-        <div>any aufbau element takes <code>skeleton</code> for the same look in its own place.</div>
-      </aufbau-item>
+        <div>any element takes <code>skeleton</code> for the same look in its own place.</div>
+      </data-item>
     </section>
 
-    <!-- :::::: SLIDER -->
+    <!-- :::::: BTN -->
 
-    <section id="slider">
-      <h2>aufbau-slider</h2>
-      <div class="row">
-        <span>type="number" controls editable</span>
-        <aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="number" range</span>
-        <aufbau-slider name="price" type="number" range value="20,80" min="0" max="100" unit="€"></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="color", the theme</span>
-        <aufbau-slider id="theme-hue" name="hue" type="color" value="#ff79c6"></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="date"</span>
-        <aufbau-slider name="day" type="date" value="2026-06-01" min="2026-01-01" max="2026-12-31"></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="datetime"</span>
-        <aufbau-slider name="moment" type="datetime" value="2026-06-01T12:00" min="2026-06-01T00:00" max="2026-06-02T00:00"></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="time"</span>
-        <aufbau-slider name="from" type="time" value="09:00"></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="duration"</span>
-        <aufbau-slider name="length" type="duration" value="2s" min="0s" max="10s" step="0.5"></aufbau-slider>
-      </div>
-      <div class="row">
-        <span>type="year"</span>
-        <aufbau-slider name="era" type="year" value="1990" min="1900" max="2030"></aufbau-slider>
-      </div>
+    <section id="btn">
+      <h2>btn-push · btn-tap · btn-icon</h2>
+      <div class="row"><span>btn-push variant</span>
+        <div class="line">
+          <btn-push>default</btn-push>
+          <btn-push variant="primary">primary</btn-push>
+          <btn-push disabled>disabled</btn-push>
+        </div></div>
+      <div class="row"><span>btn-tap</span>
+        <div class="line">
+          <btn-tap icon="lucide:bell" data-toast="a button said hello">toast me</btn-tap>
+          <btn-tap icon="lucide:shuffle" id="random-theme">random theme</btn-tap>
+        </div></div>
+      <div class="row"><span>btn-icon command</span>
+        <div class="line">
+          <btn-icon command="--like" icon="heart" commandfor="#btn" data-toast="liked"></btn-icon>
+          <btn-icon command="copy"></btn-icon>
+          <btn-icon command="share"></btn-icon>
+          <btn-icon command="more"></btn-icon>
+        </div></div>
+      <div class="row"><span>type="submit|reset"</span>
+        <p class="hint">see the form at the end of the page.</p></div>
     </section>
 
-    <!-- :::::: TABLE -->
+    <!-- :::::: DATA -->
+
+    <section id="filter">
+      <h2>data-filter</h2>
+      <p class="hint">filters other elements by their text. the aside uses one over the table of contents.</p>
+      <div class="row"><span>target="#flag-list figure"</span>
+        <data-filter target="#flag-list figure" placeholder="filter countries…"></data-filter></div>
+    </section>
+
+    <section id="index">
+      <h2>data-index · data-item</h2>
+      <div class="row"><span>viewmode</span>
+        <input-value id="index-viewmode" look="segments" value="grid">
+          <input-option>grid</input-option>
+          <input-option>list</input-option>
+          <input-option>gallery</input-option>
+          <input-option>masonry</input-option>
+        </input-value></div>
+      <div class="row"><span>item-size</span>
+        <input-number id="index-size" look="slider" value="96" min="48" max="200" step="8" unit="px"></input-number></div>
+      <data-index id="index-demo" viewmode="grid" item-size="96px" gap=".75rem">
+        <data-item shape="circle"   style="--mix: 80">circle</data-item>
+        <data-item shape="square"   style="--mix: 60">square</data-item>
+        <data-item shape="rounded"  style="--mix: 40">rounded</data-item>
+        <data-item shape="squircle" style="--mix: 20">squircle</data-item>
+        <data-item shape="1rem 0"   style="--mix: 70">1rem 0</data-item>
+        <data-item shape="rounded"  style="--mix: 50">rounded</data-item>
+        <data-item shape="circle"   style="--mix: 30">circle</data-item>
+        <data-item shape="squircle" style="--mix: 90">squircle</data-item>
+      </data-index>
+    </section>
+
+    <section id="list">
+      <h2>data-list</h2>
+      <p class="hint">a source for native list= completion. here its options are the element names of this page.</p>
+      <data-list id="element-names"></data-list>
+      <div class="row">
+        <span>list="element-names"</span>
+        <input-text name="datalist" list="element-names" placeholder="btn-…"></input-text>
+      </div>
+    </section>
 
     <section id="table">
-      <h2>aufbau-table</h2>
+      <h2>data-table</h2>
       <p class="hint">the elements of this page as data, sortable by every column.</p>
-      <aufbau-table id="table-demo" sortable></aufbau-table>
+      <data-table id="table-demo" sortable></data-table>
     </section>
 
-    <!-- :::::: TOAST -->
+    <section id="tree">
+      <h2>data-tree · data-node</h2>
+      <div class="row"><span>children</span>
+        <data-tree>
+          <data-node label="aufbau" icon="lucide:folder" expanded>
+            <data-node label="api" icon="lucide:folder">
+              <data-node label="gestalt.js" icon="lucide:file-code" value="api/gestalt.js"></data-node>
+              <data-node label="index.js"   icon="lucide:file-code" value="api/index.js"></data-node>
+            </data-node>
+            <data-node label="css" icon="lucide:folder">
+              <data-node label="themes.css" icon="lucide:file" value="css/themes.css"></data-node>
+            </data-node>
+          </data-node>
+        </data-tree></div>
+      <div class="row"><span>nodes, from js</span>
+        <data-tree id="tree-nodes"></data-tree></div>
+    </section>
 
-    <section id="toast">
-      <h2>aufbau-toast</h2>
+    <!-- :::::: DIV -->
+
+    <section id="div">
+      <h2>div-x · div-y</h2>
+      <div class="row"><span>div-x</span>
+        <div-x><span>one</span><span>two</span><span>three</span></div-x></div>
+      <div class="row"><span>div-y</span>
+        <div-y><span>one</span><span>two</span><span>three</span></div-y></div>
+    </section>
+
+    <!-- :::::: EMBED -->
+
+    <section id="embed">
+      <h2>embed-content</h2>
+      <p class="hint">nothing is requested from the provider before the click.</p>
+      <div class="row"><span>youtube</span>
+        <embed-content src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" label="a video"></embed-content></div>
+    </section>
+
+    <!-- :::::: INPUT -->
+
+    <section id="input">
+      <h2>input-value</h2>
+      <h3>type, one tag each</h3>
+      <div class="row"><span>input-text</span>     <input-text     name="text"     placeholder="a title" icon="lucide:type"></input-text></div>
+      <div class="row"><span>input-email</span>    <input-email    name="email"    placeholder="mail@example.com"></input-email></div>
+      <div class="row"><span>input-password</span> <input-password name="password" autocomplete="new-password"></input-password></div>
+      <div class="row"><span>input-phone</span>    <input-phone    name="phone"></input-phone></div>
+      <div class="row"><span>input-url</span>      <input-url      name="url"      placeholder="https://aufbau.dev"></input-url></div>
+      <div class="row"><span>input-number</span>   <input-number   name="number"   value="42"></input-number></div>
+      <div class="row"><span>input-year</span>     <input-year     name="year"     value="2026"></input-year></div>
+      <div class="row"><span>input-date</span>     <input-date     name="date"></input-date></div>
+      <div class="row"><span>input-datetime</span> <input-datetime name="datetime"></input-datetime></div>
+      <div class="row"><span>input-time</span>     <input-time     name="time"></input-time></div>
+      <div class="row"><span>input-duration</span> <input-duration name="duration" value="90s"></input-duration></div>
+      <div class="row"><span>input-color</span>    <input-color    name="color"    value="#ff79c6"></input-color></div>
+      <div class="row"><span>input-country</span>  <input-country  name="country"  value="de"></input-country></div>
+      <div class="row"><span>input-emoji</span>    <input-emoji    name="emoji"></input-emoji></div>
+      <div class="row"><span>input-icon</span>     <input-icon     name="icon"></input-icon></div>
+      <div class="row"><span>input-chips</span>    <input-chips    name="tags"     value="js,css"></input-chips></div>
+      <h3>look</h3>
       <div class="row">
-        <span>type</span>
+        <span>look="stepper", the page's font size</span>
+        <input-number id="font-size" name="fontSize" look="stepper" value="14" min="10" max="22" step="1"></input-number>
+      </div>
+      <div class="row">
+        <span>look="swatch", the theme</span>
+        <input-color id="theme-swatch" name="themeColor" look="swatch" value="#ff79c6"></input-color>
+      </div>
+      <div class="row">
+        <span>look="slider" range</span>
+        <input-number name="price" look="slider" range value="20..80" min="0" max="100" unit="€"></input-number>
+      </div>
+      <div class="row">
+        <span>look="slider", a duration</span>
+        <input-duration name="length" look="slider" value="2s" min="0s" max="10s" step="0.5"></input-duration>
+      </div>
+      <h3>options</h3>
+      <div class="row"><span>look="combobox" searchable, the theme</span>
+        <input-value id="theme-picker" name="theme" look="combobox" searchable placeholder="theme…"></input-value></div>
+      <div class="row"><span>look="segments", the look</span>
+        <input-value id="look-picker" name="look" look="segments" value="flat">
+          <input-option>flat</input-option>
+          <input-option>rounded</input-option>
+        </input-value></div>
+      <div class="row"><span>look="cycle", the mode</span>
+        <input-value id="mode-picker" name="mode" look="cycle" value="auto">
+          <input-option value="auto"  icon="lucide:sun-moon">auto</input-option>
+          <input-option value="dark"  icon="lucide:moon">dark</input-option>
+          <input-option value="light" icon="lucide:sun">light</input-option>
+        </input-value></div>
+      <div class="row"><span>look="radio", runtime options</span>
         <div class="line">
-          <aufbau-button data-toast="just so you know" data-type="info">info</aufbau-button>
-          <aufbau-button data-toast="it worked"        data-type="success">success</aufbau-button>
-          <aufbau-button data-toast="careful now"      data-type="warning">warning</aufbau-button>
-          <aufbau-button data-toast="that went wrong"  data-type="error">error</aufbau-button>
+          <btn-tap id="option-add" icon="lucide:plus">add an option</btn-tap>
+          <btn-tap id="option-drop" icon="lucide:minus">drop the last</btn-tap>
         </div></div>
+      <div class="row"><span></span>
+        <input-value id="option-picker" name="options" look="radio">
+          <input-option value="one">one</input-option>
+          <input-option value="two">two</input-option>
+          <input-option value="off" disabled>disabled</input-option>
+        </input-value></div>
+      <div class="row"><span>look="radio" multiple</span>
+        <input-value name="languages" look="radio" multiple value="js,css">
+          <input-option value="js">JavaScript</input-option>
+          <input-option value="css">CSS</input-option>
+          <input-option value="html">HTML</input-option>
+        </input-value></div>
+      <div class="row"><span>look="segments" icons-only</span>
+        <input-value name="align" look="segments" icons-only value="left">
+          <input-option value="left"   icon="lucide:align-left">left</input-option>
+          <input-option value="center" icon="lucide:align-center">center</input-option>
+          <input-option value="right"  icon="lucide:align-right">right</input-option>
+        </input-value></div>
+      <h3>input-bool</h3>
+      <div class="row"><span>look="switch", dark mode</span>
+        <input-bool id="dark-toggle" name="dark" label="dark"></input-bool></div>
+      <div class="row"><span>look="checkbox" required</span>
+        <input-bool name="terms" look="checkbox" label="accept the terms" required></input-bool></div>
+      <div class="row"><span>look="button" icon icon-checked</span>
+        <input-bool name="pinned" look="button" label="pin" icon="lucide:pin-off" icon-checked="lucide:pin"></input-bool></div>
+      <h3>constraints</h3>
+      <div class="row">
+        <span>required minlength="3"</span>
+        <input-text name="nickname" required minlength="3" placeholder="at least 3 characters"></input-text>
+      </div>
+      <div class="row">
+        <span>pattern="[a-z]+"</span>
+        <input-text name="slug" pattern="[a-z]+" placeholder="lowercase only"></input-text>
+      </div>
     </section>
 
-    <!-- :::::: TOC -->
+    <section id="file">
+      <h2>input-file</h2>
+      <div class="row"><span>look="dropzone" accept="image/*"</span>
+        <input-file name="avatar" accept="image/*"></input-file></div>
+      <div class="row"><span>look="button" multiple</span>
+        <input-file name="attachments" look="button" multiple text="pick files"></input-file></div>
+      <div class="row"><span>look="list" max-size="5MB"</span>
+        <input-file name="documents" look="list" accept=".pdf,.docx" multiple max-size="5242880"></input-file></div>
+    </section>
+
+    <!-- :::::: MEDIA -->
+
+    <section id="audio">
+      <h2>media-audio</h2>
+      <div class="row"><span>layout="card"</span>
+        <media-audio src="assets/international.mp3" label="International"></media-audio></div>
+      <div class="row"><span>layout="minimal"</span>
+        <media-audio layout="minimal" src="assets/international.mp3" label="International"></media-audio></div>
+    </section>
+
+    <section id="media-file">
+      <h2>media-file</h2>
+      <div class="row"><span>an mp3</span>
+        <media-file src="assets/international.mp3"></media-file></div>
+      <div class="row"><span>anything else</span>
+        <media-file src="demo.css" label="demo.css"></media-file></div>
+    </section>
+
+    <section id="video">
+      <h2>media-video</h2>
+      <div class="row">
+        <span>src, loop</span>
+        <media-video src="assets/chollima_on_the_wing_720p.mp4" loop></media-video>
+      </div>
+    </section>
+
+    <section id="wave">
+      <h2>media-wave</h2>
+      <div class="row"><span>peaks interactive</span>
+        <media-wave id="wave-demo" interactive progress="30" style="block-size: 4rem;"></media-wave></div>
+      <div class="row"><span>range-start range-end</span>
+        <media-wave id="wave-range" range-start="25" range-end="60" progress="45" style="block-size: 4rem;"></media-wave></div>
+    </section>
+
+    <!-- :::::: NAV -->
+
+    <section id="crumbs">
+      <h2>nav-crumbs</h2>
+      <div class="row">
+        <span>children</span>
+        <nav-crumbs>
+          <a href="#">aufbau</a>
+          <a href="#">elements</a>
+          <span>crumbs</span>
+        </nav-crumbs>
+      </div>
+      <div class="row"><span>path + root</span>
+        <nav-crumbs path="/elements/webcomponents/nav-crumbs.js" root="aufbau"></nav-crumbs></div>
+      <div class="row"><span>max="3"</span>
+        <nav-crumbs path="/a/very/deep/folder/for/crumbs" root="root" max="3"></nav-crumbs></div>
+    </section>
 
     <section id="toc-section">
-      <h2>aufbau-toc</h2>
+      <h2>nav-toc</h2>
       <p class="hint">the table of contents in the aside, built from the h2 of this page. the entry of the section you read is marked.</p>
     </section>
 
-    <!-- :::::: TOGGLE -->
+    <!-- :::::: OUTPUT -->
 
-    <section id="toggle">
-      <h2>aufbau-toggle</h2>
-      <div class="row"><span>look="switch", dark mode</span>
-        <aufbau-toggle id="dark-toggle" name="dark" label="dark"></aufbau-toggle></div>
-      <div class="row"><span>look="checkbox" required</span>
-        <aufbau-toggle name="terms" look="checkbox" label="accept the terms" required></aufbau-toggle></div>
-      <div class="row"><span>look="checkbox" indeterminate</span>
-        <aufbau-toggle name="partial" look="checkbox" label="some of them" indeterminate></aufbau-toggle></div>
-      <div class="row"><span>look="button" icon icon-checked</span>
-        <aufbau-toggle name="pinned" look="button" label="pin" icon="lucide:pin-off" icon-checked="lucide:pin"></aufbau-toggle></div>
+    <section id="md">
+      <h2>output-md</h2>
+      <div class="row"><span>markdown, children</span>
+        <output-md>## prose
+          through **the same** markdown pipeline as `src` and `raw`.
+
+          - lists
+          - [links](https://aufbau.dev)
+        </output-md></div>
+      <div class="row"><span>format="html"</span>
+        <output-md format="html"><p>plain <em>html</em>, rendered as is.</p></output-md></div>
     </section>
-
-    <!-- :::::: TREE -->
-
-    <section id="tree">
-      <h2>aufbau-tree · aufbau-tree-item</h2>
-      <div class="row"><span>children</span>
-        <aufbau-tree>
-          <aufbau-tree-item label="aufbau" icon="lucide:folder" expanded>
-            <aufbau-tree-item label="api" icon="lucide:folder">
-              <aufbau-tree-item label="gestalt.js" icon="lucide:file-code" value="api/gestalt.js"></aufbau-tree-item>
-              <aufbau-tree-item label="index.js"   icon="lucide:file-code" value="api/index.js"></aufbau-tree-item>
-            </aufbau-tree-item>
-            <aufbau-tree-item label="css" icon="lucide:folder">
-              <aufbau-tree-item label="themes.css" icon="lucide:file" value="css/themes.css"></aufbau-tree-item>
-            </aufbau-tree-item>
-          </aufbau-tree-item>
-        </aufbau-tree></div>
-      <div class="row"><span>nodes, from js</span>
-        <aufbau-tree id="tree-nodes"></aufbau-tree></div>
-    </section>
-
-    <!-- :::::: UPLOAD -->
-
-    <section id="upload">
-      <h2>aufbau-upload</h2>
-      <div class="row"><span>look="dropzone" accept="image/*"</span>
-        <aufbau-upload name="avatar" accept="image/*"></aufbau-upload></div>
-      <div class="row"><span>look="button" multiple</span>
-        <aufbau-upload name="attachments" look="button" multiple text="pick files"></aufbau-upload></div>
-      <div class="row"><span>look="list" max-size="5MB"</span>
-        <aufbau-upload name="documents" look="list" accept=".pdf,.docx" multiple max-size="5242880"></aufbau-upload></div>
-    </section>
-
-    <!-- :::::: VALUE -->
 
     <section id="value">
-      <h2>aufbau-value</h2>
-      <div class="row"><span>type="number" format="locale"</span> <aufbau-value type="number" format="locale" value="1234567.891"></aufbau-value></div>
-      <div class="row"><span>type="date" format="long"</span>     <aufbau-value type="date" format="long" value="2026-04-20"></aufbau-value></div>
-      <div class="row"><span>type="datetime" format="short"</span><aufbau-value type="datetime" format="short" value="2026-04-20T18:30"></aufbau-value></div>
-      <div class="row"><span>type="time"</span>                   <aufbau-value type="time" value="18:30"></aufbau-value></div>
-      <div class="row"><span>type="duration"</span>               <aufbau-value type="duration" value="3725s"></aufbau-value></div>
-      <div class="row"><span>type="color" copy</span>             <aufbau-value type="color" value="#ff79c6" copy></aufbau-value></div>
-      <div class="row"><span>type="email" icon</span>             <aufbau-value type="email" value="hello@aufbau.dev" icon="lucide:mail"></aufbau-value></div>
-      <div class="row"><span>type="url"</span>                    <aufbau-value type="url" value="https://aufbau.dev"></aufbau-value></div>
+      <h2>output-value</h2>
+      <div class="row"><span>type="number" locale</span>        <output-value type="number" locale="de-DE" value="1234567.891"></output-value></div>
+      <div class="row"><span>type="date" format="long"</span>     <output-value type="date" format="long" value="2026-04-20"></output-value></div>
+      <div class="row"><span>type="datetime" format="short"</span><output-value type="datetime" format="short" value="2026-04-20T18:30"></output-value></div>
+      <div class="row"><span>type="time" icon</span>              <output-value type="time" icon value="18:30"></output-value></div>
+      <div class="row"><span>type="duration"</span>               <output-value type="duration" value="3725s"></output-value></div>
+      <div class="row"><span>type="color" copy</span>             <output-value type="color" value="#ff79c6" copy></output-value></div>
+      <div class="row"><span>type="email" icon</span>             <output-value type="email" value="hello@aufbau.dev" icon></output-value></div>
+      <div class="row"><span>type="url"</span>                    <output-value type="url" value="https://aufbau.dev"></output-value></div>
     </section>
 
-    <!-- :::::: VIDEO -->
+    <!-- :::::: POP -->
 
-    <section id="video">
-      <h2>aufbau-video</h2>
+    <section id="menu">
+      <h2>pop-menu</h2>
+      <div class="row"><span>placement</span>
+        <input-value id="menu-placement" look="cycle" value="bottom-start">
+          <input-option>bottom-start</input-option>
+          <input-option>bottom-end</input-option>
+          <input-option>top-start</input-option>
+          <input-option>top-end</input-option>
+        </input-value></div>
+      <div class="row"><span>entries</span>
+        <pop-menu id="menu-demo" label="file" icon="lucide:folder">
+          <button type="button" data-toast="open…">open</button>
+          <button type="button" data-toast="saved">save</button>
+          <button type="button" data-toast="exported" data-type="success">export</button>
+        </pop-menu></div>
+    </section>
+
+    <section id="modal">
+      <h2>pop-modal</h2>
+      <div class="row"><span>show() resolves on close</span>
+        <btn-tap id="modal-open" icon="lucide:square-arrow-out-up-right">open the modal</btn-tap></div>
+      <pop-modal id="modal-demo" heading="choose">
+        <p>the modal resolves with the value it closes with.</p>
+        <div class="line">
+          <btn-push data-close="yes" variant="primary">yes</btn-push>
+          <btn-push data-close="no">no</btn-push>
+        </div>
+      </pop-modal>
+    </section>
+
+    <section id="over">
+      <h2>pop-over</h2>
+      <div class="row"><span>commandfor</span>
+        <div class="line">
+          <btn-tap command="toggle-popover" commandfor="over-demo" icon="lucide:info">info</btn-tap>
+          <pop-over id="over-demo" placement="bottom-start"><p>any content over the page, not modal.</p></pop-over>
+        </div></div>
+    </section>
+
+    <section id="prompt">
+      <h2>pop-prompt</h2>
+      <div class="row"><span>confirm, prompt, alert</span>
+        <div class="line">
+          <btn-tap id="prompt-confirm">confirm</btn-tap>
+          <btn-tap id="prompt-text">prompt</btn-tap>
+          <btn-tap id="prompt-date">prompt a date</btn-tap>
+          <btn-tap id="prompt-alert">alert</btn-tap>
+        </div></div>
+    </section>
+
+    <section id="tip">
+      <h2>pop-tip</h2>
+      <div class="row"><span>for the element before</span>
+        <div class="line">
+          <btn-icon command="save"></btn-icon>
+          <pop-tip>save (ctrl+s)</pop-tip>
+        </div></div>
+    </section>
+
+    <section id="toast">
+      <h2>pop-toast</h2>
       <div class="row">
-        <span>src, loop</span>
-        <aufbau-video src="assets/chollima_on_the_wing_720p.mp4" loop></aufbau-video>
+        <span>type</span>
+        <div class="line">
+          <btn-tap data-toast="just so you know" data-type="info">info</btn-tap>
+          <btn-tap data-toast="it worked"        data-type="success">success</btn-tap>
+          <btn-tap data-toast="careful now"      data-type="warning">warning</btn-tap>
+          <btn-tap data-toast="that went wrong"  data-type="error">error</btn-tap>
+        </div></div>
+    </section>
+
+    <!-- :::::: SVG -->
+
+    <section id="flag">
+      <h2>svg-flag</h2>
+      <div class="row">
+        <span>variant</span>
+        <div class="line">
+          <svg-flag code="de" variant="circle"></svg-flag>
+          <svg-flag code="de" variant="square"></svg-flag>
+          <svg-flag code="de" variant="4x3"></svg-flag>
+        </div></div>
+      <div class="flags" id="flag-list"></div>
+    </section>
+
+    <section id="icon">
+      <h2>svg-icon</h2>
+      <div class="row"><span>mode="mask"</span>
+        <div class="line">
+          <svg-icon icon="lucide:house"></svg-icon>
+          <svg-icon icon="lucide:search"></svg-icon>
+          <svg-icon icon="lucide:settings"></svg-icon>
+          <svg-icon icon="save"></svg-icon>
+          <small>the last one is an alias</small>
+        </div></div>
+      <div class="row"><span>size, color</span>
+        <div class="line">
+          <svg-icon icon="lucide:heart" size="1rem"></svg-icon>
+          <svg-icon icon="lucide:heart" size="2rem" color="var(--color-ink)"></svg-icon>
+          <svg-icon icon="lucide:heart" size="3rem" color="var(--color-ink)"></svg-icon>
+        </div></div>
+      <div class="row"><span>mode="image"</span>
+        <div class="line">
+          <svg-icon icon="logos:javascript" mode="image" size="2rem"></svg-icon>
+          <svg-icon icon="logos:css-3"      mode="image" size="2rem"></svg-icon>
+          <svg-icon icon="logos:html-5"     mode="image" size="2rem"></svg-icon>
+        </div></div>
+    </section>
+
+    <!-- :::::: WRITE -->
+
+    <section id="code">
+      <h2>write-code</h2>
+      <div class="row"><span>lang="json", live</span>
+      <write-code id="gestalt-code" lang="json" actions="copy"></write-code></div>
+      <div class="row">
+        <span>lang="js" editable</span>
+        <write-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</write-code>
+      </div>
+      <div class="row">
+        <span>lang="css" no-copy</span>
+        <write-code lang="css" no-copy code="body { background: var(--color-bg); color: var(--color-fg); }"></write-code>
       </div>
     </section>
 
-    <!-- :::::: WAVEFORM -->
+    <section id="write-md">
+      <h2>write-md</h2>
+      <div class="row"><span>preview="side"</span>
+        <write-md name="readme" preview="side"># hello
 
-    <section id="waveform">
-      <h2>aufbau-waveform</h2>
-      <div class="row"><span>peaks interactive</span>
-        <aufbau-waveform id="waveform-demo" interactive progress="30" style="block-size: 4rem;"></aufbau-waveform></div>
-      <div class="row"><span>range-start range-end</span>
-        <aufbau-waveform id="waveform-range" range-start="25" range-end="60" progress="45" style="block-size: 4rem;"></aufbau-waveform></div>
+**markdown** with a preview.</write-md></div>
     </section>
 
-    <!-- :::::: WRITER -->
-
-    <section id="writer">
-      <h2>aufbau-writer</h2>
+    <section id="text">
+      <h2>write-text</h2>
       <div class="row"><span>counter maxlength="280"</span>
-        <aufbau-writer name="bio" placeholder="a short bio…" counter maxlength="280"></aufbau-writer></div>
+        <write-text name="bio" placeholder="a short bio…" counter maxlength="280"></write-text></div>
       <div class="row"><span>autogrow 3–12 rows</span>
-        <aufbau-writer name="note" min-rows="3" max-rows="12"></aufbau-writer></div>
-      <div class="row"><span>resize="both", children</span>
-        <aufbau-writer name="draft" resize="both">a first draft.</aufbau-writer></div>
+        <write-text name="note" autogrow min-rows="3" max-rows="12"></write-text></div>
+      <div class="row"><span>children</span>
+        <write-text name="draft">a first draft.</write-text></div>
     </section>
 
     <!-- :::::: FORM -->
@@ -622,10 +619,10 @@
       <h2>getFormValues()</h2>
       <p class="hint">every named control of this page sits in one form. the values below update on every change.</p>
       <div class="line">
-        <aufbau-button type="submit" variant="primary">submit, checks validity</aufbau-button>
-        <aufbau-button type="reset">reset</aufbau-button>
+        <btn-push type="submit" variant="primary">submit, checks validity</btn-push>
+        <btn-push type="reset">reset</btn-push>
       </div>
-      <aufbau-code id="form-dump" lang="json" actions="copy"></aufbau-code>
+      <write-code id="form-dump" lang="json" actions="copy"></write-code>
     </section>
 
   </form>
@@ -641,10 +638,10 @@
     const $ = id => document.getElementById(id);
 
     // :::::: TOASTS
-    // every [data-toast] on the page, buttons and dropdown entries alike
+    // every [data-toast] on the page, buttons and menu entries alike
 
-    await aufbau.elements.load('aufbau-toast');
-    const Toast = customElements.get('aufbau-toast');
+    await aufbau.elements.load('pop-toast');
+    const Toast = customElements.get('pop-toast');
     const toast = (message, type = 'info') => Toast.notify({ message, type });
 
     document.addEventListener('click', event => {
@@ -654,7 +651,7 @@
 
     // :::::: GESTALT
     // the theme picker, the look segments, the mode cycle, the dark switch and
-    // the two color controls all go through one function, the code block shows the result
+    // the swatch all go through one function, the code block shows the result
 
     const themes = await gestalt.themes();
 
@@ -663,7 +660,7 @@
       $('gestalt-code').setAttribute('code', JSON.stringify({ ...gestalt.get(), colors: gestalt.colors() }, null, 2));
     }
 
-    $('theme-picker').append(...themes.map(name => Object.assign(document.createElement('aufbau-option'), { textContent: name })));
+    $('theme-picker').append(...themes.map(name => Object.assign(document.createElement('input-option'), { textContent: name })));
     $('theme-picker').setAttribute('value', gestalt.get('theme'));
 
     const onChange = (id, handler) => $(id).addEventListener('change', event => handler(event.currentTarget));
@@ -674,7 +671,7 @@
     onChange('dark-toggle',  toggle => { setGestalt({ mode: toggle.checked ? 'dark' : 'light' }); $('mode-picker').value = toggle.checked ? 'dark' : 'light'; });
 
     // a color is a theme too, themes.css derives bg and fg from it and the mode decides which way
-    for (const id of ['theme-swatch', 'theme-hue']) $(id).addEventListener('input', event => setGestalt({ theme: event.currentTarget.value }));
+    $('theme-swatch').addEventListener('input', event => setGestalt({ theme: event.currentTarget.value }));
 
     $('random-theme').addEventListener('click', () => {
       const theme = themes[Math.floor(Math.random() * themes.length)];
@@ -687,10 +684,22 @@
 
     onChange('font-size', input => { document.body.style.fontSize = `${input.value}px`; });
 
-    // :::::: DATALIST, TABLE
+    // :::::: CONFIG
+
+    $('config-demo').spec = {
+      title   : { type: 'text', default: 'aufbau' },
+      size    : { type: 'number', min: 8, max: 32, default: 14, unit: 'px' },
+      speed   : { type: 'duration', min: '0s', max: '5s', step: '0.1s', default: '1s' },
+      accent  : { type: 'color', default: '#ff79c6' },
+      density : { values: ['compact', 'cozy', 'touch'], look: 'segments', default: 'cozy' },
+      sound   : { type: 'boolean', default: true },
+    };
+    $('config-demo').addEventListener('config', event => toast(`${event.detail.key}: ${event.detail.values[event.detail.key]}`));
+
+    // :::::: DATA-LIST, DATA-TABLE
     // both read the elements of this page, from the section headings
 
-    const tags = [...document.querySelectorAll('main h2')].flatMap(heading => heading.textContent.split('·').map(tag => tag.trim())).filter(tag => tag.startsWith('aufbau-'));
+    const tags = [...document.querySelectorAll('main h2')].flatMap(heading => heading.textContent.split('·').map(tag => tag.trim())).filter(tag => tag.includes('-'));
 
     $('element-names').append(...tags.map(tag => Object.assign(document.createElement('option'), { value: tag })));
 
@@ -704,21 +713,21 @@
       };
     });
 
-    // :::::: CRUMBS, DROPDOWN, INDEX, KEYBOARD
+    // :::::: CRUMBS, INDEX, KEYBOARD, MENU
 
-    document.addEventListener('aufbau-crumbs', event => toast(`crumb: ${event.detail.path}`));
+    document.addEventListener('nav-crumbs', event => toast(`crumb: ${event.detail.path}`));
 
-    onChange('dropdown-placement', picker => $('dropdown-menu').setAttribute('placement', picker.value));
-    onChange('index-viewmode',     picker =>    $('index-demo').setAttribute('viewmode',  picker.value));
+    onChange('menu-placement',  picker => $('menu-demo').setAttribute('placement', picker.value));
+    onChange('index-viewmode',  picker => $('index-demo').setAttribute('viewmode',  picker.value));
     $('index-size').addEventListener('input', event => $('index-demo').setAttribute('item-size', `${event.currentTarget.value}px`));
-    onChange('keyboard-layout',    picker => $('keyboard-demo').setAttribute('layout', picker.value));
+    onChange('keyboard-layout', picker => $('keyboard-demo').setAttribute('layout', picker.value));
 
     // :::::: FLAGS
 
     const regions = new Intl.DisplayNames(['en'], { type: 'region' });
     $('flag-list').append(...['at', 'br', 'ch', 'de', 'es', 'fr', 'gb', 'in', 'it', 'jp', 'ke', 'mx', 'nl', 'no', 'pl', 'se', 'ua', 'us'].map(code => {
       const figure = document.createElement('figure');
-      figure.innerHTML = `<aufbau-flag code="${code}"></aufbau-flag><figcaption>${regions.of(code.toUpperCase())}</figcaption>`;
+      figure.innerHTML = `<svg-flag code="${code}"></svg-flag><figcaption>${regions.of(code.toUpperCase())}</figcaption>`;
       return figure;
     }));
 
@@ -728,27 +737,35 @@
     $('marquee').append(...words);
     $('marquee-right').append(...words.map(word => word.cloneNode(true)));
 
-    // :::::: MODAL
+    // :::::: MODAL, PROMPT
 
     $('modal-open').addEventListener('click', async () => {
       const answer = await $('modal-demo').show();
-      toast(`the modal closed with: ${answer ?? 'nothing'}`);
+      toast(`the modal closed with: ${answer || 'nothing'}`);
     });
     $('modal-demo').addEventListener('click', event => {
       const button = event.target.closest('[data-close]');
       if (button) $('modal-demo').close(button.dataset.close);
     });
 
-    // :::::: OPTION
+    await aufbau.elements.load('pop-prompt');
+    const Prompt = customElements.get('pop-prompt');
+
+    $('prompt-confirm').addEventListener('click', async () => toast(`confirmed: ${await Prompt.confirm('delete it?', { heading: 'delete', confirm: 'delete' })}`));
+    $('prompt-text').addEventListener('click',    async () => toast(`named: ${await Prompt.prompt('what is it called?', 'untitled')}`));
+    $('prompt-date').addEventListener('click',    async () => toast(`when: ${await Prompt.prompt('when?', '', { field: 'date' })}`));
+    $('prompt-alert').addEventListener('click',   () => Prompt.alert('saved.'));
+
+    // :::::: OPTIONS
 
     let added = 0;
     $('option-add').addEventListener('click', () => {
-      const option = document.createElement('aufbau-option');
+      const option = document.createElement('input-option');
       option.setAttribute('value', `new-${++added}`);
       option.textContent = `new ${added}`;
       $('option-picker').append(option);
     });
-    $('option-drop').addEventListener('click', () => [...$('option-picker').querySelectorAll('aufbau-option')].pop()?.remove());
+    $('option-drop').addEventListener('click', () => [...$('option-picker').querySelectorAll('input-option')].pop()?.remove());
 
     // :::::: PROGRESS, SKELETON
 
@@ -761,13 +778,13 @@
       { label: 'elements', icon: 'lucide:folder', expanded: true, children: tags.slice(0, 6).map(tag => ({ label: `${tag}.js`, icon: 'lucide:file-code', value: tag })) },
       { label: 'more', icon: 'lucide:folder', children: tags.slice(6).map(tag => ({ label: `${tag}.js`, icon: 'lucide:file-code', value: tag })) },
     ];
-    document.addEventListener('aufbau-tree-select', event => event.detail?.value && toast(`selected: ${event.detail.value}`));
+    document.addEventListener('data-tree-select', event => event.detail?.value && toast(`selected: ${event.detail.value}`));
 
-    // :::::: WAVEFORM
+    // :::::: WAVE
 
     const peaks = Array.from({ length: 64 }, (_, index) => (.35 + .65 * Math.abs(Math.sin(index * .37) * Math.cos(index * .11))).toFixed(2));
-    for (const id of ['waveform-demo', 'waveform-range']) $(id).setAttribute('peaks', peaks.join(','));
-    $('waveform-demo').addEventListener('aufbau-waveform-seek', event => $('waveform-demo').setAttribute('progress', event.detail.progress));
+    for (const id of ['wave-demo', 'wave-range']) $(id).setAttribute('peaks', peaks.join(' '));
+    $('wave-demo').addEventListener('media-wave-seek', event => $('wave-demo').setAttribute('progress', event.detail.progress));
 
     // :::::: FORM
 

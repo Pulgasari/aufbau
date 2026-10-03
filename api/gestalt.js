@@ -15,7 +15,7 @@
 // and a skin.
 // look and layout are stylesheets, one per kind, swapped in place, false
 // removes one. skin is both: the --skin token, and the sheet the elements adopt
-// into @layer aufbau.skin (elements/core/skin.js).
+// into @layer aufbau.skin (@aufbau/element).
 
 export const CSS_PATH = 'https://code.pulgasari.dev/aufbau/css';
 
@@ -35,7 +35,7 @@ const SHEETS = { layout: 'layouts', look: 'looks' };
 const current = {};
 
 // the skin sheet belongs to the elements, one adoption in their layer. false or null removes it
-const setSkin = async name => (await import('@aufbau/elements/core/skin.js')).setSkin(name || null);
+const setSkin = async name => (await import('@aufbau/element')).setSkin(name || null);
 
 const domina = name => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default);
 

@@ -41,7 +41,7 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | `packages` | built | repos from a package origin become local copies, the origin is rewritten to them |
 | `start`    | built | index.html moves / to the start path before the shell reads its route |
 | `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
-| `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `AufbauIcon.provide()` |
+| `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `SvgIcon.provide()` |
 | `webfonts` | built | only the fonts a config names or the code quotes, the catalog lists only those |
 | `prune`    | built | files nothing reaches are dropped |
 | `report`   | built | what still goes over the network, and the size |

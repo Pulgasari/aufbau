@@ -12,7 +12,7 @@ const facade   = (load, names) => Object.fromEntries(names.map(name => [name, as
 const once     = (load)        => { let promise; return () => promise ??= load(); };
 
 const modules = {
-  config   : once(() => import('@aufbau/elements/core/AufbauConfig.js')),
+  config   : once(() => import('@aufbau/element')),
   domina   : name    => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default),
   elements : once(() => import('@aufbau/elements')),
   filters  : once(() => import('@aufbau/filters')),
@@ -111,7 +111,7 @@ const config = {
     theme   : 'zombie',
   },
 
-  // mode: 'auto' | 'all' | false. every other key is element config, e.g. { code: { theme: 'nord' } }
+  // mode: 'auto' | 'all' | false. every other key is element config, e.g. { 'write-code': { theme: 'nord' } }
   elements : {
     mode : 'auto',
   },
@@ -144,7 +144,7 @@ async function boot (options = {}) {
   // aufbau.css first, the gestalt sheets after it
   if (reset) await linkStylesheet(`${CSS_PATH}/aufbau.css`);
 
-  if (Object.keys(defaults).length) await elements.setConfig(defaults, { layer: 'defaults' });
+  if (Object.keys(defaults).length) await elements.setConfig(defaults);
 
   await Promise.all([
     gestalt.set({ layout, look, mode: scheme, skin, theme, ...(palette && { palette }) }),
