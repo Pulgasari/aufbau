@@ -36,38 +36,43 @@ const stateSet = host => ({
 
 // :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::::
 
+// loading: the leaves of the markup become blocks of their own size. an element
+// that has no markup yet gets lines over its box instead (:state(blank))
 const SKELETON_STYLES = `
   @keyframes aufbau-skeleton { 50% { opacity: 0.45; } }
 
-  :state(skeleton),
-  :host(:state(skeleton)) {
-    --_line : var(--skeleton-line, 1em);
-    --_gap  : var(--skeleton-gap, 0.5em);
+  :state(skeleton), :host(:state(skeleton)) {
+    --_color : var(--skeleton-color, color-mix(in srgb, currentColor 14%, transparent));
 
-    animation       : aufbau-skeleton 1.4s ease-in-out infinite;
-    background      : repeating-linear-gradient(to bottom,
-                        var(--skeleton-color, color-mix(in srgb, currentColor 14%, transparent)) 0 var(--_line),
-                        transparent 0 calc(var(--_line) + var(--_gap)));
-    border-radius   : var(--skeleton-radius, 0.25em);
-    cursor          : progress;
-    min-block-size  : calc(var(--skeleton-lines, 1) * (var(--_line) + var(--_gap)) - var(--_gap));
-    min-inline-size : var(--skeleton-width, 4em);
-    pointer-events  : none;
-    user-select     : none;
+    animation      : aufbau-skeleton 1.4s ease-in-out infinite;
+    cursor         : progress;
+    pointer-events : none;
+    user-select    : none;
 
     -webkit-text-fill-color : transparent;
   }
 
-  :state(skeleton) > *,
-  :host(:state(skeleton)) *,
-  :host(:state(skeleton)) ::slotted(*) { visibility: hidden; }
+  :state(skeleton) :not(:has(*)), :host(:state(skeleton)) :not(:has(*), slot) {
+    background-color : var(--_color);
+    border-color     : transparent;
+    border-radius    : var(--skeleton-radius, 0.25em);
+    object-position  : -99999px;   /* an image steps aside for the block */
+  }
+
+  :state(blank), :host(:state(blank)) {
+    --_line : var(--skeleton-line, 1em);
+    --_gap  : var(--skeleton-gap, 0.5em);
+
+    background      : repeating-linear-gradient(to bottom, var(--_color) 0 var(--_line), transparent 0 calc(var(--_line) + var(--_gap)));
+    border-radius   : var(--skeleton-radius, 0.25em);
+    min-block-size  : calc(var(--skeleton-lines, 3) * (var(--_line) + var(--_gap)) - var(--_gap));
+    min-inline-size : var(--skeleton-width, 4em);
+  }
 
   @media (prefers-reduced-motion: reduce) {
     :state(skeleton), :host(:state(skeleton)) { animation: none; }
   }
 `;
-
-const SKELETON_VARS = { gap: 'gap', line: 'line', lines: 'lines', radius: 'radius', width: 'width' };
 
 export class AufbauElement extends HTMLElement {
 
@@ -94,30 +99,18 @@ export class AufbauElement extends HTMLElement {
   
   // :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::
 
+  // while the element loads. the attribute skeleton does the same from outside
   setSkeleton (on = true) {
-    this._skeleton = Boolean(on);
+    this._loading = Boolean(on);
     this.syncSkeleton();
     return this;
   }
 
   syncSkeleton () {
-    const on = Boolean(this._skeleton || this.getAttr('skeleton'));
-    if (!on && !this._skeletonShown) return;
-    this._skeletonShown = on;
-
+    const on = this._loading || this.hasAttribute('skeleton');
     this.states.toggle('skeleton', on);
+    this.states.toggle('blank', on && !this.renderTarget.querySelector('*'));
     if (this.internals) this.internals.ariaBusy = on ? 'true' : null;
-
-    const shape = this.constructor.skeleton;
-    let options = {};
-    if (isFn(shape))          options = shape.call(this);
-    if (isPlainObject(shape)) options = shape;
-
-    for (const [key, name] of Object.entries(SKELETON_VARS)) {
-      const value = on ? options[key] : undefined;
-      if (value == null) this.style.removeProperty(`--skeleton-${name}`);
-      else this.style.setProperty(`--skeleton-${name}`, String(value));
-    }
   }
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::

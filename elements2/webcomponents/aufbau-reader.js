@@ -16,9 +16,9 @@ export default class AufbauReader extends AufbauSourceElement {
 
   static output = 'article';
 
-  static skeleton = { lines: 4, width: '100%' };
-
   static styles = `aufbau-reader {
+    --skeleton-lines : 4;
+
     display: block;
 
     > article { display: block; min-inline-size: 0; }

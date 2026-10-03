@@ -7,13 +7,11 @@ const ITEM = 'data-tree-item';
 export default class DataTree extends AufbauElement {
   static internals = { role: 'tree' };
 
-  static skeleton = { lines: 6, line: '1.1em', gap: '0.45em', width: '100%' };
-
   static attr = {
     src : String,
   };
 
-  static styles = `data-tree { display: block; }`;
+  static styles = `data-tree { display: block; --skeleton-lines: 6; }`;
 
   // in-memory data — bypasses `src` and hand-authored markup
   set nodes (value) {

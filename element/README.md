@@ -41,7 +41,6 @@ MyThing.init();   // <my-thing>
 | `static reflect` | attributes whose resolved value goes back onto the host |
 | `static internals` | ElementInternals up front, an object sets defaults such as `{ role: 'img' }` |
 | `static parts` | part names, each gets a getter: `close-button` is `this.$closeButton` |
-| `static skeleton` | the shape of the loading placeholder |
 
 ### lifecycle
 
@@ -112,7 +111,7 @@ this.focused                        // the focused element inside
 this.states.toggle('open', true)                   // :state(open)
 this.setVar('--item-size', '200px')                // a custom property on the host
 this.setVar({ '--embed-ratio': '16 / 9', '--embed-height': null })    // null and false remove
-this.setSkeleton(true)
+this.setSkeleton(true)                             // loading: the markup turns into blocks, an empty element into lines
 ```
 
 ### styles

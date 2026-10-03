@@ -399,10 +399,13 @@ platzhalter, solange inhalt lädt. nur der host malt, nichts wird gerendert.
 <aufbau-skeleton shape="rect" size="100% 12rem"></aufbau-skeleton>
 ```
 
-jedes andere aufbau-element kann dasselbe an seiner eigenen stelle: das attribut
-`skeleton` (`<aufbau-item skeleton>`), solange die app lädt. reader, table, tree
-und picker zeigen ihn von selbst, während sie `src` laden. aussehen über
-`--skeleton-color`, `--skeleton-line`, `--skeleton-gap`, `--skeleton-radius`.
+jedes andere element kann dasselbe an seiner eigenen stelle: das attribut
+`skeleton` (`<aufbau-item skeleton>`), solange die app lädt. reader, table und
+tree zeigen ihn von selbst, während sie `src` laden. hat das element schon
+markup, wird jedes blatt davon ein grauer block in seiner eigenen größe; ist es
+noch leer, füllen zeilen die box. aussehen über `--skeleton-color`,
+`--skeleton-radius`, für die zeilen `--skeleton-line`, `--skeleton-gap`,
+`--skeleton-lines`.
 
 ## aufbau-toast
 

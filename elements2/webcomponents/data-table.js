@@ -7,8 +7,6 @@ import { html }          from '../lib/html.js';
 import { isArray }       from '@pulgasari/is';
 
 export default class DataTable extends AufbauElement {
-  static skeleton = { lines: 5, line: '1.5em', width: '100%' };
-
   static attr = {
     columns  : String,
     sortable : Boolean,
@@ -16,6 +14,9 @@ export default class DataTable extends AufbauElement {
   };
 
   static styles = `data-table {
+    --skeleton-line  : 1.5em;
+    --skeleton-lines : 5;
+
     display    : block;
     overflow-x : auto;
 
