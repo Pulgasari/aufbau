@@ -18,7 +18,7 @@ export default class AufbauFilter extends AufbauElement {
 
   static styles = `aufbau-filter { display: block; > input-search { inline-size: 100%; } }`;
 
-  onMount () {
+  onConnected () {
     const apply = debounce(query => this.apply(query), this.getAttr('debounce'));
     this.track(apply.cancel);
     this.on('input', 'input-search', (event, input) => apply(input.value));

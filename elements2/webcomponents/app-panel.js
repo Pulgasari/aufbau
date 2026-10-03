@@ -98,7 +98,7 @@ export class AppPanel extends AufbauElement {
     return this;
   }
 
-  onMount () {
+  onConnected () {
     this.on('click', '[part~="close"]',  () => this.close());
     this.on('click', '[part~="expand"]', () => this.expand());
 

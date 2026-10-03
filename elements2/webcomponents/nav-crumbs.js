@@ -59,7 +59,7 @@ export default class NavCrumbs extends AufbauElement {
     return root ? [{ label: root, path: lead || separator }, ...crumbs] : crumbs;
   }
 
-  onMount () {
+  onConnected () {
     this.on('click', 'button[data-path]', (event, button) => {
       const index = Number(button.dataset.index);
       this.emit('nav-crumbs', { index, path: button.dataset.path });
@@ -72,7 +72,7 @@ export default class NavCrumbs extends AufbauElement {
     this.track(() => observer.disconnect());
   }
 
-  onAttributeChange (name) { if (name === 'path') this._expanded = false; }
+  onAttributeChanged (name) { if (name === 'path') this._expanded = false; }
 
   render () {
     if (this.getAttr('path') == null) return null;

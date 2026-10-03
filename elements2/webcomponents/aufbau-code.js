@@ -203,7 +203,7 @@ j
 
   static preloadTheme (theme) { return loadTheme (theme); }
 
-  onMount () {
+  onConnected () {
     bindActions(this);
 
     this.on('focusin', 'code[contenteditable]', () => { this._focusedCode = this.source; });
@@ -244,8 +244,8 @@ j
     }
   }
 
-  onAttributeChange (name) { if (name === 'code') this._editedCode = undefined; }
-  onSourceChange    ()     { this._editedCode = undefined; this.invalidate().update(); }
+  onAttributeChanged (name) { if (name === 'code') this._editedCode = undefined; }
+  onSourceChange     ()     { this._editedCode = undefined; this.invalidate().update(); }
 
   get source () {
     if (this._editedCode !== undefined)

@@ -33,7 +33,7 @@ export class AppView extends AufbauElement {
   // the app-root this view belongs to, null outside of one
   get root () { return this.closest('app-root'); }
 
-  onMount () {
+  onConnected () {
     this.inert = !this.active;
     if (this.active) this.fill();
 
@@ -41,7 +41,7 @@ export class AppView extends AufbauElement {
     if (path != null && !this.active && this.getAttr('route') === path) this.activate({ history: false, transition: false });
   }
 
-  onAttributeChange (name, oldValue, newValue) {
+  onAttributeChanged (name, oldValue, newValue) {
     if (name !== 'active' || this._switching) return;
 
     if (newValue == null) { this.inert = true; return; }

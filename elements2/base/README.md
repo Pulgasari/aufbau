@@ -33,7 +33,17 @@ MyThing.init();   // <my-thing>
 
 ### lifecycle
 
-`onMount()` · `render()` · `sync()` · `onRender()` (after a rebuild) · `onAttributeChange(name, old, new)` · `onUnmount()` · `update()` · `invalidate()`
+the native callbacks do the base's work and then call a hook of the same name:
+
+| hook | |
+|---|---|
+| `onConnected()` | in the document, after styles and listeners are set up |
+| `onDisconnected()` | out of the document, listeners are already removed |
+| `onAttributeChanged(name, old, new)` | an attribute of the schema changed, `update()` follows |
+| `onAdopted(oldDocument, newDocument)` | moved into another document |
+| `onConnectedMove()` | moved with `moveBefore()`. by default disconnected and connected again, override it to keep the state |
+
+`render()` · `sync()` · `onRender()` (after a rebuild) · `onSourceChange()` · `update()` · `invalidate()`
 
 ### attributes
 
@@ -90,6 +100,9 @@ this.validate()             // extend for own checks
 this.focusTarget            // what focus() and the label point at
 this.isDisabled             // own attribute or a disabled fieldset
 ```
+
+hooks after the default handling: `onFormAssociated(form)` · `onFormDisabled(disabled)` ·
+`onFormReset()` · `onFormStateRestore(state, mode)`
 
 `persist`, `persist="session"`, `persist="theme"`, `persist="session:theme"`:
 the value is kept under the name, the id or the given key.

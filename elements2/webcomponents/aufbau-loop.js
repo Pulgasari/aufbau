@@ -55,7 +55,7 @@ export default class AufbauLoop extends AufbauElement {
     this._index = 0;
   }
 
-  onMount () {
+  onConnected () {
     // the marquee copy follows the children
     this.on(this.root, 'slotchange', () => this.copy());
 
@@ -70,9 +70,9 @@ export default class AufbauLoop extends AufbauElement {
     this.start();
   }
 
-  onUnmount () { this.stop(); }
+  onDisconnected () { this.stop(); }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     this.start();
   }
 

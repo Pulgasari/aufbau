@@ -249,7 +249,7 @@ export default class AufbauKeyboard extends AufbauElement {
 
   // :::::: LIFECYCLE
 
-  onMount () {
+  onConnected () {
     this.on('pointerdown', 'button[data-key]', (event, button) => {
       event.preventDefault();
       if (!button.disabled) this.press(button.dataset.key);
@@ -258,11 +258,11 @@ export default class AufbauKeyboard extends AufbauElement {
     if (this.getAttr('nativeKeyboard') === 'hide') { suppressNative(); this._suppressing = true; }
   }
 
-  onUnmount () {
+  onDisconnected () {
     if (this._suppressing) { restoreNative(); this._suppressing = false; }
   }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name !== 'native-keyboard') return;
     const wanted = this.getAttr('nativeKeyboard') === 'hide';
     if (wanted === !!this._suppressing) return;

@@ -54,9 +54,9 @@ export default class AufbauProgress extends AufbauElement {
     }
   `;
 
-  onMount () { this.watchScroll(); }
+  onConnected () { this.watchScroll(); }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'target' || name === 'type') this.watchScroll();
   }
 

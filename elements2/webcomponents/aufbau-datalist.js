@@ -13,7 +13,7 @@ export default class AufbauDatalist extends AufbauElement {
 
   get list () { return this._list; }
 
-  onMount () {
+  onConnected () {
     this._list ??= document.createElement('datalist');
 
     if (this.id) {

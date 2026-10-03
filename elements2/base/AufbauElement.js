@@ -183,20 +183,25 @@ export class AufbauElement extends HTMLElement {
       if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
     });
     if (this.constructor.source) this.watchSource();
-    this.onMount();
+    this.onConnected();
     this.update();
   }
   
   disconnectedCallback () {
     this._mounted = false;
     this.release();
-    this.onUnmount();
+    this.onDisconnected();
   }
+
+  adoptedCallback (oldDocument, newDocument) { this.onAdopted(oldDocument, newDocument); }
+
+  // without the hook a move is what it is without this callback: disconnected, then connected
+  connectedMoveCallback () { this.onConnectedMove(); }
 
   attributeChangedCallback (name, oldValue, newValue) {
     if (this._reflecting) return;
     if (oldValue !== newValue && this._mounted) {
-      this.onAttributeChange(name, oldValue, newValue);
+      this.onAttributeChanged(name, oldValue, newValue);
       this.update();
     }
   }
@@ -217,12 +222,14 @@ export class AufbauElement extends HTMLElement {
 
   // ::: hooks, override in subclasses
 
-  onAttributeChange (name, oldValue, newValue) {}
-  onMount   () {}
-  onUnmount () {}
-  onRender  () {}
-  render    () { return null; }
-  sync      () {}
+  onAdopted          (oldDocument, newDocument) {}
+  onAttributeChanged (name, oldValue, newValue) {}
+  onConnected        () {}
+  onConnectedMove    () { this.disconnectedCallback(); this.connectedCallback(); }
+  onDisconnected     () {}
+  onRender           () {}
+  render             () { return null; }
+  sync               () {}
 
   update () {
     if (!this._mounted) return this;

@@ -185,11 +185,11 @@ export default class AufbauEmbed extends AufbauElement {
     return this;
   }
 
-  onMount () {
+  onConnected () {
     this.on('click', 'button', (event, button) => { if (button.parentNode === this) this.activate(); });
   }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'src') this._active = false;
   }
 

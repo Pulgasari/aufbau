@@ -124,9 +124,17 @@ export class AufbauControlElement extends AufbauElement {
     return this;
   }
 
-  formResetCallback        ()         { this.commit(this.defaultValue, { notify: false }); }
-  formStateRestoreCallback (state)    { this.commit(state,             { notify: false }); }
-  formDisabledCallback     (disabled) { this._formDisabled = disabled; this.update(); }
+  formAssociatedCallback   (form)        { this.onFormAssociated(form); }
+  formDisabledCallback     (disabled)    { this._formDisabled = disabled; this.update(); this.onFormDisabled(disabled); }
+  formResetCallback        ()            { this.commit(this.defaultValue, { notify: false }); this.onFormReset(); }
+  formStateRestoreCallback (state, mode) { this.commit(state, { notify: false }); this.onFormStateRestore(state, mode); }
+
+  // ::: hooks, after the default handling above
+
+  onFormAssociated   (form)        {}
+  onFormDisabled     (disabled)    {}
+  onFormReset        ()            {}
+  onFormStateRestore (state, mode) {}
 
   // :::::: PERSISTENCE :::::::::::::::::::::::::::::::::::::::::::
 

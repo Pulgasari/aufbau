@@ -93,7 +93,7 @@ export class AppRoot extends AufbauElement {
     return document.startViewTransition(done).finished;
   }
 
-  onMount () {
+  onConnected () {
     this.on(window, 'hashchange', () => { if (this.getAttr('routing') === 'hash') this.follow(); });
     this.on(window, 'popstate',   () => { if (this.getAttr('routing') === 'path') this.follow(); });
 
@@ -101,7 +101,7 @@ export class AppRoot extends AufbauElement {
     if (!this.view) this.views[0]?.activate({ history: false, transition: false });
   }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'skin') this.applySkin();
   }
 

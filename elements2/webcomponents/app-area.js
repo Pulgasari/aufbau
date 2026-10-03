@@ -215,7 +215,7 @@ export class AppArea extends AufbauElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
-  onMount () {
+  onConnected () {
     this.watchBreakpoint();
 
     this.on(this.shadowRoot, 'click', event => {
@@ -231,9 +231,9 @@ export class AppArea extends AufbauElement {
     });
   }
 
-  onUnmount () { this.setOthersInert(false); }
+  onDisconnected () { this.setOthersInert(false); }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'breakpoint' || name === 'dock' || name === 'overlay') this.watchBreakpoint();
   }
 

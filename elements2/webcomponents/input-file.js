@@ -125,7 +125,7 @@ export default class InputFile extends AufbauControlElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
-  onMount () {
+  onConnected () {
     this.on('change', 'input[type="file"]', (event, input) => this.add([...input.files]));
     this.on('click',  '[part~="zone"]',     () => { if (!this.isDisabled) this.field?.click(); });
     this.on('click',  '[data-remove]',   (event, button) => this.remove(Number(button.dataset.remove)));
@@ -185,7 +185,7 @@ export default class InputFile extends AufbauControlElement {
     return this;
   }
 
-  formResetCallback () { this._files = []; this._rejected = []; this.invalidate().update(); }
+  onFormReset () { this._files = []; this._rejected = []; this.invalidate().update(); }
 
   validate () {
     const internals = this.internals;

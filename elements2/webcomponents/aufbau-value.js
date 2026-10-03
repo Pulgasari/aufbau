@@ -156,7 +156,7 @@ export default class AufbauValue extends AufbauElement {
 
   // :::::: LIFECYCLE
 
-  onMount () {
+  onConnected () {
     bindActions(this);
   }
 

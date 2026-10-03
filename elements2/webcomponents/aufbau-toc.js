@@ -40,9 +40,9 @@ export default class AufbauToc extends AufbauElement {
     return target ? getElement(target) : null;
   }
 
-  onMount () { this.watch(); }
+  onConnected () { this.watch(); }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'target' || name === 'selector') this.watch();
   }
 

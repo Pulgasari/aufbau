@@ -27,7 +27,7 @@ export default class DataTree extends AufbauElement {
     return [...this.querySelectorAll(ITEM)].filter(item => !item.parentElement.closest(`${ITEM}:not([expanded])`));
   }
 
-  onMount () {
+  onConnected () {
     this.on('click', ITEM, (event, item) => {
       if (!event.composedPath().includes(item.row)) return;
       item.toggle();

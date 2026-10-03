@@ -82,7 +82,7 @@ export default class AufbauAudio extends AufbauElement {
 
   get playing () { return !this._audio.paused; }
 
-  onMount () {
+  onConnected () {
     const audio = this._audio;
 
     this.on(audio, ['loadedmetadata', 'timeupdate'], () => this.syncProgress());
@@ -99,7 +99,7 @@ export default class AufbauAudio extends AufbauElement {
     });
   }
 
-  onUnmount () { this._audio.pause(); }
+  onDisconnected () { this._audio.pause(); }
 
   play   () { if (this._audio.src) this._audio.play().catch(error => console.warn('[aufbau-audio] playback refused:', error)); return this; }
   pause  () { this._audio.pause(); return this; }

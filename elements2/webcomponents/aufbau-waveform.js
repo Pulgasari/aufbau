@@ -47,7 +47,7 @@ export default class AufbauWaveform extends AufbauElement {
     &[interactive] { cursor: pointer; touch-action: pan-y; }
   }`;
 
-  onMount () {
+  onConnected () {
     this.on('click', (event) => {
       if (!this.getAttr('interactive')) return;
       const rect = this.getBoundingClientRect();

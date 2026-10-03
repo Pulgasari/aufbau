@@ -69,7 +69,7 @@ export default class AufbauIndex extends AufbauElement {
 
   render () { return null; }
 
-  onMount () {
+  onConnected () {
     this.syncResize();
 
     this.on('contentvisibilityautostatechange', (event) => {
@@ -77,9 +77,9 @@ export default class AufbauIndex extends AufbauElement {
     }, { capture: true });
   }
 
-  onUnmount () { this._resize?.destroy(); this._resize = null; }
+  onDisconnected () { this._resize?.destroy(); this._resize = null; }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'item-size-min' || name === 'item-size-max') this.syncResize();
     if (name === 'item-size'     || name === 'item-look')     this._resizeValue = null;
     if (RELAYOUT.has(name)) this.relayout();

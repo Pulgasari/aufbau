@@ -150,7 +150,7 @@ export default class AufbauToast extends AufbauElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
-  onMount () {
+  onConnected () {
     adoptBaseStyles('aufbau-toast-stack', STACK_STYLES);   // deduplicated by key
 
     this.on('click', '[part~="close"]', () => this.dismiss());
@@ -165,7 +165,7 @@ export default class AufbauToast extends AufbauElement {
     this.startTimer();
   }
 
-  onUnmount () { this.stopTimer(); }
+  onDisconnected () { this.stopTimer(); }
 
   // :::::: TIMER :::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -38,7 +38,7 @@ export default class AufbauButton extends AufbauElement {
   set disabled (next) { this.toggleAttribute('disabled', Boolean(next)); }
   get form     ()     { return this.internals?.form ?? null; }
 
-  onMount () {
+  onConnected () {
     if (!this.internals) this.setAttribute('role', 'button');
 
     this.on('click', event => {

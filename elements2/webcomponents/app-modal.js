@@ -114,7 +114,7 @@ export default class AppModal extends AufbauElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
-  onMount () {
+  onConnected () {
     adoptBaseStyles('app-modal-page', PAGE_STYLES);   // deduplicated by key
 
     this.on('click', '[part~="close"]', () => this.close());

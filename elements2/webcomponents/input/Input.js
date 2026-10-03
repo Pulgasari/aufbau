@@ -163,7 +163,7 @@ export class Input extends AufbauControlElement {
     return this;
   }
 
-  onAttributeChange (name) {
+  onAttributeChanged (name) {
     if (name === 'look') this._ownLook = false;
   }
 
@@ -339,7 +339,7 @@ export class Input extends AufbauControlElement {
     return super.captureDefaults();
   }
 
-  onMount () {
+  onConnected () {
     this.on(this.root, 'input',       event => event.stopPropagation());
     this.on(this.root, 'beforeinput', event => event.stopPropagation());
 
@@ -356,7 +356,7 @@ export class Input extends AufbauControlElement {
     }
   }
 
-  onUnmount () { this._bound = null; }
+  onDisconnected () { this._bound = null; }
 
   update () {
     if (this._mounted) this.source.refresh();

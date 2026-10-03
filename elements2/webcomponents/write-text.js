@@ -82,7 +82,7 @@ export default class WriteText extends AufbauControlElement {
   actionText   () { return this.field?.value ?? this.getAttribute('value') ?? ''; }
   actionTarget () { return this.getAttr('readonly') ? null : this.field; }
 
-  onMount () {
+  onConnected () {
     if (!this.hasAttribute('value') && this.defaultValue) this.commit(this.defaultValue, { notify: false });
 
     this.on('input',  'textarea', (event, field) => { this.commit(field.value); this.grow(field); });

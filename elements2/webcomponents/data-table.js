@@ -37,7 +37,7 @@ export default class DataTable extends AufbauElement {
   set data (value) { this._data = value; this._loadedSrc = null; this.invalidate().update(); }
   get data ()      { return this._data; }
 
-  onMount () {
+  onConnected () {
     this.on('click', 'th[data-key] > button', (event, button) => this.sortBy(button.parentElement.dataset.key));
   }
 

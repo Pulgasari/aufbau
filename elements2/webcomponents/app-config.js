@@ -35,7 +35,7 @@ export class AppConfig extends AufbauElement {
   get values ()     { return this._values ?? {}; }
   set values (next) { this._values = next; if (!this._built) this.build(); else this.fill(); }
 
-  onMount () { this.build(); }
+  onConnected () { this.build(); }
 
   build () {
     if (!this.isConnected) return;

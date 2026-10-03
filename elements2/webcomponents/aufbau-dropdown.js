@@ -63,7 +63,7 @@ export default class AufbauDropdown extends AufbauElement {
   get menu    () { return this.part('menu'); }
   get isOpen  () { return Boolean(this.menu?.matches(':popover-open')); }
 
-  onMount () {
+  onConnected () {
     this.on('click', ENTRY, (event, entry) => { if (this.contains(entry)) this.close(); });
 
     this.on(this.root, 'toggle', (event) => {

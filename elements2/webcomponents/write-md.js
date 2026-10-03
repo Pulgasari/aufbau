@@ -76,8 +76,8 @@ export class WriteMd extends AufbauElement {
   }
 
   // after the first render, and again after a reconnect: a disconnect drops the listeners
-  onMount  () { if (this.writer) this.bind(); }
-  onRender () { this.bind(); }
+  onConnected () { if (this.writer) this.bind(); }
+  onRender    () { this.bind(); }
 
   bind () {
     this.on('click', '[data-mode]', (event, button) => {
@@ -101,7 +101,7 @@ export class WriteMd extends AufbauElement {
     this.reader?.setAttribute('raw', this.value || ' ');
   }
 
-  onAttributeChange (name, oldValue, newValue) {
+  onAttributeChanged (name, oldValue, newValue) {
     if (name !== 'value' || !this.writer) return;
     this.writer.value = newValue ?? '';
     this.renderPreview();

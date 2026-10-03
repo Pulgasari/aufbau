@@ -33,7 +33,7 @@ export default class AufbauSkeleton extends AufbauElement {
     };
   }
 
-  onMount () { this.setSkeleton(true); }
+  onConnected () { this.setSkeleton(true); }
 
   render () { return null; }
 }
