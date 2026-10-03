@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 import { configKeys }                 from '../lib/config.js';
-import { AufbauElement }              from '../base/AufbauElement.js';
+import { AufbauSourceElement }        from '../base/AufbauSourceElement.js';
 import { TYPES, typeOf }              from './input/types/index.js';
 import { actionButtons, bindActions } from '../lib/actions.js';
 import { attrs, html }                from '../lib/html.js';
@@ -57,7 +57,7 @@ function displayText (type, value, format, locale) {
 
 // :::::: MAIN
 
-export default class AufbauValue extends AufbauElement {
+export default class AufbauValue extends AufbauSourceElement {
   static attr = {
     format : String,
     locale : { type: String, config: true },
@@ -73,7 +73,7 @@ export default class AufbauValue extends AufbauElement {
     ...configKeys(TAG, 'locale'),
   ];
 
-  static source = { tag: 'span' };
+  static output = 'span';
 
   static styles = `
     aufbau-value {

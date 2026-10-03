@@ -29,7 +29,7 @@ export default class AufbauVideo extends AufbauElement {
     }
   }`;
 
-  get player () { return this.$(':scope > video'); }
+  get player () { return this.$(':scope > video').node; }
 
   render () {
     const { label, src, youtubeId } = this.getAttr();

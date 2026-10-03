@@ -28,14 +28,14 @@ export default {
     ${listbox(host)}
   `,
 
-  events (host, on) {
+  events (host, scope) {
     const button = () => triggerOf(host);
-    popoverEvents(host, on, button);
+    popoverEvents(host, scope, button);
 
     let timer   = null;
     let pressed = false;
 
-    on('pointerdown', '[aria-haspopup]', event => {
+    scope.on('pointerdown', '[aria-haspopup]', event => {
       if (event.button !== 0) return;
       pressed = false;
       clearTimeout(timer);
@@ -43,16 +43,15 @@ export default {
     });
 
     const release = () => { clearTimeout(timer); if (pressed) setTimeout(() => { pressed = false; }); };
-    on(window, 'pointerup',     release);
-    on(window, 'pointercancel', release);
+    scope.$(window).on('pointerup pointercancel', release);
 
-    on('click', '[aria-haspopup]', () => {
+    scope.on('click', '[aria-haspopup]', () => {
       if (pressed) return;
       if (isOpen(host)) setOpen(host, false, button());
       else host.cycle(1);
     });
 
-    on('contextmenu', '[aria-haspopup]', event => {
+    scope.on('contextmenu', '[aria-haspopup]', event => {
       event.preventDefault();
       setOpen(host, true, button());
     });

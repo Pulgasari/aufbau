@@ -94,8 +94,8 @@ export class AppRoot extends AufbauElement {
   }
 
   onConnected () {
-    this.on(window, 'hashchange', () => { if (this.getAttr('routing') === 'hash') this.follow(); });
-    this.on(window, 'popstate',   () => { if (this.getAttr('routing') === 'path') this.follow(); });
+    this.$(window).on('hashchange', () => { if (this.getAttr('routing') === 'hash') this.follow(); });
+    this.$(window).on('popstate',   () => { if (this.getAttr('routing') === 'path') this.follow(); });
 
     this.follow({ transition: false });
     if (!this.view) this.views[0]?.activate({ history: false, transition: false });

@@ -61,8 +61,8 @@ export default class AufbauProgress extends AufbauElement {
   }
 
   watchScroll () {
-    this._unwatchScroll?.();
-    this._unwatchScroll = null;
+    this._scrollWatch?.abort();
+    this._scrollWatch = null;
 
     const { target, type } = this.getAttr();
     if (type !== 'scroll') return;
@@ -77,7 +77,8 @@ export default class AufbauProgress extends AufbauElement {
       this.setAttr({ value: value.toFixed(1) });
     };
 
-    this._unwatchScroll = this.on(scroller, 'scroll', measure, { passive: true });
+    this._scrollWatch = new AbortController;
+    this.$(scroller).until(this._scrollWatch.signal).on('scroll', measure, { passive: true });
     measure();
   }
 
@@ -99,8 +100,7 @@ export default class AufbauProgress extends AufbauElement {
       this.internals.ariaValueNow = indeterminate ? null : String(value ?? 0);
     }
 
-    const text = this.$(':scope > span');
-    if (text) text.textContent = indeterminate ? '' : `${Math.round(percentage)}${unit}`;
+    this.$(':scope > span').text(indeterminate ? '' : `${Math.round(percentage)}${unit}`);
   }
 }
 

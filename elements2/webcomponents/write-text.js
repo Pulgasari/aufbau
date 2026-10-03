@@ -1,11 +1,13 @@
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
-import { AufbauControlElement }                     from '../base/AufbauControlElement.js';
+import { withControl }                              from '../base/AufbauControlElement.js';
+import { AufbauElement }                            from '../base/AufbauElement.js';
+import { withSource }                               from '../base/AufbauSourceElement.js';
 import { dedent }                                   from '../lib/dedent.js';
 import { attrs, html }                              from '../lib/html.js';
 import { setAttr }                                  from '@domina/methods/setAttr.js';
 import { setValue }                                 from '@domina/methods/setValue.js';
 
-export default class WriteText extends AufbauControlElement {
+export default class WriteText extends withSource(withControl(AufbauElement)) {
   static reflect = ['look', 'resize'];
 
   static attr = {
@@ -22,7 +24,6 @@ export default class WriteText extends AufbauControlElement {
     spellcheck  : { type: Boolean, default: true },
   };
 
-  static source = true;
 
   static styles = `write-text {
     display: block;
@@ -76,7 +77,7 @@ export default class WriteText extends AufbauControlElement {
     }
   }`;
 
-  get field () { return this.$('textarea'); }
+  get field () { return this.$('textarea').node; }
 
   // the contract with lib/actions.js
   actionText   () { return this.field?.value ?? this.getAttribute('value') ?? ''; }
@@ -154,12 +155,8 @@ export default class WriteText extends AufbauControlElement {
 
     setAttr(field, { readonly });
 
-    for (const button of this.$$('[data-action="paste"], [data-action="clear"]')) {
-      button.disabled = this.isDisabled || readonly;
-    }
-
-    const counter = this.$('footer > output');
-    if (counter) counter.textContent = maxlength ? `${value.length} / ${maxlength}` : String(value.length);
+    this.$$('[data-action="paste"], [data-action="clear"]').attr({ disabled: this.isDisabled || readonly });
+    this.$('footer > output').text(maxlength ? `${value.length} / ${maxlength}` : String(value.length));
 
     this.states.toggle('full', Boolean(maxlength) && value.length >= maxlength);
   }

@@ -11,7 +11,7 @@ const hasSearch = host => Boolean(host.valueType.list?.query || host.getAttr('se
 function filter (host, query) {
   const needle = query.trim().toLowerCase();
 
-  for (const item of host.part('options').querySelectorAll('[data-value]')) {
+  for (const item of host.part('options').$$('[data-value]')) {
     const label = (item.title || item.textContent).toLowerCase();
     item.hidden = Boolean(needle) && !label.includes(needle);
   }
@@ -55,28 +55,28 @@ export default {
     return html`${search}<div part="options"></div>`;
   },
 
-  events (host, on) {
-    groupEvents(host, on);
+  events (host, scope) {
+    groupEvents(host, scope);
 
     const search = debounce(query => host.source.search(query), DEBOUNCE);
     host.track(search.cancel);
 
-    on(host.root, 'input', event => {
-      if (event.target !== host.part('search')) return;
+    scope.$(host.root).on('input', event => {
+      if (event.target !== host.part('search').node) return;
       if (host.valueType.list?.query) search(event.target.value);
       else filter(host, event.target.value);
     });
   },
 
   update (host) {
-    const container = host.part('options');
+    const container = host.part('options').node;
 
     // only new options rebuild the tiles
     const signature = host.options.map(entry => entry.value).join('\n');
     if (container.dataset.signature !== signature) {
       container.dataset.signature = signature;
       container.innerHTML = optionButtons(host, 'option', { iconsOnly: true });
-      const search = host.part('search');
+      const search = host.part('search').node;
       if (search?.value && !host.valueType.list?.query) filter(host, search.value);
     }
 
@@ -84,5 +84,5 @@ export default {
   },
 
   role  : GROUP.role,
-  focus : host => host.part('search') ?? host.root.querySelector('[data-value][tabindex="0"]'),
+  focus : host => host.part('search').node ?? host.root.querySelector('[data-value][tabindex="0"]'),
 };

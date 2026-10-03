@@ -57,7 +57,7 @@ export default class AufbauLoop extends AufbauElement {
 
   onConnected () {
     // the marquee copy follows the children
-    this.on(this.root, 'slotchange', () => this.copy());
+    this.$(this.root).on('slotchange', () => this.copy());
 
     this.on('pointerenter', () => { this._hovered = true;  });
     this.on('pointerleave', () => { this._hovered = false; });
@@ -121,8 +121,7 @@ export default class AufbauLoop extends AufbauElement {
   onRender () { this.copy(); }
 
   copy () {
-    const copy = this.part('copy');
-    copy?.replaceChildren(...this.slides.map(slide => slide.cloneNode(true)));
+    this.part('copy').node?.replaceChildren(...this.slides.map(slide => slide.cloneNode(true)));
   }
 
   sync () {

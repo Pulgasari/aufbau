@@ -85,8 +85,8 @@ export default class AufbauAudio extends AufbauElement {
   onConnected () {
     const audio = this._audio;
 
-    this.on(audio, ['loadedmetadata', 'timeupdate'], () => this.syncProgress());
-    this.on(audio, ['play', 'pause', 'ended'], () => {
+    this.$(audio).on('loadedmetadata timeupdate', () => this.syncProgress());
+    this.$(audio).on('play pause ended', () => {
       this.syncPlayState();
       this.emit('aufbau-audio-play', { isPlaying: this.playing });
     });
@@ -145,15 +145,15 @@ export default class AufbauAudio extends AufbauElement {
     const playing = this.playing;
     const button  = this.$(':scope > button');
 
-    button?.setAttribute('aria-label', playing ? 'pause' : 'play');
-    button?.querySelector('svg-icon')?.setAttribute('icon', playing ? 'lucide:pause' : 'lucide:play');
+    button.attr({ 'aria-label': playing ? 'pause' : 'play' });
+    button.$('svg-icon').attr({ icon: playing ? 'lucide:pause' : 'lucide:play' });
     this.states.toggle('playing', playing);
   }
 
   syncProgress () {
     const { currentTime, duration } = this._audio;
     const [current, total] = this.$$(':scope > time');
-    const seek = this.$(':scope > input');
+    const seek = this.$(':scope > input').node;
 
     if (current) current.textContent = formatTime(currentTime);
     if (total)   total.textContent   = formatTime(duration);

@@ -36,5 +36,5 @@ export default {
   `,
 
   render : host => control(host, html`<span part="track"><span part="thumb"></span></span>`, 'switch'),
-  focus  : host => host.part('control'),
+  focus  : host => host.part('control').node,
 };

@@ -11,6 +11,7 @@ export default class DataTreeItem extends AufbauElement {
   static internals = { role: 'treeitem' };
 
   static shadow = true;
+  static parts  = ['icon', 'label', 'row'];
 
   static attr = {
     expanded : Boolean,
@@ -66,7 +67,6 @@ export default class DataTreeItem extends AufbauElement {
     :host(:not([expanded])) slot { display: none; }
   `;
 
-  get row          () { return this.part('row'); }
   get items        () { return [...this.children].filter(child => child.localName === 'data-tree-item'); }
   get hasChildren  () { return this.items.length > 0; }
   get tree         () { return this.closest('data-tree'); }
@@ -98,9 +98,7 @@ export default class DataTreeItem extends AufbauElement {
   }
 
   select () {
-    for (const item of this.tree?.querySelectorAll('data-tree-item[selected]') ?? []) {
-      if (item !== this) item.removeAttribute('selected');
-    }
+    this.$(this.tree).$$('data-tree-item[selected]').attr({ selected: false });
     this.setAttr({ selected: true });
     this.tree?.syncFocus();
     this.emit('data-tree-select', { element: this, label: this.getAttr('label'), value: this.getAttr('value') });
@@ -108,14 +106,13 @@ export default class DataTreeItem extends AufbauElement {
   }
 
   sync () {
-    const row = this.row;
-    if (!row) return;
+    if (!this.$row.size) return;
 
     const { expanded, icon, label, selected } = this.getAttr();
     const hasChildren = this.hasChildren;
 
-    this.part('icon').setAttribute('icon', icon || (hasChildren ? (expanded ? ICONS.open : ICONS.folder) : ICONS.file));
-    this.part('label').textContent = label;
+    this.$icon.attr({ icon: icon || (hasChildren ? (expanded ? ICONS.open : ICONS.folder) : ICONS.file) });
+    this.$label.text(label);
     this.states.toggle('branch', hasChildren);
 
     if (this.internals) {

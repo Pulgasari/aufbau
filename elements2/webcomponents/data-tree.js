@@ -24,18 +24,18 @@ export default class DataTree extends AufbauElement {
   get nodes () { return this._data; }
 
   get visibleItems () {
-    return [...this.querySelectorAll(ITEM)].filter(item => !item.parentElement.closest(`${ITEM}:not([expanded])`));
+    return this.$$(ITEM).filter(item => !item.parentElement.closest(`${ITEM}:not([expanded])`)).nodes;
   }
 
   onConnected () {
-    this.on('click', ITEM, (event, item) => {
-      if (!event.composedPath().includes(item.row)) return;
+    this.$$(ITEM).onClick((event, item) => {
+      if (!event.composedPath().includes(item.$row.node)) return;
       item.toggle();
       item.select();
       item.focus();
     });
 
-    this.on('keydown', (event) => this.onKeydown(event));
+    this.onKeyDown(this.navigate);
 
     const observer = new MutationObserver(records => {
       for (const record of records) {
@@ -87,10 +87,10 @@ export default class DataTree extends AufbauElement {
   syncFocus () {
     const visible = this.visibleItems;
     const stop    = visible.find(item => item.hasAttribute('selected')) ?? visible[0];
-    for (const item of this.querySelectorAll(ITEM)) item.tabIndex = item === stop ? 0 : -1;
+    for (const item of this.$$(ITEM)) item.tabIndex = item === stop ? 0 : -1;
   }
 
-  onKeydown (event) {
+  navigate (event) {
     const item = event.target.closest?.(ITEM);
     if (!item || !this.contains(item)) return;
 

@@ -38,20 +38,20 @@ export default {
     ${listbox(host)}
   `,
 
-  events (host, on) {
-    popoverEvents(host, on, () => host);
+  events (host, scope) {
+    popoverEvents(host, scope, () => host);
 
-    on('click', event => {
-      if (!event.composedPath().includes(host.part('listbox'))) setOpen(host, !isOpen(host), host);
+    scope.on('click', event => {
+      if (!event.composedPath().includes(host.part('listbox').node)) setOpen(host, !isOpen(host), host);
     });
 
-    on(host.root, 'input', event => {
+    scope.$(host.root).on('input', event => {
       if (event.target !== triggerOf(host)) return;
       setOpen(host, true, host);
       filter(host, event.target.value);
     });
 
-    on(host.root, 'focusout', event => { if (event.target === triggerOf(host) && !isOpen(host)) showSelection(host); });
+    scope.$(host.root).on('focusout', event => { if (event.target === triggerOf(host) && !isOpen(host)) showSelection(host); });
   },
 
   update (host) {

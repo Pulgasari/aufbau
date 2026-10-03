@@ -5,6 +5,7 @@ import { AufbauElement } from '../base/AufbauElement.js';
 export class AppPanel extends AufbauElement {
 
   static shadow = true;
+  static parts  = ['close', 'expand', 'heading'];
 
   static attr = {
     controls : { type: String, default: 'close expand' },
@@ -99,12 +100,11 @@ export class AppPanel extends AufbauElement {
   }
 
   onConnected () {
-    this.on('click', '[part~="close"]',  () => this.close());
-    this.on('click', '[part~="expand"]', () => this.expand());
+    this.$close.onClick(this.close);
+    this.$expand.onClick(() => this.expand());
 
     // the expand icon follows the area, however it was expanded
-    const area = this.area;
-    if (area) this.on(area, 'toggle', () => this.update());
+    this.$(this.area).on('toggle', () => this.update());
   }
 
   sync () {
@@ -114,13 +114,12 @@ export class AppPanel extends AufbauElement {
     const area     = this.area;
     const docked   = Boolean(area?.docked);
     const expanded = Boolean(area?.expanded);
-    const $        = selector => this.shadowRoot.querySelector(selector);
+    const modal    = this.container?.localName === 'app-modal';
 
-    $('[part="heading"]').textContent = heading ?? '';
-    $('[part="close"]').hidden  = !(wanted.has('close') && (written || docked || this.container?.localName === 'app-modal'));
-    $('[part="expand"]').hidden = !(wanted.has('expand') && docked);
-    $('[part="expand"]').setAttribute('aria-label', expanded ? 'collapse' : 'expand');
-    $('[part="expand"] svg-icon').setAttribute('icon', expanded ? 'lucide:minimize-2' : 'lucide:maximize-2');
+    this.$heading.text(heading ?? '');
+    this.$close.attr({ hidden: !(wanted.has('close') && (written || docked || modal)) });
+    this.$expand.attr({ hidden: !(wanted.has('expand') && docked), 'aria-label': expanded ? 'collapse' : 'expand' });
+    this.$expand.$('svg-icon').attr({ icon: expanded ? 'lucide:minimize-2' : 'lucide:maximize-2' });
   }
 }
 

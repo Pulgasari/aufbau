@@ -191,7 +191,7 @@ export default class InputFile extends AufbauControlElement {
     const internals = this.internals;
     if (!internals) return this;
 
-    const anchor = this.part('zone') ?? this;
+    const anchor = this.part('zone').node ?? this;
 
     if (this._rejected?.length) internals.setValidity({ typeMismatch: true }, 'one or more files were rejected.', anchor);
     else if (this.getAttr('required') && !this.files.length) {

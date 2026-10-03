@@ -1,11 +1,11 @@
-import { AufbauElement }        from '../base/AufbauElement.js';
+import { AufbauSourceElement }  from '../base/AufbauSourceElement.js';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from '../lib/html.js';
 import { dedent }               from '../lib/dedent.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
 
-export default class AufbauReader extends AufbauElement {
+export default class AufbauReader extends AufbauSourceElement {
   static attr = {
     format : { type: String, default: 'markdown', values: ['html', 'markdown'] },
     raw    : String,
@@ -14,7 +14,7 @@ export default class AufbauReader extends AufbauElement {
 
   transform = null;
 
-  static source = { tag: 'article' };
+  static output = 'article';
 
   static skeleton = { lines: 4, width: '100%' };
 

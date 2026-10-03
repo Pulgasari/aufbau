@@ -33,7 +33,7 @@ async function paint (host) {
 }
 
 function pick (host, id) {
-  const slider = host.part('opacity');
+  const slider = host.part('opacity').node;
   const colors = host.hasAttribute('colors');
 
   host.setValue(formatPattern({
@@ -45,7 +45,7 @@ function pick (host, id) {
 }
 
 function fill (host) {
-  const popover = host.part('patterns');
+  const popover = host.part('patterns').node;
   if (popover.dataset.filled) return;
   popover.dataset.filled = 'true';
 
@@ -61,10 +61,10 @@ function fill (host) {
 }
 
 function toggle (host, open) {
-  const popover = host.part('patterns');
+  const popover = host.part('patterns').node;
   if (open) {
     popover.showPopover();
-    place(popover, host.part('current'));
+    place(popover, host.part('current').node);
     popover.querySelector('[tabindex="0"]')?.focus();
   }
   else popover.hidePopover();
@@ -144,17 +144,17 @@ export default {
     `;
   },
 
-  events (host, on) {
-    on('click', '[part~="current"]', () => toggle(host, !host.part('patterns').matches(':popover-open')));
+  events (host, scope) {
+    scope.on('click', '[part~="current"]', () => toggle(host, !host.part('patterns').matches(':popover-open')));
 
     // a click picks and closes, the arrows pick and stay
-    on('click', '[part~="patterns"] [data-pattern]', (event, button) => {
+    scope.on('click', '[part~="patterns"] [data-pattern]', (event, button) => {
       pick(host, idOf(button));
       toggle(host, false);
       host.part('current').focus();
     });
 
-    on(host.root, 'keydown', event => {
+    scope.$(host.root).on('keydown', event => {
       const steps = { ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1 };
       const step  = steps[event.key];
       const items = swatchesOf(host);
@@ -171,17 +171,17 @@ export default {
       const first = swatchesOf(host).map(idOf).find(Boolean) ?? '';
       pick(host, parsePattern(host.value).id || first);
     };
-    on(host.root, 'change', event => { if (event.target.matches('[part~="opacity"], [part~="color"]')) keep(); });
+    scope.$(host.root).on('change', event => { if (event.target.matches('[part~="opacity"], [part~="color"]')) keep(); });
   },
 
   update (host) {
     fill(host);
     const parts = parsePattern(host.value);
 
-    const current = host.part('current');
+    const current = host.part('current').node;
     current.dataset.pattern = parts.id || 'none';
 
-    const slider = host.part('opacity');
+    const slider = host.part('opacity').node;
     if (slider && slider !== host.focused) slider.value = String(Math.round((parts.opacity ?? 0.1) * 100));
 
     if (host.hasAttribute('colors')) {
@@ -200,5 +200,5 @@ export default {
     paint(host);
   },
 
-  focus : host => host.part('current'),
+  focus : host => host.part('current').node,
 };

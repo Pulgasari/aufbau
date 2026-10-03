@@ -22,11 +22,11 @@ export default {
   icon       : 'lucide:link-2',
   normalize  : slugify,
 
-  setup (host, on) {
+  setup (host, scope) {
     let edited = false;
-    on(host.root, 'keydown', event => { if (event.key !== 'Tab') edited = true; });
+    scope.$(host.root).on('keydown', event => { if (event.key !== 'Tab') edited = true; });
 
     const source = sourceOf(host);
-    if (source) on(source, 'input', () => { if (!edited) host.setValue(slugify(source.value)); });
+    if (source) scope.$(source).on('input', () => { if (!edited) host.setValue(slugify(source.value)); });
   },
 };

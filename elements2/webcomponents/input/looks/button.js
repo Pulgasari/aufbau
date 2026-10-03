@@ -15,5 +15,5 @@ export default {
   `,
 
   render : host => control(host, '', null),
-  focus  : host => host.part('control'),
+  focus  : host => host.part('control').node,
 };

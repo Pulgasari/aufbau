@@ -4,7 +4,7 @@ import { nextIndex }                       from './keys.js';
 import { isInactive, labelOf, optionIcon } from './options.js';
 
 export const triggerOf = host => host.root.querySelector('[aria-haspopup]');
-export const isOpen    = host => host.part('listbox')?.matches(':popover-open') ?? false;
+export const isOpen    = host => host.part('listbox').matches(':popover-open');
 
 export const listbox = host => html`
   <div part="listbox" role="listbox" popover="manual" ${attrs({ 'aria-multiselectable': host.count === 'multiple' && 'true' })}>
@@ -49,12 +49,12 @@ export const LISTBOX = `
 
 // below the anchor, above it where there is no room
 export function reposition (host, anchor) {
-  const list = host.part('listbox');
+  const list = host.part('listbox').node;
   if (list && isOpen(host)) host.dataset.placement = place(list, anchor);
 }
 
 export function setOpen (host, open, anchor) {
-  const list = host.part('listbox');
+  const list = host.part('listbox').node;
   if (!list || host.isDisabled || open === isOpen(host)) return;
 
   const hadFocus = list.contains(host.focused);
@@ -74,29 +74,29 @@ export function setOpen (host, open, anchor) {
 
 export function filter (host, query) {
   const needle = String(query ?? '').trim().toLowerCase();
-  for (const item of host.part('listbox')?.querySelectorAll('[role="option"]') ?? []) {
+  for (const item of host.part('listbox').$$('[role="option"]')) {
     item.hidden = Boolean(needle) && !item.textContent.toLowerCase().includes(needle);
   }
 }
 
-const enabledItems = host => [...(host.part('listbox')?.querySelectorAll('[data-value]') ?? [])].filter(item => !isInactive(item));
+const enabledItems = host => host.part('listbox').$$('[data-value]').filter(item => !isInactive(item)).nodes;
 
-export function popoverEvents (host, on, anchor) {
+export function popoverEvents (host, scope, anchor) {
   const close = () => setOpen(host, false, anchor());
 
-  on('click', '[role="option"]', (event, item) => {
+  scope.on('click', '[role="option"]', (event, item) => {
     if (isInactive(item)) return;
     host.select(item.dataset.value);
     if (host.count !== 'multiple') close();
   });
 
-  on(document, 'pointerdown', event => { if (!event.composedPath().includes(host)) close(); });
+  scope.$(document).on('pointerdown', event => { if (!event.composedPath().includes(host)) close(); });
 
   const follow = () => reposition(host, anchor());
-  on(window, 'resize', follow, { passive: true });
-  on(window, 'scroll', follow, { capture: true, passive: true });
+  scope.$(window).on('resize', follow, { passive: true });
+  scope.$(window).on('scroll', follow, { capture: true, passive: true });
 
-  on(host.root, 'keydown', event => {
+  scope.$(host.root).on('keydown', event => {
     const { key } = event;
     const item    = event.target.closest?.('[data-value]');
 

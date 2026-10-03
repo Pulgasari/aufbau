@@ -218,16 +218,11 @@ export class AppArea extends AufbauElement {
   onConnected () {
     this.watchBreakpoint();
 
-    this.on(this.shadowRoot, 'click', event => {
-      if (event.target.matches?.('[part="scrim"]')) this.hide();
-    });
+    this.part('scrim').onClick(() => this.hide());
+    this.parts('handle').onPointerDown(event => this.drag(event));
 
-    this.on(document, 'keydown', event => {
+    this.$(document).onKeyDown(event => {
       if (event.key === 'Escape' && this.isOverlay && this.open && !event.defaultPrevented) this.hide();
-    });
-
-    this.on(this.shadowRoot, 'pointerdown', event => {
-      if (event.target.matches?.('[part="handle"]')) this.drag(event);
     });
   }
 

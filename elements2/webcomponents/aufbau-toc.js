@@ -117,7 +117,7 @@ export default class AufbauToc extends AufbauElement {
     if (!entries.length || typeof IntersectionObserver === 'undefined') return;
 
     const visible = new Set;
-    const links   = new Map(entries.map(entry => [entry.heading, this.$(`a[href="#${CSS.escape(entry.id)}"]`)]));
+    const links   = new Map(entries.map(entry => [entry.heading, this.$(`a[href="#${CSS.escape(entry.id)}"]`).node]));
 
     const observer = new IntersectionObserver((records) => {
       for (const record of records) visible[record.isIntersecting ? 'add' : 'delete'](record.target);

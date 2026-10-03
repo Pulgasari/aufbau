@@ -6,6 +6,7 @@ const PAGE_STYLES = `:root:has(app-modal:state(open)) { overflow: hidden; }`;
 
 export default class AppModal extends AufbauElement {
   static shadow = true;
+  static parts  = ['close', 'dialog', 'header', 'heading'];
 
   static attr = {
     dismissible : { type: Boolean, default: true },
@@ -96,7 +97,7 @@ export default class AppModal extends AufbauElement {
     return result === 'confirm';
   }
 
-  get dialog () { return this.$('dialog'); }
+  get dialog () { return this.$dialog.node; }
   get isOpen () { return Boolean(this.dialog?.open); }
 
   show () {
@@ -117,11 +118,10 @@ export default class AppModal extends AufbauElement {
   onConnected () {
     adoptBaseStyles('app-modal-page', PAGE_STYLES);   // deduplicated by key
 
-    this.on('click', '[part~="close"]', () => this.close());
+    this.$close.onClick(() => this.close());
 
-    this.on(this.root, 'click', (event) => {
-      if (event.target === this.dialog && this.getAttr('dismissible')) this.close();
-    });
+    // a click on the backdrop lands on the dialog itself
+    this.$dialog.onClick(event => { if (event.target === this.dialog && this.getAttr('dismissible')) this.close(); });
 
     this.on('submit', (event) => {
       if (event.target.getAttribute('method')?.toLowerCase() !== 'dialog') return;
@@ -129,18 +129,16 @@ export default class AppModal extends AufbauElement {
       this.close(event.submitter?.value ?? '');
     });
 
-    this.on(this.root, 'cancel', (event) => {
-      if (!this.getAttr('dismissible')) event.preventDefault();
-    }, { capture: true });
+    this.$dialog.on('cancel', event => { if (!this.getAttr('dismissible')) event.preventDefault(); });
 
-    this.on(this.root, 'close', () => {
+    this.$dialog.on('close', () => {
       const returnValue = this.dialog.returnValue;
       this.states.delete('open');
       if (this.getAttr('open')) this.setAttr({ open: false });
       this.emit('app-modal', { open: false, returnValue });
       this._resolve?.(returnValue);
       this._closed = this._resolve = null;
-    }, { capture: true });
+    });
   }
 
   render () {
@@ -160,12 +158,9 @@ export default class AppModal extends AufbauElement {
     if (!dialog) return;
 
     const { dismissible, heading, open } = this.getAttr();
-    const header = this.$('header');
-
-    this.$('strong').textContent = heading ?? '';
-    this.$('strong').hidden      = !heading;
-    this.part('close').hidden = !dismissible;
-    header.hidden = !heading && !dismissible;
+    this.$heading.text(heading ?? '').attr({ hidden: !heading });
+    this.$close.attr({ hidden: !dismissible });
+    this.$header.attr({ hidden: !heading && !dismissible });
 
     if (heading) dialog.setAttribute('aria-label', heading);
     else dialog.removeAttribute('aria-label');

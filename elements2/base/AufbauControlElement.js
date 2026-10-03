@@ -7,7 +7,8 @@ const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1
 
 const log = new Logger({ prefix: 'aufbau-control' });
 
-export class AufbauControlElement extends AufbauElement {
+// a form control: value, FormData, validity, form.reset(), disabled from a fieldset, persist
+export const withControl = Base => class AufbauControl extends Base {
 
   static formAssociated = true;
 
@@ -182,7 +183,7 @@ export class AufbauControlElement extends AufbauElement {
 
   get isDisabled () { return this.getAttr('disabled') || Boolean(this._formDisabled); }
 
-  get focusTarget () { return this.$(FOCUSABLE); }
+  get focusTarget () { return this.$(FOCUSABLE).node; }
 
   focus (options) {
     this.focusTarget?.focus(options)
@@ -224,6 +225,8 @@ export class AufbauControlElement extends AufbauElement {
     this.validate();
     return this;
   }
-}
+};
+
+export const AufbauControlElement = withControl(AufbauElement);
 
 export default AufbauControlElement;

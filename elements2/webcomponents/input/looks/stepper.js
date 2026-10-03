@@ -33,10 +33,10 @@ export default {
     <button type="button" part="button increment" data-step="1" aria-label="more" tabindex="-1"><svg-icon icon="lucide:plus"></svg-icon></button>
   `,
 
-  events (host, on) {
-    fieldEvents(host, on);
-    on('click', '[data-step]', (event, button) => host.step(Number(button.dataset.step)));
-    on(host.root, 'keydown', event => {
+  events (host, scope) {
+    fieldEvents(host, scope);
+    scope.on('click', '[data-step]', (event, button) => host.step(Number(button.dataset.step)));
+    scope.$(host.root).on('keydown', event => {
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
       event.preventDefault();
       host.step(event.key === 'ArrowUp' ? 1 : -1);

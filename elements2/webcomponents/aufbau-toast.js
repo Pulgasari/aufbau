@@ -218,7 +218,7 @@ export default class AufbauToast extends AufbauElement {
       this.stopTimer();
     });
 
-    this.on(window, 'pointermove', (event) => {
+    this.$(window).on('pointermove', event => {
       if (origin == null) return;
       offset = event.clientX - origin;
       this.style.translate = `${offset}px 0`;
@@ -238,8 +238,7 @@ export default class AufbauToast extends AufbauElement {
       this.startTimer();
     };
 
-    this.on(window, 'pointerup',     release);
-    this.on(window, 'pointercancel', release);
+    this.$(window).on('pointerup pointercancel', release);
   }
 
   // :::::: RENDER ::::::::::::::::::::::::::::::::::::::::::::::

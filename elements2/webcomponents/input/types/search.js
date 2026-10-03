@@ -10,9 +10,9 @@ export default {
   input       : 'search',
   placeholder : 'search…',
 
-  setup (host, on) {
+  setup (host, scope) {
     const announce = debounce(() => host.emit('search', { query: host.value }), Number(host.getAttribute('debounce') ?? 250));
     host.track(announce.cancel);
-    on('input', announce);
+    scope.on('input', announce);
   },
 };

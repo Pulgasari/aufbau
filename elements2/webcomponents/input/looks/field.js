@@ -16,9 +16,9 @@ export default {
     ${actionButtons(parseActions(host.actions))}
   `,
 
-  events (host, on) {
-    fieldEvents(host, on);
-    bindActions(host, on);
+  events (host, scope) {
+    fieldEvents(host, scope);
+    bindActions(host, scope);
   },
 
   update (host) {

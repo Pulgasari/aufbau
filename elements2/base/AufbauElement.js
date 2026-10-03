@@ -5,16 +5,15 @@ import { applySkin }                                             from '../lib/sk
 import { adoptClassStyles }                                      from '../lib/styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from '../lib/config.js';
 
-import { delegateEvent } from '@domina/methods/delegateEvent.js';
-import { emitEvent }     from '@domina/methods/emitEvent.js';
-import { hasAttr }       from '@domina/methods/hasAttr.js';
-import { onEvent }       from '@domina/methods/onEvent.js';
-import { setAttr }       from '@domina/methods/setAttr.js';
+import { hasAttr } from '@domina/methods/hasAttr.js';
+import { setAttr } from '@domina/methods/setAttr.js';
 
 import { coerce, toBoolean }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
 import { toCamelCase, toKebabCase }               from '@pulgasari/str';
 import { Logger }                                 from '@pulgasari/logger';
+
+import { Selection, SHORTHANDS } from './Selection.js';
 
 const isBlank   = sth => sth === undefined || sth === null || sth === false || sth === '';
 const isDefined = sth => sth !== undefined;
@@ -84,10 +83,6 @@ export class AufbauElement extends HTMLElement {
     const shadow = this.constructor.shadow;
     if (shadow && !this.shadowRoot) this.attachShadow({ mode: 'open', ...(isPlainObject(shadow) ? shadow : {}) });
 
-    else if (this.constructor.source && !this.shadowRoot) {
-      this.attachShadow({ mode: 'open' }).innerHTML = '<slot name="output"></slot>';
-    }
-
     const defaults = this.constructor.internals;
     if (defaults && this.internals && isPlainObject(defaults)) Object.assign(this.internals, defaults);
   }
@@ -100,7 +95,7 @@ export class AufbauElement extends HTMLElement {
   get states () { return this._states ??= stateSet(this); }
 
   get root         () { return this.constructor.shadow && this.shadowRoot || this; }
-  get renderTarget () { return this.output ?? this.root; }
+  get renderTarget () { return this.root; }
 
   get focused () { return this.root === this ? document.activeElement : this.root.activeElement; }
 
@@ -132,57 +127,13 @@ export class AufbauElement extends HTMLElement {
     }
   }
 
-  // :::::: SOURCE ::::::::::::::::::::::::::::::::::::::::::::::
-
-  get output () {
-    const source = this.constructor.source;
-    if (!source) return null;
-
-    if (!this._output) {
-      this._output = document.createElement(source.tag ?? 'div');
-      this._output.slot = 'output';
-    }
-    if (this._output.parentNode !== this) this.append(this._output);
-
-    return this._output;
-  }
-
-  // the author's children, everything but the output
-  get sourceNodes () { return [...this.childNodes].filter(node => node !== this._output); }
-
-  get sourceText () {
-    return this.sourceNodes.map(node =>
-        node.nodeType === Node.TEXT_NODE    ? node.data
-      : node.nodeType === Node.ELEMENT_NODE ? node.outerHTML
-      : ''
-    ).join('');
-  }
-
-  watchSource () {
-    const isSource = node => this.sourceNodes.some(source => source === node || source.contains(node));
-    const counts   = record => record.target === this
-      ? [...record.addedNodes, ...record.removedNodes].some(node => node !== this._output)
-      : isSource(record.target);
-    const observer = new MutationObserver(records => {
-      if (records.some(counts)) this.onSourceChange();
-    });
-    observer.observe(this, { characterData: true, childList: true, subtree: true });
-    this.track(() => observer.disconnect());
-  }
-
-  // hook, the source changed. rebuilds by default
-  onSourceChange () { this.invalidate().update(); }
-
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   connectedCallback () {
     this._mounted = true;
     adoptClassStyles(this.constructor, this.root === this ? this.getRootNode() : this.root);
     applySkin();
-    this.on(window, CONFIG_EVENT, (event) => {
-      if (this._mounted && this.observesConfig(event.detail?.changed)) this.update();
-    });
-    if (this.constructor.source) this.watchSource();
+    this.$(window).on(CONFIG_EVENT, event => { if (this._mounted && this.observesConfig(event.detail?.changed)) this.update(); });
     this.onConnected();
     this.update();
   }
@@ -211,6 +162,10 @@ export class AufbauElement extends HTMLElement {
 
     if (!tag.includes('-')) return log.warn(`invalid tag name "${tag}", custom elements require a hyphen.`);
     if (customElements.get(tag)) return;
+
+    for (const name of this.parts ?? []) {
+      Object.defineProperty(this.prototype, '$' + toCamelCase(name), { configurable: true, get () { return this.part(name); } });
+    }
 
     const observed = Object.keys(schemaOf(this));
     if (observed.length && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
@@ -321,29 +276,23 @@ export class AufbauElement extends HTMLElement {
 
   // :::::: EVENTS ::::::::::::::::::::::::::::::::::::::::::::::
 
-  on (...args) {
-    const [first, second, third, fourth] = args;
-
-    if (isString(first) && isString(second) && isFn(third)) {
-      const stops = [delegateEvent(this, first, second, third, fourth)];
-      if (this.root !== this) stops.push(delegateEvent(this.root, first, second, third, fourth));
-      return this.track(() => stops.forEach(stop => stop()));
-    }
-
-    // the element itself
-    if (isString(first) && isFn(second)) {
-      return this.track(onEvent(this, first, second, third));
-    }
-
-    // any external event target or iterable of targets
-    if (!first) return () => {};
-    return this.track(onEvent(first, second, third, fourth));
+  // aborted on disconnect, a new one after
+  get signal () {
+    if (!this._controller || this._controller.signal.aborted) this._controller = new AbortController;
+    return this._controller.signal;
   }
 
-  emit (...args) { return emitEvent(this, ...args); }
+  on   (...args) { this.self.on(...args); return this; }
+  emit (...args) { return this.self.emit(...args); }
 
-  release ()            { this._effects.dispose(); return this; }
-  track   (unsubscribe) { return this._effects.add(unsubscribe); }
+  release () {
+    this._controller?.abort();
+    this._effects.dispose();
+    return this;
+  }
+
+  // anything else to undo on disconnect: an observer, a timer
+  track (stop) { return this._effects.add(stop); }
 
   // :::::: ATTRIBUTES ::::::::::::::::::::::::::::::::::::::::::
 
@@ -417,29 +366,18 @@ export class AufbauElement extends HTMLElement {
 
   // :::::: TREE ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  // the trees to search: the shadow root first, then the light children
-  get trees () { return this.shadowRoot ? [this.shadowRoot, this] : [this]; }
+  // static parts = ['close'] gives this.$close, see init()
+  get self () { return Selection.of([this], { owner: this, signal: this.signal }); }
 
-  $ (selector) {
-    for (const tree of this.trees) {
-      const found = tree.querySelector(selector);
-      if (found) return found;
-    }
-    return null;
-  }
+  $     (target)   { return this.self.$(target); }
+  $$    (selector) { return this.self.$$(selector); }
+  part  (name)     { return this.self.part(name); }
+  parts (name)     { return this.self.parts(name); }
 
-  $$ (selector) { return this.trees.flatMap(tree => [...tree.querySelectorAll(selector)]); }
+}
 
-  // the element of the own tree with that part, all of them
-  part  (name) { return this.root.querySelector(`[part~="${name}"]`); }
-  parts (name) { return [...this.root.querySelectorAll(`[part~="${name}"]`)]; }
-
-  // the part tokens of a node or its nearest ancestor that has some, [] for none
-  partOf (node) {
-    const element = node?.closest?.('[part]');
-    return element ? [...element.part] : [];
-  }
-
+for (const name of Object.keys(SHORTHANDS)) {
+  AufbauElement.prototype[name] = function (handler, options) { this.self[name](handler, options); return this; };
 }
 
 export default AufbauElement;

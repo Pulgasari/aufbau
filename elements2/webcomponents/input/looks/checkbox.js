@@ -23,5 +23,5 @@ export default {
   `,
 
   render : host => control(host, html`<span part="check"><svg-icon part="mark" icon="lucide:check"></svg-icon></span>`, 'checkbox'),
-  focus  : host => host.part('control'),
+  focus  : host => host.part('control').node,
 };

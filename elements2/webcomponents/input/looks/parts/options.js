@@ -44,10 +44,10 @@ export function updateTabStop (host, items) {
   for (const item of items) item.tabIndex = item === stop ? 0 : -1;
 }
 
-export function groupEvents (host, on) {
-  on('click', '[data-value]', (event, item) => { if (!isInactive(item)) host.select(item.dataset.value); });
+export function groupEvents (host, scope) {
+  scope.on('click', '[data-value]', (event, item) => { if (!isInactive(item)) host.select(item.dataset.value); });
 
-  on(host.root, 'keydown', event => {
+  scope.$(host.root).on('keydown', event => {
     if (event.target.localName === 'input') return;
 
     const items   = [...host.root.querySelectorAll('[data-value]')].filter(item => !isInactive(item));

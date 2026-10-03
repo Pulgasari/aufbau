@@ -23,9 +23,9 @@ export function field (host, index = 0, extra = {}) {
   return html`<input part="input" data-index="${index}" ${attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: host.valueType.input, ...extra })} />`;
 }
 
-export function fieldEvents (host, on) {
-  on('input',  'input[data-index]', (event, input) => host.setPart(Number(input.dataset.index), input.value));
-  on('change', 'input[data-index]', (event, input) => host.setPart(Number(input.dataset.index), input.value, { final: true }));
+export function fieldEvents (host, scope) {
+  scope.on('input',  'input[data-index]', (event, input) => host.setPart(Number(input.dataset.index), input.value));
+  scope.on('change', 'input[data-index]', (event, input) => host.setPart(Number(input.dataset.index), input.value, { final: true }));
 }
 
 export function updateFields (host) {

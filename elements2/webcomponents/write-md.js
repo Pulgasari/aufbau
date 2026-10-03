@@ -75,22 +75,21 @@ export class WriteMd extends AufbauElement {
     `;
   }
 
-  // after the first render, and again after a reconnect: a disconnect drops the listeners
-  onConnected () { if (this.writer) this.bind(); }
-  onRender    () { this.bind(); }
-
-  bind () {
-    this.on('click', '[data-mode]', (event, button) => {
-      const preview = button.dataset.mode === 'preview';
-      this.states.toggle('preview', preview);
-      for (const tab of this.querySelectorAll('[data-mode]')) tab.setAttribute('aria-selected', String(tab === button));
-    });
-
+  onConnected () {
     const preview = debounce(() => this.renderPreview(), DEBOUNCE);
     this.track(preview.cancel);
-    this.on(this.writer, 'input', event => { if (event.target === this.writer) preview(); });
-    this.renderPreview();
+
+    this.$$('[data-mode]').onClick((event, button) => {
+      this.states.toggle('preview', button.dataset.mode === 'preview');
+      for (const tab of this.$$('[data-mode]')) tab.setAttribute('aria-selected', String(tab === button));
+    });
+
+    this.$('write-text').onInput(event => { if (event.target === this.writer) preview(); });
+
+    if (this.writer) this.renderPreview();
   }
+
+  onRender () { this.renderPreview(); }
 
   sync () {
     const values = this.getAttr();

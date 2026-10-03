@@ -19,10 +19,10 @@ export function control (host, inner, role) {
 }
 
 
-export const events = (host, on) => on('click', '[part~="control"]', () => host.toggle());
+export const events = (host, scope) => scope.on('click', '[part~="control"]', () => host.toggle());
 
 export function update (host) {
-  const button  = host.part('control');
+  const button  = host.part('control').node;
   const checked = host.checked;
 
   button.setAttribute(host.look === 'button' ? 'aria-pressed' : 'aria-checked', String(checked));

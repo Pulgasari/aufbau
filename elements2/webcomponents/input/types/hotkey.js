@@ -28,11 +28,11 @@ export default {
   icon        : 'lucide:keyboard',
   placeholder : 'press a key…',
 
-  setup (host, on) {
+  setup (host, scope) {
     // nothing is typed into the field, only recorded
-    on(host.root, 'beforeinput', event => event.preventDefault(), { capture: true });
+    scope.$(host.root).on('beforeinput', event => event.preventDefault(), { capture: true });
 
-    on(host.root, 'keydown', event => {
+    scope.$(host.root).on('keydown', event => {
       if (host.isLocked || event.target.localName !== 'input') return;
       if (event.key === 'Tab' && bare(event)) return;
       event.preventDefault();

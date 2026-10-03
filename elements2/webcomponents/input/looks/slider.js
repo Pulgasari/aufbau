@@ -107,8 +107,8 @@ export default {
     `;
   },
 
-  events (host, on) {
-    on('input', 'input[type="range"]', (event, input) => host.setNumber(Number(input.dataset.index), Number(input.value), { track: true }));
+  events (host, scope) {
+    scope.on('input', 'input[type="range"]', (event, input) => host.setNumber(Number(input.dataset.index), Number(input.value), { track: true }));
   },
 
   update (host) {
@@ -126,12 +126,12 @@ export default {
       thumb.style.setProperty('--at', percent(positions[Number(thumb.dataset.thumb)], bounds));
     }
 
-    const track = host.part('track');
+    const track = host.part('track').node;
     track.style.setProperty('--from', range ? percent(positions[0], bounds) : 0);
     track.style.setProperty('--to',   percent(positions[range ? 1 : 0], bounds));
 
     const shown  = positions.map((position, index) => parts[index] || host.fromNumber(position));
-    const output = host.part('output');
+    const output = host.part('output').node;
     if (output) output.textContent = range ? shown.join(' – ') : shown[0];
 
     host.setVar('--slider-color', host.typeName === 'color' && shown[0]);

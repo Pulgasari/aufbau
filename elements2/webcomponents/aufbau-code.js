@@ -4,7 +4,7 @@ import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 
-import { AufbauElement }                            from '../base/AufbauElement.js';
+import { AufbauSourceElement }                      from '../base/AufbauSourceElement.js';
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { getConfig, setConfig }                     from '../lib/config.js';
 import { dedent }                                   from '../lib/dedent.js';
@@ -109,7 +109,7 @@ function setCaret (root, offset) {
   selection.addRange(range);
 }
 
-export default class AufbauCode extends AufbauElement {
+export default class AufbauCode extends AufbauSourceElement {
   static attr = {
     actions  : { type: String, default: 'copy paste clear' },
     code     : String,
@@ -120,7 +120,7 @@ export default class AufbauCode extends AufbauElement {
     theme    : { type: String, config: true }
   };
 
-  static source = { tag: 'figure' };
+  static output = 'figure';
   static styles = `aufbau-code {
     display  : block;
     font     : inherit;
@@ -269,7 +269,7 @@ j
 
   // the contract with lib/actions.js
   actionText   () { return this.source; }
-  actionTarget () { return this.getAttr('editable') ? this.$('figure > pre > code') : null; }
+  actionTarget () { return this.getAttr('editable') ? this.$('figure > pre > code').node : null; }
 
   render () {
     const { editable } = this.getAttr();

@@ -47,7 +47,7 @@ export default class DataTable extends AufbauElement {
     this._sortDir = desc ? 'desc' : 'asc';
 
     sortElements({
-      container  : this.$('tbody'),
+      container  : this.$('tbody').node,
       item       : 'tr',
       indicators : [[`[data-key="${key}"]`, `auto-${this._sortDir}`]]
     });

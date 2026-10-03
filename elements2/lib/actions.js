@@ -100,7 +100,8 @@ export const runAction = {
   },
 };
 
-export function bindActions (host, on = (...args) => host.on(...args)) {
-  on('pointerdown', '[data-action]', (event) => event.preventDefault());
-  on('click',       '[data-action]', (event, button) => runAction[button.dataset.action]?.(host, button));
+// scope: the host or a selection of it
+export function bindActions (host, scope = host) {
+  scope.on('pointerdown', '[data-action]', event => event.preventDefault());
+  scope.on('click',       '[data-action]', (event, button) => runAction[button.dataset.action]?.(host, button));
 }

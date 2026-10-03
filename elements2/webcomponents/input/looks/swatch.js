@@ -36,5 +36,5 @@ export default {
     host.setVar('--swatch', host.valueType.format(host.value));
   },
 
-  focus : host => host.part('input'),
+  focus : host => host.part('input').node,
 };

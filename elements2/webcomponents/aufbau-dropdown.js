@@ -59,22 +59,21 @@ export default class AufbauDropdown extends AufbauElement {
     }
   `;
 
-  get trigger () { return this.part('trigger'); }
-  get menu    () { return this.part('menu'); }
+  get trigger () { return this.part('trigger').node; }
+  get menu    () { return this.part('menu').node; }
   get isOpen  () { return Boolean(this.menu?.matches(':popover-open')); }
 
   onConnected () {
     this.on('click', ENTRY, (event, entry) => { if (this.contains(entry)) this.close(); });
 
-    this.on(this.root, 'toggle', (event) => {
-      if (event.target !== this.menu) return;
+    this.part('menu').on('toggle', event => {
       const open = event.newState === 'open';
       if (open !== this.getAttr('open')) this.setAttr({ open });
       this.emit('aufbau-dropdown', { open });
-    }, { capture: true });
+    });
 
-    this.on(window, 'resize', () => this.reposition(), { passive: true });
-    this.on(window, 'scroll', () => this.reposition(), { capture: true, passive: true });
+    this.$(window).on('resize', () => this.reposition(), { passive: true });
+    this.$(window).on('scroll', () => this.reposition(), { capture: true, passive: true });
   }
 
   onRender () { this.trigger.popoverTargetElement = this.menu; }

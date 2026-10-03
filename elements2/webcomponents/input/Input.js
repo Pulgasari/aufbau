@@ -179,10 +179,11 @@ export class Input extends AufbauControlElement {
     const bound = this._bound ??= {};
     if (bound[slot]?.key === key) return;
 
-    bound[slot]?.stops.forEach(stop => stop());
-    const stops = [];
-    bound[slot] = { key, stops };
-    setup?.((...args) => { const stop = this.on(...args); stops.push(stop); return stop; });
+    // the listeners of a look or type end when it is replaced
+    bound[slot]?.controller.abort();
+    const controller = new AbortController;
+    bound[slot] = { key, controller };
+    setup?.(this.self.until(controller.signal));
   }
 
   // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::
@@ -340,8 +341,7 @@ export class Input extends AufbauControlElement {
   }
 
   onConnected () {
-    this.on(this.root, 'input',       event => event.stopPropagation());
-    this.on(this.root, 'beforeinput', event => event.stopPropagation());
+    this.$(this.root).on('input beforeinput', event => event.stopPropagation());
 
     const observer = new MutationObserver(records => { if (records.some(record => record.target !== this)) this.update(); });
     observer.observe(this, { attributes: true, childList: true, subtree: true, attributeFilter: ['value', 'label', 'icon', 'disabled', 'selected'] });
@@ -370,8 +370,8 @@ export class Input extends AufbauControlElement {
 
     const look = this.lookModule;
     this.adoptLook();
-    this.bindWhile('look', this.look,     on => look.events?.(this, on));
-    this.bindWhile('type', this.typeName, on => this.valueType.setup?.(this, on));
+    this.bindWhile('look', this.look,     scope => look.events?.(this, scope));
+    this.bindWhile('type', this.typeName, scope => this.valueType.setup?.(this, scope));
 
     if (this.internals) this.internals.role = look.role?.(this) ?? null;
     look.update?.(this);

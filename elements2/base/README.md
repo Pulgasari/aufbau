@@ -1,7 +1,15 @@
 # @aufbau/elements2/base
 
-`AufbauElement` is what every element builds on, `AufbauControlElement` what
-every element that holds a form value builds on.
+`AufbauElement` is what every element builds on. two mixins add to it:
+
+| | |
+|---|---|
+| `withControl` · `AufbauControlElement` | a form control: value, FormData, validity, `persist` |
+| `withSource` · `AufbauSourceElement` | the children are input (markdown, code), the result is rendered next to them |
+
+```js
+class WriteText extends withSource(withControl(AufbauElement)) {}
+```
 
 ## AufbauElement
 
@@ -14,8 +22,10 @@ class MyThing extends AufbauElement {
   static reflect = ['size'];                   // resolved value written back onto the host
   static styles  = `:host { display: block; }`;
 
+  static parts   = ['label'];                  // this.$label
+
   render () { return html`<span part="label"></span>`; }   // rebuilt only when it changes
-  sync   () { this.part('label').textContent = this.getAttr('label'); }   // every update
+  sync   () { this.$label.text(this.getAttr('label')); }    // every update
 }
 
 MyThing.init();   // <my-thing>
@@ -28,8 +38,8 @@ MyThing.init();   // <my-thing>
 | `static styles` | css, adopted once per tree into the layer `aufbau.elements` |
 | `static reflect` | attributes whose resolved value goes back onto the host |
 | `static internals` | ElementInternals up front, an object sets defaults such as `{ role: 'img' }` |
+| `static parts` | part names, each gets a getter: `close-button` is `this.$closeButton` |
 | `static skeleton` | the shape of the loading placeholder |
-| `static source` | the children are input (markdown, code), the output is rendered next to them |
 
 ### lifecycle
 
@@ -43,7 +53,7 @@ the native callbacks do the base's work and then call a hook of the same name:
 | `onAdopted(oldDocument, newDocument)` | moved into another document |
 | `onConnectedMove()` | moved with `moveBefore()`. by default disconnected and connected again, override it to keep the state |
 
-`render()` · `sync()` · `onRender()` (after a rebuild) · `onSourceChange()` · `update()` · `invalidate()`
+`render()` · `sync()` · `onRender()` (after a rebuild) · `update()` · `invalidate()`
 
 ### attributes
 
@@ -53,29 +63,46 @@ this.getAttr()              // all of them: const { label, size } = this.getAttr
 this.setAttr({ open: true, label: false })   // false removes
 ```
 
-### tree
+### selections
+
+`$`, `$$`, `part`, `parts` and `$close` give a selection, not a node. it has the
+same methods as the element, so a child is used the same way as the host:
 
 ```js
-this.$('button')            // first match: shadow root first, then the light children
-this.$$('button')           // all matches of both
-this.part('close')          // the element of the own tree with that part
-this.parts('option')        // all of them
-this.partOf(event.target)   // the part tokens of the node or its nearest ancestor: ['close']
-this.root                   // the shadow root, or the element itself
-this.focused                // the focused element inside
+this.$('button')                    // first match: shadow root first, then the light children
+this.$$('li')                       // all matches of both
+this.part('close')                  // [part~="close"], parts() for all of them
+this.$(window)                      // a node, window or a list of nodes as it is
+
+this.$close.onClick(() => this.close());
+this.$$('li').attr({ role: 'option' }).on('click', (event, item) => …);
+this.part('list').$$('li');
 ```
 
-### events
+| | |
+|---|---|
+| `.on(types, handler, options)` | `types` may be `'dragenter dragover'`. the handler gets `(event, node)`, `this` is the element |
+| `.on(types, selector, handler)` | the same as `.$$(selector).on(types, handler)` |
+| `.onClick(handler)` … | `onBlur` `onChange` `onClick` `onFocus` `onInput` `onKeyDown` `onPointerDown` `onSubmit` |
+| `.emit(type, detail)` | a bubbling CustomEvent on each node, false when one was prevented |
+| `.attr(name)` · `.attr({ … })` | read the first, write all. false and null remove |
+| `.text()` · `.text(value)` | read the first, write all |
+| `.focus()` · `.matches(selector)` · `.includes(node)` | |
+| `.filter(test)` · `.find(test)` | |
+| `.until(signal)` | the same nodes, their listeners also end with this signal |
+| `.node` · `.nodes` · `.size` | the native nodes. a selection is iterable: `for (const item of this.$$('li'))` |
+
+a selection made with a selector is live: it is found again whenever it is
+used, so it and its listeners survive a render. a selection of a node stays
+with that node.
+
+every listener ends when the element disconnects. `this.track(stop)` does the
+same for anything else, an observer or a timer.
 
 ```js
-this.on('click', handler)                          // the element
-this.on('click', '[part~="close"]', handler)       // delegated, in both trees: (event, matched)
-this.on(window, 'resize', handler)                 // anything else
-this.emit('change', { value })                     // a bubbling CustomEvent
-this.track(stop)                                   // run on disconnect
+this.root                           // the shadow root, or the element itself
+this.focused                        // the focused element inside
 ```
-
-Every listener is removed on disconnect.
 
 ### more
 
@@ -87,10 +114,10 @@ this.setSkeleton(true)
 this.getConfig('theme', 'github')                  // attribute, then setConfig(), then fallback
 ```
 
-## AufbauControlElement
+## withControl · AufbauControlElement
 
-An `AufbauElement` that is a form control: FormData, validity, `form.reset()`,
-`disabled` from a fieldset, `persist` to local or session storage.
+a form control: FormData, validity, `form.reset()`, `disabled` from a fieldset,
+`persist` to local or session storage.
 
 ```js
 this.value                  // parseValue() of the value attribute
@@ -106,3 +133,15 @@ hooks after the default handling: `onFormAssociated(form)` · `onFormDisabled(di
 
 `persist`, `persist="session"`, `persist="theme"`, `persist="session:theme"`:
 the value is kept under the name, the id or the given key.
+
+## withSource · AufbauSourceElement
+
+the author's children are the input, `render()` writes into an output element
+next to them. `static output` names its tag, `div` by default.
+
+```js
+this.sourceText             // the children as text, the output left out
+this.sourceNodes            // the children, the output left out
+this.output                 // the element render() writes into
+onSourceChange ()           // the children changed, rebuilds by default
+```
