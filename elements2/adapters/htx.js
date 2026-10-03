@@ -7,7 +7,6 @@
 // the aufbau-* elements get a $ shorthand:
 //
 //   <$btn variant="primary">Save</$btn>       <aufbau-button variant="primary">Save</aufbau-button>
-//   <$option 'de' 'Deutsch' />                <aufbau-option value="de">Deutsch</aufbau-option>
 //
 // the others are real tags already, they are exported under the camelCase of
 // the tag, which htx reads as its kebab-case:
@@ -26,21 +25,16 @@ $dropdown = { tag: 'aufbau-dropdown',  args: 'label' },
 $embed    = { tag: 'aufbau-embed',     args: 'src' },
 $filter   = { tag: 'aufbau-filter',    args: 'target' },
 $index    = 'aufbau-index',
-$input    = { tag: 'aufbau-input',     args: 'type' },
 $item     = 'aufbau-item',
 $keyboard = 'aufbau-keyboard',
 $loop     = 'aufbau-loop',
 $modal    = { tag: 'aufbau-modal',     args: 'heading' },
-$option   = { tag: 'aufbau-option',    args: 'value' },
-$picker   = { tag: 'aufbau-picker',    args: 'look' },
 $progress = { tag: 'aufbau-progress',  args: 'value' },
 $reader   = 'aufbau-reader',
 $skeleton = { tag: 'aufbau-skeleton',  args: 'shape' },
-$slider   = 'aufbau-slider',
 $table    = { tag: 'aufbau-table',     args: 'src' },
 $toast    = { tag: 'aufbau-toast',     args: 'message' },
 $toc      = 'aufbau-toc',
-$toggle   = 'aufbau-toggle',
 $tree     = 'aufbau-tree',
 $treeItem = { tag: 'aufbau-tree-item', args: 'label' },
 $upload   = 'aufbau-upload',

@@ -3,29 +3,40 @@
 //
 //   children   <input-option> (or <option>) inside the element
 //   src        a json file, loaded once per address
-//   list type  the entries of its type (language, country, …), built again
-//              whenever its attributes or the language change
+//   list type  the entries of its type (language, emoji, …). built again when
+//              one of the type's attributes, the language or the query changes
 //
-// loading is async, `onChange` repaints once something arrived.
+// the query is what was typed into a search field. a list type that searches
+// (emoji, icon) gets it, the others ignore it. loading is async, `onChange`
+// repaints once something arrived.
 
 import { importFile }                    from '@aufbau/import';
-import { normalizeOptions, readOptions } from '../lib/options.js';
 import { localeOf }                      from '../lib/locale.js';
+import { normalizeOptions, readOptions } from '../lib/options.js';
 
 export class OptionSource {
 
   constructor (host, onChange) {
     this.host     = host;
     this.onChange = onChange;
-    this.fetched  = null;   // from src
-    this.listed   = null;   // from the list type
+    this.query    = '';
+    this.fetched  = [];   // from src
+    this.listed   = [];   // from the list type
   }
 
-  get all () { return [...readOptions(this.host), ...(this.fetched ?? []), ...(this.listed ?? [])]; }
+  get all () {
+    const children = readOptions(this.host);
+    return [...children, ...this.fetched, ...this.listed];
+  }
 
-  /** starts whatever loading is due, cheap when nothing changed */
+  // starts whatever loading is due, cheap when nothing changed
   refresh () {
     this.refreshSrc();
+    this.refreshList();
+  }
+
+  search (query) {
+    this.query = String(query ?? '').trim();
     this.refreshList();
   }
 
@@ -34,27 +45,53 @@ export class OptionSource {
     if (src === this.src) return;
 
     this.src     = src;
-    this.fetched = null;
+    this.fetched = [];
     if (!src) return;
 
+    const done = options => {
+      if (this.src !== src) return;   // the address changed meanwhile
+      this.fetched = options;
+      this.onChange();
+    };
+
     importFile(src)
-      .then(data => normalizeOptions(data))
-      .catch(error => { console.warn(`[${this.host.localName}] could not load options from "${src}":`, error); return []; })
-      .then(options => { if (this.src === src) { this.fetched = options; this.onChange(); } });
+      .then(data => done(normalizeOptions(data)))
+      .catch(error => {
+        console.warn(`[${this.host.localName}] could not load options from "${src}":`, error);
+        done([]);
+      });
   }
 
   refreshList () {
-    const type = this.host.valueType;
     const host = this.host;
-    const key  = type.list ? [host.typeName, localeOf(host), ...(type.attributes ?? []).map(name => host.getAttribute(name))].join('|') : '';
-    if (key === (this.key ?? '')) return;
+    const type = host.valueType;
 
-    this.key    = key;
-    this.listed = null;
-    if (!type.list) return;
+    if (!type.list) {
+      this.key    = '';
+      this.listed = [];
+      return;
+    }
 
-    Promise.resolve(type.list.entries(host, localeOf(host)))
-      .catch(error => { console.warn(`[${host.localName}] could not build the ${host.typeName} list:`, error); return []; })
-      .then(options => { if (this.key === key) { this.listed = options; this.onChange(); } });
+    // everything the entries are made of. the same key, the same entries
+    const locale = localeOf(host);
+    const parts  = [host.typeName, locale, this.query];
+    for (const name of type.attributes ?? []) parts.push(host.getAttribute(name));
+
+    const key = parts.join('|');
+    if (key === this.key) return;
+    this.key = key;
+
+    const done = options => {
+      if (this.key !== key) return;   // a newer request is under way
+      this.listed = options;
+      this.onChange();
+    };
+
+    Promise.resolve(type.list.entries(host, locale, this.query))
+      .then(done)
+      .catch(error => {
+        console.warn(`[${host.localName}] could not build the ${host.typeName} list:`, error);
+        done([]);
+      });
   }
 }

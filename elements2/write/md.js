@@ -10,7 +10,6 @@
 //
 // the value and the form behaviour are <aufbau-writer>'s.
 
-import '../aufbau/AufbauPicker.js';
 import '../aufbau/AufbauReader.js';
 import '../aufbau/AufbauWriter.js';
 
@@ -41,26 +40,25 @@ export class WriteMd extends AufbauComponent {
       flex-direction : column;
       gap            : var(--aufbau-control-gap, 0.5em);
 
-      > aufbau-picker { align-self: flex-start; }
-      > div           { display: grid; gap: inherit; }
+      > [role="tablist"] { align-self: flex-start; display: flex; }
+      > div              { display: grid; gap: inherit; }
 
-      &:not([preview="toggle"]) > aufbau-picker          { display: none; }
-      &[preview="none"] aufbau-reader                    { display: none; }
-      &[preview="side"] > div                            { grid-template-columns: 1fr 1fr; }
-      &[preview="toggle"]:state(preview) aufbau-writer   { display: none; }
+      &:not([preview="toggle"]) > [role="tablist"]           { display: none; }
+      &[preview="none"] aufbau-reader                        { display: none; }
+      &[preview="side"] > div                                { grid-template-columns: 1fr 1fr; }
+      &[preview="toggle"]:state(preview) aufbau-writer       { display: none; }
       &[preview="toggle"]:not(:state(preview)) aufbau-reader { display: none; }
     }`;
   }
 
   get reader () { return this.querySelector('aufbau-reader'); }
-  get toggle () { return this.querySelector(':scope > aufbau-picker'); }
 
   render () {
     return html`
-      <aufbau-picker look="segments" value="write">
-        <aufbau-option value="write">write</aufbau-option>
-        <aufbau-option value="preview">preview</aufbau-option>
-      </aufbau-picker>
+      <div role="tablist">
+        <button type="button" role="tab" data-mode="write" aria-selected="true">write</button>
+        <button type="button" role="tab" data-mode="preview" aria-selected="false">preview</button>
+      </div>
       <div>
         <aufbau-writer ${attrs({ value: this.initialValue })}></aufbau-writer>
         <aufbau-reader></aufbau-reader>
@@ -69,11 +67,12 @@ export class WriteMd extends AufbauComponent {
   }
 
   bind () {
-    const toggle = this.toggle;
-
-    // the switch is no value of the component
-    this.mute(toggle);
-    this.on(toggle, 'change', () => this.states.toggle('preview', toggle.value === 'preview'));
+    // the two tabs are no value of the component, they only switch what shows
+    this.on('click', '[data-mode]', (event, button) => {
+      const preview = button.dataset.mode === 'preview';
+      this.states.toggle('preview', preview);
+      for (const tab of this.querySelectorAll('[data-mode]')) tab.setAttribute('aria-selected', String(tab === button));
+    });
 
     this.on(this.control, 'input', event => { if (event.target === this.control) this.schedulePreview(); });
     this.renderPreview();

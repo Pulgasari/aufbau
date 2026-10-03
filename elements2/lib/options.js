@@ -1,72 +1,57 @@
 // @aufbau/elements2/lib/options.js
-// shared option handling for every container that offers a choice.
-// replaces the three near identical normalize() copies that used to live in
-// AufbauCombobox, AufbauSwitch and AufbauDatalist.
+// options as { value, label, icon, disabled, selected }: read from child
+// elements, or turned out of whatever data a json file or a list brings.
 
 import { isArray, isPlainObject } from '@pulgasari/is';
 
-// wrapped payloads are common enough that unwrapping them is worth doing here
-const unwrap = (data) =>
-    isArray(data)       ? data
-  : isPlainObject(data) ? (data.items ?? data.data ?? data.results ?? Object.values(data))
-  : [];
+const OPTION_SELECTOR = 'input-option, option';
 
-const OPTION_SELECTOR = 'input-option, aufbau-option, option, [data-value]';
+// a list hidden in a wrapper, as apis like to send it: { items: […] }, { data: […] }, …
+function unwrap (data) {
+  if (isArray(data)) return data;
+  if (isPlainObject(data)) return data.items ?? data.data ?? data.results ?? Object.values(data);
+  return [];
+}
 
-/** { value, label, icon, disabled } from anything an author might hand us */
-export const toOption = (entry, { key = 'value', labelKey = 'label' } = {}) => {
+// one option out of a plain value or an object. `key` and `labelKey` name the
+// fields where they are not called value and label
+export function toOption (entry, { key = 'value', labelKey = 'label' } = {}) {
   if (!isPlainObject(entry)) {
     const value = entry == null ? '' : String(entry);
-    return { value, label: value, icon: null, disabled: false };
+    return { disabled: false, icon: null, label: value, value };
   }
 
   const value = entry[key] ?? entry.value ?? entry.name ?? Object.values(entry)[0] ?? '';
+  const label = entry[labelKey] ?? entry.label ?? entry.name ?? value;
+
   return {
-    value    : String(value),
-    label    : String(entry[labelKey] ?? entry.label ?? entry.name ?? value),
-    icon     : entry.icon ?? null,
     disabled : Boolean(entry.disabled),
+    icon     : entry.icon ?? null,
+    label    : String(label),
+    value    : String(value),
   };
-};
+}
 
-export const normalizeOptions = (data, options) => unwrap(data).map(entry => toOption(entry, options));
+export function normalizeOptions (data, fields) {
+  return unwrap(data).map(entry => toOption(entry, fields));
+}
 
-/**
- * reads <aufbau-option>, <option> and [data-value] children.
- * the elements stay in the dom, they are the source of truth and must survive
- * every re-render of the container.
- *
- * `ignore` must be the container's own render shell. without it the rendered
- * options, which carry data-value themselves, would be read back in as sources.
- */
-export const readOptions = (host, { ignore } = {}) => [...host.querySelectorAll(OPTION_SELECTOR)]
-  .filter(element => !ignore?.contains(element))
-  .map(element => ({
-  value    : element.getAttribute('value') ?? element.dataset.value ?? element.textContent.trim(),
-  label    : element.getAttribute('label') ?? element.textContent.trim(),
-  icon     : element.getAttribute('icon'),
-  disabled : element.hasAttribute('disabled'),
-  selected : element.hasAttribute('selected'),
-}));
+// the <input-option> and <option> children. they stay in the dom and are read
+// again on every call, so options can be added and dropped at any time
+export function readOptions (host) {
+  const options = [];
 
-/**
- * watches option children so a container repaints when they are added or removed.
- * `ignore` must be the container's own render shell, otherwise every repaint
- * would feed itself back in as a mutation.
- */
-export const observeOptions = (host, onChange, { ignore } = {}) => {
-  const observer = new MutationObserver(records => {
-    if (records.some(record => !ignore?.contains(record.target))) onChange();
-  });
+  for (const element of host.querySelectorAll(OPTION_SELECTOR)) {
+    const label = element.getAttribute('label') ?? element.textContent.trim();
 
-  observer.observe(host, {
-    attributeFilter : ['value', 'label', 'icon', 'disabled', 'selected'],
-    attributes      : true,
-    childList       : true,
-    subtree         : true,
-  });
+    options.push({
+      disabled : element.hasAttribute('disabled'),
+      icon     : element.getAttribute('icon'),
+      label,
+      selected : element.hasAttribute('selected'),
+      value    : element.getAttribute('value') ?? label,
+    });
+  }
 
-  return () => observer.disconnect();
-};
-
-export { OPTION_SELECTOR };
+  return options;
+}

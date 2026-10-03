@@ -24,21 +24,16 @@ const TAGS = [
   'aufbau-embed',
   'aufbau-filter',
   'aufbau-index',
-  'aufbau-input',
   'aufbau-item',
   'aufbau-keyboard',
   'aufbau-loop',
   'aufbau-modal',
-  'aufbau-option',
-  'aufbau-picker',
   'aufbau-progress',
   'aufbau-reader',
   'aufbau-skeleton',
-  'aufbau-slider',
   'aufbau-table',
   'aufbau-toast',
   'aufbau-toc',
-  'aufbau-toggle',
   'aufbau-tree',
   'aufbau-tree-item',
   'aufbau-upload',
@@ -103,7 +98,7 @@ const TAGS = [
 const known = new Set(TAGS);
 
 // input-* elements that are more than a type have a module of their own, the others are all in ./input/tags.js
-const OWN_MODULE = new Set(['input-emoji', 'input-icon', 'input-option', 'input-pattern']);
+const OWN_MODULE = new Set(['input-option']);
 
 const pascal = text => text.replace(/(?:^|-)(\w)/g, (match, letter) => letter.toUpperCase());
 

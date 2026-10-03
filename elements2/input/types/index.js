@@ -12,7 +12,8 @@
 //   axis         a numeric axis, for steppers and sliders:
 //                { bounds, step, toNumber (value), fromNumber (number, previous) }
 //   steppable    false where an axis has no meaningful step (color)
-//   list         the values come from a list: { entries (host, locale) }
+//   list         the values come from a list: { entries (host, locale, query), query }
+//                `query` marks a list that is searched (emoji, icon)
 //   attributes   further attributes the type reads, observed on every input-*
 //   setup        (host, on) behavior beyond a value, e.g. the search event
 
@@ -24,12 +25,15 @@ import date     from './date.js';
 import datetime from './datetime.js';
 import duration from './duration.js';
 import email    from './email.js';
+import emoji    from './emoji.js';
 import font     from './font.js';
 import hotkey   from './hotkey.js';
+import icon     from './icon.js';
 import language from './language.js';
 import locale   from './locale.js';
 import number   from './number.js';
 import password from './password.js';
+import pattern  from './pattern.js';
 import phone    from './phone.js';
 import search   from './search.js';
 import slug     from './slug.js';
@@ -41,8 +45,9 @@ import url      from './url.js';
 import year     from './year.js';
 
 export const TYPES = {
-  bool, color, country, currency, date, datetime, duration, email, font, hotkey, language,
-  locale, number, password, phone, search, slug, text, time, timezone, unit, url, year,
+  bool, color, country, currency, date, datetime, duration, email, emoji, font, hotkey, icon,
+  language, locale, number, password, pattern, phone, search, slug, text, time, timezone, unit,
+  url, year,
 };
 
 /** every further attribute some type reads, as schema entries */

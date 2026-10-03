@@ -32,31 +32,21 @@ export class AufbauControl extends AufbauCore {
   };
 
   // structure shared by every control. colours, borders and radii belong to the
-  // skin, see ../../css/skins/. declared on the base class on purpose: styleOwners()
-  // keys sheets by their declaring class, so this is adopted once per root. the
-  // :host variants cover controls with a shadow root, the tag list the others.
-  // a shadowed control must not be in that list: page rules beat :host, so its
-  // own display would lose
+  // skin. the :host rules are for controls with a shadow root, <aufbau-writer>
+  // has none and is named
   static styles = `
     [hidden] { display: none !important; }
 
-    :host,
-    aufbau-input, aufbau-slider, aufbau-toggle, aufbau-writer {
+    :host, aufbau-writer {
       box-sizing : border-box;
       color      : inherit;
       display    : inline-block;
       font       : inherit;
     }
 
-    :host *,
-    :is(aufbau-input, aufbau-slider, aufbau-toggle, aufbau-writer) * {
-      box-sizing: border-box;
-    }
+    :host *, aufbau-writer * { box-sizing: border-box; }
 
-    :host(:state(disabled)),
-    :is(aufbau-input, aufbau-slider, aufbau-toggle, aufbau-writer):state(disabled) {
-      pointer-events: none;
-    }
+    :host(:state(disabled)), aufbau-writer:state(disabled) { pointer-events: none; }
   `;
 
   // attached up front, the form state is written from the first sync on
@@ -146,7 +136,7 @@ export class AufbauControl extends AufbauCore {
   syncFormState () {
     this.internals?.setFormValue(this.formValue);
     // the one point every write path passes: commit() as well as state that
-    // never touches value, like AufbauToggle.setChecked()
+    // never touches value, like a checked state
     this.savePersisted();
     return this;
   }
@@ -196,7 +186,7 @@ export class AufbauControl extends AufbauCore {
 
   /**
    * what gets written. the raw attribute rather than formValue on purpose:
-   * AufbauPicker returns a FormData from formValue when it is `multiple`.
+   * an input with `multiple` returns a FormData from formValue.
    */
   get persistedState () { return this.getAttribute('value') ?? ''; }
 

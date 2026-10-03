@@ -13,7 +13,8 @@
 // tree. the author's <option> children are left alone and only read, the own
 // <datalist> is appended once and filled, never rendered over the children.
 
-import { AufbauElement, normalizeOptions } from '../base/index.js';
+import { AufbauElement }    from '../base/index.js';
+import { normalizeOptions } from '../lib/options.js';
 import { importFile } from '@aufbau/import';
 
 export default class AufbauDatalist extends AufbauElement {

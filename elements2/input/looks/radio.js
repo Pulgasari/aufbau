@@ -27,7 +27,7 @@ export default {
     }
   `,
 
-  render : host => optionButtons(host, 'option'),
+  render : host => optionButtons(host, 'option', { mark: true }),
   events : groupEvents,
   update : host => updateTabStop(host, updateSelected(host)),
   role   : host => host.count === 'multiple' ? 'group' : 'radiogroup',

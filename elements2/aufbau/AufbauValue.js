@@ -9,14 +9,16 @@
 
 // :::::: IMPORTS
 
-import { actionButtons, bindActions }           from '../lib/actions.js';
-import { AufbauElement, TYPE_NAMES, valueType } from '../base/index.js';
-import { attrs, html } from '../lib/html.js';
-import { configKeys }  from '../base/AufbauConfig.js';
+import { configKeys }                 from '../base/AufbauConfig.js';
+import { AufbauElement }              from '../base/index.js';
+import { TYPES, typeOf }              from '../input/types/index.js';
+import { actionButtons, bindActions } from '../lib/actions.js';
+import { attrs, html }                from '../lib/html.js';
 
 // :::::: CONSTANTS
 
 const TAG           = 'aufbau-value';
+const TYPE_NAMES    = Object.keys(TYPES).filter(name => !TYPES[name].list); // the types of the inputs, the lists aside
 const TIME_TYPES    = new Set(['date', 'datetime', 'time']); // types that are an instant rather than a string, so they render as <time>       
 const NUMERIC       = /^-?\d+$/;
 const STYLES        = ['short', 'medium', 'long', 'full']; // Intl's four date/time presets. anything else falls through to the machine form     
@@ -35,7 +37,7 @@ const pad = (value, length = 2) => String(value).padStart(length, '0');
 // local wall clock rather than toISOString(): an hour past midnight in UTC+2 is
 // still yesterday in utc, and the date someone reads has to be the date they are
 // living in. this is why the machine forms are here and not taken from
-// valueTypes.js, whose formats belong to <input>, which speaks utc for `date`.
+// input/types/, whose formats belong to <input>, which speaks utc for `date`.
 const isoDate  = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 const isoTime  = (date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 const isoStamp = (date) => `${isoDate(date)}T${isoTime(date)}`;
@@ -54,7 +56,7 @@ function machineText (type, value) {
   if (type === 'date')     return isoDate (new Date(value));
   if (type === 'datetime') return isoStamp(new Date(value));
   if (type === 'time')     return isoTime (instantOf('time', value));
-  return valueType(type).format(value);
+  return typeOf(type).format(value);
 }
 
 /** the value as it is shown: `format` names a notation, the machine form is the default */
@@ -136,7 +138,7 @@ export default class AufbauValue extends AufbauElement {
     // the duration type parses to the bare amount for a slider axis, which would
     // show "3725s" as 3725. shown, the unit belongs to the value
     if (type === 'duration') return text;
-    return valueType(type).parse(raw);
+    return typeOf(type).parse(raw);
   }
 
   formatValue (value) { return machineText(this.getAttr('type'), value); }
@@ -179,7 +181,7 @@ export default class AufbauValue extends AufbauElement {
   /** the icon to show before the value, '' for none */
   iconName () {
     if (!this.hasAttr('icon')) return '';
-    return this.getAttr('icon') || valueType(this.getAttr('type')).icon || '';
+    return this.getAttr('icon') || typeOf(this.getAttr('type')).icon || '';
   }
 
   // :::::: LIFECYCLE

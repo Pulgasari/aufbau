@@ -1,7 +1,7 @@
 // <aufbau-dropdown>
 // an action menu. it carries commands, not a value, so it is NOT a control and
 // deliberately does not participate in forms. for choosing a value, use
-// <aufbau-picker look="combobox">.
+// an <input-value> with options, say look="combobox".
 //
 // trigger and menu live in the shadow root, the children are the entries and
 // are projected into the menu. nothing is moved.

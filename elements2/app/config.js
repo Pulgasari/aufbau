@@ -14,6 +14,10 @@
 // open picker with it. so values can follow the app's state while it is open.
 // events: config { key, values }. not `change`: that one already bubbles out of
 // every control inside.
+//
+// @aufbau/gui still renders the aufbau-input, -picker, -slider and -toggle of
+// @aufbau/elements, which are not part of this package: a page with
+// <app-config> loads those as well, until gui renders the input-* elements.
 
 import gui from '@aufbau/gui';
 
@@ -76,14 +80,14 @@ export class AppConfig extends AufbauElement {
     this._built = true;
   }
 
-  // the values into the controls that show something else. a toggle holds its
-  // value in `checked`, every other control in `value`
+  // the values into the controls that show something else. a bool (type
+  // checkbox) holds its value in `checked`, every other control in `value`
   fill () {
     for (const [key, value] of Object.entries(this.values)) {
       const control = this.querySelector(`[name="${CSS.escape(key)}"]:not(fieldset)`);
       if (!control) continue;
 
-      if (control.localName === 'aufbau-toggle') control.toggleAttribute('checked', Boolean(value));
+      if (control.type === 'checkbox') control.checked = Boolean(value);
       else if (String(control.value ?? '') !== String(value ?? '')) control.value = value ?? '';
     }
   }

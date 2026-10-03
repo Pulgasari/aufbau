@@ -24,12 +24,22 @@ export function nameOf (names, code) {
   catch { return code; }
 }
 
-/** the base of a list type: a combobox over a text value */
-export const listType = ({ attributes = [], entries, icon = null, placeholder }) => ({
+// the base of a list type: a combobox over a text value. `query` marks a type
+// whose entries depend on what was typed into its search field
+export const listType = ({ attributes = [], entries, icon = null, look = 'combobox', placeholder, query = false }) => ({
   ...text,
   attributes,
   icon,
-  list : { entries },
-  look : 'combobox',
+  list : { entries, query },
+  look,
   placeholder,
 });
+
+// a search shows the current value first, a new search must not make it vanish
+export function withCurrent (host, entries, entryOf) {
+  const value = host.value;
+  if (!value) return entries;
+
+  const others = entries.filter(entry => entry.value !== value);
+  return [entryOf(value), ...others];
+}

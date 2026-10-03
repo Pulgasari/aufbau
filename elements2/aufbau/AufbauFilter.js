@@ -1,7 +1,9 @@
 // <aufbau-filter>
 // a search field that filters other elements by their text. the only child is
-// an <aufbau-input type="search">. mismatches get the `hidden` attribute, so
-// filtering works without any css; `mismatch-class` switches to a class instead.
+// an <input-search>. mismatches get the `hidden` attribute, so filtering works
+// without any css; `mismatch-class` switches to a class instead.
+
+import '../input/tags.js';
 
 import { AufbauElement }  from '../base/index.js';
 import { html }           from '../lib/html.js';
@@ -17,11 +19,10 @@ export default class AufbauFilter extends AufbauElement {
     target        : String,   // selector of the elements to filter
   };
 
-  static styles = `aufbau-filter { display: block; > aufbau-input { inline-size: 100%; } }`;
+  static styles = `aufbau-filter { display: block; > input-search { inline-size: 100%; } }`;
 
   onMount () {
-    // the value comes from the element, the native input event of the inner field carries no detail
-    this.on('input', 'aufbau-input', (event, input) => {
+    this.on('input', 'input-search', (event, input) => {
       clearTimeout(this._timer);
       this._timer = setTimeout(() => this.apply(input.value), this.getAttr('debounce'));
     });
@@ -48,7 +49,7 @@ export default class AufbauFilter extends AufbauElement {
   }
 
   render () {
-    return html`<aufbau-input type="search" placeholder="${this.getAttr('placeholder')}"></aufbau-input>`;
+    return html`<input-search placeholder="${this.getAttr('placeholder')}"></input-search>`;
   }
 }
 
