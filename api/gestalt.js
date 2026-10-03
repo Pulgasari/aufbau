@@ -17,21 +17,19 @@
 // removes one. skin is both: the --skin token, and the sheet the elements adopt
 // into @layer aufbau.skin (@aufbau/element).
 
-export const CSS_PATH = 'https://code.pulgasari.dev/aufbau/css';
+export const 
+CSS_PATH   = 'https://code.pulgasari.dev/aufbau/css',
+DENSITIES  = ['compact', 'normal', 'comfortable', 'touch'],
+GEOMETRIES = ['sharp', 'soft', 'round', 'pill'],
+LAYOUTS    = ['landing', 'mobile-basic', 'three-panels'],
+LOOKS      = ['flat', 'rounded'],
+MODES      = ['auto', 'dark', 'light'],
+SKINS      = ['andromeda', 'monochrome'];
 
-export const DENSITIES  = ['compact', 'normal', 'comfortable', 'touch'];
-export const GEOMETRIES = ['sharp', 'soft', 'round', 'pill'];
-export const LAYOUTS    = ['landing', 'mobile-basic', 'three-panels'];
-export const LOOKS      = ['flat', 'rounded'];
-export const MODES      = ['auto', 'dark', 'light'];
-export const SKINS      = ['andromeda', 'monochrome'];
-
-// the properties tokens.css, palettes.css and themes.css read, mirrored as data-* for selectors
-const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };
-
-// the folder of each stylesheet kind
-const SHEETS = { layout: 'layouts', look: 'looks' };
-
+// TOKENS :: the properties tokens.css, palettes.css and themes.css read, mirrored as data-* for selectors
+// SHEETS :: the folder of each stylesheet kind
+const TOKENS  = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };      
+const SHEETS  = { layout: 'layouts', look: 'looks' };
 const current = {};
 
 // the skin sheet belongs to the elements, one adoption in their layer. false or null removes it
