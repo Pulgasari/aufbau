@@ -1,5 +1,5 @@
-import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
-import { isFn }        from '@pulgasari/is';
+import adoptStylesheet         from '@domina/methods/adoptStylesheet.js';
+import { isFn, isPlainObject } from '@pulgasari/is';
 
 export const BASE_LAYER = 'aufbau.elements';
 export const SKIN_LAYER = 'aufbau.skin';
@@ -33,17 +33,31 @@ function styleOwners (Cls) {
   return owners;
 }
 
-const toCss = (styles, owner) => {
+const kebab = key => key.startsWith('--') ? key : key.replace(/[A-Z]/g, char => `-${char.toLowerCase()}`);
+
+// { ':host': { display: 'flex', '&[hidden]': { display: 'none' } } }. a nested object
+// is a rule or an at-rule, anything else a declaration, an array repeats it
+function objectToCss (object) {
+  const out = [];
+  for (const [key, value] of Object.entries(object)) {
+    if (value == null || value === false) continue;
+    if (isPlainObject(value)) out.push(`${key} { ${objectToCss(value)} }`);
+    else for (const item of [value].flat()) out.push(`${kebab(key)}: ${item};`);
+  }
+  return out.join(' ');
+}
+
+// a string, an object, an ass`` result, a function giving one of them, or a list of those
+export function cssOf (styles, owner) {
   const value = isFn(styles) ? styles.call(owner) : styles;
-  const list  = Array.isArray(value) ? value : [value];
-  return list.filter(Boolean).join('\n');
-};
+  return [value].flat(Infinity).filter(Boolean).map(item => isPlainObject(item) ? objectToCss(item) : String(item)).join('\n');
+}
 
 // the styles of one class, built once per document
 function classSheet (owner, doc) {
   const { classes } = cacheOf(doc);
   let sheet = classes.get(owner);
-  if (!sheet) classes.set(owner, sheet = createSheet(doc, `@layer ${owner.styleLayer ?? BASE_LAYER} {\n${toCss(owner.styles, owner)}\n}`));
+  if (!sheet) classes.set(owner, sheet = createSheet(doc, `@layer ${owner.styleLayer ?? BASE_LAYER} {\n${cssOf(owner.styles, owner)}\n}`));
   return sheet;
 }
 
@@ -70,7 +84,7 @@ export function adoptClassStyles (Cls, root = document) {
   if (missing.length) root.adoptedStyleSheets = [...adopted, ...missing];
 }
 
-export function adoptBaseStyles (key, css) {
+export function adoptBaseStyles (key, styles) {
   ensureLayerOrder(document);
-  return adoptStylesheet(css, { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
+  return adoptStylesheet(cssOf(styles), { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
 }

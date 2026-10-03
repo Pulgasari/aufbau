@@ -1,3 +1,5 @@
+import { cssOf } from '@aufbau/element';
+
 import button   from './button.js';
 import checkbox from './checkbox.js';
 import chips    from './chips.js';
@@ -30,7 +32,7 @@ const sheets = new Map;
 export function sheetOf (name) {
   if (!sheets.has(name)) {
     const sheet = new CSSStyleSheet;
-    sheet.replaceSync(LOOKS[name].css);
+    sheet.replaceSync(cssOf(LOOKS[name].css));
     sheet.isLookSheet = true;
     sheets.set(name, sheet);
   }

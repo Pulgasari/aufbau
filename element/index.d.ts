@@ -48,7 +48,7 @@ export declare class AufbauElement extends HTMLElement {
   static reflect?   : string[];
   static shadow?    : boolean | ShadowRootInit;
   static skeleton?  : object | (() => object);
-  static styles?    : string | string[];
+  static styles?    : Styles | (() => Styles);
 
   static init (name?: string): void;
 
@@ -147,7 +147,11 @@ export declare function onConfigChange (listener: (event: CustomEvent<{ changed:
 export declare function setConfig      (key: string, value: unknown, options?: { layer?: 'defaults' }): void;
 export declare function setConfig      (entries: Record<string, unknown>, options?: { layer?: 'defaults' }): void;
 
-export declare function adoptBaseStyles (key: string, css: string): unknown;
+type StyleObject = { [selectorOrProperty: string]: StyleObject | string | number | (string | number)[] | null | undefined | false };
+type Styles      = string | StyleObject | { toString (): string } | null | undefined | false | Styles[];
+
+export declare function adoptBaseStyles (key: string, css: Styles): unknown;
+export declare function cssOf           (styles: Styles | (() => Styles), owner?: unknown): string;
 export declare function applySkin       (skin?: string): void;
 export declare function setSkin         (skin: string | null): void;
 

@@ -6,4 +6,4 @@ export { AufbauSourceElement, withSource }   from './withSource.js';
 export { CONFIG_EVENT, configKeys, getConfig, onConfigChange, setConfig } from './lib/config.js';
 export { session, store }                                                 from './lib/persist.js';
 export { applySkin, setSkin }                                             from './lib/skin.js';
-export { adoptBaseStyles }                                                from './lib/styles.js';
+export { adoptBaseStyles, cssOf }                                         from './lib/styles.js';

@@ -37,7 +37,7 @@ MyThing.init();   // <my-thing>
 |---|---|
 | `static attr` | the attribute schema: a type, `{ type, default, values, fn, config, var }` or a default value |
 | `static shadow` | a shadow root of its own |
-| `static styles` | css, adopted once per tree into the layer `aufbau.elements` |
+| `static styles` | css in the layer `aufbau.elements`, one sheet per class shared by every tree. see [styles](#styles) |
 | `static reflect` | attributes whose resolved value goes back onto the host |
 | `static internals` | ElementInternals up front, an object sets defaults such as `{ role: 'img' }` |
 | `static parts` | part names, each gets a getter: `close-button` is `this.$closeButton` |
@@ -115,6 +115,30 @@ this.setVar('item-size', '200px')                  // --aufbau-item-size
 this.setSkeleton(true)
 this.getConfig('theme', 'github')                  // attribute, then setConfig(), then fallback
 ```
+
+### styles
+
+`static styles` takes a string, an object, an `` ass`` `` result, a function
+giving one of them, or a list mixing them:
+
+```js
+static styles = `:host { display: flex; }`;
+
+static styles = {
+  ':host'                : { display: 'flex', flexDirection: 'column', '--panel-gap': '0.5rem' },
+  'header'               : { gap: 'var(--panel-gap)', '&[hidden]': { display: 'none' } },
+  '@media (width < 40rem)': { ':host': { flexDirection: 'row' } },
+};
+
+static styles = ass`:host { padding: small; }`;   // tokens and mixins of @aufbau/ass
+
+static styles = [BASE, { ':host': { gap: '1rem' } }];
+```
+
+in an object a nested object is a rule or an at-rule, anything else a
+declaration: camelCase becomes kebab-case, `--custom` stays, an array repeats
+the property (`{ display: ['-webkit-box', 'flex'] }`), `null` and `false` leave
+it out. `cssOf(styles)` gives the css of any of these.
 
 ## withControl · AufbauControlElement
 
