@@ -1,0 +1,85 @@
+// look="cycle": a button showing the current option. a click takes the next one,
+// a long press or the context menu opens the list. always one value
+// parts: box, button, icon, label, listbox, option
+
+import { html }                                                  from '../../core/html.js';
+import { labelOf, updateSelected }                               from './parts/options.js';
+import { LISTBOX, isOpen, listbox, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
+
+const LONG_PRESS = 500;
+
+export default {
+  fits : shape => shape.kind === 'list' && shape.count === 'single',
+
+  css : `
+    ${LISTBOX}
+
+    [part~="button"] {
+      -webkit-touch-callout : none;
+      border                : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border-radius         : var(--radius-control, 0.4em);
+      min-block-size        : var(--control-size, 2.25em);
+      padding-inline        : 0.75em;
+      user-select           : none;
+    }
+  `,
+
+  // the content comes in update(), a click must not rebuild the button it lands on
+  render : host => html`
+    <button type="button" part="button" aria-haspopup="listbox" aria-expanded="false">
+      <svg-icon part="icon" hidden></svg-icon>
+      <span part="label"></span>
+    </button>
+    ${listbox(host)}
+  `,
+
+  events (host, on) {
+    const button = () => triggerOf(host);
+    popoverEvents(host, on, button);
+
+    let timer   = null;
+    let pressed = false;
+
+    on('pointerdown', '[aria-haspopup]', event => {
+      if (event.button !== 0) return;
+      pressed = false;
+      clearTimeout(timer);
+      timer = setTimeout(() => { pressed = true; setOpen(host, true, button()); }, LONG_PRESS);
+    });
+
+    // the click that ends a long press must not step on as well, it follows pointerup within the task
+    const release = () => { clearTimeout(timer); if (pressed) setTimeout(() => { pressed = false; }); };
+    on(window, 'pointerup',     release);
+    on(window, 'pointercancel', release);
+
+    on('click', '[aria-haspopup]', () => {
+      if (pressed) return;
+      if (isOpen(host)) setOpen(host, false, button());
+      else host.cycle(1);
+    });
+
+    on('contextmenu', '[aria-haspopup]', event => {
+      event.preventDefault();
+      setOpen(host, true, button());
+    });
+  },
+
+  update (host) {
+    updateSelected(host);
+
+    const button  = triggerOf(host);
+    const current = host.options.find(entry => entry.value === host.value);
+    const name    = current ? labelOf(current) : (host.placeholder || 'select…');
+    const icon    = button.querySelector('svg-icon');
+    const label   = button.querySelector('[part~="label"]');
+
+    icon.hidden = !current?.icon;
+    if (current?.icon) icon.setAttribute('icon', current.icon);
+    label.textContent = name;
+    label.hidden      = Boolean(host.getAttr('iconsOnly') && current?.icon);
+    button.title      = name;
+    button.setAttribute('aria-label', name);
+  },
+
+  focus : triggerOf,
+};

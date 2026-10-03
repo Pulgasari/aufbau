@@ -9,11 +9,10 @@ them, in one package.
 | `app/`      | `app-*`           | the frame of an app: root, views, areas, panels |
 | `div/`      | `div-x`, `div-y`  | flex rows and columns |
 | `embed/`    | `embed-*`         | click to load embeds of youtube, bandcamp, … |
-| `input/`    | `input-*`         | one form control per kind of value, drawn by a look |
+| `input/`    | `input-*`         | one form control per kind of value, drawn by a look: types/, looks/ |
 | `svg/`      | `svg-*`           | icons and flags: a box painted by an svg |
 | `write/`    | `write-*`         | editors |
 | `core/`     |                   | the base classes, the value and list types, the config, the skin, the helpers |
-| `looks/`    |                   | the looks of the input-* elements: render modules, no elements |
 | `data/`     |                   | the lists the inputs pick from |
 | `adapters/` |                   | htx |
 
@@ -736,8 +735,8 @@ abgelehnte dateien (falscher typ, zu gross) kommen als
 
 ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
 selbst baut, mitsamt der coercion. `type` ist dasselbe vokabular wie bei den
-controls (`core/valueTypes.js`): derselbe wert wird mit `<aufbau-input
-type="date">` bearbeitet und mit `<aufbau-value type="date">` angezeigt, und
+inputs (`input/types/`): derselbe wert wird mit `<input-date>`
+bearbeitet und mit `<aufbau-value type="date">` angezeigt, und
 jeder typ, den die controls lernen, ist einer, den das hier anzeigen kann. das
 icon pro typ kommt aus derselben tabelle.
 
@@ -848,17 +847,34 @@ fixed type, `<input-number>` is `<input-value type="number">`.
 
 ## how it is built
 
-- **one element, one control.** `core/InputValue.js` is form associated:
-  FormData, validity, reset, `persist`, `disabled` from a fieldset. no inner
-  element holds the value, nothing is forwarded.
+everything of the inputs is in `input/`, one file per thing, named like it:
+
+```
+input/
+  Input.js       the base: value, form, drawing the look
+  tags.js        every input-* that is a type: <input-number> is <input-value type="number">
+  option.js      <input-option>
+  values.js      one string, two (range) or many (multiple)
+  options.js     where options come from: children, src, the list type
+  types/         what a value is, one file per type (number.js, language.js, …)
+  looks/         how it is entered, one file per look (slider.js, segments.js, …)
+    parts/       what several looks share: the field, the options, the popover, the toggle
+```
+
+- **one element, one control.** `Input.js` is form associated: FormData,
+  validity, reset, `persist`, `disabled` from a fieldset. no inner element
+  holds the value, nothing is forwarded.
 - **the value is a string with a fixed format**, the same in the attribute, in
   `value` and in FormData. `range` joins with `..`, `multiple` with `,` and
   submits one entry per value. `typedValue` is the value in its type: a number,
   epoch ms, an array for range and multiple.
-- **a look is a render module, no element** (`looks/`). it draws into the
-  element's shadow root and shares one protocol of data attributes with the
-  base (`data-index`, `data-axis`, `data-step`, `data-value`, …), so a look only
-  renders and syncs. switching `look` at runtime redraws, the value stays.
+- **a type is a plain object** (`types/`): parse, format, its default look and
+  icon, an `axis` for steppers and sliders, a `list` for values from a list.
+- **a look is a plain object** (`looks/`): render, events, update, css. it reads
+  top to bottom and changes the value only through the methods of `Input.js`:
+  `setPart`, `setNumber`, `step`, `select`, `cycle`, `add`, `removeAt`, `toggle`.
+  its stylesheet is adopted only while it is drawn, so its css needs no prefix.
+  switching `look` at runtime redraws, the value stays.
 - **the type decides which looks fit.** a look that does not fit the value is
   not drawn, the type's own default is. the drawn look is written onto the host
   where the author gave none, so `[look="slider"]` always matches.
@@ -916,7 +932,7 @@ input-value::part(selected)  {}   /* the selected option or segment */
 | `input-url`      | `https://…`, scheme added           | field        |
 | `input-year`     | `2026`                              | stepper      |
 
-the list types (`core/listTypes.js`) take their own attributes: `countries`,
+the list types (`input/types/`) take their own attributes: `countries`,
 `currencies`, `categories`, `languages`, `locales`, `zones`, `units`, and
 `flags="false"`, `native="false"`. their names are in the language of the
 nearest `[lang]`, then the document, then the browser.

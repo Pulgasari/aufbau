@@ -121,8 +121,8 @@ export const runAction = {
  *   actionText ()    the text copy puts on the clipboard
  *   actionTarget ()  the editable node paste and clear work on, null when read only
  */
-export function bindActions (host) {
+export function bindActions (host, on = (...args) => host.on(...args)) {
   // pressing a button must not steal focus, the caret position is where paste lands
-  host.on('pointerdown', '[data-action]', (event) => event.preventDefault());
-  host.on('click',       '[data-action]', (event, button) => runAction[button.dataset.action]?.(host, button));
+  on('pointerdown', '[data-action]', (event) => event.preventDefault());
+  on('click',       '[data-action]', (event, button) => runAction[button.dataset.action]?.(host, button));
 }

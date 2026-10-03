@@ -9,7 +9,8 @@ entry point. side effect free: nothing is defined until it is used.
 a tag maps onto its module:
 
   aufbau-<name>    ./aufbau/Aufbau<Name>.js    the building blocks, shadow dom
-  <group>-<name>   ./<group>/<name>.js         composed of them, light dom
+  input-<type>     ./input/tags.js             every input that is a type, in one module
+  <group>-<name>   ./<group>/<name>.js         everything else
 
 */// :::: TAGS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -101,11 +102,16 @@ const TAGS = [
 
 const known = new Set(TAGS);
 
+// input-* elements that are more than a type have a module of their own, the others are all in ./input/tags.js
+const OWN_MODULE = new Set(['input-emoji', 'input-icon', 'input-option', 'input-pattern']);
+
 const pascal = text => text.replace(/(?:^|-)(\w)/g, (match, letter) => letter.toUpperCase());
 
 function pathOf (tag) {
   const [group, ...rest] = tag.split('-');
-  return group === 'aufbau' ? `./aufbau/${pascal(tag)}.js` : `./${group}/${rest.join('-')}.js`;
+  if (group === 'aufbau')                        return `./aufbau/${pascal(tag)}.js`;
+  if (group === 'input' && !OWN_MODULE.has(tag)) return './input/tags.js';
+  return `./${group}/${rest.join('-')}.js`;
 }
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::
