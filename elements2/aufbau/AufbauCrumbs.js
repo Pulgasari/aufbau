@@ -1,29 +1,3 @@
-// <aufbau-crumbs>
-// breadcrumb navigation. the host is the navigation landmark, the separators
-// are css (::before of every crumb but the first), nothing is drawn around the
-// crumbs themselves. two sources:
-//
-// 1. the author's children, left untouched. the last one gets aria-current:
-//
-//   <aufbau-crumbs>
-//     <a href="/">Start</a>
-//     <a href="/docs">Docs</a>
-//     <span>Elements</span>
-//   </aufbau-crumbs>
-//
-// 2. a `path`, the element builds the crumbs itself:
-//
-//   <aufbau-crumbs path="/home/user/docs" root="Home"></aufbau-crumbs>
-//   <aufbau-crumbs path="/a/b/c" href="/files?path={path}"></aufbau-crumbs>
-//
-//   without `href` the crumbs are buttons and a click emits `aufbau-crumbs`
-//   with { path, index }, the app routes. with it they are real links, {path}
-//   is replaced by the encoded path of the crumb. `max` collapses the middle
-//   into one … crumb that expands on click.
-//
-// no shadow root: the crumbs are plain links and buttons in the light dom,
-// page css reaches all of them. parts are not needed, the crumbs are children.
-
 import { AufbauElement } from '../base/index.js';
 import { attrs, html }   from '../lib/html.js';
 
@@ -33,10 +7,10 @@ export default class AufbauCrumbs extends AufbauElement {
   static attr = {
     href      : String,   // link template, {path} is replaced
     label     : 'breadcrumb',
-    max       : Number,   // most crumbs shown, the middle collapses beyond it
+    max       : Number,
     path      : String,
-    root      : String,   // label of the first crumb, the path root. absent, the root is left out
-    separator : '/',      // splits `path`, the drawn separator is --crumbs-separator
+    root      : String,
+    separator : '/',
   };
 
   static styles = `aufbau-crumbs {
@@ -55,7 +29,6 @@ export default class AufbauCrumbs extends AufbauElement {
       white-space     : nowrap;
     }
 
-    /* the current crumb keeps its full name longest */
     > :last-child { flex-shrink: 0.2; }
 
     > * + *::before {
@@ -75,7 +48,6 @@ export default class AufbauCrumbs extends AufbauElement {
     }
   }`;
 
-  /** [{ label, path }] from the path attribute, the root first when it has a label */
   get crumbs () {
     const { path, root, separator } = this.getAttr();
     if (path == null) return [];
@@ -95,7 +67,6 @@ export default class AufbauCrumbs extends AufbauElement {
 
     this.on('click', 'button[data-expand]', () => { this._expanded = true; this.update(); });
 
-    // authored crumbs come and go (a router, a framework), aria-current follows the last one
     const observer = new MutationObserver(() => this.sync());
     observer.observe(this, { childList: true });
     this.track(() => observer.disconnect());
@@ -103,7 +74,6 @@ export default class AufbauCrumbs extends AufbauElement {
 
   onAttributeChange (name) { if (name === 'path') this._expanded = false; }
 
-  // only with `path`. without it the children are the author's and nothing is rendered over them
   render () {
     if (this.getAttr('path') == null) return null;
 
@@ -111,7 +81,6 @@ export default class AufbauCrumbs extends AufbauElement {
     const crumbs = this.crumbs;
     const last   = crumbs.length - 1;
 
-    // first crumb, the collapsed middle, then the tail up to `max` crumbs in total
     const collapse = max > 1 && crumbs.length > max && !this._expanded;
     const shown    = collapse ? [crumbs[0], null, ...crumbs.slice(crumbs.length - (max - 1))] : crumbs;
 
@@ -130,7 +99,6 @@ export default class AufbauCrumbs extends AufbauElement {
   sync () {
     if (this.internals) this.internals.ariaLabel = this.getAttr('label');
 
-    // authored crumbs: the last one is the current page, unless the author said otherwise
     if (this.getAttr('path') != null) return;
     const crumbs = [...this.children];
     crumbs.forEach((crumb, index) => {

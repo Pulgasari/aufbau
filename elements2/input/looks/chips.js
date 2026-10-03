@@ -1,13 +1,8 @@
-// look="chips": any number of typed values (`multiple`), each a chip. enter or a
-// comma adds what was typed, backspace in the empty field takes the last one back
-// parts: box, icon, chip, label, remove, input
-
 import { html }        from '../../lib/html.js';
 import { FRAME, icon } from './parts/field.js';
 
 const inputOf = host => host.root.querySelector('[part~="input"]');
 
-// an added or removed chip rebuilds the markup, the new field takes the focus back
 const refocus = host => queueMicrotask(() => inputOf(host)?.focus());
 
 export default {

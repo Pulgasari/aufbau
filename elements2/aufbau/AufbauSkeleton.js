@@ -1,15 +1,3 @@
-// <aufbau-skeleton>
-// a standalone placeholder, for content an app is still fetching. it is only
-// the core skeleton, permanently on: the host paints the lines, nothing is rendered.
-//
-//   <aufbau-skeleton lines="3"></aufbau-skeleton>                text block
-//   <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>   avatar, cover
-//   <aufbau-skeleton shape="rect" size="100% 12rem"></aufbau-skeleton>  image, card
-//
-// any other aufbau element takes the `skeleton` attribute for the same look in
-// its own place, e.g. <aufbau-item skeleton>. purely decorative, hidden from
-// assistive tech; mark the region that is loading with aria-busy instead.
-
 import { AufbauElement } from '../base/index.js';
 
 export default class AufbauSkeleton extends AufbauElement {
@@ -31,7 +19,6 @@ export default class AufbauSkeleton extends AufbauElement {
     &[shape="circle"] { display: inline-block; }
   }`;
 
-  // text: lines of the given height. rect and circle: one solid block of `size`
   static skeleton () {
     const { gap, line, lines, shape, size } = this.getAttr();
     const [width, height = width] = String(size ?? '').split(/\s+/).filter(Boolean);

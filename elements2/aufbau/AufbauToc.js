@@ -1,10 +1,3 @@
-// <aufbau-toc>
-// table of contents for the headings inside `target`. the host is the
-// navigation landmark, its children are the visible label and one list.
-// every entry carries its heading level as aria-level, which is also the
-// styling hook for indentation. the entry of the heading currently read is
-// marked with aria-current="location".
-
 import { AufbauElement } from '../base/index.js';
 import { html }          from '../lib/html.js';
 
@@ -53,7 +46,6 @@ export default class AufbauToc extends AufbauElement {
     if (name === 'target' || name === 'selector') this.watch();
   }
 
-  /** re-collects whenever headings appear or disappear inside the target */
   watch () {
     this._stopWatching?.();
     this._stopWatching = null;
@@ -61,7 +53,6 @@ export default class AufbauToc extends AufbauElement {
     const container = this.container;
     if (!container) return;
 
-    // the observer reports every heading on its own, a burst collapses into one rebuild
     const rescan = () => {
       if (this._rescanQueued) return;
       this._rescanQueued = true;
@@ -76,7 +67,6 @@ export default class AufbauToc extends AufbauElement {
     }));
   }
 
-  /** headings need stable, unique ids to be linkable, so they get one if missing */
   collect () {
     const container = this.container;
     if (!container) return [];
@@ -120,9 +110,6 @@ export default class AufbauToc extends AufbauElement {
     if (this.internals) this.internals.ariaLabel = this.getAttr('label');
   }
 
-  // marks the entry of the topmost heading in view. headings that leave keep
-  // their mark until another one arrives, so scrolling through a long section
-  // does not leave the list without a current entry
   spy () {
     this._stopSpy?.();
 

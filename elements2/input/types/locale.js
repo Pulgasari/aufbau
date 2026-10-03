@@ -1,5 +1,3 @@
-// a locale: 'de-AT', named 'Deutsch (Österreich)'. `locales` limits the list
-
 import { byLabel, displayNames, enabled, listOf, listType, nameOf } from './list.js';
 
 const regionOf = tag => { try { return new Intl.Locale(tag).region ?? null; } catch { return null; } };

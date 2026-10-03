@@ -1,7 +1,3 @@
-// @aufbau/elements2/base/AufbauConfig.js
-// <aufbau-config>
-// central store for global configuration values, read via AufbauCore#getConfig()
-
 // :::::: IMPORTS
 
 import { CanonicalMap } from '@pulgasari/canonicalmap';
@@ -25,7 +21,6 @@ const sources      = new Map; // one source map per <aufbau-config> element, mer
 const newSource    = ()      => new CanonicalMap;
 const toValue      = (value) => value == null ? null : String(value);
 
-// { code: { theme: 'nord' } } -> 'code-theme'. the store normalizes each path itself
 function flatten (input, prefix = '', out = newSource()) {
   for (const [key, value] of Object.entries(input ?? {})) {
     const path = prefix ? `${prefix}-${key}` : key;
@@ -60,7 +55,7 @@ function diff (next) {
   return changed;
 }
 
-/** recomputes the merged store, emits only on real changes */
+// recomputes the merged store, emits only on real changes
 export function commitConfig () {
   const next    = mergeSources();
   const changed = diff(next);
@@ -82,29 +77,12 @@ const canonicalKey   = (key)      => AufbauConfigStore.key(key);
 const onConfigChange = (listener) => onEvent (window, CONFIG_EVENT, listener);
 const setConfig      = (a,b,c)    => isString(a) ? setConfigValue(a,b,c) : setConfigObject(a,b);
 
-/** key accepts any case form, 'codeTheme' and 'code-theme' resolve alike */
 export function getConfig (key, fallback) {
   const found = AufbauConfigStore.get(key);
   return found === undefined ? fallback : found;
 }
 
-/*
-export function setConfig (keyOrMap, valueOrOptions, maybeOptions) {
-  const isKey   = isString(keyOrMap);
-  const options = (isKey ? maybeOptions : valueOrOptions) ?? {};
-  const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
-  const entries = sources.get(owner) ?? newSource();
-  sources.set(owner, entries);
-
-  isKey ? entries.set(keyOrMap, toValue(valueOrOptions))
-        : entries.merge(flatten(keyOrMap));
-
-  commitConfig();
-  return AufbauConfigStore;
-}
-*/
-
-/** Internal helper to resolve target source storage */
+// Internal helper to resolve target source storage
 function getSource (options = {}) {
   const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
   const entries = sources.get(owner) ?? newSource();
@@ -112,24 +90,20 @@ function getSource (options = {}) {
   return entries;
 }
 
-/** Set a single configuration entry */
+// Set a single configuration entry
 function setConfigValue (key, value, options) {
   getSource(options).set(key, toValue(value));
   commitConfig();
   return AufbauConfigStore;
 }
 
-/** Merge an object of configuration entries */
+// Merge an object of configuration entries
 function setConfigObject (map, options) {
   getSource(options).merge(flatten(map));
   commitConfig();
   return AufbauConfigStore;
 }
 
-/**
- * candidate config keys for an element attribute.
- * <aufbau-code theme> -> ['code-theme', 'aufbau-code-theme']
- */
 export function configKeys (tag, name) {
   const attr = toKebabCase(name);
   if (!tag) return [attr];
@@ -139,7 +113,6 @@ export function configKeys (tag, name) {
   return [`${short}-${attr}`, `${full}-${attr}`];
 }
 
-/** first hit wins. keys: true (auto namespace) | string | string[] */
 export function resolveConfig (tag, name, keys = true) {
   const candidates =
       keys === true ? configKeys(tag, name)
@@ -149,8 +122,6 @@ export function resolveConfig (tag, name, keys = true) {
   for (const key of candidates) if (AufbauConfigStore.has(key)) return AufbauConfigStore.get(key);
   return undefined;
 }
-
-
 
 // :::::: ELEMENT ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -174,7 +145,6 @@ export class AufbauConfig extends HTMLElement {
     // 1. remote defaults, lowest precedence
     if (this._remote) entries.merge(this._remote);
 
-    // 2. inline json body: <aufbau-config>{"code":{"theme":"nord"}}</aufbau-config>
     const body   = this.textContent.trim();
     const parsed = body ? toJson(body, null) : null;
 

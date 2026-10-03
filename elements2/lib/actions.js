@@ -1,13 +1,3 @@
-// @aufbau/elements2/lib/actions.js
-// copy / paste / clear / reveal buttons for text holding elements (<aufbau-code>,
-// <aufbau-writer>, the field look of the input-* elements).
-//
-// the host picks the set with an `actions` token list and implements nothing
-// but where the text lives: actionTarget() returns the editable node. edits go
-// through execCommand on purpose, deprecated or not it is the only way that
-// keeps the native undo stack and fires a real input event, so the host's own
-// input handling picks the change up as if it was typed.
-
 import { html } from './html.js';
 
 export const ACTIONS = ['copy', 'paste', 'clear', 'reveal'];
@@ -22,7 +12,6 @@ const ICONS = {
   veil   : 'lucide:eye-off',
 };
 
-/** 'copy paste' -> ['copy', 'paste'], unknown tokens dropped, order kept canonical */
 export const parseActions = (tokens) => {
   const wanted = new Set(String(tokens ?? '').split(/[\s,]+/));
   return ACTIONS.filter(action => wanted.has(action));
@@ -34,7 +23,6 @@ export const actionButtons = (actions) => html`${actions.map(action => html`
   </button>
 `)}`;
 
-// brief confirmation on the button itself, then back to its own icon
 const flash = (button, ok) => {
   const icon = button.querySelector('svg-icon');
   if (!icon) return;
@@ -43,7 +31,6 @@ const flash = (button, ok) => {
   button._flash = setTimeout(() => icon.setAttribute('icon', ICONS[button.dataset.action]), 1500);
 };
 
-// the whole content of a textarea/input or a contenteditable node
 const selectAll = (node) => {
   if ('select' in node) return node.select();
   const range = document.createRange();
@@ -53,7 +40,6 @@ const selectAll = (node) => {
   selection.addRange(range);
 };
 
-// where execCommand is gone: same edit by hand, plus the input event it would have fired
 const fallback = (node, text) => {
   if ('setRangeText' in node) node.setRangeText(text, node.selectionStart, node.selectionEnd, 'end');
   else {
@@ -65,8 +51,6 @@ const fallback = (node, text) => {
   node.dispatchEvent(new Event('input', { bubbles: true }));
 };
 
-// focus is kept in the field while a button is pressed, see bindActions. for a
-// contenteditable without a caret inside, the text goes to the end
 const insert = (node, text) => {
   node.focus();
 
@@ -116,13 +100,7 @@ export const runAction = {
   },
 };
 
-/**
- * wires the buttons of a host. the host provides:
- *   actionText ()    the text copy puts on the clipboard
- *   actionTarget ()  the editable node paste and clear work on, null when read only
- */
 export function bindActions (host, on = (...args) => host.on(...args)) {
-  // pressing a button must not steal focus, the caret position is where paste lands
   on('pointerdown', '[data-action]', (event) => event.preventDefault());
   on('click',       '[data-action]', (event, button) => runAction[button.dataset.action]?.(host, button));
 }

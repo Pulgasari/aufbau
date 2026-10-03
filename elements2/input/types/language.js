@@ -1,6 +1,3 @@
-// a language as bcp 47 tag: 'de', 'pt-BR'. named in the page language and in
-// its own (native="false" drops that). `languages` limits the list
-
 import { byLabel, displayNames, enabled, listOf, listType, nameOf } from './list.js';
 
 export default listType({

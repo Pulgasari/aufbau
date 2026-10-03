@@ -1,6 +1,3 @@
-// an amount with a unit: '2s', '150ms'. the axis is the bare amount, the unit
-// of the previous value is kept while it moves
-
 import text from './text.js';
 
 const PATTERN = /^\s*(-?\d*\.?\d+)\s*([a-z]*)\s*$/i;

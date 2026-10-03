@@ -1,24 +1,3 @@
-// <embed-bandcamp>
-// a bandcamp release or track behind a click. bandcamp embeds by a numeric id
-// that the pages do not show in their url: take it from bandcamp's own embed
-// code (share / embed). the whole iframe snippet, its src or the bare id work.
-//
-//   <embed-bandcamp src="3119776030"></embed-bandcamp>
-//   <embed-bandcamp src="https://bandcamp.com/EmbeddedPlayer/album=3119776030/…" look="slim"></embed-bandcamp>
-//   <embed-bandcamp src="1234567890" type="track" look="wide"></embed-bandcamp>
-//
-// looks, as bandcamp's embed dialog offers them:
-//   slim            one line, with the artwork              42px
-//   slim-plain      one line, without the artwork           42px
-//   standard        artwork, player, tracklist              350 × 522px (default)
-//   standard-short  artwork and player, no tracklist        350 × 470px
-//   artwork         the artwork alone, playable             350 × 350px
-//   wide            player with a small artwork             120px
-//
-// the colors follow the palette: bgcol from --color-bg, linkcol from
-// --color-ink, both as hex without #, `bgcol` and `linkcol` override them.
-// an album page url cannot be embedded, the placeholder then links to it.
-
 import { EmbedComponent } from '../base/EmbedComponent.js';
 
 const PLAYER = 'https://bandcamp.com/EmbeddedPlayer/';
@@ -32,10 +11,8 @@ export const LOOKS = {
   wide             : { height: '120px', size: 'large', extra: { artwork: 'small', tracklist: 'false' } },
 };
 
-// a track has no tracklist, its standard look is the short one
 const lookOf = (look, type) => type === 'track' && look === 'standard' ? LOOKS['standard-short'] : LOOKS[look] ?? LOOKS.standard;
 
-/** { type, id } from an iframe snippet, a player url or a bare id. null for anything else */
 export function parseBandcamp (src, type = 'release') {
   if (/^\d+$/.test(src)) return { id: src, type };
 
@@ -46,8 +23,6 @@ export function parseBandcamp (src, type = 'release') {
   return id ? { id, type: key === 'album' ? 'release' : 'track' } : null;
 }
 
-// a css color as 'rrggbb', through a pixel: computed styles keep oklch() and
-// light-dark() as they are, a canvas always answers in srgb
 function hexOf (element, color) {
   const probe = document.createElement('span');
   probe.hidden      = true;
@@ -94,7 +69,6 @@ export class EmbedBandcamp extends EmbedComponent {
     return PLAYER + Object.entries(settings).map(([key, value]) => `${key}=${value}/`).join('');
   }
 
-  // the look's size for a player, the element's default for the link to a page
   sizes () {
     const { look, src, type } = this.getAttr();
     const parsed = parseBandcamp(src?.trim() ?? '', type);

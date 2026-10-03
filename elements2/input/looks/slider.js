@@ -1,16 +1,7 @@
-// look="slider": a value on an axis, two with `range`. every axis type (number,
-// date, time, color, …) is projected onto one numeric track.
-// parts: box, track (hue for a color), fill, thumb, input, output, unit
-//
-// track, fill and thumbs are drawn, transparent native range inputs lie on top:
-// keyboard, touch and the accessible slider stay native, and the thumb can be a
-// part, which the pseudo element of a native thumb cannot.
-
 import { attrs, html } from '../../lib/html.js';
 
 const percent = (number, [min, max]) => ((number - min) / ((max - min) || 1)) * 100;
 
-/** the positions of the parts on the track, an empty end sits on its bound */
 function positionsOf (host) {
   const [min, max] = host.bounds;
   return host.values.map((raw, index) => raw === ''
@@ -47,7 +38,6 @@ export default {
       &[part~="hue"]::before { background: linear-gradient(to right in hsl longer hue, red, red); }
     }
 
-    /* positions run from half a thumb to the other half, like the native thumbs they cover */
     [part~="fill"] {
       background         : var(--color-ink, AccentColor);
       block-size         : var(--slider-track);
@@ -85,7 +75,6 @@ export default {
       &::-moz-range-thumb     { block-size: var(--slider-thumb); border: 0; inline-size: var(--slider-thumb); }
     }
 
-    /* two inputs on one track: only their thumbs take the pointer, so both stay reachable */
     :host([range]) [part~="input"] {
       pointer-events: none;
 

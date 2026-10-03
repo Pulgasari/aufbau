@@ -1,19 +1,8 @@
-// <aufbau-index>
-// layout container for a run of items: grid, list, gallery rail or masonry.
-// pure layout, it renders nothing and the children stay as authored. no shadow
-// root on purpose: the children ARE the content, page css styles them directly.
-//
-// render skipping: <aufbau-item> uses content-visibility: auto, so off screen
-// items are neither laid out nor painted. a skipped item needs a stand-in block
-// size, see ESTIMATE below and the notes at the end of the file.
-
 import { AufbauElement }           from '../base/index.js';
 import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 const parsePx = value => { const number = parseFloat(value); return Number.isFinite(number) ? number : null; };
 
-// attributes that change the item geometry. the learned estimate and the sizes
-// the browser remembered per item belong to the old layout once one of them changes
 const RELAYOUT = new Set(['item-look', 'item-shape', 'item-size', 'viewmode']);
 
 export default class AufbauIndex extends AufbauElement {
@@ -21,17 +10,16 @@ export default class AufbauIndex extends AufbauElement {
 
   static attr = {
     gap               : { type: String, var: true },   // -> --aufbau-gap
-    itemIntrinsicSize : String,   // stand-in block size for never rendered items. unset = learned from the rendered ones
+    itemIntrinsicSize : String,
     itemLook          : String,   // shorthand: "180px rounded"
     itemShape         : String,   // default shape for items without their own
-    itemSize          : String,   // min item size, e.g. "180px" — grid/gallery/masonry
+    itemSize          : String,
     itemSizeMax       : String,   // upper bound for the resize (px)
-    itemSizeMin       : String,   // with item-size-max, enables two-finger resize (px)
+    itemSizeMin       : String,
     viewmode          : { type: String, default: 'grid', values: ['grid', 'list', 'gallery', 'masonry'] },
   };
 
   static styles = `aufbau-index {
-    /* grid is the default, so a bare <aufbau-index> already lays out */
     display               : grid;
     gap                   : var(--aufbau-gap, 1rem);
     grid-template-columns : repeat(auto-fill, minmax(var(--aufbau-item-size, 200px), 1fr));
@@ -65,15 +53,12 @@ export default class AufbauIndex extends AufbauElement {
       }
     }
 
-    /* an index level default shape reaches its item children */
     &:is([item-shape="circle"], [item-shape="square"], [item-look~="circle"], [item-look~="square"]) > aufbau-item {
       aspect-ratio: 1 / 1;
     }
 
-    /* render skipping off for every item, e.g. when items draw outside their box */
     &[eager] aufbau-item { content-visibility: visible; }
 
-    /* one frame without auto: the browser drops the sizes it remembered for the old layout */
     &:state(relayout) aufbau-item { contain-intrinsic-block-size: var(--aufbau-item-intrinsic-size, var(--aufbau-item-size, 200px)); }
   }`;
 
@@ -87,7 +72,6 @@ export default class AufbauIndex extends AufbauElement {
   onMount () {
     this.syncResize();
 
-    // capture: the event does not bubble, capturing still sees it on the way down
     this.on('contentvisibilityautostatechange', (event) => {
       if (!event.skipped) this.sample(event.target);
     }, { capture: true });
@@ -105,11 +89,9 @@ export default class AufbauIndex extends AufbauElement {
 
   get learns () { return !this.getAttr('itemIntrinsicSize'); }
 
-  // every item that turns visible adds its real block size to a running mean.
-  // measured in the next frame, so a burst of items costs one layout read
   sample (item) {
     if (!this.learns || item.localName !== 'aufbau-item' || item.hasAttribute('intrinsic-size')) return;
-    if (item.parentElement?.closest('aufbau-index') !== this) return;   // items of a nested index are its own business
+    if (item.parentElement?.closest('aufbau-index') !== this) return;
 
     (this._pending ??= new Set).add(item);
     if (this._frame) return;
@@ -141,7 +123,6 @@ export default class AufbauIndex extends AufbauElement {
     this._estimate = null;
     if (this.learns) this.setVar('item-intrinsic-size', null);
 
-    // two frames: the style change has to reach resize observer timing once
     this.states.add('relayout');
     requestAnimationFrame(() => requestAnimationFrame(() => this.states.delete('relayout')));
   }
@@ -189,7 +170,6 @@ export default class AufbauIndex extends AufbauElement {
       'item-size'  : size,
     });
 
-    // a manual value replaces the learned one, clearing it hands back to learning
     if (itemIntrinsicSize) this.setVar('item-intrinsic-size', itemIntrinsicSize);
     else if (this._estimate == null) this.setVar('item-intrinsic-size', null);
   }
@@ -197,33 +177,3 @@ export default class AufbauIndex extends AufbauElement {
 
 AufbauIndex.init();
 
-/*
-
--- render skipping and intrinsic size
-content-visibility: auto skips layout and paint of off screen items. a skipped
-item is size contained, so it needs a stand-in block size, otherwise it
-collapses to 0 and the scrollbar jumps whenever items come into view.
-
-contain-intrinsic-block-size: auto <estimate>
-  `auto` makes the browser remember the real size of every item it has rendered
-  once and use that while the item is skipped. the estimate therefore only
-  stands in for items that were NEVER rendered. that is what makes variable
-  heights (list rows, masonry) workable without measuring every item.
-
-where the estimate comes from, first match wins:
-  1. `intrinsic-size` on the item                one item, set on itself
-  2. `item-intrinsic-size` on the index          every item, manual
-  3. learned                                     mean block size of the items rendered so far
-  4. --aufbau-item-size                          grid tiles are roughly that tall before anything is known
-
-square items (shape circle/square) need none of it: aspect-ratio derives the
-block size from the inline size the grid track already gives them.
-
--- relayout
-a viewmode, size or shape change invalidates both the learned mean and the
-sizes the browser remembered per item. the remembered ones are dropped by
-removing `auto` for one frame (the :state(relayout) rule), the spec clears a
-remembered size as soon as an element is seen without `auto` at resize
-observer timing.
-
-*/

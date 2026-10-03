@@ -1,28 +1,7 @@
-// <app-view>
-// one screen of an app. of the views that share a parent one is active, the
-// others are inert and not rendered (content-visibility: hidden): their dom,
-// form values and scroll position stay, showing them again costs nothing.
-//
-//   <app-view name="library" route="/" active>…</app-view>
-//   <app-view name="reader" route="/reader" transition-on="slide" transition-off="fade">…</app-view>
-//   <app-view name="settings" lazy><template>…</template></app-view>
-//
-// activate() switches to it inside a view transition, so does setting `active`
-// from outside. transition-on / transition-off name a one-way keyframe of
-// aufbau's animate/keyframes.css (fade, glide, slide, zoom, pop, focus, reveal,
-// iris, tilt-in, rotate-in) or none,
-// the app-root's `transition` is the default for both. `lazy` renders the
-// <template> child on the first activation. `route` puts the view into the
-// address, see <app-root routing>.
-//
-// events: activate and deactivate on the views, navigate { from, to } on the root.
-
 import { AufbauElement } from '../base/index.js';
-
 
 const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-/** the views a view is exclusive with: the app-views of the same parent */
 const siblingsOf = view => [...(view.parentElement?.children ?? [])].filter(element => element.localName === view.localName);
 
 export class AppView extends AufbauElement {
@@ -40,8 +19,6 @@ export class AppView extends AufbauElement {
     return `app-view {
       display: block;
 
-      /* out of the flow as well: in a flex or grid layout a hidden view would
-         still take its share of the space */
       &:not([active]) {
         content-visibility : hidden;
         position           : absolute;
@@ -53,10 +30,9 @@ export class AppView extends AufbauElement {
   get active () { return this.hasAttribute('active'); }
   set active (active) { if (active) this.activate(); else this.toggleAttribute('active', false); }
 
-  /** the app-root this view belongs to, null outside of one */
+  // the app-root this view belongs to, null outside of one
   get root () { return this.closest('app-root'); }
 
-  // a view added after its root (a framework rendering them one by one) follows the address itself
   onMount () {
     this.inert = !this.active;
     if (this.active) this.fill();
@@ -65,8 +41,6 @@ export class AppView extends AufbauElement {
     if (path != null && !this.active && this.getAttr('route') === path) this.activate({ history: false, transition: false });
   }
 
-  // an `active` written from outside (markup, a framework) switches like activate(): the
-  // attribute is taken back at once and set again inside the transition
   onAttributeChange (name, oldValue, newValue) {
     if (name !== 'active' || this._switching) return;
 
@@ -78,7 +52,6 @@ export class AppView extends AufbauElement {
     this.activate();
   }
 
-  /** shows this view, hides its siblings. `history: false` leaves the address as it is */
   activate ({ history = true, transition = true } = {}) {
     const from = siblingsOf(this).find(view => view !== this && view.active) ?? null;
     if (this.active && !from) return Promise.resolve();
@@ -125,9 +98,6 @@ export class AppView extends AufbauElement {
 }
 
 // :::::: TRANSITION ::::::::::::::::::::::::::::::::::::::::::::
-// the leaving view is captured as app-view-out, the coming one as app-view-in.
-// the keyframe names ride on custom properties of the root element, which the
-// ::view-transition pseudo elements inherit
 
 const OUT = 'app-view-out';
 const IN  = 'app-view-in';
@@ -163,7 +133,6 @@ function runTransition ({ from, root, swap, to }) {
   });
 }
 
-/** the view transition styles, global: the pseudo elements hang off the document */
 export const transitionStyles = `
   html:active-view-transition-type(app-view) {
     &::view-transition-old(root),
@@ -172,9 +141,6 @@ export const transitionStyles = `
     &::view-transition-group(${IN}),
     &::view-transition-group(${OUT}) { animation-duration: var(--app-view-duration, 0.25s); }
 
-    /* --animate-offset is registered without inheritance, the keyframes' fallback never
-       reaches the pseudo elements: the coming view slides in from the end, the leaving one
-       out to the start, a glide only a short way */
     &::view-transition-new(${IN}) {
       --animate-offset : if(style(--app-view-on: glide): 2rem 0; else: 100% 0);
       animation        : var(--app-view-duration, 0.25s) ease both;

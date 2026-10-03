@@ -1,9 +1,3 @@
-// @aufbau/elements2/data/emoji.js
-// the emoji of a single code point with emoji presentation, in code point order,
-// each with its unicode name. generated once from the unicode data of node (the
-// set) and python's unicodedata 14.0 (the names). sequences (zwj, skin tones,
-// flags, keycaps) are not in here.
-
 const TEXT = `
 ⌚ watch
 ⌛ hourglass

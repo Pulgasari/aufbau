@@ -1,7 +1,3 @@
-// an icon, as an iconify id: 'lucide:star'. searched over the iconify api,
-// nothing shows before something is typed. `prefixes` limits the collections
-// (space separated), `limit` caps the hits, 64 by default
-
 import { listType, withCurrent } from './list.js';
 
 const API = 'https://api.iconify.design/search';

@@ -1,10 +1,3 @@
-// <embed-youtube>
-// a youtube video behind a click, by url or by id. `start` in seconds or as
-// '1m30s', a url's own t= wins.
-//
-//   <embed-youtube src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></embed-youtube>
-//   <embed-youtube src="dQw4w9WgXcQ" start="1m30s"></embed-youtube>
-
 import { EmbedComponent, urlOf } from '../base/EmbedComponent.js';
 
 export class EmbedYoutube extends EmbedComponent {

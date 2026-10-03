@@ -1,7 +1,3 @@
-// @aufbau/elements2/data/locales.js
-// a working set of language and region pairs as bcp 47 tags. Intl cannot list
-// the locales it knows, so this is picked by hand: the widely used ones
-
 export const LOCALES = `
   ar-EG ar-SA bg-BG bn-BD cs-CZ da-DK de-AT de-CH de-DE el-GR en-AU en-CA en-GB
   en-IE en-IN en-NZ en-US en-ZA es-AR es-ES es-MX es-US et-EE fa-IR fi-FI fr-BE

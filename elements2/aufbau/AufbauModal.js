@@ -1,39 +1,18 @@
-// <aufbau-modal>
-// a modal dialog on a native <dialog>: top layer, inert page behind it, focus
-// kept inside and restored afterwards all come from showModal().
-//
-// the dialog lives in the shadow root, the children stay the author's and are
-// projected into it. nothing is moved, so a framework can keep rendering them.
-//
-//   <aufbau-modal heading="Löschen?">       shadow: <dialog part="dialog">
-//     …children…                                     <header part="header">
-//   </aufbau-modal>                                    <strong part="heading"> <button part="close">
-//                                                    <slot>
-//
-// `open` mirrors the dialog in both directions. show() resolves with the return
-// value once the modal is closed again. a <form method="dialog"> among the
-// children closes it with the submitter's value, like it would natively.
-// parts: dialog, header, heading, close. state: :state(open)
-
 import { AufbauElement }   from '../base/index.js';
 import { html }            from '../lib/html.js';
 import { adoptBaseStyles } from '../lib/styles.js';
 
-// page scroll lock. document level on purpose, the shadow root cannot reach :root
 const PAGE_STYLES = `:root:has(aufbau-modal:state(open)) { overflow: hidden; }`;
 
 export default class AufbauModal extends AufbauElement {
   static shadow = true;
 
   static attr = {
-    // close button, escape and a click on the backdrop close the modal
     dismissible : { type: Boolean, default: true },
     heading     : String,
     open        : Boolean,
   };
 
-  // opening and closing fade through @starting-style, display and overlay are
-  // transitioned discretely so the exit animation gets to run
   static styles = `
     :host { display: contents; }
 
@@ -99,13 +78,8 @@ export default class AufbauModal extends AufbauElement {
     }
   `;
 
-
   // :::::: IMPERATIVE API ::::::::::::::::::::::::::::::::::::::
 
-  /**
-   * a one-off confirmation. resolves true for the confirming button, false for
-   * everything else (cancel, escape, backdrop). the modal removes itself.
-   */
   static async confirm (message, { cancel = 'Cancel', confirm = 'OK', heading } = {}) {
     const modal  = document.createElement('aufbau-modal');
     const text   = Object.assign(document.createElement('p'), { textContent: message });
@@ -125,7 +99,6 @@ export default class AufbauModal extends AufbauElement {
   get dialog () { return this.$('dialog'); }
   get isOpen () { return Boolean(this.dialog?.open); }
 
-  /** opens the modal, resolves with the dialog's return value once it closes */
   show () {
     this._closed ??= new Promise(resolve => { this._resolve = resolve; });
     this.setAttr({ open: true });
@@ -146,20 +119,16 @@ export default class AufbauModal extends AufbauElement {
 
     this.on('click', '[part~="close"]', () => this.close());
 
-    // a click whose target is the dialog itself landed on the backdrop, content always sits in children
     this.on(this.root, 'click', (event) => {
       if (event.target === this.dialog && this.getAttr('dismissible')) this.close();
     });
 
-    // method="dialog" only closes a dialog that is a dom ancestor of the form.
-    // the children are projected, not contained, so the host does it instead
     this.on('submit', (event) => {
       if (event.target.getAttribute('method')?.toLowerCase() !== 'dialog') return;
       event.preventDefault();
       this.close(event.submitter?.value ?? '');
     });
 
-    // escape arrives as a cancel, a non dismissible modal refuses it
     this.on(this.root, 'cancel', (event) => {
       if (!this.getAttr('dismissible')) event.preventDefault();
     }, { capture: true });
@@ -174,7 +143,6 @@ export default class AufbauModal extends AufbauElement {
     }, { capture: true });
   }
 
-  // structure only, the dialog must survive open/close, so nothing here depends on `open`
   render () {
     return html`
       <dialog part="dialog">

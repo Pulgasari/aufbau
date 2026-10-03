@@ -1,7 +1,3 @@
-// <aufbau-upload>
-// file intake. `accept` rather than `mimetype`, because the native attribute is
-// a superset: it takes mimetypes ("image/*") as well as extensions (".pdf").
-
 import { AufbauControl }  from '../base/index.js';
 import { attrs, html }    from '../lib/html.js';
 
@@ -35,10 +31,6 @@ export default class AufbauUpload extends AufbauControl {
     text      : 'drop files here or click to browse',
   };
 
-  // the ui lives in the shadow root: the hidden native file input, a <button> as
-  // drop zone and file dialog trigger, and the list of picked files. children are
-  // the zone's text and are projected. parts: zone, icon, text, list, file, name,
-  // size, remove. state: :state(dragging), :state(filled)
   static shadow = true;
 
   static styles = `
@@ -116,14 +108,12 @@ export default class AufbauUpload extends AufbauControl {
     }
   `;
 
-
-  // reads as a file input: getFormValues() takes `files`, one or all of them
   get multiple () { return this.getAttr('multiple'); }
   get type     () { return 'file'; }
 
   get files () { return this._files ??= []; }
 
-  /** a file control submits FormData, one entry per file */
+  // a file control submits FormData, one entry per file
   get formValue () {
     const { name } = this.getAttr();
     if (!this.files.length || !name) return null;
@@ -146,7 +136,6 @@ export default class AufbauUpload extends AufbauControl {
       this.states.toggle('dragging', true);
     });
 
-    // dragleave also fires when the pointer moves onto a child, only leaving the host counts
     this.on('dragleave', (event) => {
       if (!this.contains(event.relatedTarget)) this.states.toggle('dragging', false);
     });
@@ -189,7 +178,6 @@ export default class AufbauUpload extends AufbauControl {
 
   clear () { this._files = []; this.commitFiles(); return this; }
 
-  /** files are not an attribute, so the value path is form state + events only */
   commitFiles () {
     this.invalidate().update();
     this.notify();

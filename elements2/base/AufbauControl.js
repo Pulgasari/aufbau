@@ -1,13 +1,3 @@
-// @aufbau/elements2/base/AufbauControl.js
-// shared base for every element that HOLDS A VALUE.
-//
-// it makes the controls real form participants: they show up in FormData, they
-// reset with the form, they match :invalid, and getFormValues() from
-// @domina/core reads them without any extra wiring.
-//
-// subclasses override render()/sync() as usual and call super.sync() so the
-// shared state (disabled, aria, form value, validity) is applied.
-
 import { AufbauCore }     from './AufbauCore.js';
 import { resolvePersist } from '../lib/persist.js';
 import { Logger }         from '@pulgasari/logger';
@@ -20,7 +10,6 @@ export class AufbauControl extends AufbauCore {
 
   static formAssociated = true;
 
-  // merged into every subclass schema, see attrOwners() in ./schema.js
   static attr = {
     disabled : Boolean,
     label    : String,
@@ -31,9 +20,6 @@ export class AufbauControl extends AufbauCore {
     value    : String,
   };
 
-  // structure shared by every control. colours, borders and radii belong to the
-  // skin. the :host rules are for controls with a shadow root, <aufbau-writer>
-  // has none and is named
   static styles = `
     [hidden] { display: none !important; }
 
@@ -49,7 +35,6 @@ export class AufbauControl extends AufbauCore {
     :host(:state(disabled)), aufbau-writer:state(disabled) { pointer-events: none; }
   `;
 
-  // attached up front, the form state is written from the first sync on
   static internals = true;
 
   connectedCallback () {
@@ -58,10 +43,6 @@ export class AufbauControl extends AufbauCore {
     super.connectedCallback();
   }
 
-  /**
-   * the authored markup state, kept for form.reset(). subclasses whose state is
-   * not in `value` override this and call super first.
-   */
   captureDefaults () {
     this._defaultValue ??= this.getAttribute('value') ?? '';
     return this;
@@ -79,17 +60,11 @@ export class AufbauControl extends AufbauCore {
 
   
 
-  /** what goes into FormData. null means the control submits nothing */
   get formValue () {
     const formatted = this.formatValue(this.value);
     return formatted === '' ? null : formatted;
   }
 
-  /**
-   * the single write path for a value: attribute -> form state -> events.
-   * everything that changes a value goes through here, never through setAttr
-   * directly, otherwise the form state silently drifts from the dom.
-   */
   commit (next, { notify = true } = {}) {
     const formatted = this.formatValue(next);
     const changed   = formatted !== (this.getAttribute('value') ?? '');
@@ -101,7 +76,6 @@ export class AufbauControl extends AufbauCore {
     return this;
   }
 
-  /** native-looking events, so listeners treat these like any other control */
   notify () {
     const value = this.value;
     this.emit('input',  { value });
@@ -111,9 +85,6 @@ export class AufbauControl extends AufbauCore {
 
   // :::::: FORM ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  // the surface of a native control, which form.elements consumers such as
-  // getFormValues() read. type is the attribute where a control has one,
-  // otherwise the tag; a subclass with native semantics overrides it
   get disabled () { return this.hasAttribute('disabled') || Boolean(this._formDisabled); }
   get name     () { return this.getAttribute('name') ?? ''; }
   get type     () { return this.getAttribute('type') ?? this.localName; }
@@ -135,16 +106,10 @@ export class AufbauControl extends AufbauCore {
 
   syncFormState () {
     this.internals?.setFormValue(this.formValue);
-    // the one point every write path passes: commit() as well as state that
-    // never touches value, like a checked state
     this.savePersisted();
     return this;
   }
 
-  /**
-   * subclasses extend this by overriding and calling super.validate() first,
-   * then narrowing with their own setValidity() call.
-   */
   validate () {
     const internals = this.internals; if (!internals) return this;
     const anchor    = this.focusTarget ?? this;
@@ -163,13 +128,6 @@ export class AufbauControl extends AufbauCore {
   formDisabledCallback     (disabled) { this._formDisabled = disabled; this.update(); }
 
   // :::::: PERSISTENCE :::::::::::::::::::::::::::::::::::::::::::
-  // opt in per control via the `persist` attribute:
-  // persist                  localStorage    key from name or id
-  // persist="session"        sessionStorage  key from name or id
-  // persist="theme"          localStorage    key "theme"
-  // persist="session:theme"  sessionStorage  key "theme"
-  // the attribute grammar is parsed in ./persist.js, which also owns the
-  // namespace, the quota handling and the private-mode fallback.
 
   get persistTarget () {
     if (!this.hasAttribute('persist')) return null;
@@ -184,13 +142,8 @@ export class AufbauControl extends AufbauCore {
     return target;
   }
 
-  /**
-   * what gets written. the raw attribute rather than formValue on purpose:
-   * an input with `multiple` returns a FormData from formValue.
-   */
   get persistedState () { return this.getAttribute('value') ?? ''; }
 
-  /** reuses the per element restore path the form api already goes through */
   restorePersisted (state) { this.formStateRestoreCallback(state); }
 
   readPersisted () {
@@ -209,9 +162,6 @@ export class AufbauControl extends AufbauCore {
     const state  = this.persistedState;
     if (state === this._persistedLast) return this;
 
-    // an empty control that was never stored has nothing worth writing. without
-    // this, merely putting `persist` on a control fills storage with "" on connect.
-    // clearing a control that *was* stored still persists, which is the point.
     if (state === '' && !target.store.hasSync(target.key)) return this;
 
     this._persistedLast = state;
@@ -221,7 +171,6 @@ export class AufbauControl extends AufbauCore {
 
   // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::
 
-  /** disabled by our own attribute OR by an ancestor <fieldset disabled> */
   get isDisabled () { return this.getAttr('disabled') || Boolean(this._formDisabled); }
 
   get focusTarget () { return this.$(FOCUSABLE); }
@@ -233,7 +182,6 @@ export class AufbauControl extends AufbauCore {
 
   blur () { (this.focusTarget ?? this).blur(); }
 
-  /** shared per-pass state. subclasses call this from their own sync() */
   sync () {
     const { label, readonly, required } = this.getAttr();
     const disabled  = this.isDisabled;
@@ -249,12 +197,9 @@ export class AufbauControl extends AufbauCore {
     this.states.toggle('disabled', disabled);
     this.states.toggle('readonly', readonly);
 
-    // a disabled control must drop out of the tab order entirely
     if (disabled) this.setAttribute('tabindex', '-1');
     else          this.removeAttribute('tabindex');
 
-    // only ever undo what WE disabled. an option that carries its own disabled
-    // attribute must survive the host being re-enabled
     for (const element of this.$$('button, input, select, textarea')) {
       if (disabled) {
         element.setAttribute('disabled', '');

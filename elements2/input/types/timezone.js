@@ -1,10 +1,8 @@
-// an iana time zone: 'Europe/Berlin', listed with its current offset. `zones` limits the list
-
 import { listOf, listType } from './list.js';
 
 const ZONES = Intl.supportedValuesOf?.('timeZone') ?? [];
 
-/** 'GMT+2' for a zone right now */
+// 'GMT+2' for a zone right now
 function offsetOf (zone, locale) {
   try {
     const parts = new Intl.DateTimeFormat(locale, { timeZone: zone, timeZoneName: 'shortOffset' }).formatToParts(new Date);

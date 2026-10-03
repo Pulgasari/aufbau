@@ -97,7 +97,6 @@ const TAGS = [
 
 const known = new Set(TAGS);
 
-// input-* elements that are more than a type have a module of their own, the others are all in ./input/tags.js
 const OWN_MODULE = new Set(['input-option']);
 
 const pascal = text => text.replace(/(?:^|-)(\w)/g, (match, letter) => letter.toUpperCase());
@@ -147,7 +146,6 @@ function autoloader ({ base, root = document } = {}) {
 
   scan(root.documentElement ?? root);
 
-  // only what got added is walked, never the whole document again
   const observer = new MutationObserver(records => {
     for (const record of records) record.addedNodes.forEach(scan);
   });
@@ -158,12 +156,6 @@ function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-// the base classes are NOT re-exported: a bare `import { autoloader }` would fetch and
-// evaluate AufbauCore, the config, the skin and their dependencies before the
-// first scan. the base classes and the config come from their subpaths:
-//   import { AufbauElement }        from '@aufbau/elements2/base/index.js';
-//   import { setConfig, getConfig } from '@aufbau/elements2/base/AufbauConfig.js';
-
 export {
   TAGS,
 
@@ -173,18 +165,3 @@ export {
   registerAll,
 };
 
-/* :::::: USAGE :::::::::::::::::::::::::::::::::::::::::::::::::
-
-// lazy, browser first
-import { autoloader } from '@aufbau/elements2';
-const stop = autoloader();
-
-// everything at once
-import { registerAll } from '@aufbau/elements2';
-await registerAll();
-
-// hand picked
-import '@aufbau/elements2/svg/flag.js';
-import '@aufbau/elements2/input/language.js';
-
-*/

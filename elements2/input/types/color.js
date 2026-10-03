@@ -1,6 +1,3 @@
-// a color as hex: '#3355ff'. on the axis as its hue: moving it keeps
-// saturation and lightness, so #3355ff stays a muted blue
-
 import text from './text.js';
 
 const HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;

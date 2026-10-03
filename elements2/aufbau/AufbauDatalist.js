@@ -1,18 +1,3 @@
-// <aufbau-datalist>
-// a data source for native list= autocompletion, fed by @aufbau/import.
-//
-// autonomous on purpose: the former <datalist is="aufbau-datalist"> is a
-// customized built-in, which safari never shipped. the host owns one real
-// <datalist> and hands its own id over to it, so <input list="…"> keeps
-// pointing at the same name:
-//
-//   <aufbau-datalist id="cities" src="/data/cities.json" key="name"></aufbau-datalist>
-//   <input list="cities">
-//
-// no shadow root here: list= resolves ids in the document, not in a shadow
-// tree. the author's <option> children are left alone and only read, the own
-// <datalist> is appended once and filled, never rendered over the children.
-
 import { AufbauElement }    from '../base/index.js';
 import { normalizeOptions } from '../lib/options.js';
 import { importFile } from '@aufbau/import';
@@ -31,7 +16,6 @@ export default class AufbauDatalist extends AufbauElement {
   onMount () {
     this._list ??= document.createElement('datalist');
 
-    // the id belongs to the inner datalist, two elements must not share it
     if (this.id) {
       this._list.id = this.id;
       this.removeAttribute('id');
@@ -46,7 +30,6 @@ export default class AufbauDatalist extends AufbauElement {
     if (src && src !== this._loadedSrc) {
       this._loadedSrc = src;
       try {
-        // @aufbau/import covers json, jsonc, json5, yaml, toml, csv and xml
         const items = normalizeOptions(await importFile(src), { key, labelKey });
         if (this._loadedSrc !== src) return this;   // superseded
         this._items = items;
@@ -61,7 +44,6 @@ export default class AufbauDatalist extends AufbauElement {
 
   render () { return null; }
 
-  // authored options first, then the loaded ones. rebuilt as nodes, the list is ours alone
   sync () {
     if (!this._list) return;
 

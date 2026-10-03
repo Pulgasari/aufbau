@@ -1,11 +1,3 @@
-// <aufbau-writer>
-// multiline text control. the counterpart to <aufbau-reader>.
-// the host is the field frame: the native <textarea>, then a footer with the
-// counter and the copy/paste/clear actions when either is enabled.
-//
-// `look` is reserved as the axis a richer editing mode would arrive on
-// (look="markdown"), the value api below stays the same either way.
-
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { AufbauControl } from '../base/index.js';
 import { dedent }        from '../lib/utils.js';
@@ -30,9 +22,6 @@ export default class AufbauWriter extends AufbauControl {
     spellcheck  : { type: Boolean, default: true },
   };
 
-  // :state(full) marks a counter that reached maxlength
-  // the children are the default value (static source), like the text of a
-  // <textarea>. they stay untouched, the output is a <div> in the light dom
   static source = true;
 
   static styles = `aufbau-writer {
@@ -94,7 +83,6 @@ export default class AufbauWriter extends AufbauControl {
   actionTarget () { return this.getAttr('readonly') ? null : this.field; }
 
   onMount () {
-    // the children are the starting value: <aufbau-writer>hello</aufbau-writer>
     if (!this.hasAttribute('value') && this.defaultValue) this.commit(this.defaultValue, { notify: false });
 
     this.on('input',  'textarea', (event, field) => { this.commit(field.value); this.grow(field); });
@@ -103,13 +91,11 @@ export default class AufbauWriter extends AufbauControl {
     bindActions(this);
   }
 
-  // like a <textarea>: the text content is the default value, the value attribute the current one
   captureDefaults () {
     this._defaultValue ??= dedent(this.sourceText) || (this.getAttribute('value') ?? '');
     return this;
   }
 
-  // new children are a new default. an untouched field follows it, an edited one keeps its text
   onSourceChange () {
     const previous = this._defaultValue;
     this._defaultValue = dedent(this.sourceText);
@@ -117,10 +103,6 @@ export default class AufbauWriter extends AufbauControl {
     else this.update();
   }
 
-  /**
-   * autogrow. measuring forces a layout, so it only runs when the text actually
-   * changed, not on every sync pass.
-   */
   grow (field = this.field) {
     if (!field || !this.getAttr('autogrow')) return this;
     if (field.value === this._grownFor) return this;
@@ -165,7 +147,6 @@ export default class AufbauWriter extends AufbauControl {
     const { maxlength, readonly } = this.getAttr();
     const value = this.getAttribute('value') ?? '';
 
-    // never write back into the field while the user is typing in it
     if (field !== document.activeElement) {
       setValue(field, value);
       this.grow(field);
@@ -173,7 +154,6 @@ export default class AufbauWriter extends AufbauControl {
 
     setAttr(field, { readonly });
 
-    // after super.sync(), which only handles the disabled host. read only keeps copy
     for (const button of this.$$('[data-action="paste"], [data-action="clear"]')) {
       button.disabled = this.isDisabled || readonly;
     }

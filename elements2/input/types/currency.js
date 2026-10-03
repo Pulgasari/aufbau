@@ -1,5 +1,3 @@
-// a currency as iso 4217 code: 'EUR'. `currencies` limits the list
-
 import { byLabel, displayNames, listOf, listType, nameOf } from './list.js';
 
 const CURRENCIES = Intl.supportedValuesOf?.('currency') ?? [];

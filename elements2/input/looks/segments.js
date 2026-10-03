@@ -1,6 +1,3 @@
-// look="segments": every option in one seamless row. one, or any number with `multiple`
-// parts: box, segment, icon, label
-
 import { groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
 
 export default {

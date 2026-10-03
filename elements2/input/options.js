@@ -1,15 +1,3 @@
-// @aufbau/elements2/input/options.js
-// where the options of an input-* element come from, in this order:
-//
-//   children   <input-option> (or <option>) inside the element
-//   src        a json file, loaded once per address
-//   list type  the entries of its type (language, emoji, …). built again when
-//              one of the type's attributes, the language or the query changes
-//
-// the query is what was typed into a search field. a list type that searches
-// (emoji, icon) gets it, the others ignore it. loading is async, `onChange`
-// repaints once something arrived.
-
 import { importFile }                    from '@aufbau/import';
 import { localeOf }                      from '../lib/locale.js';
 import { normalizeOptions, readOptions } from '../lib/options.js';
@@ -29,7 +17,6 @@ export class OptionSource {
     return [...children, ...this.fetched, ...this.listed];
   }
 
-  // starts whatever loading is due, cheap when nothing changed
   refresh () {
     this.refreshSrc();
     this.refreshList();
@@ -72,7 +59,6 @@ export class OptionSource {
       return;
     }
 
-    // everything the entries are made of. the same key, the same entries
     const locale = localeOf(host);
     const parts  = [host.typeName, locale, this.query];
     for (const name of type.attributes ?? []) parts.push(host.getAttribute(name));

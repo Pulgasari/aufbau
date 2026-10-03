@@ -1,7 +1,3 @@
-// <aufbau-toast>
-// the host is the toast. icon, heading, message and close button are direct
-// children, laid out by a grid on the host. notify() is the imperative entry.
-
 import { isPlainObject, isString } from '@pulgasari/is';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
@@ -19,10 +15,8 @@ const ICONS = {
 // shorthand keys of notify({ error: … }), first match wins
 const LEVELS = ['error', 'warning', 'warn', 'success', 'info'];
 
-// a swipe beyond this share of the toast width dismisses it, anything less snaps back
 const SWIPE_RATIO = 0.35;
 
-// real errors, DOMExceptions and error shaped objects ({ name, message } from an api)
 const isErrorLike = value =>
   value instanceof Error || (value != null && typeof value === 'object' && isString(value.message) && ('stack' in value || 'name' in value));
 
@@ -32,14 +26,6 @@ const messageOf = value =>
   : isErrorLike(value) ? value.message
   : String(value);
 
-/**
- * every accepted notify() input -> one flat options object.
- *   notify('saved')
- *   notify(error)                        type error, message from the error
- *   notify({ error: 'failed' })          level key: type + message in one
- *   notify({ error, heading: 'upload' })
- *   notify({ type, heading, message, duration, dismissible, icon })
- */
 export function toToastOptions (input, options = {}) {
   let result;
 
@@ -59,7 +45,6 @@ export function toToastOptions (input, options = {}) {
   return result;
 }
 
-// the stack is page level, the shadow root of a toast cannot style it
 const STACK_STYLES = `
   [data-aufbau-toasts] {
     background      : none;
@@ -88,8 +73,6 @@ export default class AufbauToast extends AufbauElement {
     type        : { default: 'info', values: ['error', 'info', 'success', 'warning'] },
   };
 
-  // the toast ui lives in the shadow root, children are the message and are
-  // projected, never re-parsed. parts: icon, heading, message, close
   static shadow = true;
 
   static styles = `
@@ -101,7 +84,6 @@ export default class AufbauToast extends AufbauElement {
       pointer-events        : auto;
     }
 
-    /* horizontal drags belong to the swipe, vertical ones still scroll the page */
     :host([dismissible]) { touch-action: pan-y; }
 
     [part~="icon"] { grid-row: span 2; line-height: 1.4; }
@@ -132,7 +114,6 @@ export default class AufbauToast extends AufbauElement {
 
   // :::::: IMPERATIVE API ::::::::::::::::::::::::::::::::::::::
 
-  /** the shared stack. a manual popover, so toasts sit in the top layer above dialogs */
   static get stack () {
     let stack = document.querySelector('[data-aufbau-toasts]');
     if (!stack) {
@@ -151,7 +132,6 @@ export default class AufbauToast extends AufbauElement {
     setAttr(toast, { dismissible, duration, heading: heading ?? title, icon, message, type });
     stack.append(toast);
 
-    // re-shown on every notify, the most recently shown top layer element is the topmost one
     if (stack.showPopover) {
       if (stack.matches(':popover-open')) stack.hidePopover();
       stack.showPopover();
@@ -169,10 +149,8 @@ export default class AufbauToast extends AufbauElement {
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
   onMount () {
-    // authored children are the message when no message attribute is given
     adoptBaseStyles('aufbau-toast-stack', STACK_STYLES);   // deduplicated by key
 
-    // the close part only, a button inside the message is the author's
     this.on('click', '[part~="close"]', () => this.dismiss());
 
     // hovering or focusing a toast holds its countdown
@@ -206,7 +184,6 @@ export default class AufbauToast extends AufbauElement {
 
   // :::::: DISMISS :::::::::::::::::::::::::::::::::::::::::::::
 
-  /** slides out towards `direction` (1 = inline end, -1 = inline start), then leaves the dom */
   dismiss (direction = 1) {
     if (this._dismissing) return this;
     this._dismissing = true;
@@ -226,7 +203,6 @@ export default class AufbauToast extends AufbauElement {
     return this;
   }
 
-  // touch and pen only. a mouse has the close button, and dragging would fight text selection
   onSwipe () {
     let origin = null;
     let offset = 0;
@@ -278,7 +254,6 @@ export default class AufbauToast extends AufbauElement {
     `;
   }
 
-  // errors interrupt, everything else waits for a pause in speech
   sync () {
     const role = this.getAttr('type') === 'error' ? 'alert' : 'status';
     if (this.internals) this.internals.role = role;

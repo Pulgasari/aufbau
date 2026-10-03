@@ -1,10 +1,3 @@
-// @aufbau/elements2/input/tags.js
-// every input-* element that is a type and nothing more. this one file defines
-// all of them: <input-number> is <input-value type="number">.
-//
-//   <input-value name="speed" type="number" look="slider"></input-value>
-//   <input-number name="count" look="stepper" min="0" max="10"></input-number>
-
 import { Input } from './Input.js';
 
 const PRESETS = {
@@ -36,7 +29,7 @@ const PRESETS = {
   'input-year'     : 'year',
 };
 
-/** the class of every tag defined here */
+// the class of every tag defined here
 export const ELEMENTS = { 'input-value': Input };
 
 for (const [tag, type] of Object.entries(PRESETS)) ELEMENTS[tag] = class extends Input { static type = type; };

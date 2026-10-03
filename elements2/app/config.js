@@ -1,33 +1,9 @@
-// <app-config>
-// the settings of an app as a form, rendered by @aufbau/gui from a spec. it is
-// content only, the frame is the app's: a view, an <app-area> (in an
-// <app-panel>) or an <aufbau-modal>.
-//
-//   const config = document.querySelector('app-config');
-//   config.spec   = { open: { type: 'enum', values: ['auto', 'single'], label: 'Open with' } };
-//   config.values = { open: 'auto' };
-//   config.controls = { enum: { look: 'segments' } };   // optional, before the spec
-//   config.addEventListener('config', event => save(event.detail.key, event.detail.values));
-//
-// spec and values are properties. a new spec rebuilds the form, new values
-// only reach the controls whose value differs: the form stays, focus and an
-// open picker with it. so values can follow the app's state while it is open.
-// events: config { key, values }. not `change`: that one already bubbles out of
-// every control inside.
-//
-// @aufbau/gui still renders the aufbau-input, -picker, -slider and -toggle of
-// @aufbau/elements, which are not part of this package: a page with
-// <app-config> loads those as well, until gui renders the input-* elements.
-
 import gui from '@aufbau/gui';
 
 import { AufbauElement } from '../base/index.js';
 
-
 export class AppConfig extends AufbauElement {
 
-  // @aufbau/gui renders <div><label><span>label</span><aufbau-*></label>…</div>:
-  // one field per line, the label beside its control while there is room
   static styles () {
     return `app-config {
       display: block;
@@ -53,7 +29,6 @@ export class AppConfig extends AufbauElement {
   get spec ()       { return this._spec ?? {}; }
   set spec (spec)   { this._spec = spec; this.build(); }
 
-  // how fields render, per type or key (@aufbau/gui's controls). set before the spec
   get controls ()         { return this._controls ?? null; }
   set controls (controls) { this._controls = controls; if (this._built) this.build(); }
 
@@ -62,7 +37,6 @@ export class AppConfig extends AufbauElement {
 
   onMount () { this.build(); }
 
-  // the form goes in as nodes of its own, the children are the component's
   build () {
     if (!this.isConnected) return;
 
@@ -80,8 +54,6 @@ export class AppConfig extends AufbauElement {
     this._built = true;
   }
 
-  // the values into the controls that show something else. a bool (type
-  // checkbox) holds its value in `checked`, every other control in `value`
   fill () {
     for (const [key, value] of Object.entries(this.values)) {
       const control = this.querySelector(`[name="${CSS.escape(key)}"]:not(fieldset)`);

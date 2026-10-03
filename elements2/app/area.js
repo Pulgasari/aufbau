@@ -1,41 +1,4 @@
-// <app-area>
-// a region of an app-root. `name` says what it is, `dock` where it sits:
-//
-//   <app-root>
-//     <app-area name="main">…app-views…</app-area>
-//     <app-area name="menu"    dock="start">…</app-area>
-//     <app-area name="config"  dock="end">…</app-area>
-//     <app-area name="context" dock="bottom" peek>…</app-area>
-//   </app-root>
-//
-// an area without dock is the main one: it holds the views and fills what the
-// docked ones leave. a docked area is a sidebar (start, end) or a sheet below
-// the main area (bottom) on wide screens, and a drawer over the app on narrow
-// ones (overlay). `overlay` forces either: always, never, auto (below
-// `breakpoint`, 48rem by default).
-//
-// open      shown. a closed area takes no space, as a drawer it is off screen
-// expanded  wider (start, end: --area-expanded-size, 50vw) or taller (bottom),
-//           full screen as a drawer
-// peek      a closed drawer leaves its handle on screen, to be pulled in
-//
-// the handle opens and closes the drawer by dragging or a tap; dragging a
-// bottom sheet further up expands it. there is no swipe from the screen edge on
-// purpose: android takes those for back and home. escape and the scrim close a
-// drawer, the rest of the app is inert while one is open. one drawer at a time:
-// opening one closes the others.
-//
-// methods: show(), hide(), toggle(force), expand(force)
-// events:  toggle { open, expanded }
-// state:   :state(overlay)
-// parts:   scrim, sheet, handle, content
-// vars:    --area-size, --area-expanded-size, --area-peek, --area-z, --area-border
-//
-// the area's own chrome (scrim, handle) lives in a shadow root, the children
-// stay the author's and are projected, so a framework keeps rendering them.
-
 import { AufbauElement } from '../base/index.js';
-
 
 // how far a drag has to go before it switches, in px
 const DRAG_THRESHOLD = 64;
@@ -54,7 +17,6 @@ export class AppArea extends AufbauElement {
     peek       : Boolean,
   };
 
-  // the resolved dock and overlay on the host, so css selects the defaults as well
   static reflect = ['dock', 'overlay'];
 
   static styles () {
@@ -85,8 +47,6 @@ export class AppArea extends AufbauElement {
       overflow       : auto;
     }
 
-    /*//////////// MAIN ////////////*/
-
     :host([dock="none"]) {
       grid-area : main;
       position  : relative;
@@ -95,14 +55,11 @@ export class AppArea extends AufbauElement {
       [part="content"] { overflow: hidden; }
     }
 
-    /* the active view fills the area and scrolls on its own, an inactive one is out of the flow (app-view) */
     ::slotted(app-view[active]) {
       flex           : 1 1 auto;
       min-block-size : 0;
       overflow       : auto;
     }
-
-    /*//////////// DOCKED ////////////*/
 
     :host([dock="start"])  { grid-area: start;  }
     :host([dock="end"])    { grid-area: end;    }
@@ -129,10 +86,7 @@ export class AppArea extends AufbauElement {
     :host([dock="bottom"]) { --area-size: 40dvh; }
     :host([dock="bottom"]:not(:state(overlay))[expanded]) { --area-size: var(--area-expanded-size, 70dvh); }
 
-    /* a closed sheet with peek keeps its handle, docked as well */
     :host([dock="bottom"]:not([open])[peek]:not(:state(overlay))) [part="content"] { display: none; }
-
-    /*//////////// OVERLAY ////////////*/
 
     :host(:state(overlay)) {
       inset          : 0;
@@ -150,7 +104,6 @@ export class AppArea extends AufbauElement {
       transition       : opacity 0.25s ease;
     }
 
-    /* an open drawer lies above the closed ones, a peeking handle included */
     :host(:state(overlay)[open]) { z-index: calc(var(--area-z) + 1); }
 
     :host(:state(overlay)[open]) [part="scrim"] { opacity: 1; pointer-events: auto; }
@@ -183,8 +136,6 @@ export class AppArea extends AufbauElement {
     :host(:state(overlay)[expanded]:not([dock="bottom"])) [part="sheet"] { inline-size: 100vw; }
     :host(:state(overlay)[expanded][dock="bottom"])       [part="sheet"] { block-size: 100dvh; border-radius: 0; max-block-size: 100dvh; }
 
-    /*//////////// HANDLE ////////////*/
-
     :host(:state(overlay)) [part="handle"],
     :host([dock="bottom"][peek]) [part="handle"] {
       cursor       : grab;
@@ -209,7 +160,6 @@ export class AppArea extends AufbauElement {
       &::after   { block-size: 0.25rem; inline-size: 2.5rem; }
     }
 
-    /* a side drawer is pulled shut at its inner edge */
     :host(:state(overlay):not([dock="bottom"])) [part="handle"] {
       inline-size : 1rem;
       inset-block : 0;
@@ -240,7 +190,6 @@ export class AppArea extends AufbauElement {
   get docked    () { return this.getAttr('dock') !== 'none'; }
   get isOverlay () { return this.states.has('overlay'); }
 
-  /** the app-root this area belongs to, null outside of one. not `root`: that is the element's own tree */
   get appRoot () { return this.closest('app-root'); }
 
   // :::::: API :::::::::::::::::::::::::::::::::::::::::::::::::
@@ -301,7 +250,6 @@ export class AppArea extends AufbauElement {
     this.setOthersInert(this.isOverlay && open);
   }
 
-  // overlay is a matter of the viewport, unless the attribute decides it. the main area never is one
   watchBreakpoint () {
     this._media?.();
     const mode = this.getAttr('overlay');
@@ -318,15 +266,11 @@ export class AppArea extends AufbauElement {
     set(Boolean(query?.matches));
   }
 
-  // one drawer at a time: each makes the rest of the root inert, two open ones
-  // would leave nothing to touch. closed before this one opens, so their inert
-  // is undone before this one sets its own
   closeOtherDrawers () {
     if (!this.isOverlay) return;
     for (const area of this.appRoot?.areas ?? []) if (area !== this && area.isOverlay && area.open) area.hide();
   }
 
-  // while a drawer is open, the rest of the root is out of reach for focus and pointer
   setOthersInert (inert) {
     const root = this.appRoot;
     if (!root) return;
@@ -343,12 +287,6 @@ export class AppArea extends AufbauElement {
 
   // :::::: DRAG ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  /*
-  the sheet follows the pointer along its axis, released it opens, closes or
-  (bottom) expands by distance. a release without movement is a tap and toggles.
-  only a drawer follows the pointer, a docked bottom sheet just switches. the
-  sheet stays between closed and open: pulled further it would lift off its edge.
-  */
   drag (start) {
     const sheet  = this.shadowRoot.querySelector('[part="sheet"]');
     const dock   = this.getAttr('dock');
@@ -358,7 +296,6 @@ export class AppArea extends AufbauElement {
     const origin = axis === 'y' ? start.clientY : start.clientX;
     let   delta  = 0;
 
-    // the offset of the closed sheet in px: off screen, but for the handle of a peeking one
     const size   = axis === 'y' ? sheet.offsetHeight : sheet.offsetWidth;
     const peek   = dock === 'bottom' && this.getAttr('peek') ? handle.offsetHeight : 0;
     const closed = (size - peek) * sign;
@@ -394,8 +331,6 @@ export class AppArea extends AufbauElement {
   }
 }
 
-// every attribute is a property too, written through to the attribute, so a
-// framework setting open={false} removes it instead of leaving an expando
 for (const name of Object.keys(AppArea.attr)) {
   Object.defineProperty(AppArea.prototype, name, {
     configurable : true,

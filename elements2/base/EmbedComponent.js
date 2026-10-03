@@ -1,8 +1,3 @@
-// @aufbau/elements2/base/EmbedComponent.js
-// the base of every embed-* component: one <aufbau-embed>, fed with the url a
-// subclass builds from what the author gave: a url, an id, a type. consent,
-// sizing and the placeholder are the element's, its attributes are forwarded.
-
 import '../aufbau/AufbauEmbed.js';
 
 import { AufbauElement } from './index.js';
@@ -25,13 +20,11 @@ export class EmbedComponent extends AufbauElement {
 
   get embed () { return this.querySelector(':scope > aufbau-embed'); }
 
-  /** hook, the url <aufbau-embed> resolves, from the src and the own attributes */
   toUrl (src) { return src; }
 
-  /** hook, sizes that depend on the own attributes, e.g. a player style. the author's win */
   sizes () { return {}; }
 
-  /** loads the player, see AufbauEmbed.activate() */
+  // loads the player, see AufbauEmbed.activate()
   activate () { this.embed?.activate(); return this; }
 
   render () { return '<aufbau-embed></aufbau-embed>'; }
@@ -51,7 +44,6 @@ export class EmbedComponent extends AufbauElement {
   }
 }
 
-/** the url of a src that already is one, null for anything else */
 export const urlOf = src => { try { return new URL(src).href; } catch { return null; } };
 
 export default EmbedComponent;

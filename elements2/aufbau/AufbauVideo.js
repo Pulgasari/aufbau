@@ -1,8 +1,3 @@
-// <aufbau-video>
-// a native <video>, or a youtube embed when `youtube-id` is set. the player is
-// the only child. playback flags are applied as properties, so toggling muted
-// or loop does not rebuild the player and reset playback.
-
 import { AufbauElement } from '../base/index.js';
 import { html }          from '../lib/html.js';
 

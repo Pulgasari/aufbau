@@ -1,7 +1,3 @@
-// <aufbau-progress>
-// the host is the progressbar. ::before is the track, the bar is a background
-// layer on it sized by --progress. the only child is the optional text.
-
 import { AufbauElement } from '../base/index.js';
 
 const clamp = value => Math.min(100, Math.max(0, value));
@@ -20,7 +16,6 @@ export default class AufbauProgress extends AufbauElement {
     value    : Number,
   };
 
-  // colours come from --progress-track and --progress-bar, the skin sets them
   static styles = `
     aufbau-progress {
       --progress-size: 0.5em;
@@ -47,7 +42,6 @@ export default class AufbauProgress extends AufbauElement {
         line-height          : 1;
       }
 
-      /* no value and not driven by scrolling: an unknown amount of work */
       &:not([value], [type="scroll"])::before {
         animation       : aufbau-progress-slide 1.2s ease-in-out infinite;
         background-size : 35% 100%;
@@ -66,7 +60,6 @@ export default class AufbauProgress extends AufbauElement {
     if (name === 'target' || name === 'type') this.watchScroll();
   }
 
-  // type="scroll" mirrors the scroll position of `target` (the page by default) into `value`
   watchScroll () {
     this._unwatchScroll?.();
     this._unwatchScroll = null;
@@ -88,7 +81,6 @@ export default class AufbauProgress extends AufbauElement {
     measure();
   }
 
-  // structure only, the amount is applied in sync() so a scroll bar restyles instead of rebuilding
   render () {
     return this.getAttr('showText') ? '<span></span>' : '';
   }

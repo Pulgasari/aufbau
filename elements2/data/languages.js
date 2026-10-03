@@ -1,7 +1,3 @@
-// @aufbau/elements2/data/languages.js
-// iso 639-1, the two letter language codes. the names are not stored, they come
-// from Intl.DisplayNames in whatever locale the component sits in
-
 export const LANGUAGES = `
   aa ab ae af ak am an ar as av ay az ba be bg bi bm bn bo br bs ca ce ch co cr
   cs cu cv cy da de dv dz ee el en eo es et eu fa ff fi fj fo fr fy ga gd gl gn

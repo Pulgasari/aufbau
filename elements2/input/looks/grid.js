@@ -1,11 +1,3 @@
-// look="grid": every option as a tile in a wrapping grid, with a search field
-// above it where the type searches (emoji, icon) or the element is `searchable`.
-// one value, or any number with `multiple`
-// parts: box, search, options, option, icon, label
-//
-// the tiles are filled in update(), not in render(): a new search changes the
-// options, and a rebuilt shell would throw the caret out of the search field.
-
 import { html }                                                     from '../../lib/html.js';
 import { groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
 
@@ -16,7 +8,6 @@ const optionsOf = host => host.root.querySelector('[part~="options"]');
 
 const hasSearch = host => Boolean(host.valueType.list?.query || host.getAttr('searchable'));
 
-// a list that does not search by itself is filtered here, by label
 function filter (host, query) {
   const needle = query.trim().toLowerCase();
 

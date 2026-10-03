@@ -1,20 +1,3 @@
-// <aufbau-dropdown>
-// an action menu. it carries commands, not a value, so it is NOT a control and
-// deliberately does not participate in forms. for choosing a value, use
-// an <input-value> with options, say look="combobox".
-//
-// trigger and menu live in the shadow root, the children are the entries and
-// are projected into the menu. nothing is moved.
-//
-//   <aufbau-dropdown label="Datei">        shadow: <button part="trigger">
-//     <button>Öffnen</button>                        <div part="menu" role="menu" popover>
-//     <a href="…">Export</a>                           <slot>
-//   </aufbau-dropdown>
-//
-// the menu is an auto popover: top layer, light dismiss and escape come from
-// the browser. `open` mirrors the popover state in both directions.
-// parts: trigger, icon, label, caret, menu
-
 import { AufbauElement } from '../base/index.js';
 import { html }          from '../lib/html.js';
 import { place }         from '../lib/placement.js';
@@ -63,7 +46,6 @@ export default class AufbauDropdown extends AufbauElement {
       &:popover-open { display: flex; }
     }
 
-    /* the entries are the author's elements, ::slotted only reaches them, not their insides */
     ::slotted(*) {
       align-items     : center;
       color           : inherit;
@@ -82,11 +64,8 @@ export default class AufbauDropdown extends AufbauElement {
   get isOpen  () { return Boolean(this.menu?.matches(':popover-open')); }
 
   onMount () {
-    // any activated entry closes the menu, the entry's own handler still runs
     this.on('click', ENTRY, (event, entry) => { if (this.contains(entry)) this.close(); });
 
-    // the popover may close by itself (light dismiss, escape), the attribute follows.
-    // toggle does not bubble, capturing on the root sees it for every menu a rebuild creates
     this.on(this.root, 'toggle', (event) => {
       if (event.target !== this.menu) return;
       const open = event.newState === 'open';
@@ -98,7 +77,6 @@ export default class AufbauDropdown extends AufbauElement {
     this.on(window, 'scroll', () => this.reposition(), { capture: true, passive: true });
   }
 
-  // the browser toggles the menu itself and keeps the trigger out of light dismiss
   onRender () { this.trigger.popoverTargetElement = this.menu; }
 
   open   () { return this.setOpen(true);  }
@@ -137,10 +115,8 @@ export default class AufbauDropdown extends AufbauElement {
     trigger.disabled = disabled;
     trigger.setAttribute('aria-expanded', String(open));
 
-    // entries without a role are menu items. an attribute only, the element stays where the author put it
     for (const entry of this.children) if (!entry.hasAttribute('role')) entry.setAttribute('role', 'menuitem');
 
-    // the attribute drives the popover, the toggle listener closes the loop the other way
     const menu = this.menu;
     if (menu.showPopover && open !== this.isOpen) menu[open ? 'showPopover' : 'hidePopover']();
     this.reposition();

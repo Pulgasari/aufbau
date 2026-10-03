@@ -1,6 +1,3 @@
-// lowercase latin letters, digits and dashes: 'Über uns!' -> 'ueber-uns'.
-// with `source` it follows another field until it is edited by hand
-
 import text from './text.js';
 
 const SPELLED = { ä: 'ae', ö: 'oe', ß: 'ss', ü: 'ue' };
@@ -13,7 +10,6 @@ export const slugify = value => String(value ?? '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
 
-/** the field `source` names, searched in the form first, then in the document */
 function sourceOf (host) {
   const selector = host.getAttribute('source');
   if (!selector) return null;

@@ -1,22 +1,3 @@
-// @aufbau/elements2/input/types
-// what a value is. one file per type, each a plain object:
-//
-//   input        the native <input type> of a field
-//   icon         the leading icon of a field
-//   look         the look drawn when the author asks for none
-//   actions      the buttons of a field: copy, paste, clear, reveal
-//   placeholder  the placeholder when the author gives none
-//   parse        attribute text -> value in its type
-//   format       value in its type -> attribute text
-//   normalize    typed text -> its canonical form, when the field is left
-//   axis         a numeric axis, for steppers and sliders:
-//                { bounds, step, toNumber (value), fromNumber (number, previous) }
-//   steppable    false where an axis has no meaningful step (color)
-//   list         the values come from a list: { entries (host, locale, query), query }
-//                `query` marks a list that is searched (emoji, icon)
-//   attributes   further attributes the type reads, observed on every input-*
-//   setup        (host, on) behavior beyond a value, e.g. the search event
-
 import bool     from './bool.js';
 import color    from './color.js';
 import country  from './country.js';
@@ -50,7 +31,6 @@ export const TYPES = {
   url, year,
 };
 
-/** every further attribute some type reads, as schema entries */
 export const TYPE_ATTRIBUTES = Object.fromEntries(
   Object.values(TYPES).flatMap(type => type.attributes ?? []).map(name => [name, String])
 );

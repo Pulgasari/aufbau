@@ -1,9 +1,3 @@
-// @aufbau/elements2/lib/persist.js
-//
-// the `persist` attribute contract the controls speak, plus the two stores it
-// resolves to. storage logic itself is all @bunker/storage — this owns only the
-// aufbau-specific part: one namespace, one version, and the attribute grammar.
-
 import { createStorage } from '@bunker/storage';
 import { Logger }        from '@pulgasari/logger';
 
@@ -18,17 +12,6 @@ export const session = createStorage({ area: 'session', namespace, onError, vers
 
 const SESSION = 'session';
 
-/*
-  resolves the `persist` attribute of a control to a store and a key.
-
-    persist                  local,   key from name or id
-    persist="session"        session, key from name or id
-    persist="theme"          local,   key "theme"
-    persist="session:theme"  session, key "theme"
-
-  returns null when there is nothing to store under, which is not an error: a
-  control can carry `persist` before it has been given a name.
-*/
 export function resolvePersist (spec, { id = '', name = '' } = {}) {
   if (spec == null) return null;
 

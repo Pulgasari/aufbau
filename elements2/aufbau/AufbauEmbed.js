@@ -1,23 +1,3 @@
-// <aufbau-embed>
-// third party content (a video, a song, a post) behind a click. until then the
-// element is a local placeholder and nothing is requested from the provider,
-// not even a thumbnail: the page's own `poster` is the only image. the click
-// swaps in the provider's player.
-//
-//   <aufbau-embed src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></aufbau-embed>
-//   <aufbau-embed src="https://open.spotify.com/album/…" remember></aufbau-embed>
-//   <aufbau-embed src="https://example.com/widget" height="400px" label="widget"></aufbau-embed>
-//
-// providers are recognized by the url: youtube, vimeo, spotify, soundcloud,
-// bandcamp (the EmbeddedPlayer url, an album page cannot be embedded), mastodon
-// posts. any other url is framed as it is. a url that cannot be framed turns the
-// placeholder into a link.
-//
-// consent="auto" loads at once, e.g. once the page asked for consent itself.
-// it can come from <aufbau-config embed-consent="auto">. `remember` stores a
-// click per provider, later embeds of it load at once. state: :state(active).
-// event: `activate` with { provider, src }.
-
 import { AufbauElement } from '../base/index.js';
 import { attrs, html }   from '../lib/html.js';
 import { store }         from '../lib/persist.js';
@@ -25,10 +5,6 @@ import { store }         from '../lib/persist.js';
 const ALLOW = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
 
 // :::::: PROVIDERS :::::::::::::::::::::::::::::::::::::::::::::
-// test(url) answers what the embed needs, null where the url is not the
-// provider's. embed(match, url) gives the player url, null where the url is the
-// provider's but has nothing to play: the placeholder then links to it.
-// ratio or height size the player
 
 const youtubeId = url => {
   if (/(^|\.)youtu\.be$/.test(url.hostname)) return url.pathname.slice(1).split('/')[0] || null;
@@ -99,7 +75,6 @@ export const PROVIDERS = [
 
 const GENERIC = { name: 'web', ratio: '16 / 9', test: url => url.href, embed: href => href };
 
-/** { provider, src, link, host, ratio, height } for a url, null where it is none */
 export function resolveEmbed (source) {
   let url;
   try { url = new URL(source, location.href); } catch { return null; }
@@ -129,9 +104,9 @@ export default class AufbauEmbed extends AufbauElement {
 
   static attr = {
     consent  : { type: String, default: 'click', values: ['auto', 'click'], config: true },
-    height   : String,   // a css length, the player is that high instead of keeping a ratio
-    label    : String,   // the name on the placeholder and of the frame, the provider's by default
-    poster   : String,   // an image of the page's own, shown on the placeholder
+    height   : String,
+    label    : String,
+    poster   : String,
     ratio    : String,   // e.g. '4 / 3', wins over the provider's
     remember : Boolean,
     src      : String,
@@ -175,14 +150,13 @@ export default class AufbauEmbed extends AufbauElement {
       > small       { font-size: 0.75em; }
     }
 
-    /* a slim player, e.g. 42px: the placeholder is one line */
     @container (max-height: 80px) {
       > :is(button, a) { flex-direction: row; gap: 0.5em; }
       > :is(button, a) > svg-icon { font-size: 1em; }
     }
   }`;
 
-  /** what the src resolves to, see resolveEmbed() */
+  // what the src resolves to, see resolveEmbed()
   get embed () {
     const src = this.getAttr('src');
     if (src !== this._resolvedSrc) {
@@ -195,13 +169,11 @@ export default class AufbauEmbed extends AufbauElement {
   get active   () { return Boolean(this._active); }
   get storeKey () { return `embed:consent:${this.embed?.provider}`; }
 
-  // consent given before: for every embed, or remembered for this provider
   get consented () {
     if (this.getAttr('consent') === 'auto') return true;
     return Boolean(this.getAttr('remember') && store.getSync(this.storeKey));
   }
 
-  /** loads the player. what the click does, callable from outside as well */
   activate () {
     const embed = this.embed;
     if (!embed?.src || this._active) return this;
@@ -233,7 +205,6 @@ export default class AufbauEmbed extends AufbauElement {
       <iframe ${attrs({ allow: ALLOW, loading: 'lazy', referrerpolicy: 'strict-origin-when-cross-origin', src: embed.src, title: name })}></iframe>
     `;
 
-    // nothing to frame: the placeholder leads to the page itself
     if (!embed.src) return html`
       <a href="${embed.link}" target="_blank" rel="noopener noreferrer">
         <svg-icon icon="lucide:external-link"></svg-icon>

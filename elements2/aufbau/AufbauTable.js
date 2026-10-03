@@ -1,9 +1,5 @@
 // <aufbau-table>
 
-// the host is the scroll container, the <table> its only child. sortable
-// headers carry a <button> so sorting works from the keyboard, the direction
-// is announced through aria-sort.
-
 import { AufbauElement } from '../base/index.js';
 import { importFile }    from '@aufbau/import';
 import { sortElements }  from '@domina/methods/sortElements.js';
@@ -39,7 +35,6 @@ export default class AufbauTable extends AufbauElement {
     }
   }`;
 
-  // allow setting data directly: table.data = [{ id: 1, name: 'Alpha' }]
   set data (value) { this._data = value; this._loadedSrc = null; this.invalidate().update(); }
   get data ()      { return this._data; }
 
@@ -80,7 +75,6 @@ export default class AufbauTable extends AufbauElement {
     return super.update();
   }
 
-  /** unwraps payloads like { data: [...] } and normalizes to a row array */
   get rows () {
     let rows = arrayfied(this._data);
 

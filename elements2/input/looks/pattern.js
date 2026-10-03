@@ -1,9 +1,3 @@
-// look="pattern": the current pattern as a swatch, a click on it opens the
-// others in a popover. beside it the opacity slider and the two color fields,
-// where the element has `opacity` and `colors`. the swatches paint each pattern
-// as a mask over the text color, so the picker follows the theme.
-// parts: box, current, swatch, opacity, colors, color, patterns
-
 import { attrs, html }                  from '../../lib/html.js';
 import { place }                        from '../../lib/placement.js';
 import { formatPattern, parsePattern }  from '../types/pattern.js';
@@ -14,14 +8,12 @@ const sliderOf   = host => host.root.querySelector('[part~="opacity"]');
 const colorOf    = (host, which) => host.root.querySelector(`[data-color="${which}"]`);
 const swatchesOf = host => [...host.root.querySelectorAll('[part~="patterns"] [data-pattern]')];
 
-// the swatch of no pattern is data-pattern="none", an empty attribute would not render
 const idOf = button => button.dataset.pattern === 'none' ? '' : button.dataset.pattern;
 
 const swatch = (id, label, part = 'swatch') => html`
   <button type="button" part="${part}" data-pattern="${id}" ${attrs({ 'aria-label': label, title: label })}><span></span></button>
 `;
 
-// the ids the element offers: `patterns` where given, all of them otherwise
 function idsOf (host, catalog) {
   const known  = catalog.map(pattern => pattern.id);
   const wanted = host.getAttribute('patterns')?.trim();
@@ -29,7 +21,6 @@ function idsOf (host, catalog) {
   return wanted.split(/\s+/).filter(id => known.includes(id));
 }
 
-// the tiles come from @aufbau/patterns, each painted once it arrived
 async function paint (host) {
   const { use } = await import('@aufbau/patterns');
 
@@ -44,7 +35,6 @@ async function paint (host) {
   }
 }
 
-// a pattern with the opacity and the colors the helpers show right now
 function pick (host, id) {
   const slider = sliderOf(host);
   const colors = host.hasAttribute('colors');
@@ -57,7 +47,6 @@ function pick (host, id) {
   }));
 }
 
-// the catalog arrives with the module, the popover is filled once, when it is there
 function fill (host) {
   const popover = popoverOf(host);
   if (popover.dataset.filled) return;
@@ -106,7 +95,6 @@ export default {
         position         : absolute;
       }
 
-      /* no pattern: one diagonal stroke */
       &[data-pattern="none"] > span {
         background : linear-gradient(to top right, transparent calc(50% - 1px), currentColor 0 calc(50% + 1px), transparent 0);
         mask-image : none;
@@ -182,7 +170,6 @@ export default {
       pick(host, idOf(next));
     });
 
-    // a new opacity or color keeps the pattern, or takes the first one where there is none
     const keep = () => {
       const first = swatchesOf(host).map(idOf).find(Boolean) ?? '';
       pick(host, parsePattern(host.value).id || first);
@@ -205,7 +192,6 @@ export default {
       colorOf(host, 'bg').value = parts.bg ?? '#ffffff';
     }
 
-    // one tab stop in the popover: the checked swatch, else the first
     const items   = swatchesOf(host);
     const checked = items.find(button => idOf(button) === parts.id) ?? items[0];
     for (const button of items) {

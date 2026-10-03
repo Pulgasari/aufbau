@@ -1,8 +1,3 @@
-// <aufbau-filter>
-// a search field that filters other elements by their text. the only child is
-// an <input-search>. mismatches get the `hidden` attribute, so filtering works
-// without any css; `mismatch-class` switches to a class instead.
-
 import '../input/tags.js';
 
 import { AufbauElement }  from '../base/index.js';
@@ -11,7 +6,7 @@ import { filterElements } from '@domina/methods/filterElements.js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {
-    container     : String,   // where to look for targets, the document by default
+    container     : String,
     debounce      : 100,
     mismatchClass : String,
     mode          : { type: String, default: 'contains', values: ['contains', 'startsWith', 'endsWith', 'exact'] },

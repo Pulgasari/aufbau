@@ -1,28 +1,6 @@
-// <app-panel>
-// a titled frame for content: a header with the heading, room for actions and
-// the buttons to close and expand the place it sits in, the content below.
-//
-//   <app-area name="config" dock="end">
-//     <app-panel heading="Settings">
-//       <button slot="actions">…</button>
-//       …
-//     </app-panel>
-//   </app-area>
-//
-// close and expand act on the container: an <app-area> is hidden or expanded,
-// an <aufbau-modal> closed. outside of both, close fires a cancelable `close`
-// event and leaves the rest to the app. `controls` names the buttons there may
-// be, "close expand" by default, and a button only shows where it can act:
-// expand in a docked area, close in a container, or anywhere once `controls`
-// is written out.
-//
-// slots: start (before the heading), actions (after it), default
-// parts: header, heading, close, expand, body
-
 import '../svg/icon.js';
 
 import { AufbauElement } from '../base/index.js';
-
 
 export class AppPanel extends AufbauElement {
 
@@ -99,7 +77,7 @@ export class AppPanel extends AufbauElement {
     `;
   }
 
-  /** the area or modal the panel sits in, the nearer one */
+  // the area or modal the panel sits in, the nearer one
   get container () { return this.parentElement?.closest(`app-area, aufbau-modal`) ?? null; }
 
   get area () {

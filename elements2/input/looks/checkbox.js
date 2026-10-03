@@ -1,6 +1,3 @@
-// look="checkbox": a bool as a box with a check mark
-// parts: box, control (checked), check, mark, icon, label
-
 import { html }                                     from '../../lib/html.js';
 import { control, controlOf, events, fits, update } from './parts/toggle.js';
 

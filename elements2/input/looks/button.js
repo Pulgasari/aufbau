@@ -1,6 +1,3 @@
-// look="button": a bool as a button that reads as pressed
-// parts: box, control (checked), icon, label
-
 import { control, controlOf, events, fits, update } from './parts/toggle.js';
 
 export default {

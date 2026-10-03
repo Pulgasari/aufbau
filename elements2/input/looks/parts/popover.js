@@ -1,9 +1,7 @@
-// @aufbau/elements2/input/looks/parts/popover.js
-// a list of options in a popover, top layer, for combobox and cycle
-
 import { attrs, html }                         from '../../../lib/html.js';
 import { place }                               from '../../../lib/placement.js';
-import { isInactive, labelOf, optionIcon }    from './options.js';
+import { nextIndex }                       from './keys.js';
+import { isInactive, labelOf, optionIcon }  from './options.js';
 
 export const listboxOf = host => host.root.querySelector('[part~="listbox"]');
 export const triggerOf = host => host.root.querySelector('[aria-haspopup]');
@@ -50,7 +48,7 @@ export const LISTBOX = `
   [part~="label"] { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 `;
 
-/** below the anchor, above it where there is no room */
+// below the anchor, above it where there is no room
 export function reposition (host, anchor) {
   const list = listboxOf(host);
   if (list && isOpen(host)) host.dataset.placement = place(list, anchor);
@@ -60,7 +58,6 @@ export function setOpen (host, open, anchor) {
   const list = listboxOf(host);
   if (!list || host.isDisabled || open === isOpen(host)) return;
 
-  // read before hiding, a hidden popover has already dropped its focus
   const hadFocus = list.contains(host.focused);
 
   list[open ? 'showPopover' : 'hidePopover']();
@@ -85,10 +82,6 @@ export function filter (host, query) {
 
 const enabledItems = host => [...(listboxOf(host)?.querySelectorAll('[data-value]') ?? [])].filter(item => !isInactive(item));
 
-/**
- * what both looks bind: a click on an option, the keys, a click outside, the
- * placement on scroll and resize. `anchor` is what the list hangs below
- */
 export function popoverEvents (host, on, anchor) {
   const close = () => setOpen(host, false, anchor());
 
@@ -111,17 +104,16 @@ export function popoverEvents (host, on, anchor) {
     if (key === 'Escape' && isOpen(host)) { event.preventDefault(); close(); return; }
     if ((key === 'Enter' || key === ' ') && item) { event.preventDefault(); item.click(); return; }
 
+    const items    = enabledItems(host);
+    const selected = items.findIndex(entry => host.selected.has(entry.dataset.value));
+    const current  = item ? items.indexOf(item) : selected;
+
     // left and right belong to the caret of a search field
-    const step = key === 'ArrowDown' ? 1 : key === 'ArrowUp' ? -1 : 0;
-    if (!step && key !== 'Home' && key !== 'End') return;
+    const index = nextIndex(key, current, items.length, { sideways: false });
+    if (index === null) return;
     event.preventDefault();
 
     if (!isOpen(host)) setOpen(host, true, anchor());
-    const items = enabledItems(host);
-    if (!items.length) return;
-
-    const current = item ? items.indexOf(item) : items.findIndex(entry => host.selected.has(entry.dataset.value));
-    const next    = key === 'Home' ? 0 : key === 'End' ? items.length - 1 : current < 0 ? 0 : (current + step + items.length) % items.length;
-    items[next].focus();
+    items[index]?.focus();
   });
 }

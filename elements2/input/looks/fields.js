@@ -1,6 +1,3 @@
-// look="fields": two typed values, from and to (`range`)
-// parts: box, icon, input, separator
-
 import { html }                                                   from '../../lib/html.js';
 import { FRAME, field, fieldEvents, firstField, icon, updateFields } from './parts/field.js';
 

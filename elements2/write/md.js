@@ -1,15 +1,3 @@
-// <write-md>
-// markdown, written in an <aufbau-writer> and shown by an <aufbau-reader>.
-//
-//   <write-md name="notes" value="# title"></write-md>
-//   <write-md preview="side"></write-md>
-//
-// preview: toggle  a switch between writing and the preview (default)
-//          side    both next to each other
-//          none    the writer alone
-//
-// the value and the form behaviour are <aufbau-writer>'s.
-
 import '../aufbau/AufbauReader.js';
 import '../aufbau/AufbauWriter.js';
 
@@ -67,7 +55,6 @@ export class WriteMd extends AufbauComponent {
   }
 
   bind () {
-    // the two tabs are no value of the component, they only switch what shows
     this.on('click', '[data-mode]', (event, button) => {
       const preview = button.dataset.mode === 'preview';
       this.states.toggle('preview', preview);

@@ -1,19 +1,3 @@
-// <aufbau-tree>
-//
-// three ways to feed it, in order of precedence:
-//   1. `nodes` property — an in-memory array of { label|name, icon, value|id,
-//      expanded, selected, children } (children same shape). set it from JS:
-//        treeEl.nodes = [...]        // or, in a vdom lib, <aufbau-tree nodes=${data}/>
-//   2. `src` attribute — a url the tree loads its data from (importFile).
-//   3. hand-authored <aufbau-tree-item> children — left untouched.
-//
-// selecting an item bubbles `aufbau-tree-select` and toggling a folder bubbles
-// `aufbau-tree-toggle`; both carry the item's `value` so callers can map the
-// event back onto their own data.
-//
-// the tree owns interaction for all of its items: clicks on a row, and the
-// keyboard pattern of a wai-aria tree view with one roving tab stop.
-
 import { AufbauElement } from '../base/index.js';
 import { importFile }    from '@aufbau/import';
 import { attrs, html }   from '../lib/html.js';
@@ -31,7 +15,6 @@ export default class AufbauTree extends AufbauElement {
 
   static styles = `aufbau-tree { display: block; }`;
 
-
   // in-memory data — bypasses `src` and hand-authored markup
   set nodes (value) {
     this._data = Array.isArray(value) ? value : null;
@@ -40,14 +23,11 @@ export default class AufbauTree extends AufbauElement {
   }
   get nodes () { return this._data; }
 
-  /** every item not hidden inside a collapsed ancestor, in document order */
   get visibleItems () {
     return [...this.querySelectorAll(ITEM)].filter(item => !item.parentElement.closest(`${ITEM}:not([expanded])`));
   }
 
   onMount () {
-    // the row lives in the item's shadow root, the click arrives retargeted to the
-    // innermost item. only a click on that item's own row counts
     this.on('click', ITEM, (event, item) => {
       if (!event.composedPath().includes(item.row)) return;
       item.toggle();
@@ -57,8 +37,6 @@ export default class AufbauTree extends AufbauElement {
 
     this.on('keydown', (event) => this.onKeydown(event));
 
-    // items added or removed later (hand authored or by the host app) change the
-    // folder state of their parent. one observer for the whole tree, not one per item
     const observer = new MutationObserver(records => {
       for (const record of records) {
         if (record.target.localName === ITEM) record.target.update();
@@ -72,7 +50,6 @@ export default class AufbauTree extends AufbauElement {
   async update () {
     const { src } = this.getAttr();
 
-    // reload whenever src actually changes (skipped once `nodes` supplied in-memory data)
     if (src && src !== this._loadedSrc && this._data == null) {
       this._loadedSrc = src;
       this.setSkeleton(true);
@@ -107,7 +84,6 @@ export default class AufbauTree extends AufbauElement {
 
   sync () { this.syncFocus(); }
 
-  // roving tabindex: the selected visible item is the one tab stop, the first one otherwise
   syncFocus () {
     const visible = this.visibleItems;
     const stop    = visible.find(item => item.hasAttribute('selected')) ?? visible[0];
@@ -128,7 +104,6 @@ export default class AufbauTree extends AufbauElement {
       case 'Home'      : return move(visible[0]);
       case 'End'       : return move(visible.at(-1));
 
-      // right opens a closed folder, on an open one it steps to the first child
       case 'ArrowRight':
         if (!item.hasChildren) return;
         event.preventDefault();
@@ -136,7 +111,6 @@ export default class AufbauTree extends AufbauElement {
         else item.items[0]?.focus();
         return;
 
-      // left closes an open folder, otherwise it steps up to the parent
       case 'ArrowLeft':
         event.preventDefault();
         if (item.hasChildren && item.getAttr('expanded')) item.collapse();

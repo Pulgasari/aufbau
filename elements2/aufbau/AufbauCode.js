@@ -18,11 +18,6 @@ const THEME_ATTR   = 'data-hljs-theme'; // separate from [data-theme], which bel
 let hljsPromise   = null;
 let themesPromise = null;
 
-/**
- * the bare specifier first, so a page that remaps `hljs` in its import map to a
- * self hosted build gets that one instance everywhere. the pinned cdn url is
- * only the fallback for pages without the aufbau import map.
- */
 const getHljs = () => (
   hljsPromise ??= import('hljs')
   .catch(() => import(HLJS_MODULE))
@@ -31,18 +26,12 @@ const getHljs = () => (
 
 // ::: languages
 
-// name -> hljs language definition, or a module specifier resolving to one.
-// module specifiers can also come from <aufbau-config code-languages-<name>="…">
 const languages = new Map;
 
-// poo ships with the element. the defaults layer is the lowest config layer, so
-// a page can point the specifier somewhere else without any api call
 setConfig({ 'code-languages-poo': '@poo/hljs' }, { layer: 'defaults' });
 
 const languageSource = (name) => languages.get(name) ?? getConfig(`code-languages-${name}`);
 
-// resolved once per name, whether it worked or not. a missing grammar is not
-// fatal, hljs just falls back to auto detection
 const resolved = new Map;
 
 function useLanguage (hljs, name) {
@@ -62,25 +51,12 @@ function useLanguage (hljs, name) {
   return pending;
 }
 
-// used ONLY when the jsdelivr file index is unreachable. the regular path stays
-// fully dynamic and offers every theme of the pinned version, see themes()
 const FALLBACK_THEMES = ['dracula', 'github', 'github-dark'];
 
-// themes that do not sit directly in /styles. the index returns these with their
-// folder already attached, the map only covers the short names used above
 const THEME_PATHS = { dracula: 'base16/dracula' };
 
-// a default theme ships with the element, so highlighting paints out of the box.
-// without it sync() finds no theme, never adopts a token sheet, and hljs tokens
-// stay uncolored. the defaults layer is the lowest config layer, so a page still
-// overrides it with `theme="…"` or <aufbau-config code-theme="…"> without any api call
 setConfig({ 'code-theme': 'github-dark' }, { layer: 'defaults' });
 
-/**
- * loads and scopes a theme sheet. domina handles fetch, scoping, dedup and
- * adoption; adopted sheets cascade after author styles, so a page level hljs
- * <link> is overridden without !important.
- */
 const loadTheme = (theme) => adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
   scope : `aufbau-code[${THEME_ATTR}="${theme}"]`,
   key   : `hljs:${theme}`,
@@ -105,10 +81,8 @@ function collectThemes (data) {
 
 // ::: editing
 
-// the pause after a keystroke before the edit is highlighted again
 const HIGHLIGHT_DELAY = 150;
 
-// the caret as a text offset inside `root`, null when it is not in there
 function caretOffset (root) {
   const selection = root.ownerDocument.getSelection();
   if (!selection?.rangeCount || !root.contains(selection.focusNode)) return null;
@@ -118,7 +92,6 @@ function caretOffset (root) {
   return range.toString().length;
 }
 
-// puts the caret back at a text offset, across whatever spans the text now sits in
 function setCaret (root, offset) {
   const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let node, rest = offset;
@@ -137,14 +110,12 @@ function setCaret (root, offset) {
 
 export default class AufbauCode extends AufbauElement {
   static attr = {
-    // copy always, paste and clear only take effect with `editable`
     actions  : { type: String, default: 'copy paste clear' },
     code     : String,
     editable : Boolean,
     lang     : String,
     language : String,
     noCopy   : Boolean,
-    // falls back to <aufbau-config code-theme="..."> when the attribute is absent
     theme    : { type: String, config: true }
   };
 
@@ -234,10 +205,6 @@ j
   onMount () {
     bindActions(this);
 
-    // typing must NOT write back into the code attribute:
-    // it is observed, would trigger update(), rebuild the markup and drop the caret.
-    // the edit is held aside and highlighted in place, with the caret put back.
-    // focusin/focusout instead of focus/blur, those do not bubble and could not be delegated
     this.on('focusin', 'code[contenteditable]', () => { this._focusedCode = this.source; });
 
     this.on('input', 'code[contenteditable]', (event, node) => {
@@ -256,7 +223,6 @@ j
 
   onUnmount () { clearTimeout(this._highlightTimer); }
 
-  /** re-highlights the edited node without a rebuild, the caret keeps its text offset */
   async highlightInPlace (node) {
     const source = node.textContent;
     if (source === this._highlighted) return;
@@ -277,7 +243,6 @@ j
     }
   }
 
-  // an external write to `code` or to the children wins over a pending edit
   onAttributeChange (name) { if (name === 'code') this._editedCode = undefined; }
   onSourceChange    ()     { this._editedCode = undefined; this.invalidate().update(); }
 
@@ -287,7 +252,7 @@ j
     return this.getAttr('code') || dedent(this.sourceText);
   }
 
-  /** the current text, including edits made through `editable` */
+  // the current text, including edits made through `editable`
   get code () { return this.source; }
 
   get lang () {
@@ -308,8 +273,6 @@ j
   render () {
     const { editable } = this.getAttr();
 
-    // language-* is the highlight.js contract, the one class that stays.
-    // no whitespace around the code, a <pre> would keep it
     return html`
       <header>
         <span>${this.lang}</span>
@@ -322,7 +285,6 @@ j
     `;
   }
 
-  /** highlighting rewrites the code node, so it only runs on a real rebuild */
   async onRender () {
     const source = this.source;
 
@@ -331,7 +293,6 @@ j
       await useLanguage(hljs, this.lang);
 
       const $code = this.output?.querySelector('pre > code');
-      // the node may already be gone or stale again after the await
       if (!$code || !this.isConnected || this.source !== source) return;
 
       hljs.highlightElement($code);
@@ -344,7 +305,6 @@ j
   sync () {
     const { theme } = this.getAttr();
 
-    // data-hljs-theme is not observed, so this cannot loop back into update()
     if (theme) {
       this.setAttribute(THEME_ATTR, theme);
       loadTheme(theme);

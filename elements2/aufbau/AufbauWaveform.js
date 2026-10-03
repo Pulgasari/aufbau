@@ -1,12 +1,3 @@
-// <aufbau-waveform>
-// no children at all: the host paints its colours as background layers and is
-// masked by an svg of the bars. a progress change is one custom property, the
-// bars are only redrawn when the peaks change.
-//
-//   progress      0..100, everything left of it is drawn in --waveform-played
-//   range-start   0..100, optional highlighted range (trim and loop editors)
-//   range-end     0..100
-
 import { AufbauElement } from '../base/index.js';
 
 const clamp = value => Math.min(100, Math.max(0, value));
@@ -17,7 +8,6 @@ const audioContext = () => {
   return sharedContext ??= Context ? new Context : null;
 };
 
-// one bar per peak, centred, at least 15% high so silence still reads as a waveform
 const barsMask = (peaks) => {
   const rects = peaks.map((peak, index) => {
     const height = Math.max(15, peak * 100);
@@ -32,7 +22,7 @@ export default class AufbauWaveform extends AufbauElement {
   static attr = {
     bars        : 40,
     interactive : Boolean,
-    peaks       : String,   // precomputed amplitudes, skips fetch and decode when set
+    peaks       : String,
     progress    : 0,
     rangeEnd    : Number,
     rangeStart  : Number,
@@ -64,7 +54,6 @@ export default class AufbauWaveform extends AufbauElement {
       this.seek((event.clientX - rect.left) / rect.width * 100);
     });
 
-    // interactive waveforms are sliders for the keyboard as well
     this.on('keydown', (event) => {
       if (!this.getAttr('interactive')) return;
       const step = { ArrowLeft: -5, ArrowRight: 5, Home: -100, End: 100 }[event.key];
@@ -84,7 +73,6 @@ export default class AufbauWaveform extends AufbauElement {
   async update () {
     const { bars, peaks: raw, src } = this.getAttr();
 
-    // caller supplied peaks win, the apps usually computed them already
     const given = this.parsePeaks(raw);
 
     if (!given && src && src !== this._loadedSrc) {
@@ -127,7 +115,6 @@ export default class AufbauWaveform extends AufbauElement {
     }
   }
 
-  // a json array ("[0.2,0.8,…]") or a plain comma/space list -> normalised 0..1, or null
   parsePeaks (raw) {
     if (!raw) return null;
 

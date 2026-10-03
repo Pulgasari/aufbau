@@ -1,7 +1,3 @@
-// @aufbau/elements2/data/regions.js
-// iso 3166-1 alpha-2, the two letter country codes. the names come from
-// Intl.DisplayNames in whatever locale the component sits in
-
 export const REGIONS = `
   AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL
   BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV

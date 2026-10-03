@@ -1,12 +1,4 @@
-// <div-x>
-// a row: a flex container along the x axis, the counterpart of <div-y>.
-// `scrollable` lets it scroll along its axis instead of growing.
-//
-//   <div-x>…</div-x>
-//   <div-x scrollable>…</div-x>
-
 import { AufbauElement } from '../base/index.js';
-
 
 export class DivX extends AufbauElement {
 

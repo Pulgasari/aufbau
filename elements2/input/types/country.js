@@ -1,5 +1,3 @@
-// a country as iso 3166-1 code: 'DE'. `countries` limits the list, flags="false" drops the flags
-
 import { byLabel, displayNames, enabled, listOf, listType, nameOf } from './list.js';
 
 export default listType({

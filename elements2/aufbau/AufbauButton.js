@@ -1,9 +1,3 @@
-// <aufbau-button>
-// the host IS the button. no inner <button>, so role, focus, keyboard
-// activation and form submission are provided here instead of natively.
-// the children are the label and stay untouched: the shadow root holds the
-// optional icon and projects them through a <slot>. label/text replace them.
-
 import { AufbauElement } from '../base/index.js';
 import { html }          from '../lib/html.js';
 
@@ -47,7 +41,6 @@ export default class AufbauButton extends AufbauElement {
   onMount () {
     if (!this.internals) this.setAttribute('role', 'button');
 
-    // capture phase: runs before any bubble listener on the host, also for clicks on children
     this.on('click', event => {
       if (this.disabled) { event.preventDefault(); event.stopImmediatePropagation(); }
     }, { capture: true });
@@ -82,7 +75,6 @@ export default class AufbauButton extends AufbauElement {
     `;
   }
 
-  // kept out of render() so toggling disabled does not rebuild the markup
   sync () {
     const disabled = this.disabled;
     if (this.internals) this.internals.ariaDisabled = String(disabled);

@@ -1,6 +1,3 @@
-// look="radio": every option stacked, with a mark. one, or any number with `multiple`
-// parts: box, option, mark, icon, label
-
 import { groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
 
 export default {

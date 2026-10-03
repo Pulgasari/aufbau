@@ -1,5 +1,3 @@
-// a time of day: '14:30'. on the axis as milliseconds since midnight, so it stays timezone free
-
 import text from './text.js';
 
 export const MINUTE = 60_000;

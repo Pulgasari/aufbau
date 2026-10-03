@@ -1,14 +1,3 @@
-// <aufbau-loop>
-// carousel: the children are the slides, stacked in one grid cell. the inactive
-//   ones are inert, the css fades them out. nothing is cloned or moved.
-// marquee: the children are projected into a track in the shadow root, next to
-//   an inert, aria-hidden copy of them. the track scrolls by half its width for
-//   a seamless loop. the copy is rebuilt whenever the children change; it sits
-//   in the shadow root, so page css that targets the originals by selector does
-//   not reach it, inherited styles do.
-// both stop while off screen: the carousel skips its ticks, the marquee
-// animation is paused through :state(offscreen). parts: track, copy
-
 import { AufbauElement } from '../base/index.js';
 import { onVisible }     from '@domina/observer';
 
@@ -47,7 +36,6 @@ export default class AufbauLoop extends AufbauElement {
 
     [part~="copy"] { display: contents; }
 
-    /* a trailing gap on every item keeps the 50% jump exact */
     [part~="track"] ::slotted(*),
     [part~="copy"] > * { flex: none; margin-inline-end: var(--loop-gap, 2rem); }
 
@@ -140,7 +128,6 @@ export default class AufbauLoop extends AufbauElement {
   sync () {
     this.style.setProperty('--loop-speed', this.getAttr('speed'));
 
-    // inert is an attribute on the author's elements, they are not moved or rewritten
     const carousel = this.getAttr('mode') === 'carousel';
     this.slides.forEach((slide, index) => { slide.inert = carousel && index !== this._index; });
   }

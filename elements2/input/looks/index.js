@@ -1,18 +1,3 @@
-// @aufbau/elements2/input/looks
-// how a value is entered. one file per look, each a plain object:
-//
-//   fits (shape)       whether it can show a value of that shape:
-//                      { axis, count: single | range | multiple, kind: free | list | bool, steppable, type }
-//   css                its styles. adopted only while it is drawn, so no selector needs a prefix
-//   render (host)      the markup inside the part `box`
-//   events (host, on)  its listeners. `on` is host.on(), they are dropped when the look changes
-//   update (host)      the state onto the markup, on every update
-//   focus (host)       what takes the focus
-//   role (host)        the aria role of the host, none by default
-//
-// a look changes the value through the methods of ../Input.js only:
-// setPart, setNumber, step, select, cycle, add, removeAt, toggle.
-
 import { BASE_LAYER } from '../../lib/styles.js';
 
 import button   from './button.js';
@@ -33,7 +18,6 @@ import toggle   from './switch.js';
 
 export const LOOKS = { button, checkbox, chips, combobox, cycle, field, fields, grid, pattern, radio, segments, slider, stepper, swatch, switch: toggle };
 
-// drawn when neither the author nor the type asks for a look that fits
 const FALLBACK = ['field', 'fields', 'chips', 'combobox', 'switch'];
 
 export function lookFor (shape, ...wanted) {
@@ -43,7 +27,6 @@ export function lookFor (shape, ...wanted) {
 
 const sheets = new Map;
 
-/** the stylesheet of a look, built once and shared by every element that draws it */
 export function sheetOf (name) {
   if (!sheets.has(name)) {
     const sheet = new CSSStyleSheet;

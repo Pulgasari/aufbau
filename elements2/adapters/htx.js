@@ -1,20 +1,3 @@
-// @aufbau/elements2/htx
-// the elements for htx. names only, no element is imported here: load them as
-// usual (autoloader() or the modules). `args` names the attributes positional
-// values fill, in order. positionals beyond them become children, which is
-// where the label of a button or the text of a reader belong.
-//
-// the aufbau-* elements get a $ shorthand:
-//
-//   <$btn variant="primary">Save</$btn>       <aufbau-button variant="primary">Save</aufbau-button>
-//
-// the others are real tags already, they are exported under the camelCase of
-// the tag, which htx reads as its kebab-case:
-//
-//   <input-color 'red' name="color" />        <input-color value="red" name="color">
-//   <embed-youtube 'dQw4w9WgXcQ' />           <embed-youtube src="dQw4w9WgXcQ">
-//   <svg-icon 'lucide:search' '1.5em' />      <svg-icon icon="lucide:search" size="1.5em">
-
 export const
 $audio    = { tag: 'aufbau-audio',     args: 'src' },
 $btn      = 'aufbau-button',
@@ -83,11 +66,3 @@ svgFlag         = { args: 'code' },
 svgIcon         = { args: ['icon', 'size'] },
 writeMd         = { args: 'value' };
 
-/* :::::: USAGE
-
-import htx from '@htx/js';
-import * as elements from '@aufbau/elements2/htx';
-
-htx.define(elements);
-
-*/

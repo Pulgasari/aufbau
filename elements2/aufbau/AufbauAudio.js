@@ -1,9 +1,3 @@
-// <aufbau-audio>
-// a small player. the host is the card, its children are laid out by grid
-// areas: cover, title, artist, play button, current time, seek bar, duration.
-// the markup is only rebuilt when the metadata changes, playback state and
-// progress are applied to the existing nodes.
-
 import { AufbauElement } from '../base/index.js';
 import { attrs, html }   from '../lib/html.js';
 
@@ -20,7 +14,6 @@ export default class AufbauAudio extends AufbauElement {
     artist   : String,
     autoplay : Boolean,
     cover    : String,
-    // renamed from title, which put a native tooltip over the whole player
     label    : 'Unknown Title',
     layout   : { type: String, default: 'card', values: ['card', 'minimal'] },
     loop     : Boolean,

@@ -1,7 +1,3 @@
-// <svg-flag>
-// the host is the flag, painted as a background image. no inner <svg-icon>:
-// a flag is always multicolour art, so the mask path of the icon has nothing to offer.
-
 import { AufbauElement } from '../base/index.js';
 import { iconUrl }       from './icon.js';
 
@@ -12,7 +8,6 @@ const VARIANTS = {
   square : { ratio: '4 / 3', set: 'flagpack'     },
 };
 
-// region names in the page language, e.g. 'de' -> 'Deutschland'
 let regionNames = null;
 const regionName = (code) => {
   try {
@@ -29,14 +24,10 @@ export default class SvgFlag extends AufbauElement {
 
   static attr = {
     code    : 'de',
-    // an explicit label wins over the region name derived from the code
     label   : String,
-    // falls back to <aufbau-config flag-variant="..."> when the attribute is absent
     variant : { type: String, default: 'circle', values: ['circle', 'square', '4x3'], config: true },
   };
 
-  // the variant can come from config, so the ratio is fed through a custom
-  // property from sync() rather than selected by attribute
   static styles = `svg-flag {
     aspect-ratio   : var(--flag-ratio, 1);
     background     : var(--flag-url, none) center / contain no-repeat;

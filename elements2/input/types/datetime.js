@@ -1,5 +1,3 @@
-// a date and a time of day, local wall clock: '2026-10-03T14:30'
-
 import text           from './text.js';
 import { parseStamp } from './date.js';
 import { MINUTE }     from './time.js';

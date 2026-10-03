@@ -1,15 +1,3 @@
-// <aufbau-tree-item>
-// one node of an <aufbau-tree>. the row (chevron, icon, label) lives in the
-// shadow root, the child items stay the author's and are projected below it:
-//
-//   <aufbau-tree-item label="src" expanded>      shadow: <div part="row"><svg-icon part="icon"><span part="label">
-//     <aufbau-tree-item label="index.js">                <slot>
-//   </aufbau-tree-item>
-//
-// the chevron is the row's ::before. interaction and keyboard handling live in
-// <aufbau-tree>, the item only knows its own state. :state(branch) marks an
-// item with children. parts: row, icon, label
-
 import { AufbauElement } from '../base/index.js';
 import { html }          from '../lib/html.js';
 
@@ -47,7 +35,6 @@ export default class AufbauTreeItem extends AufbauElement {
       gap         : 0.25rem;
       padding     : 0.25rem;
 
-      /* chevron, only visible for branches. hidden it still keeps the column */
       &::before {
         block-size        : 0.4em;
         border-block-end  : 1.5px solid;

@@ -1,10 +1,8 @@
-// a unit as Intl names it: 'kilometer'. `units` limits the list
-
 import { byLabel, listOf, listType } from './list.js';
 
 const UNITS = Intl.supportedValuesOf?.('unit') ?? [];
 
-/** 'Kilometer (km)', the long name and the short symbol */
+// 'Kilometer (km)', the long name and the short symbol
 function labelOf (unit, locale) {
   const name = display => {
     try {

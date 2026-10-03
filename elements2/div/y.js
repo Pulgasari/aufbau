@@ -1,12 +1,4 @@
-// <div-y>
-// a column: a flex container along the y axis, the counterpart of <div-x>.
-// `scrollable` lets it scroll along its axis instead of growing.
-//
-//   <div-y>…</div-y>
-//   <div-y scrollable>…</div-y>
-
 import { AufbauElement } from '../base/index.js';
-
 
 export class DivY extends AufbauElement {
 

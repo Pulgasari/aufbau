@@ -1,7 +1,3 @@
-// look="cycle": a button showing the current option. a click takes the next one,
-// a long press or the context menu opens the list. always one value
-// parts: box, button, icon, label, listbox, option
-
 import { html }                                                  from '../../lib/html.js';
 import { labelOf, updateSelected }                               from './parts/options.js';
 import { LISTBOX, isOpen, listbox, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
@@ -24,7 +20,6 @@ export default {
     }
   `,
 
-  // the content comes in update(), a click must not rebuild the button it lands on
   render : host => html`
     <button type="button" part="button" aria-haspopup="listbox" aria-expanded="false">
       <svg-icon part="icon" hidden></svg-icon>
@@ -47,7 +42,6 @@ export default {
       timer = setTimeout(() => { pressed = true; setOpen(host, true, button()); }, LONG_PRESS);
     });
 
-    // the click that ends a long press must not step on as well, it follows pointerup within the task
     const release = () => { clearTimeout(timer); if (pressed) setTimeout(() => { pressed = false; }); };
     on(window, 'pointerup',     release);
     on(window, 'pointercancel', release);

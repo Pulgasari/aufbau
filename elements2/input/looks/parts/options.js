@@ -1,7 +1,5 @@
-// @aufbau/elements2/input/looks/parts/options.js
-// what the list looks share: the markup of an option, its selected state, the arrow keys
-
 import { attrs, html } from '../../../lib/html.js';
+import { nextIndex }   from './keys.js';
 
 export const isInactive = item => item.hidden || item.matches(':disabled, [aria-disabled="true"]');
 
@@ -9,7 +7,6 @@ export const optionIcon = entry => entry.icon && html`<svg-icon part="icon" icon
 
 export const labelOf = entry => entry.label || entry.value;
 
-/** every option as a button, for the looks that show them all at once */
 export function optionButtons (host, part, { iconsOnly = host.getAttr('iconsOnly'), mark = false } = {}) {
   const role      = host.count === 'multiple' ? 'checkbox' : 'radio';
 
@@ -28,7 +25,6 @@ export function optionButtons (host, part, { iconsOnly = host.getAttr('iconsOnly
   })}`;
 }
 
-/** aria for assistive tech, the part token `selected` for css: ::part() takes no attribute selectors */
 export function updateSelected (host) {
   const selected = host.selected;
   const items    = [...host.root.querySelectorAll('[data-value]')];
@@ -42,30 +38,25 @@ export function updateSelected (host) {
   return items;
 }
 
-/** one tab stop per group: the selected option, else the first */
 export function updateTabStop (host, items) {
   const selected = host.selected;
   const stop     = items.find(item => selected.has(item.dataset.value) && !isInactive(item)) ?? items.find(item => !isInactive(item));
   for (const item of items) item.tabIndex = item === stop ? 0 : -1;
 }
 
-/** a click picks, the arrows move through the group and pick along unless it is `multiple` */
 export function groupEvents (host, on) {
   on('click', '[data-value]', (event, item) => { if (!isInactive(item)) host.select(item.dataset.value); });
 
   on(host.root, 'keydown', event => {
-    if (event.target.localName === 'input') return;   // the arrows of a search field move its caret
+    if (event.target.localName === 'input') return;
 
-    const { key } = event;
-    const step    = key === 'ArrowDown' || key === 'ArrowRight' ? 1 : key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 0;
-    if (!step && key !== 'Home' && key !== 'End') return;
-
-    const items = [...host.root.querySelectorAll('[data-value]')].filter(item => !isInactive(item));
-    if (!items.length) return;
-    event.preventDefault();
-
+    const items   = [...host.root.querySelectorAll('[data-value]')].filter(item => !isInactive(item));
     const current = items.indexOf(event.target.closest?.('[data-value]'));
-    const next    = items[key === 'Home' ? 0 : key === 'End' ? items.length - 1 : (current + step + items.length) % items.length];
+    const index   = nextIndex(event.key, current, items.length);
+    if (index === null || !items.length) return;
+
+    event.preventDefault();
+    const next = items[index];
     next.focus();
     if (host.count !== 'multiple') host.select(next.dataset.value);
   });

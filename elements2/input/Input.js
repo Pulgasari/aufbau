@@ -1,16 +1,3 @@
-// @aufbau/elements2/input/Input.js
-// the base of every input-* element. it answers four questions and draws one look:
-//
-//   what      the type: fixed by the tag (input-number) or `type` (input-value)   ./types/
-//   how many  one value, two with `range`, any number with `multiple`             ./values.js
-//   from      free, or options: children, `src`, a list type                      ./options.js
-//   how       `look`, drawn into the shadow root                                  ./looks/
-//
-// the element is the one form control: FormData, validity, reset and persist
-// come from AufbauControl. a look renders, updates its markup and calls the
-// methods below (setPart, step, select, toggle, …), nothing else.
-
-// the looks draw icons inside the shadow root, where no autoloader looks
 import '../svg/icon.js';
 
 import { isArray } from '@pulgasari/is';
@@ -22,8 +9,6 @@ import { OptionSource }             from './options.js';
 import { TYPE_ATTRIBUTES, typeOf }  from './types/index.js';
 import { joinValue, splitValue }    from './values.js';
 
-// the frame of every look is the part `box`, never the host: page css such as a
-// reset with * { padding: 0 } beats every :host rule
 const STYLES = `
   :host {
     box-sizing      : border-box;
@@ -109,7 +94,6 @@ export class Input extends AufbauControl {
 
   static styles = STYLES;
 
-  // the type of a preset. <input-value> reads its `type` attribute instead
   static type = null;
 
   constructor () {
@@ -122,12 +106,10 @@ export class Input extends AufbauControl {
   get typeName  () { return this.constructor.type ?? this.getAttr('type') ?? 'text'; }
   get valueType () { return typeOf(this.typeName); }
 
-  // a bool reads as a checkbox: getFormValues() and friends take `checked`
   get type () { return this.typeName === 'bool' ? 'checkbox' : this.typeName; }
 
   // :::::: HOW MANY ::::::::::::::::::::::::::::::::::::::::::::
 
-  /** 'single', 'range' or 'multiple'. a list knows no range, a bool is always single */
   get count () {
     if (this.typeName === 'bool') return 'single';
     if (this.getAttr('multiple')) return 'multiple';
@@ -141,7 +123,7 @@ export class Input extends AufbauControl {
 
   // :::::: HOW :::::::::::::::::::::::::::::::::::::::::::::::::
 
-  /** what decides which looks fit, see ./looks/index.js */
+  // what decides which looks fit, see ./looks/index.js
   get shape () {
     const type = this.valueType;
     return {
@@ -153,11 +135,8 @@ export class Input extends AufbauControl {
     };
   }
 
-  // the look the author asked for. the element writes its own choice onto the
-  // host so css can select [look="…"] in every case; that one is no request
   get askedLook () { return this._ownLook ? null : this.getAttribute('look'); }
 
-  /** the asked look where it fits, else the type's, else the first that fits */
   get look       () { return lookFor(this.shape, this.askedLook, this.valueType.look); }
   get lookModule () { return LOOKS[this.look]; }
 
@@ -179,7 +158,7 @@ export class Input extends AufbauControl {
     if (name === 'look') this._ownLook = false;
   }
 
-  /** the stylesheet of the drawn look, the only one adopted */
+  // the stylesheet of the drawn look, the only one adopted
   adoptLook () {
     const sheet = sheetOf(this.look);
     const root  = this.shadowRoot;
@@ -187,10 +166,6 @@ export class Input extends AufbauControl {
     root.adoptedStyleSheets = [...root.adoptedStyleSheets.filter(other => !other.isLookSheet), sheet];
   }
 
-  /**
-   * listeners that live as long as `key` stays the same: those of the look
-   * until it changes, those of the type until it changes
-   */
   bindWhile (slot, key, setup) {
     const bound = this._bound ??= {};
     if (bound[slot]?.key === key) return;
@@ -203,21 +178,19 @@ export class Input extends AufbauControl {
 
   // :::::: VALUE :::::::::::::::::::::::::::::::::::::::::::::::
 
-  /** the value as its parts: [value], [from, to] or [a, b, …] */
+  // the value as its parts: [value], [from, to] or [a, b, …]
   get values () { return splitValue(this.getAttribute('value'), this.count); }
 
   // the value stays a string, an array of parts is joined
   parseValue  (raw)   { return raw == null ? '' : String(raw); }
   formatValue (value) { return isArray(value) ? joinValue(value, this.count) : value == null ? '' : String(value); }
 
-  /** the value in its type: a number, epoch ms, … an array for range and multiple */
   get typedValue () {
     const type  = this.valueType;
     const typed = this.values.map(raw => raw === '' ? null : type.parse(raw));
     return this.count === 'single' ? typed[0] : typed;
   }
 
-  /** multiple values submit one FormData entry each, like a native multi select */
   get formValue () {
     if (this.count !== 'multiple') return super.formValue;
 
@@ -233,10 +206,9 @@ export class Input extends AufbauControl {
 
   get isLocked () { return this.isDisabled || Boolean(this.getAttr('readonly')); }
 
-  /** the whole value at once, a string or its parts */
+  // the whole value at once, a string or its parts
   setValue (value) { return this.isLocked ? this : this.commit(value); }
 
-  /** text typed into one part. `final` when the field is left: normalized, a range put in order */
   setPart (index, text, { final = false } = {}) {
     const parts = this.values;
     parts[index] = final ? this.normalize(text) : String(text ?? '');
@@ -248,7 +220,7 @@ export class Input extends AufbauControl {
     return this.valueType.normalize?.(trimmed) ?? trimmed;
   }
 
-  /** from never lies behind to */
+  // from never lies behind to
   order (parts) {
     const [from, to] = parts;
     return from && to && this.toNumber(from) > this.toNumber(to) ? [to, from] : parts;
@@ -262,18 +234,17 @@ export class Input extends AufbauControl {
   removeAt (index) { return this.setValue(this.values.filter((value, position) => position !== index)); }
 
   // :::::: AXIS ::::::::::::::::::::::::::::::::::::::::::::::::
-  // a type with an axis (number, date, time, color, …) can be stepped and slid
 
   toNumber   (raw)              { const type = this.valueType; return type.axis.toNumber(type.parse(raw)); }
   fromNumber (number, previous) { const type = this.valueType; return type.format(type.axis.fromNumber(number, previous)); }
 
-  /** [min, max] the author gave, open ends are infinite */
+  // [min, max] the author gave, open ends are infinite
   get limits () {
     const { max, min } = this.getAttr();
     return [min === undefined ? -Infinity : this.toNumber(min), max === undefined ? Infinity : this.toNumber(max)];
   }
 
-  /** [min, max] of a track: the author's, else the type's own */
+  // [min, max] of a track: the author's, else the type's own
   get bounds () {
     const [low, up]    = this.valueType.axis?.bounds ?? [0, 100];
     const { max, min } = this.getAttr();
@@ -282,7 +253,6 @@ export class Input extends AufbauControl {
 
   get stepSize () { return this.getAttr('step') || this.valueType.axis?.step || 1; }
 
-  /** a position on the axis into one part. `track` keeps it within the bounds of a track */
   setNumber (index, number, { track = false } = {}) {
     const [min, max] = track ? this.bounds : this.limits;
     const parts      = this.values;
@@ -308,7 +278,6 @@ export class Input extends AufbauControl {
 
   get selected () { return new Set(this.values.filter(Boolean)); }
 
-  /** picks an option. with `multiple` it is added or taken away */
   select (value) {
     if (this.count !== 'multiple') return this.setValue(value);
 
@@ -317,7 +286,7 @@ export class Input extends AufbauControl {
     return this.setValue([...next]);
   }
 
-  /** the next enabled option, around at both ends */
+  // the next enabled option, around at both ends
   cycle (direction = 1) {
     const options = this.options.filter(option => !option.disabled);
     if (!options.length) return this;
@@ -344,7 +313,6 @@ export class Input extends AufbauControl {
     return icon === 'false' ? null : icon || this.valueType.icon || null;
   }
 
-  // the contract of the copy, paste, clear and reveal buttons (../lib/actions.js)
   actionText   () { return this.value; }
   actionTarget () { return this.isLocked ? null : this.focusTarget; }
   revealTarget () { return this.focusTarget; }
@@ -360,17 +328,13 @@ export class Input extends AufbauControl {
   }
 
   onMount () {
-    // the native input event is composed and would leave the shadow root next to
-    // the one commit() announces. only the host speaks for the control
     this.on(this.root, 'input',       event => event.stopPropagation());
     this.on(this.root, 'beforeinput', event => event.stopPropagation());
 
-    // option children added, removed or changed. the host's own attributes are no option
     const observer = new MutationObserver(records => { if (records.some(record => record.target !== this)) this.update(); });
     observer.observe(this, { attributes: true, childList: true, subtree: true, attributeFilter: ['value', 'label', 'icon', 'disabled', 'selected'] });
     this.track(() => observer.disconnect());
 
-    // a preselected <input-option selected> is the default too, form.reset() goes back to it
     if (!this.hasAttribute('value')) {
       const preselected = this.options.filter(option => option.selected).map(option => option.value);
       if (preselected.length) {
@@ -380,7 +344,6 @@ export class Input extends AufbauControl {
     }
   }
 
-  // a disconnect released every listener, the next connect binds them anew
   onUnmount () { this._bound = null; }
 
   update () {

@@ -1,6 +1,3 @@
-// a search query. emits `search` with { query } once the typing paused
-// (`debounce`, 250ms), so a list can filter without reacting to every key
-
 import text from './text.js';
 
 export default {

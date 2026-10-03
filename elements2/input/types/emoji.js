@@ -1,8 +1,3 @@
-// an emoji, as the character itself: '😀'. searched by its english unicode name:
-// 'grinning', 'heart', 'cat'. every typed word has to start a word of the name,
-// so 'cat' finds 'cat face', not 'identification'. without a query the first
-// ones of the list show. `limit` caps the hits, 120 by default
-
 import { listType, withCurrent } from './list.js';
 
 function matches (name, words) {
