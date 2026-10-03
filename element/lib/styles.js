@@ -4,17 +4,26 @@ import { isFn }        from '@pulgasari/is';
 export const BASE_LAYER = 'aufbau.elements';
 export const SKIN_LAYER = 'aufbau.skin';
 
-let ordered = false;
+const SUPPORTED = typeof CSSStyleSheet !== 'undefined' && typeof Document !== 'undefined' && 'adoptedStyleSheets' in Document.prototype;
 
-export function ensureLayerOrder (target = document) {
-  if (ordered || typeof CSSStyleSheet === 'undefined' || !('adoptedStyleSheets' in Document.prototype)) return;
-  ordered = true;
+// a constructed sheet can only be adopted in the document it was made for:
+// document -> { order, classes: class -> sheet }. every tree of that document shares them
+const cache = new WeakMap;
 
-  const root  = target.adoptedStyleSheets ? target : document;
-  const sheet = new CSSStyleSheet;
-  sheet.replaceSync(`@layer ${BASE_LAYER}, ${SKIN_LAYER};`);
-  root.adoptedStyleSheets = [sheet, ...root.adoptedStyleSheets];
+function cacheOf (doc) {
+  let entry = cache.get(doc);
+  if (!entry) cache.set(doc, entry = { classes: new Map, order: null });
+  return entry;
 }
+
+function createSheet (doc, css) {
+  const Sheet = doc.defaultView?.CSSStyleSheet ?? CSSStyleSheet;
+  const sheet = new Sheet;
+  sheet.replaceSync(css);
+  return sheet;
+}
+
+const documentOf = root => root.ownerDocument ?? root;
 
 function styleOwners (Cls) {
   const owners = [];
@@ -30,18 +39,38 @@ const toCss = (styles, owner) => {
   return list.filter(Boolean).join('\n');
 };
 
-export function adoptClassStyles (Cls, target = document) {
-  ensureLayerOrder(target);
-
-  for (const owner of styleOwners(Cls)) {
-    adoptStylesheet(toCss(owner.styles, owner), {
-      target,
-      layer : owner.styleLayer ?? BASE_LAYER,
-      key   : `aufbau:styles:${owner.name}`,
-    });
-  }
+// the styles of one class, built once per document
+function classSheet (owner, doc) {
+  const { classes } = cacheOf(doc);
+  let sheet = classes.get(owner);
+  if (!sheet) classes.set(owner, sheet = createSheet(doc, `@layer ${owner.styleLayer ?? BASE_LAYER} {\n${toCss(owner.styles, owner)}\n}`));
+  return sheet;
 }
 
-export const adoptBaseStyles = (key, css) =>
-  adoptStylesheet(css, { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
+// the layer order goes first into every tree that gets element styles
+export function ensureLayerOrder (root = document) {
+  if (!SUPPORTED || !root?.adoptedStyleSheets) return;
 
+  const entry = cacheOf(documentOf(root));
+  entry.order ??= createSheet(documentOf(root), `@layer ${BASE_LAYER}, ${SKIN_LAYER};`);
+
+  if (!root.adoptedStyleSheets.includes(entry.order)) root.adoptedStyleSheets = [entry.order, ...root.adoptedStyleSheets];
+}
+
+// root: the shadow root of the element, or the document or shadow root it sits in
+export function adoptClassStyles (Cls, root = document) {
+  if (!SUPPORTED || !root?.adoptedStyleSheets) return;
+
+  ensureLayerOrder(root);
+
+  const doc     = documentOf(root);
+  const adopted = root.adoptedStyleSheets;
+  const missing = styleOwners(Cls).map(owner => classSheet(owner, doc)).filter(sheet => !adopted.includes(sheet));
+
+  if (missing.length) root.adoptedStyleSheets = [...adopted, ...missing];
+}
+
+export function adoptBaseStyles (key, css) {
+  ensureLayerOrder(document);
+  return adoptStylesheet(css, { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
+}
