@@ -139,7 +139,7 @@ pill  =
   --factor-radius : 0.10rem;
   --factor-space  : 0.25rem;
 
-  --mode-of-radius: : auto;
+  --mode-of-radius: auto;
 }
 
 @container style(--geometry: sharp) { body { --mode-of-radius:  off; } }
@@ -157,7 +157,7 @@ pill  =
 
 /*//////////// NODE DEPTH ////////////*/
 /* automatic calculation node depth */
-* > * {
+body * > * {
   --depth           : calc(var(--depth-of-parent, 0) + 1);
   --depth-of-parent : var(--depth);
 }
