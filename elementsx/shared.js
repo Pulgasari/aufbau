@@ -11,17 +11,21 @@ export const log  = new Logger({ prefix: '@aufbau/elements' });
 
 import delegateEvent from '@domina/methods/delegateEvent.js';
 import emitEvent     from '@domina/methods/emitEvent.js';
+import getStyleToken from '@domina/methods/getStyleToken.js';
 import hasAttr       from '@domina/methods/hasAttr.js';
 import offEvent      from '@domina/methods/offEvent.js';
 import onEvent       from '@domina/methods/onEvent.js';
 import setAttr       from '@domina/methods/setAttr.js';
+import setStyleToken from '@domina/methods/setStyleToken.js';
 
 export const dom = {
   delegateEvent,
   emitEvent,
+  getStyleToken,
   hasAttr,
   offEvent,
   onEvent,
   setAttr,
+  setStyleToken,
 };
 
