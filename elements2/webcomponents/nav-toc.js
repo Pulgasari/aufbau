@@ -6,7 +6,7 @@ import { getElement }  from '@domina/methods/getElement.js';
 import { getElements } from '@domina/methods/getElements.js';
 import { observe }     from '@domina/observer';
 
-export default class AufbauToc extends AufbauElement {
+export default class NavToc extends AufbauElement {
   static internals = { role: 'navigation' };
 
   static attr = {
@@ -15,7 +15,7 @@ export default class AufbauToc extends AufbauElement {
     target   : String,
   };
 
-  static styles = `aufbau-toc {
+  static styles = `nav-toc {
     display: block;
 
     > ol {
@@ -136,4 +136,4 @@ export default class AufbauToc extends AufbauElement {
   }
 }
 
-AufbauToc.init();
+NavToc.init();

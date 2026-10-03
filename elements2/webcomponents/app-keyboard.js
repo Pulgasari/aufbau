@@ -1,4 +1,4 @@
-// <aufbau-keyboard>
+// <app-keyboard>
 
 // :::::: IMPORTS
 
@@ -82,7 +82,7 @@ function restoreNative () {
 
 // :::::: MAIN
 
-export default class AufbauKeyboard extends AufbauElement {
+export default class AppKeyboard extends AufbauElement {
   static layouts = LAYOUTS;
 
   static attr = {
@@ -100,7 +100,7 @@ export default class AufbauKeyboard extends AufbauElement {
     shift : Boolean,
   };
 
-  static styles = `aufbau-keyboard {
+  static styles = `app-keyboard {
     background          : var(--keyboard-bg, var(--color-bg, Canvas));
     display             : flex;
     flex-direction      : column;
@@ -154,7 +154,7 @@ export default class AufbauKeyboard extends AufbauElement {
 
   // :::::: STATE
 
-  get layout    () { return AufbauKeyboard.layouts[this.getAttr('layout')] ?? AufbauKeyboard.layouts.de; }         
+  get layout    () { return AppKeyboard.layouts[this.getAttr('layout')] ?? AppKeyboard.layouts.de; }         
   get isShifted () { return this.getAttr('shift') || this.getAttr('caps'); }
 
   get target () {
@@ -200,7 +200,7 @@ export default class AufbauKeyboard extends AufbauElement {
 
     const target = this.target;
 
-    this.emit('aufbau-keyboard-key', {
+    this.emit('app-keyboard-key', {
       key, target, shiftKey: init.shiftKey, ctrlKey: init.ctrlKey, altKey: init.altKey,
     });
 
@@ -314,4 +314,4 @@ export default class AufbauKeyboard extends AufbauElement {
   }
 }
 
-AufbauKeyboard.init();
+AppKeyboard.init();

@@ -15,7 +15,6 @@ a tag maps onto its module:
 
 const TAGS = [
   'aufbau-audio',
-  'aufbau-button',
   'aufbau-code',
   'aufbau-datalist',
   'aufbau-dropdown',
@@ -23,13 +22,11 @@ const TAGS = [
   'aufbau-filter',
   'aufbau-index',
   'aufbau-item',
-  'aufbau-keyboard',
   'aufbau-loop',
   'aufbau-progress',
   'aufbau-reader',
   'aufbau-skeleton',
   'aufbau-toast',
-  'aufbau-toc',
   'aufbau-value',
   'aufbau-video',
   'aufbau-waveform',
@@ -37,10 +34,15 @@ const TAGS = [
   'app-area',
   'app-config',
   'app-float',
+  'app-keyboard',
   'app-modal',
   'app-panel',
   'app-root',
   'app-view',
+
+  'btn-icon',
+  'btn-push',
+  'btn-tap',
 
   'data-table',
   'data-tree',
@@ -57,6 +59,7 @@ const TAGS = [
   'embed-youtube',
 
   'nav-crumbs',
+  'nav-toc',
 
   'svg-flag',
   'svg-icon',

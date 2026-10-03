@@ -6,7 +6,7 @@ them, in one package. what they build on, the base class, config and skin, is
 
 | folder           | what it is |
 |------------------|------------|
-| `webcomponents/` | every element, one file each named like its tag: `aufbau-keyboard.js`, `div-x.js`, … the inputs that are a type are all in `input/tags.js` |
+| `webcomponents/` | every element, one file each named like its tag: `app-keyboard.js`, `div-x.js`, … the inputs that are a type are all in `input/tags.js` |
 | `lib/`           | helpers of the elements: html, actions, locale, options, placement, … |
 | `data/`          | the lists the inputs pick from |
 | `adapters/`      | htx |
@@ -63,31 +63,62 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 
 the building blocks. the controls that hold a value are the input-* elements below.
 
+[`<app-keyboard>`](#app-keyboard) ·
 [`<app-modal>`](#app-modal) ·
 [`<aufbau-audio>`](#aufbau-audio) ·
-[`<aufbau-button>`](#aufbau-button) ·
 [`<aufbau-code>`](#aufbau-code) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
 [`<aufbau-embed>`](#aufbau-embed) ·
 [`<aufbau-index>`](#aufbau-index) ·
-[`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
 [`<aufbau-toast>`](#aufbau-toast) ·
-[`<aufbau-toc>`](#aufbau-toc) ·
 [`<aufbau-value>`](#aufbau-value) ·
 [`<aufbau-video>`](#aufbau-video) ·
 [`<aufbau-waveform>`](#aufbau-waveform) ·
+[`<btn-push>`](#btn-push-btn-tap-btn-icon) ·
+[`<btn-tap>`](#btn-push-btn-tap-btn-icon) ·
+[`<btn-icon>`](#btn-push-btn-tap-btn-icon) ·
 [`<data-table>`](#data-table) ·
 [`<data-tree>`](#data-tree) ·
 [`<input-file>`](#input-file) ·
 [`<nav-crumbs>`](#nav-crumbs) ·
+[`<nav-toc>`](#nav-toc) ·
 [`<svg-flag>`](#svg-flag) ·
 [`<svg-icon>`](#svg-icon) ·
 [`<write-text>`](#write-text) ·
+
+## app-keyboard
+
+eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
+sie tippt in das, was fokus hat, oder in `target`, indem sie die
+keyboard-events schickt, die eine echte taste schicken würde. wo der browser
+die VirtualKeyboard-api hat, hält sie die native tastatur unten.
+
+```html
+<app-keyboard></app-keyboard>
+<app-keyboard layout="en" target="#editor textarea"></app-keyboard>
+<app-keyboard rows="keys" native-keyboard="keep"></app-keyboard>
+```
+
+`rows` sagt, welche blöcke in welcher reihenfolge gerendert werden
+(`"symbols keys"` ist der default). `layout` ist `de` oder `en`, eigene kommen
+über `AppKeyboard.layouts.fr = { regular, shift, symbols }` dazu: eine reihe
+ist ein string aus zeichen, ein leerzeichen darin ist eine lücke.
+
+`shift`, `caps`, `ctrl` und `alt` stehen als attribute am element, sind also
+les- und stylebar; shift, ctrl und alt sind einmalig und fallen mit der taste
+weg, die sie modifiziert haben. jede taste meldet sich als
+`app-keyboard-key`, und `press(key)` / `toggle(name)` gehen auch ohne klick.
+
+zwei dinge, die sie von der vorlage aus `apps/code` unterscheiden: eine taste,
+die ein editor selbst behandelt (`preventDefault` auf dem keydown), wird nicht
+noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
+wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
+hat und sonst gar nichts passieren würde.
 
 ## app-modal
 
@@ -129,18 +160,6 @@ abdunklung über `--modal-backdrop`.
   cover="/media/cover.jpg"
   layout="card">
 </aufbau-audio>
-```
-
-## aufbau-button
-
-```html
-<!-- 1. Button mit Icon + Attribut-Text -->
-<aufbau-button icon="lucide:save" label="Speichern" variant="primary"></aufbau-button>
-
-<!-- 2. Button mit Icon + Custom Children HTML -->
-<aufbau-button icon="lucide:trash-2" variant="danger">
-  <strong>Löschen</strong> <small>(irreversibel)</small>
-</aufbau-button>
 ```
 
 ## aufbau-code
@@ -304,35 +323,6 @@ bewusst über seinen rand hinaus zeichnet, denn skipping impliziert paint contai
 <aufbau-item intrinsic-size="480px">großer teaser</aufbau-item>
 ```
 
-## aufbau-keyboard
-
-eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
-sie tippt in das, was fokus hat, oder in `target`, indem sie die
-keyboard-events schickt, die eine echte taste schicken würde. wo der browser
-die VirtualKeyboard-api hat, hält sie die native tastatur unten.
-
-```html
-<aufbau-keyboard></aufbau-keyboard>
-<aufbau-keyboard layout="en" target="#editor textarea"></aufbau-keyboard>
-<aufbau-keyboard rows="keys" native-keyboard="keep"></aufbau-keyboard>
-```
-
-`rows` sagt, welche blöcke in welcher reihenfolge gerendert werden
-(`"symbols keys"` ist der default). `layout` ist `de` oder `en`, eigene kommen
-über `AufbauKeyboard.layouts.fr = { regular, shift, symbols }` dazu: eine reihe
-ist ein string aus zeichen, ein leerzeichen darin ist eine lücke.
-
-`shift`, `caps`, `ctrl` und `alt` stehen als attribute am element, sind also
-les- und stylebar; shift, ctrl und alt sind einmalig und fallen mit der taste
-weg, die sie modifiziert haben. jede taste meldet sich als
-`aufbau-keyboard-key`, und `press(key)` / `toggle(name)` gehen auch ohne klick.
-
-zwei dinge, die sie von der vorlage aus `apps/code` unterscheiden: eine taste,
-die ein editor selbst behandelt (`preventDefault` auf dem keydown), wird nicht
-noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
-wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
-hat und sonst gar nichts passieren würde.
-
 ## aufbau-loop
 
 ```html
@@ -433,25 +423,6 @@ notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
 </aufbau-toast>
 ```
 
-## aufbau-toc
-
-```html
-<div id="layout">
-  <!-- Content area that gets mutated by markdown import -->
-  <main id="markdown-container">
-    <!-- HTML injected via @aufbau/import -->
-  </main>
-
-  <!-- Autonomous TOC Component -->
-  <aufbau-toc target="#markdown-container" selector="h2, h3" label="Inhalt"></aufbau-toc>
-</div>
-```
-
-der host ist die navigation-landmark, `label` ist sichtbare überschrift und
-accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
-jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
-überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
-
 ## aufbau-value
 
 ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
@@ -512,6 +483,36 @@ einem svg der balken maskiert. ein fortschritts-update ist eine custom property,
 die balken werden nur bei neuen peaks neu gezeichnet. farben über
 `--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
 `--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
+
+## btn-push, btn-tap, btn-icon
+
+three buttons for three roles: `btn-push` is filled and does the main thing,
+`btn-tap` stays light (menus, toolbars, secondary actions), `btn-icon` shows
+only an icon.
+
+```html
+<btn-push icon="save" type="submit">Speichern</btn-push>
+<btn-tap>Abbrechen</btn-tap>
+<btn-icon icon="lucide:settings" label="Einstellungen"></btn-icon>
+```
+
+`command` runs a command on a target, named like the native invoker commands.
+the command also brings an icon and a label, so `<btn-icon command="close">`
+needs nothing else:
+
+```html
+<app-modal heading="Hallo">
+  <btn-icon command="close"></btn-icon>          <!-- the nearest element above with close() -->
+</app-modal>
+
+<btn-tap command="share" commandfor="#post">Teilen</btn-tap>   <!-- an id or a selector -->
+<btn-push command="show-modal" commandfor="settings">Öffnen</btn-push>   <!-- a native <dialog> as well -->
+```
+
+the command becomes a method (`show-modal` -> `showModal()`, `--my-thing` ->
+`myThing()`). a target without that method gets a `command` event. the presets:
+`add` `back` `cancel` `close` `collapse` `copy` `delete` `edit` `expand` `menu`
+`more` `save` `search` `share`, more through `Btn.commands`.
 
 ## config
 
@@ -598,6 +599,25 @@ im light dom. zwei quellen:
 
 `max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
 den pfad (default `/`).
+
+## nav-toc
+
+```html
+<div id="layout">
+  <!-- Content area that gets mutated by markdown import -->
+  <main id="markdown-container">
+    <!-- HTML injected via @aufbau/import -->
+  </main>
+
+  <!-- Autonomous TOC Component -->
+  <nav-toc target="#markdown-container" selector="h2, h3" label="Inhalt"></nav-toc>
+</div>
+```
+
+der host ist die navigation-landmark, `label` ist sichtbare überschrift und
+accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
+jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
+überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
 
 ## svg-flag
 
