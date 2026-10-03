@@ -55,7 +55,7 @@ export function reposition (host, anchor) {
 
 export function setOpen (host, open, anchor) {
   const list = host.part('listbox').node;
-  if (!list || host.isDisabled || open === isOpen(host)) return;
+  if (!list || host.disabled || open === isOpen(host)) return;
 
   const hadFocus = list.contains(host.focused);
 

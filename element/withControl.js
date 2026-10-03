@@ -87,9 +87,11 @@ export const withControl = Base => class AufbauControl extends Base {
 
   // :::::: FORM ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  get disabled () { return this.hasAttribute('disabled') || Boolean(this._formDisabled); }
-  get name     () { return this.getAttribute('name') ?? ''; }
-  get type     () { return this.getAttribute('type') ?? this.localName; }
+  // the own attribute or a disabled fieldset
+  get disabled ()      { return this.getAttr('disabled') || Boolean(this._formDisabled); }
+  set disabled (value) { this.setAttr({ disabled: Boolean(value) }); }
+  get name     ()      { return this.getAttribute('name') ?? ''; }
+  get type     ()      { return this.getAttribute('type') ?? this.localName; }
 
   get form              () { return this.internals?.form              ?? null;  }
   get labels            () { return this.internals?.labels            ?? [];    }
@@ -146,7 +148,7 @@ export const withControl = Base => class AufbauControl extends Base {
 
     if (!target && !this._persistWarned) {
       this._persistWarned = true;
-      log.warn(`<${this.tag} persist> needs a name, an id or persist="<key>" to store under.`);
+      log.warn(`<${this.localName} persist> needs a name, an id or persist="<key>" to store under.`);
     }
 
     return target;
@@ -181,8 +183,6 @@ export const withControl = Base => class AufbauControl extends Base {
 
   // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::
 
-  get isDisabled () { return this.getAttr('disabled') || Boolean(this._formDisabled); }
-
   get focusTarget () { return this.$(FOCUSABLE).node; }
 
   focus (options) {
@@ -194,7 +194,7 @@ export const withControl = Base => class AufbauControl extends Base {
 
   sync () {
     const { label, readonly, required } = this.getAttr();
-    const disabled  = this.isDisabled;
+    const disabled  = this.disabled;
     const internals = this.internals;
 
     if (internals) {

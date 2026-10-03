@@ -150,7 +150,7 @@ this.commit(next)           // the one way to change the value: attribute, form 
 this.formValue              // what the form submits, null for nothing
 this.validate()             // extend for own checks
 this.focusTarget            // what focus() and the label point at
-this.isDisabled             // own attribute or a disabled fieldset
+this.disabled               // own attribute or a disabled fieldset, settable
 ```
 
 hooks after the default handling: `onFormAssociated(form)` · `onFormDisabled(disabled)` ·

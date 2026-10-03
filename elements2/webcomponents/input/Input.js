@@ -217,7 +217,7 @@ export class Input extends AufbauControlElement {
     return data;
   }
 
-  get isLocked () { return this.isDisabled || Boolean(this.getAttr('readonly')); }
+  get isLocked () { return this.disabled || Boolean(this.getAttr('readonly')); }
 
   // the whole value at once, a string or its parts
   setValue (value) { return this.isLocked ? this : this.commit(value); }

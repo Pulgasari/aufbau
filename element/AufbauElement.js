@@ -26,11 +26,12 @@ const disposer = () => {
   };
 };
 
-const stateSet = (host) => ({
-  add    (name)        { try { host.internals?.states?.add(name);    } catch {} return this; },
-  delete (name)        { try { host.internals?.states?.delete(name); } catch {} return this; },
-  has    (name)        { try { return Boolean(host.internals?.states?.has(name)); } catch { return false; } },
-  toggle (name, force) { return (force ?? !this.has(name)) ? this.add(name) : this.delete(name); },
+// the custom states of the host, :state(name) in css. toggle() is what CustomStateSet lacks
+const stateSet = host => ({
+  add    (name)                         { host.internals?.states.add(name);    return this; },
+  delete (name)                         { host.internals?.states.delete(name); return this; },
+  has    (name)                         { return Boolean(host.internals?.states.has(name)); },
+  toggle (name, force = !this.has(name)) { return force ? this.add(name) : this.delete(name); },
 });
 
 // :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::::
@@ -229,7 +230,6 @@ export class AufbauElement extends HTMLElement {
   // :::::: SCHEMA ::::::::::::::::::::::::::::::::::::::::::::::
 
   get schema () { return schemaOf(this.constructor); }
-  get tag    () { return this.localName; }
 
   // the schema entry of a name in any case, a loose one outside the schema
   entryOf (name) { return this.schema.get(name) ?? looseEntry(name); }

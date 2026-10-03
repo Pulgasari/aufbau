@@ -111,7 +111,7 @@ export interface AufbauControl {
   readonly formValue    : string | null;
   readonly focusTarget  : Element | null;
   readonly form         : HTMLFormElement | null;
-  readonly isDisabled   : boolean;
+  disabled              : boolean;
 
   commit      (next: unknown, options?: { notify?: boolean }): this;
   formatValue (value: unknown): string;

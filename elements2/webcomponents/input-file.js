@@ -127,11 +127,11 @@ export default class InputFile extends AufbauControlElement {
 
   onConnected () {
     this.on('change', 'input[type="file"]', (event, input) => this.add([...input.files]));
-    this.on('click',  '[part~="zone"]',     () => { if (!this.isDisabled) this.field?.click(); });
+    this.on('click',  '[part~="zone"]',     () => { if (!this.disabled) this.field?.click(); });
     this.on('click',  '[data-remove]',   (event, button) => this.remove(Number(button.dataset.remove)));
 
     this.on('dragenter dragover', (event) => {
-      if (this.isDisabled) return;
+      if (this.disabled) return;
       event.preventDefault();
       this.states.toggle('dragging', true);
     });
@@ -143,7 +143,7 @@ export default class InputFile extends AufbauControlElement {
     this.on('drop', (event) => {
       event.preventDefault();
       this.states.toggle('dragging', false);
-      if (!this.isDisabled) this.add([...(event.dataTransfer?.files ?? [])]);
+      if (!this.disabled) this.add([...(event.dataTransfer?.files ?? [])]);
     });
   }
 

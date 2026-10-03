@@ -153,7 +153,7 @@ export default class WriteText extends withSource(withControl(AufbauElement)) {
 
     setAttr(field, { readonly });
 
-    this.$$('[data-action="paste"], [data-action="clear"]').attr({ disabled: this.isDisabled || readonly });
+    this.$$('[data-action="paste"], [data-action="clear"]').attr({ disabled: this.disabled || readonly });
     this.$('footer > output').text(maxlength ? `${value.length} / ${maxlength}` : String(value.length));
 
     this.states.toggle('full', Boolean(maxlength) && value.length >= maxlength);
