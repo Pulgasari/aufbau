@@ -61,3 +61,11 @@ export function groupEvents (host, on) {
     if (host.count !== 'multiple') host.select(next.dataset.value);
   });
 }
+
+// what every look showing all options at once shares
+export const GROUP = {
+  events : groupEvents,
+  focus  : host => host.root.querySelector('[data-value][tabindex="0"]'),
+  role   : host => host.count === 'multiple' ? 'group' : 'radiogroup',
+  update : host => updateTabStop(host, updateSelected(host)),
+};

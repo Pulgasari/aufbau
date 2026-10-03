@@ -1,6 +1,7 @@
 import './svg-icon.js';
 
 import { AufbauElement } from '../base/AufbauElement.js';
+import { ELLIPSIS }      from '../lib/css.js';
 
 export class AppPanel extends AufbauElement {
 
@@ -33,10 +34,7 @@ export class AppPanel extends AufbauElement {
     [part="heading"] {
       flex          : 1 1 auto;
       font-weight   : 600;
-      min-inline-size : 0;
-      overflow      : hidden;
-      text-overflow : ellipsis;
-      white-space   : nowrap;
+      ${ELLIPSIS}
     }
 
     button {

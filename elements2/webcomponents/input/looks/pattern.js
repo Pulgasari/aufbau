@@ -1,6 +1,6 @@
-import { attrs, html }                  from '../../../lib/html.js';
-import { place }                        from '../../../lib/placement.js';
-import { formatPattern, parsePattern }  from '../types/pattern.js';
+import { attrs, html }                 from '../../../lib/html.js';
+import { place }                       from '../../../lib/placement.js';
+import { formatPattern, parsePattern } from '../types/pattern.js';
 
 const currentOf  = host => host.root.querySelector('[part~="current"]');
 const popoverOf  = host => host.root.querySelector('[part~="patterns"]');
@@ -81,7 +81,7 @@ export default {
 
     [part~="current"], [part~="swatch"] {
       aspect-ratio  : 1;
-      border        : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border        : var(--input-line);
       border-radius : var(--radius-control, 0.4em);
       inline-size   : var(--pattern-swatch-size, 2.75em);
       overflow      : hidden;
@@ -110,7 +110,7 @@ export default {
 
     [part~="color"] {
       block-size    : 2em;
-      border        : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border        : var(--input-line);
       border-radius : var(--radius-control, 0.4em);
       inline-size   : 2.5em;
       padding       : 0.15em;
@@ -118,7 +118,7 @@ export default {
 
     [part~="patterns"] {
       background            : var(--color-bg, Canvas);
-      border                : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border                : var(--input-line);
       border-radius         : var(--radius-control, 0.4em);
       color                 : inherit;
       gap                   : 0.375em;

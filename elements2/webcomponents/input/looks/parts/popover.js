@@ -1,7 +1,7 @@
-import { attrs, html }                         from '../../../../lib/html.js';
-import { place }                               from '../../../../lib/placement.js';
+import { attrs, html }                     from '../../../../lib/html.js';
+import { place }                           from '../../../../lib/placement.js';
 import { nextIndex }                       from './keys.js';
-import { isInactive, labelOf, optionIcon }  from './options.js';
+import { isInactive, labelOf, optionIcon } from './options.js';
 
 export const listboxOf = host => host.root.querySelector('[part~="listbox"]');
 export const triggerOf = host => host.root.querySelector('[aria-haspopup]');
@@ -21,7 +21,7 @@ export const listbox = host => html`
 export const LISTBOX = `
   [part~="listbox"] {
     background          : var(--color-bg, Canvas);
-    border              : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+    border              : var(--input-line);
     border-radius       : var(--radius-control, 0.4em);
     color               : inherit;
     margin              : 0;

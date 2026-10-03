@@ -1,6 +1,6 @@
-import { attrs, html }                                                  from '../../../lib/html.js';
-import { FRAME, icon }                                                  from './parts/field.js';
-import { labelOf, updateSelected }                                      from './parts/options.js';
+import { attrs, html }                                                                    from '../../../lib/html.js';
+import { FRAME, icon }                                                                    from './parts/field.js';
+import { labelOf, updateSelected }                                                        from './parts/options.js';
 import { LISTBOX, filter, isOpen, listbox, listboxOf, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
 
 function showSelection (host) {

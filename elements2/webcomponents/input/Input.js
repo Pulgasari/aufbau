@@ -2,15 +2,18 @@ import '../svg-icon.js';
 
 import { isArray } from '@pulgasari/is';
 
-import { AufbauControlElement }            from '../../base/AufbauControlElement.js';
-import { html }                     from '../../lib/html.js';
-import { LOOKS, lookFor, sheetOf }  from './looks/index.js';
-import { OptionSource }             from './options.js';
-import { TYPE_ATTRIBUTES, typeOf }  from './types/index.js';
-import { joinValue, splitValue }    from './values.js';
+import { AufbauControlElement }    from '../../base/AufbauControlElement.js';
+import { html }                    from '../../lib/html.js';
+import { LOOKS, lookFor, sheetOf } from './looks/index.js';
+import { OptionSource }            from './options.js';
+import { TYPE_ATTRIBUTES, typeOf } from './types/index.js';
+import { joinValue, splitValue }   from './values.js';
+import { PLAIN_BUTTON }            from '../../lib/css.js';
 
 const STYLES = `
   :host {
+    --input-line    : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+
     box-sizing      : border-box;
     color           : inherit;
     display         : inline-flex;
@@ -38,19 +41,11 @@ const STYLES = `
   }
 
   button {
-    align-items     : center;
+    ${PLAIN_BUTTON}
     appearance      : none;
-    background      : none;
-    border          : 0;
-    color           : inherit;
-    cursor          : pointer;
-    display         : inline-flex;
     flex            : none;
-    font            : inherit;
     gap             : 0.5em;
     justify-content : center;
-    margin          : 0;
-    padding         : 0;
   }
 
   input {
@@ -61,6 +56,7 @@ const STYLES = `
     margin          : 0;
     min-inline-size : 0;
     padding         : 0;
+    &::-webkit-search-cancel-button { appearance: none; }
   }
 `;
 

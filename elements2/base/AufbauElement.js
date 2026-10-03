@@ -1,8 +1,8 @@
 // :::::: IMPORTS
 
-import { BASE, schemaOf }   from '../lib/schema.js';
-import { applySkin }        from '../lib/skin.js';
-import { adoptClassStyles } from '../lib/styles.js';
+import { BASE, schemaOf }                                        from '../lib/schema.js';
+import { applySkin }                                             from '../lib/skin.js';
+import { adoptClassStyles }                                      from '../lib/styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from '../lib/config.js';
 
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';
@@ -11,7 +11,6 @@ import { getElement }     from '@domina/methods/getElement.js';
 import { getElementById } from '@domina/methods/getElementById.js';
 import { getElements }    from '@domina/methods/getElements.js';
 import { hasAttr }        from '@domina/methods/hasAttr.js';
-import { offEvent }       from '@domina/methods/offEvent.js';
 import { onEvent }        from '@domina/methods/onEvent.js';
 import { setAttr }        from '@domina/methods/setAttr.js';
 
@@ -27,9 +26,8 @@ const log       = new Logger({ prefix: 'aufbau-core' });
 const disposer = () => {
   const entries = new Set;
   return {
-    add      (stop) { if (isFn(stop)) entries.add(stop); return stop; },
-    dispose  ()     { for (const stop of entries) { try { stop(); } catch {} } entries.clear(); },
-    get size ()     { return entries.size; }
+    add     (stop) { if (isFn(stop)) entries.add(stop); return stop; },
+    dispose ()     { for (const stop of entries) { try { stop(); } catch {} } entries.clear(); },
   };
 };
 
@@ -338,14 +336,7 @@ export class AufbauElement extends HTMLElement {
     return this.track(onEvent(first, second, third, fourth));
   }
 
-  off  (...args) { offEvent(this, ...args); return this; }
   emit (...args) { return emitEvent(this, ...args); }
-
-  onOutside (handler, { type = 'pointerdown' } = {}) {
-    return this.on(document, type, (event) => {
-      if (!event.composedPath().includes(this)) handler(event);
-    });
-  }
 
   release ()            { this._effects.dispose(); return this; }
   track   (unsubscribe) { return this._effects.add(unsubscribe); }
@@ -399,34 +390,11 @@ export class AufbauElement extends HTMLElement {
 
   // :::::: STYLE VARS :::::::::::::::::::::::::::::::::::::::::::
 
-  varPrefix () {
-    const raw = this.getConfig('varPrefix', 'aufbau', [...configKeys(this.tag, 'varPrefix'), 'var-prefix']);
-    if (raw === false || raw === 'false') return '';
-    if (raw === true  || raw === 'true')  return 'aufbau';
-    return String(raw);
-  }
-
-  cssVar (name) {
-    const base   = name.startsWith('--') ? name.slice(2) : name;
-    const prefix = this.varPrefix();
-    return `--${prefix && base !== prefix && !base.startsWith(`${prefix}-`) ? `${prefix}-${base}` : base}`;
-  }
-
-  getVar (name, fallback) {
-    const value = getComputedStyle(this).getPropertyValue(this.cssVar(name)).trim();
-    return value || fallback;
-  }
-
-  getVars (names = []) {
-    const style = getComputedStyle(this);
-    const out   = {};
-    for (const name of names) out[name] = style.getPropertyValue(this.cssVar(name)).trim() || undefined;
-    return out;
-  }
-
+  // item-size -> --aufbau-item-size
   setVar (name, value) {
-    if (isBlank(value)) this.style.removeProperty(this.cssVar(name));
-    else this.style.setProperty(this.cssVar(name), String(value));
+    const property = `--aufbau-${name.replace(/^--(aufbau-)?/, '')}`;
+    if (isBlank(value)) this.style.removeProperty(property);
+    else this.style.setProperty(property, String(value));
     return this;
   }
 
@@ -435,13 +403,12 @@ export class AufbauElement extends HTMLElement {
     return this;
   }
 
+  // attributes with `var` in their schema are mirrored as custom properties
   applyVars () {
     for (const [name, entry] of Object.entries(this.schema)) {
-      const key = entry.var === true ? name : entry.var;
-      if (entry.var) this.setVar(key, this.getAttr(name));
+      if (entry.var) this.setVar(entry.var === true ? name : entry.var, this.getAttr(name));
     }
   }
-  
 
   // :::::: CHILDREN REFS :::::::::::::::::::::::::::::::::::::::
 

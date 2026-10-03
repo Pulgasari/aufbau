@@ -3,7 +3,7 @@ import { attrs, html } from '../../../../lib/html.js';
 // the frame of a field like look, on the part box
 export const FRAME = `
   [part~="box"] {
-    border         : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+    border         : var(--input-line);
     border-radius  : var(--radius-control, 0.4em);
     min-block-size : var(--control-size, 2.25em);
     padding-inline : 0.6em;

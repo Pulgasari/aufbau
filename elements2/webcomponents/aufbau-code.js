@@ -1,13 +1,14 @@
 // <aufbau-code>
 
-import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
-import { attrs, html }          from '../lib/html.js';
-import { AufbauElement }        from '../base/AufbauElement.js';
-import { dedent }               from '../lib/dedent.js';
-import { getConfig, setConfig } from '../lib/config.js';
-
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
+import { debounce }        from '@pulgasari/timing';
+
+import { AufbauElement }                            from '../base/AufbauElement.js';
+import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
+import { getConfig, setConfig }                     from '../lib/config.js';
+import { dedent }                                   from '../lib/dedent.js';
+import { attrs, html }                              from '../lib/html.js';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
@@ -207,11 +208,13 @@ j
 
     this.on('focusin', 'code[contenteditable]', () => { this._focusedCode = this.source; });
 
+    const highlight = debounce(node => this.highlightInPlace(node), HIGHLIGHT_DELAY);
+    this.track(highlight.cancel);
+
     this.on('input', 'code[contenteditable]', (event, node) => {
       this._editedCode = node.textContent;
       this.emit('input', { code: this._editedCode });
-      clearTimeout(this._highlightTimer);
-      this._highlightTimer = setTimeout(() => this.highlightInPlace(node), HIGHLIGHT_DELAY);
+      highlight(node);
     });
 
     this.on('focusout', 'code[contenteditable]', () => {
@@ -220,8 +223,6 @@ j
       this.emit('change', { code: this._editedCode });
     });
   }
-
-  onUnmount () { clearTimeout(this._highlightTimer); }
 
   async highlightInPlace (node) {
     const source = node.textContent;

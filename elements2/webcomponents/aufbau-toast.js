@@ -4,6 +4,7 @@ import { setAttr }                 from '@domina/methods/setAttr.js';
 import { AufbauElement }   from '../base/AufbauElement.js';
 import { html }            from '../lib/html.js';
 import { adoptBaseStyles } from '../lib/styles.js';
+import { PLAIN_BUTTON }    from '../lib/css.js';
 
 const ICONS = {
   error   : 'lucide:alert-circle',
@@ -98,17 +99,9 @@ export default class AufbauToast extends AufbauElement {
     [part~="heading"] { font-weight: 600; }
 
     [part~="close"] {
-      align-items : center;
-      background  : none;
-      border      : 0;
-      color       : inherit;
-      cursor      : pointer;
-      display     : inline-flex;
-      font        : inherit;
+      ${PLAIN_BUTTON}
       grid-column : 3;
       grid-row    : 1 / span 2;
-      margin      : 0;
-      padding     : 0;
     }
   `;
 

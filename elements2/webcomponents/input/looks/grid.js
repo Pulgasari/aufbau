@@ -1,5 +1,7 @@
-import { html }                                                     from '../../../lib/html.js';
-import { groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
+import { debounce } from '@pulgasari/timing';
+
+import { html }                                                             from '../../../lib/html.js';
+import { GROUP, groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
 
 const DEBOUNCE = 250;
 
@@ -24,7 +26,7 @@ export default {
     [part~="box"] { align-items: stretch; flex-direction: column; }
 
     [part~="search"] {
-      border         : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border         : var(--input-line);
       border-radius  : var(--radius-control, 0.4em);
       min-block-size : var(--control-size, 2.25em);
       padding-inline : 0.6em;
@@ -58,17 +60,13 @@ export default {
   events (host, on) {
     groupEvents(host, on);
 
-    let timer = null;
-    host.track(() => clearTimeout(timer));
+    const search = debounce(query => host.source.search(query), DEBOUNCE);
+    host.track(search.cancel);
 
     on(host.root, 'input', event => {
       if (event.target !== searchOf(host)) return;
-      const query = event.target.value;
-
-      if (!host.valueType.list?.query) return filter(host, query);
-
-      clearTimeout(timer);
-      timer = setTimeout(() => host.source.search(query), DEBOUNCE);
+      if (host.valueType.list?.query) search(event.target.value);
+      else filter(host, event.target.value);
     });
   },
 
@@ -87,6 +85,6 @@ export default {
     updateTabStop(host, updateSelected(host));
   },
 
-  role  : host => host.count === 'multiple' ? 'group' : 'radiogroup',
+  role  : GROUP.role,
   focus : host => searchOf(host) ?? host.root.querySelector('[data-value][tabindex="0"]'),
 };

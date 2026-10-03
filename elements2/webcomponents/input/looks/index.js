@@ -1,5 +1,3 @@
-import { BASE_LAYER } from '../../../lib/styles.js';
-
 import button   from './button.js';
 import checkbox from './checkbox.js';
 import chips    from './chips.js';
@@ -27,10 +25,12 @@ export function lookFor (shape, ...wanted) {
 
 const sheets = new Map;
 
+// unlayered: it has to beat the layered base styles, whenever those are adopted.
+// page css still wins through ::part, it comes from outside the shadow root
 export function sheetOf (name) {
   if (!sheets.has(name)) {
     const sheet = new CSSStyleSheet;
-    sheet.replaceSync(`@layer ${BASE_LAYER} { ${LOOKS[name].css} }`);
+    sheet.replaceSync(LOOKS[name].css);
     sheet.isLookSheet = true;
     sheets.set(name, sheet);
   }

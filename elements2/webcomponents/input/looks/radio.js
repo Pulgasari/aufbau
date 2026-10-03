@@ -1,6 +1,8 @@
-import { groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
+import { GROUP, optionButtons } from './parts/options.js';
 
 export default {
+  ...GROUP,
+
   fits : shape => shape.kind === 'list' && shape.count !== 'range',
 
   css : `
@@ -25,8 +27,4 @@ export default {
   `,
 
   render : host => optionButtons(host, 'option', { mark: true }),
-  events : groupEvents,
-  update : host => updateTabStop(host, updateSelected(host)),
-  role   : host => host.count === 'multiple' ? 'group' : 'radiogroup',
-  focus  : host => host.root.querySelector('[data-value][tabindex="0"]'),
 };

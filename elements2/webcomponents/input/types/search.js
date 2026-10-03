@@ -1,3 +1,5 @@
+import { debounce } from '@pulgasari/timing';
+
 import text from './text.js';
 
 export default {
@@ -9,11 +11,8 @@ export default {
   placeholder : 'search…',
 
   setup (host, on) {
-    let timer = null;
-    on('input', () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => host.emit('search', { query: host.value }), Number(host.getAttribute('debounce') ?? 250));
-    });
-    host.track(() => clearTimeout(timer));
+    const announce = debounce(() => host.emit('search', { query: host.value }), Number(host.getAttribute('debounce') ?? 250));
+    host.track(announce.cancel);
+    on('input', announce);
   },
 };

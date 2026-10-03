@@ -1,5 +1,6 @@
 import { AufbauElement } from '../base/AufbauElement.js';
 import { html }          from '../lib/html.js';
+import { ELLIPSIS }      from '../lib/css.js';
 
 const ICONS = {
   file   : 'lucide:file-text',
@@ -56,10 +57,7 @@ export default class AufbauTreeItem extends AufbauElement {
 
     [part~="label"] {
       flex            : 1 1 auto;
-      min-inline-size : 0;
-      overflow        : hidden;
-      text-overflow   : ellipsis;
-      white-space     : nowrap;
+      ${ELLIPSIS}
     }
 
     slot { display: block; padding-inline-start: var(--tree-indent); }

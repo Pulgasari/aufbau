@@ -1,4 +1,4 @@
-import { html }                                                   from '../../../lib/html.js';
+import { html }                                                      from '../../../lib/html.js';
 import { FRAME, field, fieldEvents, firstField, icon, updateFields } from './parts/field.js';
 
 export default {

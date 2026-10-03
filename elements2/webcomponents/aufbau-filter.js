@@ -1,8 +1,10 @@
 import './input/tags.js';
 
+import { filterElements } from '@domina/methods/filterElements.js';
+import { debounce }       from '@pulgasari/timing';
+
 import { AufbauElement }  from '../base/AufbauElement.js';
 import { html }           from '../lib/html.js';
-import { filterElements } from '@domina/methods/filterElements.js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {
@@ -17,15 +19,12 @@ export default class AufbauFilter extends AufbauElement {
   static styles = `aufbau-filter { display: block; > input-search { inline-size: 100%; } }`;
 
   onMount () {
-    this.on('input', 'input-search', (event, input) => {
-      clearTimeout(this._timer);
-      this._timer = setTimeout(() => this.apply(input.value), this.getAttr('debounce'));
-    });
+    const apply = debounce(query => this.apply(query), this.getAttr('debounce'));
+    this.track(apply.cancel);
+    this.on('input', 'input-search', (event, input) => apply(input.value));
 
     this.on('aufbau-filter-reset', () => this.apply(''));
   }
-
-  onUnmount () { clearTimeout(this._timer); }
 
   apply (query) {
     const { container, mismatchClass, mode, target } = this.getAttr();

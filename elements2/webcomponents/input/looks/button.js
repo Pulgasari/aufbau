@@ -5,7 +5,7 @@ export default {
 
   css : `
     [part~="control"] {
-      border         : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border         : var(--input-line);
       border-radius  : var(--radius-control, 0.4em);
       min-block-size : var(--control-size, 2.25em);
       padding-inline : 0.75em;

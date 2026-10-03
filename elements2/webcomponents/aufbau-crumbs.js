@@ -1,5 +1,6 @@
 import { AufbauElement } from '../base/AufbauElement.js';
 import { attrs, html }   from '../lib/html.js';
+import { ELLIPSIS }      from '../lib/css.js';
 
 export default class AufbauCrumbs extends AufbauElement {
   static internals = { role: 'navigation' };
@@ -23,10 +24,7 @@ export default class AufbauCrumbs extends AufbauElement {
 
     > * {
       flex            : 0 1 auto;
-      min-inline-size : 0;
-      overflow        : hidden;
-      text-overflow   : ellipsis;
-      white-space     : nowrap;
+      ${ELLIPSIS}
     }
 
     > :last-child { flex-shrink: 0.2; }

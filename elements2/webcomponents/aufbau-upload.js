@@ -1,5 +1,6 @@
-import { AufbauControlElement }  from '../base/AufbauControlElement.js';
-import { attrs, html }    from '../lib/html.js';
+import { AufbauControlElement }   from '../base/AufbauControlElement.js';
+import { attrs, html }            from '../lib/html.js';
+import { ELLIPSIS, PLAIN_BUTTON } from '../lib/css.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 
@@ -81,10 +82,7 @@ export default class AufbauUpload extends AufbauControlElement {
 
     [part~="name"] {
       flex            : 1 1 auto;
-      min-inline-size : 0;
-      overflow        : hidden;
-      text-overflow   : ellipsis;
-      white-space     : nowrap;
+      ${ELLIPSIS}
     }
 
     [part~="size"] {
@@ -95,16 +93,8 @@ export default class AufbauUpload extends AufbauControlElement {
     }
 
     [part~="remove"] {
-      align-items : center;
-      background  : none;
-      border      : 0;
-      color       : inherit;
-      cursor      : pointer;
-      display     : inline-flex;
+      ${PLAIN_BUTTON}
       flex        : none;
-      font        : inherit;
-      margin      : 0;
-      padding     : 0;
     }
   `;
 

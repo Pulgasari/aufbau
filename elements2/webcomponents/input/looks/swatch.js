@@ -1,4 +1,4 @@
-import { html }                                  from '../../../lib/html.js';
+import { html }                                    from '../../../lib/html.js';
 import { FRAME, field, fieldEvents, updateFields } from './parts/field.js';
 
 export default {
@@ -11,7 +11,7 @@ export default {
     [part~="swatch"] {
       background    : var(--swatch, transparent);
       block-size    : 1.6em;
-      border        : var(--border-width, 1px) solid color-mix(in srgb, currentColor 25%, transparent);
+      border        : var(--input-line);
       border-radius : calc(var(--radius-control, 0.4em) * 0.75);
       flex          : none;
       inline-size   : 1.6em;

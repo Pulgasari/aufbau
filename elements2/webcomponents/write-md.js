@@ -1,7 +1,8 @@
 import './aufbau-reader.js';
 import './aufbau-writer.js';
 
-import setAttr from '@domina/methods/setAttr.js';
+import setAttr      from '@domina/methods/setAttr.js';
+import { debounce } from '@pulgasari/timing';
 
 import { AufbauElement } from '../base/AufbauElement.js';
 import { attrs, html }   from '../lib/html.js';
@@ -85,18 +86,15 @@ export class WriteMd extends AufbauElement {
       for (const tab of this.querySelectorAll('[data-mode]')) tab.setAttribute('aria-selected', String(tab === button));
     });
 
-    this.on(this.writer, 'input', event => { if (event.target === this.writer) this.schedulePreview(); });
+    const preview = debounce(() => this.renderPreview(), DEBOUNCE);
+    this.track(preview.cancel);
+    this.on(this.writer, 'input', event => { if (event.target === this.writer) preview(); });
     this.renderPreview();
   }
 
   sync () {
     const values = this.getAttr();
     setAttr(this.writer, Object.fromEntries(FORWARD.map(name => [name, values[name] ?? false])));
-  }
-
-  schedulePreview () {
-    clearTimeout(this._timer);
-    this._timer = setTimeout(() => this.renderPreview(), DEBOUNCE);
   }
 
   renderPreview () {
@@ -108,8 +106,6 @@ export class WriteMd extends AufbauElement {
     this.writer.value = newValue ?? '';
     this.renderPreview();
   }
-
-  onUnmount () { clearTimeout(this._timer); }
 }
 
 WriteMd.init('write-md');

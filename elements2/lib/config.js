@@ -1,8 +1,8 @@
-import { CanonicalMap }                  from '@pulgasari/canonicalmap';
+import { CanonicalMap }                     from '@pulgasari/canonicalmap';
 import { isArray, isPlainObject, isString } from '@pulgasari/is';
-import { str }                           from '@pulgasari/str';
-import { emitEvent }                     from '@domina/methods/emitEvent.js';
-import { onEvent }                       from '@domina/methods/onEvent.js';
+import { str }                              from '@pulgasari/str';
+import { emitEvent }                        from '@domina/methods/emitEvent.js';
+import { onEvent }                          from '@domina/methods/onEvent.js';
 
 const { toKebabCase } = str;
 

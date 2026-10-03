@@ -1,6 +1,6 @@
 import { AufbauElement }    from '../base/AufbauElement.js';
 import { normalizeOptions } from '../lib/options.js';
-import { importFile } from '@aufbau/import';
+import { importFile }       from '@aufbau/import';
 
 export default class AufbauDatalist extends AufbauElement {
   static attr = {
