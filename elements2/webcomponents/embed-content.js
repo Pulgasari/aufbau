@@ -99,7 +99,7 @@ export function resolveEmbed (source) {
 
 // :::::: ELEMENT :::::::::::::::::::::::::::::::::::::::::::::::
 
-export default class AufbauEmbed extends AufbauElement {
+export default class EmbedContent extends AufbauElement {
 
   static attr = {
     consent  : { type: String, default: 'click', values: ['auto', 'click'] },
@@ -112,7 +112,7 @@ export default class AufbauEmbed extends AufbauElement {
     width    : String,   // a css length, at most the available width
   };
 
-  static styles = `aufbau-embed {
+  static styles = `embed-content {
     aspect-ratio    : var(--embed-ratio, 16 / 9);
     background      : center / cover no-repeat var(--embed-poster, none);
     block-size      : var(--embed-height, auto);
@@ -236,4 +236,4 @@ export default class AufbauEmbed extends AufbauElement {
   }
 }
 
-AufbauEmbed.init();
+EmbedContent.init();

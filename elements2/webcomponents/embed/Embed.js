@@ -1,4 +1,4 @@
-import '../aufbau-embed.js';
+import '../embed-content.js';
 
 import { AufbauElement } from '@aufbau/element';
 import setAttr           from '@domina/methods/setAttr.js';
@@ -18,16 +18,16 @@ export class Embed extends AufbauElement {
     width    : String,
   };
 
-  get embed () { return this.querySelector(':scope > aufbau-embed'); }
+  get embed () { return this.querySelector(':scope > embed-content'); }
 
   toUrl (src) { return src; }
 
   sizes () { return {}; }
 
-  // loads the player, see AufbauEmbed.activate()
+  // loads the player, see EmbedContent.activate()
   activate () { this.embed?.activate(); return this; }
 
-  render () { return '<aufbau-embed></aufbau-embed>'; }
+  render () { return '<embed-content></embed-content>'; }
 
   sync () {
     const embed = this.embed;

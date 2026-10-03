@@ -15,12 +15,10 @@ a tag maps onto its module:
 
 const TAGS = [
   'aufbau-code',
-  'aufbau-embed',
   'aufbau-loop',
   'aufbau-progress',
   'aufbau-reader',
   'aufbau-skeleton',
-  'aufbau-value',
 
   'app-area',
   'app-config',
@@ -46,6 +44,7 @@ const TAGS = [
   'div-y',
 
   'embed-bandcamp',
+  'embed-content',
   'embed-mastodon',
   'embed-soundcloud',
   'embed-spotify',
@@ -90,6 +89,8 @@ const TAGS = [
 
   'nav-crumbs',
   'nav-toc',
+
+  'output-value',
 
   'pop-menu',
   'pop-modal',

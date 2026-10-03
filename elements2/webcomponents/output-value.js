@@ -1,4 +1,4 @@
-// <aufbau-value>
+// <output-value>
 
 // :::::: IMPORTS
 
@@ -55,7 +55,7 @@ function displayText (type, value, format, locale) {
 
 // :::::: MAIN
 
-export default class AufbauValue extends AufbauSourceElement {
+export default class OutputValue extends AufbauSourceElement {
   static attr = {
     format : String,
     locale : String,
@@ -68,7 +68,7 @@ export default class AufbauValue extends AufbauSourceElement {
   static output = 'span';
 
   static styles = `
-    aufbau-value {
+    output-value {
       display: inline;
 
       &:state(empty) { display: none; }
@@ -132,7 +132,7 @@ export default class AufbauValue extends AufbauSourceElement {
 
   // :::::: CONFIG
 
-  // the attribute, else the config of the type (aufbau-value-date-format), else the config aufbau-value-format
+  // the attribute, else the config of the type (output-value-date-format), else the config output-value-format
   formatName () {
     const type = this.getAttr('type');
     return this.getAttribute('format') ?? getConfig(`${this.localName}-${type}-format`) ?? this.getAttr('format') ?? '';
@@ -176,4 +176,4 @@ export default class AufbauValue extends AufbauSourceElement {
   }
 }
 
-AufbauValue.init();
+OutputValue.init();

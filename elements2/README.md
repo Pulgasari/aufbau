@@ -62,18 +62,17 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 # elements
 
 the building blocks, in families by what they are for: `btn-` buttons, `data-`
-collections, `media-` files and players, `nav-` navigation, `pop-` everything that
-opens over the page, `svg-` icons. the controls that hold a value are the input-*
+collections, `embed-` content of other sites, `media-` files and players, `nav-`
+navigation, `output-` values shown, `pop-` everything that opens over the page,
+`svg-` icons. the controls that hold a value are the input-*
 elements below.
 
 [`<app-keyboard>`](#app-keyboard) ·
 [`<aufbau-code>`](#aufbau-code) ·
-[`<aufbau-embed>`](#aufbau-embed) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
-[`<aufbau-value>`](#aufbau-value) ·
 [`<btn-push>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-tap>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-icon>`](#btn-push-btn-tap-btn-icon) ·
@@ -81,6 +80,7 @@ elements below.
 [`<data-list>`](#data-list) ·
 [`<data-table>`](#data-table) ·
 [`<data-tree>`](#data-tree) ·
+[`<embed-content>`](#embed-content) ·
 [`<input-file>`](#input-file) ·
 [`<media-audio>`](#media-audio) ·
 [`<media-file>`](#media-file) ·
@@ -88,6 +88,7 @@ elements below.
 [`<media-wave>`](#media-wave) ·
 [`<nav-crumbs>`](#nav-crumbs) ·
 [`<nav-toc>`](#nav-toc) ·
+[`<output-value>`](#output-value) ·
 [`<pop-menu>`](#pop-menu) ·
 [`<pop-modal>`](#pop-modal) ·
 [`<pop-over>`](#pop-over) ·
@@ -146,36 +147,6 @@ console.log(greet('aufbau'));
 `actions` wählt die buttons (default `copy paste clear`, leer = keine). `paste` und
 `clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
 gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
-
-## aufbau-embed
-
-inhalt von dritten (video, song, post) hinter einem klick. bis dahin ist das
-element ein lokaler platzhalter, beim anbieter wird nichts angefragt, auch kein
-vorschaubild: das einzige bild ist das `poster` der seite selbst.
-
-```html
-<aufbau-embed src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></aufbau-embed>
-<aufbau-embed src="https://open.spotify.com/album/…" remember></aufbau-embed>
-<aufbau-embed src="https://example.com/widget" height="400px" label="Widget"></aufbau-embed>
-```
-
-erkannt werden youtube (über youtube-nocookie), vimeo, spotify, soundcloud,
-bandcamp (die `EmbeddedPlayer`-url, eine albumseite lässt sich nicht einbetten)
-und mastodon-posts. jede andere url wird so eingebettet, wie sie ist. eine url,
-die sich nicht einbetten lässt, macht den platzhalter zum link.
-
-| attribut   | |
-|---|---|
-| `consent`  | `click` (default) oder `auto`, auch über `setConfig('aufbau-embed-consent', 'auto')`, etwa wenn die seite selbst schon gefragt hat |
-| `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
-| `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
-| `height`   | eine feste höhe statt eines verhältnisses |
-| `width`    | eine breite, höchstens die verfügbare |
-| `poster`   | ein bild der seite für den platzhalter |
-| `label`    | name auf dem platzhalter und des frames |
-
-`activate()` lädt von außen, danach `:state(active)` und das event `activate`
-mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
 
 ## aufbau-loop
 
@@ -251,46 +222,6 @@ noch leer, füllen zeilen die box. aussehen über `--skeleton-color`,
 `--skeleton-radius`, für die zeilen `--skeleton-line`, `--skeleton-gap`,
 `--skeleton-lines`.
 
-## aufbau-value
-
-ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
-selbst baut, mitsamt der coercion. `type` ist dasselbe vokabular wie bei den
-inputs (`webcomponents/input/types/`): derselbe wert wird mit `<input-date>`
-bearbeitet und mit `<aufbau-value type="date">` angezeigt, und
-jeder typ, den die controls lernen, ist einer, den das hier anzeigen kann. das
-icon pro typ kommt aus derselben tabelle.
-
-der wert steht im `value`-attribut oder als textinhalt drin (der wird beim mount
-ins attribut übernommen). eine blanke zahl ist die numerische form des typs:
-millisekunden seit epoch bei `date`/`datetime`, seit mitternacht bei `time` —
-nie sekunden.
-
-```html
-<aufbau-value type="date">1776643200000</aufbau-value>
-<aufbau-value type="date" format="medium" value="2026-04-20"></aufbau-value>
-<aufbau-value type="datetime" format="medium" locale="en-GB" value="2026-04-20T14:30"></aufbau-value>
-<aufbau-value type="time" icon>14:30</aufbau-value>
-<aufbau-value type="url" icon copy>https://example.com</aufbau-value>
-```
-
-es formatiert, es erzählt nicht: ein datum ist ein datum, nie »gestern«. die
-einzige wahl ist die schreibweise.
-
-`format` ohne angabe ist die maschinenform (`2026-04-20`, `14:30`), lokale
-wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) für
-`date`, `datetime` und `time`, sowie `locale` für `number`. pro typ auch global
-setzbar — attribut schlägt config, typ-key schlägt allgemeinen key:
-
-```js
-setConfig({ 'aufbau-value': { 'date-format': 'medium', locale: 'de-DE' } });
-```
-
-`date`, `datetime` und `time` rendern als `<time datetime="…">`, die
-maschinenform bleibt also für maschinen erhalten, egal in welcher schreibweise
-die seite sie liest. `copy` legt das in die zwischenablage, was auf dem schirm
-steht, und meldet es als `aufbau-value-copy`; der wert dahinter ist
-`el.machine`.
-
 ## btn-push, btn-tap, btn-icon
 
 three buttons for three roles: `btn-push` is filled and does the main thing,
@@ -333,7 +264,7 @@ import { setConfig } from '@aufbau/element';
 
 setConfig('svg-flag-variant', 'square');
 setConfig({ 'aufbau-code': { theme: 'nord' }, 'pop-toast': { duration: 5000 } });
-setConfig('aufbau-value-date-format', 'medium');   // the format of one type of <aufbau-value>
+setConfig('output-value-date-format', 'medium');   // the format of one type of <output-value>
 ```
 
 ## data-index
@@ -472,6 +403,36 @@ sichtbaren items, rechts öffnet bzw. springt ins erste kind, links schliesst bz
 springt zum parent, enter wählt und klappt um, leertaste wählt. ein tab-stop für
 den ganzen baum.
 
+## embed-content
+
+inhalt von dritten (video, song, post) hinter einem klick. bis dahin ist das
+element ein lokaler platzhalter, beim anbieter wird nichts angefragt, auch kein
+vorschaubild: das einzige bild ist das `poster` der seite selbst.
+
+```html
+<embed-content src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></embed-content>
+<embed-content src="https://open.spotify.com/album/…" remember></embed-content>
+<embed-content src="https://example.com/widget" height="400px" label="Widget"></embed-content>
+```
+
+erkannt werden youtube (über youtube-nocookie), vimeo, spotify, soundcloud,
+bandcamp (die `EmbeddedPlayer`-url, eine albumseite lässt sich nicht einbetten)
+und mastodon-posts. jede andere url wird so eingebettet, wie sie ist. eine url,
+die sich nicht einbetten lässt, macht den platzhalter zum link.
+
+| attribut   | |
+|---|---|
+| `consent`  | `click` (default) oder `auto`, auch über `setConfig('embed-content-consent', 'auto')`, etwa wenn die seite selbst schon gefragt hat |
+| `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
+| `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
+| `height`   | eine feste höhe statt eines verhältnisses |
+| `width`    | eine breite, höchstens die verfügbare |
+| `poster`   | ein bild der seite für den platzhalter |
+| `label`    | name auf dem platzhalter und des frames |
+
+`activate()` lädt von außen, danach `:state(active)` und das event `activate`
+mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
+
 ## input-file
 
 `accept` statt `mimetype`, weil das native attribut mehr kann: mimetypes
@@ -573,6 +534,46 @@ der host ist die navigation-landmark, `label` ist sichtbare überschrift und
 accessible name (hiess vorher `title`, das legte einen tooltip über die ganze toc).
 jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelesenen
 überschrift bekommt `aria-current="location"`. fehlende ids werden eindeutig vergeben.
+
+## output-value
+
+ein wert, der nur gelesen wird — das `<span class="date">`, das man sich sonst
+selbst baut, mitsamt der coercion. `type` ist dasselbe vokabular wie bei den
+inputs (`webcomponents/input/types/`): derselbe wert wird mit `<input-date>`
+bearbeitet und mit `<output-value type="date">` angezeigt, und
+jeder typ, den die controls lernen, ist einer, den das hier anzeigen kann. das
+icon pro typ kommt aus derselben tabelle.
+
+der wert steht im `value`-attribut oder als textinhalt drin (der wird beim mount
+ins attribut übernommen). eine blanke zahl ist die numerische form des typs:
+millisekunden seit epoch bei `date`/`datetime`, seit mitternacht bei `time` —
+nie sekunden.
+
+```html
+<output-value type="date">1776643200000</output-value>
+<output-value type="date" format="medium" value="2026-04-20"></output-value>
+<output-value type="datetime" format="medium" locale="en-GB" value="2026-04-20T14:30"></output-value>
+<output-value type="time" icon>14:30</output-value>
+<output-value type="url" icon copy>https://example.com</output-value>
+```
+
+es formatiert, es erzählt nicht: ein datum ist ein datum, nie »gestern«. die
+einzige wahl ist die schreibweise.
+
+`format` ohne angabe ist die maschinenform (`2026-04-20`, `14:30`), lokale
+wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) für
+`date`, `datetime` und `time`, sowie `locale` für `number`. pro typ auch global
+setzbar — attribut schlägt config, typ-key schlägt allgemeinen key:
+
+```js
+setConfig({ 'output-value': { 'date-format': 'medium', locale: 'de-DE' } });
+```
+
+`date`, `datetime` und `time` rendern als `<time datetime="…">`, die
+maschinenform bleibt also für maschinen erhalten, egal in welcher schreibweise
+die seite sie liest. `copy` legt das in die zwischenablage, was auf dem schirm
+steht, und meldet es als `output-value-copy`; der wert dahinter ist
+`el.machine`.
 
 ## pop-menu
 
@@ -926,7 +927,7 @@ it, `app-area` is a region of it, `app-view` one screen. `app-panel`,
 ### embed
 
 third party content behind a click, one component per provider over
-`<aufbau-embed>` (no request to the provider before the click, `consent`,
+`<embed-content>` (no request to the provider before the click, `consent`,
 `remember`, `height`, `width`, `ratio`, `poster`, `label` as there).
 
 | component          | src                                                       |
@@ -960,7 +961,7 @@ from bandcamp's own embed code; a page url turns the placeholder into a link.
 - `input-phone` could take an `input-country` for the prefix.
 - the list types do not follow a change of `[lang]` above them until one
   of their own attributes changes.
-- candidates for elements rather than components: `<aufbau-embed>` (a click to
+- candidates for elements rather than components: `<embed-content>` (a click to
   load facade for youtube, bandcamp, …) and `<aufbau-indicator type="error |
   loading | success | empty">`.
 
