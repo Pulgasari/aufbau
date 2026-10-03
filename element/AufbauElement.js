@@ -70,8 +70,7 @@ const SKELETON_VARS = { gap: 'gap', line: 'line', lines: 'lines', radius: 'radiu
 
 export class AufbauElement extends HTMLElement {
 
-  static attr = { skeleton: Boolean };
-
+  static attr   = { skeleton: Boolean };
   static styles = SKELETON_STYLES;
 
   constructor () {
@@ -85,19 +84,13 @@ export class AufbauElement extends HTMLElement {
     const defaults = this.constructor.internals;
     if (defaults && this.internals && isPlainObject(defaults)) Object.assign(this.internals, defaults);
   }
-
-  get internals () {
-    if (this._internals === undefined) this._internals = this.attachInternals?.() ?? null;
-    return this._internals;
-  }
-
-  get states () { return this._states ??= stateSet(this); }
-
-  get root         () { return this.constructor.shadow && this.shadowRoot || this; }
+  
+  get focused      () { return this.root === this ? document.activeElement : this.root.activeElement; }
+  get internals    () { if (this._internals === undefined) this._internals = this.attachInternals?.() ?? null; return this._internals; }   
   get renderTarget () { return this.root; }
-
-  get focused () { return this.root === this ? document.activeElement : this.root.activeElement; }
-
+  get root         () { return this.constructor.shadow && this.shadowRoot || this; }
+  get states       () { return this._states ??= stateSet(this); }
+  
   // :::::: SKELETON ::::::::::::::::::::::::::::::::::::::::::::
 
   setSkeleton (on = true) {
@@ -128,6 +121,8 @@ export class AufbauElement extends HTMLElement {
 
   // :::::: LIFECYCLE :::::::::::::::::::::::::::::::::::::::::::
 
+  adoptedCallback (oldDocument, newDocument) { this.onAdopted(oldDocument, newDocument); }
+
   connectedCallback () {
     this._mounted = true;
     adoptClassStyles(this.constructor, this.root === this ? this.getRootNode() : this.root);
@@ -143,8 +138,7 @@ export class AufbauElement extends HTMLElement {
     this.onDisconnected();
   }
 
-  adoptedCallback (oldDocument, newDocument) { this.onAdopted(oldDocument, newDocument); }
-
+  
   // without the hook a move is what it is without this callback: disconnected, then connected
   connectedMoveCallback () { this.onConnectedMove(); }
 
@@ -222,12 +216,10 @@ export class AufbauElement extends HTMLElement {
       if (this.getAttribute(attribute) === text) continue;
 
       this._reflecting = true;
-      try {
-        if (text === null) this.removeAttribute(attribute);
-        else this.setAttribute(attribute, text);
-        (this._reflected ??= new Set).add(attribute);
-      }
+      try     { text === null ? this.removeAttribute(attribute) : this.setAttribute(attribute, text); }
       finally { this._reflecting = false; }
+
+      (this._reflected ??= new Set).add(attribute);
     }
     return this;
   }
@@ -326,10 +318,10 @@ export class AufbauElement extends HTMLElement {
   // static parts = ['close'] gives this.$close, see init()
   get self () { return Selection.of([this], { owner: this, signal: this.signal }); }
 
-  $     (target)   { return this.self.$(target); }
-  $$    (selector) { return this.self.$$(selector); }
-  part  (name)     { return this.self.part(name); }
-  parts (name)     { return this.self.parts(name); }
+  $     (target)   { return this.self.$     (target);   }
+  $$    (selector) { return this.self.$$    (selector); }
+  part  (name)     { return this.self.part  (name);     }
+  parts (name)     { return this.self.parts (name);     }
 
 }
 
