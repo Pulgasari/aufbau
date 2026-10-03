@@ -3,7 +3,7 @@
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { attrs, html }          from '../lib/html.js';
 import { AufbauElement }        from '../base/AufbauElement.js';
-import { dedent }               from '../lib/utils.js';
+import { dedent }               from '../lib/dedent.js';
 import { getConfig, setConfig } from '../lib/config.js';
 
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';

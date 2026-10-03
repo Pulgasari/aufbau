@@ -10,5 +10,3 @@ export const REGIONS = `
   ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY
   UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW
 `.trim().split(/\s+/);
-
-export default REGIONS;

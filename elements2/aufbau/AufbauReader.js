@@ -1,7 +1,7 @@
 import { AufbauElement }        from '../base/AufbauElement.js';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from '../lib/html.js';
-import { dedent }               from '../lib/utils.js';
+import { dedent }               from '../lib/dedent.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
 

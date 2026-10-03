@@ -1,22 +1,13 @@
 import text from './text.js';
 
+export { displayNames, nameOf } from '../../lib/locale.js';
+
 export const listOf = (value, fallback) => value?.trim() ? value.trim().split(/\s+/) : fallback;
 
 // a flag that is on unless it says "false"
 export const enabled = (host, name) => host.getAttribute(name) !== 'false';
 
 export const byLabel = locale => (a, b) => a.label.localeCompare(b.label, locale);
-
-export function displayNames (locale, type, options = {}) {
-  try   { return new Intl.DisplayNames([locale], { fallback: 'code', type, ...options }); }
-  catch { return null; }
-}
-
-// the name of a code, the code itself where Intl has none
-export function nameOf (names, code) {
-  try   { return names?.of(code) ?? code; }
-  catch { return code; }
-}
 
 export const listType = ({ attributes = [], entries, icon = null, look = 'combobox', placeholder, query = false }) => ({
   ...text,

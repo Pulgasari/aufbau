@@ -77,7 +77,6 @@ the building blocks. the controls that hold a value are the input-* elements bel
 [`<aufbau-audio>`](#aufbau-audio) ·
 [`<aufbau-button>`](#aufbau-button) ·
 [`<aufbau-code>`](#aufbau-code) ·
-[`<aufbau-config>`](#aufbau-config) ·
 [`<aufbau-crumbs>`](#aufbau-crumbs) ·
 [`<aufbau-datalist>`](#aufbau-datalist) ·
 [`<aufbau-dropdown>`](#aufbau-dropdown) ·
@@ -145,36 +144,16 @@ console.log(greet('aufbau'));
 `clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
 gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 
-## aufbau-config
+## config
 
-```html
-<!-- 1. Central Global Configuration -->
-<aufbau-config 
-  flag-variant="square" 
-  toast-duration="5000" 
-  number-unit="px"
-  theme="zombie"
-></aufbau-config>
+defaults for every element of a kind, set once from script. an attribute on
+the element wins.
 
-<!-- Uses global default ("square") set via <aufbau-config> -->
-<svg-flag code="de"></svg-flag>
-<svg-flag code="us"></svg-flag>
+```js
+import { setConfig } from '@aufbau/elements2/lib/config.js';
 
-<!-- Local attribute overrides the global default for this specific element -->
-<svg-flag code="fr" variant="circle"></svg-flag>
-```
-
-```html
-<aufbau-config code-theme="tokyo-night-dark" flag-variant="square"></aufbau-config>
-
-<!-- oder als json body, verschachtelt -->
-<aufbau-config>{ "code": { "theme": "nord" }, "toast": { "duration": 5000 } }</aufbau-config>
-
-<!-- oder ausgelagert -->
-<aufbau-config src="/aufbau.config.json"></aufbau-config>
-
-<aufbau-code lang="js">const x = 1;</aufbau-code>            <!-- nutzt code-theme -->
-<aufbau-code lang="js" theme="github">…</aufbau-code>          <!-- lokaler override -->
+setConfig({ code: { theme: 'nord' }, flag: { variant: 'square' }, toast: { duration: 5000 } });
+setConfig('value-date-format', 'medium');
 ```
 
 ## aufbau-crumbs
@@ -256,7 +235,7 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 
 | attribut   | |
 |---|---|
-| `consent`  | `click` (default) oder `auto`, auch über `<aufbau-config embed-consent="auto">`, etwa wenn die seite selbst schon gefragt hat |
+| `consent`  | `click` (default) oder `auto`, auch über `setConfig('embed-consent', 'auto')`, etwa wenn die seite selbst schon gefragt hat |
 | `remember` | merkt sich den klick pro anbieter, spätere embeds von ihm laden sofort |
 | `ratio`    | z.b. `4 / 3`, sonst das des anbieters |
 | `height`   | eine feste höhe statt eines verhältnisses |
@@ -617,8 +596,8 @@ wanduhr und nicht utc. dazu `short` / `medium` / `long` / `full` (Intl) für
 `date`, `datetime` und `time`, sowie `locale` für `number`. pro typ auch global
 setzbar — attribut schlägt config, typ-key schlägt allgemeinen key:
 
-```html
-<aufbau-config value-date-format="medium" value-locale="de-DE"></aufbau-config>
+```js
+setConfig({ value: { 'date-format': 'medium', locale: 'de-DE' } });
 ```
 
 `date`, `datetime` und `time` rendern als `<time datetime="…">`, die

@@ -5,5 +5,3 @@ export const LOCALES = `
   lv-LV ms-MY nb-NO nl-BE nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sk-SK sl-SI sr-RS
   sv-SE th-TH tr-TR uk-UA vi-VN zh-CN zh-HK zh-TW
 `.trim().split(/\s+/);
-
-export default LOCALES;

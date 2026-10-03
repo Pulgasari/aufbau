@@ -1,6 +1,5 @@
 import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
 import { isFn }        from '@pulgasari/is';
-import { arrayfied }   from './utils.js';
 
 export const BASE_LAYER = 'aufbau.elements';
 export const SKIN_LAYER = 'aufbau.skin';
@@ -27,7 +26,8 @@ function styleOwners (Cls) {
 
 const toCss = (styles, owner) => {
   const value = isFn(styles) ? styles.call(owner) : styles;
-  return arrayfied(value).filter(Boolean).join('\n');
+  const list  = Array.isArray(value) ? value : [value];
+  return list.filter(Boolean).join('\n');
 };
 
 export function adoptClassStyles (Cls, target = document) {

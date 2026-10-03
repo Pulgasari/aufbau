@@ -3,7 +3,6 @@
 import { BASE, schemaOf }   from '../lib/schema.js';
 import { applySkin }        from '../lib/skin.js';
 import { adoptClassStyles } from '../lib/styles.js';
-import { decorate, decorateAll } from '../lib/utils.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from '../lib/config.js';
 
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';
@@ -448,21 +447,20 @@ export class AufbauElement extends HTMLElement {
 
   get $ () {
     const root    = this.root;
-    const findOne = spec => decorate(getElement(spec, root));
+    const findOne = spec => getElement(spec, root);
   
     return new Proxy(findOne, {
       apply: (target, thisArg, args) => findOne(...args),
       get (target, prop) {
         if (prop in target)  return target[prop];
         if (!isString(prop)) return undefined;
-        const element = getElementById(toKebabCase(prop), root) ?? getElementById(prop, root);
-        return decorate(element);
+        return getElementById(toKebabCase(prop), root) ?? getElementById(prop, root);
       }
     });
   }
   
   get $$ () {
-    return spec => decorateAll(getElements(spec, this.root));
+    return spec => getElements(spec, this.root);
   }
 
 }

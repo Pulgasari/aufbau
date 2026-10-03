@@ -1,6 +1,6 @@
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { AufbauControlElement } from '../base/AufbauControlElement.js';
-import { dedent }        from '../lib/utils.js';
+import { dedent }        from '../lib/dedent.js';
 import { attrs, html }   from '../lib/html.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setValue }      from '@domina/methods/setValue.js';

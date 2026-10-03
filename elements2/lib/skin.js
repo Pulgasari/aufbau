@@ -1,7 +1,7 @@
 import adoptStylesheet   from '@domina/methods/adoptStylesheet.js';
 import releaseStylesheet from '@domina/methods/releaseStylesheet.js';
 
-import { getConfig, onConfigChange, setConfig } from '../lib/config.js';
+import { getConfig, onConfigChange, setConfig } from './config.js';
 import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
 
 const CONFIG_KEY   = 'elements-skin';
@@ -17,9 +17,6 @@ const skinUrl = (skin) =>
 
 let current   = undefined;
 let listening = false;
-
-// the skin name currently applied, null when switched off
-const activeSkin = () => current ?? null;
 
 function applySkin (skin = getConfig(CONFIG_KEY, DEFAULT_SKIN)) {
   if (!listening) {
@@ -44,15 +41,4 @@ function setSkin (skin) {
   return applySkin();
 }
 
-// :::::: EXPORTS
-
-export {
-  CONFIG_KEY as SKIN_CONFIG_KEY,
-  DEFAULT_SKIN, 
-  SKIN_KEY,
-  activeSkin,
-  applySkin,
-  setSkin,
-};
-
-export default applySkin;
+export { applySkin, setSkin };

@@ -8,7 +8,7 @@ const ESCAPES = {
   "'" : '&#39;'
 };
 
-export const escapeHtml = value =>
+const escapeHtml = value =>
   value == null ? '' : String(value).replace(/[&<>"']/g, char => ESCAPES[char]);
 
 class Html {
@@ -17,7 +17,7 @@ class Html {
   toString () { return this.value; }
 }
 
-export const isRaw = value => value?.[RAW] === true;
+const isRaw = value => value?.[RAW] === true;
 
 const interpolate = value =>
     value == null || value === false ? ''

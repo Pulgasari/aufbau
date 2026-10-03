@@ -1,23 +1,22 @@
-// :::::: IMPORTS
-
-import { CanonicalMap } from '@pulgasari/canonicalmap';
+import { CanonicalMap }                  from '@pulgasari/canonicalmap';
 import { isArray, isPlainObject, isString } from '@pulgasari/is';
-import { str }          from '@pulgasari/str';
-import { emitEvent } from '@domina/methods/emitEvent.js';
-import { onEvent } from '@domina/methods/onEvent.js';
+import { str }                           from '@pulgasari/str';
+import { emitEvent }                     from '@domina/methods/emitEvent.js';
+import { onEvent }                       from '@domina/methods/onEvent.js';
+
 const { toKebabCase } = str;
 
-// ::::::
+export const CONFIG_EVENT = 'aufbau-config-changed';
 
-const AufbauConfigStore = new CanonicalMap; // merged, read-only view of all sources. never write directly, use setConfig()
-const CONFIG_EVENT = 'aufbau-config-changed';
-const DEFAULTS     = Symbol('defaults');
-const RUNTIME      = Symbol('runtime'); // programmatic source, always merged last so setConfig() beats markup
-const sources      = new Map;
-export const createSource = () => new CanonicalMap;
-const toValue      = (value) => value == null ? null : String(value);
+// two layers: the defaults of the elements, then what the page sets
+const defaults = new CanonicalMap;
+const settings = new CanonicalMap;
+const merged   = new CanonicalMap;
 
-export function flatten (input, prefix = '', out = createSource()) {
+const toValue = value => value == null ? null : String(value);
+
+// { code: { theme: 'nord' } } -> code-theme: 'nord'
+function flatten (input, prefix = '', out = new Map) {
   for (const [key, value] of Object.entries(input ?? {})) {
     const path = prefix ? `${prefix}-${key}` : key;
     if (isPlainObject(value)) flatten(value, path, out);
@@ -26,80 +25,46 @@ export function flatten (input, prefix = '', out = createSource()) {
   return out;
 }
 
-function mergeSources () {
-  const next  = new Map;
-  const apply = (entries) => {
-    for (const [key, value] of entries) {
+// merges both layers and announces the keys that changed. null removes a key
+function commit () {
+  const next = new Map;
+  for (const layer of [defaults, settings]) {
+    for (const [key, value] of layer) {
       if (value === null) next.delete(key);
       else next.set(key, value);
     }
-  };
-
-  if (sources.has(DEFAULTS)) apply(sources.get(DEFAULTS));
-  for (const [owner, entries] of sources) {
-    if (owner !== DEFAULTS && owner !== RUNTIME) apply(entries); // markup, in connect order
   }
-  if (sources.has(RUNTIME)) apply(sources.get(RUNTIME));
 
-  return next;
-}
-
-function diff (next) {
   const changed = [];
-  for (const [key, value] of next) if (AufbauConfigStore.get(key) !== value) changed.push(key);
-  for (const key of AufbauConfigStore.keys()) if (!next.has(key)) changed.push(key);
-  return changed;
+  for (const [key, value] of next) if (merged.get(key) !== value) changed.push(key);
+  for (const key of merged.keys()) if (!next.has(key)) changed.push(key);
+  if (!changed.length) return;
+
+  merged.clear();
+  merged.merge(next);
+  if (typeof window !== 'undefined') emitEvent(window, CONFIG_EVENT, { changed, config: merged.toObject() });
 }
 
-// recomputes the merged store, emits only on real changes
-export function commitConfig () {
-  const next    = mergeSources();
-  const changed = diff(next);
-  if (!changed.length) return changed;
+// setConfig('code-theme', 'nord') or setConfig({ code: { theme: 'nord' } }).
+// { layer: 'defaults' } is for the elements' own defaults
+export function setConfig (keyOrEntries, value, options) {
+  const single  = isString(keyOrEntries);
+  const entries = single ? new Map([[keyOrEntries, toValue(value)]]) : flatten(keyOrEntries);
+  const layer   = (single ? options : value)?.layer === 'defaults' ? defaults : settings;
 
-  AufbauConfigStore.clear();
-  AufbauConfigStore.merge(next);
-
-  if (typeof window !== 'undefined') {
-    emitEvent (window, CONFIG_EVENT, { changed, config: AufbauConfigStore.toObject() });
-  }
-
-  return changed;
+  for (const [key, entry] of entries) layer.set(key, entry);
+  commit();
 }
-
-// :::::: PUBLIC API :::::::::::::::::::::::::::::::::::::::::::
-
-const canonicalKey   = (key)      => AufbauConfigStore.key(key);
-const onConfigChange = (listener) => onEvent (window, CONFIG_EVENT, listener);
-const setConfig      = (a,b,c)    => isString(a) ? setConfigValue(a,b,c) : setConfigObject(a,b);
 
 export function getConfig (key, fallback) {
-  const found = AufbauConfigStore.get(key);
+  const found = merged.get(key);
   return found === undefined ? fallback : found;
 }
 
-// Internal helper to resolve target source storage
-function getSource (options = {}) {
-  const owner   = options.layer === 'defaults' ? DEFAULTS : RUNTIME;
-  const entries = sources.get(owner) ?? createSource();
-  sources.set(owner, entries);
-  return entries;
-}
+export const onConfigChange = listener => onEvent(window, CONFIG_EVENT, listener);
+export const canonicalKey   = key => merged.key(key);
 
-// Set a single configuration entry
-function setConfigValue (key, value, options) {
-  getSource(options).set(key, toValue(value));
-  commitConfig();
-  return AufbauConfigStore;
-}
-
-// Merge an object of configuration entries
-function setConfigObject (map, options) {
-  getSource(options).merge(flatten(map));
-  commitConfig();
-  return AufbauConfigStore;
-}
-
+// the keys an element's setting is looked up under: picker-look, aufbau-picker-look
 export function configKeys (tag, name) {
   const attr = toKebabCase(name);
   if (!tag) return [attr];
@@ -110,32 +75,10 @@ export function configKeys (tag, name) {
 }
 
 export function resolveConfig (tag, name, keys = true) {
-  const candidates =
-      keys === true ? configKeys(tag, name)
-    : isArray(keys) ? keys
-    : [keys];
+  let candidates = [keys];
+  if (keys === true)  candidates = configKeys(tag, name);
+  if (isArray(keys))  candidates = keys;
 
-  for (const key of candidates) if (AufbauConfigStore.has(key)) return AufbauConfigStore.get(key);
+  for (const key of candidates) if (merged.has(key)) return merged.get(key);
   return undefined;
 }
-
-// the values of one <aufbau-config> element, merged in connect order
-export function setConfigSource (owner, entries) {
-  sources.set(owner, entries);
-  commitConfig();
-}
-
-export function removeConfigSource (owner) {
-  sources.delete(owner);
-  commitConfig();
-}
-
-export {
-  AufbauConfigStore,
-  CONFIG_EVENT,
-  canonicalKey,
-  onConfigChange,
-  setConfig,
-  setConfigObject,
-  setConfigValue,
-};

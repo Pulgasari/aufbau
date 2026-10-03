@@ -18,7 +18,6 @@ const TAGS = [
   'aufbau-audio',
   'aufbau-button',
   'aufbau-code',
-  'aufbau-config',
   'aufbau-crumbs',
   'aufbau-datalist',
   'aufbau-dropdown',

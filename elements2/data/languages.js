@@ -8,5 +8,3 @@ export const LANGUAGES = `
   tg th ti tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh
   zu
 `.trim().split(/\s+/);
-
-export default LANGUAGES;

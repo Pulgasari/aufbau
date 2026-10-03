@@ -1151,10 +1151,7 @@ const TEXT = `
 🫶 heart hands
 `;
 
-/** [{ emoji, name }] */
 export const EMOJI = TEXT.trim().split('\n').map(line => {
   const index = line.indexOf(' ');
   return { emoji: line.slice(0, index), name: line.slice(index + 1) };
 });
-
-export default EMOJI;

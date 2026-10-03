@@ -90,7 +90,7 @@ static reflect = ['look'];
 ```
 
 writes the resolved value of those attributes back onto the host on every
-update: the default, a value from `<aufbau-config>`, or the fallback for an
+update: the default, a value from `setConfig()`, or the fallback for an
 invalid one. css can then select every state as `[look="…"]`. meant for
 presentation enums, never for values.
 
