@@ -31,13 +31,13 @@ export class AppView extends AufbauElement {
   set active (active) { if (active) this.activate(); else this.toggleAttribute('active', false); }
 
   // the app-root this view belongs to, null outside of one
-  get root () { return this.closest('app-root'); }
+  get appRoot () { return this.closest('app-root'); }
 
   onConnected () {
     this.inert = !this.active;
     if (this.active) this.fill();
 
-    const path = this.root?.path;
+    const path = this.appRoot?.path;
     if (path != null && !this.active && this.getAttr('route') === path) this.activate({ history: false, transition: false });
   }
 
@@ -56,7 +56,7 @@ export class AppView extends AufbauElement {
     const from = siblingsOf(this).find(view => view !== this && view.active) ?? null;
     if (this.active && !from) return Promise.resolve();
 
-    const root = this.root;
+    const root = this.appRoot;
     const swap = () => {
       for (const view of siblingsOf(this)) if (view !== this) view.hide();
       this.show();
