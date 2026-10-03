@@ -62,7 +62,6 @@ export function getConfig (key, fallback) {
 }
 
 export const onConfigChange = listener => onEvent(window, CONFIG_EVENT, listener);
-export const canonicalKey   = key => merged.key(key);
 
 // the keys an element's setting is looked up under: picker-look, aufbau-picker-look
 export function configKeys (tag, name) {

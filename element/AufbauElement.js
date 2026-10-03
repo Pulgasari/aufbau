@@ -1,14 +1,15 @@
 // :::::: IMPORTS
 
-import { BASE, schemaOf }                                        from './lib/schema.js';
-import { applySkin }                                             from './lib/skin.js';
-import { adoptClassStyles }                                      from './lib/styles.js';
-import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './lib/config.js';
+import { BASE, schemaOf }                         from './lib/schema.js';
+import { applySkin }                              from './lib/skin.js';
+import { adoptClassStyles }                       from './lib/styles.js';
+import { CONFIG_EVENT, configKeys, resolveConfig } from './lib/config.js';
 
 import { hasAttr }       from '@domina/methods/hasAttr.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setStyleToken } from '@domina/methods/setStyleToken.js';
 
+import { CanonicalMap }                           from '@pulgasari/canonicalmap';
 import { coerce, toBoolean }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
 import { toCamelCase, toKebabCase }               from '@pulgasari/str';
@@ -240,26 +241,27 @@ export class AufbauElement extends HTMLElement {
   get schema () { return schemaOf(this.constructor); }
   get tag    () { return this.localName; }
 
+  // the config keys the element reacts to, null for every key. once per class,
+  // the map compares camel, kebab and snake case alike
   get configWatchlist () {
-    if (this._configWatchlist !== undefined) return this._configWatchlist;
+    const Class = this.constructor;
+    if (Object.hasOwn(Class, 'configWatchlist')) return Class.configWatchlist;
 
-    const explicit = this.constructor.observedConfig;
-    if (isArray(explicit)) return (this._configWatchlist = new Set(explicit.map(canonicalKey)));
-
-    const keys = new Set;
-    for (const [name, { config }] of Object.entries(this.schema)) {
-      if (!config) continue;
-      if (config === true) configKeys(this.tag, name).forEach(key => keys.add(canonicalKey(key)));
-      else config.forEach(key => keys.add(canonicalKey(key)));
+    const keys = isArray(Class.observedConfig) ? [...Class.observedConfig] : [];
+    if (!keys.length) {
+      for (const [name, { config }] of Object.entries(this.schema)) {
+        if (config === true) keys.push(...configKeys(this.tag, name));
+        else if (config) keys.push(...config);
+      }
     }
 
-    return (this._configWatchlist = keys.size ? keys : null);
+    return (Class.configWatchlist = keys.length ? new CanonicalMap(keys.map(key => [key, true])) : null);
   }
 
   observesConfig (changed) {
     const watchlist = this.configWatchlist;
     if (!watchlist || !isArray(changed)) return true;
-    return changed.some(key => watchlist.has(canonicalKey(key)));
+    return changed.some(key => watchlist.has(key));
   }
 
   getConfig (name, fallback, keys = true) {
