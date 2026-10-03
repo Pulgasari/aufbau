@@ -626,13 +626,17 @@ element, das beim öffnen den fokus hatte, oder an `anchor` (id oder selector).
 
 ## pop-prompt
 
-eine frage in einem `pop-modal`: nachricht, vielleicht ein textfeld, abbrechen und
-bestätigen. enter im feld bestätigt.
+eine frage in einem `pop-modal`: nachricht, vielleicht ein feld, abbrechen und
+bestätigen. das feld ist ein `input-value` jeden typs, mit `look` und optionen.
+enter im feld bestätigt.
 
 ```js
 if (await PopPrompt.confirm('Datei wirklich löschen?', { heading: 'Löschen', confirm: 'Löschen' })) remove();
 
 const name = await PopPrompt.prompt('Wie soll die datei heissen?', 'unbenannt');   // null bei abbrechen
+const day  = await PopPrompt.prompt('Wann?', '', { field: 'date' });
+const lang = await PopPrompt.prompt('Sprache?', 'de', { field: 'language' });
+const size = await PopPrompt.prompt('Größe?', 'm', { options: ['s', 'm', { value: 'l', label: 'groß' }], look: 'segments' });
 await PopPrompt.alert('Gespeichert.');
 ```
 
