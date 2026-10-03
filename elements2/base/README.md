@@ -1,14 +1,8 @@
 # @aufbau/elements2/base
 
-Lightweight, zero-dependency abstraction layer for Web Components. Provides a unified lifecycle, schema-driven attribute parsing with proxy destructuring, universal event handling with auto-cleanup, and DOM querying helpers.
-
----
-
-## todo
-
-### config
-
-- hljs connection um eigenes syntax highlighting einspeisen zu können
+the classes every element builds on: a lifecycle, attributes parsed by a
+schema, events that are cleaned up on disconnect, and helpers to query the
+element's own tree.
 
 ---
 
@@ -19,7 +13,7 @@ autonomous; customized built-ins (`is="…"`) are not supported, safari never
 shipped them.
 
 ```javascript
-import { AufbauCore } from './core/AufbauCore.js';
+import { AufbauCore } from './AufbauCore.js';
 
 export class AufbauElement extends AufbauCore {}
 ```
@@ -339,7 +333,7 @@ if (!customElements.get('vanilla-audio')) {
 ### Aufbau Core Equivalent (Declarative & Clean)
 
 ```javascript
-import { AufbauElement } from './core/AufbauCore.js';
+import { AufbauElement } from './AufbauCore.js';
 
 export default class AufbauAudio extends AufbauElement {
   static attr = {

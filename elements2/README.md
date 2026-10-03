@@ -72,31 +72,7 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 
 # aufbau-*
 
-die control-elemente folgen drei achsen: `type` (welcher wert), `look` (wie es
-aussieht) und `range`/`multiple` (wie viele). ausführlich in
-[CONTROLS.md](./CONTROLS.md), die css-konfiguration in [CSS-CONFIG.md](./CSS-CONFIG.md).
-
-```html
-<aufbau-option value='de' label='Deutsch'>
-
-<aufbau-picker look='combobox'>
-<aufbau-picker look='radio'>
-<aufbau-picker look='segments'>
-
-<aufbau-toggle look='switch'>
-<aufbau-toggle look='checkbox'>
-
-<aufbau-input type='text'>
-<aufbau-input type='number' look='stepper'>
-
-<aufbau-slider type='number' range>
-<aufbau-slider type='color'>
-
-<aufbau-upload accept='image/*'>
-
-<aufbau-writer counter maxlength='280'>
-<aufbau-reader src='/docs/intro.md'>
-```
+the building blocks. the controls that hold a value are the input-* elements below.
 
 [`<aufbau-audio>`](#aufbau-audio) ·
 [`<aufbau-button>`](#aufbau-button) ·
@@ -109,19 +85,14 @@ aussieht) und `range`/`multiple` (wie viele). ausführlich in
 [`<aufbau-filter>`](#aufbau-filter) ·
 [`<svg-flag>`](#svg-flag) ·
 [`<svg-icon>`](#svg-icon) ·
-[`<aufbau-input>`](#aufbau-input) ·
 [`<aufbau-keyboard>`](#aufbau-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-modal>`](#aufbau-modal) ·
-[`<aufbau-option>`](#aufbau-option) ·
-[`<aufbau-picker>`](#aufbau-picker) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-reader>`](#aufbau-reader) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
-[`<aufbau-slider>`](#aufbau-slider) ·
 [`<aufbau-table>`](#aufbau-table) ·
 [`<aufbau-toc>`](#aufbau-toc) ·
-[`<aufbau-toggle>`](#aufbau-toggle) ·
 [`<aufbau-tree>`](#aufbau-tree) ·
 [`<aufbau-tree-item>`](#aufbau-tree-item) ·
 [`<aufbau-upload>`](#aufbau-upload) ·
@@ -253,8 +224,8 @@ element rendert einen echten `<datalist>` und reicht seine `id` an ihn weiter,
 
 ```html
 <!-- Und deine inputs nutzen das einfach nativ -->
-<aufbau-input type="text" list="cities" placeholder="Select City..."></aufbau-input>
-<aufbau-input type="text" list="countries" placeholder="Select Country..."></aufbau-input>
+<input list="cities" placeholder="Select City…">
+<input list="countries" placeholder="Select Country…">
 ```
 
 ## aufbau-dropdown
@@ -393,28 +364,6 @@ bewusst über seinen rand hinaus zeichnet, denn skipping impliziert paint contai
 <aufbau-item intrinsic-size="480px">großer teaser</aufbau-item>
 ```
 
-## aufbau-input
-
-`type` ist ausschliesslich der wertetyp, `look` ausschliesslich die darstellung.
-für `type="range"` gibt es [`<aufbau-slider>`](#aufbau-slider), für `type="file"`
-[`<aufbau-upload>`](#aufbau-upload).
-
-```html
-<!-- icon kommt automatisch aus dem typ -->
-<aufbau-input name="mail" type="email" placeholder="Enter your email"></aufbau-input>
-
-<!-- stepper statt nacktem zahlenfeld (löst <aufbau-number> ab) -->
-<aufbau-input name="size" type="number" look="stepper" min="8" max="64" step="2"></aufbau-input>
-
-<!-- farbfeld -->
-<aufbau-input name="brand" type="color" look="swatch" value="#3355ff"></aufbau-input>
-```
-
-... with [<aufbau-datalist>](#aufbau-datalist)
-```html
-<aufbau-input type="text" list="city-list" placeholder="Select City..."></aufbau-input>
-```
-
 ## aufbau-keyboard
 
 eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
@@ -493,71 +442,6 @@ transitions von `display`/`overlay`, bei reduzierter bewegung ohne animation.
 die seite scrollt nicht, solange ein modal offen ist. grösse über `--modal-size`,
 abdunklung über `--modal-backdrop`.
 
-## aufbau-option
-
-datenelement, kein control. es rendert sich nie selbst, sondern wird von seinem
-container gelesen — und bleibt dabei im dom, damit optionen zur laufzeit
-dazukommen und verschwinden können.
-
-```html
-<aufbau-picker name="lang">
-  <aufbau-option value="de" icon="circle-flags:de">Deutsch</aufbau-option>
-  <aufbau-option value="en" icon="circle-flags:us" selected>English</aufbau-option>
-  <aufbau-option value="fr" disabled>Français</aufbau-option>
-</aufbau-picker>
-```
-
-## aufbau-picker
-
-one-of-n. `look` wechselt nur die darstellung — dieselben optionen funktionieren als
-combobox, cycle, radiogruppe oder segmented control.
-
-| look       | verhalten |
-| ---------- | --------- |
-| `combobox` | der host ist das feld, die optionen stehen in einer popover-liste (default) |
-| `cycle`    | ein button mit der aktuellen option. klick nimmt die nächste, langer druck oder rechtsklick öffnet die liste zur direktauswahl. immer einfachauswahl |
-| `radio`    | alle optionen inline, untereinander, mit markierung |
-| `segments` | alle optionen inline, eine lückenlose reihe |
-
-`icons-only` blendet bei `cycle`, `radio` und `segments` die labels aus, sofern die
-option ein icon hat. das label wird dann accessible name und tooltip. die
-popover-liste zeigt immer labels.
-
-`stepper` setzt einen button davor und einen dahinter, die zur vorherigen und
-nächsten option schalten, an beiden enden rundherum. bei jedem look, nie mit
-`multiple`. parts: `step` mit `previous` bzw. `next`.
-
-```html
-<aufbau-picker name="view" look="segments" value="month">
-  <aufbau-option value="day">Tag</aufbau-option>
-  <aufbau-option value="month">Monat</aufbau-option>
-  <aufbau-option value="year">Jahr</aufbau-option>
-</aufbau-picker>
-
-<!-- durchsuchbar, optionen aus einer datei -->
-<aufbau-picker name="framework" look="combobox" searchable
-               src="/data/frameworks.yaml" placeholder="Framework wählen..."></aufbau-picker>
-
-<!-- ansicht umschalten: ein button, klick wechselt, langer druck wählt gezielt -->
-<aufbau-picker name="layout" look="cycle" icons-only value="grid">
-  <aufbau-option value="list" icon="lucide:list">Liste</aufbau-option>
-  <aufbau-option value="grid" icon="lucide:layout-grid">Raster</aufbau-option>
-</aufbau-picker>
-
-<!-- mit buttons zum durchschalten davor und danach -->
-<aufbau-picker name="month" look="combobox" stepper value="9">
-  <aufbau-option value="8">August</aufbau-option>
-  <aufbau-option value="9">September</aufbau-option>
-  <aufbau-option value="10">Oktober</aufbau-option>
-</aufbau-picker>
-
-<!-- mehrfachauswahl, ein FormData-eintrag pro wert -->
-<aufbau-picker name="tags" look="radio" multiple>
-  <aufbau-option value="js">JavaScript</aufbau-option>
-  <aufbau-option value="css">CSS</aufbau-option>
-</aufbau-picker>
-```
-
 ## aufbau-progress
 
 ```html
@@ -609,25 +493,6 @@ jedes andere aufbau-element kann dasselbe an seiner eigenen stelle: das attribut
 `skeleton` (`<aufbau-item skeleton>`), solange die app lädt. reader, table, tree
 und picker zeigen ihn von selbst, während sie `src` laden. aussehen über
 `--skeleton-color`, `--skeleton-line`, `--skeleton-gap`, `--skeleton-radius`.
-
-## aufbau-slider
-
-ein wert auf einer achse. jeder `type` wird intern auf dieselbe numerische
-achse projiziert, deshalb teilen sich zahl, farbe, datum und zeit eine
-implementierung.
-
-```html
-<aufbau-slider name="delay" type="number" value="300" min="0" max="1000" step="50" unit="ms" controls editable></aufbau-slider>
-
-<!-- zwei griffe, value="from,to" -->
-<aufbau-slider name="preis" type="number" range value="20,80" min="0" max="100"></aufbau-slider>
-
-<!-- die achse ist der farbton -->
-<aufbau-slider name="hue" type="color" value="#3355ff"></aufbau-slider>
-
-<!-- die achse ist die zeit -->
-<aufbau-slider name="von" type="time" value="09:00" min="06:00" max="22:00"></aufbau-slider>
-```
 
 ## aufbau-table
 
@@ -682,16 +547,6 @@ notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
 <aufbau-toast type="warning" heading="Achtung" dismissible>
   Speicher fast voll. <a href="/storage">Aufräumen</a>
 </aufbau-toast>
-```
-
-## aufbau-toggle
-
-ein boolean. für one-of-n gibt es [`<aufbau-picker>`](#aufbau-picker).
-
-```html
-<aufbau-toggle name="darkmode" label="Darkmode aktivieren" checked></aufbau-toggle>
-<aufbau-toggle name="agb" look="checkbox" label="AGB akzeptieren" required></aufbau-toggle>
-<aufbau-toggle name="pin" look="button" label="Anheften"></aufbau-toggle>
 ```
 
 ## aufbau-tree
@@ -1048,16 +903,13 @@ from bandcamp's own embed code; a page url turns the placeholder into a link.
 
 ## notes for later
 
-- more looks: a calendar for date, swatches for color, a grid for long lists,
-  checkboxes for a bool list.
-- `aufbau-input`, `-slider`, `-picker` and `-toggle` stay only as long as
-  `input-emoji`, `input-icon`, `input-pattern`, `write-md` and @aufbau/gui use them.
-- `input-icon` and `input-emoji` show the hits as a wrapping segments row. a
-  grid look would suit them better.
+- more looks: a calendar for date, swatches for color.
+- @aufbau/gui (and so `app-config`) still renders the aufbau-* controls of
+  @aufbau/elements.
 - `input-emoji` knows single code points only (1150), no zwj sequences, skin
   tones or flags. the names are english unicode names, not the cldr keywords.
 - `input-phone` could take an `input-country` for the prefix.
-- the list components do not follow a change of `[lang]` above them until one
+- the list types do not follow a change of `[lang]` above them until one
   of their own attributes changes.
 - candidates for elements rather than components: `<aufbau-embed>` (a click to
   load facade for youtube, bandcamp, …) and `<aufbau-indicator type="error |

@@ -11,6 +11,7 @@
     "./div/*.js",
     "./embed/*.js",
     "./input/*.js",
+    "./svg/*.js",
     "./write/*.js"
   ],
   "exports": {
@@ -21,19 +22,17 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "adapters/*.js",
-    "app/*.js",
-    "aufbau/*.js",
-    "base/*.js",
-    "lib/*.js",
-    "data/*.js",
-    "div/*.js",
-    "embed/*.js",
-    "input/*.js",
-    "looks/*.js",
-    "write/*.js",
-    "CONTROLS.md",
-    "CSS-CONFIG.md",
+    "adapters",
+    "app",
+    "aufbau",
+    "base",
+    "data",
+    "div",
+    "embed",
+    "input",
+    "lib",
+    "svg",
+    "write",
     "README.md"
   ],
   "peerDependencies": {
