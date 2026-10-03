@@ -126,8 +126,11 @@ export class AufbauCore extends HTMLElement {
     this.states.toggle('skeleton', on);
     if (this.internals) this.internals.ariaBusy = on ? 'true' : null;
 
-    const shape   = this.constructor.skeleton;
-    const options = isFn(shape) ? shape.call(this) : (isPlainObject(shape) ? shape : {});
+    const shape = this.constructor.skeleton;
+    let options = {};
+    if (isFn(shape))          options = shape.call(this);
+    if (isPlainObject(shape)) options = shape;
+
     for (const [key, name] of Object.entries(SKELETON_VARS)) {
       const value = on ? options[key] : undefined;
       if (value == null) this.style.removeProperty(`--skeleton-${name}`);
@@ -259,7 +262,10 @@ export class AufbauCore extends HTMLElement {
     for (const name of names) {
       const kebab = toKebabCase(name);
       const value = this.getAttr(name);
-      const text  = value == null || value === false ? null : value === true ? '' : String(value);
+      let text = String(value);
+      if (value === true) text = '';
+      if (value == null || value === false) text = null;
+
       if (this.getAttribute(kebab) === text) continue;
 
       this._reflecting = true;
@@ -396,7 +402,9 @@ export class AufbauCore extends HTMLElement {
 
   varPrefix () {
     const raw = this.getConfig('varPrefix', 'aufbau', [...configKeys(this.tag, 'varPrefix'), 'var-prefix']);
-    return raw === false || raw === 'false' ? '' : raw === true || raw === 'true' ? 'aufbau' : String(raw);
+    if (raw === false || raw === 'false') return '';
+    if (raw === true  || raw === 'true')  return 'aufbau';
+    return String(raw);
   }
 
   cssVar (name) {

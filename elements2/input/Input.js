@@ -124,12 +124,18 @@ export class Input extends AufbauControl {
   // :::::: HOW :::::::::::::::::::::::::::::::::::::::::::::::::
 
   // what decides which looks fit, see ./looks/index.js
+  get kind () {
+    if (this.typeName === 'bool') return 'bool';
+    if (this.isList) return 'list';
+    return 'free';
+  }
+
   get shape () {
     const type = this.valueType;
     return {
       axis      : Boolean(type.axis),
       count     : this.count,
-      kind      : this.typeName === 'bool' ? 'bool' : this.isList ? 'list' : 'free',
+      kind      : this.kind,
       steppable : Boolean(type.axis) && type.steppable !== false,
       type      : this.typeName,
     };
@@ -183,7 +189,10 @@ export class Input extends AufbauControl {
 
   // the value stays a string, an array of parts is joined
   parseValue  (raw)   { return raw == null ? '' : String(raw); }
-  formatValue (value) { return isArray(value) ? joinValue(value, this.count) : value == null ? '' : String(value); }
+  formatValue (value) {
+    if (isArray(value)) return joinValue(value, this.count);
+    return value == null ? '' : String(value);
+  }
 
   get typedValue () {
     const type  = this.valueType;

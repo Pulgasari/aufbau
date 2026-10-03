@@ -238,7 +238,10 @@ export default class AufbauKeyboard extends AufbauElement {
     const caret = (at) => { try { field.setSelectionRange(at, at); } catch {} };
 
     switch (key) {
-      case 'Backspace'  : return end > start ? splice('') : start > 0 ? splice('', start - 1, start) : this;
+      case 'Backspace'  :
+        if (end > start) return splice('');
+        if (start > 0)   return splice('', start - 1, start);
+        return this;
       case 'ArrowLeft'  : caret(Math.max(0, (end > start ? start : start - 1))); return this;
       case 'ArrowRight' : caret(Math.min(value.length, end > start ? end : end + 1)); return this;
       case 'ArrowUp'    :

@@ -2,6 +2,13 @@ import { toArray }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject } from '@pulgasari/is';
 import { toKebabCase }                  from '@pulgasari/str';
 
+// true stays true, nothing is null, anything else is converted
+function optional (value, convert) {
+  if (value === true) return true;
+  if (!value) return null;
+  return convert(value);
+}
+
 const cache = new WeakMap;
 
 export const BASE = Object.freeze({ type: String, fallback: undefined, values: null, fn: null, config: null, var: null });
@@ -21,8 +28,8 @@ export const parseSchemaEntry = (entry) => {
     fallback : entry.default,
     values   : isArray (entry.values) ? entry.values : null,
     fn       : isFn    (entry.fn)     ? entry.fn     : null,
-    config : entry.config === true ? true : (entry.config ? toArray (entry.config) : null),
-    var    : entry.var    === true ? true : (entry.var    ? String  (entry.var)    : null),
+    config   : optional(entry.config, toArray),
+    var      : optional(entry.var, String),
   };
 
   // shorthand, bare default value: `volume: 50`
