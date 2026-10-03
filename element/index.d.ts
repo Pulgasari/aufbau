@@ -89,7 +89,7 @@ export declare class AufbauElement extends HTMLElement {
 
   setSkeleton (on?: boolean): this;
   setVar      (name: string, value: unknown): this;
-  setVars     (map: Record<string, unknown>): this;
+  setVar      (map: Record<string, unknown>): this;
 
   invalidate (): this;
   render     (): unknown;

@@ -9,7 +9,7 @@ export default class AufbauIndex extends AufbauElement {
   static reflect = ['viewmode'];
 
   static attr = {
-    gap               : { type: String, var: true },   // -> --aufbau-gap
+    gap               : { type: String, var: '--index-gap' },
     itemIntrinsicSize : String,
     itemLook          : String,   // shorthand: "180px rounded"
     itemShape         : String,   // default shape for items without their own
@@ -21,8 +21,8 @@ export default class AufbauIndex extends AufbauElement {
 
   static styles = `aufbau-index {
     display               : grid;
-    gap                   : var(--aufbau-gap, 1rem);
-    grid-template-columns : repeat(auto-fill, minmax(var(--aufbau-item-size, 200px), 1fr));
+    gap                   : var(--index-gap, 1rem);
+    grid-template-columns : repeat(auto-fill, minmax(var(--item-size, 200px), 1fr));
     inline-size           : 100%;
 
     &[viewmode="list"] {
@@ -37,19 +37,19 @@ export default class AufbauIndex extends AufbauElement {
       scroll-snap-type  : x mandatory;
 
       > * {
-        flex              : 0 0 var(--aufbau-item-size, 200px);
+        flex              : 0 0 var(--item-size, 200px);
         scroll-snap-align : start;
       }
     }
 
     &[viewmode="masonry"] {
-      column-gap   : var(--aufbau-gap, 1rem);
-      column-width : var(--aufbau-item-size, 200px);
+      column-gap   : var(--index-gap, 1rem);
+      column-width : var(--item-size, 200px);
       display      : block;
 
       > * {
         break-inside     : avoid;
-        margin-block-end : var(--aufbau-gap, 1rem);
+        margin-block-end : var(--index-gap, 1rem);
       }
     }
 
@@ -59,7 +59,7 @@ export default class AufbauIndex extends AufbauElement {
 
     &[eager] aufbau-item { content-visibility: visible; }
 
-    &:state(relayout) aufbau-item { contain-intrinsic-block-size: var(--aufbau-item-intrinsic-size, var(--aufbau-item-size, 200px)); }
+    &:state(relayout) aufbau-item { contain-intrinsic-block-size: var(--item-intrinsic-size, var(--item-size, 200px)); }
   }`;
 
   constructor () {
@@ -115,13 +115,13 @@ export default class AufbauIndex extends AufbauElement {
     if (Math.abs(estimate - (this._estimate ?? 0)) < 1) return;
 
     this._estimate = estimate;
-    this.setVar('item-intrinsic-size', `${estimate}px`);
+    this.setVar('--item-intrinsic-size', `${estimate}px`);
   }
 
   relayout () {
     this._samples  = { count: 0, total: 0 };
     this._estimate = null;
-    if (this.learns) this.setVar('item-intrinsic-size', null);
+    if (this.learns) this.setVar('--item-intrinsic-size', null);
 
     this.states.add('relayout');
     requestAnimationFrame(() => requestAnimationFrame(() => this.states.delete('relayout')));
@@ -145,12 +145,12 @@ export default class AufbauIndex extends AufbauElement {
 
     const start = this._resizeValue ?? parsePx(this.getAttr('itemSize')) ?? (min + max) / 2;
     this._resizeValue = gestures.clamp(start, min, max);
-    this.setVar('item-size', `${this._resizeValue}px`);
+    this.setVar('--item-size', `${this._resizeValue}px`);
 
     this._resize = gestures.compose(this, {
       onAdjust : size => {
         this._resizeValue = Math.round(size);
-        this.setVar('item-size', `${this._resizeValue}px`);
+        this.setVar('--item-size', `${this._resizeValue}px`);
       },
       value : this._resizeValue,
       min,
@@ -165,13 +165,13 @@ export default class AufbauIndex extends AufbauElement {
     const look = parseLook(itemLook);
     const size = this._resizeValue != null ? `${this._resizeValue}px` : (itemSize || look.size);
 
-    this.setVars({
-      'item-shape' : resolveShape(itemShape || look.shape),
-      'item-size'  : size,
+    this.setVar({
+      '--item-shape' : resolveShape(itemShape || look.shape),
+      '--item-size'  : size,
     });
 
-    if (itemIntrinsicSize) this.setVar('item-intrinsic-size', itemIntrinsicSize);
-    else if (this._estimate == null) this.setVar('item-intrinsic-size', null);
+    if (itemIntrinsicSize) this.setVar('--item-intrinsic-size', itemIntrinsicSize);
+    else if (this._estimate == null) this.setVar('--item-intrinsic-size', null);
   }
 }
 

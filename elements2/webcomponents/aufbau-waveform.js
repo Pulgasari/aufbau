@@ -99,7 +99,7 @@ export default class AufbauWaveform extends AufbauElement {
     const { interactive, progress, rangeEnd, rangeStart } = this.getAttr();
     const hasRange = rangeStart != null && rangeEnd != null;
 
-    this.setVars({
+    this.setVar({
       '--waveform-end'      : hasRange ? `${clamp(rangeEnd)}%`   : '0%',
       '--waveform-progress' : `${clamp(progress)}%`,
       '--waveform-start'    : hasRange ? `${clamp(rangeStart)}%` : '0%',

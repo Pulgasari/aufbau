@@ -24,7 +24,7 @@ export default class AufbauDropdown extends AufbauElement {
       cursor      : pointer;
       display     : inline-flex;
       font        : inherit;
-      gap         : var(--aufbau-control-gap, 0.5em);
+      gap         : var(--control-gap, 0.5em);
       margin      : 0;
 
       &:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -53,7 +53,7 @@ export default class AufbauDropdown extends AufbauElement {
       display         : flex;
       flex            : none;
       font            : inherit;
-      gap             : var(--aufbau-control-gap, 0.5em);
+      gap             : var(--control-gap, 0.5em);
       text-align      : start;
       text-decoration : none;
     }

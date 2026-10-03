@@ -22,7 +22,7 @@ export default class AufbauProgress extends AufbauElement {
 
       align-items : center;
       display     : flex;
-      gap         : var(--aufbau-control-gap, 0.5em);
+      gap         : var(--control-gap, 0.5em);
 
       &::before {
         background-color  : var(--progress-track, transparent);

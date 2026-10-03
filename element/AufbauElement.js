@@ -5,8 +5,9 @@ import { applySkin }                                             from './lib/ski
 import { adoptClassStyles }                                      from './lib/styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './lib/config.js';
 
-import { hasAttr } from '@domina/methods/hasAttr.js';
-import { setAttr } from '@domina/methods/setAttr.js';
+import { hasAttr }       from '@domina/methods/hasAttr.js';
+import { setAttr }       from '@domina/methods/setAttr.js';
+import { setStyleToken } from '@domina/methods/setStyleToken.js';
 
 import { coerce, toBoolean }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
@@ -343,19 +344,9 @@ export class AufbauElement extends HTMLElement {
 
   // :::::: STYLE VARS :::::::::::::::::::::::::::::::::::::::::::
 
-  // custom properties on the host. '--name' as it is, 'name' as --aufbau-name.
-  // null, undefined, false and '' remove it
-  setVar (name, value) {
-    const property = name.startsWith('--') ? name : `--aufbau-${name}`;
-    if (isBlank(value)) this.style.removeProperty(property);
-    else this.style.setProperty(property, String(value));
-    return this;
-  }
-
-  setVars (map) {
-    for (const name in map) this.setVar(name, map[name]);
-    return this;
-  }
+  // custom properties on the host: setVar('--size', '2em') or setVar({ '--size': '2em' }).
+  // a name without -- gets it, null and false remove it
+  setVar (nameOrMap, value) { setStyleToken(this, nameOrMap, value); return this; }
 
   // attributes with `var` in their schema are mirrored as custom properties
   applyVars () {

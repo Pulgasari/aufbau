@@ -35,7 +35,7 @@ MyThing.init();   // <my-thing>
 
 | what | |
 |---|---|
-| `static attr` | the attribute schema: a type, `{ type, default, values, fn, config, var }` or a default value |
+| `static attr` | the attribute schema: a type, `{ type, default, values, fn, config, var }` or a default value. `var: true` mirrors the value as `--name`, `var: '--other'` under that name |
 | `static shadow` | a shadow root of its own |
 | `static styles` | css in the layer `aufbau.elements`, one sheet per class shared by every tree. see [styles](#styles) |
 | `static reflect` | attributes whose resolved value goes back onto the host |
@@ -110,8 +110,8 @@ this.focused                        // the focused element inside
 
 ```js
 this.states.toggle('open', true)                   // :state(open)
-this.setVars({ '--embed-ratio': '16 / 9', '--embed-height': null })   // null removes
-this.setVar('item-size', '200px')                  // --aufbau-item-size
+this.setVar('--item-size', '200px')                // a custom property on the host
+this.setVar({ '--embed-ratio': '16 / 9', '--embed-height': null })    // null and false remove
 this.setSkeleton(true)
 this.getConfig('theme', 'github')                  // attribute, then setConfig(), then fallback
 ```

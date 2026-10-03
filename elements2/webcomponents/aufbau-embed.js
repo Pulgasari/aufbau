@@ -227,7 +227,7 @@ export default class AufbauEmbed extends AufbauElement {
     const fixed = height || (!ratio && embed?.height);
 
     this.states.toggle('active', this.active);
-    this.setVars({
+    this.setVar({
       '--embed-height' : fixed,
       '--embed-poster' : poster && `url(${JSON.stringify(poster)})`,
       '--embed-ratio'  : fixed ? 'auto' : (ratio || embed?.ratio || '16 / 9'),

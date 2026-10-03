@@ -60,7 +60,7 @@ const STACK_STYLES = `
     padding         : 0;
     pointer-events  : none;
     position        : fixed;
-    z-index         : var(--aufbau-toast-z, 100);
+    z-index         : var(--toast-z, 100);
   }
 `;
 
@@ -79,7 +79,7 @@ export default class AufbauToast extends AufbauElement {
   static styles = `
     :host {
       align-items           : start;
-      column-gap            : var(--aufbau-control-gap, 0.5em);
+      column-gap            : var(--control-gap, 0.5em);
       display               : grid;
       grid-template-columns : auto 1fr auto;
       pointer-events        : auto;

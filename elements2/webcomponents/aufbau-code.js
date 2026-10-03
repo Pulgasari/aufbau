@@ -132,7 +132,7 @@ export default class AufbauCode extends AufbauSourceElement {
     }
 
     > figure > header {
-      --gap: small; /* gap: var(--aufbau-control-gap, 0.5em); */
+      --gap: small; /* gap: var(--control-gap, 0.5em); */
       
       align-items : center;
       display     : flex;

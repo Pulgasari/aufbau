@@ -10,13 +10,13 @@ export default class AufbauItem extends AufbauElement {
   };
 
   static styles = `aufbau-item {
-    border-radius : var(--aufbau-current-shape, var(--aufbau-item-shape, 0px));
+    border-radius : var(--item-current-shape, var(--item-shape, 0px));
     box-sizing    : border-box;
     display       : block;
     overflow      : hidden;
 
     content-visibility           : auto;
-    contain-intrinsic-block-size : auto var(--aufbau-item-intrinsic-size, var(--aufbau-item-size, 200px));
+    contain-intrinsic-block-size : auto var(--item-intrinsic-size, var(--item-size, 200px));
 
     transition-behavior : allow-discrete;
 
@@ -30,9 +30,9 @@ export default class AufbauItem extends AufbauElement {
   sync () {
     const { intrinsicSize, look, shape } = this.getAttr();
 
-    this.setVars({
-      'current-shape'       : resolveShape(shape || parseLook(look).shape),
-      'item-intrinsic-size' : intrinsicSize,
+    this.setVar({
+      '--item-current-shape'  : resolveShape(shape || parseLook(look).shape),
+      '--item-intrinsic-size' : intrinsicSize,
     });
   }
 }
