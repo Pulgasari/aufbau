@@ -2,6 +2,8 @@
 
 // :::::: IMPORTS
 
+import { observe }       from '@domina/observer';
+
 import { AufbauElement } from '../base/AufbauElement.js';
 import { attrs, html }   from '../lib/html.js';
 
@@ -51,29 +53,21 @@ const STICKY = ['shift', 'ctrl', 'alt'];
 const FIELDS = 'input, textarea, [contenteditable]';
 
 let suppressing = 0;
-let observer    = null;
+let unwatch     = null;
 
-const setManual = (el) => el.setAttribute('virtualkeyboardpolicy', 'manual');
-const setAuto   = (el) => el.removeAttribute('virtualkeyboardpolicy');
 const onFocusIn = () => navigator.virtualKeyboard?.hide();
+
+// every field, also the ones added later. unwatch() restores them
+function setManual (field) {
+  field.setAttribute('virtualkeyboardpolicy', 'manual');
+  return () => field.removeAttribute('virtualkeyboardpolicy');
+}
 
 function suppressNative () {
   if (!navigator.virtualKeyboard || suppressing++) return;
 
   navigator.virtualKeyboard.overlaysContent = true;
-  document.querySelectorAll(FIELDS).forEach(setManual);
-
-  observer = new MutationObserver(records => {
-    for (const { addedNodes } of records) {
-      for (const node of addedNodes) {
-        if (node.nodeType !== Node.ELEMENT_NODE) continue;
-        if (node.matches?.(FIELDS)) setManual(node);
-        node.querySelectorAll?.(FIELDS).forEach(setManual);
-      }
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-
+  unwatch = observe(FIELDS, { onMatch: setManual });
   document.addEventListener('focusin', onFocusIn, true);
 }
 
@@ -81,9 +75,8 @@ function restoreNative () {
   if (!navigator.virtualKeyboard || !suppressing || --suppressing) return;
 
   navigator.virtualKeyboard.overlaysContent = false;
-  document.querySelectorAll(FIELDS).forEach(setAuto);
-  observer?.disconnect();
-  observer = null;
+  unwatch?.();
+  unwatch = null;
   document.removeEventListener('focusin', onFocusIn, true);
 }
 

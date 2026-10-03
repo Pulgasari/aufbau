@@ -1,4 +1,5 @@
 import { isPlainObject, isString } from '@pulgasari/is';
+import { createShift, shift }      from '@pulgasari/shift';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
 import { AufbauElement }   from '../base/AufbauElement.js';
@@ -20,11 +21,12 @@ const SWIPE_RATIO = 0.35;
 const isErrorLike = value =>
   value instanceof Error || (value != null && typeof value === 'object' && isString(value.message) && ('stack' in value || 'name' in value));
 
-const messageOf = value =>
-    value == null      ? ''
-  : isString(value)    ? value
-  : isErrorLike(value) ? value.message
-  : String(value);
+const messageOf = createShift(shift.predicates).with({ isErrorLike })({
+  nullish   : '',
+  string    : message => message,
+  errorLike : error   => error.message,
+  fallback  : String,
+});
 
 export function toToastOptions (input, options = {}) {
   let result;

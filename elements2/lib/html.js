@@ -1,3 +1,5 @@
+import { createShift, shift } from '@pulgasari/shift';
+
 const RAW = Symbol.for('aufbau.raw');
 
 const ESCAPES = { 
@@ -17,13 +19,16 @@ class Html {
   toString () { return this.value; }
 }
 
-const isRaw = value => value?.[RAW] === true;
+const isFalse = value => value === false;
+const isRaw   = value => value?.[RAW] === true;
 
-const interpolate = value =>
-    value == null || value === false ? ''
-  : isRaw(value)                     ? value.toString()
-  : Array.isArray(value)             ? value.map(interpolate).join('')
-  : escapeHtml(value);
+const interpolate = createShift(shift.predicates).with({ isFalse, isRaw })({
+  nullish  : '',
+  false    : '',
+  raw      : value  => value.toString(),
+  array    : values => values.map(interpolate).join(''),
+  fallback : escapeHtml,
+});
 
 export const html = (strings, ...values) =>
   new Html(strings.reduce(
