@@ -5,7 +5,7 @@
 //   <embed-youtube src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></embed-youtube>
 //   <embed-youtube src="dQw4w9WgXcQ" start="1m30s"></embed-youtube>
 
-import { EmbedComponent, urlOf } from '../core/EmbedComponent.js';
+import { EmbedComponent, urlOf } from '../base/EmbedComponent.js';
 
 export class EmbedYoutube extends EmbedComponent {
 

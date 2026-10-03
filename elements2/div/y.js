@@ -5,7 +5,7 @@
 //   <div-y>…</div-y>
 //   <div-y scrollable>…</div-y>
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 export class DivY extends AufbauElement {

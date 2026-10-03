@@ -3,8 +3,8 @@
 // the only child. playback flags are applied as properties, so toggling muted
 // or loop does not rebuild the player and reset playback.
 
-import { AufbauElement } from '../core/index.js';
-import { html }          from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { html }          from '../lib/html.js';
 
 const YOUTUBE = 'https://www.youtube-nocookie.com/embed/';
 const ALLOW   = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';

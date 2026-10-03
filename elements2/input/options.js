@@ -9,8 +9,8 @@
 // loading is async, `onChange` repaints once something arrived.
 
 import { importFile }                    from '@aufbau/import';
-import { normalizeOptions, readOptions } from '../core/options.js';
-import { localeOf }                      from '../core/locale.js';
+import { normalizeOptions, readOptions } from '../lib/options.js';
+import { localeOf }                      from '../lib/locale.js';
 
 export class OptionSource {
 

@@ -10,8 +10,8 @@
 // <aufbau-tree>, the item only knows its own state. :state(branch) marks an
 // item with children. parts: row, icon, label
 
-import { AufbauElement } from '../core/index.js';
-import { html }          from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { html }          from '../lib/html.js';
 
 const ICONS = {
   file   : 'lucide:file-text',

@@ -4,8 +4,8 @@
 // skipped while off screen, see the notes in AufbauIndex.js for how its
 // stand-in size is chosen.
 
-import { AufbauElement }           from '../core/index.js';
-import { parseLook, resolveShape } from '../core/look.js';
+import { AufbauElement }           from '../base/index.js';
+import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 export default class AufbauItem extends AufbauElement {
   static attr = {

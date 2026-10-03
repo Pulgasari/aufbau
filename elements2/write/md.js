@@ -14,8 +14,8 @@ import '../aufbau/AufbauPicker.js';
 import '../aufbau/AufbauReader.js';
 import '../aufbau/AufbauWriter.js';
 
-import { attrs, html }     from '../core/html.js';
-import { AufbauComponent } from '../core/AufbauComponent.js';
+import { attrs, html }     from '../lib/html.js';
+import { AufbauComponent } from '../base/AufbauComponent.js';
 
 const DEBOUNCE = 150;
 

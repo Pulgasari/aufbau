@@ -6,10 +6,10 @@
 // `look` is reserved as the axis a richer editing mode would arrive on
 // (look="markdown"), the value api below stays the same either way.
 
-import { actionButtons, bindActions, parseActions } from '../core/actions.js';
-import { AufbauControl } from '../core/index.js';
-import { dedent }        from '../core/utils.js';
-import { attrs, html }   from '../core/html.js';
+import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
+import { AufbauControl } from '../base/index.js';
+import { dedent }        from '../lib/utils.js';
+import { attrs, html }   from '../lib/html.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
 import { setValue }      from '@domina/methods/setValue.js';
 
@@ -89,7 +89,7 @@ export default class AufbauWriter extends AufbauControl {
 
   get field () { return this.$('textarea'); }
 
-  // the contract with core/actions.js
+  // the contract with lib/actions.js
   actionText   () { return this.field?.value ?? this.getAttribute('value') ?? ''; }
   actionTarget () { return this.getAttr('readonly') ? null : this.field; }
 

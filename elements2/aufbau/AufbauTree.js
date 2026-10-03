@@ -14,9 +14,9 @@
 // the tree owns interaction for all of its items: clicks on a row, and the
 // keyboard pattern of a wai-aria tree view with one roving tab stop.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 import { importFile }    from '@aufbau/import';
-import { attrs, html }   from '../core/html.js';
+import { attrs, html }   from '../lib/html.js';
 
 const ITEM = 'aufbau-tree-item';
 

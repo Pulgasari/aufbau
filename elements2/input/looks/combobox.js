@@ -2,7 +2,7 @@
 // `searchable` filters them while typing. one value, or any number with `multiple`
 // parts: box, icon, input, caret, listbox, option, label
 
-import { attrs, html }                                                  from '../../core/html.js';
+import { attrs, html }                                                  from '../../lib/html.js';
 import { FRAME, icon }                                                  from './parts/field.js';
 import { labelOf, updateSelected }                                      from './parts/options.js';
 import { LISTBOX, filter, isOpen, listbox, listboxOf, popoverEvents, setOpen, triggerOf } from './parts/popover.js';

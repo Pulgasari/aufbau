@@ -4,8 +4,8 @@
 // thumb and checkbox mark are pseudo elements, the only children are the
 // optional icon and the label.
 
-import { AufbauControl } from '../core/index.js';
-import { html }          from '../core/html.js';
+import { AufbauControl } from '../base/index.js';
+import { html }          from '../lib/html.js';
 
 const ROLES = { button: 'button', checkbox: 'checkbox', switch: 'switch' };
 

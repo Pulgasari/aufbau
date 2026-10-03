@@ -15,9 +15,9 @@
 // children closes it with the submitter's value, like it would natively.
 // parts: dialog, header, heading, close. state: :state(open)
 
-import { AufbauElement }   from '../core/index.js';
-import { html }            from '../core/html.js';
-import { adoptBaseStyles } from '../core/styles.js';
+import { AufbauElement }   from '../base/index.js';
+import { html }            from '../lib/html.js';
+import { adoptBaseStyles } from '../lib/styles.js';
 
 // page scroll lock. document level on purpose, the shadow root cannot reach :root
 const PAGE_STYLES = `:root:has(aufbau-modal:state(open)) { overflow: hidden; }`;

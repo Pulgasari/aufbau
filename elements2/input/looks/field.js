@@ -1,8 +1,8 @@
 // look="field": one typed value. the icon, the text, the actions (copy, paste, clear, reveal)
 // parts: box, icon, input, action
 
-import { actionButtons, bindActions, parseActions }               from '../../core/actions.js';
-import { html }                                                   from '../../core/html.js';
+import { actionButtons, bindActions, parseActions }               from '../../lib/actions.js';
+import { html }                                                   from '../../lib/html.js';
 import { FRAME, field, fieldEvents, firstField, icon, updateFields } from './parts/field.js';
 
 export default {

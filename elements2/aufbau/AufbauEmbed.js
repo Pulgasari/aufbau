@@ -18,9 +18,9 @@
 // click per provider, later embeds of it load at once. state: :state(active).
 // event: `activate` with { provider, src }.
 
-import { AufbauElement } from '../core/index.js';
-import { attrs, html }   from '../core/html.js';
-import { store }         from '../core/persist.js';
+import { AufbauElement } from '../base/index.js';
+import { attrs, html }   from '../lib/html.js';
+import { store }         from '../lib/persist.js';
 
 const ALLOW = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
 

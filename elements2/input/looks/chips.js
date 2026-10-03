@@ -2,7 +2,7 @@
 // comma adds what was typed, backspace in the empty field takes the last one back
 // parts: box, icon, chip, label, remove, input
 
-import { html }        from '../../core/html.js';
+import { html }        from '../../lib/html.js';
 import { FRAME, icon } from './parts/field.js';
 
 const inputOf = host => host.root.querySelector('[part~="input"]');

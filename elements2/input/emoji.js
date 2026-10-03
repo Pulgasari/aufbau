@@ -7,7 +7,7 @@
 //
 // single code points only for now, see data/emoji.js.
 
-import { SearchComponent, searchStyles } from '../core/SearchComponent.js';
+import { SearchComponent, searchStyles } from '../base/SearchComponent.js';
 import { EMOJI }                          from '../data/emoji.js';
 
 const emojiEntry = ({ emoji, name }) => ({ label: emoji, value: emoji, name });

@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/look.js
+// @aufbau/elements2/lib/itemLook.js
 //
 // the shorthand shared by <aufbau-index> and <aufbau-item>: a single `look`
 // attribute that folds an item size and a shape into one token list, e.g.

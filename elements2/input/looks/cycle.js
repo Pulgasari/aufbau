@@ -2,7 +2,7 @@
 // a long press or the context menu opens the list. always one value
 // parts: box, button, icon, label, listbox, option
 
-import { html }                                                  from '../../core/html.js';
+import { html }                                                  from '../../lib/html.js';
 import { labelOf, updateSelected }                               from './parts/options.js';
 import { LISTBOX, isOpen, listbox, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
 

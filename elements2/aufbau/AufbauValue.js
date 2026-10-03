@@ -9,10 +9,10 @@
 
 // :::::: IMPORTS
 
-import { actionButtons, bindActions }           from '../core/actions.js';
-import { AufbauElement, TYPE_NAMES, valueType } from '../core/index.js';
-import { attrs, html } from '../core/html.js';
-import { configKeys }  from '../core/AufbauConfig.js';
+import { actionButtons, bindActions }           from '../lib/actions.js';
+import { AufbauElement, TYPE_NAMES, valueType } from '../base/index.js';
+import { attrs, html } from '../lib/html.js';
+import { configKeys }  from '../base/AufbauConfig.js';
 
 // :::::: CONSTANTS
 
@@ -190,7 +190,7 @@ export default class AufbauValue extends AufbauElement {
 
   sync () { this.states.toggle('empty', !this.text); }
 
-  // the contract with core/actions.js. what is on screen is what is copied, the value behind it is `el.machine`
+  // the contract with lib/actions.js. what is on screen is what is copied, the value behind it is `el.machine`
   actionText   () { return this.text; }
   actionTarget () { return null; }
 

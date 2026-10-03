@@ -34,7 +34,7 @@
 // the area's own chrome (scrim, handle) lives in a shadow root, the children
 // stay the author's and are projected, so a framework keeps rendering them.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 // how far a drag has to go before it switches, in px

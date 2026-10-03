@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/EmbedComponent.js
+// @aufbau/elements2/base/EmbedComponent.js
 // the base of every embed-* component: one <aufbau-embed>, fed with the url a
 // subclass builds from what the author gave: a url, an id, a type. consent,
 // sizing and the placeholder are the element's, its attributes are forwarded.

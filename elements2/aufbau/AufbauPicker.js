@@ -26,9 +26,9 @@ import { isArray }    from '@pulgasari/is';
 import setAttr  from '@domina/methods/setAttr.js';
 import setValue from '@domina/methods/setValue.js';
 
-import { AufbauControl, normalizeOptions, observeOptions, readOptions } from '../core/index.js';
-import { attrs, html } from '../core/html.js';
-import { place }       from '../core/placement.js';
+import { AufbauControl, normalizeOptions, observeOptions, readOptions } from '../base/index.js';
+import { attrs, html } from '../lib/html.js';
+import { place }       from '../lib/placement.js';
 
 const GROUPED    = new Set(['radio', 'segments']);
 const POPUP      = new Set(['combobox', 'cycle']);
@@ -108,7 +108,7 @@ export default class AufbauPicker extends AufbauControl {
 
     [part~="step"] { flex: none; justify-content: center; }
 
-    /* top layer, positioned by core/placement.js */
+    /* top layer, positioned by lib/placement.js */
     [part~="listbox"] {
       border              : 0;
       color               : inherit;

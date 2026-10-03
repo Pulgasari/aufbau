@@ -5,9 +5,9 @@
 import { isPlainObject, isString } from '@pulgasari/is';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
-import { AufbauElement }   from '../core/index.js';
-import { html }            from '../core/html.js';
-import { adoptBaseStyles } from '../core/styles.js';
+import { AufbauElement }   from '../base/index.js';
+import { html }            from '../lib/html.js';
+import { adoptBaseStyles } from '../lib/styles.js';
 
 const ICONS = {
   error   : 'lucide:alert-circle',

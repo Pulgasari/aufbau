@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/SearchComponent.js
+// @aufbau/elements2/base/SearchComponent.js
 // the base of every component that is picked from search hits: a search field
 // and the hits as a wrapping row of options. the field only feeds the search,
 // the <aufbau-picker> below holds the value. the current value stays among the
@@ -11,7 +11,7 @@
 import '../aufbau/AufbauInput.js';
 import '../aufbau/AufbauPicker.js';
 
-import { attrs, html }     from './html.js';
+import { attrs, html }     from '../lib/html.js';
 import { AufbauComponent } from './AufbauComponent.js';
 
 const DEBOUNCE = 250;

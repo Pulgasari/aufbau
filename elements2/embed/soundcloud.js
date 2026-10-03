@@ -4,7 +4,7 @@
 //
 //   <embed-soundcloud src="https://soundcloud.com/artist/track"></embed-soundcloud>
 
-import { EmbedComponent } from '../core/EmbedComponent.js';
+import { EmbedComponent } from '../base/EmbedComponent.js';
 
 export class EmbedSoundcloud extends EmbedComponent {}
 

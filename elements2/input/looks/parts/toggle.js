@@ -2,7 +2,7 @@
 // what the bool looks share: one button carries role and state, the label is its content.
 // `icon` and `icon-checked` put an icon into it
 
-import { attrs, html } from '../../../core/html.js';
+import { attrs, html } from '../../../lib/html.js';
 
 export const fits = shape => shape.kind === 'bool';
 

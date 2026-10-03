@@ -9,7 +9,7 @@
 // both stop while off screen: the carousel skips its ticks, the marquee
 // animation is paused through :state(offscreen). parts: track, copy
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 import { onVisible }     from '@domina/observer';
 
 export default class AufbauLoop extends AufbauElement {

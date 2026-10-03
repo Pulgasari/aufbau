@@ -5,8 +5,8 @@
 // styling hook for indentation. the entry of the heading currently read is
 // marked with aria-current="location".
 
-import { AufbauElement } from '../core/index.js';
-import { html }          from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { html }          from '../lib/html.js';
 
 import { toSlugCase }  from '@pulgasari/str';
 import { getElement }  from '@domina/methods/getElement.js';

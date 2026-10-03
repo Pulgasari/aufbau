@@ -11,8 +11,8 @@
 
 // :::::: IMPORTS
 
-import { AufbauElement } from '../core/index.js';
-import { attrs, html }   from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { attrs, html }   from '../lib/html.js';
 
 // :::::: LAYOUTS
 

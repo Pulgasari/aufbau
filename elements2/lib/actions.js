@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/actions.js
+// @aufbau/elements2/lib/actions.js
 // copy / paste / clear / reveal buttons for text holding elements (<aufbau-code>,
 // <aufbau-writer>, the field look of the input-* elements).
 //

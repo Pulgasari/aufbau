@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/locale.js
+// @aufbau/elements2/lib/locale.js
 
 /** the language an element is shown in: the nearest [lang], the document, the browser */
 export const localeOf = element =>

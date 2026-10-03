@@ -3,7 +3,7 @@
 //
 //   <embed-mastodon src="https://mastodon.social/@user/112233445566"></embed-mastodon>
 
-import { EmbedComponent } from '../core/EmbedComponent.js';
+import { EmbedComponent } from '../base/EmbedComponent.js';
 
 export class EmbedMastodon extends EmbedComponent {}
 

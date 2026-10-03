@@ -6,7 +6,7 @@
 // keyboard, touch and the accessible slider stay native, and the thumb can be a
 // part, which the pseudo element of a native thumb cannot.
 
-import { attrs, html } from '../../core/html.js';
+import { attrs, html } from '../../lib/html.js';
 
 const percent = (number, [min, max]) => ((number - min) / ((max - min) || 1)) * 100;
 

@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/utils.js
+// @aufbau/elements2/lib/utils.js
 
 import { offEvent } from '@domina/methods/offEvent.js';
 import { onEvent }  from '@domina/methods/onEvent.js';

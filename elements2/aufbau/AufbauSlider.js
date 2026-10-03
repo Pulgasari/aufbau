@@ -3,8 +3,8 @@
 // valueTypes, so color, date, datetime, time and number share this one
 // implementation. `range` turns it into a two handle span.
 
-import { AufbauControl, AXIS_TYPES, valueType } from '../core/index.js';
-import { attrs, html } from '../core/html.js';
+import { AufbauControl, AXIS_TYPES, valueType } from '../base/index.js';
+import { attrs, html } from '../lib/html.js';
 import { setValue } from '@domina/methods/setValue.js';
 
 export default class AufbauSlider extends AufbauControl {

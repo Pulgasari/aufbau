@@ -7,7 +7,7 @@
 //   range-start   0..100, optional highlighted range (trim and loop editors)
 //   range-end     0..100
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 const clamp = value => Math.min(100, Math.max(0, value));
 

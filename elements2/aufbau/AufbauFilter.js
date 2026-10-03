@@ -3,8 +3,8 @@
 // an <aufbau-input type="search">. mismatches get the `hidden` attribute, so
 // filtering works without any css; `mismatch-class` switches to a class instead.
 
-import { AufbauElement }  from '../core/index.js';
-import { html }           from '../core/html.js';
+import { AufbauElement }  from '../base/index.js';
+import { html }           from '../lib/html.js';
 import { filterElements } from '@domina/methods/filterElements.js';
 
 export default class AufbauFilter extends AufbauElement {

@@ -1,4 +1,4 @@
-# @aufbau/elements2/core
+# @aufbau/elements2/base
 
 Lightweight, zero-dependency abstraction layer for Web Components. Provides a unified lifecycle, schema-driven attribute parsing with proxy destructuring, universal event handling with auto-cleanup, and DOM querying helpers.
 

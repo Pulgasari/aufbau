@@ -2,8 +2,8 @@
 // file intake. `accept` rather than `mimetype`, because the native attribute is
 // a superset: it takes mimetypes ("image/*") as well as extensions (".pdf").
 
-import { AufbauControl }  from '../core/index.js';
-import { attrs, html }    from '../core/html.js';
+import { AufbauControl }  from '../base/index.js';
+import { attrs, html }    from '../lib/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 

@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/AufbauControl.js
+// @aufbau/elements2/base/AufbauControl.js
 // shared base for every element that HOLDS A VALUE.
 //
 // it makes the controls real form participants: they show up in FormData, they
@@ -9,7 +9,7 @@
 // shared state (disabled, aria, form value, validity) is applied.
 
 import { AufbauCore }     from './AufbauCore.js';
-import { resolvePersist } from './persist.js';
+import { resolvePersist } from '../lib/persist.js';
 import { Logger }         from '@pulgasari/logger';
 
 const FOCUSABLE = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';

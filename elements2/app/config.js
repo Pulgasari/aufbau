@@ -17,7 +17,7 @@
 
 import gui from '@aufbau/gui';
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 export class AppConfig extends AufbauElement {

@@ -163,11 +163,11 @@ function autoloader ({ base, root = document } = {}) {
 
 // :::::: EXPORT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-// the core is NOT re-exported: a bare `import { autoloader }` would fetch and
+// the base classes are NOT re-exported: a bare `import { autoloader }` would fetch and
 // evaluate AufbauCore, the config, the skin and their dependencies before the
 // first scan. the base classes and the config come from their subpaths:
-//   import { AufbauElement }        from '@aufbau/elements2/core/index.js';
-//   import { setConfig, getConfig } from '@aufbau/elements2/core/AufbauConfig.js';
+//   import { AufbauElement }        from '@aufbau/elements2/base/index.js';
+//   import { setConfig, getConfig } from '@aufbau/elements2/base/AufbauConfig.js';
 
 export {
   TAGS,

@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/styles.js
+// @aufbau/elements2/lib/styles.js
 
 import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
 import { isFn }        from '@pulgasari/is';

@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/AufbauConfig.js
+// @aufbau/elements2/base/AufbauConfig.js
 // <aufbau-config>
 // central store for global configuration values, read via AufbauCore#getConfig()
 

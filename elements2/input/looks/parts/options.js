@@ -1,7 +1,7 @@
 // @aufbau/elements2/input/looks/parts/options.js
 // what the list looks share: the markup of an option, its selected state, the arrow keys
 
-import { attrs, html } from '../../../core/html.js';
+import { attrs, html } from '../../../lib/html.js';
 
 export const isInactive = item => item.hidden || item.matches(':disabled, [aria-disabled="true"]');
 

@@ -8,9 +8,9 @@
 
 // :::::: IMPORT
 
-import { AufbauControl, TYPE_NAMES, valueType }     from '../core/index.js';
-import { actionButtons, bindActions, parseActions } from '../core/actions.js';
-import { attrs, html }                              from '../core/html.js';
+import { AufbauControl, TYPE_NAMES, valueType }     from '../base/index.js';
+import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
+import { attrs, html }                              from '../lib/html.js';
 
 import setAttr  from '@domina/methods/setAttr.js';
 import setValue from '@domina/methods/setValue.js';
@@ -118,7 +118,7 @@ export default class AufbauInput extends AufbauControl {
   /** the value parsed into its type: a Number for number, epoch ms for date, … */
   get typedValue () { return this.valueType.parse(this.getAttribute('value')); }
 
-  // the actions' contract (core/actions.js): the text and the field it lives in
+  // the actions' contract (lib/actions.js): the text and the field it lives in
   actionText   () { return this.getAttribute('value') ?? ''; }
   actionTarget () { return this.isDisabled || this.getAttr('readonly') ? null : this.focusTarget; }
 

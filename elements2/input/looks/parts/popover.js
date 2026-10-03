@@ -1,8 +1,8 @@
 // @aufbau/elements2/input/looks/parts/popover.js
 // a list of options in a popover, top layer, for combobox and cycle
 
-import { attrs, html }                         from '../../../core/html.js';
-import { place }                               from '../../../core/placement.js';
+import { attrs, html }                         from '../../../lib/html.js';
+import { place }                               from '../../../lib/placement.js';
 import { isInactive, labelOf, optionIcon }    from './options.js';
 
 export const listboxOf = host => host.root.querySelector('[part~="listbox"]');

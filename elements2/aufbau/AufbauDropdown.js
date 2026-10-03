@@ -15,9 +15,9 @@
 // the browser. `open` mirrors the popover state in both directions.
 // parts: trigger, icon, label, caret, menu
 
-import { AufbauElement } from '../core/index.js';
-import { html }          from '../core/html.js';
-import { place }         from '../core/placement.js';
+import { AufbauElement } from '../base/index.js';
+import { html }          from '../lib/html.js';
+import { place }         from '../lib/placement.js';
 
 const ENTRY = 'a, button, [role="menuitem"]';
 

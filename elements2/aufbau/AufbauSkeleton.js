@@ -10,7 +10,7 @@
 // its own place, e.g. <aufbau-item skeleton>. purely decorative, hidden from
 // assistive tech; mark the region that is loading with aria-busy instead.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 export default class AufbauSkeleton extends AufbauElement {
   static internals = { ariaHidden: 'true' };

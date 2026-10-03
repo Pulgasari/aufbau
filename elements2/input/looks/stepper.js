@@ -1,7 +1,7 @@
 // look="stepper": one value between a minus and a plus button. the arrow keys step too
 // parts: box, button (decrement, increment), input
 
-import { html }                                              from '../../core/html.js';
+import { html }                                              from '../../lib/html.js';
 import { FRAME, field, fieldEvents, firstField, updateFields } from './parts/field.js';
 
 export default {

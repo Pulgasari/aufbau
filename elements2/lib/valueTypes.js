@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/valueTypes.js
+// @aufbau/elements2/lib/valueTypes.js
 // the value types of ../input/types/ in the flat shape <aufbau-value> and the
 // aufbau-* controls read: { input, icon, parse, format, toNumber, fromNumber, step, bounds }.
 // the types themselves live in input/types/, this only reshapes them.

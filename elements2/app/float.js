@@ -15,7 +15,7 @@
 // between them let it through. --float-offset is the distance to the edges,
 // --float-gap the one between the children.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 export class AppFloat extends AufbauElement {

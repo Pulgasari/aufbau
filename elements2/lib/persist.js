@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/persist.js
+// @aufbau/elements2/lib/persist.js
 //
 // the `persist` attribute contract the controls speak, plus the two stores it
 // resolves to. storage logic itself is all @bunker/storage — this owns only the

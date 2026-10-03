@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/html.js
+// @aufbau/elements2/lib/html.js
 // internal html tagged-template helper. was @aufbau/js/html.js before the
 // js grab-bag was dissolved; lives here now because only elements use it.
 

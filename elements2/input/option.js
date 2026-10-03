@@ -5,7 +5,7 @@
 //
 //   <input-option value="de" icon="circle-flags:de" selected>Deutsch</input-option>
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 export class InputOption extends AufbauElement {
   static attr = {

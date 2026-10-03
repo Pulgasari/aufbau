@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/skin.js
+// @aufbau/elements2/lib/skin.js
 
 // the swappable look. every element ships its own structure as `static styles`,
 // the skin adds everything decorative on top: tokens, borders, radii, states.
@@ -10,7 +10,7 @@
 import adoptStylesheet   from '@domina/methods/adoptStylesheet.js';
 import releaseStylesheet from '@domina/methods/releaseStylesheet.js';
 
-import { getConfig, onConfigChange, setConfig } from './AufbauConfig.js';
+import { getConfig, onConfigChange, setConfig } from '../base/AufbauConfig.js';
 import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
 
 const CONFIG_KEY   = 'elements-skin';

@@ -24,8 +24,8 @@
 // no shadow root: the crumbs are plain links and buttons in the light dom,
 // page css reaches all of them. parts are not needed, the crumbs are children.
 
-import { AufbauElement } from '../core/index.js';
-import { attrs, html }   from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { attrs, html }   from '../lib/html.js';
 
 export default class AufbauCrumbs extends AufbauElement {
   static internals = { role: 'navigation' };

@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/schema.js
+// @aufbau/elements2/lib/schema.js
 
 import { toArray }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject } from '@pulgasari/is';

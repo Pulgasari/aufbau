@@ -1,7 +1,7 @@
 // look="switch": a bool as a track with a thumb
 // parts: box, control (checked), track, thumb, icon, label
 
-import { html }                                     from '../../core/html.js';
+import { html }                                     from '../../lib/html.js';
 import { control, controlOf, events, fits, update } from './parts/toggle.js';
 
 export default {

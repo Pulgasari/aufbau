@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/placement.js
+// @aufbau/elements2/lib/placement.js
 // places a top layer popup (a popover) next to its anchor in viewport space.
 // fixed coordinates, because a popover in the top layer has no positioned
 // ancestor to be absolute to. flips to the other side when the preferred one

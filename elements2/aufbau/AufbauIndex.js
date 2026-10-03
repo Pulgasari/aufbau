@@ -7,8 +7,8 @@
 // items are neither laid out nor painted. a skipped item needs a stand-in block
 // size, see ESTIMATE below and the notes at the end of the file.
 
-import { AufbauElement }           from '../core/index.js';
-import { parseLook, resolveShape } from '../core/look.js';
+import { AufbauElement }           from '../base/index.js';
+import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 const parsePx = value => { const number = parseFloat(value); return Number.isFinite(number) ? number : null; };
 

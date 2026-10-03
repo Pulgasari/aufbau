@@ -4,7 +4,7 @@
 // itself, and it is never removed from the dom, so options stay live and can
 // be added or dropped at runtime.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 export default class AufbauOption extends AufbauElement {
   static attr = {

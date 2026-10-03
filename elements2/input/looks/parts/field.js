@@ -1,7 +1,7 @@
 // @aufbau/elements2/input/looks/parts/field.js
 // what the looks with a text field share: the frame, the icon, the field itself
 
-import { attrs, html } from '../../../core/html.js';
+import { attrs, html } from '../../../lib/html.js';
 
 /** the frame of a field like look, on the part box */
 export const FRAME = `

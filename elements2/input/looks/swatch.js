@@ -1,7 +1,7 @@
 // look="swatch": a color. the swatch opens the native picker, the hex code can be typed next to it
 // parts: box, swatch, input
 
-import { html }                                  from '../../core/html.js';
+import { html }                                  from '../../lib/html.js';
 import { FRAME, field, fieldEvents, updateFields } from './parts/field.js';
 
 export default {

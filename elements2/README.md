@@ -12,7 +12,8 @@ them, in one package.
 | `input/`    | `input-*`         | one form control per kind of value, drawn by a look: types/, looks/ |
 | `svg/`      | `svg-*`           | icons and flags: a box painted by an svg |
 | `write/`    | `write-*`         | editors |
-| `core/`     |                   | the base classes, the value and list types, the config, the skin, the helpers |
+| `base/`     |                   | the element classes every element builds on, and the config |
+| `lib/`      |                   | helpers without an element: html, styles, skin, schema, persist, placement, … |
 | `data/`     |                   | the lists the inputs pick from |
 | `adapters/` |                   | htx |
 
@@ -44,12 +45,12 @@ import '@aufbau/elements2/input/language.js';
 <write-md name="notes" preview="side"></write-md>
 ```
 
-the entry is side effect free and does not re-export the core. the base classes
+the entry is side effect free and does not re-export the base classes. they
 and the config come from their subpaths:
 
 ```js
-import { AufbauElement }        from '@aufbau/elements2/core/index.js';
-import { setConfig, getConfig } from '@aufbau/elements2/core/AufbauConfig.js';
+import { AufbauElement }        from '@aufbau/elements2/base/index.js';
+import { setConfig, getConfig } from '@aufbau/elements2/base/AufbauConfig.js';
 ```
 
 ## htx

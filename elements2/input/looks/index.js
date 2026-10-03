@@ -13,7 +13,7 @@
 // a look changes the value through the methods of ../Input.js only:
 // setPart, setNumber, step, select, cycle, add, removeAt, toggle.
 
-import { BASE_LAYER } from '../../core/styles.js';
+import { BASE_LAYER } from '../../lib/styles.js';
 
 import button   from './button.js';
 import checkbox from './checkbox.js';

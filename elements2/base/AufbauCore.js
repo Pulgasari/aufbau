@@ -1,11 +1,11 @@
-// @aufbau/elements2/core/AufbauCore.js
+// @aufbau/elements2/base/AufbauCore.js
 
 // :::::: IMPORTS
 
-import { BASE, schemaOf }   from './schema.js';
-import { applySkin }        from './skin.js';
-import { adoptClassStyles } from './styles.js';
-import { decorate, decorateAll } from './utils.js';
+import { BASE, schemaOf }   from '../lib/schema.js';
+import { applySkin }        from '../lib/skin.js';
+import { adoptClassStyles } from '../lib/styles.js';
+import { decorate, decorateAll } from '../lib/utils.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
 import { delegateEvent }  from '@domina/methods/delegateEvent.js';

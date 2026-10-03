@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/options.js
+// @aufbau/elements2/lib/options.js
 // shared option handling for every container that offers a choice.
 // replaces the three near identical normalize() copies that used to live in
 // AufbauCombobox, AufbauSwitch and AufbauDatalist.

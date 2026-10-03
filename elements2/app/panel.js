@@ -21,7 +21,7 @@
 
 import '../svg/icon.js';
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 export class AppPanel extends AufbauElement {

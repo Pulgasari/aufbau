@@ -28,8 +28,8 @@
 import './area.js';
 import './view.js';
 
-import { AufbauElement } from '../core/index.js';
-import { setSkin }       from '../core/skin.js';
+import { AufbauElement } from '../base/index.js';
+import { setSkin }       from '../lib/skin.js';
 
 // set on the root as data-*, the css below it reads them
 const LOOK = ['density', 'geometry', 'palette', 'scheme'];

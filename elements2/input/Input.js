@@ -15,8 +15,8 @@ import '../svg/icon.js';
 
 import { isArray } from '@pulgasari/is';
 
-import { AufbauControl }            from '../core/AufbauControl.js';
-import { html }                     from '../core/html.js';
+import { AufbauControl }            from '../base/AufbauControl.js';
+import { html }                     from '../lib/html.js';
 import { LOOKS, lookFor, sheetOf }  from './looks/index.js';
 import { OptionSource }             from './options.js';
 import { TYPE_ATTRIBUTES, typeOf }  from './types/index.js';
@@ -344,7 +344,7 @@ export class Input extends AufbauControl {
     return icon === 'false' ? null : icon || this.valueType.icon || null;
   }
 
-  // the contract of the copy, paste, clear and reveal buttons (../core/actions.js)
+  // the contract of the copy, paste, clear and reveal buttons (../lib/actions.js)
   actionText   () { return this.value; }
   actionTarget () { return this.isLocked ? null : this.focusTarget; }
   revealTarget () { return this.focusTarget; }

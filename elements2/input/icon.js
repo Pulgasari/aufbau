@@ -5,7 +5,7 @@
 //   <input-icon name="icon" value="lucide:star"></input-icon>
 //   <input-icon prefixes="lucide bx" limit="96" query="arrow"></input-icon>
 
-import { SearchComponent, searchStyles } from '../core/SearchComponent.js';
+import { SearchComponent, searchStyles } from '../base/SearchComponent.js';
 
 const API = 'https://api.iconify.design/search';
 

@@ -1,10 +1,10 @@
 // <aufbau-code>
 
-import { actionButtons, bindActions, parseActions } from '../core/actions.js';
-import { attrs, html }          from '../core/html.js';
-import { AufbauElement }        from '../core/index.js';
-import { dedent }               from '../core/utils.js';
-import { getConfig, setConfig } from '../core/AufbauConfig.js';
+import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
+import { attrs, html }          from '../lib/html.js';
+import { AufbauElement }        from '../base/index.js';
+import { dedent }               from '../lib/utils.js';
+import { getConfig, setConfig } from '../base/AufbauConfig.js';
 
 import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
@@ -301,7 +301,7 @@ j
       .filter(action => action === 'copy' ? !noCopy : editable);
   }
 
-  // the contract with core/actions.js
+  // the contract with lib/actions.js
   actionText   () { return this.source; }
   actionTarget () { return this.getAttr('editable') ? this.$('figure > pre > code') : null; }
 

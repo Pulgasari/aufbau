@@ -1,4 +1,4 @@
-// @aufbau/elements2/core/AufbauComponent.js
+// @aufbau/elements2/base/AufbauComponent.js
 // the base of every component: a composition of the aufbau-* elements, rendered
 // into the light dom. the skin is adopted by the document and selects the
 // elements by tag, inside a shadow root it would not reach them.

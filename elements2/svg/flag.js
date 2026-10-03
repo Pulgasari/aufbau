@@ -2,7 +2,7 @@
 // the host is the flag, painted as a background image. no inner <svg-icon>:
 // a flag is always multicolour art, so the mask path of the icon has nothing to offer.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 import { iconUrl }       from './icon.js';
 
 // circle-flags ships 1:1 art, flagpack ships 4:3

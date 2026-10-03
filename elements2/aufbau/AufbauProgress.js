@@ -2,7 +2,7 @@
 // the host is the progressbar. ::before is the track, the bar is a background
 // layer on it sized by --progress. the only child is the optional text.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 const clamp = value => Math.min(100, Math.max(0, value));
 

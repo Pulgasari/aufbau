@@ -4,8 +4,8 @@
 // the markup is only rebuilt when the metadata changes, playback state and
 // progress are applied to the existing nodes.
 
-import { AufbauElement } from '../core/index.js';
-import { attrs, html }   from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { attrs, html }   from '../lib/html.js';
 
 const formatTime = (seconds) => {
   if (!Number.isFinite(seconds)) return '0:00';

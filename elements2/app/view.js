@@ -17,7 +17,7 @@
 //
 // events: activate and deactivate on the views, navigate { from, to } on the root.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;

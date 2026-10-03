@@ -4,8 +4,8 @@
 // the children are the label and stay untouched: the shadow root holds the
 // optional icon and projects them through a <slot>. label/text replace them.
 
-import { AufbauElement } from '../core/index.js';
-import { html }          from '../core/html.js';
+import { AufbauElement } from '../base/index.js';
+import { html }          from '../lib/html.js';
 
 export default class AufbauButton extends AufbauElement {
   static formAssociated = true;

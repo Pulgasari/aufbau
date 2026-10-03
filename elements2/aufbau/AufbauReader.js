@@ -17,10 +17,10 @@
 // the first content loads it shows the core skeleton. state:
 // :state(loading|ready|error|idle|skeleton).
 
-import { AufbauElement }        from '../core/index.js';
+import { AufbauElement }        from '../base/index.js';
 import { importFile, renderMD } from '@aufbau/import';
-import { html, raw as rawHtml } from '../core/html.js';
-import { dedent }               from '../core/utils.js';
+import { html, raw as rawHtml } from '../lib/html.js';
+import { dedent }               from '../lib/utils.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
 

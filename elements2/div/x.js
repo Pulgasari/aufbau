@@ -5,7 +5,7 @@
 //   <div-x>…</div-x>
 //   <div-x scrollable>…</div-x>
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 
 export class DivX extends AufbauElement {

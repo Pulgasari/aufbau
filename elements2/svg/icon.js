@@ -10,7 +10,7 @@
 // SvgIcon.provide() first. that is the hook for offline bundles, see the
 // bundling notes in @aufbau/icons/README.md.
 
-import { AufbauElement } from '../core/index.js';
+import { AufbauElement } from '../base/index.js';
 
 const API      = 'https://api.iconify.design';
 const DEFAULTS = '@aufbau/icons/aliases.js';

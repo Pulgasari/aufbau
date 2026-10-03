@@ -19,7 +19,7 @@
 // --color-ink, both as hex without #, `bgcol` and `linkcol` override them.
 // an album page url cannot be embedded, the placeholder then links to it.
 
-import { EmbedComponent } from '../core/EmbedComponent.js';
+import { EmbedComponent } from '../base/EmbedComponent.js';
 
 const PLAYER = 'https://bandcamp.com/EmbeddedPlayer/';
 
