@@ -2,9 +2,6 @@ import { attrs, html }                 from '../../../lib/html.js';
 import { place }                       from '../../../lib/placement.js';
 import { formatPattern, parsePattern } from '../types/pattern.js';
 
-const currentOf  = host => host.root.querySelector('[part~="current"]');
-const popoverOf  = host => host.root.querySelector('[part~="patterns"]');
-const sliderOf   = host => host.root.querySelector('[part~="opacity"]');
 const colorOf    = (host, which) => host.root.querySelector(`[data-color="${which}"]`);
 const swatchesOf = host => [...host.root.querySelectorAll('[part~="patterns"] [data-pattern]')];
 
@@ -36,7 +33,7 @@ async function paint (host) {
 }
 
 function pick (host, id) {
-  const slider = sliderOf(host);
+  const slider = host.part('opacity');
   const colors = host.hasAttribute('colors');
 
   host.setValue(formatPattern({
@@ -48,7 +45,7 @@ function pick (host, id) {
 }
 
 function fill (host) {
-  const popover = popoverOf(host);
+  const popover = host.part('patterns');
   if (popover.dataset.filled) return;
   popover.dataset.filled = 'true';
 
@@ -64,10 +61,10 @@ function fill (host) {
 }
 
 function toggle (host, open) {
-  const popover = popoverOf(host);
+  const popover = host.part('patterns');
   if (open) {
     popover.showPopover();
-    place(popover, currentOf(host));
+    place(popover, host.part('current'));
     popover.querySelector('[tabindex="0"]')?.focus();
   }
   else popover.hidePopover();
@@ -148,13 +145,13 @@ export default {
   },
 
   events (host, on) {
-    on('click', '[part~="current"]', () => toggle(host, !popoverOf(host).matches(':popover-open')));
+    on('click', '[part~="current"]', () => toggle(host, !host.part('patterns').matches(':popover-open')));
 
     // a click picks and closes, the arrows pick and stay
     on('click', '[part~="patterns"] [data-pattern]', (event, button) => {
       pick(host, idOf(button));
       toggle(host, false);
-      currentOf(host).focus();
+      host.part('current').focus();
     });
 
     on(host.root, 'keydown', event => {
@@ -181,10 +178,10 @@ export default {
     fill(host);
     const parts = parsePattern(host.value);
 
-    const current = currentOf(host);
+    const current = host.part('current');
     current.dataset.pattern = parts.id || 'none';
 
-    const slider = sliderOf(host);
+    const slider = host.part('opacity');
     if (slider && slider !== host.focused) slider.value = String(Math.round((parts.opacity ?? 0.1) * 100));
 
     if (host.hasAttribute('colors')) {
@@ -203,5 +200,5 @@ export default {
     paint(host);
   },
 
-  focus : currentOf,
+  focus : host => host.part('current'),
 };

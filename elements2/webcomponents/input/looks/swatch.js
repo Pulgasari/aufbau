@@ -33,8 +33,8 @@ export default {
 
   update (host) {
     updateFields(host);
-    host.style.setProperty('--swatch', host.valueType.format(host.value));
+    host.setVar('--swatch', host.valueType.format(host.value));
   },
 
-  focus : host => host.root.querySelector('[part~="input"]'),
+  focus : host => host.part('input'),
 };

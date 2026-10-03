@@ -1,7 +1,6 @@
 import './svg-icon.js';
 
 import { AufbauElement } from '../base/AufbauElement.js';
-import { ELLIPSIS }      from '../lib/css.js';
 
 export class AppPanel extends AufbauElement {
 
@@ -34,7 +33,10 @@ export class AppPanel extends AufbauElement {
     [part="heading"] {
       flex          : 1 1 auto;
       font-weight   : 600;
-      ${ELLIPSIS}
+      min-inline-size : 0;
+      overflow        : hidden;
+      text-overflow   : ellipsis;
+      white-space     : nowrap;
     }
 
     button {
@@ -97,11 +99,8 @@ export class AppPanel extends AufbauElement {
   }
 
   onMount () {
-    this.on(this.shadowRoot, 'click', event => {
-      const part = event.target.closest?.('[part]')?.getAttribute('part');
-      if (part === 'close')  this.close();
-      if (part === 'expand') this.expand();
-    });
+    this.on('click', '[part~="close"]',  () => this.close());
+    this.on('click', '[part~="expand"]', () => this.expand());
 
     // the expand icon follows the area, however it was expanded
     const area = this.area;

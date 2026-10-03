@@ -3,8 +3,8 @@ import './input/tags.js';
 import { filterElements } from '@domina/methods/filterElements.js';
 import { debounce }       from '@pulgasari/timing';
 
-import { AufbauElement }  from '../base/AufbauElement.js';
-import { html }           from '../lib/html.js';
+import { AufbauElement } from '../base/AufbauElement.js';
+import { html }          from '../lib/html.js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {

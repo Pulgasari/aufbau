@@ -87,7 +87,7 @@ export default class AufbauWaveform extends AufbauElement {
 
     if (key !== this._maskKey) {
       this._maskKey = key;
-      this.style.setProperty('--waveform-bars', barsMask(peaks));
+      this.setVar('--waveform-bars', barsMask(peaks));
     }
 
     return super.update();
@@ -99,9 +99,11 @@ export default class AufbauWaveform extends AufbauElement {
     const { interactive, progress, rangeEnd, rangeStart } = this.getAttr();
     const hasRange = rangeStart != null && rangeEnd != null;
 
-    this.style.setProperty('--waveform-progress', `${clamp(progress)}%`);
-    this.style.setProperty('--waveform-start',    hasRange ? `${clamp(rangeStart)}%` : '0%');
-    this.style.setProperty('--waveform-end',      hasRange ? `${clamp(rangeEnd)}%`   : '0%');
+    this.setVars({
+      '--waveform-end'      : hasRange ? `${clamp(rangeEnd)}%`   : '0%',
+      '--waveform-progress' : `${clamp(progress)}%`,
+      '--waveform-start'    : hasRange ? `${clamp(rangeStart)}%` : '0%',
+    });
 
     if (interactive) this.tabIndex = 0;
     else this.removeAttribute('tabindex');

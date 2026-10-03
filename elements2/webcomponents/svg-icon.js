@@ -95,9 +95,7 @@ export default class SvgIcon extends AufbauElement {
 
     const url = id ? iconUrl(id) : null;
 
-    this.style.setProperty('--icon-url',   url ? `url("${url}")` : '');
-    this.style.setProperty('--icon-size',  size  || '');
-    this.style.setProperty('--icon-color', color || '');
+    this.setVars({ '--icon-color': color, '--icon-size': size, '--icon-url': url && `url("${url}")` });
 
     if (this.internals) {
       this.internals.role       = label ? 'img' : null;

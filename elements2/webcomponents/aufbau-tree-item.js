@@ -1,6 +1,5 @@
 import { AufbauElement } from '../base/AufbauElement.js';
 import { html }          from '../lib/html.js';
-import { ELLIPSIS }      from '../lib/css.js';
 
 const ICONS = {
   file   : 'lucide:file-text',
@@ -57,14 +56,17 @@ export default class AufbauTreeItem extends AufbauElement {
 
     [part~="label"] {
       flex            : 1 1 auto;
-      ${ELLIPSIS}
+      min-inline-size : 0;
+      overflow        : hidden;
+      text-overflow   : ellipsis;
+      white-space     : nowrap;
     }
 
     slot { display: block; padding-inline-start: var(--tree-indent); }
     :host(:not([expanded])) slot { display: none; }
   `;
 
-  get row          () { return this.$('[part~="row"]'); }
+  get row          () { return this.part('row'); }
   get items        () { return [...this.children].filter(child => child.localName === 'aufbau-tree-item'); }
   get hasChildren  () { return this.items.length > 0; }
   get tree         () { return this.closest('aufbau-tree'); }
@@ -112,8 +114,8 @@ export default class AufbauTreeItem extends AufbauElement {
     const { expanded, icon, label, selected } = this.getAttr();
     const hasChildren = this.hasChildren;
 
-    this.$('[part~="icon"]').setAttribute('icon', icon || (hasChildren ? (expanded ? ICONS.open : ICONS.folder) : ICONS.file));
-    this.$('[part~="label"]').textContent = label;
+    this.part('icon').setAttribute('icon', icon || (hasChildren ? (expanded ? ICONS.open : ICONS.folder) : ICONS.file));
+    this.part('label').textContent = label;
     this.states.toggle('branch', hasChildren);
 
     if (this.internals) {

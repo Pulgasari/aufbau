@@ -18,12 +18,11 @@ export function control (host, inner, role) {
   `;
 }
 
-export const controlOf = host => host.root.querySelector('[part~="control"]');
 
 export const events = (host, on) => on('click', '[part~="control"]', () => host.toggle());
 
 export function update (host) {
-  const button  = controlOf(host);
+  const button  = host.part('control');
   const checked = host.checked;
 
   button.setAttribute(host.look === 'button' ? 'aria-pressed' : 'aria-checked', String(checked));

@@ -5,15 +5,13 @@ import { GROUP, groupEvents, optionButtons, updateSelected, updateTabStop } from
 
 const DEBOUNCE = 250;
 
-const searchOf  = host => host.root.querySelector('[part~="search"]');
-const optionsOf = host => host.root.querySelector('[part~="options"]');
 
 const hasSearch = host => Boolean(host.valueType.list?.query || host.getAttr('searchable'));
 
 function filter (host, query) {
   const needle = query.trim().toLowerCase();
 
-  for (const item of optionsOf(host).querySelectorAll('[data-value]')) {
+  for (const item of host.part('options').querySelectorAll('[data-value]')) {
     const label = (item.title || item.textContent).toLowerCase();
     item.hidden = Boolean(needle) && !label.includes(needle);
   }
@@ -64,21 +62,21 @@ export default {
     host.track(search.cancel);
 
     on(host.root, 'input', event => {
-      if (event.target !== searchOf(host)) return;
+      if (event.target !== host.part('search')) return;
       if (host.valueType.list?.query) search(event.target.value);
       else filter(host, event.target.value);
     });
   },
 
   update (host) {
-    const container = optionsOf(host);
+    const container = host.part('options');
 
     // only new options rebuild the tiles
     const signature = host.options.map(entry => entry.value).join('\n');
     if (container.dataset.signature !== signature) {
       container.dataset.signature = signature;
       container.innerHTML = optionButtons(host, 'option', { iconsOnly: true });
-      const search = searchOf(host);
+      const search = host.part('search');
       if (search?.value && !host.valueType.list?.query) filter(host, search.value);
     }
 
@@ -86,5 +84,5 @@ export default {
   },
 
   role  : GROUP.role,
-  focus : host => searchOf(host) ?? host.root.querySelector('[data-value][tabindex="0"]'),
+  focus : host => host.part('search') ?? host.root.querySelector('[data-value][tabindex="0"]'),
 };

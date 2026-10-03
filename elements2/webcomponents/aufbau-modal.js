@@ -1,7 +1,6 @@
 import { AufbauElement }   from '../base/AufbauElement.js';
 import { html }            from '../lib/html.js';
 import { adoptBaseStyles } from '../lib/styles.js';
-import { PLAIN_BUTTON }    from '../lib/css.js';
 
 const PAGE_STYLES = `:root:has(aufbau-modal:state(open)) { overflow: hidden; }`;
 
@@ -62,8 +61,15 @@ export default class AufbauModal extends AufbauElement {
       > strong { font-weight: 600; }
 
       > button {
-        ${PLAIN_BUTTON}
-        margin: 0 0 0 auto;
+        align-items : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
+        margin      : 0 0 0 auto;
+        padding     : 0;
       }
     }
 
@@ -158,7 +164,7 @@ export default class AufbauModal extends AufbauElement {
 
     this.$('strong').textContent = heading ?? '';
     this.$('strong').hidden      = !heading;
-    this.$('[part~="close"]').hidden = !dismissible;
+    this.part('close').hidden = !dismissible;
     header.hidden = !heading && !dismissible;
 
     if (heading) dialog.setAttribute('aria-label', heading);

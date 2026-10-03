@@ -1,6 +1,5 @@
-import { AufbauControlElement }   from '../base/AufbauControlElement.js';
-import { attrs, html }            from '../lib/html.js';
-import { ELLIPSIS, PLAIN_BUTTON } from '../lib/css.js';
+import { AufbauControlElement } from '../base/AufbauControlElement.js';
+import { attrs, html }          from '../lib/html.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 
@@ -82,7 +81,10 @@ export default class AufbauUpload extends AufbauControlElement {
 
     [part~="name"] {
       flex            : 1 1 auto;
-      ${ELLIPSIS}
+      min-inline-size : 0;
+      overflow        : hidden;
+      text-overflow   : ellipsis;
+      white-space     : nowrap;
     }
 
     [part~="size"] {
@@ -93,7 +95,15 @@ export default class AufbauUpload extends AufbauControlElement {
     }
 
     [part~="remove"] {
-      ${PLAIN_BUTTON}
+      align-items : center;
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      font        : inherit;
+      margin      : 0;
+      padding     : 0;
       flex        : none;
     }
   `;
@@ -181,7 +191,7 @@ export default class AufbauUpload extends AufbauControlElement {
     const internals = this.internals;
     if (!internals) return this;
 
-    const anchor = this.$('[part~="zone"]') ?? this;
+    const anchor = this.part('zone') ?? this;
 
     if (this._rejected?.length) internals.setValidity({ typeMismatch: true }, 'one or more files were rejected.', anchor);
     else if (this.getAttr('required') && !this.files.length) {

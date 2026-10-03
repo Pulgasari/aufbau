@@ -7,7 +7,6 @@ import { AufbauElement }              from '../base/AufbauElement.js';
 import { TYPES, typeOf }              from './input/types/index.js';
 import { actionButtons, bindActions } from '../lib/actions.js';
 import { attrs, html }                from '../lib/html.js';
-import { PLAIN_BUTTON }               from '../lib/css.js';
 
 // :::::: CONSTANTS
 
@@ -95,9 +94,16 @@ export default class AufbauValue extends AufbauElement {
       > span > svg-icon { align-self: center; }
 
       > span > button {
-        ${PLAIN_BUTTON}
         align-self  : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
         line-height : 0;
+        margin      : 0;
+        padding     : 0;
       }
     }
   `;

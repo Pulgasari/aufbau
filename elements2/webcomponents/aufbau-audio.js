@@ -1,6 +1,5 @@
 import { AufbauElement } from '../base/AufbauElement.js';
 import { attrs, html }   from '../lib/html.js';
-import { PLAIN_BUTTON }  from '../lib/css.js';
 
 const formatTime = (seconds) => {
   if (!Number.isFinite(seconds)) return '0:00';
@@ -53,7 +52,15 @@ export default class AufbauAudio extends AufbauElement {
     > span   { grid-area: artist; opacity: 0.7; }
 
     > button {
-      ${PLAIN_BUTTON}
+      align-items : center;
+      background  : none;
+      border      : 0;
+      color       : inherit;
+      cursor      : pointer;
+      display     : inline-flex;
+      font        : inherit;
+      margin      : 0;
+      padding     : 0;
       grid-area   : play;
     }
 

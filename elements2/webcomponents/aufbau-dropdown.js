@@ -59,8 +59,8 @@ export default class AufbauDropdown extends AufbauElement {
     }
   `;
 
-  get trigger () { return this.$('[part~="trigger"]'); }
-  get menu    () { return this.$('[part~="menu"]'); }
+  get trigger () { return this.part('trigger'); }
+  get menu    () { return this.part('menu'); }
   get isOpen  () { return Boolean(this.menu?.matches(':popover-open')); }
 
   onMount () {

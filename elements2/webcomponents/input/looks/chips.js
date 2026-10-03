@@ -1,9 +1,8 @@
 import { html }        from '../../../lib/html.js';
 import { FRAME, icon } from './parts/field.js';
 
-const inputOf = host => host.root.querySelector('[part~="input"]');
 
-const refocus = host => queueMicrotask(() => inputOf(host)?.focus());
+const refocus = host => queueMicrotask(() => host.part('input')?.focus());
 
 export default {
   fits : shape => shape.kind === 'free' && shape.count === 'multiple',
@@ -40,10 +39,10 @@ export default {
     const add = input => { if (input.value.trim()) { host.add(input.value); refocus(host); } };
 
     on('click', '[part~="remove"]', (event, button) => host.removeAt(Number(button.dataset.index)));
-    on(host.root, 'change', event => { if (event.target === inputOf(host)) add(event.target); });
+    on(host.root, 'change', event => { if (event.target === host.part('input')) add(event.target); });
 
     on(host.root, 'keydown', event => {
-      const input = inputOf(host);
+      const input = host.part('input');
       if (event.target !== input) return;
 
       if (event.key === 'Enter' || event.key === ',') { event.preventDefault(); add(input); }
@@ -51,7 +50,7 @@ export default {
     });
   },
 
-  update (host) { const input = inputOf(host); if (input) input.readOnly = Boolean(host.getAttr('readonly')); },
+  update (host) { const input = host.part('input'); if (input) input.readOnly = Boolean(host.getAttr('readonly')); },
 
-  focus : inputOf,
+  focus : host => host.part('input'),
 };

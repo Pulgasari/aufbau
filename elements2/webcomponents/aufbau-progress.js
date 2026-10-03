@@ -91,7 +91,7 @@ export default class AufbauProgress extends AufbauElement {
     const indeterminate = value === undefined && type !== 'scroll';
     const percentage    = indeterminate ? 0 : clamp((value ?? 0) / max * 100);
 
-    this.style.setProperty('--progress', `${percentage}%`);
+    this.setVar('--progress', `${percentage}%`);
 
     if (this.internals) {
       this.internals.ariaValueMin = '0';

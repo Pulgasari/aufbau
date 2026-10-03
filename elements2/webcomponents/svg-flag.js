@@ -43,8 +43,7 @@ export default class SvgFlag extends AufbauElement {
     const region = String(code).toLowerCase();
     const url    = iconUrl(`${set}:${region}`);
 
-    this.style.setProperty('--flag-ratio', ratio);
-    this.style.setProperty('--flag-url',   url ? `url("${url}")` : '');
+    this.setVars({ '--flag-ratio': ratio, '--flag-url': url && `url("${url}")` });
 
     if (this.internals) this.internals.ariaLabel = label || regionName(region);
   }

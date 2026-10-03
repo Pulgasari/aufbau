@@ -228,10 +228,12 @@ export default class AufbauEmbed extends AufbauElement {
     const fixed = height || (!ratio && embed?.height);
 
     this.states.toggle('active', this.active);
-    this.style.setProperty('--embed-ratio', fixed ? 'auto' : (ratio || embed?.ratio || '16 / 9'));
-    if (fixed) this.style.setProperty('--embed-height', fixed); else this.style.removeProperty('--embed-height');
-    if (poster) this.style.setProperty('--embed-poster', `url(${JSON.stringify(poster)})`); else this.style.removeProperty('--embed-poster');
-    if (width)  this.style.setProperty('--embed-width', width); else this.style.removeProperty('--embed-width');
+    this.setVars({
+      '--embed-height' : fixed,
+      '--embed-poster' : poster && `url(${JSON.stringify(poster)})`,
+      '--embed-ratio'  : fixed ? 'auto' : (ratio || embed?.ratio || '16 / 9'),
+      '--embed-width'  : width,
+    });
   }
 }
 

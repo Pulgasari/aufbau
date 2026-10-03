@@ -8,7 +8,6 @@ import { LOOKS, lookFor, sheetOf } from './looks/index.js';
 import { OptionSource }            from './options.js';
 import { TYPE_ATTRIBUTES, typeOf } from './types/index.js';
 import { joinValue, splitValue }   from './values.js';
-import { PLAIN_BUTTON }            from '../../lib/css.js';
 
 const STYLES = `
   :host {
@@ -41,7 +40,15 @@ const STYLES = `
   }
 
   button {
-    ${PLAIN_BUTTON}
+    align-items : center;
+    background  : none;
+    border      : 0;
+    color       : inherit;
+    cursor      : pointer;
+    display     : inline-flex;
+    font        : inherit;
+    margin      : 0;
+    padding     : 0;
     appearance      : none;
     flex            : none;
     gap             : 0.5em;

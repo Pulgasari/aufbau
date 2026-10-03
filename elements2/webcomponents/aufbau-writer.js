@@ -4,7 +4,6 @@ import { dedent }                                   from '../lib/dedent.js';
 import { attrs, html }                              from '../lib/html.js';
 import { setAttr }                                  from '@domina/methods/setAttr.js';
 import { setValue }                                 from '@domina/methods/setValue.js';
-import { PLAIN_BUTTON }                             from '../lib/css.js';
 
 export default class AufbauWriter extends AufbauControlElement {
   static reflect = ['look', 'resize'];
@@ -64,7 +63,15 @@ export default class AufbauWriter extends AufbauControlElement {
       }
 
       > button {
-        ${PLAIN_BUTTON}
+        align-items : center;
+        background  : none;
+        border      : 0;
+        color       : inherit;
+        cursor      : pointer;
+        display     : inline-flex;
+        font        : inherit;
+        margin      : 0;
+        padding     : 0;
       }
     }
   }`;

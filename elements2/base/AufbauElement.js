@@ -5,14 +5,11 @@ import { applySkin }                                             from '../lib/sk
 import { adoptClassStyles }                                      from '../lib/styles.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from '../lib/config.js';
 
-import { delegateEvent }  from '@domina/methods/delegateEvent.js';
-import { emitEvent }      from '@domina/methods/emitEvent.js';
-import { getElement }     from '@domina/methods/getElement.js';
-import { getElementById } from '@domina/methods/getElementById.js';
-import { getElements }    from '@domina/methods/getElements.js';
-import { hasAttr }        from '@domina/methods/hasAttr.js';
-import { onEvent }        from '@domina/methods/onEvent.js';
-import { setAttr }        from '@domina/methods/setAttr.js';
+import { delegateEvent } from '@domina/methods/delegateEvent.js';
+import { emitEvent }     from '@domina/methods/emitEvent.js';
+import { hasAttr }       from '@domina/methods/hasAttr.js';
+import { onEvent }       from '@domina/methods/onEvent.js';
+import { setAttr }       from '@domina/methods/setAttr.js';
 
 import { coerce, toBoolean }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';
@@ -390,9 +387,10 @@ export class AufbauElement extends HTMLElement {
 
   // :::::: STYLE VARS :::::::::::::::::::::::::::::::::::::::::::
 
-  // item-size -> --aufbau-item-size
+  // custom properties on the host. '--name' as it is, 'name' as --aufbau-name.
+  // null, undefined, false and '' remove it
   setVar (name, value) {
-    const property = `--aufbau-${name.replace(/^--(aufbau-)?/, '')}`;
+    const property = name.startsWith('--') ? name : `--aufbau-${name}`;
     if (isBlank(value)) this.style.removeProperty(property);
     else this.style.setProperty(property, String(value));
     return this;
@@ -410,24 +408,29 @@ export class AufbauElement extends HTMLElement {
     }
   }
 
-  // :::::: CHILDREN REFS :::::::::::::::::::::::::::::::::::::::
+  // :::::: TREE ::::::::::::::::::::::::::::::::::::::::::::::::
 
-  get $ () {
-    const root    = this.root;
-    const findOne = spec => getElement(spec, root);
-  
-    return new Proxy(findOne, {
-      apply: (target, thisArg, args) => findOne(...args),
-      get (target, prop) {
-        if (prop in target)  return target[prop];
-        if (!isString(prop)) return undefined;
-        return getElementById(toKebabCase(prop), root) ?? getElementById(prop, root);
-      }
-    });
+  // the trees to search: the shadow root first, then the light children
+  get trees () { return this.shadowRoot ? [this.shadowRoot, this] : [this]; }
+
+  $ (selector) {
+    for (const tree of this.trees) {
+      const found = tree.querySelector(selector);
+      if (found) return found;
+    }
+    return null;
   }
-  
-  get $$ () {
-    return spec => getElements(spec, this.root);
+
+  $$ (selector) { return this.trees.flatMap(tree => [...tree.querySelectorAll(selector)]); }
+
+  // the element of the own tree with that part, all of them
+  part  (name) { return this.root.querySelector(`[part~="${name}"]`); }
+  parts (name) { return [...this.root.querySelectorAll(`[part~="${name}"]`)]; }
+
+  // the part tokens of a node or its nearest ancestor that has some, [] for none
+  partOf (node) {
+    const element = node?.closest?.('[part]');
+    return element ? [...element.part] : [];
   }
 
 }

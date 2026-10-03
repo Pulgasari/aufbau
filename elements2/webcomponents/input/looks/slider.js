@@ -126,16 +126,15 @@ export default {
       thumb.style.setProperty('--at', percent(positions[Number(thumb.dataset.thumb)], bounds));
     }
 
-    const track = host.root.querySelector('[part~="track"]');
+    const track = host.part('track');
     track.style.setProperty('--from', range ? percent(positions[0], bounds) : 0);
     track.style.setProperty('--to',   percent(positions[range ? 1 : 0], bounds));
 
     const shown  = positions.map((position, index) => parts[index] || host.fromNumber(position));
-    const output = host.root.querySelector('[part~="output"]');
+    const output = host.part('output');
     if (output) output.textContent = range ? shown.join(' – ') : shown[0];
 
-    if (host.typeName === 'color') host.style.setProperty('--slider-color', shown[0]);
-    else host.style.removeProperty('--slider-color');
+    host.setVar('--slider-color', host.typeName === 'color' && shown[0]);
   },
 
   focus : host => host.root.querySelector('input[type="range"]'),

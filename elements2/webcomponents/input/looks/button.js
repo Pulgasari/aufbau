@@ -1,4 +1,4 @@
-import { control, controlOf, events, fits, update } from './parts/toggle.js';
+import { control, events, fits, update } from './parts/toggle.js';
 
 export default {
   fits, events, update,
@@ -15,5 +15,5 @@ export default {
   `,
 
   render : host => control(host, '', null),
-  focus  : controlOf,
+  focus  : host => host.part('control'),
 };

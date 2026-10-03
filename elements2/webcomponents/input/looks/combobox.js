@@ -1,7 +1,7 @@
-import { attrs, html }                                                                    from '../../../lib/html.js';
-import { FRAME, icon }                                                                    from './parts/field.js';
-import { labelOf, updateSelected }                                                        from './parts/options.js';
-import { LISTBOX, filter, isOpen, listbox, listboxOf, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
+import { attrs, html }                                                         from '../../../lib/html.js';
+import { FRAME, icon }                                                         from './parts/field.js';
+import { labelOf, updateSelected }                                             from './parts/options.js';
+import { LISTBOX, filter, isOpen, listbox, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
 
 function showSelection (host) {
   const input = triggerOf(host);
@@ -42,7 +42,7 @@ export default {
     popoverEvents(host, on, () => host);
 
     on('click', event => {
-      if (!event.composedPath().includes(listboxOf(host))) setOpen(host, !isOpen(host), host);
+      if (!event.composedPath().includes(host.part('listbox'))) setOpen(host, !isOpen(host), host);
     });
 
     on(host.root, 'input', event => {

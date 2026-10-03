@@ -1,5 +1,5 @@
-import { html }                                     from '../../../lib/html.js';
-import { control, controlOf, events, fits, update } from './parts/toggle.js';
+import { html }                          from '../../../lib/html.js';
+import { control, events, fits, update } from './parts/toggle.js';
 
 export default {
   fits, events, update,
@@ -23,5 +23,5 @@ export default {
   `,
 
   render : host => control(host, html`<span part="check"><svg-icon part="mark" icon="lucide:check"></svg-icon></span>`, 'checkbox'),
-  focus  : controlOf,
+  focus  : host => host.part('control'),
 };

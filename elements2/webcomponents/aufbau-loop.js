@@ -121,12 +121,12 @@ export default class AufbauLoop extends AufbauElement {
   onRender () { this.copy(); }
 
   copy () {
-    const copy = this.$('[part~="copy"]');
+    const copy = this.part('copy');
     copy?.replaceChildren(...this.slides.map(slide => slide.cloneNode(true)));
   }
 
   sync () {
-    this.style.setProperty('--loop-speed', this.getAttr('speed'));
+    this.setVar('--loop-speed', this.getAttr('speed'));
 
     const carousel = this.getAttr('mode') === 'carousel';
     this.slides.forEach((slide, index) => { slide.inert = carousel && index !== this._index; });
