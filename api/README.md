@@ -59,7 +59,7 @@ await aufbau.remove('#hero', ['pattern']);   // every kind without the list
 ```javascript
 await aufbau.elements.enableAutoload();   // returns the stop function
 await aufbau.elements.registerAll();
-await aufbau.elements.setConfig({ code: { theme: 'nord' } });
+await aufbau.elements.setConfig({ 'write-code': { theme: 'nord' } });
 
 await aufbau.data.filters;    // also icons, patterns, themes, webfonts. each one a promise
 await aufbau.gestalt.set({ theme: 'oled' });   // see gestalt.js

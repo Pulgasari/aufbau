@@ -20,7 +20,7 @@
     "@domina/methods": "^0.1.0"
   },
   "peerDependencies": {
-    "@aufbau/elements": "^1.0.0"
+    "@aufbau/elements": "^2.0.0"
   },
   "files": [
     "index.js",

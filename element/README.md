@@ -1,6 +1,6 @@
 # @aufbau/element
 
-the base of the [@aufbau custom elements](../elements2/README.md): attribute schema,
+the base of the [@aufbau custom elements](../elements/README.md): attribute schema,
 rendering, selections, config and skin. `AufbauElement` is what every element
 builds on, two mixins add to it:
 

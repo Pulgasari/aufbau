@@ -1,6 +1,6 @@
 // panels/css.js
 
-// an editable <aufbau-code> writing straight into a <style> in <head>, backed by
+// an editable <write-code> writing straight into a <style> in <head>, backed by
 // localStorage so the sheet survives reloads. the style node is appended as soon
 // as this module evaluates, so stored css paints with the first frame instead of
 // waiting for the panel to be opened.
@@ -19,12 +19,12 @@ const $liveCss = createElement('style', { id: 'devtools-live-css', textContent: 
 document.head.append($liveCss);
 
 export function createCssPanel () {
-  const $code = createElement('aufbau-code', {
+  const $code = createElement('write-code', {
     lang     : 'css',
     theme    : settings.get('codeTheme'),
     editable : '',
     code     : read() || '/* live css */',
-    // <aufbau-code> re-emits every edit of its contenteditable as a CustomEvent
+    // <write-code> re-emits every edit of its contenteditable as a CustomEvent
     // carrying the current source. the inner node's native input event bubbles up
     // here as well, hence the fallback to the element's own getter.
     onInput  : (event) => {
@@ -34,7 +34,7 @@ export function createCssPanel () {
     },
   });
 
-  // aufbau-code observes `theme` and re-adopts the token sheet itself
+  // write-code observes `theme` and re-adopts the token sheet itself
   settings.subscribe((key, value) => {
     if (key === 'codeTheme' || key === null) $code.setAttribute('theme', settings.get('codeTheme'));
   });

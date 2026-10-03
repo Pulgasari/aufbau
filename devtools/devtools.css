@@ -137,7 +137,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
     > li { display: flex; gap: 0.5rem; }
 
-    aufbau-icon {
+    svg-icon {
       cursor: pointer;
       &[aria-pressed="true"] { color: var(--color-ink, #ff79c6); }
     }
@@ -486,7 +486,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
         &[aria-current] { opacity: 1; background: #fff1; }
 
         /* the level marker in front of the entry */
-        > aufbau-icon { flex: none; margin-block-start: 0.2em; opacity: 0.8; }
+        > svg-icon { flex: none; margin-block-start: 0.2em; opacity: 0.8; }
 
         > div { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
 
@@ -500,8 +500,8 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
           align-self : flex-start;
           font-size  : 1.2em;
 
-          aufbau-icon         { cursor: pointer; }
-          aufbau-icon[hidden] { display: none; }
+          svg-icon         { cursor: pointer; }
+          svg-icon[hidden] { display: none; }
         }
 
         /* the count badge on a collapsed repeat */
@@ -694,7 +694,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
   /* :::: live css ::::::::::::::::::::::::::::::::::::::::::::::: */
 
-  > section#devtools-css aufbau-code pre {
+  > section#devtools-css write-code pre {
     max-block-size: 40dvh;
     overflow-y    : auto;
   }

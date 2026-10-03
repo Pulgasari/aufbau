@@ -6,7 +6,7 @@
 //   createDocsFW({ index: '$repo/readme.md', sidebar: { … }, vars: { repo: '../' } });
 
 import initDefaultStylesheet from './ss.js';
-import AufbauCode            from '@aufbau/elements/AufbauCode.js';   // for its static themes()
+import WriteCode             from '@aufbau/elements/webcomponents/write-code.js';   // for its static themes()
 import aufbau                from '@aufbau/api';
 import importFile            from '@aufbau/import';
 import { effect, signal, typedSignal } from '@aufbau/signals';
@@ -142,12 +142,12 @@ function rebaseAssets (doc, docURL, rootURL) {
   }
 }
 
-// fenced code blocks become <aufbau-code>, so highlighting and copy come from the element.
+// fenced code blocks become <write-code>, so highlighting and copy come from the element.
 // doc.createElement on purpose: the live document would upgrade an element that
 // never lives there
 function upgradeCodeBlocks (doc) {
   for (const code of doc.querySelectorAll('pre > code')) {
-    const element = doc.createElement('aufbau-code');
+    const element = doc.createElement('write-code');
     element.setAttribute('lang', [...code.classList].find(name => name.startsWith('language-'))?.slice(9) || 'plaintext');
     element.textContent = code.textContent;
     code.parentElement.replaceWith(element);
@@ -184,7 +184,7 @@ export function createDocsFW (config = {}) {
 
   // :::::: THEME
   // the page theme is a preset of css/themes.css (or any css color), the code theme
-  // one of aufbau-code's. both persist, both lists are loaded behind the first paint
+  // one of write-code's. both persist, both lists are loaded behind the first paint
 
   const pageTheme  = typedSignal({ type: 'string', value: DEFAULT_THEME, key: 'docs-theme-page', storage: 'aufbau' });
   const codeTheme  = typedSignal({ type: 'string', value: DEFAULT_CODE,  key: 'docs-theme-code', storage: 'aufbau' });
@@ -198,11 +198,11 @@ export function createDocsFW (config = {}) {
   if (sw) navigator.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
 
   effect(() => { aufbau.gestalt.set({ theme: pageTheme.value }); });
-  effect(() => { aufbau.elements.setConfig({ code: { theme: codeTheme.value } }); });
+  effect(() => { aufbau.elements.setConfig({ 'write-code': { theme: codeTheme.value } }); });
 
   const withActive = (list, active) => list.includes(active) ? list : [active, ...list];
   aufbau.gestalt.themes().then(list => { pageThemes.value = withActive(list, pageTheme.value); });
-  AufbauCode.themes().then(list => { codeThemes.value = withActive(list, codeTheme.value); });
+  WriteCode.themes().then(list => { codeThemes.value = withActive(list, codeTheme.value); });
 
   // :::::: STATE
 
@@ -322,7 +322,7 @@ export function createDocsFW (config = {}) {
           <article id="docs-content" class="markdown-body" dangerouslySetInnerHTML=${{ __html: content }} />
           <${ExtensionSlot} slot=${afterSlot} />
         </div>
-        ${toc ? html`<aufbau-toc class="docs-toc" target="#docs-content" selector=${toc} />` : null}
+        ${toc ? html`<nav-toc class="docs-toc" target="#docs-content" selector=${toc} />` : null}
       </div>
     `;
   }
@@ -332,9 +332,9 @@ export function createDocsFW (config = {}) {
     return html`
       <div class="theme-control">
         <label for=${id}>${label}</label>
-        <aufbau-picker id=${id} look="combobox" searchable value=${value.value} onChange=${onChange}>
-          ${options.value.map(name => html`<aufbau-option key=${name} value=${name}>${name}</aufbau-option>`)}
-        </aufbau-picker>
+        <input-value id=${id} look="combobox" searchable value=${value.value} onChange=${onChange}>
+          ${options.value.map(name => html`<input-option key=${name} value=${name}>${name}</input-option>`)}
+        </input-value>
       </div>
     `;
   }

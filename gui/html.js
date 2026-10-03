@@ -12,7 +12,7 @@ const attrStr = attrs => Object.entries(attrs).map(([k, v]) => (v === '' ? ` ${k
 export function fieldHTML (key, spec, value) {
   const { tag, attrs, options } = toControl(key, spec, value);
   const inner = options
-    ? options.map(option => { const [val, label] = normalizeOption(option); return `<aufbau-option value="${escAttr(val)}">${escText(label)}</aufbau-option>`; }).join('')
+    ? options.map(option => { const [val, label] = normalizeOption(option); return `<input-option value="${escAttr(val)}">${escText(label)}</input-option>`; }).join('')
     : '';
   return `<label class="aufbau-field"><span class="aufbau-field-label">${escText(spec.label ?? key)}</span><${tag}${attrStr(attrs)}>${inner}</${tag}></label>`;
 }

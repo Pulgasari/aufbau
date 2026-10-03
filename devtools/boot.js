@@ -38,7 +38,7 @@ const registry = {
 };
 
 // made with htx
-//htx.tags.icon = { tag: 'aufbau-icon', args: 'icon', props: { role: 'button', tabIndex: 0 } };
+//htx.tags.icon = { tag: 'svg-icon', args: 'icon', props: { role: 'button', tabIndex: 0 } };
 //const $devtools = htx`<aside id='devtools' />`;
 //const $tab      = htx`<$icon 'mdi:console-line' title='console' />`;
 
@@ -105,7 +105,7 @@ const panels = {};
 const $icons = {};
 
 const icon = (props, group) => {
-  const $icon = createElement('aufbau-icon', { role: 'button', tabIndex: 0, ...props });
+  const $icon = createElement('svg-icon', { role: 'button', tabIndex: 0, ...props });
   group.append($icon);
   return $icon;
 };

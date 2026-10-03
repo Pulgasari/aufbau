@@ -83,4 +83,4 @@ pre, code {
 .theme-controls              { use: .row; gap: 1rem; font-size: 0.8rem; flex-wrap: wrap; justify-content: center; }
 .theme-control               { use: .row; gap: 0.5rem; }
 .theme-control label         { text-transform: uppercase; opacity: 0.7; white-space: nowrap; }
-.theme-control aufbau-picker { min-width: 11rem; }
+.theme-control input-value { min-width: 11rem; }

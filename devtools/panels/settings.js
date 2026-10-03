@@ -4,7 +4,7 @@
 the controls are native <input>/<select> rather than @aufbau/runtime/gui.js,
 which builds the same shape of panel from the same shape of spec and is what
 zugriff's own app settings use. the reason is narrow: a debugging tool should
-not depend on the component library it may be used to debug. if <aufbau-picker>
+not depend on the component library it may be used to debug. if <input-value>
 is what broke, devtools still has to open. the spec in ../settings.js is kept
 in gui.js's format, so swapping this file for a gui.controls() call is a local
 change if that trade ever stops being worth it.

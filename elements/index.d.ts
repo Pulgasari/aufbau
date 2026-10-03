@@ -1,14 +1,6 @@
-/*
-import type { HTMLAttributes } from "react";
+export declare const TAGS: readonly string[];
 
-declare module "react" {
-  namespace JSX {
-    interface IntrinsicElements {
-      "aufbau-icon": HTMLAttributes<HTMLElement> & {
-        name?: string;
-        size?: string | number;
-      };
-    }
-  }
-}
-*/
+export declare function autoloader (options?: { base?: string | URL, root?: Document | Element }): () => void;
+export declare function load (tag: string): Promise<unknown | null>;
+export declare function pathOf (tag: string): string;
+export declare function registerAll (): Promise<unknown[]>;

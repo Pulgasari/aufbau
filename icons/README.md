@@ -7,20 +7,20 @@ eigenes icons-package. wie schon bei `@aufbau/webfonts` ein hybrid:
 ## nutzung
 
 ```js
-import '@aufbau/icons';               // registriert <aufbau-icon>, <aufbau-flag> + default-aliases
-import { AufbauIcon } from '@aufbau/icons';
+import '@aufbau/icons';               // registriert <svg-icon>, <svg-flag> + default-aliases
+import { SvgIcon } from '@aufbau/icons';
 
-AufbauIcon.register({ brand: 'simple-icons:deno' });  // eigene aliases, überschreiben defaults
+SvgIcon.register({ brand: 'simple-icons:deno' });  // eigene aliases, überschreiben defaults
 ```
 
 ```html
-<aufbau-icon icon="save"></aufbau-icon>               <!-- alias -->
-<aufbau-icon icon="lucide:save"></aufbau-icon>        <!-- volle iconify-id -->
-<aufbau-icon icon="info" label="Hinweis"></aufbau-icon> <!-- mit label: role img, sonst aria-hidden -->
-<aufbau-flag code="de"></aufbau-flag>
+<svg-icon icon="save"></svg-icon>               <!-- alias -->
+<svg-icon icon="lucide:save"></svg-icon>        <!-- volle iconify-id -->
+<svg-icon icon="info" label="Hinweis"></svg-icon> <!-- mit label: role img, sonst aria-hidden -->
+<svg-flag code="de"></svg-flag>
 ```
 
-`@aufbau/elements` hängt nicht von diesem package ab. `<aufbau-icon>` lädt
+`@aufbau/elements` hängt nicht von diesem package ab. `<svg-icon>` lädt
 `@aufbau/icons/aliases.js` lazy per dynamic import, sobald zum ersten mal ein
 unbekannter alias auftaucht. seiten, die nur volle ids nutzen, laden die liste nie.
 ist das package nicht auflösbar (kein import-map-eintrag), gibt es eine warnung
@@ -30,7 +30,7 @@ und aliases bleiben leer.
 
 | datei              | inhalt |
 | ------------------ | ------ |
-| `index.js`         | reicht `AufbauIcon`/`AufbauFlag` durch, registriert die aliases eager |
+| `index.js`         | reicht `SvgIcon`/`SvgFlag` durch, registriert die aliases eager |
 | `aliases.js`       | nur daten, importiert kein element (sonst zyklus mit dem lazy import) |
 | `data/icons.json`  | allgemeine ui-icons |
 | `data/code.json`   | editor-spezifisch (apps/code) |
@@ -39,7 +39,7 @@ und aliases bleiben leer.
 ## offline-bundling
 
 ziel: ein build ohne netz zur laufzeit, z. b. zugriff als capacitor-android-app
-mit lokalen assets. `<aufbau-icon>` fragt zuerst `AufbauIcon.provide()` ab und
+mit lokalen assets. `<svg-icon>` fragt zuerst `SvgIcon.provide()` ab und
 nur, wenn dort nichts liegt, die iconify-api.
 
 das übernimmt der `icons`-schritt von `@aufbau/bundler` (`bundler/steps/icons.js`):
@@ -50,11 +50,11 @@ das übernimmt der `icons`-schritt von `@aufbau/bundler` (`bundler/steps/icons.j
    eine registry ab. dynamische namen findet kein scanner, dafür `include`.
 2. **svgs holen**: aus `@iconify-json/<set>` von npm, mit `getIconData()` +
    `iconToSVG()` aus `@iconify/utils`.
-3. **ausgeben**: ein modul, das sie per `AufbauIcon.provide()` übergibt, am ende
+3. **ausgeben**: ein modul, das sie per `SvgIcon.provide()` übergibt, am ende
    von `<head>` eingebunden, also vor der app:
 
 ```js
 // /_icons/provide.js (generiert)
-import AufbauIcon from '@aufbau/elements/AufbauIcon.js';
-AufbauIcon.provide({ 'mdi:folder': '<svg …>…</svg>', … });
+import SvgIcon from '@aufbau/elements/webcomponents/svg-icon.js';
+SvgIcon.provide({ 'mdi:folder': '<svg …>…</svg>', … });
 ```
