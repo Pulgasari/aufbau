@@ -86,16 +86,92 @@
       section  { padding: 1rem; }
     }
   </style>
+<style>
+body { display: flex; }
+#dock { flex: 0; }
+main { flex: 1; }
+
+body { overflow: hidden; }
+main { overflow: auto; }
+  
+#dock {
+  background-color: var(--fg);
+  color: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+  
+/* 1. Make native scrollbar transparent so the progress bar shines through */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Allows visual track beneath to show */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25); /* Subtle overlay handle for dragging */
+  border-radius: 6px;
+}
+
+/* Firefox scrollbar styling */
+html {
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+  scrollbar-width: auto;
+}
+
+/* 2. Visual background track fixed at the scrollbar position */
+.scroll-progress-track {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 100vh;
+  background-color: --alpha(fg, 0.90); /* Track background color */
+  pointer-events: none; /* Let mouse drag clicks pass through to native scrollbar */
+  z-index: 9998;
+}
+
+/* 3. Growing progress bar fill */
+.scroll-progress-fill {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-ink); /* Active progress color */
+  transform-origin: top;
+  scale: 1 0;
+
+  /* Dynamically scale height based on scroll position */
+  animation: grow-progress linear;
+  animation-timeline: scroll(root block);
+}
+
+@keyframes grow-progress {
+  to {
+    scale: 1 1;
+  }
+}
+
+</style>
 </head>
 <body>
 
+  <!-- Visual progress bar placed under the scrollbar area -->
+<div class="scroll-progress-track">
+  <div class="scroll-progress-fill"></div>
+</div>
+
+<nav id='dock'></nav>
+
+<!--
   <aside>
     <h1>@aufbau/elements</h1>
     <p>every element with its types and looks. the aside is a data-filter over a nav-toc.</p>
     <data-filter target="#toc li" placeholder="filter elements…"></data-filter>
     <nav-toc id="toc" target="main" selector="h2"></nav-toc>
   </aside>
-
+-->
+  
   <!-- the whole page is one form: every named control lands in getFormValues() at the end -->
   <main>
   <form id="form">
@@ -636,6 +712,19 @@
 
     const { gestalt } = aufbau;
     const $ = id => document.getElementById(id);
+
+    import { htx, render } from '@htx/preact';
+
+    function Dock () {
+      return htx`<>
+          <btn-icon icon='search'></btn-icon>
+          <btn-icon icon='search'></btn-icon>
+          <btn-icon icon='search'></btn-icon>
+          <btn-icon icon='search'></btn-icon>
+      </>`;
+    }
+
+    render(htx`<${Dock}/>`, document.getElementById('dock'));
 
     // :::::: TOASTS
     // every [data-toast] on the page, buttons and menu entries alike
