@@ -18,7 +18,6 @@
     h2      { font-size: 1.25rem; }
     h3      { font-size: .9rem; font-weight: 600; color: var(--muted); margin-top: .5rem; }
 
-    code  { font-size: .9em; }
     small { color: var(--muted); }
 
     /* one variant per row: what it is on the left, the element on the right */
@@ -47,8 +46,8 @@
 
     /* :::::: ELEMENTS */
 
-    .flags { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .75rem; }
-    .flags figure { display: grid; justify-items: center; gap: .25rem; font-size: .75rem; color: var(--muted); }
+    .flags          { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .75rem; }
+    .flags figure   { display: grid; justify-items: center; gap: .25rem; font-size: .75rem; color: var(--muted); }
     .flags svg-flag { width: 2.5rem; }
 
     #table-demo td:first-child { white-space: nowrap; }
@@ -63,8 +62,10 @@
     }
     #index data-index[viewmode="list"] data-item { aspect-ratio: auto; padding: .75rem; place-items: start; }
 
-    #loop aufbau-loop[mode="carousel"] { block-size: 8rem; border: 1px solid var(--line); border-radius: .75rem; }
-    #loop aufbau-loop[mode="carousel"] > div { display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; }
+    #loop aufbau-loop[mode="carousel"] { 
+      block-size: 8rem; border: 1px solid var(--line); border-radius: .75rem;
+      > div { display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; }
+    }
     #loop aufbau-loop[mode="marquee"] span { padding-inline: 1.5rem; font-family: ui-monospace, monospace; }
 
     #keyboard textarea {
@@ -73,8 +74,10 @@
       background: var(--panel); color: inherit; font: inherit;
     }
 
-    #div div-x, #div div-y { gap: .5rem; padding: .5rem; border: 1px dashed var(--line); border-radius: .5rem; }
-    #div div-x > span, #div div-y > span { padding: .25rem .75rem; border-radius: .4rem; background: var(--panel); }
+    #div is(div-x, div-y) { 
+      gap: .5rem; padding: .5rem; border: 1px dashed var(--line); border-radius: .5rem;
+      > span { padding: .25rem .75rem; border-radius: .4rem; background: var(--panel); }
+    }
 
     #skeleton data-item { display: grid; grid-template-columns: 3rem 1fr; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: .75rem; }
     #skeleton .avatar { width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--color-ink); }
@@ -650,10 +653,14 @@
 
     function Dock () {
       return htx`<>
+        <btn-icon icon='search'></btn-icon>
+        <div>
           <btn-icon icon='search'></btn-icon>
           <btn-icon icon='search'></btn-icon>
           <btn-icon icon='search'></btn-icon>
           <btn-icon icon='search'></btn-icon>
+        </div>
+        <btn-icon icon='search'></btn-icon>
       </>`;
     }
 
