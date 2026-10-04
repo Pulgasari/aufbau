@@ -21,7 +21,7 @@ body {
 
 
 body  { display: flex; }
-#dock { flex: 0; }
+#dock { flex: 0 0 10%; }
 main  { flex: 1; }
 
 body { overflow: hidden; }
