@@ -32,6 +32,8 @@ main { overflow-y: auto; min-height: 0; }
   color: var(--color-bg);
   display: flex;
   flex-direction: column;
+   justify-content: space-between;
+   > * { flex-basis: 0; }
 }
   
 /* 1. Make native scrollbar transparent so the progress bar shines through */
