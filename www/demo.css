@@ -23,7 +23,7 @@ body  { display: flex; }
 main  { flex: 1; }
 
 body { overflow: hidden; }
-main { overflow: auto; }
+main { overflow-y: auto; min-height: 0; }
   
 #dock {
   background-color: var(--color-fg);
