@@ -1,5 +1,29 @@
+/* flow.css */
 
+/*
 
+1. grid-functions
+
+:::::: 2. pseudo-prop ::::::
+step 1: definiert im css
+step 2: parsed by <app-root> or <data-index>
+step 3: values mapped to data-attr
+step 4: used by css
+
+*/
+
+* {
+  --flow: unset;
+}
+
+.container {
+   grid          : attr(data-grid, unset);
+   place-content : attr(data-place-content, unset);
+   place-items   : attr(data-place-items, unset);
+   place-self    : attr(data-place-self, unset);
+
+   grid : --grid(attr(data-flow)):
+}
 
 
 @function --grid(
