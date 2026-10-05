@@ -1,3 +1,62 @@
+
+
+
+
+@function --grid(
+
+) {
+   result: if(
+      style(--val: auto)      : auto-flow;
+      style(--val: auto cols) : grid-auto-columns;
+      style(--val: auto rows) : grid-auto-rows;
+      style(--val: 3x3)       : grid-template: repeat(3, 1fr) / repeat(3, 1fr);;
+   );
+}
+
+
+.grid-square-long {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-auto-rows: auto;
+   
+  > * { aspect-ratio: 1 / 1; } /* Enforce 1:1 aspect ratio for perfect square items */
+}
+
+.grid-square-short {
+  /* Syntax: <auto-rows> / <columns> */
+  grid: auto / repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.grid-square-short > * {
+  aspect-ratio: 1;
+}
+
+
+10 pro reihe
+
+.grid-10-short1 {
+  grid-template: auto / repeat(10, 1fr);
+}
+
+
+
+.grid-10-short2 {
+  grid-web: auto / repeat(10, 1fr);
+  grid: auto / repeat(10, 1fr);
+}
+
+
+/*
+row dense
+*;
+
+
+
+.grid-3x3-short1 {
+  /* Syntax: <rows> / <columns> */
+  
+}
+
+
 /*
 grid-template: <rows> / <columns>;
 
