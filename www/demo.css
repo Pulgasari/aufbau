@@ -29,7 +29,8 @@ main { overflow-y: auto; min-height: 0; }
 #dock {
   --bg: --color(ink);
   --fg: --color(fg);
-  
+
+  font-size: 2rem;
    justify-content: space-between;
    > * { flex-basis: 0; }
 }
