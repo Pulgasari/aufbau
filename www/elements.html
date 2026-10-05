@@ -95,7 +95,8 @@
   <div class="scroll-progress-fill"></div>
 </div>
 
-<nav id='dock'></nav>
+<htx-part src='./dock.htx.html'></htx-part>
+
 
 <!--
   <aside>
@@ -154,10 +155,10 @@
 
     const { gestalt } = aufbau;
     const $ = id => document.getElementById(id);
-
+  
     import { htx, render } from '@htx/preact';
     loadStylesheet('./demo.css');
-
+/*
     function Dock () {
       return htx`
         <div>
@@ -176,7 +177,7 @@
     }
 
     render(htx`<${Dock}/>`, document.getElementById('dock'));
-
+*/
     // :::::: TOASTS
     // every [data-toast] on the page, buttons and menu entries alike
 
