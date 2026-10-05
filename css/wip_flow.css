@@ -51,6 +51,175 @@ step 4: used by css
 }
 
 
+
+/* flow-container-queries.css */
+
+/*
+:::::: 1. Container Setup ::::::
+*/
+
+.flow {
+  /* Establish container query context for size and style */
+  container-type: inline-size;
+  container-name: layout;
+
+  /* Default base layout */
+  display: grid;
+  gap: var(--flow-gap, 1rem);
+
+  /* Default custom property token */
+  --flow: unset;
+}
+
+/*
+:::::: 2. Style Queries for Presets ::::::
+*/
+
+/* Preset: 3x3 Grid */
+@container layout style(--flow: 3x3) {
+  :scope {
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  }
+}
+
+/* Preset: 10 Columns */
+@container layout style(--flow: 10) {
+  :scope {
+    grid: auto / repeat(10, 1fr);
+  }
+}
+
+/* Preset: Responsive Auto-Fit Grid */
+@container layout style(--flow: auto-fit) {
+  :scope {
+    grid-template-columns: repeat(auto-fit, minmax(var(--flow-min, 200px), 1fr));
+  }
+}
+
+/*
+:::::: 3. Responsive Container Size Overrides ::::::
+Combine style and size queries for adaptive layout behavior
+*/
+
+@container layout (max-width: 500px) {
+  /* Automatically collapse 3x3 on small containers */
+  @container layout style(--flow: 3x3) {
+    :scope {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+  }
+
+  /* Automatically adjust 10-column layout on small containers */
+  @container layout style(--flow: 10) {
+    :scope {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+
+
+/* flow-hybrid.css */
+
+/*
+:::::: 1. Attribute Selectors driven by JS Engine ::::::
+*/
+
+[data-flow] {
+  display: grid;
+}
+
+/* Matrix shorthand mapping (e.g., data-flow="3x3") */
+[data-grid-matrix="3/3"] {
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+}
+
+[data-grid-matrix="2/4"] {
+  grid-template: repeat(2, 1fr) / repeat(4, 1fr);
+}
+
+/* Alignment mapping */
+[data-place-items="center"] {
+  place-items: center;
+}
+
+/* Dynamic gap assignment */
+[data-gap="sm"] { gap: 0.5rem; }
+[data-gap="md"] { gap: 1rem; }
+[data-gap="lg"] { gap: 2rem; }
+
+/* flow-observer.js */
+
+class FlowEngine {
+  static init() {
+    // Observe DOM mutations for data-flow attribute changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-flow') {
+          FlowEngine.parse(mutation.target);
+        }
+      });
+    });
+
+    // Attach observer to containers
+    document.querySelectorAll('[data-flow]').forEach((el) => {
+      FlowEngine.parse(el);
+      observer.observe(el, { attributes: true });
+    });
+  }
+
+  static parse(el) {
+    const rawValue = el.getAttribute('data-flow') || '';
+    const tokens = rawValue.split(' ').map((t) => t.trim());
+
+    // Map tokens to targeted data-attributes
+    tokens.forEach((token) => {
+      if (token.includes('x')) {
+        const [rows, cols] = token.split('x');
+        el.setAttribute('data-grid-matrix', `${rows}/${cols}`);
+      } else if (token === 'center' || token === 'start' || token === 'end') {
+        el.setAttribute('data-place-items', token);
+      } else if (token.startsWith('gap-')) {
+        el.setAttribute('data-gap', token.replace('gap-', ''));
+      }
+    });
+  }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => FlowEngine.init());
+
+/* flow-tokens.css */
+
+/*
+:::::: Functional Grid Class using Variable Fallbacks ::::::
+*/
+
+.grid-flow {
+  display: grid;
+
+  /* Dynamic evaluation: Custom property override or fallback */
+  grid-template-columns: var(
+    --cols,
+    repeat(auto-fit, minmax(var(--min-item-width, 200px), 1fr))
+  );
+  grid-template-rows: var(--rows, auto);
+  gap: var(--gap, 1rem);
+  place-items: var(--place, stretch);
+}
+
+/* Predefined Utility Modifiers */
+.grid-flow[data-preset="3x3"] {
+  --cols: repeat(3, 1fr);
+  --rows: repeat(3, 1fr);
+}
+
+.grid-flow[data-preset="10-col"] {
+  --cols: repeat(10, 1fr);
+}
+
+
 /*
 row dense
 *;
