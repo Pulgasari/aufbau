@@ -652,16 +652,20 @@
     import { htx, render } from '@htx/preact';
 
     function Dock () {
-      return htx`<>
-        <btn-icon icon='search'></btn-icon>
+      return htx`
+        <div>
+          <btn-icon icon='search'></btn-icon>
+        </div>
         <div>
           <btn-icon icon='search'></btn-icon>
           <btn-icon icon='search'></btn-icon>
           <btn-icon icon='search'></btn-icon>
           <btn-icon icon='search'></btn-icon>
         </div>
-        <btn-icon icon='search'></btn-icon>
-      </>`;
+        <div>
+          <btn-icon icon='search'></btn-icon>
+        </div>
+      `;
     }
 
     render(htx`<${Dock}/>`, document.getElementById('dock'));
