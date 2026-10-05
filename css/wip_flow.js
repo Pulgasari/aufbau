@@ -1,13 +1,28 @@
 /* flow-engine.js */
 
-/* flow-engine.js */
+/*
+[data-flow] {
+  display: grid;
+
+
+  grid-template-columns: var(--flow-cols, auto);
+  grid-template-rows: var(--flow-rows, auto);
+  grid-auto-flow: var(--flow-auto, row);
+  gap: var(--flow-gap, 1rem);
+}
+
+[data-flow] > * {
+  aspect-ratio: var(--flow-ratio, unset);
+}
+*/
+
+const app = document.querySelector('app-root');
+app.observe.attr('data-flow', parse);
 
 // Functional helper methods for curried property manipulation
 const ensurePrefix = (prefix) => (str) => str.startsWith(prefix) ? str : prefix + str;
 const ensureDashed = ensurePrefix('--flow-');
-
 const setToken = (el) => (k, v) => el.style.setProperty(ensureDashed(k), v);
-
 const entries = Object.entries;
 
 class FlowEngine {
@@ -69,8 +84,8 @@ class FlowEngine {
     // Watch for dynamic DOM attribute updates
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((m) => {
-        if (m.type === 'attributes' && m.attributeName === 'data-flow') {
-          parse(m.target);
+        if (m.type === 'attributes' && m.attributeName === ' data -flow ') {
+         data -flow parse(m.target);
         }
       });
     });
