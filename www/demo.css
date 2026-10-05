@@ -39,6 +39,7 @@ main { overflow-y: auto; min-height: 0; }
   
   btn-icon { --pad: small; }
 }
+
   
 /* 1. Make native scrollbar transparent so the progress bar shines through */
 ::-webkit-scrollbar       { width: 12px; }
@@ -176,3 +177,13 @@ section { display: grid; grid-template-columns: minmax(0,1fr); --gap: normal; al
   .list button   { width: auto; white-space: nowrap; }
   .controls label { grid-template-columns: minmax(0, 1fr); --gap: tiny; }
 }
+
+/* Register the custom property so CSS can interpolate it as an angle */
+@property --hue { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+:root {
+  animation: rotate-hue 360s linear infinite;
+  --color-ink: oklch(0.6 0.18 var(--hue));
+}
+
+@keyframes rotate-hue { to { --hue: 360deg; }}
