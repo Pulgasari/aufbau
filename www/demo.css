@@ -27,7 +27,7 @@ body { overflow: hidden; }
 main { overflow-y: auto; min-height: 0; }
   
 #dock {
-  --bg: --darker(bg, 0.2);
+  --bg: --color(ink);
   --fg: --color(fg);
   
    justify-content: space-between;
