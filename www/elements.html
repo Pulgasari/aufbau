@@ -7,13 +7,18 @@
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <!--<link rel="stylesheet" href="./demo.css"/>-->
   <style>
+    main, #form { margin: 0; padding: 0; }
     #form   { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; padding: 0; }
     #form > section { border-radius: 0; --pad: normal; scroll-margin-top: 1rem; }
     #form > section:nth-child(odd) { --bg: var(--zebra); }
 
     h1, h2, h3, h4, h5, h6 { font-weight: 600; --fg: --muted(50%); }
 
-    small { --fg: --muted(); }
+    small { --fg: --muted(0.5); }
+    small { --fg: --color(fg, muted, 0.5); }
+    small { color: --muted(0.5); }
+    small { color: --color(fg, muted, 0.5); }
+
 
     /* one variant per row: what it is on the left, the element on the right */
     .row { 
@@ -104,7 +109,7 @@
   <main>
   <form id="form">
 
-    <!-- :::::: APP -->
+    <!-- :::::: APP- -->
 
     <section id="config">
       <h2>app-config</h2>
@@ -123,58 +128,7 @@
       <app-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></app-keyboard>
     </section>
 
-    <!-- :::::: AUFBAU -->
-
-    <section id="loop">
-      <h2>aufbau-loop</h2>
-      <div class="row"><span>mode="carousel"</span>
-        <aufbau-loop mode="carousel" interval="2000" pause-on-hover>
-          <div>eins</div>
-          <div>zwei</div>
-          <div>drei</div>
-        </aufbau-loop></div>
-      <div class="row"><span>mode="marquee"</span>
-        <aufbau-loop id="marquee" mode="marquee" speed="30s" pause-on-hover></aufbau-loop></div>
-      <div class="row"><span>direction="right"</span>
-        <aufbau-loop id="marquee-right" mode="marquee" direction="right" speed="40s"></aufbau-loop></div>
-    </section>
-
-    <section id="progress">
-      <h2>aufbau-progress</h2>
-      <div class="row"><span>type="standard" show-text</span>
-        <aufbau-progress id="progress-demo" value="40" max="100" show-text></aufbau-progress></div>
-      <div class="row"><span>value</span>
-        <input-number id="progress-value" look="slider" value="40" min="0" max="100" unit="%"></input-number></div>
-      <div class="row"><span>type="scroll"</span>
-        <p class="hint">the bar at the top of the page follows the scroll position.</p></div>
-      <aufbau-progress type="scroll" target="body" style="position: fixed; inset: 0 0 auto; z-index: 10;"></aufbau-progress>
-    </section>
-
-    <section id="skeleton">
-      <h2>aufbau-skeleton</h2>
-      <div class="row">
-        <span>shape="text" lines="3"</span>
-        <aufbau-skeleton lines="3"></aufbau-skeleton>
-      </div>
-      <div class="row">
-        <span>shape="circle"</span>
-        <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
-      </div>
-      <div class="row">
-        <span>shape="rect"</span>
-        <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton>
-      </div>
-      <div class="row">
-        <span>the skeleton attribute</span>
-        <input-bool id="skeleton-toggle" label="loading"></input-bool>
-      </div>
-      <data-item id="skeleton-card">
-        <div class="avatar"></div>
-        <div>any element takes <code>skeleton</code> for the same look in its own place.</div>
-      </data-item>
-    </section>
-
-    <!-- :::::: BTN -->
+    <!-- :::::: BTN :::::: -->
 
     <section id="btn">
       <h2>btn-push · btn-tap · btn-icon</h2>
@@ -200,7 +154,7 @@
         <p class="hint">see the form at the end of the page.</p></div>
     </section>
 
-    <!-- :::::: DATA -->
+    <!-- :::::: DATA :::::: -->
 
     <section id="filter">
       <h2>data-filter</h2>
@@ -266,7 +220,7 @@
         <data-tree id="tree-nodes"></data-tree></div>
     </section>
 
-    <!-- :::::: DIV -->
+    <!-- :::::: DIV :::::: -->
 
     <section id="div">
       <h2>div-x · div-y</h2>
@@ -276,7 +230,7 @@
         <div-y><span>one</span><span>two</span><span>three</span></div-y></div>
     </section>
 
-    <!-- :::::: EMBED -->
+    <!-- :::::: EMBED :::::: -->
 
     <section id="embed">
       <h2>embed-content</h2>
@@ -285,7 +239,7 @@
         <embed-content src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" label="a video"></embed-content></div>
     </section>
 
-    <!-- :::::: INPUT -->
+    <!-- :::::: INPUT :::::: -->
 
     <section id="input">
       <h2>input-value</h2>
@@ -388,7 +342,7 @@
         <input-file name="documents" look="list" accept=".pdf,.docx" multiple max-size="5242880"></input-file></div>
     </section>
 
-    <!-- :::::: MEDIA -->
+    <!-- :::::: MEDIA :::::: -->
 
     <section id="audio">
       <h2>media-audio</h2>
@@ -422,7 +376,7 @@
         <media-wave id="wave-range" range-start="25" range-end="60" progress="45" style="block-size: 4rem;"></media-wave></div>
     </section>
 
-    <!-- :::::: NAV -->
+    <!-- :::::: NAV :::::: -->
 
     <section id="crumbs">
       <h2>nav-crumbs</h2>
@@ -445,7 +399,7 @@
       <p class="hint">the table of contents in the aside, built from the h2 of this page. the entry of the section you read is marked.</p>
     </section>
 
-    <!-- :::::: OUTPUT -->
+    <!-- :::::: OUTPUT :::::: -->
 
     <section id="md">
       <h2>output-md</h2>
@@ -472,7 +426,7 @@
       <div class="row"><span>type="url"</span>                    <output-value type="url" value="https://aufbau.dev"></output-value></div>
     </section>
 
-    <!-- :::::: POP -->
+    <!-- :::::: POP :::::: -->
 
     <section id="menu">
       <h2>pop-menu</h2>
@@ -545,7 +499,7 @@
         </div></div>
     </section>
 
-    <!-- :::::: SVG -->
+    <!-- :::::: SVG :::::: -->
 
     <section id="flag">
       <h2>svg-flag</h2>
@@ -583,7 +537,7 @@
         </div></div>
     </section>
 
-    <!-- :::::: WRITE -->
+    <!-- :::::: WRITE :::::: -->
 
     <section id="code">
       <h2>write-code</h2>
@@ -617,7 +571,7 @@
         <write-text name="draft">a first draft.</write-text></div>
     </section>
 
-    <!-- :::::: FORM -->
+    <!-- :::::: FORM :::::: -->
 
     <section id="form-values">
       <h2>getFormValues()</h2>
@@ -627,6 +581,57 @@
         <btn-push type="reset">reset</btn-push>
       </div>
       <write-code id="form-dump" lang="json" actions="copy"></write-code>
+    </section>
+
+    <!-- :::::: AUFBAU :::::: -->
+
+    <section id="loop">
+      <h2>aufbau-loop</h2>
+      <div class="row"><span>mode="carousel"</span>
+        <aufbau-loop mode="carousel" interval="2000" pause-on-hover>
+          <div>eins</div>
+          <div>zwei</div>
+          <div>drei</div>
+        </aufbau-loop></div>
+      <div class="row"><span>mode="marquee"</span>
+        <aufbau-loop id="marquee" mode="marquee" speed="30s" pause-on-hover></aufbau-loop></div>
+      <div class="row"><span>direction="right"</span>
+        <aufbau-loop id="marquee-right" mode="marquee" direction="right" speed="40s"></aufbau-loop></div>
+    </section>
+
+    <section id="progress">
+      <h2>aufbau-progress</h2>
+      <div class="row"><span>type="standard" show-text</span>
+        <aufbau-progress id="progress-demo" value="40" max="100" show-text></aufbau-progress></div>
+      <div class="row"><span>value</span>
+        <input-number id="progress-value" look="slider" value="40" min="0" max="100" unit="%"></input-number></div>
+      <div class="row"><span>type="scroll"</span>
+        <p class="hint">the bar at the top of the page follows the scroll position.</p></div>
+      <aufbau-progress type="scroll" target="body" style="position: fixed; inset: 0 0 auto; z-index: 10;"></aufbau-progress>
+    </section>
+    
+    <section id="skeleton">
+      <h2>aufbau-skeleton</h2>
+      <div class="row">
+        <span>shape="text" lines="3"</span>
+        <aufbau-skeleton lines="3"></aufbau-skeleton>
+      </div>
+      <div class="row">
+        <span>shape="circle"</span>
+        <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
+      </div>
+      <div class="row">
+        <span>shape="rect"</span>
+        <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton>
+      </div>
+      <div class="row">
+        <span>the skeleton attribute</span>
+        <input-bool id="skeleton-toggle" label="loading"></input-bool>
+      </div>
+      <data-item id="skeleton-card">
+        <div class="avatar"></div>
+        <div>any element takes <code>skeleton</code> for the same look in its own place.</div>
+      </data-item>
     </section>
 
   </form>
