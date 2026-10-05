@@ -1,0 +1,36 @@
+/* Helper to calculate the next smaller step size */
+@function --next-smaller-step(--current <number>) returns <number> {
+  result: if(
+    var(--current) > 6 : 6;
+    var(--current) > 4 : 4;
+    var(--current) > 2 : 2;
+    else               : 1
+  );
+}
+
+/* Resolver function evaluating the element's OWN visual state */
+@function --resolve-padding-step(
+  --base <number> : 4
+) returns <number> {
+  /* 1. Check if THIS element has a background or border defined */
+  --has-bg     : if(style(--bg     : *) : true; else: false);
+  --has-border : if(style(--border : *) : true; else: false);
+
+  /* 2. Determine if padding should be stepped down based on element properties */
+  --is-framed: if(
+    style(--has-bg     : true) : true;
+    style(--has-border : true) : true;
+    else: false
+  );
+
+  /* 3. Return smaller step if framed, otherwise return base step */
+  result: if(
+    style(--is-framed: true) : --next-smaller-step(var(--base));
+    else                      : var(--base)
+  );
+}
+
+/* Helper to convert steps to rem values */
+@function --space(--size <number> : 4) returns <length> {
+  result: calc(var(--unit, 0.25rem) * var(--size));
+}
