@@ -1,8 +1,11 @@
 import { AufbauElement } from '@aufbau/element';
 
 const API      = 'https://api.iconify.design';
-const DEFAULTS = '@aufbau/icons/aliases.js';
+const DEFAULTS = '@aufbau/svg/aliases.js';
 const FALLBACK = 'material-symbols:help';
+
+// prefixes served from files instead of iconify, resolved through the importmap
+const LOCAL = { aufbau: '@aufbau/svg/icons/' };
 
 const aliases  = new Map;
 const provided = new Map;
@@ -23,13 +26,24 @@ export function resolveIcon (icon) {
   return value.includes(':') ? value : aliases.get(value) ?? null;
 }
 
+// base + name -> the url of name.svg through the importmap, null without an entry
+export function localUrl (base, name) {
+  try { return import.meta.resolve(`${base}${name}.svg`); }
+  catch {
+    warnOnce(base, `"${base}" could not be resolved, add it to the importmap.`);
+    return null;
+  }
+}
+
 export function iconUrl (id) {
   const svg = provided.get(id);
   if (svg) return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 
   const [collection, ...rest] = id.split(':');
   const name = rest.join(':');
-  return collection && name ? `${API}/${encodeURIComponent(collection)}:${encodeURIComponent(name)}.svg` : null;
+  if (!collection || !name) return null;
+  if (LOCAL[collection]) return localUrl(LOCAL[collection], name);
+  return `${API}/${encodeURIComponent(collection)}:${encodeURIComponent(name)}.svg`;
 }
 
 export default class SvgIcon extends AufbauElement {

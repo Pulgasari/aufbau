@@ -100,6 +100,7 @@ const TAGS = [
 
   'svg-flag',
   'svg-icon',
+  'svg-logo',
 
   'write-code',
   'write-md',

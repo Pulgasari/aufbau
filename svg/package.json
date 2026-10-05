@@ -1,0 +1,18 @@
+{
+  "name": "@aufbau/svg",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./aliases": "./aliases.js",
+    "./aliases.js": "./aliases.js",
+    "./data/*": "./data/*",
+    "./filters/*": "./filters/*",
+    "./icons/*": "./icons/*",
+    "./index.json5": "./index.json5",
+    "./logos/*": "./logos/*",
+    "./patterns/*": "./patterns/*"
+  },
+  "peerDependencies": {
+    "@aufbau/elements": "^2.0.0"
+  }
+}

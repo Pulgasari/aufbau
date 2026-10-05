@@ -18,7 +18,6 @@
   | [html](https://aufbau.dev/gestures.html)
 - [@aufbau/gui](gui/)
   | [html](https://aufbau.dev/gui.html)
-- [@aufbau/icons](icons/)
 - [@aufbau/import](import/)
 - [@aufbau/patterns](patterns/)
   | [html](https://aufbau.dev/patterns.html)

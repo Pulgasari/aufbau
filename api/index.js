@@ -16,7 +16,7 @@ const modules = {
   domina   : name    => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default),
   elements : once(() => import('@aufbau/elements')),
   filters  : once(() => import('@aufbau/filters')),
-  icons    : once(() => import('@aufbau/icons/aliases.js')),
+  icons    : once(() => import('@aufbau/svg/aliases.js')),
   patterns : once(() => import('@aufbau/patterns')),
   webfonts : once(() => import('@aufbau/webfonts')),
 //$load    : (name)  => modules[name]().then(module => module.data),

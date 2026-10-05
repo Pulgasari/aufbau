@@ -72,7 +72,7 @@ without one) are resolved at build time.
 
 - icons: every quoted `set:name` in the staged code and data whose set is an
   iconify collection (`@iconify/collections`), which covers `icon="…"`, alias
-  lists (@aufbau/icons, a project's own) and data files like a registry. the
+  lists (@aufbau/svg, a project's own) and data files like a registry. the
   svgs come from `@iconify-json/<set>` on npm through `@iconify/utils`. ids built
   at runtime go into `include`, or come from the api as before.
 - webfonts: the fonts in `keep`, plus every font whose name the staged css and js

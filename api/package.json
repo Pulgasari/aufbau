@@ -14,8 +14,8 @@
     "@aufbau/element": "^0.1.0",
     "@aufbau/elements": "^2.0.0",
     "@aufbau/filters": "^1.0.0",
-    "@aufbau/icons": "*",
     "@aufbau/patterns": "^1.1.0",
+    "@aufbau/svg": "*",
     "@aufbau/webfonts": "*",
     "@domina/methods": "*"
   },

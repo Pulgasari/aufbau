@@ -677,13 +677,25 @@ der accessible name ist der ländername in der seitensprache (`de` → „Deutsc
 ## svg-icon
 
 reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
-[`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
+[`@aufbau/svg`](../svg/README.md) (lazy nachgeladen oder per import registriert).
+das präfix `aufbau` nimmt die dateien aus `@aufbau/svg/icons/` statt iconify.
 
 ```html
 <svg-icon icon="lucide:save"></svg-icon>
+<svg-icon icon="aufbau:aufbau"></svg-icon>             <!-- @aufbau/svg/icons/aufbau.svg -->
 <svg-icon icon="save" size="2em" color="tomato"></svg-icon>
 <svg-icon icon="logos:deno" mode="image"></svg-icon>   <!-- mehrfarbig -->
 <svg-icon icon="info" label="Hinweis"></svg-icon>      <!-- sonst aria-hidden -->
+```
+
+## svg-logo
+
+ein logo aus `@aufbau/svg/logos/` in seinen eigenen farben. ein `<img>`, die
+breite folgt dem seitenverhältnis der datei, `size` setzt die höhe.
+
+```html
+<svg-logo logo="zugriff"></svg-logo>
+<svg-logo logo="aufbau" size="3rem" label="aufbau"></svg-logo>   <!-- sonst alt="" -->
 ```
 
 ## write-code

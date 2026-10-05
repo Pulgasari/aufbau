@@ -12,7 +12,7 @@
 //   }
 //
 // the ids come from the staged files: every quoted `set:name` whose set is an
-// iconify collection (the alias lists of @aufbau/icons and a project's own are
+// iconify collection (the alias lists of @aufbau/svg and a project's own are
 // such strings too). the svgs come from the @iconify-json/<set> packages on npm,
 // built by @iconify/utils. an id that is not in its set is left out, the api
 // still serves it at runtime.

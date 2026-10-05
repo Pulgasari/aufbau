@@ -19,9 +19,10 @@
 // a quoted path is resolved from the root when it starts with /, else from the
 // file's directory. bare specifiers go through the importmap the vendor step left
 // (or `importmap` in this config), a prefix entry whose key is quoted keeps its
-// whole directory. importmap targets are only reached through their keys, so a
-// map written into a page does not keep everything it lists, and the keys in the
-// file that defines the map (one naming at least half of them) count as no use.
+// whole directory, so does a quoted directory under it ('@aufbau/svg/icons/').
+// importmap targets are only reached through their keys, so a map written into a
+// page does not keep everything it lists, and the keys in the file that defines
+// the map (one naming at least half of them) count as no use.
 //
 // a loader that imports by a name, `zugriff.component('Icon')`, is declared in
 // `loaders` with the path its names stand for: every string argument of a call
@@ -76,11 +77,12 @@ async function prune (context) {
     return path.startsWith('/') ? joinPath(out, path) : joinPath(directoryOf(from), path);
   };
 
-  // a bare specifier through the importmap: the file, or a directory for a prefix entry
+  // a bare specifier through the importmap: the file, or a directory for a prefix
+  // entry and anything under it that ends with a slash
   const mapped = specifier => {
     const key = keys.find(key => key === specifier || (key.endsWith('/') && specifier.startsWith(key)));
     if (!key) return null;
-    return { directory: key.endsWith('/') && specifier === key, url: key.endsWith('/') ? imports[key] + specifier.slice(key.length) : imports[key] };
+    return { directory: key.endsWith('/') && specifier.endsWith('/'), url: key.endsWith('/') ? imports[key] + specifier.slice(key.length) : imports[key] };
   };
 
   // :::::: WALK
