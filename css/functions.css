@@ -18,6 +18,18 @@ https://caniuse.com/wf-function
 
 /*//////////// COLOR ////////////*/
 
+@function --color(
+  --value type(<color> | bg | fg | ink | cc) : cc
+) returns <color> {
+  result: if(
+    style(--value: bg)  : var(--color-bg);
+    style(--value: fg)  : var(--color-fg);
+    style(--value: ink) : var(--color-ink);
+    style(--value: cc)  : currentColor;
+    else                : var(--value);
+  );
+}
+
 @function --fallback-color(
   --value type(<color> | bg | fg | ink | cc) : cc
 ) returns <color> {
@@ -39,46 +51,24 @@ https://caniuse.com/wf-function
   );
 }
 
+@function --alpha(
+  --base    type(*) : cc,
+  --opacity <percentage> : 50%,
+  --mode                 : oklch
+) returns <color> {
+  --C: --color(var(--base));
+  result: color-mix(in var(--mode), var(--C) var(--opacity), transparent);
+}
+
 @function --darker(
-  --base   type(<color> | bg | fg | ink | cc) : cc,
-  --amount type(<number> | <percentage>)      : 0.1
+  --base   type(*) : cc,
+  --amount type(<number> | <percentage>) : 0.1
 ) returns <color> {
   --C: --color(var(--base));
   --A: --normalize-amount(var(--amount));
   result: oklch(from var(--C) max(0, l - var(--A)) c h / alpha);
 }
 
-
-
-
-/* every color parameter also takes the palette by name: bg, fg, ink for
-   --color-bg, --color-fg, --color-ink, cc for currentColor.
-   --darker(bg) instead of --darker(var(--color-bg)). the names are listed by
-   hand in each type(), there are only these few. --color() resolves one, on
-   its own as well: color: --color(ink) */
-@function --color(
-  --value type(<color> | bg | fg | ink | cc) : cc
-) returns <color> {
-  result: if(
-    style(--value: bg)  : var(--color-bg);
-    style(--value: fg)  : var(--color-fg);
-    style(--value: ink) : var(--color-ink);
-    style(--value: cc)  : currentColor;
-    else                : var(--value);
-  );
-}
-
-/* transparency */
-@function --alpha(
-  --base    type(<color> | bg | fg | ink | cc) : cc,
-  --opacity <percentage>                       : 50%,
-  --mode                                       : oklch
-) returns <color> {
-  --C: --color(var(--base));
-  result: color-mix(in var(--mode), var(--C) var(--opacity), transparent);
-}
-
-/* two colors mixed, --amount of the second */
 @function --mix(
   --from   type(<color> | bg | fg | ink | cc) : bg,
   --to     type(<color> | bg | fg | ink | cc) : fg,
@@ -88,15 +78,6 @@ https://caniuse.com/wf-function
   --F: --color(var(--from));
   --T: --color(var(--to));
   result: color-mix(in var(--mode), var(--F), var(--T) var(--amount));
-}
-
-/* lightness down or up in oklch, hue and chroma stay */
-@function --darker(
-  --base   type(<color> | bg | fg | ink | cc) : cc,
-  --amount type(<number>  | <percentage>)     : 0.1
-) returns <color> {
-  --C: --color(var(--base));
-  result: oklch(from var(--C) max(0, l - var(--amount)) c h / alpha);
 }
 
 @function --lighter(
