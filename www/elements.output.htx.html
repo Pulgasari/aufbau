@@ -1,0 +1,26 @@
+<!-- elements.output.htx.html: the output- elements of elements.html -->
+
+<section id="md">
+  <h2>output-md</h2>
+  <div class="row"><span>markdown, children</span>
+    <output-md>## prose
+      through **the same** markdown pipeline as `src` and `raw`.
+
+      - lists
+      - [links](https://aufbau.dev)
+    </output-md></div>
+  <div class="row"><span>format="html"</span>
+    <output-md format="html"><p>plain <em>html</em>, rendered as is.</p></output-md></div>
+</section>
+
+<section id="value">
+  <h2>output-value</h2>
+  <div class="row"><span>type="number" locale</span>        <output-value type="number" locale="de-DE" value="1234567.891"></output-value></div>
+  <div class="row"><span>type="date" format="long"</span>     <output-value type="date" format="long" value="2026-04-20"></output-value></div>
+  <div class="row"><span>type="datetime" format="short"</span><output-value type="datetime" format="short" value="2026-04-20T18:30"></output-value></div>
+  <div class="row"><span>type="time" icon</span>              <output-value type="time" icon value="18:30"></output-value></div>
+  <div class="row"><span>type="duration"</span>               <output-value type="duration" value="3725s"></output-value></div>
+  <div class="row"><span>type="color" copy</span>             <output-value type="color" value="#ff79c6" copy></output-value></div>
+  <div class="row"><span>type="email" icon</span>             <output-value type="email" value="hello@aufbau.dev" icon></output-value></div>
+  <div class="row"><span>type="url"</span>                    <output-value type="url" value="https://aufbau.dev"></output-value></div>
+</section>

@@ -1,0 +1,25 @@
+<!-- elements.btn.htx.html: the btn- elements of elements.html -->
+
+<section id="btn">
+  <h2>btn-push · btn-tap · btn-icon</h2>
+  <div class="row"><span>btn-push variant</span>
+    <div class="line">
+      <btn-push>default</btn-push>
+      <btn-push variant="primary">primary</btn-push>
+      <btn-push disabled>disabled</btn-push>
+    </div></div>
+  <div class="row"><span>btn-tap</span>
+    <div class="line">
+      <btn-tap icon="lucide:bell" data-toast="a button said hello">toast me</btn-tap>
+      <btn-tap icon="lucide:shuffle" id="random-theme">random theme</btn-tap>
+    </div></div>
+  <div class="row"><span>btn-icon command</span>
+    <div class="line">
+      <btn-icon command="--like" icon="heart" commandfor="#btn" data-toast="liked"></btn-icon>
+      <btn-icon command="copy"></btn-icon>
+      <btn-icon command="share"></btn-icon>
+      <btn-icon command="more"></btn-icon>
+    </div></div>
+  <div class="row"><span>type="submit|reset"</span>
+    <p class="hint">see the form at the end of the page.</p></div>
+</section>

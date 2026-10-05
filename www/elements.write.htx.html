@@ -1,0 +1,33 @@
+<!-- elements.write.htx.html: the write- elements of elements.html -->
+
+<section id="code">
+  <h2>write-code</h2>
+  <div class="row"><span>lang="json", live</span>
+  <write-code id="gestalt-code" lang="json" actions="copy"></write-code></div>
+  <div class="row">
+    <span>lang="js" editable</span>
+    <write-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</write-code>
+  </div>
+  <div class="row">
+    <span>lang="css" no-copy</span>
+    <write-code lang="css" no-copy code="body { background: var(--color-bg); color: var(--color-fg); }"></write-code>
+  </div>
+</section>
+
+<section id="write-md">
+  <h2>write-md</h2>
+  <div class="row"><span>preview="side"</span>
+    <write-md name="readme" preview="side"># hello
+
+**markdown** with a preview.</write-md></div>
+</section>
+
+<section id="text">
+  <h2>write-text</h2>
+  <div class="row"><span>counter maxlength="280"</span>
+    <write-text name="bio" placeholder="a short bio…" counter maxlength="280"></write-text></div>
+  <div class="row"><span>autogrow 3–12 rows</span>
+    <write-text name="note" autogrow min-rows="3" max-rows="12"></write-text></div>
+  <div class="row"><span>children</span>
+    <write-text name="draft">a first draft.</write-text></div>
+</section>

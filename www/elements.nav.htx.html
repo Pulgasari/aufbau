@@ -1,0 +1,22 @@
+<!-- elements.nav.htx.html: the nav- elements of elements.html -->
+
+<section id="crumbs">
+  <h2>nav-crumbs</h2>
+  <div class="row">
+    <span>children</span>
+    <nav-crumbs>
+      <a href="#">aufbau</a>
+      <a href="#">elements</a>
+      <span>crumbs</span>
+    </nav-crumbs>
+  </div>
+  <div class="row"><span>path + root</span>
+    <nav-crumbs path="/elements/webcomponents/nav-crumbs.js" root="aufbau"></nav-crumbs></div>
+  <div class="row"><span>max="3"</span>
+    <nav-crumbs path="/a/very/deep/folder/for/crumbs" root="root" max="3"></nav-crumbs></div>
+</section>
+
+<section id="toc-section">
+  <h2>nav-toc</h2>
+  <p class="hint">the table of contents in the aside, built from the h2 of this page. the entry of the section you read is marked.</p>
+</section>

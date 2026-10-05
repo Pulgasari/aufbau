@@ -1,0 +1,50 @@
+<!-- elements.aufbau.htx.html: the aufbau- elements of elements.html -->
+
+<section id="loop">
+  <h2>aufbau-loop</h2>
+  <div class="row"><span>mode="carousel"</span>
+    <aufbau-loop mode="carousel" interval="2000" pause-on-hover>
+      <div>eins</div>
+      <div>zwei</div>
+      <div>drei</div>
+    </aufbau-loop></div>
+  <div class="row"><span>mode="marquee"</span>
+    <aufbau-loop id="marquee" mode="marquee" speed="30s" pause-on-hover></aufbau-loop></div>
+  <div class="row"><span>direction="right"</span>
+    <aufbau-loop id="marquee-right" mode="marquee" direction="right" speed="40s"></aufbau-loop></div>
+</section>
+
+<section id="progress">
+  <h2>aufbau-progress</h2>
+  <div class="row"><span>type="standard" show-text</span>
+    <aufbau-progress id="progress-demo" value="40" max="100" show-text></aufbau-progress></div>
+  <div class="row"><span>value</span>
+    <input-number id="progress-value" look="slider" value="40" min="0" max="100" unit="%"></input-number></div>
+  <div class="row"><span>type="scroll"</span>
+    <p class="hint">the bar at the top of the page follows the scroll position.</p></div>
+  <aufbau-progress type="scroll" target="body" style="position: fixed; inset: 0 0 auto; z-index: 10;"></aufbau-progress>
+</section>
+
+<section id="skeleton">
+  <h2>aufbau-skeleton</h2>
+  <div class="row">
+    <span>shape="text" lines="3"</span>
+    <aufbau-skeleton lines="3"></aufbau-skeleton>
+  </div>
+  <div class="row">
+    <span>shape="circle"</span>
+    <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
+  </div>
+  <div class="row">
+    <span>shape="rect"</span>
+    <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton>
+  </div>
+  <div class="row">
+    <span>the skeleton attribute</span>
+    <input-bool id="skeleton-toggle" label="loading"></input-bool>
+  </div>
+  <data-item id="skeleton-card">
+    <div class="avatar"></div>
+    <div>any element takes <code>skeleton</code> for the same look in its own place.</div>
+  </data-item>
+</section>
