@@ -6,17 +6,16 @@
 
 body {
   --line  : color-mix(in oklch, var(--color-fg) 14%, var(--color-bg));
-  --muted : color-mix(in oklch, var(--color-fg) 60%, var(--color-bg));
   --panel : color-mix(in oklch, var(--color-fg) 6%,  var(--color-bg));
   --zebra : color-mix(in oklch, var(--color-fg) 3%,  var(--color-bg));
    /*
   display               : grid;
   grid-template-columns : 14rem minmax(0, 1fr);
    */
-  min-height : 100dvh;
-  max-height : 100dvh;
-  font-size             : 14px;
-  line-height           : 1.5;
+  min-height  : 100dvh;
+  max-height  : 100dvh;
+  font-size   : 14px;
+  line-height : 1.5;
 }
 
 
@@ -28,8 +27,8 @@ body { overflow: hidden; }
 main { overflow-y: auto; min-height: 0; }
   
 #dock {
-  background-color: var(--color-fg);
-  color: var(--color-bg);
+  --bg: --darker(bg, 0.2);
+  --fg: --color(fg);
   
    justify-content: space-between;
    > * { flex-basis: 0; }
@@ -42,18 +41,9 @@ main { overflow-y: auto; min-height: 0; }
 }
   
 /* 1. Make native scrollbar transparent so the progress bar shines through */
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent; /* Allows visual track beneath to show */
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25); /* Subtle overlay handle for dragging */
-  border-radius: 6px;
-}
+::-webkit-scrollbar       { width: 12px; }
+::-webkit-scrollbar-track { --bg: transparent; }
+::-webkit-scrollbar-thumb { --bg: rgba(0, 0, 0, 0.25); }
 
 /* Firefox scrollbar styling */
 html {
@@ -63,34 +53,24 @@ html {
 
 /* 2. Visual background track fixed at the scrollbar position */
 .scroll-progress-track {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 12px;
-  height: 100vh;
-  background-color: --alpha(fg, 0.90); /* Track background color */
-  pointer-events: none; /* Let mouse drag clicks pass through to native scrollbar */
+  position: fixed; top: 0; right: 0;
+  height: 100dvh; width: 12px;
+  --bg: --alpha(fg, 0.90); /* Track background color */
+  pointer-events: none;
   z-index: 9998;
 }
 
 /* 3. Growing progress bar fill */
 .scroll-progress-fill {
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-ink); /* Active progress color */
+  height: 100%; width: 100%;
+  --bg: --color(ink);
   transform-origin: top;
   scale: 1 0;
-
-  /* Dynamically scale height based on scroll position */
   animation: grow-progress linear;
   animation-timeline: scroll(root block);
 }
 
-@keyframes grow-progress {
-  to {
-    scale: 1 1;
-  }
-}
+@keyframes grow-progress { to { scale: 1 1; } }
 
 
 a { color: var(--color-ink); }
@@ -105,10 +85,10 @@ aside {
   top          : 0;
   height       : 100dvh;
   overflow     : auto;
-  padding      : 1rem;
+  --pad        : normal;
   border-right : 1px solid var(--line);
 
-  p { margin-block: .25rem 1rem; color: var(--muted); font-size: .8rem; text-align: start; }
+  p { --fg: var(--muted); text-align: start; }
 }
 
 .list button {
@@ -116,88 +96,83 @@ aside {
   background    : none;
   border        : 0;
   width         : 100%;
-  padding       : .35rem .6rem;
-  border-radius : .4rem;
+  --pad         : small;
   color         : inherit;
   font          : inherit;
   text-align    : left;
   cursor        : pointer;
 
-  &:hover                { background: var(--panel); }
-  &[aria-current="true"] { background: var(--color-ink); color: var(--color-bg); }
+  &:hover                { --bg: var(--panel); }
+  &[aria-current="true"] { --bg: --color(ink); --fg: --color(bg); }
   &:disabled             { opacity: .35; cursor: default; background: none; }
 }
 
 /* :::::: MAIN */
 
-/* minmax(0, 1fr): an auto track grows to its widest child, a long line of code
-   would push the page past the viewport */
 main {
-  display               : grid;
   grid-template-columns : minmax(0, 1fr);
-  align-content         : start;
-  max-width             : 60rem;
+  display       : grid;
+  align-content : start;
+  max-width     : 60rem;
 }
 
 [hidden] { display: none !important; }
 
-section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-content: start; min-width: 0; }
+section { display: grid; grid-template-columns: minmax(0,1fr); --gap: normal; align-content: start; min-width: 0; }
 
 .stage {
-  display       : grid;
-  place-items   : center;
-  min-height    : 16rem;
-  overflow      : hidden;
-  border        : 1px solid var(--line);
-  border-radius : .75rem;
-
+  display     : grid;
+  place-items : center;
+  min-height  : 16rem;
+  overflow    : hidden;
+  border      : 1px solid var(--line);
   canvas { display: block; max-width: 100%; height: auto; }
 }
 
-.hint { color: var(--muted); font-size: .8rem; text-align: start; }   /* aufbau.css justifies p, short lines tear apart */
+.hint { --fg: --muted(0.5); text-align: start; }   /* aufbau.css justifies p, short lines tear apart */
 
 /* @aufbau/gui renders a div of <label><span>name</span><control/></label> */
-.controls > div { display: grid; gap: .75rem; }
+.controls > div { display: grid; --gap: small; }
 .controls label {
-  display               : grid;
+  display : grid;
+  --gap   : normal;
+  align-items : center;
   grid-template-columns : 8rem minmax(0, 1fr);
-  gap                   : 1rem;
-  align-items           : center;
 
   > span { color: var(--muted); }
 }
 
-.panels { display: grid; gap: .75rem; min-width: 0; }
+.panels { display: grid; --gap: normal; min-width: 0; }
 
 /* :::::: TABS */
 
 [role="tablist"] {
-  display       : flex;
-  gap           : .25rem;
+  display : flex;
+  --gap   : tiny;
   border-bottom : 1px solid var(--line);
 }
 
 [role="tab"] {
-  padding       : .5rem .9rem;
+  --pad         : normal;
   background    : none;
   border        : 0;
   margin-bottom : -1px;
   border-bottom : 2px solid transparent;
-  color         : var(--muted);
+  --fg          : --muted();
   font          : inherit;
   cursor        : pointer;
 
-  &[aria-selected="true"] { border-color: var(--color-ink); color: var(--color-fg); }
+  &[aria-selected="true"] { border-color: --color(ink); --fg: --color(fg); }
 }
 
 /* :::::: NARROW */
 
 @media (width < 48rem) {
-  body  { grid-template-columns: minmax(0, 1fr); }
+  body  { grid-template-columns: minmax(0,1fr); }
   aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-  main  { padding: 1rem; }
+  main  { --pad: normal; }
 
-  .list          { display: flex; gap: .25rem; overflow-x: auto; }
+  .list          { display: flex; --gap: tiny; overflow-x: auto; }
   .list button   { width: auto; white-space: nowrap; }
-  .controls label { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+  .controls label { grid-template-columns: minmax(0, 1fr); --gap: tiny; }
 }
