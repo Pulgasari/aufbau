@@ -7,17 +7,13 @@
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <link rel="stylesheet" href="./demo.css"/>
   <style>
-    #form   { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
-    section { gap: .75rem; padding: 1.5rem; scroll-margin-top: 1rem; }
-
-    #form > section:nth-child(odd) { background-color: var(--zebra); }
-
-    #form           { padding: 0; }
-    #form > section { border-radius: 0; }
+    #form   { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; padding: 0; }
+    #form > section { border-radius: 0; --pad: normal; scroll-margin-top: 1rem; }
+    #form > section:nth-child(odd) { --bg: var(--zebra); }
 
     h1, h2, h3, h4, h5, h6 { font-weight: 600; --fg: --muted(50%); }
 
-    small { color: var(--muted); }
+    small { --fg: --muted(); }
 
     /* one variant per row: what it is on the left, the element on the right */
     .row {
@@ -26,12 +22,12 @@
       gap                   : 1rem;
       align-items           : center;
 
-      > span { color: var(--muted); font-size: .8rem; font-family: ui-monospace, monospace; }
+      > span { --fg: --muted(); font-size: .8rem; font-family: ui-monospace, monospace; }
 
       /* inline controls keep their own width, fields take the row */
       > :is(input-bool, btn-push, btn-tap, btn-icon, output-value, aufbau-skeleton[shape="circle"]) { justify-self: start; }
     }
-    .line { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+    .line { display: flex; flex-wrap: wrap; --gap: small; align-items: center; }
 
     /* :::::: ASIDE: filter + toc */
 
@@ -46,7 +42,7 @@
     /* :::::: ELEMENTS */
 
     .flags          { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); --gap: small; }
-    .flags figure   { display: grid; justify-items: center; --gap: tiny; font-size: .75rem; color: var(--muted); }
+    .flags figure   { display: grid; justify-items: center; --gap: tiny; font-size: .75rem; color: --muted(); }
     .flags svg-flag { width: 2.5rem; }
 
     #table-demo td:first-child { white-space: nowrap; }
