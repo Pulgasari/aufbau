@@ -8,15 +8,14 @@
   <link rel="stylesheet" href="./demo.css"/>
   <style>
     #form   { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
-    section { gap: .75rem; padding: 1.5rem; border-radius: .75rem; scroll-margin-top: 1rem; }
+    section { gap: .75rem; padding: 1.5rem; scroll-margin-top: 1rem; }
 
     #form > section:nth-child(odd) { background-color: var(--zebra); }
 
     #form           { padding: 0; }
     #form > section { border-radius: 0; }
 
-    h2      { font-size: 1.25rem; }
-    h3      { font-size: .9rem; font-weight: 600; color: var(--muted); margin-top: .5rem; }
+    h1, h2, h3, h4, h5, h6 { font-weight: 600; --fg: --muted(50%); }
 
     small { color: var(--muted); }
 
@@ -39,15 +38,15 @@
     aside data-filter { display: block; margin-bottom: .75rem; }
     aside nav-toc {
       ol     { list-style: none; }
-      a      { display: block; padding: .2rem .6rem; border-radius: .4rem; color: inherit; text-decoration: none; }
-      a:hover                        { background: var(--panel); }
-      a[aria-current]                { background: var(--color-ink); color: var(--color-bg); }
+      a      { display: block; --pad: small; color: inherit; text-decoration: none; }
+      a:hover         { --bg: var(--panel); }
+      a[aria-current] { --bg: --color(ink); --fg: --color(bg); }
     }
 
     /* :::::: ELEMENTS */
 
-    .flags          { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: .75rem; }
-    .flags figure   { display: grid; justify-items: center; gap: .25rem; font-size: .75rem; color: var(--muted); }
+    .flags          { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); --gap: small; }
+    .flags figure   { display: grid; justify-items: center; --gap: tiny; font-size: .75rem; color: var(--muted); }
     .flags svg-flag { width: 2.5rem; }
 
     #table-demo td:first-child { white-space: nowrap; }
@@ -57,35 +56,35 @@
       place-items     : center;
       aspect-ratio    : 1;
       background      : color-mix(in oklch, var(--color-ink) calc(var(--mix) * 1%), var(--color-bg));
-      color           : var(--color-fg);
+      --fg            : var(--color-fg);
       font-weight     : 600;
     }
-    #index data-index[viewmode="list"] data-item { aspect-ratio: auto; padding: .75rem; place-items: start; }
+    #index data-index[viewmode="list"] data-item { aspect-ratio: auto; --pad: normal; place-items: start; }
 
     #loop aufbau-loop[mode="carousel"] { 
-      block-size: 8rem; border: 1px solid var(--line); border-radius: .75rem;
+      block-size: 8rem; border: 1px;
       > div { display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; }
     }
     #loop aufbau-loop[mode="marquee"] span { padding-inline: 1.5rem; font-family: ui-monospace, monospace; }
 
     #keyboard textarea {
-      width: 100%; min-height: 4rem; padding: .5rem;
-      border: 1px solid var(--line); border-radius: .4rem;
+      width: 100%; min-height: 4rem; --pad: small;
+      border: 1px;
       background: var(--panel); color: inherit; font: inherit;
     }
 
     #div is(div-x, div-y) { 
-      gap: .5rem; padding: .5rem; border: 1px dashed var(--line); border-radius: .5rem;
-      > span { padding: .25rem .75rem; border-radius: .4rem; background: var(--panel); }
+      border: 1px; --gap: small; --pad: small; 
+      > span { --bg: var(--panel); --pad: tiny; }
     }
 
-    #skeleton data-item { display: grid; grid-template-columns: 3rem 1fr; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: .75rem; }
-    #skeleton .avatar { width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--color-ink); }
+    #skeleton data-item { display: grid; grid-template-columns: 3rem 1fr; --gap: small; --pad: small; align-items: center; border: 1px;  }
+    #skeleton .avatar   { width: 3rem; aspect-ratio: 1; border-radius: 50%; --bg: --color(ink); }
 
     media-video, media-audio, media-file { max-width: 32rem; }
 
     @media (width < 48rem) {
-      .row     { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+      .row     { grid-template-columns: minmax(0, 1fr); --gap: tiny; }
       section  { padding: 1rem; }
     }
   </style>
