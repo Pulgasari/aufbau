@@ -1,5 +1,23 @@
 /* flow.css */
 
+/* flow-base.css */
+
+[data-flow] {
+  display: grid;
+
+  /* Apply dynamic values parsed from data-flow expression */
+  grid-template-columns : var(--flow-cols, auto);
+  grid-template-rows    : var(--flow-rows, auto);
+  grid-auto-flow        : var(--flow-auto, row);
+  gap                   : var(--flow-gap, 1rem);
+}
+
+/* Enforce aspect-ratio on all direct children if square token is present */
+[data-flow] > * {
+  aspect-ratio: var(--flow-aspect, unset);
+}
+
+
 /*
 
 :::::: 1. grid-functions ::::::
