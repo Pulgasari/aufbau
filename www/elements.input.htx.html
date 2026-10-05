@@ -1,0 +1,102 @@
+<!-- elements.input.htx.html: the input- elements of elements.html -->
+
+<section id="input">
+  <h2>input-value</h2>
+  <h3>type, one tag each</h3>
+  <div class="row"><span>input-text</span>     <input-text     name="text"     placeholder="a title" icon="lucide:type"></input-text></div>
+  <div class="row"><span>input-email</span>    <input-email    name="email"    placeholder="mail@example.com"></input-email></div>
+  <div class="row"><span>input-password</span> <input-password name="password" autocomplete="new-password"></input-password></div>
+  <div class="row"><span>input-phone</span>    <input-phone    name="phone"></input-phone></div>
+  <div class="row"><span>input-url</span>      <input-url      name="url"      placeholder="https://aufbau.dev"></input-url></div>
+  <div class="row"><span>input-number</span>   <input-number   name="number"   value="42"></input-number></div>
+  <div class="row"><span>input-year</span>     <input-year     name="year"     value="2026"></input-year></div>
+  <div class="row"><span>input-date</span>     <input-date     name="date"></input-date></div>
+  <div class="row"><span>input-datetime</span> <input-datetime name="datetime"></input-datetime></div>
+  <div class="row"><span>input-time</span>     <input-time     name="time"></input-time></div>
+  <div class="row"><span>input-duration</span> <input-duration name="duration" value="90s"></input-duration></div>
+  <div class="row"><span>input-color</span>    <input-color    name="color"    value="#ff79c6"></input-color></div>
+  <div class="row"><span>input-country</span>  <input-country  name="country"  value="de"></input-country></div>
+  <div class="row"><span>input-emoji</span>    <input-emoji    name="emoji"></input-emoji></div>
+  <div class="row"><span>input-icon</span>     <input-icon     name="icon"></input-icon></div>
+  <div class="row"><span>input-chips</span>    <input-chips    name="tags"     value="js,css"></input-chips></div>
+  <h3>look</h3>
+  <div class="row">
+    <span>look="stepper", the page's font size</span>
+    <input-number id="font-size" name="fontSize" look="stepper" value="14" min="10" max="22" step="1"></input-number>
+  </div>
+  <div class="row">
+    <span>look="swatch", the theme</span>
+    <input-color id="theme-swatch" name="themeColor" look="swatch" value="#ff79c6"></input-color>
+  </div>
+  <div class="row">
+    <span>look="slider" range</span>
+    <input-number name="price" look="slider" range value="20..80" min="0" max="100" unit="€"></input-number>
+  </div>
+  <div class="row">
+    <span>look="slider", a duration</span>
+    <input-duration name="length" look="slider" value="2s" min="0s" max="10s" step="0.5"></input-duration>
+  </div>
+  <h3>options</h3>
+  <div class="row"><span>look="combobox" searchable, the theme</span>
+    <input-value id="theme-picker" name="theme" look="combobox" searchable placeholder="theme…"></input-value></div>
+  <div class="row"><span>look="segments", the look</span>
+    <input-value id="look-picker" name="look" look="segments" value="flat">
+      <input-option>flat</input-option>
+      <input-option>rounded</input-option>
+    </input-value></div>
+  <div class="row"><span>look="cycle", the mode</span>
+    <input-value id="mode-picker" name="mode" look="cycle" value="auto">
+      <input-option value="auto"  icon="lucide:sun-moon">auto</input-option>
+      <input-option value="dark"  icon="lucide:moon">dark</input-option>
+      <input-option value="light" icon="lucide:sun">light</input-option>
+    </input-value></div>
+  <div class="row"><span>look="radio", runtime options</span>
+    <div class="line">
+      <btn-tap id="option-add" icon="lucide:plus">add an option</btn-tap>
+      <btn-tap id="option-drop" icon="lucide:minus">drop the last</btn-tap>
+    </div></div>
+  <div class="row"><span></span>
+    <input-value id="option-picker" name="options" look="radio">
+      <input-option value="one">one</input-option>
+      <input-option value="two">two</input-option>
+      <input-option value="off" disabled>disabled</input-option>
+    </input-value></div>
+  <div class="row"><span>look="radio" multiple</span>
+    <input-value name="languages" look="radio" multiple value="js,css">
+      <input-option value="js">JavaScript</input-option>
+      <input-option value="css">CSS</input-option>
+      <input-option value="html">HTML</input-option>
+    </input-value></div>
+  <div class="row"><span>look="segments" icons-only</span>
+    <input-value name="align" look="segments" icons-only value="left">
+      <input-option value="left"   icon="lucide:align-left">left</input-option>
+      <input-option value="center" icon="lucide:align-center">center</input-option>
+      <input-option value="right"  icon="lucide:align-right">right</input-option>
+    </input-value></div>
+  <h3>input-bool</h3>
+  <div class="row"><span>look="switch", dark mode</span>
+    <input-bool id="dark-toggle" name="dark" label="dark"></input-bool></div>
+  <div class="row"><span>look="checkbox" required</span>
+    <input-bool name="terms" look="checkbox" label="accept the terms" required></input-bool></div>
+  <div class="row"><span>look="button" icon icon-checked</span>
+    <input-bool name="pinned" look="button" label="pin" icon="lucide:pin-off" icon-checked="lucide:pin"></input-bool></div>
+  <h3>constraints</h3>
+  <div class="row">
+    <span>required minlength="3"</span>
+    <input-text name="nickname" required minlength="3" placeholder="at least 3 characters"></input-text>
+  </div>
+  <div class="row">
+    <span>pattern="[a-z]+"</span>
+    <input-text name="slug" pattern="[a-z]+" placeholder="lowercase only"></input-text>
+  </div>
+</section>
+
+<section id="file">
+  <h2>input-file</h2>
+  <div class="row"><span>look="dropzone" accept="image/*"</span>
+    <input-file name="avatar" accept="image/*"></input-file></div>
+  <div class="row"><span>look="button" multiple</span>
+    <input-file name="attachments" look="button" multiple text="pick files"></input-file></div>
+  <div class="row"><span>look="list" max-size="5MB"</span>
+    <input-file name="documents" look="list" accept=".pdf,.docx" multiple max-size="5242880"></input-file></div>
+</section>

@@ -1,0 +1,72 @@
+<!-- elements.pop.htx.html: the pop- elements of elements.html -->
+
+<section id="menu">
+  <h2>pop-menu</h2>
+  <div class="row"><span>placement</span>
+    <input-value id="menu-placement" look="cycle" value="bottom-start">
+      <input-option>bottom-start</input-option>
+      <input-option>bottom-end</input-option>
+      <input-option>top-start</input-option>
+      <input-option>top-end</input-option>
+    </input-value></div>
+  <div class="row"><span>entries</span>
+    <pop-menu id="menu-demo" label="file" icon="lucide:folder">
+      <button type="button" data-toast="open…">open</button>
+      <button type="button" data-toast="saved">save</button>
+      <button type="button" data-toast="exported" data-type="success">export</button>
+    </pop-menu></div>
+</section>
+
+<section id="modal">
+  <h2>pop-modal</h2>
+  <div class="row"><span>show() resolves on close</span>
+    <btn-tap id="modal-open" icon="lucide:square-arrow-out-up-right">open the modal</btn-tap></div>
+  <pop-modal id="modal-demo" heading="choose">
+    <p>the modal resolves with the value it closes with.</p>
+    <div class="line">
+      <btn-push data-close="yes" variant="primary">yes</btn-push>
+      <btn-push data-close="no">no</btn-push>
+    </div>
+  </pop-modal>
+</section>
+
+<section id="over">
+  <h2>pop-over</h2>
+  <div class="row"><span>commandfor</span>
+    <div class="line">
+      <btn-tap command="toggle-popover" commandfor="over-demo" icon="lucide:info">info</btn-tap>
+      <pop-over id="over-demo" placement="bottom-start"><p>any content over the page, not modal.</p></pop-over>
+    </div></div>
+</section>
+
+<section id="prompt">
+  <h2>pop-prompt</h2>
+  <div class="row"><span>confirm, prompt, alert</span>
+    <div class="line">
+      <btn-tap id="prompt-confirm">confirm</btn-tap>
+      <btn-tap id="prompt-text">prompt</btn-tap>
+      <btn-tap id="prompt-date">prompt a date</btn-tap>
+      <btn-tap id="prompt-alert">alert</btn-tap>
+    </div></div>
+</section>
+
+<section id="tip">
+  <h2>pop-tip</h2>
+  <div class="row"><span>for the element before</span>
+    <div class="line">
+      <btn-icon command="save"></btn-icon>
+      <pop-tip>save (ctrl+s)</pop-tip>
+    </div></div>
+</section>
+
+<section id="toast">
+  <h2>pop-toast</h2>
+  <div class="row">
+    <span>type</span>
+    <div class="line">
+      <btn-tap data-toast="just so you know" data-type="info">info</btn-tap>
+      <btn-tap data-toast="it worked"        data-type="success">success</btn-tap>
+      <btn-tap data-toast="careful now"      data-type="warning">warning</btn-tap>
+      <btn-tap data-toast="that went wrong"  data-type="error">error</btn-tap>
+    </div></div>
+</section>

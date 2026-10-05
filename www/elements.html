@@ -110,466 +110,40 @@
   <form id="form">
 
     <!-- :::::: APP- -->
-
-    <section id="config">
-      <h2>app-config</h2>
-      <p class="hint">a form from a spec of @aufbau/gui, every field an input-* control.</p>
-      <app-config id="config-demo"></app-config>
-    </section>
-
-    <section id="keyboard">
-      <h2>app-keyboard</h2>
-      <div class="row"><span>layout</span>
-        <input-value id="keyboard-layout" look="segments" value="de">
-          <input-option>de</input-option>
-          <input-option>en</input-option>
-        </input-value></div>
-      <textarea id="keyboard-target" placeholder="type with the keys below"></textarea>
-      <app-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></app-keyboard>
-    </section>
+    <htx-part src='./elements.app.htx.html'></htx-part>
 
     <!-- :::::: BTN :::::: -->
-
-    <section id="btn">
-      <h2>btn-push · btn-tap · btn-icon</h2>
-      <div class="row"><span>btn-push variant</span>
-        <div class="line">
-          <btn-push>default</btn-push>
-          <btn-push variant="primary">primary</btn-push>
-          <btn-push disabled>disabled</btn-push>
-        </div></div>
-      <div class="row"><span>btn-tap</span>
-        <div class="line">
-          <btn-tap icon="lucide:bell" data-toast="a button said hello">toast me</btn-tap>
-          <btn-tap icon="lucide:shuffle" id="random-theme">random theme</btn-tap>
-        </div></div>
-      <div class="row"><span>btn-icon command</span>
-        <div class="line">
-          <btn-icon command="--like" icon="heart" commandfor="#btn" data-toast="liked"></btn-icon>
-          <btn-icon command="copy"></btn-icon>
-          <btn-icon command="share"></btn-icon>
-          <btn-icon command="more"></btn-icon>
-        </div></div>
-      <div class="row"><span>type="submit|reset"</span>
-        <p class="hint">see the form at the end of the page.</p></div>
-    </section>
+    <htx-part src='./elements.btn.htx.html'></htx-part>
 
     <!-- :::::: DATA :::::: -->
-
-    <section id="filter">
-      <h2>data-filter</h2>
-      <p class="hint">filters other elements by their text. the aside uses one over the table of contents.</p>
-      <div class="row"><span>target="#flag-list figure"</span>
-        <data-filter target="#flag-list figure" placeholder="filter countries…"></data-filter></div>
-    </section>
-
-    <section id="index">
-      <h2>data-index · data-item</h2>
-      <div class="row"><span>viewmode</span>
-        <input-value id="index-viewmode" look="segments" value="grid">
-          <input-option>grid</input-option>
-          <input-option>list</input-option>
-          <input-option>gallery</input-option>
-          <input-option>masonry</input-option>
-        </input-value></div>
-      <div class="row"><span>item-size</span>
-        <input-number id="index-size" look="slider" value="96" min="48" max="200" step="8" unit="px"></input-number></div>
-      <data-index id="index-demo" viewmode="grid" item-size="96px" gap=".75rem">
-        <data-item shape="circle"   style="--mix: 80">circle</data-item>
-        <data-item shape="square"   style="--mix: 60">square</data-item>
-        <data-item shape="rounded"  style="--mix: 40">rounded</data-item>
-        <data-item shape="squircle" style="--mix: 20">squircle</data-item>
-        <data-item shape="1rem 0"   style="--mix: 70">1rem 0</data-item>
-        <data-item shape="rounded"  style="--mix: 50">rounded</data-item>
-        <data-item shape="circle"   style="--mix: 30">circle</data-item>
-        <data-item shape="squircle" style="--mix: 90">squircle</data-item>
-      </data-index>
-    </section>
-
-    <section id="list">
-      <h2>data-list</h2>
-      <p class="hint">a source for native list= completion. here its options are the element names of this page.</p>
-      <data-list id="element-names"></data-list>
-      <div class="row">
-        <span>list="element-names"</span>
-        <input-text name="datalist" list="element-names" placeholder="btn-…"></input-text>
-      </div>
-    </section>
-
-    <section id="table">
-      <h2>data-table</h2>
-      <p class="hint">the elements of this page as data, sortable by every column.</p>
-      <data-table id="table-demo" sortable></data-table>
-    </section>
-
-    <section id="tree">
-      <h2>data-tree · data-node</h2>
-      <div class="row"><span>children</span>
-        <data-tree>
-          <data-node label="aufbau" icon="lucide:folder" expanded>
-            <data-node label="api" icon="lucide:folder">
-              <data-node label="gestalt.js" icon="lucide:file-code" value="api/gestalt.js"></data-node>
-              <data-node label="index.js"   icon="lucide:file-code" value="api/index.js"></data-node>
-            </data-node>
-            <data-node label="css" icon="lucide:folder">
-              <data-node label="themes.css" icon="lucide:file" value="css/themes.css"></data-node>
-            </data-node>
-          </data-node>
-        </data-tree></div>
-      <div class="row"><span>nodes, from js</span>
-        <data-tree id="tree-nodes"></data-tree></div>
-    </section>
+    <htx-part src='./elements.data.htx.html'></htx-part>
 
     <!-- :::::: DIV :::::: -->
-
-    <section id="div">
-      <h2>div-x · div-y</h2>
-      <div class="row"><span>div-x</span>
-        <div-x><span>one</span><span>two</span><span>three</span></div-x></div>
-      <div class="row"><span>div-y</span>
-        <div-y><span>one</span><span>two</span><span>three</span></div-y></div>
-    </section>
+    <htx-part src='./elements.div.htx.html'></htx-part>
 
     <!-- :::::: EMBED :::::: -->
-
-    <section id="embed">
-      <h2>embed-content</h2>
-      <p class="hint">nothing is requested from the provider before the click.</p>
-      <div class="row"><span>youtube</span>
-        <embed-content src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" label="a video"></embed-content></div>
-    </section>
+    <htx-part src='./elements.embed.htx.html'></htx-part>
 
     <!-- :::::: INPUT :::::: -->
-
-    <section id="input">
-      <h2>input-value</h2>
-      <h3>type, one tag each</h3>
-      <div class="row"><span>input-text</span>     <input-text     name="text"     placeholder="a title" icon="lucide:type"></input-text></div>
-      <div class="row"><span>input-email</span>    <input-email    name="email"    placeholder="mail@example.com"></input-email></div>
-      <div class="row"><span>input-password</span> <input-password name="password" autocomplete="new-password"></input-password></div>
-      <div class="row"><span>input-phone</span>    <input-phone    name="phone"></input-phone></div>
-      <div class="row"><span>input-url</span>      <input-url      name="url"      placeholder="https://aufbau.dev"></input-url></div>
-      <div class="row"><span>input-number</span>   <input-number   name="number"   value="42"></input-number></div>
-      <div class="row"><span>input-year</span>     <input-year     name="year"     value="2026"></input-year></div>
-      <div class="row"><span>input-date</span>     <input-date     name="date"></input-date></div>
-      <div class="row"><span>input-datetime</span> <input-datetime name="datetime"></input-datetime></div>
-      <div class="row"><span>input-time</span>     <input-time     name="time"></input-time></div>
-      <div class="row"><span>input-duration</span> <input-duration name="duration" value="90s"></input-duration></div>
-      <div class="row"><span>input-color</span>    <input-color    name="color"    value="#ff79c6"></input-color></div>
-      <div class="row"><span>input-country</span>  <input-country  name="country"  value="de"></input-country></div>
-      <div class="row"><span>input-emoji</span>    <input-emoji    name="emoji"></input-emoji></div>
-      <div class="row"><span>input-icon</span>     <input-icon     name="icon"></input-icon></div>
-      <div class="row"><span>input-chips</span>    <input-chips    name="tags"     value="js,css"></input-chips></div>
-      <h3>look</h3>
-      <div class="row">
-        <span>look="stepper", the page's font size</span>
-        <input-number id="font-size" name="fontSize" look="stepper" value="14" min="10" max="22" step="1"></input-number>
-      </div>
-      <div class="row">
-        <span>look="swatch", the theme</span>
-        <input-color id="theme-swatch" name="themeColor" look="swatch" value="#ff79c6"></input-color>
-      </div>
-      <div class="row">
-        <span>look="slider" range</span>
-        <input-number name="price" look="slider" range value="20..80" min="0" max="100" unit="€"></input-number>
-      </div>
-      <div class="row">
-        <span>look="slider", a duration</span>
-        <input-duration name="length" look="slider" value="2s" min="0s" max="10s" step="0.5"></input-duration>
-      </div>
-      <h3>options</h3>
-      <div class="row"><span>look="combobox" searchable, the theme</span>
-        <input-value id="theme-picker" name="theme" look="combobox" searchable placeholder="theme…"></input-value></div>
-      <div class="row"><span>look="segments", the look</span>
-        <input-value id="look-picker" name="look" look="segments" value="flat">
-          <input-option>flat</input-option>
-          <input-option>rounded</input-option>
-        </input-value></div>
-      <div class="row"><span>look="cycle", the mode</span>
-        <input-value id="mode-picker" name="mode" look="cycle" value="auto">
-          <input-option value="auto"  icon="lucide:sun-moon">auto</input-option>
-          <input-option value="dark"  icon="lucide:moon">dark</input-option>
-          <input-option value="light" icon="lucide:sun">light</input-option>
-        </input-value></div>
-      <div class="row"><span>look="radio", runtime options</span>
-        <div class="line">
-          <btn-tap id="option-add" icon="lucide:plus">add an option</btn-tap>
-          <btn-tap id="option-drop" icon="lucide:minus">drop the last</btn-tap>
-        </div></div>
-      <div class="row"><span></span>
-        <input-value id="option-picker" name="options" look="radio">
-          <input-option value="one">one</input-option>
-          <input-option value="two">two</input-option>
-          <input-option value="off" disabled>disabled</input-option>
-        </input-value></div>
-      <div class="row"><span>look="radio" multiple</span>
-        <input-value name="languages" look="radio" multiple value="js,css">
-          <input-option value="js">JavaScript</input-option>
-          <input-option value="css">CSS</input-option>
-          <input-option value="html">HTML</input-option>
-        </input-value></div>
-      <div class="row"><span>look="segments" icons-only</span>
-        <input-value name="align" look="segments" icons-only value="left">
-          <input-option value="left"   icon="lucide:align-left">left</input-option>
-          <input-option value="center" icon="lucide:align-center">center</input-option>
-          <input-option value="right"  icon="lucide:align-right">right</input-option>
-        </input-value></div>
-      <h3>input-bool</h3>
-      <div class="row"><span>look="switch", dark mode</span>
-        <input-bool id="dark-toggle" name="dark" label="dark"></input-bool></div>
-      <div class="row"><span>look="checkbox" required</span>
-        <input-bool name="terms" look="checkbox" label="accept the terms" required></input-bool></div>
-      <div class="row"><span>look="button" icon icon-checked</span>
-        <input-bool name="pinned" look="button" label="pin" icon="lucide:pin-off" icon-checked="lucide:pin"></input-bool></div>
-      <h3>constraints</h3>
-      <div class="row">
-        <span>required minlength="3"</span>
-        <input-text name="nickname" required minlength="3" placeholder="at least 3 characters"></input-text>
-      </div>
-      <div class="row">
-        <span>pattern="[a-z]+"</span>
-        <input-text name="slug" pattern="[a-z]+" placeholder="lowercase only"></input-text>
-      </div>
-    </section>
-
-    <section id="file">
-      <h2>input-file</h2>
-      <div class="row"><span>look="dropzone" accept="image/*"</span>
-        <input-file name="avatar" accept="image/*"></input-file></div>
-      <div class="row"><span>look="button" multiple</span>
-        <input-file name="attachments" look="button" multiple text="pick files"></input-file></div>
-      <div class="row"><span>look="list" max-size="5MB"</span>
-        <input-file name="documents" look="list" accept=".pdf,.docx" multiple max-size="5242880"></input-file></div>
-    </section>
+    <htx-part src='./elements.input.htx.html'></htx-part>
 
     <!-- :::::: MEDIA :::::: -->
-
-    <section id="audio">
-      <h2>media-audio</h2>
-      <div class="row"><span>layout="card"</span>
-        <media-audio src="assets/international.mp3" label="International"></media-audio></div>
-      <div class="row"><span>layout="minimal"</span>
-        <media-audio layout="minimal" src="assets/international.mp3" label="International"></media-audio></div>
-    </section>
-
-    <section id="media-file">
-      <h2>media-file</h2>
-      <div class="row"><span>an mp3</span>
-        <media-file src="assets/international.mp3"></media-file></div>
-      <div class="row"><span>anything else</span>
-        <media-file src="demo.css" label="demo.css"></media-file></div>
-    </section>
-
-    <section id="video">
-      <h2>media-video</h2>
-      <div class="row">
-        <span>src, loop</span>
-        <media-video src="assets/chollima_on_the_wing_720p.mp4" loop></media-video>
-      </div>
-    </section>
-
-    <section id="wave">
-      <h2>media-wave</h2>
-      <div class="row"><span>peaks interactive</span>
-        <media-wave id="wave-demo" interactive progress="30" style="block-size: 4rem;"></media-wave></div>
-      <div class="row"><span>range-start range-end</span>
-        <media-wave id="wave-range" range-start="25" range-end="60" progress="45" style="block-size: 4rem;"></media-wave></div>
-    </section>
+    <htx-part src='./elements.media.htx.html'></htx-part>
 
     <!-- :::::: NAV :::::: -->
-
-    <section id="crumbs">
-      <h2>nav-crumbs</h2>
-      <div class="row">
-        <span>children</span>
-        <nav-crumbs>
-          <a href="#">aufbau</a>
-          <a href="#">elements</a>
-          <span>crumbs</span>
-        </nav-crumbs>
-      </div>
-      <div class="row"><span>path + root</span>
-        <nav-crumbs path="/elements/webcomponents/nav-crumbs.js" root="aufbau"></nav-crumbs></div>
-      <div class="row"><span>max="3"</span>
-        <nav-crumbs path="/a/very/deep/folder/for/crumbs" root="root" max="3"></nav-crumbs></div>
-    </section>
-
-    <section id="toc-section">
-      <h2>nav-toc</h2>
-      <p class="hint">the table of contents in the aside, built from the h2 of this page. the entry of the section you read is marked.</p>
-    </section>
+    <htx-part src='./elements.nav.htx.html'></htx-part>
 
     <!-- :::::: OUTPUT :::::: -->
-
-    <section id="md">
-      <h2>output-md</h2>
-      <div class="row"><span>markdown, children</span>
-        <output-md>## prose
-          through **the same** markdown pipeline as `src` and `raw`.
-
-          - lists
-          - [links](https://aufbau.dev)
-        </output-md></div>
-      <div class="row"><span>format="html"</span>
-        <output-md format="html"><p>plain <em>html</em>, rendered as is.</p></output-md></div>
-    </section>
-
-    <section id="value">
-      <h2>output-value</h2>
-      <div class="row"><span>type="number" locale</span>        <output-value type="number" locale="de-DE" value="1234567.891"></output-value></div>
-      <div class="row"><span>type="date" format="long"</span>     <output-value type="date" format="long" value="2026-04-20"></output-value></div>
-      <div class="row"><span>type="datetime" format="short"</span><output-value type="datetime" format="short" value="2026-04-20T18:30"></output-value></div>
-      <div class="row"><span>type="time" icon</span>              <output-value type="time" icon value="18:30"></output-value></div>
-      <div class="row"><span>type="duration"</span>               <output-value type="duration" value="3725s"></output-value></div>
-      <div class="row"><span>type="color" copy</span>             <output-value type="color" value="#ff79c6" copy></output-value></div>
-      <div class="row"><span>type="email" icon</span>             <output-value type="email" value="hello@aufbau.dev" icon></output-value></div>
-      <div class="row"><span>type="url"</span>                    <output-value type="url" value="https://aufbau.dev"></output-value></div>
-    </section>
+    <htx-part src='./elements.output.htx.html'></htx-part>
 
     <!-- :::::: POP :::::: -->
-
-    <section id="menu">
-      <h2>pop-menu</h2>
-      <div class="row"><span>placement</span>
-        <input-value id="menu-placement" look="cycle" value="bottom-start">
-          <input-option>bottom-start</input-option>
-          <input-option>bottom-end</input-option>
-          <input-option>top-start</input-option>
-          <input-option>top-end</input-option>
-        </input-value></div>
-      <div class="row"><span>entries</span>
-        <pop-menu id="menu-demo" label="file" icon="lucide:folder">
-          <button type="button" data-toast="open…">open</button>
-          <button type="button" data-toast="saved">save</button>
-          <button type="button" data-toast="exported" data-type="success">export</button>
-        </pop-menu></div>
-    </section>
-
-    <section id="modal">
-      <h2>pop-modal</h2>
-      <div class="row"><span>show() resolves on close</span>
-        <btn-tap id="modal-open" icon="lucide:square-arrow-out-up-right">open the modal</btn-tap></div>
-      <pop-modal id="modal-demo" heading="choose">
-        <p>the modal resolves with the value it closes with.</p>
-        <div class="line">
-          <btn-push data-close="yes" variant="primary">yes</btn-push>
-          <btn-push data-close="no">no</btn-push>
-        </div>
-      </pop-modal>
-    </section>
-
-    <section id="over">
-      <h2>pop-over</h2>
-      <div class="row"><span>commandfor</span>
-        <div class="line">
-          <btn-tap command="toggle-popover" commandfor="over-demo" icon="lucide:info">info</btn-tap>
-          <pop-over id="over-demo" placement="bottom-start"><p>any content over the page, not modal.</p></pop-over>
-        </div></div>
-    </section>
-
-    <section id="prompt">
-      <h2>pop-prompt</h2>
-      <div class="row"><span>confirm, prompt, alert</span>
-        <div class="line">
-          <btn-tap id="prompt-confirm">confirm</btn-tap>
-          <btn-tap id="prompt-text">prompt</btn-tap>
-          <btn-tap id="prompt-date">prompt a date</btn-tap>
-          <btn-tap id="prompt-alert">alert</btn-tap>
-        </div></div>
-    </section>
-
-    <section id="tip">
-      <h2>pop-tip</h2>
-      <div class="row"><span>for the element before</span>
-        <div class="line">
-          <btn-icon command="save"></btn-icon>
-          <pop-tip>save (ctrl+s)</pop-tip>
-        </div></div>
-    </section>
-
-    <section id="toast">
-      <h2>pop-toast</h2>
-      <div class="row">
-        <span>type</span>
-        <div class="line">
-          <btn-tap data-toast="just so you know" data-type="info">info</btn-tap>
-          <btn-tap data-toast="it worked"        data-type="success">success</btn-tap>
-          <btn-tap data-toast="careful now"      data-type="warning">warning</btn-tap>
-          <btn-tap data-toast="that went wrong"  data-type="error">error</btn-tap>
-        </div></div>
-    </section>
+    <htx-part src='./elements.pop.htx.html'></htx-part>
 
     <!-- :::::: SVG :::::: -->
-
-    <section id="flag">
-      <h2>svg-flag</h2>
-      <div class="row">
-        <span>variant</span>
-        <div class="line">
-          <svg-flag code="de" variant="circle"></svg-flag>
-          <svg-flag code="de" variant="square"></svg-flag>
-          <svg-flag code="de" variant="4x3"></svg-flag>
-        </div></div>
-      <div class="flags" id="flag-list"></div>
-    </section>
-
-    <section id="icon">
-      <h2>svg-icon</h2>
-      <div class="row"><span>mode="mask"</span>
-        <div class="line">
-          <svg-icon icon="lucide:house"></svg-icon>
-          <svg-icon icon="lucide:search"></svg-icon>
-          <svg-icon icon="lucide:settings"></svg-icon>
-          <svg-icon icon="save"></svg-icon>
-          <small>the last one is an alias</small>
-        </div></div>
-      <div class="row"><span>size, color</span>
-        <div class="line">
-          <svg-icon icon="lucide:heart" size="1rem"></svg-icon>
-          <svg-icon icon="lucide:heart" size="2rem" color="var(--color-ink)"></svg-icon>
-          <svg-icon icon="lucide:heart" size="3rem" color="var(--color-ink)"></svg-icon>
-        </div></div>
-      <div class="row"><span>mode="image"</span>
-        <div class="line">
-          <svg-icon icon="logos:javascript" mode="image" size="2rem"></svg-icon>
-          <svg-icon icon="logos:css-3"      mode="image" size="2rem"></svg-icon>
-          <svg-icon icon="logos:html-5"     mode="image" size="2rem"></svg-icon>
-        </div></div>
-    </section>
+    <htx-part src='./elements.svg.htx.html'></htx-part>
 
     <!-- :::::: WRITE :::::: -->
-
-    <section id="code">
-      <h2>write-code</h2>
-      <div class="row"><span>lang="json", live</span>
-      <write-code id="gestalt-code" lang="json" actions="copy"></write-code></div>
-      <div class="row">
-        <span>lang="js" editable</span>
-        <write-code lang="js" editable>await aufbau.gestalt.set({ theme: 'petrol', look: 'rounded' });</write-code>
-      </div>
-      <div class="row">
-        <span>lang="css" no-copy</span>
-        <write-code lang="css" no-copy code="body { background: var(--color-bg); color: var(--color-fg); }"></write-code>
-      </div>
-    </section>
-
-    <section id="write-md">
-      <h2>write-md</h2>
-      <div class="row"><span>preview="side"</span>
-        <write-md name="readme" preview="side"># hello
-
-**markdown** with a preview.</write-md></div>
-    </section>
-
-    <section id="text">
-      <h2>write-text</h2>
-      <div class="row"><span>counter maxlength="280"</span>
-        <write-text name="bio" placeholder="a short bio…" counter maxlength="280"></write-text></div>
-      <div class="row"><span>autogrow 3–12 rows</span>
-        <write-text name="note" autogrow min-rows="3" max-rows="12"></write-text></div>
-      <div class="row"><span>children</span>
-        <write-text name="draft">a first draft.</write-text></div>
-    </section>
+    <htx-part src='./elements.write.htx.html'></htx-part>
 
     <!-- :::::: FORM :::::: -->
 
@@ -584,55 +158,7 @@
     </section>
 
     <!-- :::::: AUFBAU :::::: -->
-
-    <section id="loop">
-      <h2>aufbau-loop</h2>
-      <div class="row"><span>mode="carousel"</span>
-        <aufbau-loop mode="carousel" interval="2000" pause-on-hover>
-          <div>eins</div>
-          <div>zwei</div>
-          <div>drei</div>
-        </aufbau-loop></div>
-      <div class="row"><span>mode="marquee"</span>
-        <aufbau-loop id="marquee" mode="marquee" speed="30s" pause-on-hover></aufbau-loop></div>
-      <div class="row"><span>direction="right"</span>
-        <aufbau-loop id="marquee-right" mode="marquee" direction="right" speed="40s"></aufbau-loop></div>
-    </section>
-
-    <section id="progress">
-      <h2>aufbau-progress</h2>
-      <div class="row"><span>type="standard" show-text</span>
-        <aufbau-progress id="progress-demo" value="40" max="100" show-text></aufbau-progress></div>
-      <div class="row"><span>value</span>
-        <input-number id="progress-value" look="slider" value="40" min="0" max="100" unit="%"></input-number></div>
-      <div class="row"><span>type="scroll"</span>
-        <p class="hint">the bar at the top of the page follows the scroll position.</p></div>
-      <aufbau-progress type="scroll" target="body" style="position: fixed; inset: 0 0 auto; z-index: 10;"></aufbau-progress>
-    </section>
-    
-    <section id="skeleton">
-      <h2>aufbau-skeleton</h2>
-      <div class="row">
-        <span>shape="text" lines="3"</span>
-        <aufbau-skeleton lines="3"></aufbau-skeleton>
-      </div>
-      <div class="row">
-        <span>shape="circle"</span>
-        <aufbau-skeleton shape="circle" size="3rem"></aufbau-skeleton>
-      </div>
-      <div class="row">
-        <span>shape="rect"</span>
-        <aufbau-skeleton shape="rect" size="100% 6rem"></aufbau-skeleton>
-      </div>
-      <div class="row">
-        <span>the skeleton attribute</span>
-        <input-bool id="skeleton-toggle" label="loading"></input-bool>
-      </div>
-      <data-item id="skeleton-card">
-        <div class="avatar"></div>
-        <div>any element takes <code>skeleton</code> for the same look in its own place.</div>
-      </data-item>
-    </section>
+    <htx-part src='./elements.aufbau.htx.html'></htx-part>
 
   </form>
   </main>
@@ -640,6 +166,11 @@
   <script type="module">
     import aufbau        from '@aufbau/api';
     import getFormValues from '@domina/methods/getFormValues.js';
+    import { settled }   from '@htx/elements';
+
+    // the sections of the form come from elements.<namespace>.htx.html, through
+    // <htx-part>. everything below reads them by id, so they have to be in first
+    await settled();
 
     await aufbau.boot();
     if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');

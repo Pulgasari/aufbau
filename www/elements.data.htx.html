@@ -1,0 +1,65 @@
+<!-- elements.data.htx.html: the data- elements of elements.html -->
+
+<section id="filter">
+  <h2>data-filter</h2>
+  <p class="hint">filters other elements by their text. the aside uses one over the table of contents.</p>
+  <div class="row"><span>target="#flag-list figure"</span>
+    <data-filter target="#flag-list figure" placeholder="filter countries…"></data-filter></div>
+</section>
+
+<section id="index">
+  <h2>data-index · data-item</h2>
+  <div class="row"><span>viewmode</span>
+    <input-value id="index-viewmode" look="segments" value="grid">
+      <input-option>grid</input-option>
+      <input-option>list</input-option>
+      <input-option>gallery</input-option>
+      <input-option>masonry</input-option>
+    </input-value></div>
+  <div class="row"><span>item-size</span>
+    <input-number id="index-size" look="slider" value="96" min="48" max="200" step="8" unit="px"></input-number></div>
+  <data-index id="index-demo" viewmode="grid" item-size="96px" gap=".75rem">
+    <data-item shape="circle"   style="--mix: 80">circle</data-item>
+    <data-item shape="square"   style="--mix: 60">square</data-item>
+    <data-item shape="rounded"  style="--mix: 40">rounded</data-item>
+    <data-item shape="squircle" style="--mix: 20">squircle</data-item>
+    <data-item shape="1rem 0"   style="--mix: 70">1rem 0</data-item>
+    <data-item shape="rounded"  style="--mix: 50">rounded</data-item>
+    <data-item shape="circle"   style="--mix: 30">circle</data-item>
+    <data-item shape="squircle" style="--mix: 90">squircle</data-item>
+  </data-index>
+</section>
+
+<section id="list">
+  <h2>data-list</h2>
+  <p class="hint">a source for native list= completion. here its options are the element names of this page.</p>
+  <data-list id="element-names"></data-list>
+  <div class="row">
+    <span>list="element-names"</span>
+    <input-text name="datalist" list="element-names" placeholder="btn-…"></input-text>
+  </div>
+</section>
+
+<section id="table">
+  <h2>data-table</h2>
+  <p class="hint">the elements of this page as data, sortable by every column.</p>
+  <data-table id="table-demo" sortable></data-table>
+</section>
+
+<section id="tree">
+  <h2>data-tree · data-node</h2>
+  <div class="row"><span>children</span>
+    <data-tree>
+      <data-node label="aufbau" icon="lucide:folder" expanded>
+        <data-node label="api" icon="lucide:folder">
+          <data-node label="gestalt.js" icon="lucide:file-code" value="api/gestalt.js"></data-node>
+          <data-node label="index.js"   icon="lucide:file-code" value="api/index.js"></data-node>
+        </data-node>
+        <data-node label="css" icon="lucide:folder">
+          <data-node label="themes.css" icon="lucide:file" value="css/themes.css"></data-node>
+        </data-node>
+      </data-node>
+    </data-tree></div>
+  <div class="row"><span>nodes, from js</span>
+    <data-tree id="tree-nodes"></data-tree></div>
+</section>

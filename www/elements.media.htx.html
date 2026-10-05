@@ -1,0 +1,33 @@
+<!-- elements.media.htx.html: the media- elements of elements.html -->
+
+<section id="audio">
+  <h2>media-audio</h2>
+  <div class="row"><span>layout="card"</span>
+    <media-audio src="assets/international.mp3" label="International"></media-audio></div>
+  <div class="row"><span>layout="minimal"</span>
+    <media-audio layout="minimal" src="assets/international.mp3" label="International"></media-audio></div>
+</section>
+
+<section id="media-file">
+  <h2>media-file</h2>
+  <div class="row"><span>an mp3</span>
+    <media-file src="assets/international.mp3"></media-file></div>
+  <div class="row"><span>anything else</span>
+    <media-file src="demo.css" label="demo.css"></media-file></div>
+</section>
+
+<section id="video">
+  <h2>media-video</h2>
+  <div class="row">
+    <span>src, loop</span>
+    <media-video src="assets/chollima_on_the_wing_720p.mp4" loop></media-video>
+  </div>
+</section>
+
+<section id="wave">
+  <h2>media-wave</h2>
+  <div class="row"><span>peaks interactive</span>
+    <media-wave id="wave-demo" interactive progress="30" style="block-size: 4rem;"></media-wave></div>
+  <div class="row"><span>range-start range-end</span>
+    <media-wave id="wave-range" range-start="25" range-end="60" progress="45" style="block-size: 4rem;"></media-wave></div>
+</section>

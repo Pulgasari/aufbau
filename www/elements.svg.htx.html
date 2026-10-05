@@ -1,0 +1,37 @@
+<!-- elements.svg.htx.html: the svg- elements of elements.html -->
+
+<section id="flag">
+  <h2>svg-flag</h2>
+  <div class="row">
+    <span>variant</span>
+    <div class="line">
+      <svg-flag code="de" variant="circle"></svg-flag>
+      <svg-flag code="de" variant="square"></svg-flag>
+      <svg-flag code="de" variant="4x3"></svg-flag>
+    </div></div>
+  <div class="flags" id="flag-list"></div>
+</section>
+
+<section id="icon">
+  <h2>svg-icon</h2>
+  <div class="row"><span>mode="mask"</span>
+    <div class="line">
+      <svg-icon icon="lucide:house"></svg-icon>
+      <svg-icon icon="lucide:search"></svg-icon>
+      <svg-icon icon="lucide:settings"></svg-icon>
+      <svg-icon icon="save"></svg-icon>
+      <small>the last one is an alias</small>
+    </div></div>
+  <div class="row"><span>size, color</span>
+    <div class="line">
+      <svg-icon icon="lucide:heart" size="1rem"></svg-icon>
+      <svg-icon icon="lucide:heart" size="2rem" color="var(--color-ink)"></svg-icon>
+      <svg-icon icon="lucide:heart" size="3rem" color="var(--color-ink)"></svg-icon>
+    </div></div>
+  <div class="row"><span>mode="image"</span>
+    <div class="line">
+      <svg-icon icon="logos:javascript" mode="image" size="2rem"></svg-icon>
+      <svg-icon icon="logos:css-3"      mode="image" size="2rem"></svg-icon>
+      <svg-icon icon="logos:html-5"     mode="image" size="2rem"></svg-icon>
+    </div></div>
+</section>

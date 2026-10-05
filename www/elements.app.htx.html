@@ -1,0 +1,18 @@
+<!-- elements.app.htx.html: the app- elements of elements.html -->
+
+<section id="config">
+  <h2>app-config</h2>
+  <p class="hint">a form from a spec of @aufbau/gui, every field an input-* control.</p>
+  <app-config id="config-demo"></app-config>
+</section>
+
+<section id="keyboard">
+  <h2>app-keyboard</h2>
+  <div class="row"><span>layout</span>
+    <input-value id="keyboard-layout" look="segments" value="de">
+      <input-option>de</input-option>
+      <input-option>en</input-option>
+    </input-value></div>
+  <textarea id="keyboard-target" placeholder="type with the keys below"></textarea>
+  <app-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></app-keyboard>
+</section>
