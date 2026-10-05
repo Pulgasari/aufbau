@@ -1,7 +1,6 @@
 @import url("https://code.pulgasari.dev/aufbau/css/aufbau.css");
-@import url("https://code.pulgasari.dev/aufbau/css/animations.css");
 
-    * { font-family: "Hubot Sans"; line-height: 1; }
+* { font-family: "Hubot Sans"; line-height: 1; }
 
 a { color: currentcolor; }
 
