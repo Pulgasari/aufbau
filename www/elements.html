@@ -16,12 +16,9 @@
     small { --fg: --muted(); }
 
     /* one variant per row: what it is on the left, the element on the right */
-    .row {
-      display               : grid;
-      grid-template-columns : 12rem minmax(0, 1fr);
-      gap                   : 1rem;
-      align-items           : center;
-
+    .row { 
+      display: grid; grid-template-columns : 12rem minmax(0, 1fr);
+      align-items: center; --gap: normal;
       > span { --fg: --muted(); font-size: .8rem; font-family: ui-monospace, monospace; }
 
       /* inline controls keep their own width, fields take the row */
@@ -640,6 +637,7 @@
     import getFormValues from '@domina/methods/getFormValues.js';
 
     await aufbau.boot();
+    if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
 
     const { gestalt } = aufbau;
     const $ = id => document.getElementById(id);
