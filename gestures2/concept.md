@@ -17,6 +17,59 @@ gestures(element, {
 element.addEventListener('swipeleft', event => next());   // the same, as a dom event
 ```
 
+better:
+
+```js
+import gestures from '@aufbau/gestures';
+
+//
+gestures.apply (element, {
+  onTap        : gesture => select(gesture.target),
+  onSwipeLeft  : gesture => next(),
+  onSwipeRight : { minimumSpeed: 1, handler: gesture => previous() },
+});
+
+//
+const applyGestures = gestures.apply ({
+  onTap        : gesture => select (gesture.target),
+  onSwipeLeft  : gesture => next(),
+  onSwipeRight : { minimumSpeed: 1, handler: gesture => previous() },
+});
+
+applyGestures(element1);
+applyGestures(element2, element3, ...);
+```
+
+### on the element prototype
+
+💀💀💀 don't do that! it's super evil and dangerous!!! 💀💀💀
+
+```js
+// prototype :: variante 1
+import '@aufbau/gestures/prototype/addGestureListener.js';
+
+element.addGestureListener('swipeleft', event => next());
+```
+
+```js
+// prototype :: variante 2
+import '@aufbau/gestures/prototype/onGesture.js';
+import '@aufbau/gestures/prototype/onGestures.js';
+
+element.onGesture('swipeleft', event => next());
+element.onGestures({
+  tap        : gesture => select (gesture.target),
+  swipeleft  : gesture => next(),
+  swiperight : { minimumSpeed: 1, handler: gesture => previous() },
+});
+// they work all: swipeleft, swipeLeft, onswipeleft, onSwipeleft, oNsWiPeLefT
+```
+
+```js
+//
+element.addEventListener('swipeleft', event => next());   // the same, as a dom event
+```
+
 ## layers
 
 1. **tracker** measures. one per element, one session from the first pointer
