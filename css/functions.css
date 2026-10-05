@@ -25,6 +25,32 @@ https://caniuse.com/wf-function
   );
 }
 
+/* Adjusts lightness with signed integers: -100 (black) to +100 (white) */
+@function --adjust-lightness(
+  --base            : cc,
+  --amount <number> : 0
+) returns <color> {
+  --C: --color(var(--base));
+  result: oklch(
+    from var(--C) 
+    clamp(0, calc(l + var(--amount) / 100), 1) 
+    c 
+    h / alpha
+  );
+}
+
+@function --darker(
+  --base   type(<color> | bg | fg | ink | cc) : cc,
+  --amount type(<number> | <percentage>)      : 0.1
+) returns <color> {
+  --C: --color(var(--base));
+  --A: --normalize-amount(var(--amount));
+  result: oklch(from var(--C) max(0, l - var(--A)) c h / alpha);
+}
+
+
+
+
 /* every color parameter also takes the palette by name: bg, fg, ink for
    --color-bg, --color-fg, --color-ink, cc for currentColor.
    --darker(bg) instead of --darker(var(--color-bg)). the names are listed by
@@ -67,7 +93,7 @@ https://caniuse.com/wf-function
 /* lightness down or up in oklch, hue and chroma stay */
 @function --darker(
   --base   type(<color> | bg | fg | ink | cc) : cc,
-  --amount <number>                           : 0.1
+  --amount type(<number>  | <percentage>)     : 0.1
 ) returns <color> {
   --C: --color(var(--base));
   result: oklch(from var(--C) max(0, l - var(--amount)) c h / alpha);
@@ -124,38 +150,42 @@ https://caniuse.com/wf-function
 }
 
 @function --hue-shift(
-  --base  type(<color> | bg | fg | ink | cc) : ink,
-  --angle <angle>                            : 30deg
+  --base  type(<color> | <custom-ident>) : ink,
+  --angle <angle>                        : 30deg
 ) returns <color> {
   --C: --color(var(--base));
   result: oklch(from var(--C) l c calc(h + var(--angle) / 1deg) / alpha);
 }
 
-@function --complement(--color type(<color> | bg | fg | ink | cc) : ink) returns <color> {
-  result: --hue-shift(var(--color), 180deg);
+@function --complement(
+  --base type(<color> || <custom-ident>) : ink
+) returns <color> {
+  result: --hue-shift(var(--base), 180deg);
 }
 
 /* the neighbours on the wheel: --analogous(ink, -1) and (ink, 1) */
 @function --analogous(
-  --color type(<color> | bg | fg | ink | cc) : ink,
+  --base type(<color> || <custom-ident>) : ink
   --step  <number>                           : 1,
   --angle <angle>                            : 30deg
 ) returns <color> {
-  result: --hue-shift(var(--color), calc(var(--angle) * var(--step)));
+  result: --hue-shift(var(--base), calc(var(--angle) * var(--step)));
 }
 
 /* black or white, whichever reads on --background. the lightness is pushed
    against a threshold and clamped, so the result is exactly 0 or 1 */
 @function --on(
-  --background type(<color> | bg | fg | ink | cc) : ink,
-  --threshold  <number>                           : 0.62
+  --base type(<color> || <custom-ident>) : ink
+  --threshold  <number>                   : 0.62
 ) returns <color> {
   --C: --color(var(--background));
   result: oklch(from var(--C) clamp(0, (var(--threshold) - l) * 1000, 1) 0 0);
 }
 
 /* the text color between fg and bg: 0 is fg, 100% the background */
-@function --muted(--amount <percentage> : 50%) returns <color> {
+@function --muted(
+  --amount <percentage> : 50%
+) returns <color> {
   result: color-mix(in oklch, var(--color-fg), var(--color-bg) var(--amount));
 }
 
@@ -170,7 +200,7 @@ https://caniuse.com/wf-function
 
 /* one color, its interaction states: hover, active, focus, disabled */
 @function --state(
-  --base  type(<color> | bg | fg | ink | cc)               : ink,
+  ----base type(<color> || <custom-ident>) : ink,
   --state type(normal | hover | active | focus | disabled) : normal
 ) returns <color> {
   --C: --color(var(--base));
