@@ -1,3 +1,27 @@
+/* work in progress (do not use. do not care.) */
+
+@function --space(
+  --size type(<number> | tiny | small | normal | large | huge) : normal
+) returns <length> {
+  --steps: if(
+    style(--size: tiny)   :  1; /* 0.25rem */
+    style(--size: small)  :  2; /* 0.5rem  */
+    style(--size: normal) :  4; /* 1rem    */
+    style(--size: large)  :  6; /* 1.5rem  */
+    style(--size: huge)   : 10; /* 2.5rem  */
+    else                  : var(--size);
+  );
+  result: calc(var(--unit, 0.25rem) * var(--steps));
+}
+
+/* a modular scale:
+--step(0) is the base, every step --ratio times more.
+font sizes and larger spaces off one ratio 
+*/
+@function --step(--n <number> : 0) returns <length> {
+  result: calc(var(--base-size, 1rem) * pow(var(--ratio, 1.25), var(--n)));
+}
+
 /* Helper to calculate the next smaller step size */
 @function --next-smaller-step(--current <number>) returns <number> {
   result: if(
@@ -104,3 +128,25 @@
   --steps: --resolve-space-step(var(--size), var(--parent-step, 4));
   result: calc(var(--unit, 0.25rem) * var(--steps));
 }
+
+
+/*
+@function --step(--n <number> : 0) returns <length> {
+  result: calc(var(--base-size, 1rem) * pow(var(--ratio, 1.25), var(--n)));
+}
+
+@def $base.size = '1rem';
+@def $ratio     = '1.25';
+
+:: --step ( <number> ) => <length>
+fn --step ( $n = 0 )   => {
+  result: calc($base.size * pow(--ratio, $n));
+}
+
+
+      >>  css identifier
+  @   >>  keyword
+  $   >>  identifier (inline/helpers)
+  --  >>  identifier (custom)
+  <>  >>  identifier (type)
+*/
