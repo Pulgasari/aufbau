@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>@aufbau/elements</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
-  <link rel="stylesheet" href="./demo.css"/>
+  <!--<link rel="stylesheet" href="./demo.css"/>-->
   <style>
     #form   { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; padding: 0; }
     #form > section { border-radius: 0; --pad: normal; scroll-margin-top: 1rem; }
@@ -645,6 +645,7 @@
     const $ = id => document.getElementById(id);
 
     import { htx, render } from '@htx/preact';
+    loadStylesheet('./demo.css');
 
     function Dock () {
       return htx`
@@ -832,6 +833,40 @@
     });
 
     dump();
+
+
+    /**
+ * Appends a stylesheet link element to document head with cache busting.
+ * 
+ * @param {string} href - The URL of the CSS file.
+ * @param {Object} [options] - Optional settings.
+ * @param {string} [options.id] - ID attribute for the link tag.
+ * @param {string|number} [options.version] - Custom version parameter (defaults to timestamp).
+ * @returns {Promise<HTMLLinkElement>} Resolves when the CSS file is loaded.
+ */
+function loadStylesheet(href, options = {}) {
+  return new Promise((resolve, reject) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+
+    if (options.id) {
+      link.id = options.id;
+    }
+
+    // Determine cache-busting param (uses Date.now() if no version is provided)
+    const version = options.version ?? Date.now();
+    const separator = href.includes('?') ? '&' : '?';
+    
+    link.href = `${href}${separator}v=${encodeURIComponent(version)}`;
+
+    link.onload = () => resolve(link);
+    link.onerror = () => reject(new Error(`Failed to load stylesheet: ${href}`));
+
+    document.head.appendChild(link);
+  });
+}
+
   </script>
 </body>
 </html>
