@@ -1,16 +1,14 @@
 /* flow-engine.js */
 
-const
-ensurePrefix = (str) => (prefix) => str.startsWith(prefix) ? str : prefix + str,
-ensureDashed = (str) => ensurePrefix('--flow-');
+/* flow-engine.js */
 
-const
-setToken = (el) => (k,v) => el.style.setProperty(ensureDashed(k), v);
+// Functional helper methods for curried property manipulation
+const ensurePrefix = (prefix) => (str) => str.startsWith(prefix) ? str : prefix + str;
+const ensureDashed = ensurePrefix('--flow-');
 
-const
-entries = Object.entries,
-keys    = Object.keys,
-values  = Object.values;
+const setToken = (el) => (k, v) => el.style.setProperty(ensureDashed(k), v);
+
+const entries = Object.entries;
 
 class FlowEngine {
   static init() {
@@ -22,8 +20,8 @@ class FlowEngine {
 
       let cols = 'unset';
       let rows = 'unset';
-      let autoFlow = 'row';
-      let aspect = 'unset';
+      let auto = 'row';
+      let ratio = 'unset';
 
       for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
@@ -47,31 +45,28 @@ class FlowEngine {
           i++; // Skip the minSize token in next iteration
         }
 
-        // 4. Square Modifier
+        // 4. Square / Ratio Modifier
         else if (token === 'square') {
-          aspect = '1 / 1';
+          ratio = '1 / 1';
         }
 
         // 5. Direction Modifier
         else if (token === 'col' || token === 'column') {
-          autoFlow = 'column';
+          auto = 'column';
         } else if (token === 'dense') {
-          autoFlow += ' dense';
+          auto += ' dense';
         }
       }
 
-      // Write evaluated values directly into CSS Custom Properties
+      // Curried setter bound to current element
       const tkn = setToken(el);
-      tkn('cols', cols);
-      tkn('rows', rows);
-      tkn('auto', auto);
-      tkn('ratio', ratio);
+      const applyTokens = (obj) => entries(obj).forEach(([k, v]) => tkn(k, v));
 
-      const tkns (obj) => entries(obj).map(tkn);
-      tkns({ cols, rows, auto, ratio });
+      // Batch update CSS Custom Properties (--flow-cols, --flow-rows, --flow-auto, --flow-ratio)
+      applyTokens({ cols, rows, auto, ratio });
     };
 
-    // Watch for dynamic DOM changes
+    // Watch for dynamic DOM attribute updates
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((m) => {
         if (m.type === 'attributes' && m.attributeName === 'data-flow') {
