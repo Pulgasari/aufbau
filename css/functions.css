@@ -13,10 +13,17 @@ https://caniuse.com/wf-function
 
 /* custom light-dark() function that works for any value */
 /* found here: https://www.bram.us/2025/09/30/css-custom-light-dark/ */
-@function --light-dark(--l, --d) { result: if(color-scheme(dark): var(--d); else: var(--l)); }
-@function --ld(--L, --D) { result: if(color-scheme(dark): var(--D); else: var(--L)); }
+@function --light-dark(--l, --d) { result: if(color-scheme(dark): var(--d); else: var(--l)); }     
+@function         --ld(--L, --D) { result: if(color-scheme(dark): var(--D); else: var(--L)); }
 
 /*//////////// COLOR ////////////*/
+
+@function --fallback-color(
+  --value type(<color> | bg | fg | ink | cc) : cc
+) returns <color> {
+    result: var(--value)
+  );
+}
 
 /* every color parameter also takes the palette by name: bg, fg, ink for
    --color-bg, --color-fg, --color-ink, cc for currentColor.
