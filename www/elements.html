@@ -13,12 +13,14 @@
     #form > section:nth-child(odd) { --bg: var(--zebra); }
 
     h1, h2, h3, h4, h5, h6 { font-weight: 600; --fg: --muted(50%); }
-    h2 { --bg: --alpha(ink, 0.5); }
+    h1 { --bg: --alpha(ink, 0.2); --pad: big; text-align: center; text-transform: uppercase; }
 
     small { --fg: --muted(0.5); }
+    /*
     small { --fg: --color(fg, muted, 0.5); }
     small { color: --muted(0.5); }
     small { color: --color(fg, muted, 0.5); }
+    */
 
 
     /* one variant per row: what it is on the left, the element on the right */
@@ -110,18 +112,18 @@
   
 <main>
 <form id="form"><!-- the whole page is one form: every named control lands in getFormValues() at the end -->
-<!--|::: APP    :::|--><h2>app-</h2>    <htx-part src='./elements.app.htx.html'></htx-part>
-<!--|::: BTN    :::|--><h2>btn-</h2>    <htx-part src='./elements.btn.htx.html'></htx-part>
-<!--|::: DATA   :::|--><h2>data-</h2>   <htx-part src='./elements.data.htx.html'></htx-part>
-<!--|::: DIV    :::|--><h2>div-</h2>    <htx-part src='./elements.div.htx.html'></htx-part>
-<!--|::: EMBED  :::|--><h2>embed-</h2>  <htx-part src='./elements.embed.htx.html'></htx-part>
-<!--|::: INPUT  :::|--><h2>input-</h2>  <htx-part src='./elements.input.htx.html'></htx-part>
-<!--|::: MEDIA  :::|--><h2>media-</h2>  <htx-part src='./elements.media.htx.html'></htx-part>
-<!--|::: NAV    :::|--><h2>nav-</h2>    <htx-part src='./elements.nav.htx.html'></htx-part>
-<!--|::: OUTPUT :::|--><h2>output-</h2> <htx-part src='./elements.output.htx.html'></htx-part>
-<!--|::: POP    :::|--><h2>pop-</h2>    <htx-part src='./elements.pop.htx.html'></htx-part>
-<!--|::: SVG    :::|--><h2>svg-</h2>    <htx-part src='./elements.svg.htx.html'></htx-part>
-<!--|::: WRITE  :::|--><h2>write-</h2>  <htx-part src='./elements.write.htx.html'></htx-part>
+<!--|::: APP    :::|--><h1>app-</h1>    <htx-part src='./elements.app.htx.html'></htx-part>
+<!--|::: BTN    :::|--><h1>btn-</h1>    <htx-part src='./elements.btn.htx.html'></htx-part>
+<!--|::: DATA   :::|--><h1>data-</h1>   <htx-part src='./elements.data.htx.html'></htx-part>
+<!--|::: DIV    :::|--><h1>div-</h1>    <htx-part src='./elements.div.htx.html'></htx-part>
+<!--|::: EMBED  :::|--><h1>embed-</h1>  <htx-part src='./elements.embed.htx.html'></htx-part>
+<!--|::: INPUT  :::|--><h1>input-</h1>  <htx-part src='./elements.input.htx.html'></htx-part>
+<!--|::: MEDIA  :::|--><h1>media-</h1>  <htx-part src='./elements.media.htx.html'></htx-part>
+<!--|::: NAV    :::|--><h1>nav-</h1>    <htx-part src='./elements.nav.htx.html'></htx-part>
+<!--|::: OUTPUT :::|--><h1>output-</h1> <htx-part src='./elements.output.htx.html'></htx-part>
+<!--|::: POP    :::|--><h1>pop-</h1>    <htx-part src='./elements.pop.htx.html'></htx-part>
+<!--|::: SVG    :::|--><h1>svg-</h1>    <htx-part src='./elements.svg.htx.html'></htx-part>
+<!--|::: WRITE  :::|--><h1>write-</h1>  <htx-part src='./elements.write.htx.html'></htx-part>
 
     <!-- :::::: FORM :::::: -->
 
