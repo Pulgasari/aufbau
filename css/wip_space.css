@@ -34,3 +34,73 @@
 @function --space(--size <number> : 4) returns <length> {
   result: calc(var(--unit, 0.25rem) * var(--size));
 }
+
+
+
+
+
+/* ----------------------------------------------------------------
+   1. INTERNAL ENGINE / RESOLVER (--resolve-space-step)
+   ---------------------------------------------------------------- */
+
+/* Helper: Maps size keywords to numeric step units */
+@function --keyword-to-step(--kw) returns <number> {
+  result: if(
+    style(--kw: tiny)   : 1;  /* 0.25rem */
+    style(--kw: small)  : 2;  /* 0.50rem */
+    style(--kw: normal) : 4;  /* 1.00rem */
+    style(--kw: large)  : 6;  /* 1.50rem */
+    style(--kw: huge)   : 10; /* 2.50rem */
+    else                : 0
+  );
+}
+
+/* Helper: Clamps and steps down in scale */
+@function --step-down(--current <number>) returns <number> {
+  result: if(
+    var(--current) > 6 : 6;
+    var(--current) > 4 : 4;
+    var(--current) > 2 : 2;
+    else               : 1
+  );
+}
+
+/* Resolver: Evaluates context automatically on the calling element */
+@function --resolve-space-step(
+  --size : normal,
+  --parent <number> : 4
+) returns <number> {
+  /* Internal context detection on the calling element */
+  --has-bg: if(style(--bg: *) : true; else: false);
+  --has-border: if(style(--border: *) : true; else: false);
+  --is-framed: if(style(--has-bg: true) or style(--has-border: true) : true; else: false);
+
+  --kw-step: --keyword-to-step(var(--size));
+
+  result: if(
+    /* 1. Keyword mode: tiny, small, normal, large, huge */
+    var(--kw-step) > 0 : var(--kw-step);
+
+    /* 2. Relative step-down mode: true */
+    style(--size: true) : --step-down(var(--parent));
+
+    /* 3. Auto-framed mode: auto */
+    style(--size: auto) : if(style(--is-framed: true) : --step-down(var(--parent)); else: var(--parent));
+
+    /* 4. Direct numeric value: e.g. 8 */
+    else : var(--size)
+  );
+}
+
+
+/* ----------------------------------------------------------------
+   2. PUBLIC CLEAN API (--space)
+   ---------------------------------------------------------------- */
+
+@function --space(
+  --size : normal
+) returns <length> {
+  /* Implicitly reads --parent-step from the calling element's context */
+  --steps: --resolve-space-step(var(--size), var(--parent-step, 4));
+  result: calc(var(--unit, 0.25rem) * var(--steps));
+}
