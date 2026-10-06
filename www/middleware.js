@@ -8,7 +8,7 @@ function getCookie (cookieHeader, name) {
 }
 
 export default async function middleware (request) {
-  alert('middleware!'); // test
+  //alert('middleware!'); // test
   
   const startTime = performance.now();
   const url       = new URL(request.url);
