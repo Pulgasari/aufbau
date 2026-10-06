@@ -1,5 +1,39 @@
 <!-- htx: partial -->
+<script>
+  const path = './..';
+  const src  = (slug) => `${path}/elements.${slug}.htx.html`;
+</script>
+
 <section>
   <h1>@aufbau/elements</h1>
   <p>placeholder for /elements/</p>
 </section>
+
+<form id="form"><!-- the whole page is one form: every named control lands in getFormValues() at the end -->
+<!--|::: APP    :::|--><h1>app-</h1>    <htx-part src=${src('app')} />
+<!--|::: BTN    :::|--><h1>btn-</h1>    <htx-part src=${src('btn')} />
+<!--|::: DATA   :::|--><h1>data-</h1>   <htx-part src=${src('data')} />
+<!--|::: DIV    :::|--><h1>div-</h1>    <htx-part src=${src('div')} />
+<!--|::: EMBED  :::|--><h1>embed-</h1>  <htx-part src=${src('embed')} />
+<!--|::: INPUT  :::|--><h1>input-</h1>  <htx-part src=${src('input')} />
+<!--|::: MEDIA  :::|--><h1>media-</h1>  <htx-part src=${src('media')} />
+<!--|::: MOCK   :::|--><h1>mock-</h1>   <htx-part src=${src('mock')} />
+<!--|::: NAV    :::|--><h1>nav-</h1>    <htx-part src=${src('nav')} />
+<!--|::: OUTPUT :::|--><h1>output-</h1> <htx-part src=${src('output')} />
+<!--|::: POP    :::|--><h1>pop-</h1>    <htx-part src=${src('pop')} />
+<!--|::: SVG    :::|--><h1>svg-</h1>    <htx-part src=${src('svg')} />
+<!--|::: WIDGET :::|--><h1>widget-</h1> <htx-part src=${src('widget')} />
+<!--|::: WRITE  :::|--><h1>write-</h1>  <htx-part src=${src('write')} />
+<!--|:mn: FORM   :::|-->
+<section id="form-values">
+  <h2>getFormValues()</h2>
+  <p class="hint">every named control of this page sits in one form. the values below update on every change.</p>
+  <div class="line">
+    <btn-push type="submit" variant="primary">submit, checks validity</btn-push>
+    <btn-push type="reset">reset</btn-push>
+  </div>
+  <write-code id="form-dump" lang="json" actions="copy"></write-code>
+</section>
+<!-- :::::: AUFBAU :::::: -->
+<htx-part src=${src('aufbau')} />
+</form>
