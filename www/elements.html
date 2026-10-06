@@ -92,12 +92,6 @@
 </head>
 <body>
 
-  <!-- Visual progress bar placed under the scrollbar area -->
-<div class="scroll-progress-track">
-  <div class="scroll-progress-fill"></div>
-</div>
-
-<htx-part src='./dock.htx.html'></htx-part>
 
 
 <!--
@@ -109,7 +103,14 @@
   </aside>
 -->
   
-  
+<app-root>
+<!-- Visual progress bar placed under the scrollbar area -->
+<div class="scroll-progress-track">
+  <div class="scroll-progress-fill"></div>
+</div>
+
+<htx-part src='./dock.htx.html'></htx-part>
+
 <main>
 <form id="form"><!-- the whole page is one form: every named control lands in getFormValues() at the end -->
 <!--|::: APP    :::|--><h1>app-</h1>    <htx-part src='./elements.app.htx.html'></htx-part>
@@ -126,24 +127,22 @@
 <!--|::: SVG    :::|--><h1>svg-</h1>    <htx-part src='./elements.svg.htx.html'></htx-part>
 <!--|::: WIDGET :::|--><h1>widget-</h1> <htx-part src='./elements.widget.htx.html'></htx-part>
 <!--|::: WRITE  :::|--><h1>write-</h1>  <htx-part src='./elements.write.htx.html'></htx-part>
-
-    <!-- :::::: FORM :::::: -->
-
-    <section id="form-values">
-      <h2>getFormValues()</h2>
-      <p class="hint">every named control of this page sits in one form. the values below update on every change.</p>
-      <div class="line">
-        <btn-push type="submit" variant="primary">submit, checks validity</btn-push>
-        <btn-push type="reset">reset</btn-push>
-      </div>
-      <write-code id="form-dump" lang="json" actions="copy"></write-code>
-    </section>
-
-    <!-- :::::: AUFBAU :::::: -->
-    <htx-part src='./elements.aufbau.htx.html'></htx-part>
-
-  </form>
-  </main>
+<!--|::: FORM   :::|-->
+<section id="form-values">
+  <h2>getFormValues()</h2>
+  <p class="hint">every named control of this page sits in one form. the values below update on every change.</p>
+  <div class="line">
+    <btn-push type="submit" variant="primary">submit, checks validity</btn-push>
+    <btn-push type="reset">reset</btn-push>
+  </div>
+  <write-code id="form-dump" lang="json" actions="copy"></write-code>
+</section>
+<!-- :::::: AUFBAU :::::: -->
+<htx-part src='./elements.aufbau.htx.html'></htx-part>
+  
+</form>
+</main>
+</app-root>
 
   <script type="module">
     import aufbau        from '@aufbau/api';
