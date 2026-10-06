@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <script src="./fouc.js"></script>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <link rel="stylesheet" href="./demo.css"/>
   <title>@aufbau/gestures · playground</title>
+  
   <style>
     :root { color-scheme: light dark; --line: color-mix(in oklch, currentColor 20%, transparent); --soft: color-mix(in oklch, currentColor 6%, transparent); --accent: #ff79c6; }
     *    { box-sizing: border-box; }
@@ -81,6 +85,12 @@
   </style>
 </head>
 <body>
+
+  <app-root>
+
+<htx-part src='./dock.htx.html'></htx-part>
+
+<main>
 
   <header>
     <h1>@aufbau/gestures · playground</h1>
@@ -202,7 +212,19 @@
     <div id="log"></div>
   </section>
 
-  <script type="module">
+</main>
+</app-root>
+  
+<script type="module">
+  import aufbau          from '@aufbau/api';
+  import { settled }     from '@htx/elements';
+  //import { htx, render } from '@htx/preact';
+
+    aufbau.boot();
+    // the sections of the form come from elements.<namespace>.htx.html, through
+    // <htx-part>. everything below reads them by id, so they have to be in first
+    await settled();
+    
     import gestures, { dismissable, draggable, pullable, sortable, transformable } from '@aufbau/gestures';
 
     const $ = id => document.getElementById(id);
