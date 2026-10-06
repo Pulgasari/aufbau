@@ -52,39 +52,6 @@ main { overflow-y: auto; min-height: 0; }
 #dock a   { color: var(--color-fg); }
 #dock div { display: block; flex: 0 1 auto; }
 
-  
-/* 1. Make native scrollbar transparent so the progress bar shines through */
-::-webkit-scrollbar       { width: 12px; }
-::-webkit-scrollbar-track { --bg: transparent; }
-::-webkit-scrollbar-thumb { --bg: rgba(0, 0, 0, 0.25); }
-
-/* Firefox scrollbar styling */
-html {
-  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-  scrollbar-width: auto;
-}
-
-/* 2. Visual background track fixed at the scrollbar position */
-.scroll-progress-track {
-  position: fixed; top: 0; right: 0;
-  height: 100dvh; width: 12px;
-  --bg: --alpha(fg, 0.90); /* Track background color */
-  pointer-events: none;
-  z-index: 9998;
-}
-
-/* 3. Growing progress bar fill */
-.scroll-progress-fill {
-  height: 100%; width: 100%;
-  --bg: --color(ink);
-  transform-origin: top;
-  scale: 1 0;
-  animation: grow-progress linear;
-  animation-timeline: scroll(root block);
-}
-
-@keyframes grow-progress { to { scale: 1 1; } }
-
 
 a { color: var(--color-ink); }
 
