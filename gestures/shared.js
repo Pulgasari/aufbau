@@ -1,4 +1,4 @@
-// @aufbau/gestures2/shared.js
+// @aufbau/gestures/shared.js
 
 // movement below the tolerance does not count as moving, a finger is less exact
 // than a mouse. a number applies to every input

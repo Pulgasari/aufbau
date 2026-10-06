@@ -1,4 +1,4 @@
-// @aufbau/gestures2/tracker.js
+// @aufbau/gestures/tracker.js
 // measures, decides nothing. one session per element, from the first pointer
 // down to the last pointer up. the recognizers read the session through the
 // hooks, see concept.md for its fields.

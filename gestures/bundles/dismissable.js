@@ -1,4 +1,4 @@
-// @aufbau/gestures2/bundles/dismissable.js
+// @aufbau/gestures/bundles/dismissable.js
 // swipe away: the element follows the finger along one axis and fades, and on
 // release it either leaves (far enough, or flicked fast enough) or snaps back.
 // a direction that is not allowed follows with resistance.

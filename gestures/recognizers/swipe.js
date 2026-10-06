@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/swipe.js
+// @aufbau/gestures/recognizers/swipe.js
 // a flick: judged on release, far enough and fast enough. it reads the same
 // session as pan, the two coexist. a claimed long press rules it out.
 //

@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/press.js
+// @aufbau/gestures/recognizers/press.js
 // the contact itself, for immediate feedback: pressStart when the first pointer
 // goes down, pressEnd when the last one comes up, pressCancel when the browser
 // takes it. what :active is for the mouse, for every input. it decides nothing

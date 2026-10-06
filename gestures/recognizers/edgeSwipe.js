@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/edgeSwipe.js
+// @aufbau/gestures/recognizers/edgeSwipe.js
 // a swipe that starts at an edge and moves away from it: the back gesture, a
 // drawer pulled out. the first pointer has to go down within `size` px of one of
 // the `edges`, of the element or of the viewport (`relativeTo: 'viewport'`).

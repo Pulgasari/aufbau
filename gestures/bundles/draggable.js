@@ -1,4 +1,4 @@
-// @aufbau/gestures2/bundles/draggable.js
+// @aufbau/gestures/bundles/draggable.js
 // an element that follows a pointer: moved with the css `translate` property,
 // optionally locked to an axis, kept within bounds, gliding on after a flick,
 // snapping to a grid or to points, and dropped onto targets.

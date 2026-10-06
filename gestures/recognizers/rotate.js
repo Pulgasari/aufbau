@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/rotate.js
+// @aufbau/gestures/recognizers/rotate.js
 // two pointers turning around each other. starts once they turned more than
 // `threshold` degrees, reports every move, ends when fewer than two pointers are
 // left. `rotation` is in degrees since the pair went down and passes ±180

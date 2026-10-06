@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/tap.js
+// @aufbau/gestures/recognizers/tap.js
 // tap and doubleTap. a tap is a session that did not travel past the tolerance,
 // was released within maximumDuration and was not claimed by anything else.
 // consecutive taps close in time and place count up; `count` is in the detail.
