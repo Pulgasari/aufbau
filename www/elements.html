@@ -145,42 +145,22 @@
 </app-root>
 
   <script type="module">
-    import aufbau        from '@aufbau/api';
-    import getFormValues from '@domina/methods/getFormValues.js';
-    import { settled }   from '@htx/elements';
+    import aufbau          from '@aufbau/api';
+    import getFormValues   from '@domina/methods/getFormValues.js';
+    import { settled }     from '@htx/elements';
+    import { htx, render } from '@htx/preact';
 
+    aufbau.boot();
     // the sections of the form come from elements.<namespace>.htx.html, through
     // <htx-part>. everything below reads them by id, so they have to be in first
     await settled();
 
-    await aufbau.boot();
+    
     if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
 
     const { gestalt } = aufbau;
     const $ = id => document.getElementById(id);
   
-    import { htx, render } from '@htx/preact';
-    //loadStylesheet('./demo.css');
-/*
-    function Dock () {
-      return htx`
-        <div>
-          <btn-icon icon='search'></btn-icon>
-        </div>
-        <div>
-          <btn-icon icon='search'></btn-icon>
-          <btn-icon icon='search'></btn-icon>
-          <btn-icon icon='search'></btn-icon>
-          <btn-icon icon='search'></btn-icon>
-        </div>
-        <div>
-          <btn-icon icon='search'></btn-icon>
-        </div>
-      `;
-    }
-
-    render(htx`<${Dock}/>`, document.getElementById('dock'));
-*/
     // :::::: TOASTS
     // every [data-toast] on the page, buttons and menu entries alike
 
