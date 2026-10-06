@@ -12,6 +12,7 @@ container header. the preview recognises it and shows the json instead of bytes.
 import createElement      from '@domina/methods/createElement.js';
 import fmt                from '../fmt.js';
 import { armAction, button } from './kit.js';
+import { DevPanel }      from './DevPanel.js';
 
 const el = createElement;
 
@@ -208,3 +209,12 @@ export function createFilesPanel () {
 }
 
 export default createFilesPanel;
+
+// :::::: ELEMENT
+
+export class DevFiles extends DevPanel {
+  static create = createFilesPanel;
+  static icon   = 'mdi:folder-outline';
+}
+
+DevFiles.init();

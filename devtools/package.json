@@ -12,6 +12,7 @@
     "./recorder.js": "./recorder.js"
   },
   "peerDependencies": {
+    "@aufbau/element": "^0.1.0",
     "@aufbau/elements": "^2.0.0",
     "@domina/methods": "*",
     "@htx/js": "*"
