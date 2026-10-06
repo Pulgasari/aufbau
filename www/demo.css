@@ -8,31 +8,26 @@ body {
   --line  : color-mix(in oklch, var(--color-fg) 14%, var(--color-bg));
   --panel : color-mix(in oklch, var(--color-fg) 6%,  var(--color-bg));
   --zebra : color-mix(in oklch, var(--color-fg) 3%,  var(--color-bg));
-   /*
-  display               : grid;
-  grid-template-columns : 14rem minmax(0, 1fr);
-   */
+   
   min-height  : 100dvh;
   max-height  : 100dvh;
   font-size   : 14px;
   line-height : 1.5;
 }
 
-body  { display: flex; }
-app-root {
-   display: flex;
-   flex-direction: row;
-   overflow: hidden;
-}
-#dock { flex: 0 0 10%; }
-main  { flex: 1; }
+body     { display: flex; }
+app-root { display: flex; flex-direction: row; }
+#dock    { flex: 0 0 10%; }
+main     { flex: 1; }
 
+app-root { overflow: hidden; }
+body     { overflow: hidden; }
+main     { overflow-y: auto; min-height: 0; }
 
+a  { color: var(--color-ink); }
+h1 { font-size: 1rem; }
+h2 { font-size: 1rem; font-weight: 600; }
 
-
-body { overflow: hidden; }
-main { overflow-y: auto; min-height: 0; }
-  
 #dock {
   --bg: --color(ink);
   --fg: --color(fg);
@@ -51,12 +46,6 @@ main { overflow-y: auto; min-height: 0; }
 
 #dock a   { color: var(--color-fg); }
 #dock div { display: block; flex: 0 1 auto; }
-
-
-a { color: var(--color-ink); }
-
-h1 { font-size: 1rem; }
-h2 { font-size: 1rem; font-weight: 600; }
 
 /* :::::: ASIDE */
 
