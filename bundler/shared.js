@@ -119,6 +119,21 @@ async function sizeOf (path) {
 
 const megabytes = bytes => (bytes / 1024 / 1024).toFixed(1);
 
+// 812 b, 14.2 kb, 3.1 mb
+const formatBytes = bytes =>
+    bytes < 1024        ? `${bytes} b`
+  : bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} kb`
+  :                       `${megabytes(bytes)} mb`;
+
+// every file below a directory with its size: [{ file, path, bytes, extension }]
+async function inventory (directory) {
+  const entries = [];
+  for (const file of await listFiles(directory)) {
+    entries.push({ bytes: (await stat(file)).size, extension: extname(file).toLowerCase() || '(none)', file, path: outputPath(directory, file) });
+  }
+  return entries;
+}
+
 // :::::: PROCESSES AND MODULES
 
 const importFile = path => import(pathToFileURL(path).href);
@@ -166,8 +181,10 @@ export {
   directoryOf,
   escapeRegExp,
   extensionOf,
+  formatBytes,
   importFile,
   install,
+  inventory,
   isDirectory,
   isFile,
   isText,

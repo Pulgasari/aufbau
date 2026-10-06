@@ -5,9 +5,11 @@
 const 
 $head   = document.head,
 $root   = document.documentElement,
-$script = document.currentScript; if (!$script) throw new Error('[boot] Must be executed synchronously as a classic script in <head>'),     
-$data   = $script.dataset,
-$style  = $script.style;
+$script = document.currentScript,
+$data   = $script?.dataset,
+$style  = $script?.style;
+
+if (!$script) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
 
 // :::::: HELPERS + REFS
 

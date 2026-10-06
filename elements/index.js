@@ -58,6 +58,7 @@ const TAGS = [
   'input-duration',
   'input-email',
   'input-emoji',
+  'input-address',
   'input-file',
   'input-font',
   'input-hotkey',
@@ -81,6 +82,11 @@ const TAGS = [
 
   'media-audio',
   'media-file',
+  'media-font',
+  'media-gif',
+  'media-json',
+  'media-pdf',
+  'media-svg',
   'media-video',
   'media-wave',
 
@@ -102,9 +108,11 @@ const TAGS = [
   'pop-tip',
   'pop-toast',
 
+  'svg-file',
   'svg-flag',
   'svg-icon',
   'svg-logo',
+  'svg-sprite',
 
   'widget-calculator',
   'widget-keyboard',
@@ -116,7 +124,7 @@ const TAGS = [
 
 const known = new Set(TAGS);
 
-const OWN_FILE = new Set(['input-file', 'input-option']);
+const OWN_FILE = new Set(['input-address', 'input-file', 'input-option']);
 
 // the inputs that are a type and nothing more share one module
 function pathOf (tag) {

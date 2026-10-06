@@ -56,3 +56,25 @@
       <svg-logo logo="poo" size="2rem"></svg-logo>
     </div></div>
 </section>
+
+<section id="file">
+  <h2>svg-file</h2>
+  <div class="row"><span>inline, css reaches in</span>
+    <div class="line">
+      <svg-file src="../svg/icons/aufbau.svg" size="2rem"></svg-file>
+      <svg-file src="../svg/logos/zugriff.svg" size="1.5rem" style="color: var(--color-ink)"></svg-file>
+    </div></div>
+</section>
+
+<section id="sprite">
+  <h2>svg-sprite</h2>
+  <svg hidden>
+    <symbol id="demo-star" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5-6.5-4.5-6.5 4.5 2-7.5L2 9h7z"/></symbol>
+    <symbol id="demo-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></symbol>
+  </svg>
+  <div class="row"><span>a sheet in the page</span>
+    <div class="line">
+      <svg-sprite icon="demo-star" size="1.5rem"></svg-sprite>
+      <svg-sprite icon="demo-dot" size="1.5rem" style="color: var(--color-ink)"></svg-sprite>
+    </div></div>
+</section>
