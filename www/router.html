@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@aufbau/filters</title>
+  
+  <script src="./fouc.js"></script>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <link rel="stylesheet" href="./demo.css"/>
+  
+</head>
+<body>
+
+<app-root>
+  <htx-part src='./dock.htx.html'></htx-part>
+  
+  <main>
+    aufbau
+    <!--
+    <app-router>
+      <app-route route='elements' src='elements.html'></app-route>
+      <app-route route='filters'  src='filters.html'></app-route>
+      <app-route route='gestures' src='gestures.html'></app-route>
+      <app-route route='patterns' src='patterns.html'></app-route>
+      <app-route route='webfonts' src='webfonts.html'></app-route>
+    </app-router>
+    -->
+  </main>
+</app-root>
+
+<script type="module">
+  import aufbau          from '@aufbau/api';
+  import { settled }     from '@htx/elements';
+  import { htx, render } from '@htx/preact';
+  
+  await aufbau.boot();
+  await settled();
+</script>
+
+</body>
+</html>
