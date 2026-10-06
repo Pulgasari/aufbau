@@ -19,6 +19,11 @@ if (!currentScript) throw new Error('[boot] Must be executed synchronously as a 
 
 
 // :::::: HELPERS + REFS
+
+const { log, warn } = console;
+const on = window.addEventListener;
+const SW = navigator?.serviceWorker ?? null;
+  
 const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
 const $head = document.head;
 const $root = document.documentElement;
@@ -32,30 +37,9 @@ const $root = document.documentElement;
 // script runs, the parser loads and runs it right after, ahead of the rest of
 // <head>. an appended <script> would load async and could come too late.
 // importScripts() exists in workers only
-function initDevRecorder () {
-  document.write('<script src="https://code.pulgasari.dev/aufbau/devtools/recorder.js"><\/script>');
-}
-
+const initDevRecorder = () => document.write('<script src="https://code.pulgasari.dev/aufbau/devtools/recorder.js"><\/script>');
 initDevRecorder();
 
-// :::::: Task 1: Dev Tools Injection | ?dev
-function initDevTools (force = false) {
-  try {
-    const KEY = 'zugriff:devtools';
-    const dev = force || new URLSearchParams(location.search).get('dev');
-    if (dev !== null) {
-      if (dev === 'off' || dev === '0') sessionStorage.removeItem(KEY);
-      else sessionStorage.setItem(KEY, '1');
-    }
-    if (sessionStorage.getItem(KEY)) {
-      document.head.append(createElement('script', {
-        src    : 'https://cdn.jsdelivr.net/npm/eruda@3',
-        onload : () => { try { window.eruda?.init(); } catch {} },
-      }));
-    }
-  } catch {} // storage may be blocked in incognito
-}
-  
 // :::::: Task 2: Gestalt Boot (Synchronous - Prevents FOUC)
 // the palette, density and geometry leaves of the app's store
 // (zugriff:<slug>:<leaf>), set before the first paint. aufbau's css resolves
@@ -75,9 +59,7 @@ function applyGestalt ({ prefix }) {
   }
 }
 
-const { log, warn } = console;
-const on = window.addEventListener;
-const SW = navigator?.serviceWorker ?? null;
+
   
 // :::::: Service Worker Registration
 function registerServiceWorker ({ path, ...options }) {
