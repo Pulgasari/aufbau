@@ -6,10 +6,9 @@ import { onEvent }       from '@domina/methods/onEvent.js';
 // page wide defaults. an attribute falls back to the key tag-attribute:
 // setConfig('app-panel-controls', 'close') is the default of <app-panel controls>
 
-export const CONFIG_EVENT = 'aufbau-config-changed';
-
-const config   = new CanonicalMap(null, ['kebab', 'camel', 'snake']);
-const elements = new Map;   // tag -> the connected elements of it
+const CONFIG_EVENT = 'aufbau-config-changed';
+const config   = new CanonicalMap (null, ['kebab', 'camel', 'snake']);
+const elements = new Map; // tag -> the connected elements of it
 
 // { write: { code: { theme: 'nord' } } } -> write-code-theme
 function flatten (input, prefix = '', out = new Map) {
@@ -31,7 +30,7 @@ function notify (changed) {
 }
 
 // setConfig('write-code-theme', 'nord') or setConfig({ 'write-code': { theme: 'nord' } }). null removes
-export function setConfig (keyOrEntries, value) {
+function setConfig (keyOrEntries, value) {
   const entries = isPlainObject(keyOrEntries) ? flatten(keyOrEntries) : new Map([[keyOrEntries, value]]);
   const changed = [];
 
@@ -47,14 +46,17 @@ export function setConfig (keyOrEntries, value) {
   if (changed.length) notify(changed);
 }
 
-export const getConfig = (key, fallback) => config.get(key) ?? fallback;
-
-export const onConfigChange = listener => onEvent(window, CONFIG_EVENT, listener);
+const getConfig      = (key, fallback) => config.get(key) ?? fallback;
+const onConfigChange = listener        => onEvent (window, CONFIG_EVENT, listener);
 
 // an element follows the config while it is connected. returns the stop
-export function followConfig (element) {
+function followConfig (element) {
   const tag = element.localName;
   if (!elements.has(tag)) elements.set(tag, new Set);
   elements.get(tag).add(element);
   return () => elements.get(tag)?.delete(element);
 }
+
+// ::::::EXPORT
+
+export { CONFIG_EVENT, followConfig, getConfig, setConfig, onConfigChange };
