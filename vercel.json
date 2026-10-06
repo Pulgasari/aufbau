@@ -6,10 +6,6 @@
   "trailingSlash": true,
   "rewrites": [
     {
-      "source": "/:page(elements|filters|gestures|icons|patterns|webfonts)/",
-      "destination": "https://code.pulgasari.dev/aufbau/www/index2.html"
-    },
-    {
       "source": "/:path*",
       "destination": "https://code.pulgasari.dev/aufbau/www/:path*"
     }

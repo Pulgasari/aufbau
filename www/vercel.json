@@ -1,0 +1,9 @@
+{
+  "trailingSlash": true,
+  "rewrites": [
+    {
+      "source": "/:page(elements|filters|gestures|icons|patterns|webfonts)/",
+      "destination": "/index2.html"
+    }
+  ]
+}
