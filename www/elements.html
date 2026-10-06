@@ -178,9 +178,17 @@
 
     const themes = await gestalt.themes();
 
+    // what was picked also goes into a cookie, middleware.js writes it into the
+    // html of the next page, so it opens in the same gestalt without a flash
+    const picked = {};
+
     async function setGestalt (values) {
       await gestalt.set(values);
       $('gestalt-code').setAttribute('code', JSON.stringify({ ...gestalt.get(), colors: gestalt.colors() }, null, 2));
+
+      Object.assign(picked, values);
+      const cookie = new URLSearchParams(Object.entries(picked).filter(([, value]) => typeof value === 'string' && value));
+      document.cookie = `aufbau-gestalt=${encodeURIComponent(cookie)}; path=/; max-age=31536000; samesite=lax`;
     }
 
     $('theme-picker').append(...themes.map(name => Object.assign(document.createElement('input-option'), { textContent: name })));

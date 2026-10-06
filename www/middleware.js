@@ -1,59 +1,68 @@
-// No dependencies or imports required! Uses native Web Standard APIs.
+// aufbau/www :: middleware.js (vercel routing middleware, runs at the edge)
+//
+// the gestalt picked on a demo page (theme, mode, palette, density, geometry,
+// skin) goes into the html of every page before it leaves the edge, from the
+// cookie elements.html writes. the same tokens aufbau.gestalt sets: a custom
+// property and a data attribute each, mode as --scheme / data-scheme.
+//
+// no imports, web apis only. without a cookie, for anything that is not a page
+// and on anything unexpected the page goes out untouched.
 
-// Helper to parse cookie values from the raw Cookie header
-function getCookie (cookieHeader, name) {
-  if (!cookieHeader) return null;
-  const match = cookieHeader.match(new RegExp(`(?:^|; )` + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + `=([^;]*)`));
-  return match ? decodeURIComponent(match[1]) : null;
+const COOKIE = 'aufbau-gestalt';
+
+// the picked name -> the token aufbau's css reads (api/gestalt.js)
+const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };
+
+// a preset name or a css color, nothing that could leave the attribute or the declaration
+const SAFE = /^[\w#%.,()\s-]{1,64}$/;
+
+function cookieOf (header, name) {
+  for (const part of String(header ?? '').split(';')) {
+    const [key, ...rest] = part.trim().split('=');
+    if (key === name) {
+      try   { return decodeURIComponent(rest.join('=')); }
+      catch { return null; }
+    }
+  }
+  return null;
+}
+
+// token -> value, only the known ones with safe values
+function gestaltOf (request) {
+  const raw = cookieOf(request.headers.get('cookie'), COOKIE);
+  if (!raw) return null;
+
+  const params = new URLSearchParams(raw);
+  const found  = Object.entries(TOKENS)
+    .map(([name, token]) => [token, params.get(name)?.trim()])
+    .filter(([, value]) => value && SAFE.test(value));
+
+  return found.length ? Object.fromEntries(found) : null;
 }
 
 export default async function middleware (request) {
-  //alert('middleware!'); // test
-  
-  const startTime = performance.now();
-  const url       = new URL(request.url);
+  if (!(request.headers.get('accept') ?? '').includes('text/html')) return;
 
-  // 1. Filter: Only process HTML page requests
-  const accept = request.headers.get('accept') || '';
-  if (!accept.includes('text/html')) return fetch(request);
-  
-  // 2. Read raw Cookie header from incoming request
-  const cookieHeader = request.headers.get('cookie');
-  const theme        = getCookie(cookieHeader, 'theme')   || '#111827';
-  const compact      = getCookie(cookieHeader, 'compact') || 'false';
+  const gestalt = gestaltOf(request);
+  if (!gestalt) return;   // nothing picked, the page goes out as it is
 
-  console.log(`[Edge Middleware] Request: ${url.pathname}${url.search}`);
-  console.log(`[Edge Middleware] Parsed cookies -> theme: "${theme}", compact: "${compact}"`);
+  const response = await fetch(request);
+  if (!response.ok || !(response.headers.get('content-type') ?? '').includes('text/html')) return response;
 
-  // 3. Fetch static HTML file from origin
-  const response    = await fetch (request);
-  const contentType = response.headers.get('content-type') || '';
-  if (!contentType.includes('text/html')) return response;
-  
+  const entries = Object.entries(gestalt);
+  const data    = entries.map(([token, value]) => `data-${token}="${value}"`).join(' ');
+  const style   = entries.map(([token, value]) => `--${token}: ${value}`).join('; ');
+  const html    = (await response.text()).replace(/<html\b/i, `<html ${data} style="${style}"`);
 
-  let html = await response.text();
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+  headers.set('cache-control', 'private, no-cache');   // the page now depends on the cookie
+  headers.set('vary', 'cookie');
 
-  // 4. Inject styles and dataset attributes into <html...> tag
-  const rootAttributes = `style="--theme: ${theme};" data-compact="${compact}"`;
-  const htmlInjected   = html.replace('<html', `<html ${rootAttributes}`);
-
-  const duration = (performance.now() - startTime).toFixed(2);
-  console.log(`[Edge Middleware] State injected successfully in ${duration}ms`);
-
-  // 5. Construct response with new headers
-  const newHeaders = new Headers(response.headers);
-  newHeaders.set('content-type', 'text/html; charset=utf-8');
-  newHeaders.set('Server-Timing', `edge-fouc;desc="Edge State Injection";dur=${duration}`);
-
-  return new Response (htmlInjected, {
-    status  : response.status,
-    headers : newHeaders,
-  });
+  return new Response(html, { headers, status: response.status, statusText: response.statusText });
 }
 
-// Optimization: Bypass middleware for static assets
+// pages only, the assets never reach it
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js)$).*)',
-  ],
+  matcher: ['/((?!.*\\.(?:css|gif|ico|jpe?g|js|json5?|md|mp3|mp4|pdf|png|svg|ttf|webp|woff2?)$).*)'],
 };
