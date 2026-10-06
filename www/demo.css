@@ -193,7 +193,7 @@ section { display: grid; grid-template-columns: minmax(0,1fr); --gap: normal; al
 @property --hue { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 @keyframes rotate-hue { to { --hue: 360deg; }}
 
-:root {
+body {
   animation: rotate-hue 360s linear infinite;
   --color-ink: oklch(0.6 0.18 var(--hue));
 }
