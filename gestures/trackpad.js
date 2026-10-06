@@ -1,4 +1,4 @@
-// @aufbau/gestures2/trackpad.js
+// @aufbau/gestures/trackpad.js
 // a trackpad sends no pointers for a pinch or a rotation:
 // - chrome and firefox report a pinch as wheel events with ctrlKey (the page
 //   zoom convention, a mouse wheel with ctrl held arrives the same way)

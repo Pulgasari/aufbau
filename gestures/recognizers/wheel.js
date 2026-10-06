@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/wheel.js
+// @aufbau/gestures/recognizers/wheel.js
 // the wheel (or a trackpad scrolled with two fingers) as a continuous gesture:
 // wheelStart, wheelMove for every wheel event, wheelEnd after a pause. named so
 // it cannot be mistaken for the native wheel event. `movement` is the event's

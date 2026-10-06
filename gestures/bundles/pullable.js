@@ -1,4 +1,4 @@
-// @aufbau/gestures2/bundles/pullable.js
+// @aufbau/gestures/bundles/pullable.js
 // pull to refresh on a scroll container: at the top, pulling down draws the
 // content after the pointer with resistance. released past `threshold` it
 // holds there while `onRefresh` runs (a promise is awaited), then goes back.

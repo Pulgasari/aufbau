@@ -1,4 +1,4 @@
-// @aufbau/gestures2/bundles/motion.js
+// @aufbau/gestures/bundles/motion.js
 // the motion the bundles share: easing to a point, and gliding on after a
 // release. both run on requestAnimationFrame, report every frame and can be
 // stopped; a new gesture stops the motion still running.

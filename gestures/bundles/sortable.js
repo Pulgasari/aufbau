@@ -1,4 +1,4 @@
-// @aufbau/gestures2/bundles/sortable.js
+// @aufbau/gestures/bundles/sortable.js
 // reorder the items of a list or grid by dragging them. on touch and pen an item
 // is lifted by a long press first, so a plain drag still scrolls the list; the
 // mouse drags at once. the item follows the pointer, the others make room with a

@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/pinch.js
+// @aufbau/gestures/recognizers/pinch.js
 // two pointers moving apart or together. starts once the scale left 1 by more
 // than `threshold`, reports every move, ends when fewer than two pointers are
 // left. `scale` is relative to the moment the pair went down, `scaleChange` to

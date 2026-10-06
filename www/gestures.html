@@ -1,198 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
-  <title>@aufbau/gestures — demo</title>
-
+  <title>@aufbau/gestures · playground</title>
   <style>
-    :root { --line: #e2e2e6; --color-ink: #5b5bd6; --text: #1a1a1e; --muted: #6b6b74; }
-    * { box-sizing: border-box; }
-    body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 1rem 1rem 4rem; max-width: 56rem; margin-inline: auto; color: var(--text); }
-    h1 { font-size: 1.8rem; margin: 0 0 .25rem; }
-    h2 { font-size: 1.15rem; margin: 2.25rem 0 .5rem; }
-    p.lead { color: var(--muted); margin: 0 0 1rem; }
-    .hint { color: var(--muted); font-size: .85rem; margin: .25rem 0 .75rem; }
-    code { font: 13px/1.4 ui-monospace, monospace; background: #f3f3f7; padding: .05rem .3rem; border-radius: .3rem; }
-    .card { border: 1px solid var(--line); border-radius: .6rem; padding: 1rem; }
-    .read { font: 12px/1.5 ui-monospace, monospace; color: var(--muted); white-space: pre-wrap; margin-top: .5rem; }
-    button { font: inherit; padding: .4rem .8rem; border: 1px solid var(--line); border-radius: .4rem; background: #fff; cursor: pointer; }
-    button:hover { border-color: var(--color-ink); }
+    :root { color-scheme: light dark; --line: color-mix(in oklch, currentColor 20%, transparent); --soft: color-mix(in oklch, currentColor 6%, transparent); --accent: #ff79c6; }
+    *    { box-sizing: border-box; }
+    body { margin: 0; padding: 1rem; font: 15px/1.5 system-ui, sans-serif; display: grid; gap: 1.5rem; max-width: 56rem; margin-inline: auto; }
+    h1   { font-size: 1.25rem; margin: 0; }
+    h2   { font-size: 1rem; margin: 0 0 .25rem; }
+    p    { margin: 0; opacity: .7; font-size: .85rem; }
+    code { font-size: .85em; }
 
-    /* transformable */
-    .stage { position: relative; height: 62vh; min-height: 320px; overflow: hidden; border: 1px solid var(--line);
-             border-radius: .6rem; background: repeating-conic-gradient(#f6f6fa 0 25%, #fff 0 50%) 0 0 / 32px 32px; touch-action: none; }
-    .object { position: absolute; top: 0; left: 0; width: 200px; height: 260px; transform-origin: 0 0;
-              display: grid; place-items: center; text-align: center; color: #fff; font-weight: 700;
-              border-radius: .8rem; box-shadow: 0 12px 40px rgb(0 0 0 / .25);
-              background: linear-gradient(140deg, #5b5bd6, #d65b9a); user-select: none; }
-    .toolbar { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; flex-wrap: wrap; }
+    section { display: grid; gap: .5rem; }
+    .grid   { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
 
-    /* smaller demos */
-    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
-    .pad { height: 150px; border-radius: .5rem; display: grid; place-items: center; color: #fff; font-weight: 600;
-           background: #3a3a44; touch-action: none; user-select: none; text-align: center; padding: .5rem; }
-    .follow { width: 64px; height: 64px; border-radius: .5rem; background: var(--color-ink); }
-    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--size, 64px), 1fr)); gap: .4rem; touch-action: pan-x pan-y; }
-    .gallery > div { aspect-ratio: 1; border-radius: .4rem; background: linear-gradient(135deg, #5b5bd6, #7ab8ff); }
+    .pad {
+      display: grid; place-items: center; min-height: 10rem; padding: 1rem;
+      border: 1px solid var(--line); border-radius: .75rem; background: var(--soft);
+      text-align: center; font-weight: 600;
+    }
+    .pad.flash   { outline: 3px solid var(--color-ink); outline-offset: -3px; }
+    .pad.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent); scale: .98; }
+    .pad         { transition: background-color .08s, scale .08s; }
+
+    #pan-pad  { position: relative; overflow: hidden; }
+    #pan-chip { width: 4rem; aspect-ratio: 1; border-radius: 1rem; background: var(--color-ink); transition: translate .25s ease; }
+    #pan-chip.dragging { transition: none; }
+
+    #transform-pad { overflow: hidden; min-height: 14rem; }
+    #transform-box { width: 6rem; aspect-ratio: 1; border-radius: .75rem; background: linear-gradient(135deg, var(--color-ink), #8be9fd); display: grid; place-items: center; color: #000; font-weight: 700; }
+    #wheel-dot     { width: 1.5rem; aspect-ratio: 1; border-radius: 50%; background: var(--color-ink); }
+    #stepper       { display: flex; gap: 1rem; align-items: center; justify-content: center; }
+    #stepper button { width: 3.5rem; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--line); background: var(--soft); color: inherit; font-size: 1.5rem; }
+    #stepper output { min-width: 4ch; text-align: center; font: 700 2rem/1 ui-monospace, monospace; }
+
+    /* :::::: BUNDLES */
+
+    #viewer       { position: relative; overflow: hidden; min-height: 16rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--soft); outline-offset: 2px; }
+    #viewer-image { position: absolute; left: calc(50% - 5rem); top: calc(50% - 4rem); width: 10rem; height: 8rem; border-radius: .5rem; background: conic-gradient(from 45deg, var(--color-ink), #8be9fd, #50fa7b, #f1fa8c, var(--color-ink)); display: grid; place-items: center; font-weight: 800; color: #000; }
+
+    #yard  { position: relative; min-height: 14rem; border: 1px dashed var(--line); border-radius: .75rem; padding: .75rem; display: flex; gap: .75rem; align-items: flex-start; flex-wrap: wrap; }
+    .chip  { width: 3.5rem; aspect-ratio: 1; border-radius: .75rem; background: var(--color-ink); display: grid; place-items: center; font-weight: 700; color: #000; cursor: grab; }
+    .chip[data-dragging] { cursor: grabbing; box-shadow: 0 .5rem 1.5rem #0006; z-index: 2; }
+    .slot  { width: 5rem; aspect-ratio: 1; border: 2px dashed var(--line); border-radius: .75rem; display: grid; place-items: center; font-size: .75rem; opacity: .8; margin-left: auto; }
+    .slot[data-drop-over] { border-color: var(--color-ink); background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
+    .slot .chip { cursor: default; }
+
+    #cards      { display: grid; gap: .5rem; }
+    #cards .card { padding: 1rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--soft); }
+
+    #drawer-panel { position: relative; overflow: hidden; min-height: 14rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--soft); display: grid; place-items: center; padding: 1rem; text-align: center; }
+    #drawer       { position: absolute; inset: 0 auto 0 0; width: 70%; background: var(--color-ink); color: #000; padding: 1rem; translate: -100% 0; font-weight: 700; }
+    #drawer.animated { transition: translate .2s ease; }
+
+    #sort-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+    #sort-list li, #sort-grid div { padding: .75rem 1rem; border: 1px solid var(--line); border-radius: .6rem; background: var(--soft); transition: box-shadow .15s, scale .15s; }
+    #sort-list li[data-lifted], #sort-grid div[data-lifted] { scale: 1.03; box-shadow: 0 .4rem 1rem #0005; }
+    #sort-list li[data-dragging], #sort-grid div[data-dragging] { box-shadow: 0 .6rem 1.5rem #0007; background: color-mix(in oklch, var(--color-ink) 25%, var(--soft)); }
+    #sort-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; }
+    #sort-grid div { aspect-ratio: 1; display: grid; place-items: center; font-weight: 700; padding: 0; }
+
+    #feed      { height: 14rem; overflow: auto; border: 1px solid var(--line); border-radius: .75rem; position: relative; }
+    #feed-hint { position: absolute; inset: 0 0 auto; height: 64px; display: grid; place-items: center; font-size: .8rem; opacity: .7; }
+    #feed-list { list-style: none; margin: 0; padding: 0; background: var(--soft); position: relative; min-height: 100%; }
+    #feed-list li { padding: .75rem 1rem; border-top: 1px solid var(--line); }
+
+    #list    { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: .75rem; overflow: hidden; }
+    #list li { padding: .9rem 1rem; border-top: 1px solid var(--line); background: var(--soft); transition: opacity .2s; }
+    #list li:first-child { border-top: 0; }
+    #list li.done { opacity: .35; text-decoration: line-through; }
+
+    table { border-collapse: collapse; font: 12px/1.4 ui-monospace, monospace; width: 100%; }
+    td    { padding: .15rem .5rem; border-top: 1px solid var(--line); vertical-align: top; }
+    td:first-child { opacity: .6; white-space: nowrap; }
+
+    #log { font: 12px/1.5 ui-monospace, monospace; max-height: 12rem; overflow: auto; border: 1px solid var(--line); border-radius: .5rem; padding: .5rem; white-space: pre-wrap; }
   </style>
 </head>
-
 <body>
 
-<h1>@aufbau/gestures</h1>
-<p class="lead">pointer-driven gestures — best opened on a touch device. drag, pinch, rotate, swipe, hold.</p>
+  <header>
+    <h1>@aufbau/gestures · playground</h1>
+    <p>a draft. try everything with mouse, touch and pen, the log and the session table show what was measured and recognized.</p>
+  </header>
 
-<!--
-<h2>transformable <span class="hint">(the flagship)</span></h2>
-<div class="toolbar">
-  <button id="reset">reset</button>
-  <label><input type="checkbox" id="rotate" checked /> rotate</label>
-  <label><input type="checkbox" id="zoom" checked /> zoom</label>
-</div>
-<p class="hint">one finger pans · two fingers pan + pinch-zoom + rotate around the midpoint · wheel zooms toward the cursor</p>
-<div class="stage" id="stage">
-  <div class="object" id="object">drag<br/>pinch<br/>rotate</div>
-</div>
-<div class="read" id="tf-read">x 0 · y 0 · scale 1.00 · rotation 0°</div>
--->
-
-<h2>the pieces</h2>
-<div class="grid">
-
-  <div class="card">
-    <strong>adjustable</strong> <span class="hint">two-finger resize · ctrl/⌘+wheel</span>
-    <div class="gallery" id="gallery"></div>
-    <div class="read" id="gallery-read">size 64px</div>
-  </div>
-
-  <div class="card">
-    <strong>holdable</strong>
-    <div class="pad" id="hold">hold me</div>
-    <div class="read" id="hold-read">0</div>
-  </div>
-
-  <div class="card">
-    <strong>pannable</strong>
-    <div class="pad" id="pan" style="position: relative; overflow: hidden;">
-      <div class="follow" id="follow"></div>
+  <section class="grid">
+    <div>
+      <h2>tap · doubleTap · longPress · secondary</h2>
+      <p>every tap at once, the second of a pair also as doubleTap. <code>press</code> colors the pad the moment it is touched.</p>
+      <div class="pad" id="press-pad" tabindex="0">press me</div>
     </div>
-    <div class="read" id="pan-read">Δ 0, 0</div>
-  </div>
+    <div>
+      <h2>tap · doubleTap, exclusive</h2>
+      <p><code>tap: { waitForDoubleTap: true }</code>: only one of the two fires, a single tap waits 100 ms. taps counted up to 300 ms apart.</p>
+      <div class="pad" id="exclusive-pad">press me</div>
+    </div>
+    <div>
+      <h2>swipe</h2>
+      <p>any direction. a fast right swipe (speed &gt; 1) has its own guarded handler.</p>
+      <div class="pad" id="swipe-pad">swipe me</div>
+    </div>
+    <div>
+      <h2>pan</h2>
+      <p>drag the chip, it springs back on release.</p>
+      <div class="pad" id="pan-pad"><div id="pan-chip"></div></div>
+    </div>
+  </section>
 
-  <div class="card">
-    <strong>pinchable</strong>
-    <div class="pad" id="pinch">pinch me</div>
-    <div class="read" id="pinch-read">scale 1.00</div>
-  </div>
+  <section class="grid">
+    <div>
+      <h2>pinch · rotate · pan</h2>
+      <p>two fingers pinch and turn the box, one finger moves it. on a trackpad: pinch (all browsers), rotate (safari). double tap resets.</p>
+      <div class="pad" id="transform-pad"><div id="transform-box">aufbau</div></div>
+    </div>
+    <div>
+      <h2>wheel</h2>
+      <p><code>wheelStart</code>, <code>wheelMove</code>, <code>wheelEnd</code>: wheel or two-finger trackpad scroll moves the dot, the page does not scroll here.</p>
+      <div class="pad" id="wheel-pad"><div id="wheel-dot"></div></div>
+    </div>
+    <div>
+      <h2>pressRepeat</h2>
+      <p>a stepper: one step on contact (<code>pressStart</code>), then repeating while held.</p>
+      <div class="pad" id="stepper">
+        <button type="button" data-step="-1">−</button>
+        <output>0</output>
+        <button type="button" data-step="1">+</button>
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
-    <strong>pressable</strong>
-    <div class="pad" id="press">tap · double-tap · long-press</div>
-    <div class="read" id="press-read">click 0 · double 0 · long 0</div>
-  </div>
+  <section>
+    <h2>bundles</h2>
+    <p>bundles act on the element: <code>transformable</code>, <code>draggable</code>, <code>dismissable</code>. each has keyboard counterparts once focused.</p>
+  </section>
 
-  <div class="card">
-    <strong>rotatable</strong>
-    <div class="pad" id="rotate-pad">rotate me</div>
-    <div class="read" id="rotate-read">0°</div>
-  </div>
+  <section class="grid">
+    <div>
+      <h2>transformable</h2>
+      <p>one finger moves, two pinch and turn, wheel zooms toward the cursor, double tap zooms in and back. keys: arrows, + −, [ ], 0.</p>
+      <div id="viewer"><div id="viewer-image">aufbau</div></div>
+    </div>
+    <div>
+      <h2>draggable</h2>
+      <p>the pink chips go into the slot or back. the blue one is free: bounds, a flick glides on, snaps to a 40 px grid. keys: arrows.</p>
+      <div id="yard">
+        <div class="chip" data-kind="slot">1</div>
+        <div class="chip" data-kind="slot">2</div>
+        <div class="chip" id="free-chip" style="background: #8be9fd">~</div>
+        <div class="slot">drop here</div>
+      </div>
+    </div>
+    <div>
+      <h2>dismissable</h2>
+      <p>swipe a card away to either side, a slow short drag snaps back. key: delete. <button type="button" id="cards-reset">bring them back</button></p>
+      <div id="cards"></div>
+    </div>
+    <div>
+      <h2>edgeSwipe</h2>
+      <p>pull the drawer out from the left edge of the panel. swipe left or tap the panel to close.</p>
+      <div id="drawer-panel">content<div id="drawer">drawer</div></div>
+    </div>
+  </section>
 
-  <div class="card">
-    <strong>swipeable</strong>
-    <div class="pad" id="swipe">swipe me</div>
-    <div class="read" id="swipe-read">—</div>
-  </div>
+  <section class="grid">
+    <div>
+      <h2>sortable · list</h2>
+      <p>touch and pen: hold, then drag. mouse: drag at once. keys: alt + arrows.</p>
+      <ul id="sort-list"><li>eins</li><li>zwei</li><li>drei</li><li>vier</li><li>fünf</li></ul>
+    </div>
+    <div>
+      <h2>sortable · grid</h2>
+      <p>the same in two dimensions, <code>axis: null</code>.</p>
+      <div id="sort-grid"><div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div><div>H</div></div>
+    </div>
+    <div>
+      <h2>pullable</h2>
+      <p>at the top pull down, release past the line to refresh (1 s, adds an entry).</p>
+      <div id="feed"><div id="feed-hint">pull to refresh</div><ul id="feed-list"></ul></div>
+    </div>
+  </section>
 
-  <div class="card">
-    <strong>wheelable</strong>
-    <div class="pad" id="wheel">scroll / trackpad here</div>
-    <div class="read" id="wheel-read">Δ 0, 0</div>
-  </div>
+  <section>
+    <h2>delegation</h2>
+    <p>one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>, dom events from the items: swipe left marks done, swipe right undoes, tap logs.</p>
+    <ul id="list">
+      <li>eins</li><li>zwei</li><li>drei</li><li>vier</li>
+    </ul>
+  </section>
 
-</div>
+  <section>
+    <h2>session</h2>
+    <p>the last gesture's detail.</p>
+    <table id="session"></table>
+  </section>
 
-<script type="module">
-  import * as gestures from '@aufbau/gestures';
+  <section>
+    <h2>log</h2>
+    <div id="log"></div>
+  </section>
 
-  const $ = id => document.getElementById(id);
+  <script type="module">
+    import gestures, { dismissable, draggable, pullable, sortable, transformable } from '@aufbau/gestures';
 
-  /*
-  // ── transformable ─────────────────────────────────────────────────────────
-  const object = $('object');
-  const render = t => {
-    object.style.transform = `translate(${t.x}px, ${t.y}px) rotate(${t.rotation}deg) scale(${t.scale})`;
-    $('tf-read').textContent = `x ${t.x.toFixed(0)} · y ${t.y.toFixed(0)} · scale ${t.scale.toFixed(2)} · rotation ${t.rotation.toFixed(0)}°`;
-  };
-  // options are read once at attach, so a toggle rebuilds the gesture — the
-  // current transform is carried over as the new initial via get() + set().
-  let tf = null, handle = null;
-  const build = () => {
-    const prev = tf ? tf.get() : { x: 0, y: 0, scale: 1, rotation: 0 };
-    handle?.destroy();
-    handle = gestures($('stage'), {
-      onTransform : render,
-      minScale    : 0.2,
-      maxScale    : 8,
-      rotate      : $('rotate').checked,
-      zoom        : $('zoom').checked,
-      ...prev,
+    const $ = id => document.getElementById(id);
+
+    // :::::: OUTPUT
+
+    const round  = value => typeof value === 'number' ? Math.round(value * 100) / 100 : value;
+    const format = value =>
+        value == null               ? String(value)
+      : value instanceof Element    ? `<${value.localName}${value.id ? '#' + value.id : ''}>`
+      : value instanceof Event      ? value.type
+      : typeof value === 'object'   ? JSON.stringify(value, (key, inner) => round(inner))
+      :                               String(round(value));
+
+    function show (gesture) {
+      $('session').replaceChildren(...Object.keys(gesture).sort().map(key => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${key}</td><td></td>`;
+        row.lastChild.textContent = format(gesture[key]);
+        return row;
+      }));
+    }
+
+    function log (text, gesture) {
+      const line = `${new Date().toLocaleTimeString()}  ${text}`;
+      $('log').textContent = line + '\n' + $('log').textContent.split('\n').slice(0, 60).join('\n');
+      if (gesture) show(gesture);
+    }
+
+    const flash = element => { element.classList.add('flash'); setTimeout(() => element.classList.remove('flash'), 180); };
+
+    // :::::: PRESS
+
+    const pressed = element => ({
+      onPressCancel : () => element.classList.remove('pressed'),
+      onPressEnd    : () => element.classList.remove('pressed'),
+      onPressStart  : () => element.classList.add('pressed'),
     });
-    tf = handle.parts.find(p => p.get);
-    render(tf.get());
-  };
-  build();
-  $('reset').onclick   = () => { tf.set({ x: 0, y: 0, scale: 1, rotation: 0 }); render(tf.get()); };
-  $('rotate').onchange = build;
-  $('zoom').onchange   = build;
-  */
 
-  // ── pinchable ─────────────────────────────────────────────────────────────
-  gestures.compose($('pinch'), { onPinch: p => $('pinch-read').textContent = `scale ${p.scale.toFixed(2)}` });
+    gestures($('press-pad'), {
+      ...pressed($('press-pad')),
+      onDoubleTap : gesture => { flash($('press-pad')); log(`doubleTap  · ${gesture.input}`, gesture); },
+      onLongPress : gesture => { flash($('press-pad')); log(`longPress  · ${gesture.input} · ${Math.round(gesture.duration)} ms`, gesture); },
+      onSecondary : gesture => { flash($('press-pad')); log(`secondary  · ${gesture.input}`, gesture); },
+      onTap       : gesture => { flash($('press-pad')); log(`tap ${gesture.count}      · ${gesture.input} · pointers ${gesture.maximumPointers}`, gesture); },
+    });
 
-  // ── rotatable ─────────────────────────────────────────────────────────────
-  gestures.compose($('rotate-pad'), { onRotate: r => $('rotate-read').textContent = `${r.rotation.toFixed(0)}°` });
+    gestures($('exclusive-pad'), {
+      ...pressed($('exclusive-pad')),
+      onDoubleTap : gesture => { flash($('exclusive-pad')); log('exclusive doubleTap', gesture); },
+      onTap       : gesture => { flash($('exclusive-pad')); log('exclusive tap', gesture); },
+      tap         : { waitForDoubleTap: true },
+    });
 
-  // ── swipeable ─────────────────────────────────────────────────────────────
-  gestures.compose($('swipe'), { onSwipe: s => $('swipe-read').textContent = `${s.direction}  (Δ ${s.deltaX.toFixed(0)}, ${s.deltaY.toFixed(0)})` });
+    // :::::: SWIPE
 
-  // ── pannable ──────────────────────────────────────────────────────────────
-  const follow = $('follow');
-  gestures.compose($('pan'), {
-    onPan : p => {
-      follow.style.transform = `translate(${p.deltaX}px, ${p.deltaY}px)`;
-      $('pan-read').textContent = `Δ ${p.deltaX.toFixed(0)}, ${p.deltaY.toFixed(0)}`;
-    },
-    onPanEnd : () => { follow.style.transform = ''; },
-  });
+    gestures($('swipe-pad'), {
+      onSwipe      : gesture => { flash($('swipe-pad')); log(`swipe ${gesture.direction} · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
+      onSwipeRight : { minimumSpeed: 1, handler: () => log('swipeRight, fast (guard minimumSpeed: 1)') },
+    });
 
-  // ── pressable ─────────────────────────────────────────────────────────────
-  let clicks = 0, doubles = 0, longs = 0;
-  const pressRead = () => $('press-read').textContent = `click ${clicks} · double ${doubles} · long ${longs}`;
-  gestures.compose($('press'), {
-    onClick       : () => { clicks++;  pressRead(); },
-    onDoubleClick : () => { doubles++; pressRead(); },
-    onLongClick   : () => { longs++;   pressRead(); },
-  });
+    // :::::: PAN
 
-  // ── holdable ──────────────────────────────────────────────────────────────
-  gestures.compose($('hold'), { onHold: n => $('hold-read').textContent = String(n) });
+    const chip = $('pan-chip');
+    gestures($('pan-pad'), {
+      onPanCancel : ()      => { chip.classList.remove('dragging'); chip.style.translate = ''; log('panCancel'); },
+      onPanEnd    : gesture => { chip.classList.remove('dragging'); chip.style.translate = ''; log(`panEnd · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
+      onPanMove   : gesture => { chip.style.translate = `${gesture.delta.x}px ${gesture.delta.y}px`; show(gesture); },
+      onPanStart  : gesture => { chip.classList.add('dragging'); log('panStart', gesture); },
+    });
 
-  // ── wheelable ─────────────────────────────────────────────────────────────
-  gestures.compose($('wheel'), { onWheel: w => $('wheel-read').textContent = `Δ ${w.deltaX.toFixed(0)}, ${w.deltaY.toFixed(0)}` });
+    // :::::: PINCH · ROTATE · PAN
+    // an incremental transform: every event multiplies by scaleChange and adds
+    // rotationChange and movement, so fingers, trackpad and mouse all compose
 
-  // ── adjustable ────────────────────────────────────────────────────────────
-  const gallery = $('gallery');
-  for (let i = 0; i < 24; i++) gallery.appendChild(document.createElement('div'));
-  gestures.compose(gallery, {
-    onAdjust : (size, meta) => {
-      gallery.style.setProperty('--size', `${size.toFixed(0)}px`);
-      $('gallery-read').textContent = `size ${size.toFixed(0)}px${meta.final ? ' (snapped)' : ''}`;
-    },
-    value : 64, min : 40, max : 160,
-  });
-</script>
+    const box = $('transform-box');
+    let state = { rotation: 0, scale: 1, x: 0, y: 0 };
+    const draw = () => { box.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rotation}deg) scale(${state.scale})`; };
 
+    gestures($('transform-pad'), {
+      onDoubleTap   : ()      => { state = { rotation: 0, scale: 1, x: 0, y: 0 }; draw(); log('reset'); },
+      onPanMove     : gesture => { state.x += gesture.movement.x; state.y += gesture.movement.y; draw(); },
+      onPinchEnd    : gesture => log(`pinchEnd · ${gesture.input} · scale ${gesture.scale.toFixed(2)}`, gesture),
+      onPinchMove   : gesture => { state.scale = Math.min(6, Math.max(.2, state.scale * gesture.scaleChange)); if (gesture.pointers > 1) { state.x += gesture.movement.x; state.y += gesture.movement.y; } draw(); show(gesture); },
+      onPinchStart  : gesture => log(`pinchStart · ${gesture.input}`, gesture),
+      onRotateEnd   : gesture => log(`rotateEnd · ${gesture.input} · ${gesture.rotation.toFixed(0)}°`, gesture),
+      onRotateMove  : gesture => { state.rotation += gesture.rotationChange; draw(); },
+      onRotateStart : gesture => log(`rotateStart · ${gesture.input}`, gesture),
+      pan           : { pointers: 1 },
+    });
+
+    // :::::: WHEEL
+
+    const dot = $('wheel-dot');
+    gestures($('wheel-pad'), {
+      onWheelEnd   : gesture => log(`wheelEnd · Δ ${gesture.delta.x.toFixed(0)}, ${gesture.delta.y.toFixed(0)}`, gesture),
+      onWheelMove  : gesture => { dot.style.translate = `${Math.max(-120, Math.min(120, gesture.delta.x / 4))}px ${Math.max(-60, Math.min(60, gesture.delta.y / 4))}px`; show(gesture); },
+      onWheelStart : ()      => log('wheelStart'),
+    });
+
+    // :::::: PRESS REPEAT
+
+    const output = $('stepper').querySelector('output');
+    for (const button of $('stepper').querySelectorAll('button')) {
+      const step = () => { output.value = Number(output.value) + Number(button.dataset.step); };
+      gestures(button, { ...pressed(button), onPressRepeat: step, onPressStart: () => { button.classList.add('pressed'); step(); } });
+    }
+
+    // :::::: BUNDLES
+
+    transformable($('viewer-image'), {
+      maximumScale : 6,
+      onChange     : state => { $('viewer-image').dataset.state = JSON.stringify(state); },
+      surface      : $('viewer'),
+    });
+
+    for (const chip of document.querySelectorAll('.chip[data-kind="slot"]')) {
+      draggable(chip, {
+        bounds  : 'parent',
+        drop    : '.slot',
+        onDrop  : ({ target }) => { target.replaceChildren(chip); chip.style.translate = ''; log(`dropped chip ${chip.textContent}`); },
+        onEnter : () => log('over the slot'),
+        revert  : true,
+      });
+    }
+
+    draggable($('free-chip'), {
+      bounds : 'parent',
+      grid   : 40,
+      onEnd  : ({ position }) => log(`free chip at ${position.x}, ${position.y}`),
+    });
+
+    const cardTexts = ['a message', 'another one', 'swipe me', 'and me'];
+    function makeCards () {
+      $('cards').replaceChildren(...cardTexts.map(text => {
+        const card = Object.assign(document.createElement('div'), { className: 'card', textContent: text });
+        dismissable(card, { onDismiss: ({ direction }) => { card.remove(); log(`dismissed "${text}" to the ${direction}`); } });
+        return card;
+      }));
+    }
+    makeCards();
+    $('cards-reset').addEventListener('click', makeCards);
+
+    const drawer = $('drawer');
+    let drawerOpen = false;
+    const placeDrawer = progress => { drawer.style.translate = `${(progress - 1) * 100}% 0`; };
+    const setDrawer   = open => { drawerOpen = open; drawer.classList.add('animated'); placeDrawer(open ? 1 : 0); };
+
+    gestures($('drawer-panel'), {
+      edgeSwipe            : { edges: ['left'], size: 32 },
+      onEdgeSwipeCancel    : () => setDrawer(false),
+      onEdgeSwipeEnd       : gesture => { setDrawer(gesture.progress > 0.35 || gesture.velocity.x > 0.4); log(`edgeSwipeEnd · ${gesture.progress.toFixed(2)}`, gesture); },
+      onEdgeSwipeMove      : gesture => { drawer.classList.remove('animated'); placeDrawer(Math.min(1, gesture.progress / 0.7)); },
+      onEdgeSwipeStart     : gesture => log(`edgeSwipeStart · ${gesture.edge}`, gesture),
+      onSwipeLeft          : () => drawerOpen && setDrawer(false),
+      onTap                : gesture => { if (drawerOpen && !drawer.contains(gesture.target)) setDrawer(false); },
+    });
+
+    // :::::: SORTABLE · PULLABLE
+
+    sortable($('sort-list'), { onSort: ({ from, to, order }) => log(`sorted ${from} → ${to}: ${order.map(item => item.textContent).join(' ')}`) });
+    sortable($('sort-grid'), { axis: null, onSort: ({ from, to }) => log(`grid ${from} → ${to}`) });
+
+    const feed = $('feed-list');
+    let entries = 0;
+    const addEntry = () => { const item = document.createElement('li'); item.textContent = `entry ${++entries} · ${new Date().toLocaleTimeString()}`; feed.prepend(item); };
+    for (let i = 0; i < 12; i++) addEntry();
+
+    pullable($('feed'), {
+      content   : feed,
+      onPull    : ({ progress, refreshing }) => { $('feed-hint').textContent = refreshing ? 'refreshing …' : progress >= 1 ? 'release to refresh' : 'pull to refresh'; },
+      onRefresh : () => new Promise(resolve => setTimeout(() => { addEntry(); log('refreshed'); resolve(); }, 1000)),
+    });
+
+    // :::::: DELEGATION
+
+    const list = $('list');
+    gestures(list, { recognize: ['swipe', 'tap'], swipe: { touchAction: 'pan-y' } });
+    list.addEventListener('swipeleft',  event => { event.target.closest('li')?.classList.add('done');    log('list swipeleft', event.detail); });
+    list.addEventListener('swiperight', event => { event.target.closest('li')?.classList.remove('done'); log('list swiperight', event.detail); });
+    list.addEventListener('tap',        event => log(`list tap · ${event.target.closest('li')?.textContent}`, event.detail));
+  </script>
 </body>
 </html>

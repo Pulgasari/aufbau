@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/pan.js
+// @aufbau/gestures/recognizers/pan.js
 // a drag. starts once the session travels past the tolerance with the given
 // number of pointers, then claims the session (no tap follows). reports start,
 // every move, end, and cancel when the browser takes the pointer.

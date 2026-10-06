@@ -140,22 +140,23 @@ export default class DataIndex extends AufbauElement {
 
     if (!active) { this._resizeValue = null; return; }
 
-    const gestures = await import('@aufbau/gestures');
+    const { adjustable } = await import('@aufbau/gestures');
     if (token !== this._resizeToken || !this._mounted) return;   // superseded or unmounted
 
     const start = this._resizeValue ?? parsePx(this.getAttr('itemSize')) ?? (min + max) / 2;
-    this._resizeValue = gestures.clamp(start, min, max);
-    this.setVar('--item-size', `${this._resizeValue}px`);
 
-    this._resize = gestures.compose(this, {
-      onAdjust : size => {
+    this._resize = adjustable(this, {
+      maximum  : max,
+      minimum  : min,
+      onChange : size => {
         this._resizeValue = Math.round(size);
         this.setVar('--item-size', `${this._resizeValue}px`);
       },
-      value : this._resizeValue,
-      min,
-      max,
+      value : start,
     });
+
+    this._resizeValue = this._resize.get();
+    this.setVar('--item-size', `${this._resizeValue}px`);
   }
 
   // :::::: SYNC ::::::::::::::::::::::::::::::::::::::::::::::::

@@ -1,172 +1,172 @@
-// @aufbau/gestures — type declarations
-
-export type Axis = 'x' | 'y' | 'both' | 'auto';
-export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
+// @aufbau/gestures
 
 export interface Point { x: number; y: number; }
 
-export interface RecognizerPart {
-  handlers: Record<string, (event: Event) => void>;
-  style?: Partial<CSSStyleDeclaration>;
-  touchAction?: string;
-  destroy?: () => void;
-  set?: (value: number) => void;
+export type Direction = 'down' | 'left' | 'right' | 'up';
+export type Input     = 'mouse' | 'pen' | 'touch' | 'trackpad' | 'wheel';
+export type Tolerance = number | { mouse?: number; pen?: number; touch?: number };
+
+// the session as every gesture carries it, see concept.md
+export interface Gesture {
+  angle           : number;
+  buttons         : number;
+  center          : Point;
+  delta           : Point;
+  direction       : Direction | null;
+  distance        : number;
+  duration        : number;
+  element         : Element;
+  gesture         : string;
+  input           : Input;
+  maximumPointers : number;
+  modifiers       : { alt: boolean; control: boolean; meta: boolean; shift: boolean };
+  movement        : Point;
+  phase           : 'start' | 'move' | 'end' | 'cancel';
+  pointers        : number;
+  rotation        : number;
+  scale           : number;
+  sourceEvent     : Event | null;
+  start           : Point;
+  target          : Element;
+  time            : number;
+  travel          : number;
+  velocity        : { speed: number; x: number; y: number };
+
+  count?          : number;   // tap, doubleTap, pressRepeat
+  edge?           : Direction; // edgeSwipe
+  progress?       : number;   // edgeSwipe
+  rotationChange? : number;   // rotateMove
+  scaleChange?    : number;   // pinchMove
 }
 
-// ── recognizers ──────────────────────────────────────────────────────────
+export type Handler = (gesture: Gesture, event: CustomEvent<Gesture>) => void;
 
-export interface PressableOptions {
-  onClick?: (event: PointerEvent) => void;
-  onDoubleClick?: (event: PointerEvent) => void;
-  onLongClick?: (event: PointerEvent) => void;
-  threshold?: number;      // ms held before a long-press fires (default 500)
-  tolerance?: number;      // px of movement that cancels the tap (default 8)
-  doubleWithin?: number;   // ms window for a double-tap (default 300)
+// a guard only filters what reaches its handler
+export interface Guarded {
+  handler          : Handler;
+  input?           : Input;
+  minimumDistance? : number;
+  minimumSpeed?    : number;
+  pointers?        : number;
 }
-export function pressable (options?: PressableOptions): RecognizerPart;
 
-export interface HoldableOptions {
-  onHold?: (count: number) => void;
-  delay?: number;          // ms before repeating starts (default 500)
-  speed?: number;          // ms between repeats (default 100)
-}
-export function holdable (options?: HoldableOptions): RecognizerPart;
+export type GestureName =
+  | 'doubleTap' | 'longPress' | 'secondary' | 'tap'
+  | 'pressCancel' | 'pressEnd' | 'pressRepeat' | 'pressStart'
+  | 'swipe' | 'swipeDown' | 'swipeLeft' | 'swipeRight' | 'swipeUp'
+  | 'edgeSwipeCancel' | 'edgeSwipeEnd' | 'edgeSwipeMove' | 'edgeSwipeStart'
+  | 'panCancel' | 'panEnd' | 'panMove' | 'panStart'
+  | 'pinchCancel' | 'pinchEnd' | 'pinchMove' | 'pinchStart'
+  | 'rotateCancel' | 'rotateEnd' | 'rotateMove' | 'rotateStart'
+  | 'wheelEnd' | 'wheelMove' | 'wheelStart';
 
-export interface SwipePayload {
-  direction: SwipeDirection;
-  deltaX: number;
-  deltaY: number;
-  duration: number;
-  event: PointerEvent;
-}
-export interface SwipeableOptions {
-  onSwipe?: (payload: SwipePayload) => void;
-  onSwipeUp?: (payload: SwipePayload) => void;
-  onSwipeDown?: (payload: SwipePayload) => void;
-  onSwipeLeft?: (payload: SwipePayload) => void;
-  onSwipeRight?: (payload: SwipePayload) => void;
-  threshold?: number;       // px before a swipe registers (default 50)
-  holdTime?: number;        // ms; ignore swipes slower than this (default 0 = off)
-  preventScroll?: boolean;  // force touch-action 'none' (default false)
-  touchAction?: string;     // override the axis-derived touch-action (default null)
-}
-export function swipeable (options?: SwipeableOptions): RecognizerPart;
+export type Handlers = { [K in GestureName as `on${Capitalize<K>}`]?: Handler | Guarded };
 
-export interface PanPayload {
-  deltaX: number;   // total movement since the gesture started
-  deltaY: number;
-  stepX: number;    // movement since the previous move event
-  stepY: number;
-  event: PointerEvent;
+// thresholds, per recognizer
+export interface RecognizerOptions {
+  edgeSwipe? : { edges?: Direction[]; relativeTo?: 'element' | 'viewport'; size?: number; tolerance?: Tolerance };
+  longPress? : { duration?: number; tolerance?: Tolerance };
+  pan?       : { after?: 'longPress' | { [input: string]: 'longPress' }; axis?: 'x' | 'y' | null; pointers?: number; tolerance?: Tolerance; touchAction?: string };
+  pinch?     : { threshold?: number; trackpad?: boolean; wheelIntensity?: number };
+  press?     : { delay?: number; interval?: number; tolerance?: Tolerance };
+  rotate?    : { threshold?: number; trackpad?: boolean };
+  secondary? : { nativeMenu?: boolean };
+  swipe?     : { minimumDistance?: number; minimumSpeed?: number; touchAction?: string };
+  tap?       : { interval?: number; maximumDuration?: number; tolerance?: Tolerance; waitForDoubleTap?: boolean };
+  wheel?     : { modifier?: 'alt' | 'control' | 'meta' | 'shift' | null; nativeScroll?: boolean };
 }
-export interface PannableOptions {
-  onPanStart?: (payload: PanPayload) => void;
-  onPan?: (payload: PanPayload) => void;
-  onPanEnd?: (payload: PanPayload) => void;
-  tolerance?: number;   // px before the drag starts (default 8)
-}
-export function pannable (options?: PannableOptions): RecognizerPart;
 
-export interface AdjustMeta { axis: Axis; final: boolean; element: Element; }
-export interface AdjustableOptions {
-  onAdjust?: (value: number, meta: AdjustMeta) => void;
-  value?: number;                       // starting value (default 48)
-  min?: number;                         // default 48
-  max?: number;                         // default 256
-  steps?: number | number[] | null;     // snap target on release (default null)
-  axis?: Axis;                          // 'auto' derives from the finger pair
-  wheelStep?: number;                   // ctrl/cmd + wheel increment (default 16)
-  wheel?: boolean;                      // enable the wheel fallback (default true)
+export interface GestureOptions extends Handlers, RecognizerOptions {
+  recognize?   : GestureName[];   // for listeners added with addEventListener
+  touchAction? : string;          // instead of the strictest one the recognizers ask for
 }
-export function adjustable (options?: AdjustableOptions): RecognizerPart & { set: (value: number) => void };
-
-export type Modifier = 'ctrl' | 'meta' | 'shift' | 'alt';
-
-export interface WheelPayload { deltaX: number; deltaY: number; event: WheelEvent; }
-export interface WheelableOptions {
-  onWheel?: (payload: WheelPayload) => void;
-  modifier?: Modifier | null;   // only react while this key is held (default null)
-}
-export function wheelable (options?: WheelableOptions): RecognizerPart;
-
-export interface PinchPayload {
-  scale: number;        // relative to the gesture start (start = 1)
-  deltaScale: number;   // ratio since the previous event
-  focal: Point;         // finger midpoint (client coords)
-  event: PointerEvent;
-}
-export interface PinchableOptions {
-  onPinchStart?: (payload: PinchPayload) => void;
-  onPinch?: (payload: PinchPayload) => void;
-  onPinchEnd?: (payload: PinchPayload) => void;
-}
-export function pinchable (options?: PinchableOptions): RecognizerPart;
-
-export interface RotatePayload {
-  rotation: number;        // accumulated degrees over the gesture
-  deltaRotation: number;   // degrees since the previous event
-  focal: Point;
-  event: PointerEvent;
-}
-export interface RotatableOptions {
-  onRotateStart?: (payload: RotatePayload) => void;
-  onRotate?: (payload: RotatePayload) => void;
-  onRotateEnd?: (payload: RotatePayload) => void;
-}
-export function rotatable (options?: RotatableOptions): RecognizerPart;
-
-export interface Transform { x: number; y: number; scale: number; rotation: number; }
-export interface TransformPayload extends Transform {
-  matrix: [number, number, number, number, number, number];   // matrix(a,b,c,d,e,f)
-  focal: Point;
-  event: PointerEvent | WheelEvent;
-}
-export interface TransformableOptions extends Partial<Transform> {
-  onTransformStart?: (payload: TransformPayload) => void;
-  onTransform?: (payload: TransformPayload) => void;
-  onTransformEnd?: (payload: TransformPayload) => void;
-  minScale?: number;         // default 0.05
-  maxScale?: number;         // default 40
-  pan?: boolean;             // single-pointer + midpoint translation (default true)
-  zoom?: boolean;            // default true
-  rotate?: boolean;          // default true
-  wheel?: boolean;           // wheel zoom (default true)
-  wheelIntensity?: number;   // zoom per normalized wheel pixel (default 0.0015)
-  wheelModifier?: Modifier | null;
-}
-export function transformable (options?: TransformableOptions): RecognizerPart & {
-  set: (transform: Partial<Transform>) => void;
-  get: () => Transform;
-};
-
-// ── compose ──────────────────────────────────────────────────────────────
-
-export type GestureOptions =
-  PressableOptions & HoldableOptions & SwipeableOptions & PannableOptions &
-  PinchableOptions & RotatableOptions & WheelableOptions & AdjustableOptions & TransformableOptions & {
-    pressable?: PressableOptions;
-    holdable?: HoldableOptions;
-    swipeable?: SwipeableOptions;
-    pannable?: PannableOptions;
-    pinchable?: PinchableOptions;
-    rotatable?: RotatableOptions;
-    wheelable?: WheelableOptions;
-    adjustable?: AdjustableOptions;
-    transformable?: TransformableOptions;
-  };
-
-export const RECOGNIZERS: readonly string[];
 
 export interface GestureHandle {
-  parts: RecognizerPart[];
+  readonly element : Element;
+  readonly session : Gesture | null;
   destroy (): void;
 }
-export function compose (element: Element, options?: GestureOptions): GestureHandle;
 
-// ── math helpers ─────────────────────────────────────────────────────────
+export function gestures (element: Element, options?: GestureOptions): GestureHandle;
+export default gestures;
 
-export function angle (a: Point, b: Point): number;   // degrees
-export function clamp (value: number, min: number, max: number): number;
-export function distance (a: Point, b: Point): number;
-export function midpoint (a: Point, b: Point): Point;
-export function snap (value: number, steps: number | number[] | null): number;
+// :::::: BUNDLES
+
+export interface AdjustableOptions {
+  maximum?  : number;
+  minimum?  : number;
+  onChange? : (value: number, meta: { element: Element; final: boolean }) => void;
+  steps?    : number | null;
+  value?    : number;
+}
+export function adjustable (element: Element, options?: AdjustableOptions): { destroy (): void; get (): number; set (value: number): number };
+
+export interface DismissableOptions {
+  axis?       : 'x' | 'y';
+  directions? : Direction[];
+  distance?   : number;
+  fade?       : boolean;
+  keyboard?   : boolean;
+  onDismiss?  : (detail: { direction: Direction; element: Element }) => void;
+  onMove?     : (detail: { element: Element; offset: number; progress: number }) => void;
+  remove?     : boolean;
+  speed?      : number;
+}
+export function dismissable (element: Element, options?: DismissableOptions): { destroy (): void; dismiss (direction?: Direction): void; reset (): void };
+
+export interface DragDetail { element: Element; position: Point; target: Element | null }
+export interface DraggableOptions {
+  axis?     : 'x' | 'y' | null;
+  bounds?   : 'parent' | Element | null;
+  drop?     : string | null;
+  grid?     : number | null;
+  inertia?  : boolean;
+  keyboard? : boolean;
+  onDrop?   : (detail: DragDetail) => void;
+  onEnd?    : (detail: DragDetail) => void;
+  onEnter?  : (detail: DragDetail) => void;
+  onLeave?  : (detail: DragDetail) => void;
+  onMove?   : (detail: DragDetail) => void;
+  onStart?  : (detail: DragDetail) => void;
+  revert?   : boolean;
+  snap?     : Point[] | null;
+  step?     : number;
+}
+export function draggable (element: Element, options?: DraggableOptions): { destroy (): void; get (): Point; reset (): void; set (position: Point): void };
+
+export interface PullableOptions {
+  content?    : Element;
+  maximum?    : number;
+  onPull?     : (detail: { distance: number; progress: number; refreshing: boolean }) => void;
+  onRefresh?  : () => unknown;
+  resistance? : number;
+  threshold?  : number;
+}
+export function pullable (element: Element, options?: PullableOptions): { destroy (): void; refresh (): Promise<void> };
+
+export interface SortableOptions {
+  axis?     : 'x' | 'y' | null;
+  handle?   : string | null;
+  hold?     : number;
+  items?    : string | null;
+  keyboard? : boolean;
+  onEnd?    : (detail: { from: number; item: Element; to: number }) => void;
+  onSort?   : (detail: { from: number; item: Element; order: Element[]; to: number }) => void;
+  onStart?  : (detail: { from: number; item: Element }) => void;
+}
+export function sortable (element: Element, options?: SortableOptions): { destroy (): void; order (): Element[] };
+
+export interface TransformState { rotation: number; scale: number; x: number; y: number }
+export interface TransformableOptions {
+  doubleTapScale? : number;
+  initial?        : Partial<TransformState>;
+  keyboard?       : boolean;
+  maximumScale?   : number;
+  minimumScale?   : number;
+  onChange?       : (state: TransformState) => void;
+  rotate?         : boolean;
+  surface?        : Element;
+  wheel?          : 'zoom' | 'pan' | false;
+  wheelIntensity? : number;
+}
+export function transformable (element: Element, options?: TransformableOptions): { destroy (): void; get (): TransformState; reset (): void; set (state: Partial<TransformState>): void };

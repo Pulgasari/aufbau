@@ -1,4 +1,4 @@
-# @aufbau/gestures2 — concept
+# @aufbau/gestures — concept
 
 a working draft. it is meant to change while we build, try and review it.
 decisions below are marked **open** where they are not settled yet.
@@ -277,5 +277,5 @@ on real devices.
 
 ## to try out
 
-`playground.html` next to this file, e.g.
-https://code.pulgasari.dev/aufbau/gestures2/playground.html
+`www/gestures.html` in this repo, e.g.
+https://code.pulgasari.dev/aufbau/www/gestures.html

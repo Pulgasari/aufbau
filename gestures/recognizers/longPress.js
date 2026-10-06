@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/longPress.js
+// @aufbau/gestures/recognizers/longPress.js
 // a session held still for `duration` ms. it claims the session, so a tap does
 // not follow on release.
 //

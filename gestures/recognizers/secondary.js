@@ -1,4 +1,4 @@
-// @aufbau/gestures2/recognizers/secondary.js
+// @aufbau/gestures/recognizers/secondary.js
 // the intent to see options, from the native contextmenu: right click, a long
 // press where the platform fires one, the menu key, shift+f10. not tracked by
 // the session, the platform already decided. the native menu is prevented,

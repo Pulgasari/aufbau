@@ -1,4 +1,4 @@
-// @aufbau/gestures2/bundles/transformable.js
+// @aufbau/gestures/bundles/transformable.js
 // free move, zoom and turn of an element: one finger moves it, two fingers
 // pinch and turn it around their center, the wheel or a trackpad pinch zooms
 // toward the cursor, a double tap zooms in and back. the point under the
