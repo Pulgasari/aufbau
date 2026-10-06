@@ -26,12 +26,10 @@ export default async function middleware (request) {
   console.log(`[Edge Middleware] Parsed cookies -> theme: "${theme}", compact: "${compact}"`);
 
   // 3. Fetch static HTML file from origin
-  const response = await fetch(request);
-
+  const response    = await fetch (request);
   const contentType = response.headers.get('content-type') || '';
-  if (!contentType.includes('text/html')) {
-    return response;
-  }
+  if (!contentType.includes('text/html')) return response;
+  
 
   let html = await response.text();
 
