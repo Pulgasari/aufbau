@@ -4,8 +4,11 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>@aufbau/filters</title>
+  
+  <script src="./fouc.js"></script>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <link rel="stylesheet" href="./demo.css"/>
+  
   <style>
     #subject     { width: min(32rem, 80%); }
     #subject svg { display: block; width: 100%; height: auto; }
@@ -30,13 +33,18 @@
 </head>
 <body>
 
-  <aside>
-    <h1>@aufbau/filters</h1>
-    <p id="about"></p>
-    <nav class="list" id="list"></nav>
-  </aside>
-
+  
+  
+<app-root>
+  <htx-part src='./dock.htx.html'></htx-part>
+  
   <main>
+
+    <aside>
+      <h1>@aufbau/filters</h1>
+      <p id="about"></p>
+      <nav class="list" id="list"></nav>
+    </aside>
 
     <nav role="tablist">
       <button role="tab" aria-controls="dom">dom</button>
@@ -70,31 +78,32 @@
     </section>
 
   </main>
-
   <!-- the host the previewed <filter> of the dom tab lives in -->
   <svg id="defs" aria-hidden="true"></svg>
+</app-root>
 
-  <script type="module">
-    import aufbau from '@aufbau/api';
-    import { createPipeline, filterCanvas, filterCss, filterSvg, list } from '@aufbau/filters';
-    import { render as renderControls } from '@aufbau/gui';
+  
 
+<script type="module">
+  import aufbau          from '@aufbau/api';
+  import { createPipeline, filterCanvas, filterCss, filterSvg, list } from '@aufbau/filters';
+  import { render as renderControls } from '@aufbau/gui';
+  import getFormValues   from '@domina/methods/getFormValues.js';
+  import { settled }     from '@htx/elements';
+  import { htx, render } from '@htx/preact';
+  
     await aufbau.boot();
+    await settled();
 
     // :::::: HELPERS
 
     const $ = id => document.getElementById(id);
 
-    const catalogue = list();
-    const byId      = Object.fromEntries(catalogue.map(filter => [filter.id, filter]));
-
+    const catalogue   = list();
+    const byId        = Object.fromEntries(catalogue.map(filter => [filter.id, filter]));
     const defaultsOf  = filter  => Object.fromEntries(Object.entries(filter.vars).map(([key, spec]) => [key, spec.default]));
     const optionsCode = options => JSON.stringify(options, null, 2).replace(/"([^"]+)":/g, '$1:');
-
-    const backendOf = ({ backends }) =>
-        backends.webgl                    ? 'webgl'
-      : !backends.svg && !backends.css    ? 'imageData'
-      :                                     'bridge';
+    const backendOf   = ({ backends }) => backends.webgl ? 'webgl' : !backends.svg && !backends.css ? 'imageData' : 'bridge';
 
     function showControls (tab, filter, values, onChange) {
       $(`${tab}-title`).textContent = `${filter.name}  ·  ${filter.id}`;
