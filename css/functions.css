@@ -4,6 +4,7 @@ hier ist alles noch recht experimentell.
 
 --- links to read
 https://caniuse.com/wf-function
+https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Custom_functions_and_mixins/Using_custom_functions    
 */
 
 /* returns the negative of a value */
@@ -147,8 +148,8 @@ https://caniuse.com/wf-function
 /* the neighbours on the wheel: --analogous(ink, -1) and (ink, 1) */
 @function --analogous(
   --base type(<color> || <custom-ident>) : ink
-  --step  <number>                           : 1,
-  --angle <angle>                            : 30deg
+  --step  <number> : 1,
+  --angle <angle>  : 30deg
 ) returns <color> {
   result: --hue-shift(var(--base), calc(var(--angle) * var(--step)));
 }
