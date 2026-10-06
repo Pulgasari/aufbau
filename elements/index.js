@@ -21,7 +21,6 @@ const TAGS = [
   'app-area',
   'app-config',
   'app-float',
-  'app-keyboard',
   'app-panel',
   'app-root',
   'app-view',
@@ -106,6 +105,9 @@ const TAGS = [
   'svg-flag',
   'svg-icon',
   'svg-logo',
+
+  'widget-calculator',
+  'widget-keyboard',
 
   'write-code',
   'write-md',

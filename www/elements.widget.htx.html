@@ -1,0 +1,19 @@
+<!-- elements.widget.htx.html: the widget- elements of elements.html -->
+
+<section id="calculator">
+  <h2>widget-calculator</h2>
+  <div class="row"><span>input-number actions="calculator"</span>
+    <input-number actions="calculator" value="125"></input-number></div>
+  <widget-calculator value="200 + 10%"></widget-calculator>
+</section>
+
+<section id="keyboard">
+  <h2>widget-keyboard</h2>
+  <div class="row"><span>layout</span>
+    <input-value id="keyboard-layout" look="segments" value="de">
+      <input-option>de</input-option>
+      <input-option>en</input-option>
+    </input-value></div>
+  <textarea id="keyboard-target" placeholder="type with the keys below"></textarea>
+  <widget-keyboard id="keyboard-demo" target="#keyboard-target" native-keyboard="keep"></widget-keyboard>
+</section>
