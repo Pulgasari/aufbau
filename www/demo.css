@@ -33,6 +33,7 @@ main { overflow-y: auto; min-height: 0; }
   font-size: 2rem;
    justify-content: space-between;
    > * { flex-basis: 0; }
+   a   { color: var(--color-fg); }
 }
 #dock, #dock > * {
   display: flex;
