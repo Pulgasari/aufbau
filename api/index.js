@@ -61,7 +61,7 @@ const dom = {
   adoptStylesheet : async (...args) => (await modules.domina('adoptStylesheet'))(...args),
   getStyleToken   : async (...args) => (await modules.domina('getStyleToken'))(...args),
   setStyleToken   : async (...args) => (await modules.domina('setStyleToken'))(...args),
-  viewport
+  //viewport
 };
 
 // :::::: COMBINED ::::::::::::::::::::::::::::::::::::::::::::::
