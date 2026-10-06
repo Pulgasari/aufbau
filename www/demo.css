@@ -18,6 +18,11 @@ body {
   line-height : 1.5;
 }
 
+app-root {
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;
+}
 
 body  { display: flex; }
 #dock { flex: 0 0 10%; }
