@@ -14,7 +14,6 @@
 
 <app-root>
   <htx-part src='./dock.htx.html'></htx-part>
-  
   <main>
     aufbau
     <!--
@@ -33,9 +32,14 @@
   import aufbau          from '@aufbau/api';
   import { settled }     from '@htx/elements';
   import { htx, render } from '@htx/preact';
+  import { url }         from '@pulgasari/url';
   
   await aufbau.boot();
   await settled();
+  if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
+
+  const $container = document.querySelector('main');
+  render(htx`<${Page}/>`, $container);
 </script>
 
 </body>
