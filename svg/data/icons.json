@@ -1,4 +1,6 @@
 {
+  "aufbau"            : "aufbau:aufbau",
+  
   "add"               : "material-symbols:add",
   "alert"             : "mdi:alert-circle-outline",
   "arrow-down"        : "mdi:arrow-down-bold",
