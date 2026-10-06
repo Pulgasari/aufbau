@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>aufbau</title>
+
+  <!-- absolute paths: this file is served under /elements/, /filters/, ... too -->
+  <script src="/fouc.js"></script>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <link rel="stylesheet" href="/demo.css"/>
+</head>
+<body>
+
+<app-root routing="path">
+  <htx-part src="/pages/dock.htx.html"></htx-part>
+  <main>
+    <!-- one view per route, a lazy view loads its part on the first activation -->
+    <app-view name="home"     route="/"           lazy><template><htx-part src="/pages/home.htx.html"></htx-part></template></app-view>
+    <app-view name="elements" route="/elements/"  lazy><template><htx-part src="/pages/elements.htx.html"></htx-part></template></app-view>
+    <app-view name="filters"  route="/filters/"   lazy><template><htx-part src="/pages/filters.htx.html"></htx-part></template></app-view>
+    <app-view name="gestures" route="/gestures/"  lazy><template><htx-part src="/pages/gestures.htx.html"></htx-part></template></app-view>
+    <app-view name="icons"    route="/icons/"     lazy><template><htx-part src="/pages/icons.htx.html"></htx-part></template></app-view>
+    <app-view name="patterns" route="/patterns/"  lazy><template><htx-part src="/pages/patterns.htx.html"></htx-part></template></app-view>
+    <app-view name="webfonts" route="/webfonts/"  lazy><template><htx-part src="/pages/webfonts.htx.html"></htx-part></template></app-view>
+  </main>
+</app-root>
+
+<script type="module">
+  import aufbau      from '@aufbau/api';
+  import { settled } from '@htx/elements';
+
+  await aufbau.boot();
+  await settled();
+  if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
+
+  // app-root follows the address but does not catch link clicks yet:
+  // a plain left click on a link to a known route switches the view instead of loading the page
+  const root = document.querySelector('app-root');
+
+  document.addEventListener('click', event => {
+    if (event.defaultPrevented || event.button || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const link = event.target.closest('a[href]');
+    if (!link || link.origin !== location.origin || link.target) return;
+    const view = root.views.find(view => view.getAttr('route') === link.pathname);
+    if (!view) return;
+    event.preventDefault();
+    view.activate();
+  });
+</script>
+
+</body>
+</html>
