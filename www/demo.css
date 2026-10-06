@@ -18,15 +18,17 @@ body {
   line-height : 1.5;
 }
 
+body  { display: flex; }
 app-root {
    display: flex;
-   flex-direction: column;
+   flex-direction: row;
    overflow: hidden;
 }
-
-body  { display: flex; }
 #dock { flex: 0 0 10%; }
 main  { flex: 1; }
+
+
+
 
 body { overflow: hidden; }
 main { overflow-y: auto; min-height: 0; }
