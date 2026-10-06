@@ -22,8 +22,10 @@ export default class SvgLogo extends AufbauElement {
     vertical-align   : var(--logo-align, middle);
 
     img {
+      /*
       block-size  : var(--logo-size, 1.5em);
       inline-size : auto;
+      */
       visibility  : hidden;
     }
 
