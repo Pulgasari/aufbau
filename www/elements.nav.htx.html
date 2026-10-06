@@ -16,6 +16,28 @@
     <nav-crumbs path="/a/very/deep/folder/for/crumbs" root="root" max="3"></nav-crumbs></div>
 </section>
 
+<section id="initials">
+  <h2>nav-initials</h2>
+  <div class="row"><span>empty</span>
+    <nav-initials target="#initials-list" empty></nav-initials></div>
+  <div class="row"><span>lang="sv"</span>
+    <nav-initials target="#initials-list" lang="sv" order="desc"></nav-initials></div>
+  <ul id="initials-list" lang="de">
+    <li>Apfel</li><li>Äpfel</li><li>Birne</li><li>Öl</li><li>Orange</li><li>Über</li><li>Uhr</li><li>Zebra</li><li>42</li>
+  </ul>
+</section>
+
+<section id="paginate">
+  <h2>nav-paginate</h2>
+  <div class="row"><span>target, size="3"</span>
+    <nav-paginate target="#paginate-list" size="3"></nav-paginate></div>
+  <ol id="paginate-list">
+    <li>one</li><li>two</li><li>three</li><li>four</li><li>five</li><li>six</li><li>seven</li><li>eight</li><li>nine</li><li>ten</li>
+  </ol>
+  <div class="row"><span>pages="20" page="9"</span>
+    <nav-paginate pages="20" page="9"></nav-paginate></div>
+</section>
+
 <section id="toc-section">
   <h2>nav-toc</h2>
   <p class="hint">the table of contents in the aside, built from the h2 of this page. the entry of the section you read is marked.</p>

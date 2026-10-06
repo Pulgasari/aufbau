@@ -29,7 +29,7 @@ SvgIcon.register({ brand: 'simple-icons:deno' });  // eigene aliases, überschre
 <svg-icon icon="aufbau:aufbau"></svg-icon>      <!-- icons/aufbau.svg -->
 <svg-icon icon="info" label="Hinweis"></svg-icon> <!-- mit label: role img, sonst aria-hidden -->
 <svg-flag code="de"></svg-flag>
-<svg-logo logo="zugriff" label="zugriff"></svg-logo> <!-- logos/zugriff.svg -->
+<svg-logo logo="zugriff" label="zugriff"></svg-logo> <!-- logos/zugriff.svg, in currentColor -->
 ```
 
 `@aufbau/elements` hängt nicht von diesem package ab. `<svg-icon>` lädt

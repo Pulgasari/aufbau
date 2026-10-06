@@ -85,7 +85,12 @@ const TAGS = [
   'media-video',
   'media-wave',
 
+  'mock-img',
+  'mock-p',
+
   'nav-crumbs',
+  'nav-initials',
+  'nav-paginate',
   'nav-toc',
 
   'output-md',

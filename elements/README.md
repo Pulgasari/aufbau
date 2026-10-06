@@ -448,6 +448,31 @@ die balken werden nur bei neuen peaks neu gezeichnet. farben über
 `--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
 `--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
 
+## mock-img
+
+ein platzhalter-foto von [picsum.photos](https://picsum.photos). gleicher `seed`,
+gleiches foto, ohne `seed` bekommt jedes element ein anderes.
+
+```html
+<mock-img width="400" height="300"></mock-img>
+<mock-img seed="aufbau" width="160" height="120" grayscale blurred="3"></mock-img>
+```
+
+`blurred` statt `blur`: `blur` ist eine methode von `HTMLElement`, renderer wie
+htx oder preact setzen es als property statt als attribut.
+
+## mock-p
+
+ein absatz lorem ipsum, lokal erzeugt, ohne api. `seed` hält den text über
+ladevorgänge gleich, `classic` beginnt mit „Lorem ipsum dolor sit amet“.
+
+```html
+<mock-p></mock-p>                    <!-- 50 wörter -->
+<mock-p words="120" seed="intro" classic></mock-p>
+```
+
+`lorem({ classic, random, words })` gibt es auch als export von `mock-p.js`.
+
 ## nav-crumbs
 
 brotkrumen-navigation. der host ist die navigation-landmark, die trenner sind
@@ -471,6 +496,44 @@ im light dom. zwei quellen:
 
 `max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
 den pfad (default `/`).
+
+## nav-initials
+
+die anfangsbuchstaben der items in `target`, ein button je buchstabe, der zum
+ersten item scrollt und `nav-initials` mit `{ initial, items }` feuert.
+
+```html
+<nav-initials target="#contacts" empty></nav-initials>
+<ul id="contacts">…</ul>
+```
+
+| attribut | |
+|---|---|
+| `target` | der container |
+| `items` | die items darin, default `:scope > *` |
+| `text` | selector im item, dessen text zählt, default das item selbst |
+| `empty` | auch buchstaben ohne items, disabled |
+| `alphabet` | die buchstaben für `empty`, default `A`–`Z` |
+| `order` | `asc` (default) oder `desc` |
+
+gruppiert und sortiert wird mit `Intl.Collator` in der sprache des elements
+(nächstes `[lang]`, sonst das dokument): auf deutsch geht Ü zu U, auf schwedisch
+ist Ö ein eigener buchstabe nach Z. alles ohne buchstaben vorn landet unter `#`.
+
+## nav-paginate
+
+seiten der items in `target`: die items außerhalb der seite bekommen `hidden`.
+ohne `target` zeigt es nur `pages` und meldet die gewählte seite, z.b. für
+serverseitiges paging.
+
+```html
+<nav-paginate target="#results" size="20"></nav-paginate>
+<nav-paginate pages="20" page="9"></nav-paginate>
+```
+
+`page` ist die aktuelle seite (1-basiert), `size` items pro seite, `around` wie
+viele nachbarn um die aktuelle seite stehen (`1 … 8 9 10 … 20`). ein wechsel
+setzt `page` und feuert `nav-paginate` mit `{ page, pages }`.
 
 ## nav-toc
 
@@ -690,12 +753,13 @@ das präfix `aufbau` nimmt die dateien aus `@aufbau/svg/icons/` statt iconify.
 
 ## svg-logo
 
-ein logo aus `@aufbau/svg/logos/` in seinen eigenen farben. ein `<img>`, die
-breite folgt dem seitenverhältnis der datei, `size` setzt die höhe.
+ein logo aus `@aufbau/svg/logos/`, vorerst nur monochrom in `currentColor` wie
+`<svg-icon>` (die datei ist die maske). ein verstecktes `<img>` der datei gibt die
+breite zur höhe, `size` setzt die höhe.
 
 ```html
 <svg-logo logo="zugriff"></svg-logo>
-<svg-logo logo="aufbau" size="3rem" label="aufbau"></svg-logo>   <!-- sonst alt="" -->
+<svg-logo logo="aufbau" size="3rem" color="tomato" label="aufbau"></svg-logo>   <!-- sonst aria-hidden -->
 ```
 
 ## write-code
