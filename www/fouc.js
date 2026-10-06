@@ -64,8 +64,8 @@ const config = {
 //initGestalt (config.gestalt);
 //initService (config.sw);
 
-$style.setProperty(`--bg`, 'red');
-$style.setProperty(`--fg`, 'yellow');
+$style.setProperty(`--color-bg`, 'red');
+$style.setProperty(`--color-fg`, 'yellow');
 
 // :::::: Task 0: Devtools Recorder
 // @aufbau/devtools/recorder.js records console calls and failed loads from here
