@@ -11,6 +11,7 @@ import createElement from '@domina/methods/createElement.js';
 import fmt           from '../fmt.js';
 import settings      from '../settings.js';
 import { button }    from './kit.js';
+import { DevPanel }  from './DevPanel.js';
 
 // :::::: FEATURE PROBES ::::::::::::::::::::::::::::::::::::::::
 
@@ -673,3 +674,12 @@ export function createDataPanel () {
 }
 
 export default createDataPanel;
+
+// :::::: ELEMENT
+
+export class DevData extends DevPanel {
+  static create = createDataPanel;
+  static icon   = 'mdi:database-outline';
+}
+
+DevData.init();

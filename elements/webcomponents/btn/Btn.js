@@ -5,7 +5,7 @@ import { isFn }          from '@pulgasari/is';
 import { toCamelCase }   from '@pulgasari/str';
 import { html }          from '../../lib/html.js';
 
-// command -> icon (an alias of @aufbau/icons) and label. Btn.commands takes more
+// command -> icon (an alias of @aufbau/svg) and label. Btn.commands takes more
 const COMMANDS = {
   add      : { icon: 'add',          label: 'add'      },
   back     : { icon: 'arrow-left',   label: 'back'     },

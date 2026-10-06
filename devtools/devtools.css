@@ -87,7 +87,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
   background     : color-mix(in oklch, var(--color-bg), black 20%);
   display        : flex;
   flex-flow      : column;
-  /* no height here: the aside is the menu plus whatever panel is open, and a
+  /* no height here: the element is the menu plus whatever panel is open, and a
      height on it would stretch the menu to fill it when nothing is */
   font-size      : var(--dt-font, 13px);
   line-height    : 1.45;
@@ -98,13 +98,13 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
   &[data-position="top"] { flex-flow: column-reverse; }
 
   /* the drag handle. it belongs to the open panel, so with none open there is
-     nothing to resize and nothing to show. it stays a child of the aside rather
+     nothing to resize and nothing to show. it stays a child of the element rather
      than moving into the section: the section scrolls, and a grip that scrolls
      away with the content is not a grip.
 
      touch-action is what stops the browser from scrolling the page instead of
      letting the pointer events through */
-  &:not(:has(> section:not([hidden]))) > div:first-child { display: none; }
+  &:not(:has(> [data-panel]:not([hidden]))) > div:first-child { display: none; }
 
   > div:first-child {
     flex           : none;
@@ -149,7 +149,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
      :not([hidden]) is load-bearing: a closed panel is hidden by the attribute
      alone, and an unconditional `display` here would win over the ua stylesheet's
      [hidden] { display: none } and show every panel at once */
-  > section:not([hidden]) {
+  > [data-panel]:not([hidden]) {
     /* the height lives here, on the panel itself: a fixed one, not a cap, so the
        panel does not resize every time you switch tabs and move the thing you
        were about to tap */
@@ -537,7 +537,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
   }
 
   /* long urls and stack traces: wrap by default, one setting away from a scroll */
-  &[data-wrap="off"] > section#devtools-console > ol > li > div {
+  &[data-wrap="off"] > #devtools-console > ol > li > div {
     white-space  : pre;
     overflow-x   : auto;
     overflow-wrap: normal;
@@ -545,7 +545,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
   /* :::: elements ::::::::::::::::::::::::::::::::::::::::::::::: */
 
-  > section#devtools-dom {
+  > #devtools-dom {
     /* the tree */
     > nav {
       max-block-size     : 40dvh;
@@ -621,7 +621,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
   /* :::: files ::::::::::::::::::::::::::::::::::::::::::::::::: */
 
-  > section#devtools-files {
+  > #devtools-files {
     header {
       flex-wrap: wrap;
 
@@ -694,7 +694,7 @@ body:has(#devtools[data-position="top"]) { flex-direction: column-reverse; }
 
   /* :::: live css ::::::::::::::::::::::::::::::::::::::::::::::: */
 
-  > section#devtools-css write-code pre {
+  > #devtools-css write-code pre {
     max-block-size: 40dvh;
     overflow-y    : auto;
   }

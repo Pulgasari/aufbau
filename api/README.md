@@ -145,7 +145,7 @@ um derlei infos parat zu haben.
 @aufbau/ass
 @aufbau/elements
 @aufbau/gui
-@aufbau/icons
+@aufbau/svg
 @aufbau/import
 
 @aufbau/filters

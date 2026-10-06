@@ -6,7 +6,7 @@ them, in one package. what they build on, the base class, config and skin, is
 
 | folder           | what it is |
 |------------------|------------|
-| `webcomponents/` | every element, one file each named like its tag: `app-keyboard.js`, `div-x.js`, … the inputs that are a type are all in `input/tags.js` |
+| `webcomponents/` | every element, one file each named like its tag: `btn-icon.js`, `div-x.js`, … the inputs that are a type are all in `input/tags.js` |
 | `lib/`           | helpers of the elements: html, actions, locale, options, placement, … |
 | `data/`          | the lists the inputs pick from |
 | `adapters/`      | htx |
@@ -64,13 +64,13 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 the building blocks, in families by what they are for: `btn-` buttons, `data-`
 collections, `embed-` content of other sites, `media-` files and players, `nav-`
 navigation, `output-` values shown, `pop-` everything that opens over the page,
-`svg-` icons, `write-` editors. the controls that hold a value are the input-*
+`svg-` icons, `widget-` small tools of their own (keyboard, calculator),
+`write-` editors. `mock-` fills a page with placeholders. the controls that hold a value are the input-*
 elements below.
 
 `aufbau-loop`, `aufbau-progress` and `aufbau-skeleton` keep their `aufbau-` names
 for now: no better name found yet, and not happy with these.
 
-[`<app-keyboard>`](#app-keyboard) ·
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
@@ -87,7 +87,11 @@ for now: no better name found yet, and not happy with these.
 [`<media-file>`](#media-file) ·
 [`<media-video>`](#media-video) ·
 [`<media-wave>`](#media-wave) ·
+[`<mock-img>`](#mock-img) ·
+[`<mock-p>`](#mock-p) ·
 [`<nav-crumbs>`](#nav-crumbs) ·
+[`<nav-initials>`](#nav-initials) ·
+[`<nav-paginate>`](#nav-paginate) ·
 [`<nav-toc>`](#nav-toc) ·
 [`<output-md>`](#output-md) ·
 [`<output-value>`](#output-value) ·
@@ -99,37 +103,11 @@ for now: no better name found yet, and not happy with these.
 [`<pop-toast>`](#pop-toast) ·
 [`<svg-flag>`](#svg-flag) ·
 [`<svg-icon>`](#svg-icon) ·
+[`<svg-logo>`](#svg-logo) ·
+[`<widget-calculator>`](#widget-calculator) ·
+[`<widget-keyboard>`](#widget-keyboard) ·
 [`<write-code>`](#write-code) ·
 [`<write-text>`](#write-text) ·
-
-## app-keyboard
-
-eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
-sie tippt in das, was fokus hat, oder in `target`, indem sie die
-keyboard-events schickt, die eine echte taste schicken würde. wo der browser
-die VirtualKeyboard-api hat, hält sie die native tastatur unten.
-
-```html
-<app-keyboard></app-keyboard>
-<app-keyboard layout="en" target="#editor textarea"></app-keyboard>
-<app-keyboard rows="keys" native-keyboard="keep"></app-keyboard>
-```
-
-`rows` sagt, welche blöcke in welcher reihenfolge gerendert werden
-(`"symbols keys"` ist der default). `layout` ist `de` oder `en`, eigene kommen
-über `AppKeyboard.layouts.fr = { regular, shift, symbols }` dazu: eine reihe
-ist ein string aus zeichen, ein leerzeichen darin ist eine lücke.
-
-`shift`, `caps`, `ctrl` und `alt` stehen als attribute am element, sind also
-les- und stylebar; shift, ctrl und alt sind einmalig und fallen mit der taste
-weg, die sie modifiziert haben. jede taste meldet sich als
-`app-keyboard-key`, und `press(key)` / `toggle(name)` gehen auch ohne klick.
-
-zwei dinge, die sie von der vorlage aus `apps/code` unterscheiden: eine taste,
-die ein editor selbst behandelt (`preventDefault` auf dem keydown), wird nicht
-noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
-wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
-hat und sonst gar nichts passieren würde.
 
 ## aufbau-loop
 
@@ -448,6 +426,31 @@ die balken werden nur bei neuen peaks neu gezeichnet. farben über
 `--waveform-played`, `--waveform-range`, `--waveform-rest`, höhe über
 `--waveform-height`. `interactive` macht ihn zum slider (klick, pfeiltasten).
 
+## mock-img
+
+ein platzhalter-foto von [picsum.photos](https://picsum.photos). gleicher `seed`,
+gleiches foto, ohne `seed` bekommt jedes element ein anderes.
+
+```html
+<mock-img width="400" height="300"></mock-img>
+<mock-img seed="aufbau" width="160" height="120" grayscale blurred="3"></mock-img>
+```
+
+`blurred` statt `blur`: `blur` ist eine methode von `HTMLElement`, renderer wie
+htx oder preact setzen es als property statt als attribut.
+
+## mock-p
+
+ein absatz lorem ipsum, lokal erzeugt, ohne api. `seed` hält den text über
+ladevorgänge gleich, `classic` beginnt mit „Lorem ipsum dolor sit amet“.
+
+```html
+<mock-p></mock-p>                    <!-- 50 wörter -->
+<mock-p words="120" seed="intro" classic></mock-p>
+```
+
+`lorem({ classic, random, words })` gibt es auch als export von `mock-p.js`.
+
 ## nav-crumbs
 
 brotkrumen-navigation. der host ist die navigation-landmark, die trenner sind
@@ -471,6 +474,44 @@ im light dom. zwei quellen:
 
 `max` kürzt die mitte zu einem `…`, das per klick aufklappt. `separator` trennt
 den pfad (default `/`).
+
+## nav-initials
+
+die anfangsbuchstaben der items in `target`, ein button je buchstabe, der zum
+ersten item scrollt und `nav-initials` mit `{ initial, items }` feuert.
+
+```html
+<nav-initials target="#contacts" empty></nav-initials>
+<ul id="contacts">…</ul>
+```
+
+| attribut | |
+|---|---|
+| `target` | der container |
+| `items` | die items darin, default `:scope > *` |
+| `text` | selector im item, dessen text zählt, default das item selbst |
+| `empty` | auch buchstaben ohne items, disabled |
+| `alphabet` | die buchstaben für `empty`, default `A`–`Z` |
+| `order` | `asc` (default) oder `desc` |
+
+gruppiert und sortiert wird mit `Intl.Collator` in der sprache des elements
+(nächstes `[lang]`, sonst das dokument): auf deutsch geht Ü zu U, auf schwedisch
+ist Ö ein eigener buchstabe nach Z. alles ohne buchstaben vorn landet unter `#`.
+
+## nav-paginate
+
+seiten der items in `target`: die items außerhalb der seite bekommen `hidden`.
+ohne `target` zeigt es nur `pages` und meldet die gewählte seite, z.b. für
+serverseitiges paging.
+
+```html
+<nav-paginate target="#results" size="20"></nav-paginate>
+<nav-paginate pages="20" page="9"></nav-paginate>
+```
+
+`page` ist die aktuelle seite (1-basiert), `size` items pro seite, `around` wie
+viele nachbarn um die aktuelle seite stehen (`1 … 8 9 10 … 20`). ein wechsel
+setzt `page` und feuert `nav-paginate` mit `{ page, pages }`.
 
 ## nav-toc
 
@@ -677,14 +718,77 @@ der accessible name ist der ländername in der seitensprache (`de` → „Deutsc
 ## svg-icon
 
 reines css, kein markup. volle iconify-id oder alias, aliases kommen aus
-[`@aufbau/icons`](../icons/README.md) (lazy nachgeladen oder per import registriert).
+[`@aufbau/svg`](../svg/README.md) (lazy nachgeladen oder per import registriert).
+das präfix `aufbau` nimmt die dateien aus `@aufbau/svg/icons/` statt iconify.
 
 ```html
 <svg-icon icon="lucide:save"></svg-icon>
+<svg-icon icon="aufbau:aufbau"></svg-icon>             <!-- @aufbau/svg/icons/aufbau.svg -->
 <svg-icon icon="save" size="2em" color="tomato"></svg-icon>
 <svg-icon icon="logos:deno" mode="image"></svg-icon>   <!-- mehrfarbig -->
 <svg-icon icon="info" label="Hinweis"></svg-icon>      <!-- sonst aria-hidden -->
 ```
+
+## svg-logo
+
+ein logo aus `@aufbau/svg/logos/`, vorerst nur monochrom in `currentColor` wie
+`<svg-icon>` (die datei ist die maske). ein verstecktes `<img>` der datei gibt die
+breite zur höhe, `size` setzt die höhe.
+
+```html
+<svg-logo logo="zugriff"></svg-logo>
+<svg-logo logo="aufbau" size="3rem" color="tomato" label="aufbau"></svg-logo>   <!-- sonst aria-hidden -->
+```
+
+## widget-calculator
+
+ein taschenrechner als eingabe für eine zahl. der ausdruck steht im display und
+lässt sich frei bearbeiten, `✓` rechnet ihn aus und meldet das ergebnis.
+
+```html
+<widget-calculator value="125"></widget-calculator>
+<input-number actions="calculator"></input-number>   <!-- öffnet ihn im popover -->
+```
+
+- `+ − × ÷`, klammern, `%` wie am handy: `200 + 10%` ist 220, `200 × 10%` ist 20
+- `( )` setzt die klammer, die gerade passt. offene klammern am ende schließen sich
+- das dezimalzeichen kommt aus der sprache des elements (`,` auf deutsch)
+- kopfzeile: schließen, kopieren, einfügen, zurücksetzen, systemtastatur
+- `α` tauscht die tasten gegen `<widget-keyboard>`
+- gerechnet wird mit einem kleinen parser, ohne `eval`. `calculate(text)` gibt es
+  auch als export, `null` für einen ungültigen ausdruck
+
+events: `widget-calculator` mit `{ action: 'done', value }` bei `✓` oder enter,
+`{ action: 'close' }` beim schließen oder escape.
+
+## widget-keyboard
+
+eine bildschirmtastatur — fürs handy und überall da, wo die echte im weg ist.
+sie tippt in das, was fokus hat, oder in `target`, indem sie die
+keyboard-events schickt, die eine echte taste schicken würde. wo der browser
+die VirtualKeyboard-api hat, hält sie die native tastatur unten.
+
+```html
+<widget-keyboard></widget-keyboard>
+<widget-keyboard layout="en" target="#editor textarea"></widget-keyboard>
+<widget-keyboard rows="keys" native-keyboard="keep"></widget-keyboard>
+```
+
+`rows` sagt, welche blöcke in welcher reihenfolge gerendert werden
+(`"symbols keys"` ist der default). `layout` ist `de` oder `en`, eigene kommen
+über `WidgetKeyboard.layouts.fr = { regular, shift, symbols }` dazu: eine reihe
+ist ein string aus zeichen, ein leerzeichen darin ist eine lücke.
+
+`shift`, `caps`, `ctrl` und `alt` stehen als attribute am element, sind also
+les- und stylebar; shift, ctrl und alt sind einmalig und fallen mit der taste
+weg, die sie modifiziert haben. jede taste meldet sich als
+`widget-keyboard-key`, und `press(key)` / `toggle(name)` gehen auch ohne klick.
+
+zwei dinge, die sie von der vorlage aus `apps/code` unterscheiden: eine taste,
+die ein editor selbst behandelt (`preventDefault` auf dem keydown), wird nicht
+noch ein zweites mal getippt — und ein blankes `<input>`/`<textarea>` wird
+wirklich editiert, weil ein synthetisches KeyboardEvent keine default-action
+hat und sonst gar nichts passieren würde.
 
 ## write-code
 

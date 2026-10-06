@@ -12,6 +12,7 @@ change if that trade ever stops being worth it.
 
 import createElement from '@domina/methods/createElement.js';
 import settings, { SECTIONS, SPEC } from '../settings.js';
+import { DevPanel } from './DevPanel.js';
 
 const el = createElement;
 
@@ -100,3 +101,12 @@ export function createSettingsPanel () {
 }
 
 export default createSettingsPanel;
+
+// :::::: ELEMENT
+
+export class DevSettings extends DevPanel {
+  static create = createSettingsPanel;
+  static icon   = 'mdi:tune-variant';
+}
+
+DevSettings.init();

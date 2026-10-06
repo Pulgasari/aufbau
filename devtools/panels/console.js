@@ -16,6 +16,7 @@ import createElement from '@domina/methods/createElement.js';
 
 import settings                from '../settings.js';
 import { inspector, preview }  from '../inspector.js';
+import { DevPanel }              from './DevPanel.js';
 
 const el = createElement;
 
@@ -517,3 +518,12 @@ export function createConsolePanel () {
 }
 
 export default createConsolePanel;
+
+// :::::: ELEMENT
+
+export class DevConsole extends DevPanel {
+  static create = createConsolePanel;
+  static icon   = 'mdi:console-line';
+}
+
+DevConsole.init();

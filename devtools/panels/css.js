@@ -7,6 +7,7 @@
 
 import createElement from '@domina/methods/createElement.js';
 import settings      from '../settings.js';
+import { DevPanel }  from './DevPanel.js';
 
 const KEY = 'devtools:css';
 
@@ -43,3 +44,12 @@ export function createCssPanel () {
 }
 
 export default createCssPanel;
+
+// :::::: ELEMENT
+
+export class DevCss extends DevPanel {
+  static create = createCssPanel;
+  static icon   = 'ph:file-css-fill';
+}
+
+DevCss.init();

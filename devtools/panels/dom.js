@@ -14,6 +14,7 @@ and without the guard the tree contains itself and every pick lands on a devtool
 
 import createElement from '@domina/methods/createElement.js';
 import fmt from '../fmt.js';
+import { DevPanel } from './DevPanel.js';
 
 const el = createElement;
 const PANEL_ID   = 'devtools';
@@ -481,3 +482,17 @@ export function createDomPanel () {
 }
 
 export default createDomPanel;
+
+// :::::: ELEMENT
+
+export class DevDom extends DevPanel {
+  static create = createDomPanel;
+  static icon   = 'mdi:file-tree';
+
+  // picking is wanted from the menu of <dev-tools> as well
+  pick (on) { return this.panel.pick(on); }
+
+  set onPickChange (fn) { this.panel.onPickChange = fn; }
+}
+
+DevDom.init();

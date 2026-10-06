@@ -1,15 +1,16 @@
 import { html } from './html.js';
 
-export const ACTIONS = ['copy', 'paste', 'clear', 'reveal'];
+export const ACTIONS = ['copy', 'paste', 'clear', 'reveal', 'calculator'];
 
 const ICONS = {
-  clear  : 'lucide:eraser',
-  copy   : 'lucide:copy',
-  done   : 'lucide:check',
-  fail   : 'lucide:x',
-  paste  : 'lucide:clipboard-paste',
-  reveal : 'lucide:eye',
-  veil   : 'lucide:eye-off',
+  calculator : 'lucide:calculator',
+  clear      : 'lucide:eraser',
+  copy       : 'lucide:copy',
+  done       : 'lucide:check',
+  fail       : 'lucide:x',
+  paste      : 'lucide:clipboard-paste',
+  reveal     : 'lucide:eye',
+  veil       : 'lucide:eye-off',
 };
 
 export const parseActions = (tokens) => {
@@ -68,7 +69,41 @@ const insert = (node, text) => {
   if (!document.execCommand('insertText', false, text)) fallback(node, text);
 };
 
+// one calculator in a popover for every field, it writes into the one that opened it
+let calculator = null;
+
+async function openCalculator (host) {
+  await Promise.all([import('../webcomponents/pop-over.js'), import('../webcomponents/widget-calculator.js')]);
+
+  if (!calculator) {
+    const pop    = document.createElement('pop-over');
+    const widget = document.createElement('widget-calculator');
+    pop.append(widget);
+    document.body.append(pop);
+
+    widget.addEventListener('widget-calculator', ({ detail }) => {
+      if (detail.action === 'done' && detail.value != null) calculator.host?.setValue(String(detail.value));
+      pop.hide();
+    });
+    pop.addEventListener('pop-over', ({ detail }) => { if (!detail.open) calculator.host = null; });
+
+    // the field that opened it is the anchor, not what had the focus
+    Object.defineProperty(pop, 'anchorElement', { get: () => calculator.host });
+
+    calculator = { host: null, pop, widget };
+  }
+
+  const value = host.value ?? '';
+  calculator.host = host;
+  calculator.widget.setAttribute('value', value);
+  calculator.widget.setExpression(value);
+  calculator.pop.show();
+  calculator.widget.display?.focus();
+}
+
 export const runAction = {
+  calculator (host) { return openCalculator(host); },
+
   async copy (host, button) {
     try   { await navigator.clipboard.writeText(host.actionText()); flash(button, true); host.emit('aufbau-copy', { text: host.actionText() }); }
     catch (error) { flash(button, false); console.warn(`[${host.localName}] copy failed:`, error); }
