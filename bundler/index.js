@@ -24,7 +24,16 @@ async function bundle (config, { steps = STEPS } = {}) {
 
   await removePath(out);
   await makeDirectory(out);
-  for (const step of steps) await step(context);
+  // how long each step took, for the report
+  const timing = [];
+  for (const step of steps) {
+    const started = performance.now();
+    await step(context);
+    timing.push([step.name, performance.now() - started]);
+  }
+
+  const total = timing.reduce((sum, [, ms]) => sum + ms, 0);
+  context.report('timing', [`${(total / 1000).toFixed(1)} s in all`, ...timing.filter(([, ms]) => ms >= 1).map(([name, ms]) => `${name} ${ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`}`)]);
 
   // markdown, e.g. for a ci step summary
   const summary = [...sections].map(([title, lines]) => [`#### ${title}`, '', ...lines.map(line => `- ${line}`)].join('\n')).join('\n\n');

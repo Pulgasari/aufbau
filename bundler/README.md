@@ -50,5 +50,8 @@ relative to itself. they stay as soon as prune reaches a file of that package:
 ```
 vendor and icons install what they need from npm into the system temp dir.
 
-`bundle()` returns `{ out, sections, summary }`, the summary as markdown (what is
-local, what was vendored, what still goes over the network, the size).
+`bundle()` returns `{ out, sections, summary }`, the summary as markdown: what is
+local, what was vendored, the files in and out per extension, their size with
+gzip and brotli, the areas (own files, packages, vendored modules), the largest
+files, duplicate contents, what still goes over the network and the time of
+every step.

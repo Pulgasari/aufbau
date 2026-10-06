@@ -43,8 +43,9 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
 | `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `SvgIcon.provide()` |
 | `webfonts` | built | only the fonts a config names or the code quotes, the catalog lists only those |
+| `survey`   | built | what the output holds before prune, for the report |
 | `prune`    | built | files nothing reaches are dropped |
-| `report`   | built | what still goes over the network, and the size |
+| `report`   | built | files in and out per extension, compressed size, areas, largest files, duplicates, network |
 
 ## vendor
 
