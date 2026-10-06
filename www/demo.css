@@ -49,6 +49,9 @@ main { overflow-y: auto; min-height: 0; }
   btn-icon { --pad: small; }
 }
 
+#dock a   { color: var(--color-fg); }
+#dock div { display: block; flex: 0 1 auto; }
+
   
 /* 1. Make native scrollbar transparent so the progress bar shines through */
 ::-webkit-scrollbar       { width: 12px; }
