@@ -82,9 +82,15 @@ for now: no better name found yet, and not happy with these.
 [`<data-table>`](#data-table) ·
 [`<data-tree>`](#data-tree) ·
 [`<embed-content>`](#embed-content) ·
+[`<input-address>`](#input-address) ·
 [`<input-file>`](#input-file) ·
 [`<media-audio>`](#media-audio) ·
 [`<media-file>`](#media-file) ·
+[`<media-font>`](#media-font) ·
+[`<media-gif>`](#media-gif) ·
+[`<media-json>`](#media-json) ·
+[`<media-pdf>`](#media-pdf) ·
+[`<media-svg>`](#media-svg) ·
 [`<media-video>`](#media-video) ·
 [`<media-wave>`](#media-wave) ·
 [`<mock-img>`](#mock-img) ·
@@ -101,9 +107,11 @@ for now: no better name found yet, and not happy with these.
 [`<pop-prompt>`](#pop-prompt) ·
 [`<pop-tip>`](#pop-tip) ·
 [`<pop-toast>`](#pop-toast) ·
+[`<svg-file>`](#svg-file) ·
 [`<svg-flag>`](#svg-flag) ·
 [`<svg-icon>`](#svg-icon) ·
 [`<svg-logo>`](#svg-logo) ·
+[`<svg-sprite>`](#svg-sprite) ·
 [`<widget-calculator>`](#widget-calculator) ·
 [`<widget-keyboard>`](#widget-keyboard) ·
 [`<write-code>`](#write-code) ·
@@ -367,6 +375,18 @@ die sich nicht einbetten lässt, macht den platzhalter zum link.
 `activate()` lädt von außen, danach `:state(active)` und das event `activate`
 mit `{ provider, src }`. `resolveEmbed(url)` ist exportiert.
 
+## input-address
+
+eine postanschrift: straße, plz, ort, region und land, in der reihenfolge, die
+das land schreibt (us, ca, au: ort, region, plz; gb, ie: ort, dann plz; sonst
+plz vor ort). ohne land gilt die region der sprache. der wert ist json, ein
+formular bekommt einen eintrag je teil: `address[street]`, `address[city]`, …
+
+```html
+<input-address name="address"></input-address>
+<input-address name="billing" value='{"street":"Hauptstr. 1","postcode":"10115","city":"Berlin","country":"DE"}' required></input-address>
+```
+
 ## input-file
 
 `accept` statt `mimetype`, weil das native attribut mehr kann: mimetypes
@@ -404,6 +424,54 @@ der endung.
 <media-file src="/files/scan.pdf" label="Rechnung"></media-file>
 <media-file src="/api/blob/42" type="image/png"></media-file>
 ```
+
+## media-font
+
+eine schriftdatei als muster: name, ein satz in ein paar größen und die
+zeichen. `family` registriert sie unter einem eigenen namen.
+
+```html
+<media-font src="/fonts/manrope.ttf" sizes="16 24 36" text="Zwölf Boxkämpfer jagen Viktor"></media-font>
+```
+
+## media-gif
+
+ein gif, das anhalten kann: ein klick (oder leertaste) hält es an, ein standbild
+des gerade sichtbaren frames liegt dann darüber. bei `prefers-reduced-motion`
+startet es angehalten. `play()`, `pause()`, `toggle()`.
+
+```html
+<media-gif src="/files/dance.gif" alt="a dancing cat"></media-gif>
+```
+
+## media-json
+
+eine json-datei als aufklappbarer baum (`data-tree`), `depth` ebenen sind offen.
+`value` nimmt daten, die schon da sind.
+
+```html
+<media-json src="/package.json" depth="2"></media-json>
+```
+
+## media-pdf
+
+ein pdf im viewer des browsers, `page` springt zu einer seite. viele mobile
+browser zeigen pdfs nicht inline, darum steht ein link darunter.
+
+```html
+<media-pdf src="/files/scan.pdf" page="2"></media-pdf>
+```
+
+## media-svg
+
+eine svg-datei zum ansehen: inline, ohne skripte und event-handler, auf die
+breite eingepasst. `checker` legt ein schachbrett dahinter.
+
+```html
+<media-svg src="/files/logo.svg" checker></media-svg>
+```
+
+`media-file` nimmt für gif, pdf, json und schriften diese elemente.
 
 ## media-video
 
@@ -705,6 +773,16 @@ notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
 </pop-toast>
 ```
 
+## svg-file
+
+eine svg-datei inline, damit css hineinreicht: `currentColor`, `var()`, `:hover`
+auf ihren teilen. skripte und event-handler der datei fallen weg, jede url wird
+nur einmal geladen.
+
+```html
+<svg-file src="/img/diagram.svg" size="10rem"></svg-file>
+```
+
 ## svg-flag
 
 ```html
@@ -738,6 +816,17 @@ breite zur höhe, `size` setzt die höhe.
 ```html
 <svg-logo logo="zugriff"></svg-logo>
 <svg-logo logo="aufbau" size="3rem" color="tomato" label="aufbau"></svg-logo>   <!-- sonst aria-hidden -->
+```
+
+## svg-sprite
+
+ein symbol aus einem sprite-sheet: `<svg><use href="sprite.svg#name">`. das
+sheet muss same-origin sein, ohne `src` ein sheet in der seite. `fill` ist
+`currentColor`, wo das symbol es offen lässt.
+
+```html
+<svg-sprite src="/img/sprite.svg" icon="star"></svg-sprite>
+<svg-sprite icon="star" size="2rem" label="favorit"></svg-sprite>
 ```
 
 ## widget-calculator
@@ -947,6 +1036,21 @@ input-value::part(selected)  {}   /* the selected option or segment */
 | `input-unit`     | `kilometer`                         | combobox     |
 | `input-url`      | `https://…`, scheme added           | field        |
 | `input-year`     | `2026`                              | stepper      |
+
+`input-chips` prüft, bevor ein chip dazukommt: `transform` formt den text,
+`pattern` und `accept` können ihn ablehnen (die meldung zeigt das feld,
+`input-chips-refused` meldet es). `suggestions` und `suggest` bieten texte beim
+tippen an, als datalist am feld.
+
+```html
+<input-chips suggestions="html, css, javascript" pattern="[a-z]+"></input-chips>
+```
+
+```js
+chips.transform = text => text.toLowerCase();
+chips.accept    = text => text.length <= 20 || 'too long';
+chips.suggest   = async text => (await fetch(`/tags?q=${text}`)).json();
+```
 
 the list types (`input/types/`) take their own attributes: `countries`,
 `currencies`, `categories`, `languages`, `locales`, `zones`, `units`, and

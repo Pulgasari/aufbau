@@ -161,6 +161,8 @@
 
     const { gestalt } = aufbau;
     const $ = id => document.getElementById(id);
+
+    $('chips-demo').transform = text => text.toLowerCase();
   
     // :::::: TOASTS
     // every [data-toast] on the page, buttons and menu entries alike
