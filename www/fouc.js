@@ -2,9 +2,10 @@
 
 (() => {
   
-const currentScript = document.currentScript;
-if (!currentScript) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
-
+const 
+$head   = document.head,
+$root   = document.documentElement,
+$script = document.currentScript; if (!$script) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');     
 
 // :::::: HELPERS + REFS
 
@@ -13,8 +14,7 @@ const on = window.addEventListener;
 const SW = navigator?.serviceWorker ?? null;
   
 const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
-const $head = document.head;
-const $root = document.documentElement;
+
 
 // init: aufbau devtools recorder
 document.write('<script src="https://code.pulgasari.dev/aufbau/devtools/recorder.js"><\/script>');
