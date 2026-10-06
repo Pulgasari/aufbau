@@ -5,7 +5,9 @@
 const 
 $head   = document.head,
 $root   = document.documentElement,
-$script = document.currentScript; if (!$script) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');     
+$script = document.currentScript; if (!$script) throw new Error('[boot] Must be executed synchronously as a classic script in <head>'),     
+$data   = $script.dataset,
+$style  = $script.style;
 
 // :::::: HELPERS + REFS
 
@@ -23,14 +25,14 @@ document.write('<script src="https://code.pulgasari.dev/aufbau/devtools/recorder
 const GESTALT_TOKENS = ['density', 'geometry', 'palette'];
 
 function initGestalt ({ prefix }) {
-  const slug = $root.dataset.app;
+  const slug = $data.app;
   if (!prefix || !slug) return;
   for (const token of GESTALT_TOKENS) {
     try {
       const value = JSON.parse(localStorage.getItem(`${prefix}:${slug}:${token}`));
       if (typeof value !== 'string' || !value) continue;
-      $root.style.setProperty(`--${token}`, value);
-      $root.dataset[token] = value;
+      $style.setProperty(`--${token}`, value);
+      $data[token] = value;
     } catch {} // storage may be blocked, a stored value may be broken
   }
 }
@@ -40,32 +42,25 @@ function initService ({ path, ...options }) {
   if (path) on('load', () => SW?.register(path, options).catch(warn));
 }
 
-
-  // hidden until ready. an app page reveals itself once its first view has settled
-  // (transitions.js), any other page on load. the timeout is the failsafe: an app
-  // that crashed on the way must not leave an empty page behind
-  const ready = () => { $root.classList.remove('is-loading'); $root.classList.add('is-ready'); };
-  $root.classList.add('is-loading');
-  if ($root.dataset.app) setTimeout(ready, 4000);
-  else window.addEventListener('load', ready);
-
-// Merge options: HTML data-attributes < global window config < default options
-const ds = currentScript.dataset;
-const userConfig = window.__BOOT_CONFIG__ || {};
+// hidden until ready. an app page reveals itself once its first view has settled
+// (transitions.js), any other page on load. the timeout is the failsafe: an app
+// that crashed on the way must not leave an empty page behind
+const ready = () => { $root.classList.remove('is-loading'); $root.classList.add('is-ready'); };
+$root.classList.add('is-loading');
+if ($data.app) setTimeout(ready, 4000);
+else on('load', ready);
 
 const config = {
   sw: {
-    path  : ds.sw      ?? userConfig.sw      ?? '/sw.js',     // off by default — app.js registers the sw; set data-sw to enable here
-    type  : ds.swType  ?? userConfig.swType  ?? 'module',  // 'module' | 'classic'
-    scope : ds.swScope ?? userConfig.swScope ?? undefined,
+    path  : $data.sw      ?? '/sw.js',     // off by default — app.js registers the sw; set data-sw to enable here
+    type  : $data.swType  ?? 'module',  // 'module' | 'classic'
+    scope : $data.swScope ?? undefined,
   },
   gestalt: {
-    prefix : ds.gestaltPrefix ?? userConfig.gestaltPrefix ?? 'zugriff',
+    prefix : $data.gestaltPrefix ?? 'zugriff',
   },
-  preload : userConfig.preload || [],
 };
 
-const { preload, sw } = config;
 initGestalt (config.gestalt);
 initService (config.sw);
 
