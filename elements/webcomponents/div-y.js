@@ -10,6 +10,8 @@ export class DivY extends AufbauElement {
     return `div-y {
       display        : flex;
       flex-direction : column;
+      min-height     : stretch;
+      place-content  : safe center;
 
       &[scrollable] {
         min-block-size : 0;
