@@ -1,4 +1,4 @@
-// @aufbau/css/animate/index.js
+// @aufbau/gestalt/animate/index.js
 
 /*
 a thin layer over animations.css: sets the data-animate attributes, restarts,

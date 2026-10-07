@@ -5,28 +5,29 @@
 //   await gestalt.set({ palette: 'oled', mode: 'dark', density: 'touch', geometry: 'round' });
 //   gestalt.get('palette')    // 'oled'
 //   gestalt.colors()          // { bg, fg, ink } as the browser computed them
-//   await gestalt.palettes()  // the preset names of css/palettes.css
-//   await gestalt.themes()    // the preset names of css/themes.css
+//   await gestalt.palettes()  // the preset names of gestalt/palettes.css
+//   await gestalt.themes()    // the preset names of gestalt/themes.css
 //
 // palette, mode, theme, density and geometry are custom properties on the root,
 // mode as --scheme.
-// css/palettes.css reads palette, css/tokens.css the scheme, so a palette is a preset name or any css color:
-// 'dracula', 'teal', '#ff8800'. css/themes.css turns a theme into a palette
+// gestalt/palettes.css reads palette, gestalt/gestalt.css the scheme, so a palette is a preset name or any css color:
+// 'dracula', 'teal', '#ff8800'. gestalt/themes.css turns a theme into a palette
 // and a skin.
 // look and layout are stylesheets, one per kind, swapped in place, false
 // removes one. skin is both: the --skin token, and the sheet the elements adopt
 // into @layer aufbau.skin (@aufbau/element).
 
 export const 
-CSS_PATH   = 'https://code.pulgasari.dev/aufbau/css',
-DENSITIES  = ['compact', 'normal', 'comfortable', 'touch'],
-GEOMETRIES = ['sharp', 'soft', 'round', 'pill'],
-LAYOUTS    = ['landing', 'mobile-basic', 'three-panels'],
-LOOKS      = ['flat', 'rounded'],
-MODES      = ['auto', 'dark', 'light'],
-SKINS      = ['andromeda', 'monochrome'];
+CSS_PATH     = 'https://code.pulgasari.dev/aufbau/css',
+GESTALT_PATH = 'https://code.pulgasari.dev/aufbau/gestalt',
+DENSITIES    = ['compact', 'normal', 'comfortable', 'touch'],
+GEOMETRIES   = ['sharp', 'soft', 'round', 'pill'],
+LAYOUTS      = ['landing', 'mobile-basic', 'three-panels'],
+LOOKS        = ['flat', 'rounded'],
+MODES        = ['auto', 'dark', 'light'],
+SKINS        = ['andromeda', 'monochrome'];
 
-// TOKENS :: the properties tokens.css, palettes.css and themes.css read, mirrored as data-* for selectors
+// TOKENS :: the properties gestalt.css, palettes.css and themes.css read, mirrored as data-* for selectors
 // SHEETS :: the folder of each stylesheet kind
 const TOKENS  = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };      
 const SHEETS  = { layout: 'layouts', look: 'looks' };
@@ -60,12 +61,12 @@ const readToken = name => getComputedStyle(document.documentElement).getProperty
 async function setSheet (kind, name) {
   const key = `gestalt:${kind}`;
   if (!name) return (await domina('releaseStylesheet'))(key);
-  return (await domina('adoptStylesheet'))(`${CSS_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
+  return (await domina('adoptStylesheet'))(`${GESTALT_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
 }
 
 // :::::: PRESETS
-// the presets are read off the container queries of css/palettes.css and
-// css/themes.css, so the stylesheets stay the only place that lists them.
+// the presets are read off the container queries of gestalt/palettes.css and
+// gestalt/themes.css, so the stylesheets stay the only place that lists them.
 // loaded once, on first ask
 
 const presetPattern = property => new RegExp(`style\\(\\s*--${property}\\s*:\\s*([\\w-]+)\\s*\\)`);
@@ -95,7 +96,7 @@ const presets = new Map;   // property -> promise of names
 
 /** the preset names of --property in a stylesheet, in their order there. a failed load is retried on the next call */
 function presetNames (file, property) {
-  if (!presets.has(property)) presets.set(property, loadSheet(`${CSS_PATH}/${file}`)
+  if (!presets.has(property)) presets.set(property, loadSheet(`${GESTALT_PATH}/${file}`)
     .then(sheet => [...new Set(presetsOf(sheet.cssRules, presetPattern(property)))])
     .catch(error => { presets.delete(property); throw error; }));
   return presets.get(property);

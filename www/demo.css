@@ -1,7 +1,7 @@
 /* @aufbau/www/demo.css
    the package demos: a list on the side, stage, controls and code in main.
 
-   the colors come from css/themes.css (aufbau.boot adopts it), which resolves
+   the colors come from gestalt/themes.css (aufbau.boot adopts it), which resolves
    them on body. so the tokens derived from them live on body as well. */
 
 body {

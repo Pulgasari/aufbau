@@ -1,26 +1,18 @@
-/* @aufbau/css/skins/monochrome.css
-   the default decoration of @aufbau/elements: one hairline, small radii, no
-   shadows, no gradients. lines and tints are mixed from currentColor, surfaces
-   are --color-bg, highlights --color-ink. so the skin follows whatever palette
-   or text color it sits in.
+/* @aufbau/gestalt/skins/andromeda.css */
 
-   a skin decorates: lines, radii, colors, states. sizes, font sizes and spacing
-   are not its business, the block at the end holds the spacing the elements do
-   not carry themselves yet.
-
-   loaded by elements/core/skin.js into @layer aufbau.skin.
-
-   to do in the elements, so this file can shrink to rules per role:
-   - one part name per role across all elements: control (a framed field or
-     trigger), surface (a popup: listbox, menu, dialog), option (a pickable row)
-   - one way to states: :state(checked | selected | disabled | open) instead of
-     attributes here, part tokens there
-   - the spacing below moves into the structure of each element */
+/*
+skin: andromeda
+loaded by elements/core/skin.js into @layer aufbau.skin. 
+*/
 
 /*//////////// TOKENS ////////////*/
 
-/* unregistered on purpose: a registered <color> would resolve currentColor once
-   on :root, unregistered it resolves where the token is used */
+/* 
+unregistered on purpose:
+a registered <color> would resolve currentColor once on :root, 
+unregistered it resolves where the token is used.
+*/
+
 :root {
   --line         : color-mix(in oklab, currentColor 35%, transparent);
   --hover        : color-mix(in oklab, currentColor  8%, transparent);
@@ -30,7 +22,7 @@
   --color-muted  : color-mix(in oklab, currentColor 55%, transparent);
 
   --border : 1px solid var(--line);
-  --radius : 0.25rem;
+  --radius : 0.5rem;
 }
 
 /*//////////// FRAME ////////////*/
@@ -46,7 +38,7 @@ aufbau-dropdown::part(trigger),
 aufbau-picker[look="cycle"]::part(trigger),
 aufbau-upload::part(zone) {
   border        : var(--border);
-  border-radius : var(--radius);
+  /*border-radius : var(--radius);*/
 }
 
 /*//////////// SURFACE ////////////*/
@@ -57,7 +49,6 @@ aufbau-modal::part(dialog),
 aufbau-picker::part(listbox) {
   background-color : var(--color-bg);
   border           : var(--border);
-  border-radius    : var(--radius);
   color            : var(--color-fg);
 }
 
@@ -179,10 +170,10 @@ aufbau-embed {
   border-radius : var(--radius);
   overflow      : hidden;
 
-  > :is(button, a) { background-color: var(--sunken); }
-  > :is(button, a):hover { background-color: var(--hover); }
+  > :is(button, a)               { background-color: var(--sunken); }
+  > :is(button, a):hover         { background-color: var(--hover); }
   > :is(button, a):focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
-  > :is(button, a) > small { color: var(--color-muted); }
+  > :is(button, a) > small       { color: var(--color-muted); }
 }
 
 aufbau-modal::part(header) { border-block-end: var(--border); }
@@ -202,7 +193,7 @@ aufbau-picker[look="radio"] {
 }
 
 aufbau-slider > div > input {
-  &::-webkit-slider-runnable-track { background: none; }
+  &::-webkit-slider-runnable-track { backgrounad: none; }
   &::-moz-range-track              { background: none; }
 
   &::-webkit-slider-thumb {
@@ -306,28 +297,42 @@ aufbau-button,
 aufbau-input,
 aufbau-picker[look="combobox"],
 aufbau-toggle[look="button"],
-aufbau-writer,
+
 aufbau-dropdown > *,
 aufbau-dropdown::part(trigger),
 aufbau-picker[look="cycle"]::part(trigger),
-aufbau-upload::part(zone) {
-  padding: 0.35em 0.55em;
+aufbau-upload::part(file),
+aufbau-upload::part(zone),
+aufbau-writer {
+  --pad: small;
 }
 
-aufbau-picker::part(listbox),
-aufbau-dropdown::part(menu)       { padding: 0.2em; }
-aufbau-picker::part(option)       { padding: 0.35em 0.55em; }
+/*
+@prop --pad {
+   tiny : 
+      aufbau-input    > button,
+      aufbau-dropdown >> menu,
+      aufbau-picker   >> :is(listbox, option,step),
+}
+
+aufbau-input > button             { --pad: tiny; }
+aufbau-dropdown::part(menu)       { --pad: tiny; }
+aufbau-picker::part(listbox)      { --pad: tiny; }
+aufbau-picker::part(option)       { --pad: tiny; }
+aufbau-picker::part(step)         { --pad: tiny; }
 aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
-aufbau-input > button             { padding: 0.15em; }
-aufbau-picker::part(step)         { padding: 0.15em; }
-aufbau-upload::part(file)         { padding: 0.2em 0.4em; }
-:is(aufbau-code, aufbau-writer) [data-action] { padding: 0.2em; }
-aufbau-code > figure > header     { padding: 0.3em 0.6em; }
-aufbau-code > figure > pre        { padding: 0.75em; }
-aufbau-modal::part(dialog)        { padding: 1rem; }
-aufbau-modal::part(header)        { margin: -0.25em -0.25em 0.75em; padding: 0 0.25em 0.5em; }
-aufbau-slider > output > input    { padding-block-end: 0.1em; }
-aufbau-toast                      { padding: 0.6em 0.75em; }
+*/
+
+   
+aufbau-code   [data-action]   { --pad: tiny; }
+aufbau-writer [data-action]   { --pad: tiny; }
+aufbau-code > figure > header { --pad: small; }
+aufbau-code > figure > pre    { --pad: normal; }
+aufbau-modal::part(dialog)    { --pad: normal; }
+   
+aufbau-modal::part(header)     { margin: -0.25em -0.25em 0.75em; padding: 0 0.25em 0.5em; }
+aufbau-slider > output > input { padding-block-end: 0.1em; }
+aufbau-toast                      { --pad: normal; }
 aufbau-toc a                      { display: block; padding-block: 0.15em; padding-inline-start: 0.5em; }
 
 aufbau-table {
