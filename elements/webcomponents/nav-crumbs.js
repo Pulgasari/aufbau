@@ -32,9 +32,9 @@ export default class NavCrumbs extends AufbauElement {
     > :last-child { flex-shrink: 0.2; }
 
     > * + *::before {
-      content      : var(--crumbs-separator, '/');
-      margin-inline-end : var(--crumbs-gap, --space(tiny));
-      opacity      : 0.5;
+      content            : var(--crumbs-separator, '/');
+      opacity            : 0.5;
+      padding-inline-end : var(--crumbs-gap, --space(tiny));
     }
 
     > button {

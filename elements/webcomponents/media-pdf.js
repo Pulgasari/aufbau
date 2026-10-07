@@ -20,7 +20,7 @@ export default class MediaPdf extends AufbauElement {
       inline-size  : 100%;
     }
 
-    > a { display: inline-block; font-size: 0.85em; margin-block-start: --space(tiny); }
+    > a { display: inline-block; font-size: 0.85em; padding-block-start: --space(tiny); }
   }`;
 
   render () {

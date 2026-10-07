@@ -154,7 +154,10 @@ export default class WidgetCalculator extends AufbauElement {
       gap     : var(--calculator-gap);
 
       > button { block-size: 2.25rem; inline-size: 2.25rem; font-size: 1.25rem; }
-      > [data-act="close"] { margin-inline-end: auto; }
+
+      /* close at the start, the rest at the end, a spacer between */
+      > [data-act="close"] { order: -2; }
+      &::before            { content: ''; flex: 1 1 auto; order: -1; }
     }
 
     [part="screen"] {

@@ -43,7 +43,6 @@ export default class DataNode extends AufbauElement {
         content           : '';
         flex              : none;
         inline-size       : 0.4em;
-        margin-inline     : --space(tiny);
         rotate            : -45deg;
         transition        : rotate 0.12s ease;
         visibility        : hidden;
