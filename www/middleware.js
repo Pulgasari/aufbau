@@ -1,6 +1,6 @@
 // aufbau/www :: middleware.js (vercel routing middleware, runs at the edge)
 //
-// the gestalt picked on a demo page (theme, mode, palette, density, geometry,
+// the gestalt picked on a demo page (mode, palette, density, geometry,
 // skin) goes into the html of every page before it leaves the edge, from the
 // cookie elements.html writes. the same tokens aufbau.gestalt sets: a custom
 // property and a data attribute each, mode as --scheme / data-scheme.
