@@ -1,28 +1,62 @@
 <script>
-  import gestures, { dismissable, draggable, pullable, sortable, transformable } from '@aufbau/gestures';
+  import gestures from '@aufbau/gestures';
 
-  const $ = id => document.getElementById(id);
-  
-  const output = $('stepper').querySelector('output');
-  for (const button of $('stepper').querySelectorAll('button')) {
+  // the script is the body of the component and runs before its markup exists,
+  // so the elements come through ref, each one as soon as it is built
+  let output;
+
+  const pressed = element => ({
+    onPressCancel : () => element.classList.remove('pressed'),
+    onPressEnd    : () => element.classList.remove('pressed'),
+    onPressStart  : () => element.classList.add('pressed'),
+  });
+
+  const stepper = button => {
     const step = () => { output.value = Number(output.value) + Number(button.dataset.step); };
-    gestures (button, { 
-      ...pressed(button), 
-      onPressRepeat: step, 
-      onPressStart: () => { button.classList.add('pressed'); step(); } 
+    gestures(button, {
+      ...pressed(button),
+      onPressRepeat : step,
+      onPressStart  : () => { button.classList.add('pressed'); step(); },
     });
-  }
+  };
 </script>
 
+<style>
+  .stepper {
+    align-items     : center;
+    display         : flex;
+    gap             : 1rem;
+    justify-content : center;
+    padding         : 1rem;
+
+    button {
+      aspect-ratio  : 1;
+      background    : color-mix(in oklch, currentColor 6%, transparent);
+      border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
+      border-radius : 50%;
+      color         : inherit;
+      font-size     : 1.5rem;
+      inline-size   : 3.5rem;
+      touch-action  : manipulation;
+      transition    : background-color .08s, scale .08s;
+      user-select   : none;
+
+      &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent); scale: .96; }
+    }
+
+    output { font: 700 2rem/1 ui-monospace, monospace; min-inline-size: 4ch; text-align: center; }
+  }
+</style>
+
 <div>
-  
+
   <h2>pressRepeat</h2>
   <p>a stepper: one step on contact (<code>pressStart</code>), then repeating while held.</p>
-  
-  <div class="pad" id="stepper">
-    <button type="button" data-step="-1">−</button>
-    <output>0</output>
-    <button type="button" data-step="1">+</button>
+
+  <div class="stepper">
+    <button type="button" data-step="-1" ref=${stepper}>−</button>
+    <output ref=${node => output = node}>0</output>
+    <button type="button" data-step="1" ref=${stepper}>+</button>
   </div>
-  
+
 </div>
