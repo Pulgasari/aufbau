@@ -6,7 +6,12 @@
 
     > section { display: grid; gap: .5rem; }
     .grid     { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
-    
+    .grid > *:nth-child(odd) { 
+      background-color: --darker(var(--color-bg), 0.2);
+      /*
+      --bg: --darker(bg, 0.2);
+      */
+    }
 
     .pad {
       background    : color-mix(in oklch, currentColor 6%, transparent);
