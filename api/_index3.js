@@ -60,3 +60,16 @@ export const apply = (target, spec = {}) =>
         : handler.apply(target, ...normalizeEntry(val));
     })
   );
+
+// :::::: NAMESPACE PROXIES :::::::::::::::::::::::::::::
+
+const delegate = (loader) => new Proxy({}, {
+  get: (_, method) => async (...args) => (await loader())[method](...args)
+});
+
+export const
+elements = delegate(() => import('@aufbau/elements')),
+filters  = delegate(() => import('@aufbau/filters' )),
+patterns = delegate(() => import('@aufbau/patterns')),
+webfonts = delegate(() => import('@aufbau/webfonts'));
+
