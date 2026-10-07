@@ -4,10 +4,9 @@
     display : grid;
     gap     : 1.5rem;
 
-    > section     { display: grid; gap: .5rem; }
-    .grid         { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
-    h2            { font-size: 1rem; margin: 0 0 .25rem; }
-    p             { font-size: .85rem; margin: 0; opacity: .7; }
+    > section { display: grid; gap: .5rem; }
+    .grid     { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+    
 
     .pad {
       background    : color-mix(in oklch, currentColor 6%, transparent);
@@ -22,21 +21,23 @@
       transition    : background-color .08s, scale .08s;
 
       &.flash   { outline: 3px solid var(--color-ink); outline-offset: -3px; }
-      &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent); scale: .98; }
+      &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent);  }
     }
 
-    table { border-collapse: collapse; font: 12px/1.4 ui-monospace, monospace; inline-size: 100%; }
+    table { border-collapse: collapse; inline-size: 100%; }
     td    { border-top: 1px solid color-mix(in oklch, currentColor 20%, transparent); padding: .15rem .5rem; vertical-align: top; }
     td:first-child { opacity: .6; white-space: nowrap; }
 
     #gestures-log {
       border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
-      border-radius : .5rem;
-      font          : 12px/1.5 ui-monospace, monospace;
       max-block-size: 12rem;
       overflow      : auto;
-      padding       : .5rem;
+      padding       : 1rem;
       white-space   : pre-wrap;
+    }
+
+    #gestures-log, table {
+      font: 12px/1.4 ui-monospace, monospace;
     }
   }
 </style>
