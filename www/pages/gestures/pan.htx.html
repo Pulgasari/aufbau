@@ -13,13 +13,15 @@
 </script>
 
 <style>
-  .pan-pad  { overflow: hidden; position: relative; }
-  .pan-chip { aspect-ratio: 1; background: var(--color-ink); border-radius: 1rem; inline-size: 4rem; transition: translate .25s ease; }
+  .pan-pad           { overflow: hidden; position: relative; }
+  .pan-chip          { aspect-ratio: 1; background: --color(ink); inline-size: 4rem; }
   .pan-chip.dragging { transition: none; }
 </style>
 
 <div>
   <h2>pan</h2>
   <p>drag the chip, it springs back on release.</p>
-  <div class="pad pan-pad" ref=${setup}><div class="pan-chip" ref=${node => chip = node}></div></div>
+  <div class="pad pan-pad" ref=${setup}>
+    <div class="pan-chip" ref=${node => chip = node}></div>
+  </div>
 </div>
