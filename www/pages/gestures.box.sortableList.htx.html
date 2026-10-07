@@ -8,7 +8,13 @@
 </script>
 
 <style>
-  .sort-list { display: grid; gap: .4rem; list-style: none; margin: 0; padding: 0; }
+  .sort-list { 
+    display: grid;
+    gap: .4rem; 
+    list-style: none; 
+    margin: 0; 
+    padding: 0;
+  }
   .sort-list li {
     background    : color-mix(in oklch, currentColor 6%, transparent);
     border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
@@ -24,5 +30,11 @@
 <div>
   <h2>sortable · list</h2>
   <p>touch and pen: hold, then drag. mouse: drag at once. keys: alt + arrows.</p>
-  <ul class="sort-list" ref=${setup}><li>eins</li><li>zwei</li><li>drei</li><li>vier</li><li>fünf</li></ul>
+  <ul class="sort-list" ref=${setup}>
+    <li>eins</li>
+    <li>zwei</li>
+    <li>drei</li>
+    <li>vier</li>
+    <li>fünf</li>
+  </ul>
 </div>
