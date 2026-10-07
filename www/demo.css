@@ -76,6 +76,21 @@ aside {
   &:disabled             { opacity: .35; cursor: default; background: none; }
 }
 
+button {
+   background    : color-mix(in oklch, currentColor 6%, transparent);
+   border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
+   border-radius : 50%;
+   color         : inherit;
+   font-size     : 1.5rem;
+   inline-size   : 3.5rem;
+   touch-action  : manipulation;
+   transition    : background-color .08s, scale .08s;
+   user-select   : none;
+
+   &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent); scale: .96; }
+}
+
+
 /* :::::: MAIN */
 
 main {
