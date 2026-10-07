@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>css functions</title>
+  <script src="../fouc.js"></script>
+  <script src="https://code.pulgasari.dev/importmap.js"></script>
+  <style>
+    /* the page chrome only. the functions it shows are the ones it uses */
+
+    body {
+      --line  : color-mix(in oklch, var(--color-fg) 15%, transparent);
+      --line  : --alpha(fg, 15%);
+      --muted : color-mix(in oklch, var(--color-fg) 60%, var(--color-bg));
+      --muted : --muted(40%);
+
+      block-size     : 100dvh;
+      display        : grid;
+      grid-template  : auto 1fr / minmax(12rem, 16rem) 1fr;
+      line-height    : 1.5;
+      margin         : 0;
+      overflow       : hidden;
+    }
+
+    code, pre, input { user-select: text; }
+    code, pre        { font-family: ui-monospace, monospace; }
+
+    body > header {
+      align-items   : center;
+      border-bottom : 1px solid var(--line);
+      display       : flex;
+      flex-wrap     : wrap;
+      gap           : --space(small);
+      grid-column   : 1 / -1;
+      padding       : --space(small) --space(normal);
+
+      h1 { flex: 1 1 auto; font-size: 1rem; margin: 0; }
+    }
+
+    body > nav {
+      border-right : 1px solid var(--line);
+      overflow-y   : auto;
+      padding      : --space(small);
+
+      h2 { color: var(--muted); font-size: 0.75rem; margin: --space(normal) 0 --space(tiny); text-transform: uppercase; }
+      a  { color: inherit; display: block; font-family: ui-monospace, monospace; font-size: 0.85rem; padding: 0 --space(small); text-decoration: none; }
+      a[aria-current] { background: --alpha(ink, 20%); }
+    }
+
+    body > main { overflow-y: auto; padding: --space(normal); scroll-padding-top: --space(normal); }
+
+    #banner:not(:empty) { background: --alpha(warning, 20%); margin-bottom: --space(normal); padding: --space(small) --space(normal); }
+
+    .file  { margin-bottom: --space(huge); }
+    .file > h2   { margin: 0; }
+    .file > pre  { color: var(--muted); margin: --space(small) 0 --space(normal); white-space: pre-wrap; }
+    .section     { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.05em; margin: --space(large) 0 --space(small); text-transform: uppercase; }
+
+    .fn {
+      border        : 1px solid var(--line);
+      display       : grid;
+      gap           : --space(small) --space(normal);
+      grid-template : "head head" "controls preview" "call call" / minmax(0, 1fr) minmax(0, 1fr);
+      margin-bottom : --space(normal);
+      padding       : --space(normal);
+
+      > header   { grid-area: head; }
+      > .controls { display: grid; gap: --space(small); grid-area: controls; align-content: start; }
+      > .preview  { grid-area: preview; }
+      > .call     { grid-area: call; }
+
+      h3 { font-size: 1rem; margin: 0; }
+      p  { margin: --space(tiny) 0 0; text-align: start; }
+      details { color: var(--muted); font-size: 0.85rem; margin-top: --space(tiny); }
+      pre     { overflow-x: auto; }
+    }
+
+    .signature { color: var(--muted); font-size: 0.85rem; }
+
+    .controls label {
+      align-items           : center;
+      display               : grid;
+      gap                   : --space(small);
+      grid-template-columns : 8rem minmax(0, 1fr);
+
+      > span  { font-family: ui-monospace, monospace; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; }
+      > input { background: --alpha(fg, 6%); border: 1px solid var(--line); color: inherit; font: inherit; min-inline-size: 0; padding: --space(tiny) --space(small); }
+    }
+
+    .examples { display: flex; flex-wrap: wrap; gap: --space(tiny); }
+    .examples button { background: none; border: 1px solid var(--line); color: inherit; font: 0.8rem ui-monospace, monospace; padding: --space(tiny) --space(small); }
+
+    .call {
+      align-items : center;
+      display     : flex;
+      gap         : --space(small);
+
+      code   { background: --alpha(fg, 6%); flex: 1 1 auto; overflow-x: auto; padding: --space(tiny) --space(small); white-space: nowrap; }
+      output { color: var(--muted); font: 0.85rem ui-monospace, monospace; }
+    }
+
+    /* previews, one per kind. the probe properties carry the result */
+    .preview { align-content: center; display: grid; gap: --space(small); min-block-size: 6rem; }
+    .swatch  { background: repeating-conic-gradient(--alpha(fg, 10%) 0 25%, transparent 0 50%) 0 0 / 1rem 1rem; block-size: 5rem; }
+    .swatch > div { block-size: 100%; }
+    .bar     { background: --alpha(fg, 8%); block-size: 1.5rem; }
+    .bar > div { background: var(--color-ink); block-size: 100%; max-inline-size: 100%; }
+    .track   { background: --alpha(fg, 8%); block-size: 1.5rem; position: relative; }
+    .dot     { aspect-ratio: 1; background: var(--color-ink); block-size: 100%; border-radius: 50%; position: absolute; }
+    .track[data-kind="time"]   .dot { animation: cssfn-move 1s linear infinite alternate; }
+    .track[data-kind="easing"] .dot { animation: cssfn-move 1.2s infinite alternate; }
+    .track[data-kind="transition"] .dot { inset-inline-start: 0; }
+    .track[data-kind="transition"][data-on] .dot { inset-inline-start: calc(100% - 1.5rem); opacity: 0.3; }
+    .number  { font: 2rem ui-monospace, monospace; }
+
+    @keyframes cssfn-move { from { inset-inline-start: 0; } to { inset-inline-start: calc(100% - 1.5rem); } }
+
+    @media (width < 48rem) {
+      body { grid-template: auto auto 1fr / 1fr; }
+      body > nav { border-bottom: 1px solid var(--line); border-right: 0; display: flex; gap: --space(small); max-block-size: 30vh; overflow-x: auto; }
+      body > nav h2 { display: none; }
+      body > nav a  { white-space: nowrap; }
+      .fn { grid-template: "head" "controls" "preview" "call" / minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>css functions</h1>
+    <input-value id="palette" look="combobox" searchable placeholder="palette"></input-value>
+    <input-value id="scheme" look="segments" value="auto">
+      <input-option>auto</input-option>
+      <input-option>light</input-option>
+      <input-option>dark</input-option>
+    </input-value>
+    <input-bool id="sketches" label="sketches"></input-bool>
+  </header>
+  <nav id="nav"></nav>
+  <main>
+    <div id="banner"></div>
+    <div id="docs"></div>
+  </main>
+
+  <script type="module">
+    import aufbau from '@aufbau/api';
+
+    // the files are read where the page is served from, ../../css on code.pulgasari.dev
+    const BASE     = new URL('../../css/', location.href);
+    const INDEX    = new URL('functions.css', BASE);
+    const SKETCHES = new URL('functions/_.css', BASE);
+
+    const ROLES = ['bg', 'fg', 'ink', 'cc', 'error', 'success', 'warning', 'danger'];
+
+    // the property a result is read from, and the preview it gets, by return type
+    const PROBES = {
+      '<angle>'      : { syntax: '<angle>',      initial: '0deg',        preview: 'value'  },
+      '<color>'      : { syntax: '<color>',      initial: 'transparent', preview: 'color'  },
+      '<image>'      : { syntax: '<image>',      initial: 'none',        preview: 'value'  },
+      '<integer>'    : { syntax: '<integer>',    initial: '0',           preview: 'number' },
+      '<length>'     : { syntax: '<length>',     initial: '0px',         preview: 'length' },
+      '<number>'     : { syntax: '<number>',     initial: '0',           preview: 'number' },
+      '<percentage>' : { syntax: '<percentage>', initial: '0%',          preview: 'value'  },
+      '<time>'       : { syntax: '<time>',       initial: '0s',          preview: 'time'   },
+    };
+
+    // functions without a return type, shown by what they are for
+    const UNTYPED = { '--ease': 'easing', '--transition': 'transition' };
+
+    const $  = id => document.getElementById(id);
+    const el = (tag, props = {}, ...children) => {
+      const node = Object.assign(document.createElement(tag), props);
+      node.append(...children.flat().filter(child => child != null && child !== false));
+      return node;
+    };
+
+    // :::::: PARSE ::::::::::::::::::::::::::::::::::::::::::::::
+
+    // the index of the paren that closes the one at `start`
+    function closing (text, start) {
+      let depth = 0;
+      for (let index = start; index < text.length; index++) {
+        if (text[index] === '(') depth++;
+        if (text[index] === ')' && --depth === 0) return index;
+      }
+      return -1;
+    }
+
+    // split on commas or a character outside of parens
+    function splitTop (text, separator = ',') {
+      const parts = [];
+      let depth = 0, from = 0;
+      for (let index = 0; index < text.length; index++) {
+        const char = text[index];
+        if (char === '(') depth++;
+        if (char === ')') depth--;
+        if (char === separator && depth === 0) { parts.push(text.slice(from, index)); from = index + 1; }
+      }
+      parts.push(text.slice(from));
+      return parts.map(part => part.trim()).filter(Boolean);
+    }
+
+    function parseParam (text) {
+      const match = /^(--[\w-]+)\s*([\s\S]*)$/.exec(text);
+      if (!match) return null;
+      const rest  = match[2].trim();
+      const parts = splitTop(rest, ':');
+      const [type, def] = rest.startsWith(':') ? ['', rest.slice(1)] : [parts[0] ?? '', parts.slice(1).join(':')];
+
+      // the keywords of a type(), and the roles where a color goes
+      const idents = [...type.matchAll(/(?:^|[|(\s])([a-z][\w-]*)(?=\s*[|)]|\s*$)/g)].map(found => found[1]).filter(name => name !== 'type');
+      const color  = /<color>/.test(type) || ROLES.includes(def.trim());
+      return { choices: [...new Set([...idents, ...(color ? ROLES : [])])], def: def.trim(), name: match[1], type: type.trim() };
+    }
+
+    // the comment right before an offset, if only whitespace is between
+    function commentBefore (text, offset) {
+      const before = text.slice(0, offset).trimEnd();
+      if (!before.endsWith('*/')) return '';
+      const start = before.lastIndexOf('/*');
+      const body  = before.slice(start + 2, -2);
+      return /^\/{4,}/.test(body) ? '' : body.replace(/^\s*\n/, '').replace(/\s+$/, '');
+    }
+
+    // the indented lines of a comment with a call in them are examples
+    const examplesOf = (comment, name) => comment.split('\n')
+      .map(line => line.trim())
+      .flatMap(line => [...line.matchAll(new RegExp(`${name}\\((?:[^()]|\\([^()]*\\))*\\)`, 'g'))].map(found => found[0]));
+
+    function parseFile (text, file) {
+      const header   = /^\s*\/\*\s*@aufbau\/css\/[^\n]*\n?([\s\S]*?)\*\//.exec(text);
+      const sections = [...text.matchAll(/\/\*\/{4,}\s*(.*?)\s*\/{4,}\*\//g)].map(found => ({ at: found.index, title: found[1] }));
+      const fns      = [];
+
+      for (const match of text.matchAll(/@function\s+(--[\w-]+)\s*\(/g)) {
+        const name  = match[1];
+        const open  = match.index + match[0].length - 1;
+        const close = closing(text, open);
+        if (close < 0) continue;
+        const brace   = text.indexOf('{', close);
+        const end     = closing(text.replaceAll('{', '(').replaceAll('}', ')'), brace);
+        const returns = /returns\s+([^{]+?)\s*$/.exec(text.slice(close + 1, brace))?.[1] ?? null;
+        const comment = commentBefore(text, match.index);
+        fns.push({
+          comment,
+          examples : examplesOf(comment, name),
+          file,
+          name,
+          params   : splitTop(text.slice(open + 1, close)).map(parseParam).filter(Boolean),
+          returns,
+          section  : sections.filter(section => section.at < match.index).at(-1)?.title ?? null,
+          source   : text.slice(match.index, end + 1),
+        });
+      }
+      return { file, fns, intro: header?.[1].trim() ?? '' };
+    }
+
+    async function load (url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`${response.status} ${url}`);
+      return response.text();
+    }
+
+    // the files in the order functions.css imports them
+    async function files (withSketches) {
+      const index = await load(INDEX);
+      const urls  = [...index.matchAll(/@import\s+url\(['"]?([^'")]+)['"]?\)/g)].map(found => new URL(found[1], INDEX));
+      if (withSketches) urls.push(SKETCHES);
+      return Promise.all(urls.map(async url => parseFile(await load(url), url.pathname.split('/').pop())));
+    }
+
+    // :::::: PROBES :::::::::::::::::::::::::::::::::::::::::::::
+
+    for (const [type, { syntax, initial }] of Object.entries(PROBES)) {
+      try { CSS.registerProperty({ inherits: false, initialValue: initial, name: `--probe-${type.slice(1, -1)}`, syntax }); }
+      catch { /* registered already */ }
+    }
+
+    const probeOf = fn => fn.returns && PROBES[fn.returns] ? `--probe-${fn.returns.slice(1, -1)}` : '--probe-any';
+    const kindOf  = fn => UNTYPED[fn.name] ?? PROBES[fn.returns]?.preview ?? 'value';
+
+    // the call with the given values, trailing defaults left out
+    function callOf (fn, values) {
+      const args = fn.params.map((param, index) => (values[index] ?? '').trim() || param.def);
+      let last = -1;
+      fn.params.forEach((param, index) => { if ((values[index] ?? '').trim() && values[index].trim() !== param.def) last = index; });
+      return `${fn.name}(${args.slice(0, last + 1).join(', ')})`;
+    }
+
+    // :::::: RENDER :::::::::::::::::::::::::::::::::::::::::::::
+
+    let toggles = [];
+
+    function preview (fn, node, call) {
+      const kind = kindOf(fn);
+      node.replaceChildren();
+      if (kind === 'color')  node.append(el('div', { className: 'swatch' }, el('div', { style: `background-color: ${call}` })));
+      if (kind === 'length') node.append(el('div', { className: 'bar' }, el('div', { style: `inline-size: max(1px, ${call})` })));
+      if (kind === 'number') node.append(el('div', { className: 'number' }));
+      if (kind === 'time' || kind === 'easing' || kind === 'transition') {
+        const track = el('div', { className: 'track' }, el('div', { className: 'dot' }));
+        track.dataset.kind = kind;
+        node.append(track);
+        if (kind === 'time')       track.querySelector('.dot').style.animationDuration       = call;
+        if (kind === 'easing')     track.querySelector('.dot').style.animationTimingFunction = call;
+        if (kind === 'transition') { track.querySelector('.dot').style.transition = call; toggles.push(track); }
+      }
+    }
+
+    function Fn (fn) {
+      const values  = fn.params.map(() => '');
+      const code    = el('code');
+      const output  = el('output');
+      const view    = el('div', { className: 'preview' });
+      const inputs  = [];
+      const listId  = `${fn.name}-choices`;
+
+      function update () {
+        const call = callOf(fn, values);
+        const prop = probeOf(fn);
+        view.style.setProperty(prop, call);
+        code.textContent = `${prop === '--probe-color' ? 'background' : 'value'}: ${call};`;
+        preview(fn, view, call);
+        // a color reads where it is painted, currentColor resolved
+        const swatch  = view.querySelector('.swatch > div');
+        const value   = swatch ? getComputedStyle(swatch).backgroundColor : getComputedStyle(view).getPropertyValue(prop).trim();
+        const missing = fn.params.find((param, index) => !param.def && !(values[index] ?? '').trim());
+        output.textContent = missing ? `${missing.name} needs a value` : value || 'invalid, or not supported here';
+        const number = view.querySelector('.number');
+        if (number) number.textContent = value;
+      }
+
+      const controls = el('div', { className: 'controls' },
+        fn.params.map((param, index) => {
+          const input = el('input', { placeholder: param.def, spellcheck: false, type: 'text' });
+          if (param.choices.length) input.setAttribute('list', `${listId}-${index}`);
+          input.addEventListener('input', () => { values[index] = input.value; update(); });
+          inputs.push(input);
+          return el('label', { title: param.type || 'any value' },
+            el('span', { textContent: param.name }),
+            input,
+            param.choices.length ? el('datalist', { id: `${listId}-${index}` }, param.choices.map(choice => el('option', { value: choice }))) : null);
+        }),
+        fn.examples.length ? el('div', { className: 'examples' }, fn.examples.map(example => el('button', {
+          onclick     : () => {
+            const args = splitTop(example.slice(fn.name.length + 1, -1));
+            fn.params.forEach((param, index) => { values[index] = args[index] ?? ''; inputs[index].value = values[index]; });
+            update();
+          },
+          textContent : example,
+          type        : 'button',
+        }))) : null,
+      );
+
+      const copy = el('button', { textContent: 'copy', type: 'button', onclick: () => navigator.clipboard?.writeText(code.textContent) });
+
+      const node = el('article', { className: 'fn', id: fn.name },
+        el('header', {},
+          el('h3', {}, el('code', { textContent: fn.name })),
+          el('div', { className: 'signature' }, el('code', { textContent: `(${fn.params.map(param => [param.name, param.type, param.def && `: ${param.def}`].filter(Boolean).join(' ')).join(', ')})${fn.returns ? ` returns ${fn.returns}` : ''}` })),
+          fn.comment ? el('p', { textContent: fn.comment.replace(/\n\s*/g, ' ') }) : null,
+          el('details', {}, el('summary', { textContent: 'source' }), el('pre', {}, el('code', { textContent: fn.source })))),
+        controls,
+        view,
+        el('div', { className: 'call' }, code, copy, output));
+
+      queueMicrotask(update);
+      return node;
+    }
+
+    async function render () {
+      toggles = [];
+      let parsed;
+      try   { parsed = await files($('sketches').checked); }
+      catch (error) { $('banner').textContent = `the functions could not be read: ${error.message}`; return; }
+
+      $('nav').replaceChildren(...parsed.flatMap(({ file, fns }) => [
+        el('h2', { textContent: file }),
+        ...fns.map(fn => el('a', { href: `#${fn.name}`, textContent: fn.name })),
+      ]));
+
+      $('docs').replaceChildren(...parsed.map(({ file, fns, intro }) => {
+        let section = null;
+        return el('section', { className: 'file', id: `file-${file}` },
+          el('h2', {}, el('code', { textContent: file })),
+          intro ? el('pre', { textContent: intro }) : null,
+          fns.flatMap(fn => {
+            const heading = fn.section !== section ? el('h4', { className: 'section', textContent: fn.section ?? '' }) : null;
+            section = fn.section;
+            return [heading, Fn(fn)];
+          }));
+      }));
+
+      if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+    }
+
+    // transitions need a change of state to show
+    setInterval(() => toggles.forEach(track => track.toggleAttribute('data-on')), 1500);
+
+    // the current function in the nav
+    const spy = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        for (const link of $('nav').querySelectorAll('a')) link.toggleAttribute('aria-current', link.hash === `#${entry.target.id}`);
+      }
+    }, { rootMargin: '0px 0px -80% 0px' });
+    new MutationObserver(() => document.querySelectorAll('.fn').forEach(node => spy.observe(node))).observe($('docs'), { childList: true });
+
+    // :::::: GESTALT ::::::::::::::::::::::::::::::::::::::::::::
+
+    await aufbau.boot();
+    const { gestalt } = aufbau;
+
+    // without @function and if() nothing here works
+    const test = el('div');
+    document.body.append(test);
+    test.style.setProperty('--probe-color', '--color(ink)');
+    if (getComputedStyle(test).getPropertyValue('--probe-color').trim() === 'rgba(0, 0, 0, 0)') {
+      $('banner').textContent = 'this browser does not run css custom functions yet (@function, if()). the docs are here, the previews are not.';
+    }
+    test.remove();
+
+    await aufbau.elements.load('input-value', 'input-bool', 'input-option');
+
+    const palettes = await gestalt.palettes().catch(() => []);
+    $('palette').append(...palettes.map(name => el('input-option', { textContent: name })));
+    $('palette').setAttribute('value', gestalt.get('palette') ?? '');
+
+    // a gestalt change changes every result, so everything is drawn anew
+    const change = async values => { await gestalt.set(values); render(); };
+
+    $('palette').addEventListener('change', event => event.currentTarget.value && change({ palette: event.currentTarget.value }));
+    $('scheme').addEventListener('change', event => change({ mode: event.currentTarget.value }));
+    $('sketches').addEventListener('change', async event => {
+      // the sketches are not in aufbau.css, they come in as a sheet of their own
+      const sheet = $('sketch-sheet') ?? document.head.appendChild(el('link', { href: SKETCHES.href, id: 'sketch-sheet', rel: 'stylesheet' }));
+      sheet.disabled = !event.currentTarget.checked;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
