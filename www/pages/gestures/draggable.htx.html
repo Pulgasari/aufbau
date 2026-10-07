@@ -1,6 +1,6 @@
 <script>
   import { draggable }    from '@aufbau/gestures';
-  import { log, mounted } from './gestures.shared.js';
+  import { log, mounted } from './../gestures.shared.js';
 
   // the pink chips go into the slot or back, the blue one is free
   const setup = mounted(yard => {
@@ -8,7 +8,11 @@
       draggable(chip, {
         bounds  : 'parent',
         drop    : '.slot',
-        onDrop  : ({ target }) => { target.replaceChildren(chip); chip.style.translate = ''; log(`dropped chip ${chip.textContent}`); },
+        onDrop  : ({ target }) => { 
+          target.replaceChildren(chip); 
+          chip.style.translate = ''; 
+          log(`dropped chip ${chip.textContent}`); 
+        },
         onEnter : () => log('over the slot'),
         revert  : true,
       });
@@ -23,7 +27,17 @@
 </script>
 
 <style>
-  .yard { align-items: flex-start; border: 1px dashed color-mix(in oklch, currentColor 20%, transparent); border-radius: .75rem; display: flex; flex-wrap: wrap; gap: .75rem; min-block-size: 14rem; padding: .75rem; position: relative; }
+  .yard { 
+    align-items: flex-start; 
+    border: 1px dashed color-mix(in oklch, currentColor 20%, transparent); 
+    border-radius: .75rem; 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: .75rem; 
+    min-block-size: 14rem; 
+    padding: .75rem; 
+    position: relative; 
+  }
   .yard .chip {
     aspect-ratio  : 1;
     background    : var(--color-ink);
@@ -41,7 +55,6 @@
   .yard .slot {
     aspect-ratio  : 1;
     border        : 2px dashed color-mix(in oklch, currentColor 20%, transparent);
-    border-radius : .75rem;
     display       : grid;
     font-size     : .75rem;
     inline-size   : 5rem;
@@ -49,14 +62,21 @@
     opacity       : .8;
     place-items   : center;
 
-    &[data-drop-over] { background: color-mix(in oklch, var(--color-ink) 20%, transparent); border-color: var(--color-ink); }
-    .chip             { cursor: default; }
+    &[data-drop-over] { 
+      background: color-mix(in oklch, var(--color-ink) 20%, transparent); 
+      border-color: var(--color-ink); 
+    }
+    .chip { cursor: default; }
   }
 </style>
 
 <div>
   <h2>draggable</h2>
-  <p>the pink chips go into the slot or back. the blue one is free: bounds, a flick glides on, snaps to a 40 px grid. keys: arrows.</p>
+  <p>
+    the pink chips go into the slot or back. 
+    the blue one is free: bounds, a flick glides on, snaps to a 40 px grid. 
+    keys: arrows.
+  </p>
   <div class="yard" ref=${setup}>
     <div class="chip" data-kind="slot">1</div>
     <div class="chip" data-kind="slot">2</div>
