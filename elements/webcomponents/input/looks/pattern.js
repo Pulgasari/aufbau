@@ -103,14 +103,14 @@ export default {
 
     [part~="opacity"] { accent-color: var(--color-ink, AccentColor); flex: 1 1 8em; }
 
-    [part~="colors"] { display: flex; gap: 0.5em; }
+    [part~="colors"] { display: flex; gap: --space(small); }
 
     [part~="color"] {
       block-size    : 2em;
       border        : var(--input-line);
       border-radius : --radius();
       inline-size   : 2.5em;
-      padding       : 0.15em;
+      padding       : --space(tiny);
     }
 
     [part~="patterns"] {
@@ -118,10 +118,10 @@ export default {
       border                : var(--input-line);
       border-radius         : --radius();
       color                 : inherit;
-      gap                   : 0.375em;
+      gap                   : --space(tiny);
       grid-template-columns : repeat(var(--pattern-columns, 5), var(--pattern-swatch-size, 2.75em));
       margin                : 0;
-      padding               : 0.5em;
+      padding               : --space(small);
       position              : fixed;
 
       &:popover-open { display: grid; }

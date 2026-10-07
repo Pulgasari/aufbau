@@ -6,7 +6,7 @@ export default {
 
   css : `
     ${FRAME}
-    [part~="box"] { padding-inline-start: 0.3em; }
+    [part~="box"] { padding-inline-start: --space(tiny); }
 
     [part~="swatch"] {
       background    : var(--swatch, transparent);

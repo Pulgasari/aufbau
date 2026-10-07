@@ -8,7 +8,7 @@ export default {
       border         : var(--input-line);
       border-radius  : --radius();
       min-block-size : --space(9);
-      padding-inline : 0.75em;
+      padding-inline : --space(normal);
     }
 
     [part~="checked"] { background: var(--color-ink, AccentColor); border-color: transparent; color: var(--color-bg, Canvas); }

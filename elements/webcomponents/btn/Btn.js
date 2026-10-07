@@ -58,7 +58,7 @@ export class Btn extends AufbauElement {
       border-radius   : var(--btn-radius, 0.375em);
       cursor          : pointer;
       display         : inline-flex;
-      gap             : 0.5em;
+      gap             : --space(small);
       justify-content : center;
       line-height     : 1.2;
       user-select     : none;

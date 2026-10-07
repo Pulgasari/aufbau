@@ -123,7 +123,7 @@ export default class WidgetCalculator extends AufbauElement {
   };
 
   static styles = `widget-calculator {
-    --calculator-gap : 0.5rem;
+    --calculator-gap : --space(small);
 
     background     : var(--calculator-bg, var(--color-bg, Canvas));
     color          : var(--color-fg, CanvasText);
@@ -161,7 +161,7 @@ export default class WidgetCalculator extends AufbauElement {
       background    : color-mix(in oklch, var(--color-bg, Canvas), var(--color-fg, CanvasText) 15%);
       border-radius : 0.25rem;
       display       : grid;
-      padding       : 0.75rem;
+      padding       : --space(normal);
     }
 
     [part="display"] {

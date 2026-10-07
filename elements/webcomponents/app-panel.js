@@ -25,8 +25,8 @@ export class AppPanel extends AufbauElement {
       align-items : center;
       display     : flex;
       flex        : none;
-      gap         : 0.5em;
-      padding     : var(--panel-header-padding, 0.5rem 0.75rem);
+      gap         : --space(small);
+      padding     : var(--panel-header-padding, --space(small));
 
       &[hidden] { display: none; }
     }
@@ -50,7 +50,7 @@ export class AppPanel extends AufbauElement {
       display       : inline-flex;
       font          : inherit;
       font-size     : 1.15em;
-      padding       : 0.25em;
+      padding       : --space(tiny);
 
       &:hover          { background-color: color-mix(in oklab, currentColor 8%, transparent); }
       &:focus-visible  { outline: 2px solid color-mix(in oklab, currentColor 55%, transparent); }
@@ -61,7 +61,7 @@ export class AppPanel extends AufbauElement {
       flex           : 1 1 auto;
       min-block-size : 0;
       overflow       : auto;
-      padding        : var(--panel-padding, 0 0.75rem 0.75rem);
+      padding        : var(--panel-padding, 0 --space(normal) --space(normal));
     }
   `;
 

@@ -6,7 +6,7 @@ export const FRAME = `
     border         : var(--input-line);
     border-radius  : --radius();
     min-block-size : --space(9);
-    padding-inline : 0.6em;
+    padding-inline : --space(small);
 
     &:focus-within { border-color: var(--color-ink, Highlight); }
   }

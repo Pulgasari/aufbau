@@ -129,7 +129,7 @@ export default class WriteCode extends AufbauSourceElement {
     }
 
     > figure > header {
-      --gap: small; /* gap: --space(small); */
+      --gap: --space(small); /* gap: --space(small); */
       
       align-items : center;
       display     : flex;
@@ -144,7 +144,7 @@ export default class WriteCode extends AufbauSourceElement {
       }
       > div {
         display : inline-flex;
-        gap     : small;
+        gap     : --space(small);
       }
       button {
         align-items : center;

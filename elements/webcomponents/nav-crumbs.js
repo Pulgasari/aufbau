@@ -17,7 +17,7 @@ export default class NavCrumbs extends AufbauElement {
     align-items : center;
     display     : flex;
     flex-wrap   : nowrap;
-    gap         : var(--crumbs-gap, 0.35em);
+    gap         : var(--crumbs-gap, --space(tiny));
     min-inline-size : 0;
     overflow    : hidden;
 
@@ -33,7 +33,7 @@ export default class NavCrumbs extends AufbauElement {
 
     > * + *::before {
       content      : var(--crumbs-separator, '/');
-      margin-inline-end : var(--crumbs-gap, 0.35em);
+      margin-inline-end : var(--crumbs-gap, --space(tiny));
       opacity      : 0.5;
     }
 

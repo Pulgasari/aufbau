@@ -27,14 +27,14 @@ export default {
       border         : var(--input-line);
       border-radius  : --radius();
       min-block-size : --space(9);
-      padding-inline : 0.6em;
+      padding-inline : --space(small);
 
       &:focus { border-color: var(--color-ink, Highlight); }
     }
 
     [part~="options"] {
       display               : grid;
-      gap                   : 0.25em;
+      gap                   : --space(tiny);
       grid-template-columns : repeat(auto-fill, minmax(var(--grid-size, 2.5em), 1fr));
       max-block-size        : var(--grid-height, 16em);
       overflow-y            : auto;

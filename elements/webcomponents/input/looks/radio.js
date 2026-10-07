@@ -6,8 +6,8 @@ export default {
   fits : shape => shape.kind === 'list' && shape.count !== 'range',
 
   css : `
-    [part~="box"]    { align-items: flex-start; flex-direction: column; gap: 0.35em; }
-    [part~="option"] { gap: 0.5em; justify-content: flex-start; }
+    [part~="box"]    { align-items: flex-start; flex-direction: column; gap: --space(tiny); }
+    [part~="option"] { gap: --space(small); justify-content: flex-start; }
 
     [part~="mark"] {
       block-size    : 1em;

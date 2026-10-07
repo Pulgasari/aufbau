@@ -52,7 +52,7 @@ const STACK_STYLES = `
     border          : 0;
     display         : flex;
     flex-direction  : column;
-    gap             : 0.5rem;
+    gap             : --space(small);
     inset           : 1rem 1rem auto auto;
     margin          : 0;
     max-inline-size : min(24rem, calc(100vw - 2rem));

@@ -76,7 +76,7 @@ export default class OutputValue extends AufbauSourceElement {
       > span {
         align-items : baseline;
         display     : inline-flex;
-        gap         : var(--value-gap, 0.25rem);
+        gap         : var(--value-gap, --space(tiny));
       }
 
       &:is([type="date"], [type="datetime"], [type="number"], [type="time"], [type="year"]) > span > :is(span, time) {

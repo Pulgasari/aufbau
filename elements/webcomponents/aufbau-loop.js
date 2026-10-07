@@ -38,7 +38,7 @@ export default class AufbauLoop extends AufbauElement {
     [part~="copy"] { display: contents; }
 
     [part~="track"] ::slotted(*),
-    [part~="copy"] > * { flex: none; margin-inline-end: var(--loop-gap, 2rem); }
+    [part~="copy"] > * { flex: none; margin-inline-end: var(--loop-gap, --space(large)); }
 
     :host([direction="right"]) [part~="track"]    { animation-direction: reverse; }
     :host([pause-on-hover]:hover) [part~="track"] { animation-play-state: paused; }

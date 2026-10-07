@@ -51,7 +51,7 @@ export default class MockP extends AufbauElement {
 
   static styles = `mock-p {
     display      : block;
-    margin-block : 1em;
+    margin-block : --space(normal);
   }`;
 
   own = Math.floor(Math.random() * 4294967296);

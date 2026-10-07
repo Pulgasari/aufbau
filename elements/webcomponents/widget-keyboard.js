@@ -104,7 +104,7 @@ export default class WidgetKeyboard extends AufbauElement {
     background          : var(--keyboard-bg, var(--color-bg, Canvas));
     display             : flex;
     flex-direction      : column;
-    gap                 : var(--keyboard-gap, 0.25rem);
+    gap                 : var(--keyboard-gap, --space(tiny));
     touch-action        : manipulation;
     user-select         : none;
     -webkit-user-select : none;
@@ -112,11 +112,11 @@ export default class WidgetKeyboard extends AufbauElement {
     > div {
       display        : flex;
       flex-direction : column;
-      gap            : var(--keyboard-gap, 0.25rem);
+      gap            : var(--keyboard-gap, --space(tiny));
 
       > div {
         display         : flex;
-        gap             : var(--keyboard-gap, 0.25rem);
+        gap             : var(--keyboard-gap, --space(tiny));
         justify-content : center;
 
         > span { flex: 1 0 0; }
@@ -133,7 +133,7 @@ export default class WidgetKeyboard extends AufbauElement {
       flex          : 1 0 0;
       font          : inherit;
       margin        : 0;
-      padding       : var(--keyboard-key-padding, 0.5rem 0);
+      padding       : var(--keyboard-key-padding, --space(small) 0);
       place-content : center;
 
       &[aria-pressed="true"] {

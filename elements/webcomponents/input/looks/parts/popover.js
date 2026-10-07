@@ -27,7 +27,7 @@ export const LISTBOX = `
     max-block-size      : var(--list-size, 15em);
     overflow-y          : auto;
     overscroll-behavior : contain;
-    padding             : 0.25em;
+    padding             : --space(tiny);
     position            : fixed;
   }
 
@@ -36,8 +36,8 @@ export const LISTBOX = `
     border-radius : calc(--radius() * 0.75);
     cursor        : pointer;
     display       : flex;
-    gap           : 0.5em;
-    padding       : 0.35em 0.5em;
+    gap           : --space(small);
+    padding       : --space(small);
 
     &:hover, &:focus        { background: color-mix(in srgb, currentColor 10%, transparent); }
     &[part~="selected"]     { color: var(--color-ink, AccentColor); }

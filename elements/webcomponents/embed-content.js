@@ -138,7 +138,7 @@ export default class EmbedContent extends AufbauElement {
       display         : flex;
       flex-direction  : column;
       font            : inherit;
-      gap             : 0.25em;
+      gap             : --space(tiny);
       inline-size     : 100%;
       justify-content : center;
       margin          : 0;
@@ -150,7 +150,7 @@ export default class EmbedContent extends AufbauElement {
     }
 
     @container (max-height: 80px) {
-      > :is(button, a) { flex-direction: row; gap: 0.5em; }
+      > :is(button, a) { flex-direction: row; gap: --space(small); }
       > :is(button, a) > svg-icon { font-size: 1em; }
     }
   }`;

@@ -6,7 +6,7 @@ export default {
 
   css : `
     ${FRAME}
-    [part~="box"] { padding-inline: 0.25em; }
+    [part~="box"] { padding-inline: --space(tiny); }
 
     [part~="input"] {
       appearance  : textfield;

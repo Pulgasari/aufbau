@@ -25,7 +25,7 @@ export default class NavToc extends AufbauElement {
     }
 
     li {
-      padding-inline-start: calc((var(--toc-level, 1) - 1) * var(--toc-indent, 0.75rem));
+      padding-inline-start: calc((var(--toc-level, 1) - 1) * var(--toc-indent, --space(normal)));
 
       &[aria-level="2"] { --toc-level: 2; }
       &[aria-level="3"] { --toc-level: 3; }

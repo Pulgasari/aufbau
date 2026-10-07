@@ -51,7 +51,7 @@ export default class InputFile extends AufbauControlElement {
       gap             : --space(small);
       justify-content : center;
       margin          : 0;
-      padding         : 1.5em 1em;
+      padding         : --space(large);
       text-align      : center;
 
       > svg-icon { --icon-size: 1.75em; }
@@ -67,7 +67,7 @@ export default class InputFile extends AufbauControlElement {
     [part~="list"] {
       display        : flex;
       flex-direction : column;
-      gap            : 0.25em;
+      gap            : --space(tiny);
       list-style     : none;
       margin         : 0;
       padding        : 0;
