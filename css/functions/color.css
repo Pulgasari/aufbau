@@ -1,176 +1,152 @@
-/* gestalt/functions/color.css */
+/* @aufbau/css/functions/color.css
 
-/*
+every color function takes its colors through --color(): a css color or a
+role of the palette.
+
+  bg      --color-bg
+  fg      --color-fg
+  ink     --color-ink
+  cc      currentColor
+  error   --color-error
+  success --color-success
+  warning --color-warning
+  danger  --color-danger
+
+an amount is a number or a percentage, 0.1 and 10% are the same. */
+
+/*//////////// RESOLVER ////////////*/
+
+/* a role of the palette or a color as it is */
 @function --color(
-  --value type(<color>) : currentColor
+  --value type(<color> | bg | fg | ink | cc | error | success | warning | danger) : cc
 ) returns <color> {
   result: if(
-    style(--fn: darker)  : var(--color-bg);
-    style(--fn: lighter) : var(--color-fg);
-    else                 : var(--value);
-  );
-}
-*/
-
-@function --fallback-color(
-  --value type(<color> | bg | fg | ink | cc) : cc
-) returns <color> {
-    result: var(--value)
-  );
-}
-
-/* Adjusts lightness with signed integers: -100 (black) to +100 (white) */
-@function --adjust-lightness(
-  --base            : cc,
-  --amount <number> : 0
-) returns <color> {
-  --C: --color(var(--base));
-  result: oklch(
-    from var(--C) 
-    clamp(0, calc(l + var(--amount) / 100), 1) 
-    c 
-    h / alpha
+    style(--value: bg)      : var(--color-bg);
+    style(--value: fg)      : var(--color-fg);
+    style(--value: ink)     : var(--color-ink);
+    style(--value: cc)      : currentColor;
+    style(--value: error)   : var(--color-error);
+    style(--value: success) : var(--color-success);
+    style(--value: warning) : var(--color-warning);
+    style(--value: danger)  : var(--color-danger);
+    else                    : var(--value);
   );
 }
 
+/*//////////// AMOUNTS ////////////*/
+
+/* a percentage as a number: 10% -> 0.1. a number does not fit the return type,
+   the call is invalid, and the fallback of the caller takes over */
+@function --percentage-to-number(--value) returns <number> {
+  result: calc(var(--value) / 100%);
+}
+
+/* 0.1 or 10% -> 0.1 */
+@function --fraction(
+  --value type(<number> | <percentage>) : 0
+) returns <number> {
+  --from-percentage: --percentage-to-number(var(--value));
+  result: var(--from-percentage, var(--value));
+}
+
+/* 0.1 or 10% -> 10% */
+@function --percentage(
+  --value type(<number> | <percentage>) : 0
+) returns <percentage> {
+  result: calc(--fraction(var(--value)) * 100%);
+}
+
+/*//////////// TRANSPARENCY AND MIXING ////////////*/
+
+/* the color at an opacity: --alpha(fg, 15%) */
 @function --alpha(
-  --base    <color> : currentColor,
-  --opacity type(<number> | <percentage>) : 50%,
-  --mode    : oklch
+  --base                                     : cc,
+  --opacity type(<number> | <percentage>)    : 50%,
+  --mode                                     : oklch
 ) returns <color> {
-  --C: var(--base);
-  result: color-mix(in var(--mode), var(--C) var(--opacity), transparent);
+  result: color-mix(in var(--mode), --color(var(--base)) --percentage(var(--opacity)), transparent);
 }
 
-@function --darker(
-  --base   <color> : currentColor,
-  --amount type(<number> | <percentage>) : 0.1
-) returns <color> {
-  --C: --color(var(--base));
-  --A: --normalize-amount(var(--amount));
-  result: oklch(from var(--C) max(0, l - var(--A)) c h / alpha);
-}
-
+/* --amount of --to in --from: --mix(bg, ink, 20%) */
 @function --mix(
-  --from   <color> : currentColor,
-  --to     <color> : currentColor,
-  --amount type(<number> | <percentage>) : 0.5,
-  --mode   : oklch
+  --from                                     : bg,
+  --to                                       : fg,
+  --amount type(<number> | <percentage>)     : 50%,
+  --mode                                     : oklch
 ) returns <color> {
-  --F: --color(var(--from));
-  --T: --color(var(--to));
-  result: color-mix(in var(--mode), var(--F), var(--T) var(--amount));
+  result: color-mix(in var(--mode), --color(var(--from)), --color(var(--to)) --percentage(var(--amount)));
 }
 
-@function --lighter(
-  --base   <color> : currentColor,
-  --amount type(<number> | <percentage>) : 0.1
-) returns <color> {
-  --C: --color(var(--base));
-  result: oklch(from var(--C) min(1, l + var(--amount)) c h / alpha);
-}
-
-/* towards the background or the foreground: lighter or darker depending on the
-   scheme, so a tint reads the same in light and dark */
+/* towards the background: lighter on a light palette, darker on a dark one */
 @function --tint(
-  --base   type(<color> | bg | fg | ink | cc) : ink,
-  --amount type(<number> | <percentage>) : 0.1
+  --base                                     : ink,
+  --amount type(<number> | <percentage>)     : 20%
 ) returns <color> {
-  --C: --color(var(--base));
-  result: color-mix(in oklch, var(--C), var(--color-bg) var(--amount));
+  result: --mix(var(--base), bg, var(--amount));
 }
 
+/* towards the text color, the other way round */
 @function --shade(
-  --base   type(<color> | bg | fg | ink | cc) : ink,
-  --amount type(<number> | <percentage>) : 0.1
+  --base                                     : ink,
+  --amount type(<number> | <percentage>)     : 20%
 ) returns <color> {
-  --C: --color(var(--base));
-  result: color-mix(in oklch, var(--C), var(--color-fg) var(--amount));
-}
-
-/* a fixed lightness, 0 black to 1 white: --tone(ink, 0.95) is a pale
-   background in the ink's hue */
-@function --tone(
-  --base      type(<color> | bg | fg | ink | cc) : ink,
-  --lightness type(<number> | <percentage>) : 0.5
-) returns <color> {
-  --C: --color(var(--base));
-  result: oklch(from var(--C) var(--lightness) c h / alpha);
-}
-
-/* chroma times --factor, 0 is grey, above 1 more vivid */
-@function --saturate(
-  --base   type(<color> | bg | fg | ink | cc) : cc,
-  --factor type(<number> | <percentage>) : 1.5
-) returns <color> {
-  --C: --color(var(--base));
-  result: oklch(from var(--C) l calc(c * var(--factor)) h / alpha);
-}
-
-@function --grayscale(--base type(<color> | bg | fg | ink | cc) : cc) returns <color> {
-  --C: --color(var(--base));
-  result: oklch(from var(--C) l 0 h / alpha);
-}
-
-@function --hue-shift(
-  --base  <color> : currentColor,
-  --angle <angle> : 30deg
-) returns <color> {
-  result: oklch(from var(--base) l c calc(h + var(--angle) / 1deg) / alpha);
-}
-
-@function --complement(
-  --base <color> : currentColor
-) returns <color> {
-  result: --hue-shift(var(--base), 180deg);
-}
-
-/* the neighbours on the wheel: --analogous(ink, -1) and (ink, 1) */
-@function --analogous(
-  --base  <color>  : currentColor
-  --step  <number> : 1,
-  --angle <angle>  : 30deg
-) returns <color> {
-  result: --hue-shift(var(--base), calc(var(--angle) * var(--step)));
-}
-
-/* black or white, whichever reads on --background. the lightness is pushed
-   against a threshold and clamped, so the result is exactly 0 or 1 */
-@function --on(
-  --base type(<color> || <custom-ident>) : ink
-  --threshold  <number>                   : 0.62
-) returns <color> {
-  --C: --color(var(--background));
-  result: oklch(from var(--C) clamp(0, (var(--threshold) - l) * 1000, 1) 0 0);
+  result: --mix(var(--base), fg, var(--amount));
 }
 
 /* the text color between fg and bg: 0 is fg, 100% the background */
 @function --muted(
-  --amount type(<number> | <percentage>) : 50%
+  --amount type(<number> | <percentage>)     : 50%
 ) returns <color> {
-  result: color-mix(in oklch, var(--color-fg), var(--color-bg) var(--amount));
+  result: --mix(fg, bg, var(--amount));
 }
 
-/* surfaces stacked on the background: every level mixes a bit more fg in.
-   cards, panels, zebra rows, in light and dark alike */
-@function --surface(
-  --level <number>     : 1,
-  --step  <percentage> : 4%
+/*//////////// LIGHTNESS ////////////*/
+
+/* lightness up by --amount, 1 is white */
+@function --lighter(
+  --base                                     : cc,
+  --amount type(<number> | <percentage>)     : 0.1
 ) returns <color> {
-  result: color-mix(in oklch, var(--color-bg), var(--color-fg) calc(var(--level) * var(--step)));
+  result: oklch(from --color(var(--base)) min(1, l + --fraction(var(--amount))) c h / alpha);
 }
 
-/* one color, its interaction states: hover, active, focus, disabled */
-@function --state(
-  ----base type(<color> || <custom-ident>) : ink,
-  --state type(normal | hover | active | focus | disabled) : normal
+/* lightness down by --amount, 0 is black */
+@function --darker(
+  --base                                     : cc,
+  --amount type(<number> | <percentage>)     : 0.1
 ) returns <color> {
-  --C: --color(var(--base));
-  result: if(
-    style(--state: hover)    : color-mix(in oklch, var(--C), var(--color-fg) 12%);
-    style(--state: active)   : color-mix(in oklch, var(--C), var(--color-fg) 24%);
-    style(--state: focus)    : color-mix(in oklch, var(--C), var(--color-bg) 12%);
-    style(--state: disabled) : oklch(from var(--C) l calc(c * 0.2) h / 0.5);
-    else                     : var(--C);
-  );
+  result: oklch(from --color(var(--base)) max(0, l - --fraction(var(--amount))) c h / alpha);
+}
+
+/* lightness by a signed amount: --adjust-lightness(ink, -0.2) is --darker(ink, 0.2) */
+@function --adjust-lightness(
+  --base                                     : cc,
+  --amount type(<number> | <percentage>)     : 0
+) returns <color> {
+  result: oklch(from --color(var(--base)) clamp(0, l + --fraction(var(--amount)), 1) c h / alpha);
+}
+
+/* a fixed lightness, 0 black to 1 white: --tone(ink, 0.95) is a pale background in the ink's hue */
+@function --tone(
+  --base                                     : ink,
+  --lightness type(<number> | <percentage>)  : 0.5
+) returns <color> {
+  result: oklch(from --color(var(--base)) --fraction(var(--lightness)) c h / alpha);
+}
+
+/*//////////// HUE ////////////*/
+
+/* the hue turned by --angle */
+@function --hue-shift(
+  --base                                     : ink,
+  --angle <angle>                            : 30deg
+) returns <color> {
+  result: oklch(from --color(var(--base)) l c calc(h + var(--angle) / 1deg) / alpha);
+}
+
+/* the opposite on the wheel */
+@function --complement(
+  --base                                     : ink
+) returns <color> {
+  result: --hue-shift(var(--base), 180deg);
 }

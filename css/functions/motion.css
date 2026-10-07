@@ -1,6 +1,4 @@
-/* @aufbau/css/functions.css */
-
-/*//////////// MOTION ////////////*/
+/* @aufbau/css/functions/motion.css */
 
 /* named easing curves */
 @function --ease(
@@ -39,24 +37,3 @@
 ) {
   result: var(--property) --duration(var(--speed)) --ease(var(--kind));
 }
-
-/*//////////// LAYERS ////////////*/
-
-/* z-index by name, one order for the whole system */
-@function --z(
-  --layer type(base | below | raised | dropdown | sticky | overlay | modal | toast | tooltip) : base
-) returns <integer> {
-  result: if(
-    style(--layer: below)    :  -1;
-    style(--layer: raised)   :  10;
-    style(--layer: dropdown) : 100;
-    style(--layer: sticky)   : 200;
-    style(--layer: overlay)  : 300;
-    style(--layer: modal)    : 400;
-    style(--layer: toast)    : 500;
-    style(--layer: tooltip)  : 600;
-    else                     :   0;
-  );
-}
-
-
