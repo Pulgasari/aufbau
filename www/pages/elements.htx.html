@@ -2,6 +2,8 @@
 <script>
   const path = './..';
   const src  = (slug) => `${path}/elements.${slug}.htx.html`;
+  const namespaces = ['app', 'btn'];
+  // ${namespaces.map(ns => <h1>${ns}</h1><htx-part src=${src(ns)} />)}
 </script>
 
 <section>
