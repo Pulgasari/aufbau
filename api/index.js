@@ -3,7 +3,7 @@
 import { deepMerge } from '@pulgasari/obj';
 //import { shift }     from '@pulgasari/shapeshift';
   
-import { CSS_PATH, gestalt } from './gestalt.js';
+import { CSS_PATH, gestalt } from '../gestalt/index.js';
 
 // :::::: LAZY ::::::::::::::::::::::::::::::::::::::::::::::::::
 
