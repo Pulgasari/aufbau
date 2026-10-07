@@ -79,7 +79,6 @@ aside {
 button {
    background    : color-mix(in oklch, currentColor 6%, transparent);
    border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
-   border-radius : 50%;
    color         : inherit;
    font-size     : 1.5rem;
    inline-size   : 3.5rem;
