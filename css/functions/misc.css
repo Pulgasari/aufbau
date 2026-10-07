@@ -1,0 +1,18 @@
+@function --combine-strings(--strings type(<string>+)) {
+  result: var(--strings) " ❤️";
+}
+/* content: --combine-strings("hello" "goodbye"); */
+
+@function --color-choice(--color1 <color>, --color2 <color>, --breakpoint <length>: 720px) {
+  result: var(--color1);
+  @media (width < var(--breakpoint)) {
+    result: var(--color2);
+  }
+}
+
+@function --choice(--a type(*), --b type(*), --breakpoint <length>: 720px) {
+  result: var(--a);
+  @media (width < var(--breakpoint)) {
+    result: var(--b);
+  }
+}
