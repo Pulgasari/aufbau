@@ -13,11 +13,24 @@
 </script>
 
 <style>
-  .wheel-dot { aspect-ratio: 1; background: var(--color-ink); border-radius: 50%; inline-size: 1.5rem; }
+  .wheel-dot { 
+    aspect-ratio: 1; 
+    background: var(--color-ink); 
+    border-radius: 50%; 
+    inline-size: 1.5rem;
+  }
 </style>
 
 <div>
   <h2>wheel</h2>
-  <p><code>wheelStart</code>, <code>wheelMove</code>, <code>wheelEnd</code>: wheel or two-finger trackpad scroll moves the dot, the page does not scroll here.</p>
-  <div class="pad" ref=${setup}><div class="wheel-dot" ref=${node => dot = node}></div></div>
+  <p>
+    <code>wheelStart</code>,
+    <code>wheelMove</code>,
+    <code>wheelEnd</code>:
+    wheel or two-finger trackpad scroll moves the dot,
+    the page does not scroll here.
+  </p>
+  <div class="pad" ref=${setup}>
+    <div class="wheel-dot" ref=${node => dot = node}></div>
+  </div>
 </div>
