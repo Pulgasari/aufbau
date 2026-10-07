@@ -2,7 +2,10 @@
   import { sortable }     from '@aufbau/gestures';
   import { log, mounted } from './../gestures.shared.js';
 
-  const setup = mounted(grid => sortable(grid, { axis: null, onSort: ({ from, to }) => log(`grid ${from} → ${to}`) }));
+  const setup = mounted(grid => sortable(grid, { 
+    axis   : null,
+    onSort : ({ from, to }) => log(`grid ${from} → ${to}`)
+  }));
 </script>
 
 <style>
@@ -11,7 +14,6 @@
     aspect-ratio  : 1;
     background    : color-mix(in oklch, currentColor 6%, transparent);
     border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
-    border-radius : .6rem;
     display       : grid;
     font-weight   : 700;
     place-items   : center;
