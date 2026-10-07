@@ -13,18 +13,14 @@ which a page sets to 0 for reduced motion.
 
 /*//////////// DURATION ////////////*/
 
-/* a speed by name or a time, times --motion. auto takes the default of --name */
+/* a speed by name or a time, times --motion. the names are the ones of
+   --duration() (css/functions/motion.css), auto takes the default of --name */
 @function --animate-time(
   --speed type(auto | instant | fast | normal | slow | lazy | <time>) : auto,
   --name  <custom-ident>                                              : none
 ) returns <time> {
-  --time: if(
-    style(--speed: instant) :  60ms;
-    style(--speed: fast)    :  150ms;
-    style(--speed: normal)  :  200ms;
-    style(--speed: slow)    :  600ms;
-    style(--speed: lazy)    : 1200ms;
-    style(--speed: auto)    : if(
+  --own: if(
+    style(--speed: auto) : if(
       style(--name: vibrate)     : 100ms;
       style(--name: glitch)      : 300ms;
       style(--name: fade)        : 300ms;
@@ -54,9 +50,16 @@ which a page sets to 0 for reduced motion.
       style(--name: shimmer)     : 1500ms;
       style(--name: drift)       : 2s;
       else                       : 1s);
-    else                    : var(--speed);
+    else                 : var(--speed);
   );
-  result: calc(var(--motion, 1) * var(--time));
+  result: if(
+    style(--speed: instant) : --duration(instant);
+    style(--speed: fast)    : --duration(fast);
+    style(--speed: normal)  : --duration(normal);
+    style(--speed: slow)    : --duration(slow);
+    style(--speed: lazy)    : --duration(lazy);
+    else                    : calc(var(--motion, 1) * var(--own));
+  );
 }
 
 /*//////////// EASING ////////////*/

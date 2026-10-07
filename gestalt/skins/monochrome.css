@@ -4,235 +4,143 @@
    are --color-bg, highlights --color-ink. so the skin follows whatever palette
    or text color it sits in.
 
-   a skin decorates: lines, radii, colors, states. sizes, font sizes and spacing
-   are not its business, the block at the end holds the spacing the elements do
-   not carry themselves yet.
+   a skin decorates: lines, colors, states. the radius comes from --geometry
+   (--radius()), sizes, font sizes and spacing are the elements' own business.
 
-   loaded by elements/core/skin.js into @layer aufbau.skin.
+   adopted by @aufbau/element (lib/skin.js) into @layer aufbau.skin of the
+   document. it reaches a shadow element through its host, the tokens the host
+   inherits and its parts. the parts are named by role, the same name in every
+   element, so most rules here do not name a tag:
 
-   to do in the elements, so this file can shrink to rules per role:
-   - one part name per role across all elements: control (a framed field or
-     trigger), surface (a popup: listbox, menu, dialog), option (a pickable row)
-   - one way to states: :state(checked | selected | disabled | open) instead of
-     attributes here, part tokens there
-   - the spacing below moves into the structure of each element */
+     listbox   a popup list, option and selected in it
+     segment   one of joined options, selected among them
+     trigger   what opens a popup
+     zone      a drop area
+
+   a rule from outside on a part wins over the element's own rules, its states
+   included. so the skin leaves the parts that change with a state (track,
+   thumb, mark, check) to the element and sets their tokens instead. */
 
 /*//////////// TOKENS ////////////*/
 
 /* unregistered on purpose: a registered <color> would resolve currentColor once
    on :root, unregistered it resolves where the token is used */
 :root {
-  --line         : color-mix(in oklab, currentColor 35%, transparent);
-  --hover        : color-mix(in oklab, currentColor  8%, transparent);
-  --sunken       : color-mix(in oklab, currentColor  6%, transparent);
-  --track        : color-mix(in oklab, currentColor 18%, transparent);
-  --color-focus  : color-mix(in oklab, currentColor 55%, transparent);
-  --color-muted  : color-mix(in oklab, currentColor 55%, transparent);
+  --line        : color-mix(in oklab, currentColor 35%, transparent);
+  --hover       : color-mix(in oklab, currentColor  8%, transparent);
+  --sunken      : color-mix(in oklab, currentColor  6%, transparent);
+  --track       : color-mix(in oklab, currentColor 18%, transparent);
+  --color-focus : color-mix(in oklab, currentColor 55%, transparent);
+  --color-muted : color-mix(in oklab, currentColor 55%, transparent);
 
   --border : 1px solid var(--line);
-  --radius : 0.25rem;
+
+  /* what the elements read */
+  --area-border    : var(--border);
+  --input-line     : var(--border);
+  --progress-bar   : var(--color-ink);
+  --progress-track : var(--track);
 }
 
 /*//////////// FRAME ////////////*/
 
-aufbau-button,
-aufbau-code,
-aufbau-input,
-aufbau-picker[look="combobox"],
-aufbau-picker[look="segments"],
-aufbau-toggle[look="button"],
-aufbau-writer,
-aufbau-dropdown::part(trigger),
-aufbau-picker[look="cycle"]::part(trigger),
-aufbau-upload::part(zone) {
+btn-push,
+write-code,
+write-text > div,
+::part(trigger),
+::part(zone) {
   border        : var(--border);
-  border-radius : var(--radius);
+  border-radius : --radius();
 }
 
 /*//////////// SURFACE ////////////*/
 
-aufbau-toast,
-aufbau-dropdown::part(menu),
-aufbau-modal::part(dialog),
-aufbau-picker::part(listbox) {
+pop-toast,
+::part(dialog),
+::part(listbox),
+::part(menu) {
   background-color : var(--color-bg);
   border           : var(--border);
-  border-radius    : var(--radius);
+  border-radius    : --radius();
   color            : var(--color-fg);
 }
 
 /*//////////// STATES ////////////*/
 
-:is(aufbau-input, aufbau-picker, aufbau-slider, aufbau-toggle, aufbau-upload, aufbau-writer):state(disabled) { opacity: 0.5; }
+:state(disabled) { opacity: 0.5; }
 
 /* hover, a tint of the text color */
-:is(aufbau-button, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):hover:not(:disabled, [disabled]),
-aufbau-dropdown > *:hover,
-aufbau-table tbody tr:hover,
-aufbau-dropdown::part(trigger):hover:not(:disabled),
-aufbau-picker::part(step):hover:not(:disabled),
-aufbau-picker::part(trigger):hover,
-aufbau-picker[look="segments"]::part(option):hover,
-aufbau-tree-item::part(row):hover,
-aufbau-upload::part(remove):hover,
-aufbau-upload::part(zone):hover,
-aufbau-upload:state(dragging)::part(zone) {
+:is(btn-tap, btn-push, btn-icon):hover:not([disabled]),
+write-code > figure > header button:hover,
+data-table tbody tr:hover,
+::part(action):hover,
+[look="button"]::part(control):hover,
+::part(option):hover,
+::part(remove):hover,
+::part(row):hover,
+::part(segment):hover,
+::part(trigger):hover,
+::part(zone):hover {
   background-color: var(--hover);
 }
 
-/* focus, one ring for all of them. ::part() cannot sit inside :is(), the parts are listed on their own */
-:is(aufbau-input, aufbau-picker[look="combobox"], aufbau-writer):focus-within,
-:is(aufbau-button, aufbau-toggle, aufbau-input > button, aufbau-slider > button, :is(aufbau-code, aufbau-writer, aufbau-value) [data-action]):focus-visible,
-aufbau-dropdown::part(trigger):focus-visible,
-aufbau-picker::part(option):focus-visible,
-aufbau-picker::part(step):focus-visible,
-aufbau-picker::part(trigger):focus-visible,
-aufbau-upload::part(remove):focus-visible,
-aufbau-upload::part(zone):focus-visible {
+/* focus, one ring for all of them */
+:is(btn-tap, btn-push, btn-icon):focus-visible,
+write-code > figure > header button:focus-visible,
+[look="button"]::part(control):focus-visible,
+::part(option):focus-visible,
+::part(remove):focus-visible,
+::part(segment):focus-visible,
+::part(trigger):focus-visible,
+::part(zone):focus-visible {
   outline        : 2px solid var(--color-focus);
   outline-offset : 1px;
 }
 
-aufbau-tree-item:focus-visible::part(row) {
+::part(box):focus-within { border-color: var(--color-focus); }
+
+data-node:focus-visible::part(row) {
   outline        : 2px solid var(--color-focus);
   outline-offset : -2px;
 }
 
 /* selected, the ink with the background as text */
-aufbau-picker[look="combobox"]::part(option):hover,
-aufbau-picker[look="cycle"]::part(option):hover,
-aufbau-picker[look="combobox"]::part(option selected),
-aufbau-picker[look="cycle"]::part(option selected),
-aufbau-picker[look="segments"]::part(option selected),
-aufbau-toggle[look="button"][checked],
-aufbau-tree-item[selected]::part(row) {
+::part(option selected),
+::part(segment selected),
+[look="button"]::part(control checked),
+data-node[selected]::part(row) {
   background-color : var(--color-ink);
   color            : var(--color-bg);
 }
 
-/*//////////// TRACK AND FILL ////////////*/
-
-aufbau-progress {
-  --progress-bar   : var(--color-ink);
-  --progress-track : var(--track);
-}
-
-aufbau-slider > div {
-  &::before { background-color: var(--track); }
-  &::after  { background-color: var(--color-ink); }
-}
-
-aufbau-slider[type="color"] > div::after { background-color: var(--slider-color, var(--color-ink)); }
-
-aufbau-toggle[look="switch"] {
-  &::before          { background-color: var(--track); transition: background-color 0.15s ease; }
-  &[checked]::before { background-color: var(--color-ink); }
-  &::after           { background-color: var(--color-bg); border: var(--border); }
-}
-
-/* round ends */
-aufbau-progress::before,
-aufbau-slider > div::before,
-aufbau-slider > div::after,
-aufbau-toggle[look="switch"]::before,
-aufbau-toggle[look="switch"]::after,
-aufbau-picker[look="radio"]::part(option)::before {
-  border-radius: 999px;
-}
-
 /*//////////// ELEMENTS ////////////*/
 
-aufbau-button {
-  background-color : transparent;
-  border-color     : currentColor;
-  border-radius    : var(--radius);
-
+btn-tap {
   &[variant="ghost"]   { border-color: transparent; }
   &[variant="primary"] { color: var(--color-ink); }
 }
 
-aufbau-code > figure > header {
-  border-block-end : var(--border);
-  color            : var(--color-muted);
+write-code {
+  > figure > header { border-block-end: var(--border); color: var(--color-muted); }
+  code[contenteditable]:focus { background-color: var(--sunken); }
 }
 
-aufbau-code code[contenteditable]:focus { background-color: var(--sunken); }
-
-aufbau-input[look="swatch"]::after,
-aufbau-toggle[look="checkbox"]::before {
-  border        : var(--border);
-  border-radius : calc(var(--radius) * 0.6);
+write-text {
+                > div > footer > output { color: var(--color-muted); }
+  &:state(full) > div > footer > output { color: var(--color-error); }
 }
 
-aufbau-input > button,
-aufbau-dropdown > *,
-aufbau-picker::part(option),
-aufbau-picker::part(step),
-aufbau-tree-item::part(row),
-aufbau-upload::part(file),
-:is(aufbau-code, aufbau-writer) [data-action] {
-  border-radius: calc(var(--radius) * 0.8);
+/* the segments share one frame, the element draws the dividers from --input-line */
+::part(segment) { border-radius: 0; }
+
+::part(header) { border-block-end: var(--border); }
+
+data-table {
+  thead th      { border-block-end: var(--border); }
+  tbody tr + tr { border-block-start: 1px solid var(--track); }
 }
 
-aufbau-embed {
-  border        : var(--border);
-  border-radius : var(--radius);
-  overflow      : hidden;
-
-  > :is(button, a) { background-color: var(--sunken); }
-  > :is(button, a):hover { background-color: var(--hover); }
-  > :is(button, a):focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
-  > :is(button, a) > small { color: var(--color-muted); }
-}
-
-aufbau-modal::part(header) { border-block-end: var(--border); }
-
-/* the segments share one frame, the element draws the dividers from --picker-divider */
-aufbau-picker[look="segments"] {
-  --picker-divider : var(--border);
-  overflow         : hidden;
-
-  &::part(option) { border-radius: 0; }
-}
-
-aufbau-picker[look="radio"] {
-  &::part(option)::before          { border: var(--border); transition: border-width 0.12s ease; }
-  &[multiple]::part(option)::before { border-radius: calc(var(--radius) * 0.4); }
-  &::part(option selected)::before  { border-color: var(--color-ink); border-width: 0.28em; }
-}
-
-aufbau-slider > div > input {
-  &::-webkit-slider-runnable-track { background: none; }
-  &::-moz-range-track              { background: none; }
-
-  &::-webkit-slider-thumb {
-    appearance       : none;
-    background-color : var(--color-bg);
-    block-size       : var(--slider-thumb-size);
-    border           : 2px solid var(--color-ink);
-    border-radius    : 999px;
-    cursor           : grab;
-    inline-size      : var(--slider-thumb-size);
-  }
-
-  &::-moz-range-thumb {
-    background-color : var(--color-bg);
-    block-size       : var(--slider-thumb-size);
-    border           : 2px solid var(--color-ink);
-    border-radius    : 999px;
-    cursor           : grab;
-    inline-size      : var(--slider-thumb-size);
-  }
-}
-
-aufbau-slider > output > input { border-block-end: var(--border); }
-
-aufbau-table {
-  thead th       { border-block-end: var(--border); }
-  tbody tr + tr  { border-block-start: 1px solid var(--track); }
-}
-
-aufbau-toast {
+pop-toast {
   border-inline-start-width : 3px;
 
   &[type="success"] { border-inline-start-color: var(--color-success); }
@@ -240,9 +148,9 @@ aufbau-toast {
   &[type="error"]   { border-inline-start-color: var(--color-error); }
 }
 
-aufbau-toast::part(message) { color: var(--color-muted); }
+pop-toast::part(message) { color: var(--color-muted); }
 
-aufbau-toc {
+nav-toc {
   > header { color: var(--color-muted); }
 
   a {
@@ -254,93 +162,15 @@ aufbau-toc {
   }
 }
 
-/* the mark is a rotated corner, no icon request */
-aufbau-toggle[look="checkbox"] {
-  &::after {
-    border-block-end  : 2px solid var(--color-ink);
-    border-inline-end : 2px solid var(--color-ink);
-    rotate            : 45deg;
-    scale             : 0;
-    transition        : scale 0.12s ease;
-    translate         : 0 -10%;
-  }
-
-  &[checked]::after { scale: 1; }
-
-  &[indeterminate]::after {
-    block-size        : 2px;
-    border-inline-end : 0;
-    inset-block-start : calc(50% - 1px);
-    rotate            : 0deg;
-    scale             : 1;
-    translate         : 0;
-  }
+input-file {
+  &::part(zone) { background-color: var(--sunken); border-style: dashed; }
+  &::part(file) { background-color: var(--sunken); border-radius: calc(--radius() * 0.8); }
 }
 
-aufbau-toggle[look="button"] {
-  background-color : transparent;
-  transition       : background-color 0.15s ease;
+embed-content {
+  border        : var(--border);
+  border-radius : --radius();
+  overflow      : hidden;
 }
 
-aufbau-upload {
-  &::part(zone) {
-    background-color : var(--sunken);
-    border-style     : dashed;
-    transition       : background-color 0.15s ease;
-  }
-
-  &::part(file) { background-color: var(--sunken); }
-}
-
-aufbau-writer {
-                > div > footer > output { color: var(--color-muted); }
-  &:state(full) > div > footer > output { color: var(--color-error); }
-}
-
-aufbau-reader article a { color: var(--color-ink); }
-
-/*//////////// SPACING THE ELEMENTS DO NOT CARRY YET ////////////*/
-/* belongs into the structure of each element, see the note at the top */
-
-aufbau-button,
-aufbau-input,
-aufbau-picker[look="combobox"],
-aufbau-toggle[look="button"],
-aufbau-writer,
-aufbau-dropdown > *,
-aufbau-dropdown::part(trigger),
-aufbau-picker[look="cycle"]::part(trigger),
-aufbau-upload::part(zone) {
-  padding: 0.35em 0.55em;
-}
-
-aufbau-picker::part(listbox),
-aufbau-dropdown::part(menu)       { padding: 0.2em; }
-aufbau-picker::part(option)       { padding: 0.35em 0.55em; }
-aufbau-picker[look="radio"]::part(option) { padding-inline: 0; }
-aufbau-input > button             { padding: 0.15em; }
-aufbau-picker::part(step)         { padding: 0.15em; }
-aufbau-upload::part(file)         { padding: 0.2em 0.4em; }
-:is(aufbau-code, aufbau-writer) [data-action] { padding: 0.2em; }
-aufbau-code > figure > header     { padding: 0.3em 0.6em; }
-aufbau-code > figure > pre        { padding: 0.75em; }
-aufbau-modal::part(dialog)        { padding: 1rem; }
-aufbau-modal::part(header)        { margin: -0.25em -0.25em 0.75em; padding: 0 0.25em 0.5em; }
-aufbau-slider > output > input    { padding-block-end: 0.1em; }
-aufbau-toast                      { padding: 0.6em 0.75em; }
-aufbau-toc a                      { display: block; padding-block: 0.15em; padding-inline-start: 0.5em; }
-
-aufbau-table {
-  table       { border-collapse: collapse; inline-size: 100%; }
-  :is(th, td) { padding: 0.35em 0.6em; text-align: start; vertical-align: top; }
-  th > button { background: none; border: 0; color: inherit; cursor: pointer; font: inherit; inline-size: 100%; padding: 0; text-align: start; }
-}
-
-/* the reset strips lists and spacing, prose needs them back */
-aufbau-reader article {
-  > * + *             { margin-block-start: 0.75em; }
-  :is(ul, ol)         { padding-inline-start: 1.25em; }
-  ul                  { list-style: disc; }
-  ol                  { list-style: decimal; }
-  :is(h1, h2, h3, h4) { line-height: 1.2; }
-}
+output-md article a { color: var(--color-ink); }
