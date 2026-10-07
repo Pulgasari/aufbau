@@ -1,6 +1,6 @@
 // aufbau/www :: middleware.js (vercel routing middleware, runs at the edge)
 //
-// the gestalt picked on a demo page (theme, mode, palette, density, geometry,
+// the gestalt picked on a demo page (mode, palette, density, geometry,
 // skin) goes into the html of every page before it leaves the edge, from the
 // cookie elements.html writes. the same tokens aufbau.gestalt sets: a custom
 // property and a data attribute each, mode as --scheme / data-scheme.
@@ -11,7 +11,7 @@
 const COOKIE = 'aufbau-gestalt';
 
 // the picked name -> the token aufbau's css reads (@aufbau/gestalt)
-const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };
+const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin' };
 
 // a preset name or a css color, nothing that could leave the attribute or the declaration
 const SAFE = /^[\w#%.,()\s-]{1,64}$/;

@@ -22,7 +22,7 @@ export default class MediaAudio extends AufbauElement {
 
   static styles = `media-audio {
     align-items           : center;
-    column-gap            : 0.75em;
+    column-gap            : --space(normal);
     display               : grid;
     grid-template-areas   : "cover title   title   title title"
                             "cover artist  artist  artist artist"

@@ -11,15 +11,15 @@ export default {
 
   css : `
     ${FRAME}
-    [part~="box"] { flex-wrap: wrap; gap: 0.35em; padding-block: 0.3em; }
+    [part~="box"] { flex-wrap: wrap; gap: --space(tiny); padding-block: --space(tiny); }
 
     [part~="chip"] {
       align-items   : center;
       background    : color-mix(in srgb, currentColor 12%, transparent);
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       display       : inline-flex;
-      gap           : 0.25em;
-      padding       : 0.1em 0.25em 0.1em 0.5em;
+      gap           : --space(tiny);
+      padding       : --space(tiny);
     }
 
     [part~="remove"] { --icon-size: 0.85em; opacity: 0.65; }

@@ -123,7 +123,7 @@ export default class WidgetCalculator extends AufbauElement {
   };
 
   static styles = `widget-calculator {
-    --calculator-gap : 0.5rem;
+    --calculator-gap : --space(small);
 
     background     : var(--calculator-bg, var(--color-bg, Canvas));
     color          : var(--color-fg, CanvasText);
@@ -154,14 +154,17 @@ export default class WidgetCalculator extends AufbauElement {
       gap     : var(--calculator-gap);
 
       > button { block-size: 2.25rem; inline-size: 2.25rem; font-size: 1.25rem; }
-      > [data-act="close"] { margin-inline-end: auto; }
+
+      /* close at the start, the rest at the end, a spacer between */
+      > [data-act="close"] { order: -2; }
+      &::before            { content: ''; flex: 1 1 auto; order: -1; }
     }
 
     [part="screen"] {
       background    : color-mix(in oklch, var(--color-bg, Canvas), var(--color-fg, CanvasText) 15%);
       border-radius : 0.25rem;
       display       : grid;
-      padding       : 0.75rem;
+      padding       : --space(normal);
     }
 
     [part="display"] {

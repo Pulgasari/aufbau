@@ -35,7 +35,7 @@ const STYLES = `
     align-items     : center;
     display         : flex;
     flex            : 1 1 auto;
-    gap             : var(--input-gap, 0.5em);
+    gap             : var(--input-gap, --space(small));
     min-inline-size : 0;
   }
 
@@ -51,7 +51,7 @@ const STYLES = `
     padding     : 0;
     appearance      : none;
     flex            : none;
-    gap             : 0.5em;
+    gap             : --space(small);
     justify-content : center;
   }
 

@@ -11,7 +11,7 @@ export default class BtnPush extends Btn {
       --btn-background : color-mix(in oklab, currentColor 12%, transparent);
 
       background-color : var(--btn-background);
-      padding          : var(--btn-padding, 0.5em 1em);
+      padding          : var(--btn-padding, --space(small));
     }
   `;
 }

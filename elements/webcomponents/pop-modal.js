@@ -31,8 +31,11 @@ export default class PopModal extends AufbauElement {
         overlay   var(--modal-duration) allow-discrete;
 
       &[open] {
-        opacity   : 1;
-        translate : 0 0;
+        display        : flex;
+        flex-direction : column;
+        gap            : --space(normal);
+        opacity        : 1;
+        translate      : 0 0;
 
         @starting-style { opacity: 0; translate: 0 0.75rem; }
       }
@@ -55,10 +58,10 @@ export default class PopModal extends AufbauElement {
     header {
       align-items     : center;
       display         : flex;
-      gap             : var(--control-gap, 0.5em);
-      justify-content : space-between;
+      gap             : --space(small);
+      justify-content : flex-end;
 
-      > strong { font-weight: 600; }
+      > strong { flex: 1 1 auto; font-weight: 600; }
 
       > button {
         align-items : center;
@@ -68,7 +71,7 @@ export default class PopModal extends AufbauElement {
         cursor      : pointer;
         display     : inline-flex;
         font        : inherit;
-        margin      : 0 0 0 auto;
+        margin      : 0;
         padding     : 0;
       }
     }

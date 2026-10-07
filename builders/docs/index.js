@@ -18,7 +18,7 @@ import { h, render }         from 'preact';
 const html = htm.bind(h);
 
 const DEFAULT_CODE  = 'github-dark';
-const DEFAULT_THEME = 'zombie';
+const DEFAULT_PALETTE = 'zombie';
 
 const isExternal = href => /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
 
@@ -183,25 +183,25 @@ export function createDocsFW (config = {}) {
   } = config;
 
   // :::::: THEME
-  // the page theme is a preset of gestalt/themes.css (or any css color), the code theme
+  // the page palette is a preset of gestalt/palettes.css (or any css color), the code theme
   // one of write-code's. both persist, both lists are loaded behind the first paint
 
-  const pageTheme  = typedSignal({ type: 'string', value: DEFAULT_THEME, key: 'docs-theme-page', storage: 'aufbau' });
-  const codeTheme  = typedSignal({ type: 'string', value: DEFAULT_CODE,  key: 'docs-theme-code', storage: 'aufbau' });
-  const pageThemes = signal([pageTheme.value]);   // seeded with the active one, so a picker is never empty
-  const codeThemes = signal([codeTheme.value]);
+  const pagePalette  = typedSignal({ type: 'string', value: DEFAULT_PALETTE, key: 'docs-palette-page', storage: 'aufbau' });
+  const codeTheme    = typedSignal({ type: 'string', value: DEFAULT_CODE,    key: 'docs-theme-code', storage: 'aufbau' });
+  const pagePalettes = signal([pagePalette.value]);   // seeded with the active one, so a picker is never empty
+  const codeThemes   = signal([codeTheme.value]);
 
   // index.ass links the reset: linked sheets come before adopted ones in the
   // cascade, an adopted reset would undo the typography of css/docs.css
-  aufbau.boot({ css: { reset: false, theme: pageTheme.value }, font: ['manrope', 'jetbrains-mono'] });
+  aufbau.boot({ css: { palette: pagePalette.value, reset: false }, font: ['manrope', 'jetbrains-mono'] });
   initDefaultStylesheet(import.meta.resolve('./index.ass'));
   if (sw) navigator.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
 
-  effect(() => { aufbau.gestalt.set({ theme: pageTheme.value }); });
+  effect(() => { aufbau.gestalt.set({ palette: pagePalette.value }); });
   effect(() => { aufbau.elements.setConfig({ 'write-code': { theme: codeTheme.value } }); });
 
   const withActive = (list, active) => list.includes(active) ? list : [active, ...list];
-  aufbau.gestalt.themes().then(list => { pageThemes.value = withActive(list, pageTheme.value); });
+  aufbau.gestalt.palettes().then(list => { pagePalettes.value = withActive(list, pagePalette.value); });
   WriteCode.themes().then(list => { codeThemes.value = withActive(list, codeTheme.value); });
 
   // :::::: STATE
@@ -343,7 +343,7 @@ export function createDocsFW (config = {}) {
     return html`
       <footer id="app-footer">
         <div class="theme-controls">
-          <${ThemePicker} id="page-theme" label="theme"  options=${pageThemes} value=${pageTheme} />
+          <${ThemePicker} id="page-palette" label="palette" options=${pagePalettes} value=${pagePalette} />
           <${ThemePicker} id="code-theme" label="syntax" options=${codeThemes} value=${codeTheme} />
         </div>
       </footer>

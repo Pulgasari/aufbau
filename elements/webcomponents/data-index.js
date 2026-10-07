@@ -21,7 +21,7 @@ export default class DataIndex extends AufbauElement {
 
   static styles = `data-index {
     display               : grid;
-    gap                   : var(--index-gap, 1rem);
+    gap                   : var(--index-gap, --space(normal));
     grid-template-columns : repeat(auto-fill, minmax(var(--item-size, 200px), 1fr));
     inline-size           : 100%;
 
@@ -33,7 +33,7 @@ export default class DataIndex extends AufbauElement {
     &[viewmode="gallery"] {
       display           : flex;
       overflow-x        : auto;
-      padding-block-end : 0.5rem;
+      padding-block-end : --space(small);
       scroll-snap-type  : x mandatory;
 
       > * {
@@ -43,13 +43,13 @@ export default class DataIndex extends AufbauElement {
     }
 
     &[viewmode="masonry"] {
-      column-gap   : var(--index-gap, 1rem);
+      column-gap   : var(--index-gap, --space(normal));
       column-width : var(--item-size, 200px);
       display      : block;
 
       > * {
         break-inside     : avoid;
-        margin-block-end : var(--index-gap, 1rem);
+        margin-block-end : var(--index-gap, --space(normal));
       }
     }
 

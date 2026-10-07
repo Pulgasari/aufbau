@@ -10,6 +10,10 @@
 //
 //   import { CODE } from '../urls.js';
 //   fetch(`${CODE}/css/functions.css`);
+//
+// markup can not import, an attribute writes the CODE url out:
+//
+//   <svg-file src="https://code.pulgasari.dev/aufbau/svg/icons/aufbau.svg"></svg-file>
 
 export const SITE = 'https://aufbau.dev';
 export const CODE = 'https://code.pulgasari.dev/aufbau';

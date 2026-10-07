@@ -25,16 +25,16 @@ export default {
 
     [part~="search"] {
       border         : var(--input-line);
-      border-radius  : var(--radius-control, 0.4em);
-      min-block-size : var(--control-size, 2.25em);
-      padding-inline : 0.6em;
+      border-radius  : --radius();
+      min-block-size : --space(9);
+      padding-inline : --space(small);
 
       &:focus { border-color: var(--color-ink, Highlight); }
     }
 
     [part~="options"] {
       display               : grid;
-      gap                   : 0.25em;
+      gap                   : --space(tiny);
       grid-template-columns : repeat(auto-fill, minmax(var(--grid-size, 2.5em), 1fr));
       max-block-size        : var(--grid-height, 16em);
       overflow-y            : auto;
@@ -42,7 +42,7 @@ export default {
 
     [part~="option"] {
       aspect-ratio  : 1;
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       font-size     : 1.25em;
 
       &:hover             { background: color-mix(in srgb, currentColor 10%, transparent); }

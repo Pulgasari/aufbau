@@ -16,7 +16,7 @@ export class AppFloat extends AufbauElement {
       align-items    : center;
       display        : flex;
       flex-direction : column-reverse;
-      gap            : var(--float-gap, 0.75rem);
+      gap            : var(--float-gap, --space(normal));
       pointer-events : none;
       position       : absolute;
       z-index        : var(--float-z, 10);

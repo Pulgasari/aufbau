@@ -3,7 +3,7 @@
 import { deepMerge } from '@pulgasari/obj';
 //import { shift }     from '@pulgasari/shapeshift';
   
-import { CSS_PATH, gestalt } from '../gestalt/index.js';
+import { CSS_PATH, gestalt } from '@aufbau/gestalt';
 
 // :::::: LAZY ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -62,7 +62,6 @@ const data = {
   get icons    () { return modules.icons   ().then(module => module.default); },
   get palettes () { return gestalt.palettes(); },
   get patterns () { return modules.patterns().then(module => module.data); },
-  get themes   () { return gestalt.themes(); },
   get webfonts () { return modules.webfonts().then(module => module.data); },
 };
 
@@ -114,9 +113,8 @@ const remove = (target, keys = Object.keys(KINDS)) => Promise.all(keys.map(key =
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const config = {
-  // reset is css/aufbau.css, which brings tokens, palettes and themes along.
-  // false when the page links it itself. the rest goes through gestalt, a
-  // palette set here wins over the one of the theme
+  // reset is css/aufbau.css, which brings the gestalt tokens and the palettes along.
+  // false when the page links it itself. the rest goes through gestalt
   css : {
     layout  : false,
     look    : 'flat',
@@ -124,7 +122,6 @@ const config = {
     palette : null,
     reset   : true,
     skin    : 'monochrome',
-    theme   : 'zombie',
   },
 
   // mode: 'auto' | 'all' | false. every other key is element config, e.g. { 'write-code': { theme: 'nord' } }
@@ -155,7 +152,7 @@ async function boot (options = {}) {
   if (booted || typeof window === 'undefined') return booted;
   booted = true;
 
-  const { css: { layout, look, mode: scheme, palette, reset, skin, theme }, elements: { mode, ...defaults }, font } = config;
+  const { css: { layout, look, mode: scheme, palette, reset, skin }, elements: { mode, ...defaults }, font } = config;
 
   // aufbau.css first, the gestalt sheets after it
   if (reset) await linkStylesheet(`${CSS_PATH}/aufbau.css`);
@@ -163,7 +160,7 @@ async function boot (options = {}) {
   if (Object.keys(defaults).length) await elements.setConfig(defaults);
 
   await Promise.all([
-    gestalt.set({ layout, look, mode: scheme, skin, theme, ...(palette && { palette }) }),
+    gestalt.set({ layout, look, mode: scheme, skin, ...(palette && { palette }) }),
     mode === 'auto' && elements.enableAutoload(),
     mode === 'all'  && elements.registerAll(),
     font && webfonts.init(font),

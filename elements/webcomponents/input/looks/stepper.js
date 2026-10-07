@@ -6,7 +6,7 @@ export default {
 
   css : `
     ${FRAME}
-    [part~="box"] { padding-inline: 0.25em; }
+    [part~="box"] { padding-inline: --space(tiny); }
 
     [part~="input"] {
       appearance  : textfield;
@@ -20,7 +20,7 @@ export default {
 
     [part~="button"] {
       block-size    : 1.75em;
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       inline-size   : 1.75em;
 
       &:hover { background: color-mix(in srgb, currentColor 10%, transparent); }

@@ -28,7 +28,7 @@ export default class NavInitials extends AufbauElement {
     > ol {
       display    : flex;
       flex-wrap  : wrap;
-      gap        : 0.25em;
+      gap        : --space(tiny);
       list-style : none;
       margin     : 0;
       padding    : 0;

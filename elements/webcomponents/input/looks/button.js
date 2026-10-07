@@ -6,9 +6,9 @@ export default {
   css : `
     [part~="control"] {
       border         : var(--input-line);
-      border-radius  : var(--radius-control, 0.4em);
-      min-block-size : var(--control-size, 2.25em);
-      padding-inline : 0.75em;
+      border-radius  : --radius();
+      min-block-size : --space(9);
+      padding-inline : --space(normal);
     }
 
     [part~="checked"] { background: var(--color-ink, AccentColor); border-color: transparent; color: var(--color-bg, Canvas); }

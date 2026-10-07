@@ -9,7 +9,7 @@ export default {
       align-items     : center;
       block-size      : 1.15em;
       border          : var(--border-width, 1px) solid color-mix(in srgb, currentColor 45%, transparent);
-      border-radius   : calc(var(--radius-control, 0.4em) * 0.5);
+      border-radius   : calc(--radius() * 0.5);
       display         : inline-flex;
       flex            : none;
       inline-size     : 1.15em;

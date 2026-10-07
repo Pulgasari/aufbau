@@ -30,7 +30,7 @@ export default class MediaGif extends AufbauElement {
       font-size     : 0.75em;
       font-weight   : 700;
       inset         : auto auto 0.5em 0.5em;
-      padding       : 0.1em 0.4em;
+      padding       : --space(tiny);
       position      : absolute;
     }
     &:not([paused]) > span { display: none; }

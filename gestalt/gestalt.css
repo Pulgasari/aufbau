@@ -15,8 +15,8 @@ axes, each writes its own raw tokens:
 
 --palette  :: <preset> | <color>                      -> --color-bg, --color-fg, --color-ink (palettes.css)
 --scheme   :: auto | light | dark                     -> color-scheme (the palettes use light-dark())
---geometry :: sharp | soft | round | pill             -> --radius, --border-width
---density  :: compact | normal | comfortable | touch  -> --unit, --control-size
+--geometry :: sharp | soft | round | pill             -> --radius()
+--density  :: compact | normal | comfortable | touch  (not used yet)
 --skin     :: monochrome | …                          -> the decoration of the elements (skins/)
 --typo     :: system | humanist | mono | editorial    -> --font-body, --font-heading, --font-mono, --ratio
 --motion   :: <number>, 0 turns every duration off
@@ -31,6 +31,7 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 --gap : <number> | tiny … huge   gap     (through --space())
 --pad : <number> | tiny … huge   padding (through --space())
 --mgn : <number> | tiny … huge   margin  (through --space())
+--rad : <length> | auto | none   border-radius, auto is --radius() of the geometry
 */
 
 /*//////////// AXES ////////////*/
@@ -71,12 +72,13 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 
 /*//////////// GEOMETRY ////////////*/
 
-:root, [data-geometry] {
-  --radius-control: if(
-    style(--geometry: sharp) : 0;
+/* the radius of the geometry: --rad: auto, or border-radius: --radius() */
+@function --radius() returns <length> {
+  result: if(
+    style(--geometry: sharp) : 0px;
     style(--geometry: round) : 0.75em;
     style(--geometry: pill)  : 999px;
-    else                     : 0.25em
+    else                     : 0.25em;
   );
 }
 
@@ -99,6 +101,8 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 @property --pad { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
 @property --mgn { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
 
+@property --rad { inherits: false; initial-value: none; syntax: "none | auto | <length-percentage>"; }
+
 /* specificity 0: any rule of the page that sets the property itself wins */
 :where(*) {
   background-color : var(--bg);
@@ -108,6 +112,9 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
   gap     : if(style(--gap: none): normal; else: --space(var(--gap)));
   padding : if(style(--pad: none): 0;      else: --space(var(--pad)));
   margin  : if(style(--mgn: none): 0;      else: --space(var(--mgn)));
+
+  /* none steps back, so the radius an element gives itself (:host included) stays */
+  border-radius : if(style(--rad: none): revert-layer; style(--rad: auto): --radius(); else: var(--rad));
 }
 
 /* the page paints the palette */
@@ -132,58 +139,11 @@ pill  =
 
 /*//////////// CONFIG ////////////*/
 
-@property --depth           { inherits: false; initial-value: 0; syntax: "<number>"; }
-@property --depth-of-parent { inherits: false; initial-value: 0; syntax: "<number>"; }
-
-@property --factor-radius { inherits: false; initial-value: 0.10rem; syntax: "<length>"; }
-@property --factor-space  { inherits: false; initial-value: 0.25rem; syntax: "<length>"; }
+@property --factor-space { inherits: false; initial-value: 0.25rem; syntax: "<length>"; }
 
 :root {
-  --factor-radius : 0.10rem;
-  --factor-space  : 0.25rem;
-
-  --mode-of-radius: auto;
+  --factor-space : 0.25rem;
 }
-
-@container style(--geometry: sharp) { body { --mode-of-radius:  off; } }
-@container style(--geometry: soft)  { body { --mode-of-radius:   on; } }
-@container style(--geometry: round) { body { --mode-of-radius: auto; } }
-@container style(--geometry: pill)  { body { --mode-of-radius: auto; } }
-
-@container style(--mode-of-radius: on) {
-  * { border-radius: var(--factor-radius); }
-}
-
-@container style(--mode-of-radius: auto) {
-  * { border-radius: calc(var(--depth) * var(--factor-radius)); }
-}
-
-/*//////////// NODE DEPTH ////////////*/
-/* automatic calculation node depth */
-body * > * {
-  --depth           : calc(var(--depth-of-parent, 0) + 1);
-  --depth-of-parent : var(--depth);
-}
-body  {
-  --depth           :  0;
-  --depth-of-parent : -1;
-}
-
-
-
-/*
-@function --radius(
-  --n <number> : 0.1
-) returns <color> { 
-  result: --if(
-    style(--geometry: sharp)    : 0;
-    style(--geometry: soft)     : var(--factor-radius, 0.1rem);
-    style(--geometry: rounded)  : calc(var(--depth) * var(--factor-radius));
-    else: var(--n);
-  );
-}
-*/
-
 
 
 /*
@@ -206,3 +166,4 @@ in my tests these work at least in @property
 @property --scheme   { inherits: true; initial-value: auto;       syntax: var(--syntax-scheme); }
 @property --skin     { inherits: true; initial-value: monochrome; syntax: var(--syntax-skin); }
 */
+

@@ -27,7 +27,7 @@ export default class NavPaginate extends AufbauElement {
       align-items : center;
       display     : flex;
       flex-wrap   : wrap;
-      gap         : 0.25em;
+      gap         : --space(tiny);
       list-style  : none;
       margin      : 0;
       padding     : 0;

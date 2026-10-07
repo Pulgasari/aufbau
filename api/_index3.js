@@ -1,7 +1,7 @@
 // @aufbau/api
 
 import { deepMerge } from '@pulgasari/obj';
-import { CSS_PATH, gestalt } from '../gestalt/index.js';
+import { CSS_PATH, gestalt } from '@aufbau/gestalt';
 
 // :::::: LAZY MODULE LOADERS ::::::::::::::::::::::::::::::::::
 // Simple, explicit singletons using promise memoization

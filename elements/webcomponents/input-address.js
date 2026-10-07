@@ -25,7 +25,7 @@ export default class InputAddress extends AufbauControlElement {
   static styles = `
     :host {
       display               : grid;
-      gap                   : var(--control-gap, 0.5em);
+      gap                   : --space(small);
       grid-template-areas   : "street street" "postcode city" "country country";
       grid-template-columns : minmax(5em, 1fr) 3fr;
     }

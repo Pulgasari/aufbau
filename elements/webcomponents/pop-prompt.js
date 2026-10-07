@@ -25,14 +25,13 @@ export default class PopPrompt extends PopModal {
   };
 
   static styles = `
-    [part~="message"] { margin-block: 0.75em; }
+    [part~="message"] { margin: 0; }
     [part~="field"]   { box-sizing: border-box; inline-size: 100%; }
 
     [part~="actions"] {
       display         : flex;
-      gap             : var(--control-gap, 0.5em);
+      gap             : --space(small);
       justify-content : flex-end;
-      margin-block    : 1em 0;
     }
   `;
 

@@ -33,8 +33,8 @@ export default class DataNode extends AufbauElement {
       align-items : center;
       cursor      : pointer;
       display     : flex;
-      gap         : 0.25rem;
-      padding     : 0.25rem;
+      gap         : --space(tiny);
+      padding     : --space(tiny);
 
       &::before {
         block-size        : 0.4em;
@@ -43,7 +43,6 @@ export default class DataNode extends AufbauElement {
         content           : '';
         flex              : none;
         inline-size       : 0.4em;
-        margin-inline     : 0.3em;
         rotate            : -45deg;
         transition        : rotate 0.12s ease;
         visibility        : hidden;

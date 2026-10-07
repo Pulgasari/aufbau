@@ -8,15 +8,15 @@ export default {
   css : `
     [part~="box"] {
       border        : var(--input-line);
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       gap           : 0;
       overflow      : hidden;
     }
 
     [part~="segment"] {
       flex           : 1 1 auto;
-      min-block-size : var(--control-size, 2.25em);
-      padding-inline : 0.75em;
+      min-block-size : --space(9);
+      padding-inline : --space(normal);
 
       & + [part~="segment"] { border-inline-start: var(--input-line); }
 

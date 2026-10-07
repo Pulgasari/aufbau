@@ -16,10 +16,12 @@ export default class MediaFont extends AufbauElement {
   };
 
   static styles = `media-font {
-    display: block;
+    display        : flex;
+    flex-direction : column;
+    gap            : --space(tiny);
 
     > header { font-size: 0.8em; opacity: 0.7; }
-    > p      { line-height: 1.2; margin: 0.25em 0; overflow-wrap: anywhere; }
+    > p      { line-height: 1.2; margin: 0; overflow-wrap: anywhere; }
     > p[part="glyphs"] { font-size: 1.5em; letter-spacing: 0.05em; }
 
     &[failed]::before { content: 'not a font'; opacity: 0.6; }

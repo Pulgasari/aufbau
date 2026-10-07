@@ -11,14 +11,14 @@ export class AppConfig extends AufbauElement {
       > div {
         display        : flex;
         flex-direction : column;
-        gap            : var(--config-gap, 0.75rem);
+        gap            : var(--config-gap, --space(normal));
       }
 
       label {
         align-items : center;
         display     : flex;
         flex-wrap   : wrap;
-        gap         : 0.25rem 0.75rem;
+        gap         : --space(small);
 
         > span       { flex: 0 0 var(--config-label-size, 7rem); font-size: 0.85em; opacity: 0.65; }
         > :not(span) { flex: 1 1 12rem; min-inline-size: 0; }

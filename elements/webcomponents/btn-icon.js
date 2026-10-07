@@ -7,7 +7,7 @@ export default class BtnIcon extends Btn {
     :host {
       aspect-ratio : 1;
       font-size    : var(--btn-icon-size, 1.15em);
-      padding      : var(--btn-padding, 0.35em);
+      padding      : var(--btn-padding, --space(tiny));
     }
 
     [part="label"] { display: none; }
