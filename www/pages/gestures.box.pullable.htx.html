@@ -1,0 +1,37 @@
+<script>
+  import { pullable }     from '@aufbau/gestures';
+  import { log, mounted } from './gestures.shared.js';
+
+  let hint;
+  let list;
+  let entries = 0;
+
+  const add = () => {
+    const item = document.createElement('li');
+    item.textContent = `entry ${++entries} · ${new Date().toLocaleTimeString()}`;
+    list.prepend(item);
+  };
+
+  const fill  = node => { list = node; for (let i = 0; i < 12; i++) add(); };
+  const setup = mounted(feed => pullable(feed, {
+    content   : list,
+    onPull    : ({ progress, refreshing }) => { hint.textContent = refreshing ? 'refreshing …' : progress >= 1 ? 'release to refresh' : 'pull to refresh'; },
+    onRefresh : () => new Promise(resolve => setTimeout(() => { add(); log('refreshed'); resolve(); }, 1000)),
+  }));
+</script>
+
+<style>
+  .feed         { block-size: 14rem; border: 1px solid color-mix(in oklch, currentColor 20%, transparent); border-radius: .75rem; overflow: auto; position: relative; }
+  .feed-hint    { block-size: 64px; display: grid; font-size: .8rem; inset: 0 0 auto; opacity: .7; place-items: center; position: absolute; }
+  .feed-list    { background: color-mix(in oklch, currentColor 6%, transparent); list-style: none; margin: 0; min-block-size: 100%; padding: 0; position: relative; }
+  .feed-list li { border-top: 1px solid color-mix(in oklch, currentColor 20%, transparent); padding: .75rem 1rem; }
+</style>
+
+<div>
+  <h2>pullable</h2>
+  <p>at the top pull down, release past the line to refresh (1 s, adds an entry).</p>
+  <div class="feed" ref=${setup}>
+    <div class="feed-hint" ref=${node => hint = node}>pull to refresh</div>
+    <ul class="feed-list" ref=${fill}></ul>
+  </div>
+</div>

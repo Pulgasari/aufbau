@@ -1,0 +1,17 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { flash, log, pressed } from './gestures.shared.js';
+
+  const setup = pad => gestures(pad, {
+    ...pressed(pad),
+    onDoubleTap : gesture => { flash(pad); log('exclusive doubleTap', gesture); },
+    onTap       : gesture => { flash(pad); log('exclusive tap', gesture); },
+    tap         : { waitForDoubleTap: true },
+  });
+</script>
+
+<div>
+  <h2>tap · doubleTap, exclusive</h2>
+  <p><code>tap: { waitForDoubleTap: true }</code>: only one of the two fires, a single tap waits for a possible second one.</p>
+  <div class="pad" ref=${setup}>press me</div>
+</div>

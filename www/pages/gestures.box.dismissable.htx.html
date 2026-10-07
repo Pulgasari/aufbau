@@ -1,0 +1,28 @@
+<script>
+  import { dismissable } from '@aufbau/gestures';
+  import { log }         from './gestures.shared.js';
+
+  const TEXTS = ['a message', 'another one', 'swipe me', 'and me'];
+  let cards;
+
+  function makeCards () {
+    cards.replaceChildren(...TEXTS.map(text => {
+      const card = Object.assign(document.createElement('div'), { className: 'card', textContent: text });
+      dismissable(card, { onDismiss: ({ direction }) => { card.remove(); log(`dismissed "${text}" to the ${direction}`); } });
+      return card;
+    }));
+  }
+
+  const setup = node => { cards = node; makeCards(); };
+</script>
+
+<style>
+  .cards       { display: grid; gap: .5rem; }
+  .cards .card { background: color-mix(in oklch, currentColor 6%, transparent); border: 1px solid color-mix(in oklch, currentColor 20%, transparent); border-radius: .75rem; padding: 1rem; }
+</style>
+
+<div>
+  <h2>dismissable</h2>
+  <p>swipe a card away to either side, a slow short drag snaps back. key: delete. <button type="button" onClick=${() => makeCards()}>bring them back</button></p>
+  <div class="cards" ref=${setup}></div>
+</div>

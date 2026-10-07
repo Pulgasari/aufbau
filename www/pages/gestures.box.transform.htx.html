@@ -1,0 +1,47 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { log, show } from './gestures.shared.js';
+
+  // an incremental transform: every event multiplies by scaleChange and adds
+  // rotationChange and movement, so fingers, trackpad and mouse all compose
+  let box;
+  let state = { rotation: 0, scale: 1, x: 0, y: 0 };
+  const draw = () => { box.style.transform = `translate(${state.x}px, ${state.y}px) rotate(${state.rotation}deg) scale(${state.scale})`; };
+
+  const setup = pad => gestures(pad, {
+    onDoubleTap   : ()      => { state = { rotation: 0, scale: 1, x: 0, y: 0 }; draw(); log('reset'); },
+    onPanMove     : gesture => { state.x += gesture.movement.x; state.y += gesture.movement.y; draw(); },
+    onPinchEnd    : gesture => log(`pinchEnd · ${gesture.input} · scale ${gesture.scale.toFixed(2)}`, gesture),
+    onPinchMove   : gesture => {
+      state.scale = Math.min(6, Math.max(.2, state.scale * gesture.scaleChange));
+      if (gesture.pointers > 1) { state.x += gesture.movement.x; state.y += gesture.movement.y; }
+      draw();
+      show(gesture);
+    },
+    onPinchStart  : gesture => log(`pinchStart · ${gesture.input}`, gesture),
+    onRotateEnd   : gesture => log(`rotateEnd · ${gesture.input} · ${gesture.rotation.toFixed(0)}°`, gesture),
+    onRotateMove  : gesture => { state.rotation += gesture.rotationChange; draw(); },
+    onRotateStart : gesture => log(`rotateStart · ${gesture.input}`, gesture),
+    pan           : { pointers: 1 },
+  });
+</script>
+
+<style>
+  .transform-pad { min-block-size: 14rem; overflow: hidden; }
+  .transform-box {
+    aspect-ratio  : 1;
+    background    : linear-gradient(135deg, var(--color-ink), #8be9fd);
+    border-radius : .75rem;
+    color         : #000;
+    display       : grid;
+    font-weight   : 700;
+    inline-size   : 6rem;
+    place-items   : center;
+  }
+</style>
+
+<div>
+  <h2>pinch · rotate · pan</h2>
+  <p>two fingers pinch and turn the box, one finger moves it. on a trackpad: pinch (all browsers), rotate (safari). double tap resets.</p>
+  <div class="pad transform-pad" ref=${setup}><div class="transform-box" ref=${node => box = node}>aufbau</div></div>
+</div>

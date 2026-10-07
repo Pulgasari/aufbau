@@ -1,0 +1,18 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { flash, log, pressed } from './gestures.shared.js';
+
+  const setup = pad => gestures(pad, {
+    ...pressed(pad),
+    onDoubleTap : gesture => { flash(pad); log(`doubleTap  · ${gesture.input}`, gesture); },
+    onLongPress : gesture => { flash(pad); log(`longPress  · ${gesture.input} · ${Math.round(gesture.duration)} ms`, gesture); },
+    onSecondary : gesture => { flash(pad); log(`secondary  · ${gesture.input}`, gesture); },
+    onTap       : gesture => { flash(pad); log(`tap ${gesture.count}      · ${gesture.input} · pointers ${gesture.maximumPointers}`, gesture); },
+  });
+</script>
+
+<div>
+  <h2>tap · doubleTap · longPress · secondary</h2>
+  <p>every tap at once, the second of a pair also as doubleTap. <code>press</code> colors the pad the moment it is touched.</p>
+  <div class="pad" tabindex="0" ref=${setup}>press me</div>
+</div>

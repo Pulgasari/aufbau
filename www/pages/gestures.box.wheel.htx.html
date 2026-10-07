@@ -1,0 +1,23 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { log, show } from './gestures.shared.js';
+
+  let dot;
+  const clamp = (value, limit) => Math.max(-limit, Math.min(limit, value));
+
+  const setup = pad => gestures(pad, {
+    onWheelEnd   : gesture => log(`wheelEnd · Δ ${gesture.delta.x.toFixed(0)}, ${gesture.delta.y.toFixed(0)}`, gesture),
+    onWheelMove  : gesture => { dot.style.translate = `${clamp(gesture.delta.x / 4, 120)}px ${clamp(gesture.delta.y / 4, 60)}px`; show(gesture); },
+    onWheelStart : ()      => log('wheelStart'),
+  });
+</script>
+
+<style>
+  .wheel-dot { aspect-ratio: 1; background: var(--color-ink); border-radius: 50%; inline-size: 1.5rem; }
+</style>
+
+<div>
+  <h2>wheel</h2>
+  <p><code>wheelStart</code>, <code>wheelMove</code>, <code>wheelEnd</code>: wheel or two-finger trackpad scroll moves the dot, the page does not scroll here.</p>
+  <div class="pad" ref=${setup}><div class="wheel-dot" ref=${node => dot = node}></div></div>
+</div>

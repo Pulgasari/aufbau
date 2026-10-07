@@ -1,0 +1,15 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { flash, log } from './gestures.shared.js';
+
+  const setup = pad => gestures(pad, {
+    onSwipe      : gesture => { flash(pad); log(`swipe ${gesture.direction} · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
+    onSwipeRight : { minimumSpeed: 1, handler: () => log('swipeRight, fast (guard minimumSpeed: 1)') },
+  });
+</script>
+
+<div>
+  <h2>swipe</h2>
+  <p>any direction. a fast right swipe (speed > 1) has its own guarded handler.</p>
+  <div class="pad" ref=${setup}>swipe me</div>
+</div>
