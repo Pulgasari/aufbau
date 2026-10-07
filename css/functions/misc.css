@@ -1,3 +1,5 @@
+/* gestalt/functions/misc.css */
+
 @function --combine-strings(--strings type(<string>+)) {
   result: var(--strings) " ❤️";
 }
@@ -16,3 +18,15 @@
     result: var(--b);
   }
 }
+
+/* returns the negative of a value */
+@function --negate(--value type(<length-percentage> | <number>)) {
+  result: calc(-1 * var(--value));
+}
+
+/* custom light-dark() function that works for any value */
+/* found here: https://www.bram.us/2025/09/30/css-custom-light-dark/ */
+@function --light-dark(--l, --d) { result: if(color-scheme(dark): var(--d); else: var(--l)); }     
+@function         --ld(--L, --D) { result: if(color-scheme(dark): var(--D); else: var(--L)); }
+
+
