@@ -3,8 +3,14 @@
   import { flash, log } from './gestures.shared.js';
 
   const setup = pad => gestures(pad, {
-    onSwipe      : gesture => { flash(pad); log(`swipe ${gesture.direction} · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
-    onSwipeRight : { minimumSpeed: 1, handler: () => log('swipeRight, fast (guard minimumSpeed: 1)') },
+    onSwipe      : gesture => { 
+      flash(pad); 
+      log(`swipe ${gesture.direction} · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); 
+    },
+    onSwipeRight : { 
+      minimumSpeed: 1,
+      handler: () => log('swipeRight, fast (guard minimumSpeed: 1)') 
+    },
   });
 </script>
 
