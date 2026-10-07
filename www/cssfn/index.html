@@ -143,10 +143,11 @@
   </main>
 
   <script type="module">
-    import aufbau from '@aufbau/api';
+    import aufbau   from '@aufbau/api';
+    import { CODE } from '../urls.js';
 
-    // the files are read where the page is served from, ../../css on code.pulgasari.dev
-    const BASE     = new URL('../../css/', location.href);
+    // the files come from the repo, not from where the page is served, see ../urls.js
+    const BASE     = new URL(`${CODE}/css/`);
     const INDEX    = new URL('functions.css', BASE);
     const SKETCHES = new URL('functions/_.css', BASE);
 
