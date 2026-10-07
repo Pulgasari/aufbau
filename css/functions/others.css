@@ -1,0 +1,62 @@
+/* @aufbau/css/functions.css */
+
+/*//////////// MOTION ////////////*/
+
+/* named easing curves */
+@function --ease(
+  --kind type(smooth | snappy | enter | exit | bounce | spring | linear) : smooth
+) {
+  result: if(
+    style(--kind: snappy)     : cubic-bezier(0.2, 0, 0, 1);
+    style(--kind: enter)      : cubic-bezier(0, 0, 0.2, 1);
+    style(--kind: exit)       : cubic-bezier(0.4, 0, 1, 1);
+    style(--kind: bounce)     : linear(0, 0.36 18%, 0.98 36%, 0.84 45%, 1 58%, 0.95 66%, 1 80%, 0.99 88%, 1);
+    style(--kind: spring)     : linear(0, 0.21 6%, 0.66 14%, 1.03 24%, 1.12 30%, 1.07 38%, 0.99 48%, 0.98 58%, 1 72%, 1);
+    style(--kind: linear)     : linear;
+    else                      : cubic-bezier(0.4, 0, 0.2, 1);
+  );
+}
+
+/* named durations times --motion, a token that goes to 0 for reduced motion:
+   @media (prefers-reduced-motion: reduce) { :root { --motion: 0; } } */
+@function --duration(
+  --speed type(instant | fast | normal | slow | lazy) : normal
+) returns <time> {
+  result: calc(var(--motion, 1) * if(
+    style(--speed: instant) :  60ms;
+    style(--speed: fast)    : 120ms;
+    style(--speed: slow)    : 400ms;
+    style(--speed: lazy)    : 700ms;
+    else                    : 200ms;
+  ));
+}
+
+/* one transition entry: transition: --transition(opacity), --transition(transform, slow, spring) */
+@function --transition(
+  --property <custom-ident>                                                   : all,
+  --speed    type(instant | fast | normal | slow | lazy)                      : normal,
+  --kind     type(smooth | snappy | enter | exit | bounce | spring | linear) : smooth
+) {
+  result: var(--property) --duration(var(--speed)) --ease(var(--kind));
+}
+
+/*//////////// LAYERS ////////////*/
+
+/* z-index by name, one order for the whole system */
+@function --z(
+  --layer type(base | below | raised | dropdown | sticky | overlay | modal | toast | tooltip) : base
+) returns <integer> {
+  result: if(
+    style(--layer: below)    :  -1;
+    style(--layer: raised)   :  10;
+    style(--layer: dropdown) : 100;
+    style(--layer: sticky)   : 200;
+    style(--layer: overlay)  : 300;
+    style(--layer: modal)    : 400;
+    style(--layer: toast)    : 500;
+    style(--layer: tooltip)  : 600;
+    else                     :   0;
+  );
+}
+
+
