@@ -25,18 +25,7 @@
     padding         : 1rem;
 
     button {
-      aspect-ratio  : 1;
-      background    : color-mix(in oklch, currentColor 6%, transparent);
-      border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
       border-radius : 50%;
-      color         : inherit;
-      font-size     : 1.5rem;
-      inline-size   : 3.5rem;
-      touch-action  : manipulation;
-      transition    : background-color .08s, scale .08s;
-      user-select   : none;
-
-      &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent); scale: .96; }
     }
 
     output { font: 700 2rem/1 ui-monospace, monospace; min-inline-size: 4ch; text-align: center; }
