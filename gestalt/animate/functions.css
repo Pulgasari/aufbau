@@ -21,7 +21,7 @@ which a page sets to 0 for reduced motion.
   --time: if(
     style(--speed: instant) :  60ms;
     style(--speed: fast)    :  150ms;
-    style(--speed: normal)  :  300ms;
+    style(--speed: normal)  :  200ms;
     style(--speed: slow)    :  600ms;
     style(--speed: lazy)    : 1200ms;
     style(--speed: auto)    : if(

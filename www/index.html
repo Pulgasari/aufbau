@@ -49,7 +49,7 @@
     applyFilter('body', filter, FILTERS[filter]);
 
     // index.css brings the reset itself
-    await aufbau.boot({ css: { reset: false, theme: pick(await aufbau.gestalt.themes()) } });
+    await aufbau.boot({ css: { palette: pick(await aufbau.gestalt.palettes()), reset: false } });
   </script>
 
 </body>

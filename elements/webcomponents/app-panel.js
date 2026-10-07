@@ -44,7 +44,7 @@ export class AppPanel extends AufbauElement {
       align-items   : center;
       background    : none;
       border        : 0;
-      border-radius : var(--radius-control, 0.25rem);
+      border-radius : --radius();
       color         : inherit;
       cursor        : pointer;
       display       : inline-flex;

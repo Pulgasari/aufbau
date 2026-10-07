@@ -8,7 +8,6 @@
 @import url('../gestalt/animate/functions.css');
 @import url('../gestalt/gestalt.css')             layer(aufbau.tokens);
 @import url('../gestalt/palettes.css')            layer(aufbau.tokens);
-/*@import url('../gestalt/themes.css')            layer(aufbau.tokens);*/
 @import url('./reset.css')                        layer(aufbau.reset);
 @import url('../gestalt/animate/keyframes.css')   layer(aufbau.utilities);
 @import url('../gestalt/animate/animations.css')  layer(aufbau.utilities);

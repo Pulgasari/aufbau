@@ -4,7 +4,7 @@ import { attrs, html } from '../../../../lib/html.js';
 export const FRAME = `
   [part~="box"] {
     border         : var(--input-line);
-    border-radius  : var(--radius-control, 0.4em);
+    border-radius  : --radius();
     min-block-size : var(--control-size, 2.25em);
     padding-inline : 0.6em;
 

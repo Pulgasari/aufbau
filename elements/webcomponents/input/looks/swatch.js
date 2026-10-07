@@ -12,7 +12,7 @@ export default {
       background    : var(--swatch, transparent);
       block-size    : 1.6em;
       border        : var(--input-line);
-      border-radius : calc(var(--radius-control, 0.4em) * 0.75);
+      border-radius : calc(--radius() * 0.75);
       flex          : none;
       inline-size   : 1.6em;
       overflow      : hidden;

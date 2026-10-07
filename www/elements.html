@@ -173,10 +173,10 @@
     });
 
     // :::::: GESTALT
-    // the theme picker, the look segments, the mode cycle, the dark switch and
+    // the palette picker, the look segments, the mode cycle, the dark switch and
     // the swatch all go through one function, the code block shows the result
 
-    const themes = await gestalt.themes();
+    const palettes = await gestalt.palettes();
 
     // what was picked also goes into a cookie, middleware.js writes it into the
     // html of the next page, so it opens in the same gestalt without a flash
@@ -191,23 +191,23 @@
       document.cookie = `aufbau-gestalt=${encodeURIComponent(cookie)}; path=/; max-age=31536000; samesite=lax`;
     }
 
-    $('theme-picker').append(...themes.map(name => Object.assign(document.createElement('input-option'), { textContent: name })));
-    $('theme-picker').setAttribute('value', gestalt.get('theme'));
+    $('palette-picker').append(...palettes.map(name => Object.assign(document.createElement('input-option'), { textContent: name })));
+    $('palette-picker').setAttribute('value', gestalt.get('palette'));
 
     const onChange = (id, handler) => $(id).addEventListener('change', event => handler(event.currentTarget));
 
-    onChange('theme-picker', picker => picker.value && setGestalt({ theme: picker.value }));
-    onChange('look-picker',  picker => setGestalt({ look: picker.value }));
-    onChange('mode-picker',  picker => { setGestalt({ mode: picker.value }); $('dark-toggle').checked = picker.value === 'dark'; });
-    onChange('dark-toggle',  toggle => { setGestalt({ mode: toggle.checked ? 'dark' : 'light' }); $('mode-picker').value = toggle.checked ? 'dark' : 'light'; });
+    onChange('palette-picker', picker => picker.value && setGestalt({ palette: picker.value }));
+    onChange('look-picker',    picker => setGestalt({ look: picker.value }));
+    onChange('mode-picker',    picker => { setGestalt({ mode: picker.value }); $('dark-toggle').checked = picker.value === 'dark'; });
+    onChange('dark-toggle',    toggle => { setGestalt({ mode: toggle.checked ? 'dark' : 'light' }); $('mode-picker').value = toggle.checked ? 'dark' : 'light'; });
 
-    // a color is a theme too, themes.css derives bg and fg from it and the mode decides which way
-    $('theme-swatch').addEventListener('input', event => setGestalt({ theme: event.currentTarget.value }));
+    // a color is a palette too, palettes.css derives bg and fg from it and the mode decides which way
+    $('palette-swatch').addEventListener('input', event => setGestalt({ palette: event.currentTarget.value }));
 
-    $('random-theme').addEventListener('click', () => {
-      const theme = themes[Math.floor(Math.random() * themes.length)];
-      $('theme-picker').value = theme;
-      setGestalt({ theme });
+    $('random-palette').addEventListener('click', () => {
+      const palette = palettes[Math.floor(Math.random() * palettes.length)];
+      $('palette-picker').value = palette;
+      setGestalt({ palette });
     });
 
     $('dark-toggle').checked = matchMedia('(prefers-color-scheme: dark)').matches;

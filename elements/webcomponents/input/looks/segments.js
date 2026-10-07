@@ -8,7 +8,7 @@ export default {
   css : `
     [part~="box"] {
       border        : var(--input-line);
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       gap           : 0;
       overflow      : hidden;
     }

@@ -25,7 +25,7 @@ export default {
 
     [part~="search"] {
       border         : var(--input-line);
-      border-radius  : var(--radius-control, 0.4em);
+      border-radius  : --radius();
       min-block-size : var(--control-size, 2.25em);
       padding-inline : 0.6em;
 
@@ -42,7 +42,7 @@ export default {
 
     [part~="option"] {
       aspect-ratio  : 1;
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       font-size     : 1.25em;
 
       &:hover             { background: color-mix(in srgb, currentColor 10%, transparent); }

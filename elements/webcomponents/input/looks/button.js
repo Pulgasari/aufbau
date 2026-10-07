@@ -6,7 +6,7 @@ export default {
   css : `
     [part~="control"] {
       border         : var(--input-line);
-      border-radius  : var(--radius-control, 0.4em);
+      border-radius  : --radius();
       min-block-size : var(--control-size, 2.25em);
       padding-inline : 0.75em;
     }

@@ -20,7 +20,7 @@ export default {
 
     [part~="button"] {
       block-size    : 1.75em;
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       inline-size   : 1.75em;
 
       &:hover { background: color-mix(in srgb, currentColor 10%, transparent); }

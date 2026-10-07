@@ -16,7 +16,7 @@ export default {
     [part~="chip"] {
       align-items   : center;
       background    : color-mix(in srgb, currentColor 12%, transparent);
-      border-radius : var(--radius-control, 0.4em);
+      border-radius : --radius();
       display       : inline-flex;
       gap           : 0.25em;
       padding       : 0.1em 0.25em 0.1em 0.5em;

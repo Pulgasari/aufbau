@@ -1,18 +1,16 @@
 // @aufbau/gestalt
-// the appearance of a page as a whole: palette, mode, theme, density, geometry,
+// the appearance of a page as a whole: palette, mode, density, geometry,
 // look, layout and skin, one controller for all of them.
 //
 //   await gestalt.set({ palette: 'oled', mode: 'dark', density: 'touch', geometry: 'round' });
 //   gestalt.get('palette')    // 'oled'
 //   gestalt.colors()          // { bg, fg, ink } as the browser computed them
 //   await gestalt.palettes()  // the preset names of gestalt/palettes.css
-//   await gestalt.themes()    // the preset names of gestalt/themes.css
 //
-// palette, mode, theme, density and geometry are custom properties on the root,
+// palette, mode, density and geometry are custom properties on the root,
 // mode as --scheme.
 // gestalt/palettes.css reads palette, gestalt/gestalt.css the scheme, so a palette is a preset name or any css color:
-// 'dracula', 'teal', '#ff8800'. gestalt/themes.css turns a theme into a palette
-// and a skin.
+// 'dracula', 'teal', '#ff8800'.
 // look and layout are stylesheets, one per kind, swapped in place, false
 // removes one. skin is both: the --skin token, and the sheet the elements adopt
 // into @layer aufbau.skin (@aufbau/element).
@@ -27,9 +25,9 @@ LOOKS        = ['flat', 'rounded'],
 MODES        = ['auto', 'dark', 'light'],
 SKINS        = ['andromeda', 'monochrome'];
 
-// TOKENS :: the properties gestalt.css, palettes.css and themes.css read, mirrored as data-* for selectors
+// TOKENS :: the properties gestalt.css and palettes.css read, mirrored as data-* for selectors
 // SHEETS :: the folder of each stylesheet kind
-const TOKENS  = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin', theme: 'theme' };      
+const TOKENS  = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin' };      
 const SHEETS  = { layout: 'layouts', look: 'looks' };
 const current = {};
 
@@ -65,8 +63,8 @@ async function setSheet (kind, name) {
 }
 
 // :::::: PRESETS
-// the presets are read off the container queries of gestalt/palettes.css and
-// gestalt/themes.css, so the stylesheets stay the only place that lists them.
+// the presets are read off the container queries of gestalt/palettes.css,
+// so the stylesheet stays the only place that lists them.
 // loaded once, on first ask
 
 const presetPattern = property => new RegExp(`style\\(\\s*--${property}\\s*:\\s*([\\w-]+)\\s*\\)`);
@@ -103,7 +101,6 @@ function presetNames (file, property) {
 }
 
 const palettes = () => presetNames('palettes.css', 'palette');
-const themes   = () => presetNames('themes.css', 'theme');
 
 // :::::: API
 
@@ -130,6 +127,6 @@ const colors = (element = document.body) => {
   return Object.fromEntries(['bg', 'fg', 'ink'].map(name => [name, style.getPropertyValue(`--color-${name}`).trim()]));
 };
 
-export const gestalt = { colors, get, palettes, set, themes, densities: DENSITIES, geometries: GEOMETRIES, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS };
+export const gestalt = { colors, get, palettes, set, densities: DENSITIES, geometries: GEOMETRIES, layouts: LAYOUTS, looks: LOOKS, modes: MODES, skins: SKINS };
 
 export default gestalt;

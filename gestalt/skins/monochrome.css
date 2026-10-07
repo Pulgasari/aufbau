@@ -145,7 +145,7 @@ aufbau-picker[look="radio"]::part(option)::before {
 aufbau-button {
   background-color : transparent;
   border-color     : currentColor;
-  border-radius    : var(--radius-control, var(--radius));
+  border-radius    : var(--radius);
 
   &[variant="ghost"]   { border-color: transparent; }
   &[variant="primary"] { color: var(--color-ink); }

@@ -1,6 +1,6 @@
 # @aufbau/gestalt
 
-the appearance of a page as a whole: palette, mode, theme, density, geometry,
+the appearance of a page as a whole: palette, mode, density, geometry,
 look, layout and skin. the stylesheets that read them, and one controller to set
 them.
 
@@ -20,9 +20,9 @@ await gestalt.palettes();   // the preset names of palettes.css
 | file           | what it is |
 |----------------|------------|
 | `index.js`     | the controller |
-| `gestalt.css`  | the axes (`--palette`, `--scheme`, `--density`, `--geometry`, `--skin`) and the shorthands (`--bg`, `--fg`, `--ink`, …) |
+| `gestalt.css`  | the axes (`--palette`, `--scheme`, `--density`, `--geometry`, `--skin`), `--radius()` and the shorthands (`--bg`, `--fg`, `--ink`, `--rad`, …) |
 | `palettes.css` | the palettes, a preset name or any css color to `--color-bg`, `--color-fg`, `--color-ink` |
-| `themes.css`   | a theme to a palette and a skin |
+| `themes.css`   | a theme to a palette and a skin, kept but not loaded |
 | `skins/`       | the decoration of `@aufbau/elements`, adopted into `@layer aufbau.skin` |
 | `looks/`       | look sheets, one at a time |
 | `layouts/`     | layout sheets, one at a time |

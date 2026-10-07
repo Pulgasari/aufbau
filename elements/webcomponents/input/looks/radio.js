@@ -17,7 +17,7 @@ export default {
       inline-size   : 1em;
     }
 
-    [role="checkbox"] [part~="mark"] { border-radius: calc(var(--radius-control, 0.4em) * 0.5); }
+    [role="checkbox"] [part~="mark"] { border-radius: calc(--radius() * 0.5); }
 
     [part~="selected"] [part~="mark"] {
       background : var(--color-ink, AccentColor);

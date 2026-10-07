@@ -21,7 +21,7 @@ export const LISTBOX = `
   [part~="listbox"] {
     background          : var(--color-bg, Canvas);
     border              : var(--input-line);
-    border-radius       : var(--radius-control, 0.4em);
+    border-radius       : --radius();
     color               : inherit;
     margin              : 0;
     max-block-size      : var(--list-size, 15em);
@@ -33,7 +33,7 @@ export const LISTBOX = `
 
   [part~="option"] {
     align-items   : center;
-    border-radius : calc(var(--radius-control, 0.4em) * 0.75);
+    border-radius : calc(--radius() * 0.75);
     cursor        : pointer;
     display       : flex;
     gap           : 0.5em;

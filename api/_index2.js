@@ -1,7 +1,7 @@
 // @aufbau/api
 
 import { deepMerge } from '@pulgasari/obj';
-import { CSS_PATH, gestalt } from '../gestalt/index.js';
+import { CSS_PATH, gestalt } from '@aufbau/gestalt';
 
 // :::::: LAZY HELPERS :::::::::::::::::::::::::::::::::::::::::
 
