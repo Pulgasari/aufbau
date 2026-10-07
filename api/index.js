@@ -29,17 +29,6 @@ const filters  = facade(modules.filters , [...CONTRACT, 'createPipeline', 'suppo
 const patterns = facade(modules.patterns, CONTRACT);
 const webfonts = facade(modules.webfonts, [...CONTRACT, 'configure', 'init']);
 
-const modules = {
-  config   : once(() => import('@aufbau/element')),
-  domina   : name    => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default),
-  elements : once(() => import('@aufbau/elements')),
-  filters  : once(() => import('@aufbau/filters')),
-  icons    : once(() => import('@aufbau/svg/aliases.js')),
-  patterns : once(() => import('@aufbau/patterns')),
-  webfonts : once(() => import('@aufbau/webfonts')),
-//$load    : (name)  => modules[name]().then(module => module.data),
-};
-
 const elements = {
   getConfig      : async (...args) => (await modules.config()).getConfig(...args),
   setConfig      : async (...args) => (await modules.config()).setConfig(...args),
