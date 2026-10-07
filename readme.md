@@ -14,6 +14,7 @@
   | [html](https://aufbau.dev/elements.html)
 - [@aufbau/filters](filters/)
   | [html](https://aufbau.dev/filters.html)
+- [@aufbau/gestalt](gestalt/)
 - [@aufbau/gestures](gestures/)
   | [html](https://aufbau.dev/gestures.html)
 - [@aufbau/gui](gui/)
@@ -37,4 +38,5 @@
 
 #### resources
 - [@aufbau/css](css/)
+  | [functions](https://aufbau.dev/cssfn/)
 - [@aufbau/svg](svg/)

@@ -1,4 +1,4 @@
-// @aufbau/api/gestalt.js
+// @aufbau/gestalt
 // the appearance of a page as a whole: palette, mode, theme, density, geometry,
 // look, layout and skin, one controller for all of them.
 //

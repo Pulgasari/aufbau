@@ -1,0 +1,16 @@
+{
+  "name": "@aufbau/gestalt",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*"
+  },
+  "peerDependencies": {
+    "@aufbau/element": "^0.1.0",
+    "@domina/methods": "*"
+  },
+  "license": "MIT"
+}
