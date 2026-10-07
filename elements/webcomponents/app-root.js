@@ -96,6 +96,22 @@ export class AppRoot extends AufbauElement {
     this.$(window).on('hashchange', () => { if (this.getAttr('routing') === 'hash') this.follow(); });
     this.$(window).on('popstate',   () => { if (this.getAttr('routing') === 'path') this.follow(); });
 
+    this.start();
+  }
+
+  // the views may come later than the root, a page that renders into a root of its
+  // markup: then the address is read once the first of them is there
+  start () {
+    if (!this.views.length) {
+      const observer = new MutationObserver(() => {
+        if (!this.views.length) return;
+        observer.disconnect();
+        this.start();
+      });
+      observer.observe(this, { childList: true, subtree: true });
+      this.track(() => observer.disconnect());
+      return;
+    }
     this.follow({ transition: false });
     if (!this.view) this.views[0]?.activate({ history: false, transition: false });
   }
