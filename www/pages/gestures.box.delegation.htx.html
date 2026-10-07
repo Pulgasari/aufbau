@@ -16,7 +16,7 @@
   .delegation-list li {
     background : color-mix(in oklch, currentColor 6%, transparent);
     border-top : 1px solid color-mix(in oklch, currentColor 20%, transparent);
-    padding    : .9rem 1rem;
+    padding    : 1rem;
     transition : opacity .2s;
 
     &:first-child { border-top: 0; }
@@ -26,6 +26,15 @@
 
 <section>
   <h2>delegation</h2>
-  <p>one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>, dom events from the items: swipe left marks done, swipe right undoes, tap logs.</p>
-  <ul class="delegation-list" ref=${setup}><li>eins</li><li>zwei</li><li>drei</li><li>vier</li></ul>
+  <p>
+    one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>,
+    dom events from the items: 
+    swipe left marks done, swipe right undoes, tap logs.
+  </p>
+  <ul class="delegation-list" ref=${setup}>
+    <li>eins</li>
+    <li>zwei</li>
+    <li>drei</li>
+    <li>vier</li>
+  </ul>
 </section>
