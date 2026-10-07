@@ -10,6 +10,7 @@ import { CSS_PATH, gestalt } from './gestalt.js';
 const CONTRACT = ['apply', 'list', 'load', 'remove', 'update', 'use'];
 const facade   = (load, names) => Object.fromEntries(names.map(name => [name, async (...args) => (await load())[name](...args)]));
 const once     = (load)        => { let promise; return () => promise ??= load(); };
+const lazy     = (load, name)  => async (...args) => (await load())[name](...args);
 
 const modules = {
   config   : once(() => import('@aufbau/element')),
@@ -28,6 +29,17 @@ const filters  = facade(modules.filters , [...CONTRACT, 'createPipeline', 'suppo
 const patterns = facade(modules.patterns, CONTRACT);
 const webfonts = facade(modules.webfonts, [...CONTRACT, 'configure', 'init']);
 
+const modules = {
+  config   : once(() => import('@aufbau/element')),
+  domina   : name    => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default),
+  elements : once(() => import('@aufbau/elements')),
+  filters  : once(() => import('@aufbau/filters')),
+  icons    : once(() => import('@aufbau/svg/aliases.js')),
+  patterns : once(() => import('@aufbau/patterns')),
+  webfonts : once(() => import('@aufbau/webfonts')),
+//$load    : (name)  => modules[name]().then(module => module.data),
+};
+
 const elements = {
   getConfig      : async (...args) => (await modules.config()).getConfig(...args),
   setConfig      : async (...args) => (await modules.config()).setConfig(...args),
@@ -37,6 +49,17 @@ const elements = {
   registerAll    : async ()        => (await modules.elements()).registerAll(),
   
 };
+
+/*
+const elements = {
+  getConfig      : lazy(modules.config, 'getConfig'),
+  setConfig      : lazy(modules.config, 'setConfig'),
+  enableAutoload : lazy(modules.elements, 'autoloader'),
+  load           : lazy(modules.elements, 'load'),
+  registerAll    : lazy(modules.elements, 'registerAll'),
+};
+*/
+
 
 // catalogues, each one a promise
 const data = {
