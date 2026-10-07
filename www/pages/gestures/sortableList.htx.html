@@ -1,6 +1,6 @@
 <script>
   import { sortable }     from '@aufbau/gestures';
-  import { log, mounted } from './gestures.shared.js';
+  import { log, mounted } from './../gestures.shared.js';
 
   const setup = mounted(list => sortable(list, {
     onSort: ({ from, to, order }) => log(`sorted ${from} → ${to}: ${order.map(item => item.textContent).join(' ')}`),
