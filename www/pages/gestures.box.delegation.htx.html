@@ -1,0 +1,31 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { log }  from './gestures.shared.js';
+
+  // one gestures() on the list, the items are told apart by event.target
+  const setup = list => {
+    gestures(list, { recognize: ['swipe', 'tap'], swipe: { touchAction: 'pan-y' } });
+    list.addEventListener('swipeleft',  event => { event.target.closest('li')?.classList.add('done');    log('list swipeleft', event.detail); });
+    list.addEventListener('swiperight', event => { event.target.closest('li')?.classList.remove('done'); log('list swiperight', event.detail); });
+    list.addEventListener('tap',        event => log(`list tap · ${event.target.closest('li')?.textContent}`, event.detail));
+  };
+</script>
+
+<style>
+  .delegation-list { border: 1px solid color-mix(in oklch, currentColor 20%, transparent); border-radius: .75rem; list-style: none; margin: 0; overflow: hidden; padding: 0; }
+  .delegation-list li {
+    background : color-mix(in oklch, currentColor 6%, transparent);
+    border-top : 1px solid color-mix(in oklch, currentColor 20%, transparent);
+    padding    : .9rem 1rem;
+    transition : opacity .2s;
+
+    &:first-child { border-top: 0; }
+    &.done        { opacity: .35; text-decoration: line-through; }
+  }
+</style>
+
+<section>
+  <h2>delegation</h2>
+  <p>one <code>gestures(list, { recognize: ['swipe', 'tap'] })</code>, dom events from the items: swipe left marks done, swipe right undoes, tap logs.</p>
+  <ul class="delegation-list" ref=${setup}><li>eins</li><li>zwei</li><li>drei</li><li>vier</li></ul>
+</section>

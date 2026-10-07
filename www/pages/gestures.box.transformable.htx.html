@@ -1,0 +1,32 @@
+<script>
+  import { transformable } from '@aufbau/gestures';
+  import { mounted }       from './gestures.shared.js';
+
+  const setup = mounted(viewer => {
+    const image = viewer.firstElementChild;
+    transformable(image, { maximumScale: 6, onChange: state => { image.dataset.state = JSON.stringify(state); }, surface: viewer });
+  });
+</script>
+
+<style>
+  .viewer       { background: color-mix(in oklch, currentColor 6%, transparent); border: 1px solid color-mix(in oklch, currentColor 20%, transparent); border-radius: .75rem; min-block-size: 16rem; outline-offset: 2px; overflow: hidden; position: relative; }
+  .viewer-image {
+    background    : conic-gradient(from 45deg, var(--color-ink), #8be9fd, #50fa7b, #f1fa8c, var(--color-ink));
+    block-size    : 8rem;
+    border-radius : .5rem;
+    color         : #000;
+    display       : grid;
+    font-weight   : 800;
+    inline-size   : 10rem;
+    inset-block-start  : calc(50% - 4rem);
+    inset-inline-start : calc(50% - 5rem);
+    place-items   : center;
+    position      : absolute;
+  }
+</style>
+
+<div>
+  <h2>transformable</h2>
+  <p>one finger moves, two pinch and turn, wheel zooms toward the cursor, double tap zooms in and back. keys: arrows, + −, [ ], 0.</p>
+  <div class="viewer" tabindex="0" ref=${setup}><div class="viewer-image">aufbau</div></div>
+</div>

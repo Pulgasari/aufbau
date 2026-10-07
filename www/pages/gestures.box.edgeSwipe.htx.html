@@ -1,0 +1,32 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { log }  from './gestures.shared.js';
+
+  let drawer;
+  let open = false;
+
+  const place = progress => { drawer.style.translate = `${(progress - 1) * 100}% 0`; };
+  const set   = next     => { open = next; drawer.classList.add('animated'); place(open ? 1 : 0); };
+
+  const setup = panel => gestures(panel, {
+    edgeSwipe         : { edges: ['left'], size: 32 },
+    onEdgeSwipeCancel : () => set(false),
+    onEdgeSwipeEnd    : gesture => { set(gesture.progress > 0.35 || gesture.velocity.x > 0.4); log(`edgeSwipeEnd · ${gesture.progress.toFixed(2)}`, gesture); },
+    onEdgeSwipeMove   : gesture => { drawer.classList.remove('animated'); place(Math.min(1, gesture.progress / 0.7)); },
+    onEdgeSwipeStart  : gesture => log(`edgeSwipeStart · ${gesture.edge}`, gesture),
+    onSwipeLeft       : () => open && set(false),
+    onTap             : gesture => { if (open && !drawer.contains(gesture.target)) set(false); },
+  });
+</script>
+
+<style>
+  .drawer-panel { background: color-mix(in oklch, currentColor 6%, transparent); border: 1px solid color-mix(in oklch, currentColor 20%, transparent); border-radius: .75rem; display: grid; min-block-size: 14rem; overflow: hidden; padding: 1rem; place-items: center; position: relative; text-align: center; }
+  .drawer       { background: var(--color-ink); color: #000; font-weight: 700; inline-size: 70%; inset: 0 auto 0 0; padding: 1rem; position: absolute; translate: -100% 0; }
+  .drawer.animated { transition: translate .2s ease; }
+</style>
+
+<div>
+  <h2>edgeSwipe</h2>
+  <p>pull the drawer out from the left edge of the panel. swipe left or tap the panel to close.</p>
+  <div class="drawer-panel" ref=${setup}>content<div class="drawer" ref=${node => drawer = node}>drawer</div></div>
+</div>

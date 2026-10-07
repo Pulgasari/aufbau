@@ -1,15 +1,10 @@
 <script>
-  import gestures from '@aufbau/gestures';
+  import gestures    from '@aufbau/gestures';
+  import { pressed } from './gestures.shared.js';
 
   // the script is the body of the component and runs before its markup exists,
   // so the elements come through ref, each one as soon as it is built
   let output;
-
-  const pressed = element => ({
-    onPressCancel : () => element.classList.remove('pressed'),
-    onPressEnd    : () => element.classList.remove('pressed'),
-    onPressStart  : () => element.classList.add('pressed'),
-  });
 
   const stepper = button => {
     const step = () => { output.value = Number(output.value) + Number(button.dataset.step); };
@@ -22,7 +17,7 @@
 </script>
 
 <style>
-  .stepper {
+  .gestures .pad.stepper {
     align-items     : center;
     display         : flex;
     gap             : 1rem;
@@ -53,7 +48,7 @@
   <h2>pressRepeat</h2>
   <p>a stepper: one step on contact (<code>pressStart</code>), then repeating while held.</p>
 
-  <div class="stepper">
+  <div class="pad stepper">
     <button type="button" data-step="-1" ref=${stepper}>−</button>
     <output ref=${node => output = node}>0</output>
     <button type="button" data-step="1" ref=${stepper}>+</button>

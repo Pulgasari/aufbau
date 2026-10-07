@@ -1,8 +1,95 @@
 <!-- htx: partial -->
-<section>
-  <h1>@aufbau/gestures</h1>
-</section>
+<style>
+  .gestures {
+    display : grid;
+    gap     : 1.5rem;
 
-<section>
-  <htx-part src='./gestures.box.pressRepeat.htx.html' />
-</section>
+    > section     { display: grid; gap: .5rem; }
+    .grid         { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+    h2            { font-size: 1rem; margin: 0 0 .25rem; }
+    p             { font-size: .85rem; margin: 0; opacity: .7; }
+
+    .pad {
+      background    : color-mix(in oklch, currentColor 6%, transparent);
+      border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
+      border-radius : .75rem;
+      display       : grid;
+      font-weight   : 600;
+      min-block-size: 10rem;
+      padding       : 1rem;
+      place-items   : center;
+      text-align    : center;
+      transition    : background-color .08s, scale .08s;
+
+      &.flash   { outline: 3px solid var(--color-ink); outline-offset: -3px; }
+      &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent); scale: .98; }
+    }
+
+    table { border-collapse: collapse; font: 12px/1.4 ui-monospace, monospace; inline-size: 100%; }
+    td    { border-top: 1px solid color-mix(in oklch, currentColor 20%, transparent); padding: .15rem .5rem; vertical-align: top; }
+    td:first-child { opacity: .6; white-space: nowrap; }
+
+    #gestures-log {
+      border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
+      border-radius : .5rem;
+      font          : 12px/1.5 ui-monospace, monospace;
+      max-block-size: 12rem;
+      overflow      : auto;
+      padding       : .5rem;
+      white-space   : pre-wrap;
+    }
+  }
+</style>
+
+<div class="gestures">
+
+  <section>
+    <h1>@aufbau/gestures</h1>
+    <p>try everything with mouse, touch and pen, the log and the session table show what was measured and recognized.</p>
+  </section>
+
+  <section class="grid">
+    <htx-part src='./gestures.box.press.htx.html' />
+    <htx-part src='./gestures.box.exclusive.htx.html' />
+    <htx-part src='./gestures.box.swipe.htx.html' />
+    <htx-part src='./gestures.box.pan.htx.html' />
+  </section>
+
+  <section class="grid">
+    <htx-part src='./gestures.box.transform.htx.html' />
+    <htx-part src='./gestures.box.wheel.htx.html' />
+    <htx-part src='./gestures.box.pressRepeat.htx.html' />
+  </section>
+
+  <section>
+    <h2>bundles</h2>
+    <p>bundles act on the element: <code>transformable</code>, <code>draggable</code>, <code>dismissable</code>, <code>sortable</code>, <code>pullable</code>. each has keyboard counterparts once focused.</p>
+  </section>
+
+  <section class="grid">
+    <htx-part src='./gestures.box.transformable.htx.html' />
+    <htx-part src='./gestures.box.draggable.htx.html' />
+    <htx-part src='./gestures.box.dismissable.htx.html' />
+    <htx-part src='./gestures.box.edgeSwipe.htx.html' />
+  </section>
+
+  <section class="grid">
+    <htx-part src='./gestures.box.sortableList.htx.html' />
+    <htx-part src='./gestures.box.sortableGrid.htx.html' />
+    <htx-part src='./gestures.box.pullable.htx.html' />
+  </section>
+
+  <htx-part src='./gestures.box.delegation.htx.html' />
+
+  <section>
+    <h2>session</h2>
+    <p>the last gesture's detail.</p>
+    <table id="gestures-session"></table>
+  </section>
+
+  <section>
+    <h2>log</h2>
+    <div id="gestures-log"></div>
+  </section>
+
+</div>

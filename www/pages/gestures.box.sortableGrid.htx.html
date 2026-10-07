@@ -1,0 +1,29 @@
+<script>
+  import { sortable }     from '@aufbau/gestures';
+  import { log, mounted } from './gestures.shared.js';
+
+  const setup = mounted(grid => sortable(grid, { axis: null, onSort: ({ from, to }) => log(`grid ${from} → ${to}`) }));
+</script>
+
+<style>
+  .sort-grid { display: grid; gap: .4rem; grid-template-columns: repeat(4, 1fr); }
+  .sort-grid div {
+    aspect-ratio  : 1;
+    background    : color-mix(in oklch, currentColor 6%, transparent);
+    border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
+    border-radius : .6rem;
+    display       : grid;
+    font-weight   : 700;
+    place-items   : center;
+    transition    : box-shadow .15s, scale .15s;
+
+    &[data-lifted]   { box-shadow: 0 .4rem 1rem #0005; scale: 1.03; }
+    &[data-dragging] { background: color-mix(in oklch, var(--color-ink) 25%, transparent); box-shadow: 0 .6rem 1.5rem #0007; }
+  }
+</style>
+
+<div>
+  <h2>sortable · grid</h2>
+  <p>the same in two dimensions, <code>axis: null</code>.</p>
+  <div class="sort-grid" ref=${setup}><div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div><div>H</div></div>
+</div>

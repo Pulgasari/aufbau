@@ -1,0 +1,25 @@
+<script>
+  import gestures from '@aufbau/gestures';
+  import { log, show } from './gestures.shared.js';
+
+  let chip;
+
+  const setup = pad => gestures(pad, {
+    onPanCancel : ()      => { chip.classList.remove('dragging'); chip.style.translate = ''; log('panCancel'); },
+    onPanEnd    : gesture => { chip.classList.remove('dragging'); chip.style.translate = ''; log(`panEnd · ${gesture.distance.toFixed(0)} px · ${gesture.velocity.speed.toFixed(2)} px/ms`, gesture); },
+    onPanMove   : gesture => { chip.style.translate = `${gesture.delta.x}px ${gesture.delta.y}px`; show(gesture); },
+    onPanStart  : gesture => { chip.classList.add('dragging'); log('panStart', gesture); },
+  });
+</script>
+
+<style>
+  .pan-pad  { overflow: hidden; position: relative; }
+  .pan-chip { aspect-ratio: 1; background: var(--color-ink); border-radius: 1rem; inline-size: 4rem; transition: translate .25s ease; }
+  .pan-chip.dragging { transition: none; }
+</style>
+
+<div>
+  <h2>pan</h2>
+  <p>drag the chip, it springs back on release.</p>
+  <div class="pad pan-pad" ref=${setup}><div class="pan-chip" ref=${node => chip = node}></div></div>
+</div>
