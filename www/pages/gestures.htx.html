@@ -1,44 +1,55 @@
 <!-- htx: partial -->
 <style>
   .gestures {
+    --b: 1px solid --alpha(cc, 0.8);
+    
     display : grid;
     gap     : 1.5rem;
 
     > section { display: grid; gap: .5rem; }
-    .grid     { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
-    .grid > *:nth-child(odd) { 
-      background-color: --darker(var(--color-bg), 0.2);
-      /*
-      --bg: --darker(bg, 0.2);
-      */
+    .grid {
+      display: grid; 
+      gap: 1rem; 
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); 
     }
+    .grid > *:nth-child(odd) { --bg: --darker(bg, 0.2); }
 
     .pad {
-      background    : color-mix(in oklch, currentColor 6%, transparent);
-      border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
-      border-radius : .75rem;
+      background    : --alpha(cc, 0.9);
+      border        : var(--b);
       display       : grid;
       font-weight   : 600;
       min-block-size: 10rem;
       padding       : 1rem;
       place-items   : center;
       text-align    : center;
-      transition    : background-color .08s, scale .08s;
+      transition    : background-color .1s, scale .1s;
 
       &.flash   { outline: 3px solid var(--color-ink); outline-offset: -3px; }
-      &.pressed { background: color-mix(in oklch, var(--color-ink) 25%, transparent);  }
+      &.pressed { --bg: --alpha(ink, 0.75); }
     }
 
-    table { border-collapse: collapse; inline-size: 100%; }
-    td    { border-top: 1px solid color-mix(in oklch, currentColor 20%, transparent); padding: .15rem .5rem; vertical-align: top; }
-    td:first-child { opacity: .6; white-space: nowrap; }
+    table {
+      border-collapse: collapse; 
+      inline-size: 100%;
+    }
+    td {     
+      border-top: var(--b);
+      padding: --space(small); 
+      vertical-align: top;
+    }
+    td:first-child {
+      opacity: .6; 
+      white-space: nowrap;
+    }
 
     #gestures-log {
-      border        : 1px solid color-mix(in oklch, currentColor 20%, transparent);
-      max-block-size: 12rem;
-      overflow      : auto;
-      padding       : 1rem;
-      white-space   : pre-wrap;
+      
+      border         : var(--b);
+      max-block-size : 12rem;
+      overflow       : auto;
+      padding        : 1rem;
+      white-space    : pre-wrap;
     }
 
     #gestures-log, table {
@@ -51,7 +62,10 @@
 
   <section>
     <h1>@aufbau/gestures</h1>
-    <p>try everything with mouse, touch and pen, the log and the session table show what was measured and recognized.</p>
+    <p>
+      try everything with mouse, touch and pen, 
+      the log and the session table show what was measured and recognized.
+    </p>
   </section>
 
   <section class="grid">
