@@ -1,4 +1,4 @@
-/* @aufbau/css/animate/keyframes.css
+/* @aufbau/gestalt/animate/keyframes.css
 
 the keyframes only, no selectors. the parameters are custom properties,
 set by animations.css, each with a fallback here so the file works on its own:

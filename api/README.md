@@ -63,7 +63,7 @@ await aufbau.elements.setConfig({ 'write-code': { theme: 'nord' } });
 
 await aufbau.data.filters;    // also icons, patterns, themes, webfonts. each one a promise
 await aufbau.gestalt.set({ theme: 'oled' });   // see gestalt.js
-await aufbau.gestalt.themes();                 // the presets, read off css/themes.css
+await aufbau.gestalt.themes();                 // the presets, read off gestalt/themes.css
 ```
 
 ### boot config

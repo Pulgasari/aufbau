@@ -1,4 +1,4 @@
-/* the colors come from css/themes.css (aufbau.boot adopts it),
+/* the colors come from gestalt/themes.css (aufbau.boot adopts it),
 which resolves --bg, --fg and --accent on body. the surfaces derive from them
 there, so the page follows any theme */
 

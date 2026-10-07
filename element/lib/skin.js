@@ -6,7 +6,7 @@ import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
 
 const CONFIG_KEY   = 'elements-skin';
 const DEFAULT_SKIN = 'monochrome';
-const SKIN_BASE    = new URL('../../css/skins/', import.meta.url);
+const SKIN_BASE    = new URL('../../gestalt/skins/', import.meta.url);
 const SKIN_KEY     = 'aufbau:skin';
 
 const skinUrl = (skin) =>

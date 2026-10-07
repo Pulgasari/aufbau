@@ -1,12 +1,12 @@
 # @aufbau/css
 
 ```md
-functions.css
-keyframes.css
-palettes.css
-themes.css
-tokens.css
+aufbau.css      the entry: layers, functions, reset and the gestalt sheets
+functions.css   the custom functions, functions/*.css
+reset.css
 ```
+
+the axes, palettes, skins, looks, layouts and animations are in `../gestalt`.
 
 ## shorthand props
 

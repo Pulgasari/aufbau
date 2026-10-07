@@ -183,7 +183,7 @@ export function createDocsFW (config = {}) {
   } = config;
 
   // :::::: THEME
-  // the page theme is a preset of css/themes.css (or any css color), the code theme
+  // the page theme is a preset of gestalt/themes.css (or any css color), the code theme
   // one of write-code's. both persist, both lists are loaded behind the first paint
 
   const pageTheme  = typedSignal({ type: 'string', value: DEFAULT_THEME, key: 'docs-theme-page', storage: 'aufbau' });
