@@ -37,7 +37,7 @@ export default class InputFile extends AufbauControlElement {
     :host {
       display        : flex;
       flex-direction : column;
-      gap            : var(--control-gap, 0.5em);
+      gap            : --space(small);
     }
 
     [part~="zone"] {
@@ -48,7 +48,7 @@ export default class InputFile extends AufbauControlElement {
       display         : flex;
       flex-direction  : column;
       font            : inherit;
-      gap             : var(--control-gap, 0.5em);
+      gap             : --space(small);
       justify-content : center;
       margin          : 0;
       padding         : 1.5em 1em;
@@ -59,7 +59,7 @@ export default class InputFile extends AufbauControlElement {
 
     :host([look="button"]) [part~="zone"] {
       flex-direction : row;
-      padding        : var(--control-pad, 0.35em 0.55em);
+      padding        : --space(small);
     }
 
     :host([look="list"]) [part~="zone"] { display: none; }
@@ -76,7 +76,7 @@ export default class InputFile extends AufbauControlElement {
     [part~="file"] {
       align-items : center;
       display     : flex;
-      gap         : var(--control-gap, 0.5em);
+      gap         : --space(small);
     }
 
     [part~="name"] {

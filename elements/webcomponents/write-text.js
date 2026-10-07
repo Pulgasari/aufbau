@@ -50,7 +50,7 @@ export default class WriteText extends withSource(withControl(AufbauElement)) {
     > div > footer {
       align-items     : center;
       display         : flex;
-      gap             : var(--control-gap, 0.5em);
+      gap             : --space(small);
       justify-content : flex-end;
 
       > output {

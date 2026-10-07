@@ -129,7 +129,7 @@ export default class WriteCode extends AufbauSourceElement {
     }
 
     > figure > header {
-      --gap: small; /* gap: var(--control-gap, 0.5em); */
+      --gap: small; /* gap: --space(small); */
       
       align-items : center;
       display     : flex;

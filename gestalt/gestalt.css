@@ -16,7 +16,7 @@ axes, each writes its own raw tokens:
 --palette  :: <preset> | <color>                      -> --color-bg, --color-fg, --color-ink (palettes.css)
 --scheme   :: auto | light | dark                     -> color-scheme (the palettes use light-dark())
 --geometry :: sharp | soft | round | pill             -> --radius()
---density  :: compact | normal | comfortable | touch  -> --unit, --control-size
+--density  :: compact | normal | comfortable | touch  (not used yet)
 --skin     :: monochrome | …                          -> the decoration of the elements (skins/)
 --typo     :: system | humanist | mono | editorial    -> --font-body, --font-heading, --font-mono, --ratio
 --motion   :: <number>, 0 turns every duration off

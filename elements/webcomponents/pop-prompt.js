@@ -30,7 +30,7 @@ export default class PopPrompt extends PopModal {
 
     [part~="actions"] {
       display         : flex;
-      gap             : var(--control-gap, 0.5em);
+      gap             : --space(small);
       justify-content : flex-end;
       margin-block    : 1em 0;
     }

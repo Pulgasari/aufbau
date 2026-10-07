@@ -26,7 +26,7 @@ export default {
     [part~="search"] {
       border         : var(--input-line);
       border-radius  : --radius();
-      min-block-size : var(--control-size, 2.25em);
+      min-block-size : --space(9);
       padding-inline : 0.6em;
 
       &:focus { border-color: var(--color-ink, Highlight); }

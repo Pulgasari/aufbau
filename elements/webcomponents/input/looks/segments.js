@@ -15,7 +15,7 @@ export default {
 
     [part~="segment"] {
       flex           : 1 1 auto;
-      min-block-size : var(--control-size, 2.25em);
+      min-block-size : --space(9);
       padding-inline : 0.75em;
 
       & + [part~="segment"] { border-inline-start: var(--input-line); }

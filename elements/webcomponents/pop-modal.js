@@ -55,7 +55,7 @@ export default class PopModal extends AufbauElement {
     header {
       align-items     : center;
       display         : flex;
-      gap             : var(--control-gap, 0.5em);
+      gap             : --space(small);
       justify-content : space-between;
 
       > strong { font-weight: 600; }

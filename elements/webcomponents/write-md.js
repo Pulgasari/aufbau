@@ -36,7 +36,7 @@ export class WriteMd extends AufbauElement {
     return `write-md {
       display        : flex;
       flex-direction : column;
-      gap            : var(--control-gap, 0.5em);
+      gap            : --space(small);
 
       > [role="tablist"] { align-self: flex-start; display: flex; }
       > div              { display: grid; gap: inherit; }

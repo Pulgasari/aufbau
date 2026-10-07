@@ -24,7 +24,7 @@ export default class PopMenu extends AufbauElement {
       cursor      : pointer;
       display     : inline-flex;
       font        : inherit;
-      gap         : var(--control-gap, 0.5em);
+      gap         : --space(small);
       margin      : 0;
 
       &:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -53,7 +53,7 @@ export default class PopMenu extends AufbauElement {
       display         : flex;
       flex            : none;
       font            : inherit;
-      gap             : var(--control-gap, 0.5em);
+      gap             : --space(small);
       text-align      : start;
       text-decoration : none;
     }

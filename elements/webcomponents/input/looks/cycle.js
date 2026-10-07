@@ -14,7 +14,7 @@ export default {
       -webkit-touch-callout : none;
       border                : var(--input-line);
       border-radius         : --radius();
-      min-block-size        : var(--control-size, 2.25em);
+      min-block-size        : --space(9);
       padding-inline        : 0.75em;
       user-select           : none;
     }

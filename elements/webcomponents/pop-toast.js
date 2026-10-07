@@ -79,7 +79,7 @@ export default class PopToast extends AufbauElement {
   static styles = `
     :host {
       align-items           : start;
-      column-gap            : var(--control-gap, 0.5em);
+      column-gap            : --space(small);
       display               : grid;
       grid-template-columns : auto 1fr auto;
       pointer-events        : auto;
