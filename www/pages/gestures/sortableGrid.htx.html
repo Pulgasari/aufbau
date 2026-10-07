@@ -1,6 +1,6 @@
 <script>
   import { sortable }     from '@aufbau/gestures';
-  import { log, mounted } from './gestures.shared.js';
+  import { log, mounted } from './../gestures.shared.js';
 
   const setup = mounted(grid => sortable(grid, { axis: null, onSort: ({ from, to }) => log(`grid ${from} → ${to}`) }));
 </script>
