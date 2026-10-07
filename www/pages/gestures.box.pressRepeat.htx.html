@@ -1,0 +1,28 @@
+<script>
+  import gestures, { dismissable, draggable, pullable, sortable, transformable } from '@aufbau/gestures';
+
+  const $ = id => document.getElementById(id);
+  
+  const output = $('stepper').querySelector('output');
+  for (const button of $('stepper').querySelectorAll('button')) {
+    const step = () => { output.value = Number(output.value) + Number(button.dataset.step); };
+    gestures (button, { 
+      ...pressed(button), 
+      onPressRepeat: step, 
+      onPressStart: () => { button.classList.add('pressed'); step(); } 
+    });
+  }
+</script>
+
+<div>
+  
+  <h2>pressRepeat</h2>
+  <p>a stepper: one step on contact (<code>pressStart</code>), then repeating while held.</p>
+  
+  <div class="pad" id="stepper">
+    <button type="button" data-step="-1">−</button>
+    <output>0</output>
+    <button type="button" data-step="1">+</button>
+  </div>
+  
+</div>
