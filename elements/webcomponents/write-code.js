@@ -1,6 +1,6 @@
 // <write-code>
 
-import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
+import { adoptStyleSheet } from '@domina/methods/adoptStyleSheet.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 
@@ -54,7 +54,7 @@ const FALLBACK_THEMES = ['dracula', 'github', 'github-dark'];
 
 const THEME_PATHS = { dracula: 'base16/dracula' };
 
-const loadTheme = (theme) => adoptStylesheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
+const loadTheme = (theme) => adoptStyleSheet(`${HLJS_STYLES}${THEME_PATHS[theme] ?? theme}.min.css`, {
   scope : `write-code[${THEME_ATTR}="${theme}"]`,
   key   : `hljs:${theme}`,
 });
