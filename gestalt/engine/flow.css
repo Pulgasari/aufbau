@@ -28,10 +28,17 @@ modern css custom functions for grid
 
 
 :::::: 2. pseudo-prop ::::::
+
 step 1: definiert im css (--flow)
 step 2: parsed by <app-root> or <data-index>
 step 3: values mapped to data-attr
 step 4: used by css
+
+----------------------------
+
+--flow:
+--gaps:
+--typo: 
 
 :::::: 3. some util classes ::::::
 
