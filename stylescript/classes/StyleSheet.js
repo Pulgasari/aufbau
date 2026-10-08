@@ -1,8 +1,8 @@
 // classes/StyleSheet.js
 
 import {
-  adoptStylesheet,
-  createStylesheet,
+  adoptStyleSheet,
+  createStyleSheet,
   isArray, isFn, isObject, isString,
   setStyleElement,
 } from './../vendors.js';
@@ -99,10 +99,10 @@ export class StyleSheet {
   }
 
   // constructable path: the layer is already baked into compiledCSS, so it is
-  // not passed again to createStylesheet. keyed adopt engages domina's dedup.
+  // not passed again to createStyleSheet. keyed adopt engages domina's dedup.
   adoptConstructable (root) {
-    this.sheetInstance = createStylesheet(this.compiledCSS, { media: this.media ?? undefined });
-    adoptStylesheet(this.sheetInstance, { target: root, key: this.key });
+    this.sheetInstance = createStyleSheet(this.compiledCSS, { media: this.media ?? undefined });
+    adoptStyleSheet(this.sheetInstance, { target: root, key: this.key });
     return this.sheetInstance;
   }
 

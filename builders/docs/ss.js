@@ -2,7 +2,7 @@
 
 import { compile }     from '@aufbau/ass';
 import { createCache } from '@bunker/cache';
-import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
+import adoptStyleSheet from '@domina/methods/adoptStyleSheet.js';
 
 const KEY      = 'aufbau:docs:shell';
 const cssCache = createCache({ name: 'aufbau-docs-css' });
@@ -22,7 +22,7 @@ const cssCache = createCache({ name: 'aufbau-docs-css' });
 */
 export async function initDefaultStylesheet (assURL = './index.ass') {
   const base  = new URL(assURL, document.baseURI).href;
-  const adopt = (css) => adoptStylesheet(css, { base, imports: 'link', key: KEY, replace: true });
+  const adopt = (css) => adoptStyleSheet(css, { base, imports: 'link', key: KEY, replace: true });
 
   const response = await cssCache.staleWhileRevalidate(assURL, {
     onRevalidate : async (fresh) => adopt(await fresh.text()),

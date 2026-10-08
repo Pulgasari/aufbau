@@ -58,8 +58,8 @@ const readToken = name => getComputedStyle(document.documentElement).getProperty
 
 async function setSheet (kind, name) {
   const key = `gestalt:${kind}`;
-  if (!name) return (await domina('releaseStylesheet'))(key);
-  return (await domina('adoptStylesheet'))(`${GESTALT_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
+  if (!name) return (await domina('releaseStyleSheet'))(key);
+  return (await domina('adoptStyleSheet'))(`${GESTALT_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
 }
 
 // :::::: PRESETS

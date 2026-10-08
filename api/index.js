@@ -69,7 +69,7 @@ const data = {
 //const viewport = new CanonicalMap ({ width: 'device-width', initialScale: '1.0', userScalable: 'no' });
 
 const dom = {
-  adoptStylesheet : async (...args) => (await modules.domina('adoptStylesheet'))(...args),
+  adoptStyleSheet : async (...args) => (await modules.domina('adoptStyleSheet'))(...args),
   getStyleToken   : async (...args) => (await modules.domina('getStyleToken'))(...args),
   setStyleToken   : async (...args) => (await modules.domina('setStyleToken'))(...args),
   //viewport

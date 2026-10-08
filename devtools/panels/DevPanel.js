@@ -5,10 +5,10 @@
 // panel polls only while it is on screen.
 
 import { AufbauElement } from '@aufbau/element';
-import adoptStylesheet   from '@domina/methods/adoptStylesheet.js';
+import adoptStyleSheet   from '@domina/methods/adoptStyleSheet.js';
 import createElement     from '@domina/methods/createElement.js';
 
-adoptStylesheet(new URL('../devtools.css?v=2', import.meta.url).href, { key: 'devtools' });
+adoptStyleSheet(new URL('../devtools.css?v=2', import.meta.url).href, { key: 'devtools' });
 
 export class DevPanel extends AufbauElement {
   static attr = { hidden: Boolean };

@@ -12,5 +12,10 @@
     "@aufbau/element": "^0.1.0",
     "@domina/methods": "*"
   },
+  "aufbau": {
+    "bundle": {
+      "keep": ["./layouts/", "./looks/", "./palettes.css", "./skins/"]
+    }
+  },
   "license": "MIT"
 }

@@ -1,5 +1,5 @@
-import adoptStylesheet   from '@domina/methods/adoptStylesheet.js';
-import releaseStylesheet from '@domina/methods/releaseStylesheet.js';
+import adoptStyleSheet   from '@domina/methods/adoptStyleSheet.js';
+import releaseStyleSheet from '@domina/methods/releaseStyleSheet.js';
 
 import { getConfig, onConfigChange, setConfig } from './config.js';
 import { ensureLayerOrder, SKIN_LAYER }         from './styles.js';
@@ -30,8 +30,8 @@ function applySkin (skin = getConfig(CONFIG_KEY, DEFAULT_SKIN)) {
 
   ensureLayerOrder();
 
-  if (next)     return adoptStylesheet(skinUrl(next), { key: SKIN_KEY, layer: SKIN_LAYER, replace: previous != null });
-  if (previous) return releaseStylesheet(SKIN_KEY);
+  if (next)     return adoptStyleSheet(skinUrl(next), { key: SKIN_KEY, layer: SKIN_LAYER, replace: previous != null });
+  if (previous) return releaseStyleSheet(SKIN_KEY);
 }
 
 function setSkin (skin) {

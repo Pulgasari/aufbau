@@ -1,4 +1,4 @@
-import adoptStylesheet         from '@domina/methods/adoptStylesheet.js';
+import adoptStyleSheet         from '@domina/methods/adoptStyleSheet.js';
 import { isFn, isPlainObject } from '@pulgasari/is';
 
 export const BASE_LAYER = 'aufbau.elements';
@@ -86,5 +86,5 @@ export function adoptClassStyles (Cls, root = document) {
 
 export function adoptBaseStyles (key, styles) {
   ensureLayerOrder(document);
-  return adoptStylesheet(cssOf(styles), { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
+  return adoptStyleSheet(cssOf(styles), { key: `aufbau:styles:${key}`, layer: BASE_LAYER });
 }
