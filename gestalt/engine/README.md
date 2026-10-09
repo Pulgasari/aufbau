@@ -50,4 +50,6 @@ $div.gestalt.typo = 'uppercase';
 2. dieser gibt ein objekt (mit data-attr oder custom-props) zurück, die der observer dann ans element bindet.
 3. das css reagiert dann auf diese werte automatisch.
 
-anmerkung: derart nötig ist das nur, weil css nicht auf substrings reagieren bzw . diese überhaupt ausleaen kann, ansonsten wäre das zeug schon css-only möglich.
+anmerkung: 
+- derart nötig ist das nur, weil css nicht auf substrings reagieren bzw . diese überhaupt ausleaen kann, ansonsten wäre das zeug schon css-only möglich.
+- bzgl. der festen werte wäre es theoretisch rein über ein class-system möglich
