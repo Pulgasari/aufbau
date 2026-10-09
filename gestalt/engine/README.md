@@ -15,8 +15,8 @@ ziel ist, die engine auf verschiedene arten nutzen zu können:
 <app-root>
   ...
   <div
-    gestalt-flow='grid 3x3'
-    gestalt-typo='uppercase'
+    gestalt-engine-flow='grid 3x3'
+    gestalt-engine-typo='uppercase'
   >
     ...
   </div>
@@ -28,7 +28,7 @@ ziel ist, die engine auf verschiedene arten nutzen zu können:
 
 ```css
 div {
-  --gestalt-flow: grid 3x3;
-  --gestalt-typo: uppercase;
+  --gestalt-engine-flow: grid 3x3;
+  --gestalt-engine-typo: uppercase;
 }
 ```
