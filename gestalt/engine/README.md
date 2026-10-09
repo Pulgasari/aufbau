@@ -33,6 +33,17 @@ div {
 }
 ```
 
+### by js
+
+```js
+import 'gestalt/prototype.js';
+
+const $div = document.querySelector('div');
+
+$div.gestalt.flow = 'grid 3x3';
+$div.gestalt.typo = 'uppercase';
+```
+
 ## how it works
 
 1. der observer erkennt die jeweiligen namespaces und extrahiert deren content und übergibt diesen an den jeweiligen parser.
