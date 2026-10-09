@@ -34,13 +34,25 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 --rad : <length> | auto | none   border-radius, auto is --radius() of the geometry
 */
 
-/*//////////// AXES ////////////*/
+/*///////////////// TOKENS | CUSTOM PROPERTIES /////////////////*/
 
+/* ===== axes ===== */
 @property --density  { inherits: true; initial-value: normal;     syntax: "compact | normal | comfortable | touch"; }
 @property --geometry { inherits: true; initial-value: soft;       syntax: "sharp | soft | round | pill"; }
 @property --palette  { inherits: true; initial-value: zombie;     syntax: "<color> | <custom-ident>"; }
 @property --scheme   { inherits: true; initial-value: auto;       syntax: "auto | light | dark"; }
 @property --skin     { inherits: true; initial-value: monochrome; syntax: "<custom-ident>"; }
+
+/* ===== shorthands ===== */
+@property --bg  { inherits: false; initial-value: transparent; syntax: "<color>"; }
+@property --fg  { inherits: false; initial-value: none;        syntax: "<color> | none"; }
+@property --ink { inherits: false; initial-value: none;        syntax: "<color> | none"; }
+@property --gap { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
+@property --mgn { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
+@property --pad { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }         
+@property --rad { inherits: false; initial-value: none; syntax: "none | auto | <length-percentage>"; }
+
+/*///////////////// ... /////////////////*/
 
 :root {
   /* a11y */
@@ -76,9 +88,9 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 @function --radius() returns <length> {
   result: if(
     style(--geometry: sharp) : 0px;
-    style(--geometry: round) : 0.75em;
+    style(--geometry: round) : 0.75rem;
     style(--geometry: pill)  : 999px;
-    else                     : 0.25em;
+    else                     : 0.25rem;
   );
 }
 
@@ -93,15 +105,6 @@ the colors of the palette are --color-bg, --color-fg, --color-ink, read those.
 
 /*//////////// SHORTHANDS ////////////*/
 
-@property --bg  { inherits: false; initial-value: transparent; syntax: "<color>"; }
-@property --fg  { inherits: false; initial-value: none;        syntax: "<color> | none"; }
-@property --ink { inherits: false; initial-value: none;        syntax: "<color> | none"; }
-
-@property --gap { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
-@property --pad { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
-@property --mgn { inherits: false; initial-value: none; syntax: "none | <number> | tiny | small | normal | large | huge"; }
-
-@property --rad { inherits: false; initial-value: none; syntax: "none | auto | <length-percentage>"; }
 
 /* specificity 0: any rule of the page that sets the property itself wins */
 :where(*) {
@@ -127,16 +130,6 @@ body {
   --ink : var(--color-ink);
 }
 
-/*//////////// EXPERIMENTAL :: GEOMETRY ////////////*/
-/*
-type(sharp | soft | round | pill)
-
-sharp = keinerlei rundungen
-soft  = minimale rundung, quasi überall gleich
-round = abgerundet
-pill  = 
-*/
-
 /*//////////// CONFIG ////////////*/
 
 @property --factor-space { inherits: false; initial-value: 0.25rem; syntax: "<length>"; }
@@ -144,26 +137,4 @@ pill  =
 :root {
   --factor-space : 0.25rem;
 }
-
-
-/*
-in my tests these work at least in @property
-
-:root {
-  --syntax-density  : "compact | normal | comfortable | touch";
-  --syntax-geometry : "sharp | soft | round | pill";
-  --syntax-palette  : "<color> | <custom-ident>";
-  --syntax-scheme   : "auto | light | dark";
-  --syntax-skin     : "monochrome";
-
-  --type-density  : type(compact | normal | comfortable | touch);
-  --type-geometry : type(sharp | soft | round | pill);
-}
-
-@property --density  { inherits: true; initial-value: normal;     syntax: var(--syntax-density); }
-@property --geometry { inherits: true; initial-value: soft;       syntax: var(--syntax-geometry); }
-@property --palette  { inherits: true; initial-value: zombie;     syntax: var(--syntax-palette); }
-@property --scheme   { inherits: true; initial-value: auto;       syntax: var(--syntax-scheme); }
-@property --skin     { inherits: true; initial-value: monochrome; syntax: var(--syntax-skin); }
-*/
 
