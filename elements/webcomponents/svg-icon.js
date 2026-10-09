@@ -14,6 +14,9 @@ const warned   = new Set;
 let defaults       = null;
 let defaultsLoaded = false;
 
+// a file instead of a name: an app's own icon, <svg-icon icon='/notes/app.svg' mode='image'>
+const isFile = icon => /^(\.{0,2}\/|https?:|data:)/.test(icon);
+
 const warnOnce = (key, message) => {
   if (warned.has(key)) return;
   warned.add(key);
@@ -22,6 +25,7 @@ const warnOnce = (key, message) => {
 
 export function resolveIcon (icon) {
   if (!icon) return null;
+  if (isFile(icon)) return icon;
   const value = String(icon).trim().replace('/', ':');
   return value.includes(':') ? value : aliases.get(value) ?? null;
 }
@@ -36,6 +40,8 @@ export function localUrl (base, name) {
 }
 
 export function iconUrl (id) {
+  if (isFile(id)) return id;
+
   const svg = provided.get(id);
   if (svg) return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 
