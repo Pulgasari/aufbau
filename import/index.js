@@ -14,8 +14,8 @@ const domFromString = (code, mimeType) => new DOMParser().parseFromString(code, 
 
 // :::::: CACHE :::::::::::::::::::::::::::::::::::::::::::::::::::
 
-import { BunkerDB, createDb } from 'https://code.pulgasari.dev/bunker/db/index.js';
-import { createPolicy }       from 'https://code.pulgasari.dev/bunker/policy/index.js';
+import { BunkerDB, createDb } from '@bunker/db';
+import { createPolicy }       from '@bunker/policy';
 
 const namespace = 'aufbau';
 const version   = 1;

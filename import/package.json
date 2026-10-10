@@ -13,7 +13,7 @@
     }
   },
   "dependencies": {
-    "@bunker/db"    : "^0.1.0",
+    "@bunker/db"    : "^0.2.0",
     "@bunker/policy": "^0.1.0"
   },
   "files": [
