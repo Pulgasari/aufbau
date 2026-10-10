@@ -30,9 +30,6 @@ Element.gestalt.replace (key, value) -> replaces its value
 }
 
 [gestalt-typo] {
-  font-color  : var(--gestalt-font-color,  inherit);
-  font-size   : var(--gestalt-font-size,   inherit);
-  line-height : var(--gestalt-line-height, inherit);
 
   /* direction */
   &:[gestalt-typo~='ltr']  { direction: ltr; }
@@ -58,16 +55,9 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='700'] { font-weight: 700; }
   &:[gestalt-typo~='800'] { font-weight: 800; }
   &:[gestalt-typo~='900'] { font-weight: 900; }
-  
   &:[gestalt-typo~='bold']     { font-weight: bold; }
   &:[gestalt-typo~='bolder']   { font-weight: bolder; }
   &:[gestalt-typo~='lighter']  { font-weight: lighter; }
-  
-  &:[gestalt-typo~='thin']     { font-weight: 100; }
-  &:[gestalt-typo~='light']    { font-weight: 300; }
-  &:[gestalt-typo~='normal']   { font-weight: 400; font-style: normal; }
-  &:[gestalt-typo~='medium']   { font-weight: 500; }
-  &:[gestalt-typo~='semibold'] { font-weight: 600; }
   
   /* text-align */
   &:[gestalt-typo~='center']  { text-align: center; }
@@ -92,6 +82,18 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='sans']  { font-family: system-ui, sans-serif; }
   &:[gestalt-typo~='serif'] { font-family: Georgia, serif; }
 }
+
+/*
+font-color  : var(--gestalt-font-color,  inherit);
+  font-size   : var(--gestalt-font-size,   inherit);
+  line-height : var(--gestalt-line-height, inherit);
+
+  &:[gestalt-typo~='thin']     { font-weight: 100; }
+  &:[gestalt-typo~='light']    { font-weight: 300; }
+  &:[gestalt-typo~='normal']   { font-weight: 400; font-style: normal; }
+  &:[gestalt-typo~='medium']   { font-weight: 500; }
+  &:[gestalt-typo~='semibold'] { font-weight: 600; }
+*/
 
 /*
 * `direction` – `ltr`, `rtl`
