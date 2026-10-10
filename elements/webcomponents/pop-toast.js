@@ -261,6 +261,13 @@ export default class PopToast extends AufbauElement {
   }
 }
 
-export const notify = (input, options) => PopToast.notify(input, options);
+// notify('…') and its levels as notify.error('…'), info, success, warning, warn
+export const notify = Object.assign((input, options) => PopToast.notify(input, options), {
+  error   : (input, options) => PopToast.error   (input, options),
+  info    : (input, options) => PopToast.info    (input, options),
+  success : (input, options) => PopToast.success (input, options),
+  warn    : (input, options) => PopToast.warning (input, options),
+  warning : (input, options) => PopToast.warning (input, options),
+});
 
 PopToast.init();
