@@ -29,3 +29,44 @@ Element.gestalt.replace (key, value) -> replaces its value
   --gestalt-engine-typo-text-transform : none;
 }
 
+[gestalt-typo] {
+  font-color  : var(--gestalt-font-color,  inherit);
+  font-size   : var(--gestalt-font-size,   inherit);
+  line-height : var(--gestalt-line-height, inherit);
+
+  /* font-style */
+  &:[gestalt-typo~='italic']  { font-style: italic; }
+  &:[gestalt-typo~='oblique'] { font-style: oblique; }
+
+  /* font-weight */
+  &:[gestalt-typo~='100'] { font-weight: 100; }
+  &:[gestalt-typo~='200'] { font-weight: 200; }
+  &:[gestalt-typo~='300'] { font-weight: 300; }
+  &:[gestalt-typo~='400'] { font-weight: 400; }
+  &:[gestalt-typo~='500'] { font-weight: 500; }
+  &:[gestalt-typo~='600'] { font-weight: 600; }
+  &:[gestalt-typo~='700'] { font-weight: 700; }
+  &:[gestalt-typo~='800'] { font-weight: 800; }
+  &:[gestalt-typo~='900'] { font-weight: 900; }
+  &:[gestalt-typo~='thin']     { font-weight: 100; }
+  &:[gestalt-typo~='light']    { font-weight: 300; }
+  &:[gestalt-typo~='normal']   { font-weight: 400; font-style: normal; }
+  &:[gestalt-typo~='medium']   { font-weight: 500; }
+  &:[gestalt-typo~='semibold'] { font-weight: 600; }
+  &:[gestalt-typo~='bold']     { font-weight: 700; }
+
+  /* text-transform */
+  &:[gestalt-typo~='capitalize'] { text-transform: capitalize; }
+  &:[gestalt-typo~='lowercase']  { text-transform: lowercase; }
+  &:[gestalt-typo~='uppercase']  { text-transform: uppercase; }
+  
+  /* text-alignment */
+  &:[gestalt-typo~='center'] { text-align: center; }
+  &:[gestalt-typo~='left']   { text-align: left; }
+  &:[gestalt-typo~='right']  { text-align: right; }
+
+  /* font-family */
+  &:[gestalt-typo~='mono']  { font-family: ui-monospace, monospace; }
+  &:[gestalt-typo~='sans']  { font-family: system-ui, sans-serif; }
+  &:[gestalt-typo~='serif'] { font-family: Georgia, serif; }
+}
