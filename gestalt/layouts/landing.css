@@ -25,13 +25,10 @@ body  { z-index: 1; }
     justify-content : space-between;
     text-transform  : uppercase;
   }
+
+  nav { display: flex; flex-wrap: row wrap; gap: 1rem; }
 }
 
-nav {
-   display: flex;
-   gap: 1;
-   flex-wrap: row wrap;
-}
 #logo {
    display: flex;
    flex-flow: column nowrap;
