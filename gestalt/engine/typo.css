@@ -34,9 +34,19 @@ Element.gestalt.replace (key, value) -> replaces its value
   font-size   : var(--gestalt-font-size,   inherit);
   line-height : var(--gestalt-line-height, inherit);
 
+  /* direction */
+  &:[gestalt-typo~='ltr']  { direction: ltr; }
+  &:[gestalt-typo~='rtl']  { direction: rtl; }
+
+  /* font-stretch */
+  &:[gestalt-typo~='ultra-condensed']  { font-style: ultra-condensed; }
+
   /* font-style */
   &:[gestalt-typo~='italic']  { font-style: italic; }
   &:[gestalt-typo~='oblique'] { font-style: oblique; }
+
+  /* font-variant-caps */
+  &:[gestalt-typo~='small-caps']  { font-variant-caps: small-caps; }
 
   /* font-weight */
   &:[gestalt-typo~='100'] { font-weight: 100; }
@@ -48,12 +58,24 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='700'] { font-weight: 700; }
   &:[gestalt-typo~='800'] { font-weight: 800; }
   &:[gestalt-typo~='900'] { font-weight: 900; }
+  
+  &:[gestalt-typo~='bold']     { font-weight: bold; }
+  &:[gestalt-typo~='bolder']   { font-weight: bolder; }
+  &:[gestalt-typo~='lighter']  { font-weight: lighter; }
+  
   &:[gestalt-typo~='thin']     { font-weight: 100; }
   &:[gestalt-typo~='light']    { font-weight: 300; }
   &:[gestalt-typo~='normal']   { font-weight: 400; font-style: normal; }
   &:[gestalt-typo~='medium']   { font-weight: 500; }
   &:[gestalt-typo~='semibold'] { font-weight: 600; }
-  &:[gestalt-typo~='bold']     { font-weight: 700; }
+  
+  /* text-align */
+  &:[gestalt-typo~='center']  { text-align: center; }
+  &:[gestalt-typo~='justify'] { text-align: justify; }
+  &:[gestalt-typo~='left']    { text-align: left; }
+
+  /* text-decoration-line */
+  &:[gestalt-typo~='underline']    { text-decoration-line: underline; }
 
   /* text-transform */
   &:[gestalt-typo~='capitalize'] { text-transform: capitalize; }
@@ -70,3 +92,95 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='sans']  { font-family: system-ui, sans-serif; }
   &:[gestalt-typo~='serif'] { font-family: Georgia, serif; }
 }
+
+/*
+* `direction` – `ltr`, `rtl`
+* `font-stretch` – `normal`, `ultra-condensed`, `extra-condensed`, `condensed`, `semi-condensed`, `semi-expanded`, `expanded`, `extra-expanded`, `ultra-expanded`
+* `font-style` – `normal`, `italic`, `oblique`
+* `font-variant-caps` – `normal`, `small-caps`, `all-small-caps`, `petite-caps`, `all-petite-caps`, `unicase`, `titling-caps`
+* `font-weight` – `normal`, `bold`, `bolder`, `lighter`
+* `hyphens` – `none`, `manual`, `auto`
+* `overflow-wrap` – `normal`, `break-word`, `anywhere`
+* `text-align` – `left`, `right`, `center`, `justify`, `start`, `end`
+* `text-align-last` – `auto`, `left`, `right`, `center`, `justify`, `start`, `end`
+* `text-decoration-line` – `none`, `underline`, `overline`, `line-through`
+* `text-decoration-style` – `solid`, `double`, `dotted`, `dashed`, `wavy`
+* `text-orientation` – `mixed`, `upright`, `sideways`
+* `text-overflow` – `clip`, `ellipsis`
+* `text-rendering` – `auto`, `optimizeSpeed`, `optimizeLegibility`, `geometricPrecision`
+* `text-transform` – `none`, `capitalize`, `uppercase`, `lowercase`, `full-width`
+* `text-wrap` – `wrap`, `nowrap`, `balance`, `pretty`
+* `vertical-align` – `baseline`, `sub`, `super`, `top`, `text-top`, `middle`, `bottom`, `text-bottom`
+* `white-space` – `normal`, `nowrap`, `pre`, `pre-wrap`, `pre-line`, `break-spaces`
+* `word-break` – `normal`, `break-all`, `keep-all`, `break-word`
+* `writing-mode` – `horizontal-tb`, `vertical-rl`, `vertical-lr`
+*/
+
+/*
+* `color` – Textfarbe
+* `direction` – Textrichtung (`ltr` / `rtl`)
+* `font` – Shorthand-Eigenschaft für mehrere Schrift-Eigenschaften
+* `font-family` – Schriftart / Font-Familie
+* `font-feature-settings` – Steuerung fortgeschrittener OpenType-Features
+* `font-kerning` – Steuerung des Schriftausgleichs (Kerning)
+* `font-language-override` – Überschreibung von sprachspezifischen OpenType-Glyphen
+* `font-optical-sizing` – Optische Größenanpassung variabler Schriften
+* `font-palette` – Farbpaletten für Farb-Fonts (COLR/CPAL)
+* `font-size` – Schriftgröße
+* `font-size-adjust` – Verhältnismäßige Anpassung der x-Höhe alternativer Schriften
+* `font-stretch` – Schriftbreite (gedehnt / gestaucht)
+* `font-style` – Schriftstil (`normal`, `italic`, `oblique`)
+* `font-synthesis` – Erlaubt/verbietet synthetisches Fett-/Kursivmachen durch den Browser
+* `font-synthesis-small-caps` – Steuert synthetische Kapitälchen
+* `font-synthesis-style` – Steuert synthetischen Kursivstil
+* `font-synthesis-weight` – Steuert synthetische Fettschrift
+* `font-variant` – Shorthand für Schriftvarianten (Kapitälchen, Ligaturen, Ziffern)
+* `font-variant-alternates` – Alternative Glyphenformen
+* `font-variant-caps` – Kapitälchen und Versalien-Varianten
+* `font-variant-east-asian` – Ostasiatische Schriftzeichen-Varianten
+* `font-variant-emoji` – Steuerung von Emoji- vs. Text-Darstellung
+* `font-variant-ligatures` – Steuerung von Schriftligaturen
+* `font-variant-numeric` – Steuerung von Ziffernformen (z. B. Tabellenziffern)
+* `font-variant-position` – Hoch- und Tiefstellung (`sub`, `super`)
+* `font-variation-settings` – Feingranulare Steuerung von Achsen bei Variable Fonts
+* `font-weight` – Strichstärke / Schriftgewicht (`400`, `700`, `bold` etc.)
+* `hyphenate-character` – Zeichen für die Silbentrennung
+* `hyphenate-limit-chars` – Zeichenanzahl-Regeln für automatische Silbentrennung
+* `hyphens` – Steuerung der automatischen Silbentrennung (`none`, `manual`, `auto`)
+* `letter-spacing` – Zeichenabstand (Laufweite)
+* `line-break` – Strenge der Umbruchregeln (besonders für asiatische Sprachen)
+* `line-height` – Zeilenhöhe / Zeilenabstand
+* `overflow-wrap` – Verhalten bei überlangen Wörtern (früher `word-wrap`)
+* `quotes` – Definition von Anführungszeichen bei Zitaten
+* `tab-size` – Breite von Tabulatorzeichen
+* `text-align` – Horizontale Textausrichtung (`left`, `center`, `right`, `justify`)
+* `text-align-last` – Ausrichtung der letzten Zeile eines Textblocks
+* `text-combine-upright` – Kombiniert Zeichen vertikal in ostasiatischem Text
+* `text-decoration` – Shorthand für Textverzierungen
+* `text-decoration-color` – Farbe der Textverzierung
+* `text-decoration-line` – Art der Verzierung (`underline`, `line-through` etc.)
+* `text-decoration-skip-ink` – Unterbrechung der Unterstreichung bei Zeichen-Unterlängen
+* `text-decoration-style` – Stil der Verzierungslinie (`solid`, `wavy`, `dashed` etc.)
+* `text-decoration-thickness` – Dicke der Verzierungslinie
+* `text-emphasis` – Shorthand für Akzentzeichen über/unter Text
+* `text-emphasis-color` – Farbe der Akzentzeichen
+* `text-emphasis-position` – Position der Akzentzeichen
+* `text-emphasis-style` – Form der Akzentzeichen
+* `text-indent` – Einrückung der ersten Textzeile
+* `text-justify` – Ausrichtungsalgorithmus bei `text-align: justify`
+* `text-orientation` – Orientierung von Zeichen in vertikalen Textabläufen
+* `text-overflow` – Verhalten bei Textüberlauf im Container (z. B. `ellipsis`)
+* `text-rendering` – Optimierung für Lesbarkeit, Render-Geschwindigkeit oder Geometrie
+* `text-shadow` – Textschatten
+* `text-transform` – Groß-/Kleinschreibung (`uppercase`, `lowercase`, `capitalize`)
+* `text-underline-offset` – Abstand der Unterstreichung zum Text
+* `text-underline-position` – Positionierung der Unterstreichungslinie
+* `text-wrap` – Umbruchverhalten von Textblöcken (`wrap`, `nowrap`, `balance`, `pretty`)
+* `unicode-bidi` – Bidirektionale Textverarbeitung zusammen mit `direction`
+* `vertical-align` – Vertikale Ausrichtung auf Zeilenebene (`baseline`, `middle` etc.)
+* `white-space` – Handhabung von Leerzeichen und Umbrüchen
+* `white-space-collapse` – Steuerung des Kollabierens aufeinanderfolgender Leerzeichen
+* `word-break` – Umbruchregeln innerhalb von Wörtern
+* `word-spacing` – Wortabstand
+* `writing-mode` – Grundlegende Schreibrichtung (`horizontal-tb`, `vertical-rl` etc.)
+*/
