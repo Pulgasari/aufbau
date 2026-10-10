@@ -806,7 +806,8 @@ einem `catch`. `dismissible` (default bei `notify()`) erlaubt schliessen per but
 und wegwischen per touch. hover und fokus halten den countdown an.
 
 ```js
-import { notify } from '@aufbau/elements/webcomponents/pop-toast.js';
+import { notify }    from '@aufbau/elements/webcomponents/pop-toast.js';
+import { setConfig } from '@aufbau/element';
 
 notify('Gespeichert');
 notify({ success: 'Export fertig', heading: 'Dateien' });
@@ -815,8 +816,10 @@ notify({ error: 'Upload fehlgeschlagen' });
 try { await save(); }
 catch (error) { notify(error); }          // type error, message aus dem error
 
-PopToast.error('…');                   // + info, success, warning, warn
+notify.error('…');                     // + info, success, warning, warn, also as PopToast.error('…')
 notify('Bleibt stehen', { duration: 0 }); // 0 = kein auto-dismiss
+
+setConfig({ 'pop-toast': { duration: 3000 } }); // die dauer aller toasts, die keine eigene haben
 ```
 
 ```html
