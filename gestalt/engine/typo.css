@@ -30,6 +30,118 @@ Element.gestalt.replace (key, value) -> replaces its value
 }
 
 [gestalt-typo] {
+  /* direction */
+  &:[gestalt-typo~='ltr'] { direction: ltr; }
+  &:[gestalt-typo~='rtl'] { direction: rtl; }
+
+  /* font-family */
+  &:[gestalt-typo~='mono']  { font-family: ui-monospace, monospace; }
+  &:[gestalt-typo~='sans']  { font-family: system-ui, sans-serif; }
+  &:[gestalt-typo~='serif'] { font-family: Georgia, serif; }
+
+  /* font-stretch */
+  &:[gestalt-typo~='condensed']       { font-stretch: condensed; }
+  &:[gestalt-typo~='expanded']        { font-stretch: expanded; }
+  &:[gestalt-typo~='extra-condensed'] { font-stretch: extra-condensed; }
+  &:[gestalt-typo~='extra-expanded']  { font-stretch: extra-expanded; }
+  &:[gestalt-typo~='semi-condensed']  { font-stretch: semi-condensed; }
+  &:[gestalt-typo~='semi-expanded']   { font-stretch: semi-expanded; }
+  &:[gestalt-typo~='ultra-condensed'] { font-stretch: ultra-condensed; }
+  &:[gestalt-typo~='ultra-expanded']  { font-stretch: ultra-expanded; }
+
+  /* font-style */
+  &:[gestalt-typo~='italic']  { font-style: italic; }
+  &:[gestalt-typo~='oblique'] { font-style: oblique; }
+
+  /* font-variant-caps */
+  &:[gestalt-typo~='all-petite-caps'] { font-variant-caps: all-petite-caps; }
+  &:[gestalt-typo~='all-small-caps']  { font-variant-caps: all-small-caps; }
+  &:[gestalt-typo~='petite-caps']     { font-variant-caps: petite-caps; }
+  &:[gestalt-typo~='small-caps']      { font-variant-caps: small-caps; }
+  &:[gestalt-typo~='titling-caps']    { font-variant-caps: titling-caps; }
+  &:[gestalt-typo~='unicase']         { font-variant-caps: unicase; }
+
+  /* font-weight */
+  &:[gestalt-typo~='100']     { font-weight: 100; }
+  &:[gestalt-typo~='200']     { font-weight: 200; }
+  &:[gestalt-typo~='300']     { font-weight: 300; }
+  &:[gestalt-typo~='400']     { font-weight: 400; }
+  &:[gestalt-typo~='500']     { font-weight: 500; }
+  &:[gestalt-typo~='600']     { font-weight: 600; }
+  &:[gestalt-typo~='700']     { font-weight: 700; }
+  &:[gestalt-typo~='800']     { font-weight: 800; }
+  &:[gestalt-typo~='900']     { font-weight: 900; }
+  &:[gestalt-typo~='bold']    { font-weight: bold; }
+  &:[gestalt-typo~='bolder']  { font-weight: bolder; }
+  &:[gestalt-typo~='lighter'] { font-weight: lighter; }
+
+  /* overflow-wrap */
+  &:[gestalt-typo~='break-word'] { overflow-wrap: break-word; }
+
+  /* text-align */
+  &:[gestalt-typo~='center']  { text-align: center; }
+  &:[gestalt-typo~='justify'] { text-align: justify; }
+  &:[gestalt-typo~='left']    { text-align: left; }
+  &:[gestalt-typo~='right']   { text-align: right; }
+
+  /* text-decoration-line */
+  &:[gestalt-typo~='line-through'] { text-decoration-line: line-through; }
+  &:[gestalt-typo~='overline']     { text-decoration-line: overline; }
+  &:[gestalt-typo~='underline']    { text-decoration-line: underline; }
+
+  /* text-decoration-style */
+  &:[gestalt-typo~='dashed'] { text-decoration-style: dashed; }
+  &:[gestalt-typo~='dotted'] { text-decoration-style: dotted; }
+  &:[gestalt-typo~='double'] { text-decoration-style: double; }
+  &:[gestalt-typo~='wavy']   { text-decoration-style: wavy; }
+
+  /* text-orientation */
+  &:[gestalt-typo~='sideways'] { text-orientation: sideways; }
+  &:[gestalt-typo~='upright']  { text-orientation: upright; }
+
+  /* text-overflow */
+  &:[gestalt-typo~='clip']     { text-overflow: clip; }
+  &:[gestalt-typo~='ellipsis'] { text-overflow: ellipsis; }
+
+  /* text-rendering */
+  &:[gestalt-typo~='geometricPrecision'] { text-rendering: geometricPrecision; }
+  &:[gestalt-typo~='optimizeLegibility'] { text-rendering: optimizeLegibility; }
+  &:[gestalt-typo~='optimizeSpeed']      { text-rendering: optimizeSpeed; }
+
+  /* text-transform */
+  &:[gestalt-typo~='capitalize'] { text-transform: capitalize; }
+  &:[gestalt-typo~='lowercase']  { text-transform: lowercase; }
+  &:[gestalt-typo~='uppercase']  { text-transform: uppercase; }
+
+  /* text-wrap */
+  &:[gestalt-typo~='balance'] { text-wrap: balance; }
+  &:[gestalt-typo~='nowrap']  { text-wrap: nowrap; }
+  &:[gestalt-typo~='pretty']  { text-wrap: pretty; }
+
+  /* vertical-align */
+  &:[gestalt-typo~='sub']         { vertical-align: sub; }
+  &:[gestalt-typo~='super']       { vertical-align: super; }
+  &:[gestalt-typo~='text-bottom'] { vertical-align: text-bottom; }
+  &:[gestalt-typo~='text-top']    { vertical-align: text-top; }
+
+  /* white-space */
+  &:[gestalt-typo~='break-spaces'] { white-space: break-spaces; }
+  &:[gestalt-typo~='pre']          { white-space: pre; }
+  &:[gestalt-typo~='pre-line']     { white-space: pre-line; }
+  &:[gestalt-typo~='pre-wrap']     { white-space: pre-wrap; }
+
+  /* word-break */
+  &:[gestalt-typo~='break-all'] { word-break: break-all; }
+  &:[gestalt-typo~='keep-all']  { word-break: keep-all; }
+
+  /* writing-mode */
+  &:[gestalt-typo~='horizontal-tb'] { writing-mode: horizontal-tb; }
+  &:[gestalt-typo~='vertical-lr']   { writing-mode: vertical-lr; }
+  &:[gestalt-typo~='vertical-rl']   { writing-mode: vertical-rl; }
+}
+
+
+[gestalt-typo] {
 
   /* direction */
   &:[gestalt-typo~='ltr']  { direction: ltr; }
