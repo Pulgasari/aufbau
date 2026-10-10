@@ -29,7 +29,8 @@ body  { z-index: 1; }
 
 nav {
    display: flex;
-   gap: 1.25rem;
+   gap: 1;
+   flex-wrap: row wrap;
 }
 #logo {
    display: flex;
