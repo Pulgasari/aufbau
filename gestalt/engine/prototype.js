@@ -82,3 +82,17 @@ Object.defineProperty(Element.prototype, 'gestalt', {
   configurable: true,
   enumerable: true
 });
+
+
+// USAGE EXAMPLES
+
+const el = document.querySelector('div');
+
+// Sets font-size to 14px (via CSS var), line-height to 1.5, and adds italic + uppercase attributes
+el.gestalt.typo = '14px/1.5 uppercase italic bold mono';
+
+// Reads remaining attribute keywords: "uppercase italic bold mono"
+console.log(el.gestalt.get('typo'));
+
+// clears typography attributes and reset CSS variables
+el.gestalt.clear('typo');
