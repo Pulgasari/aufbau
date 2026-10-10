@@ -53,3 +53,18 @@ $div.gestalt.typo = 'uppercase';
 anmerkung: 
 - derart nötig ist das nur, weil css nicht auf substrings reagieren bzw . diese überhaupt ausleaen kann, ansonsten wäre das zeug schon css-only möglich.
 - bzgl. der festen werte wäre es theoretisch rein über ein class-system möglich
+
+---
+
+# the problem with css
+
+on the one hand css is extremly powerful and flexible and contains lots of great APIs. but on the other hand its also flawed.
+
+und auch die neueren css-features sind ebenso zweischneidig – einerseits toll, andererseits fehlt dann doch irgendwas.
+
+- container-queries: nice, aber beziehen sich nicht auf den host
+- custom functions: nice, aber ermöglichen keine substrings
+- attr(): nice, aber auch kein parsing von dynamischen teil-strings möglich
+- [attr-selector]: nice, aber bei komplexeren sachen extrem redundant
+- styles-queries: nice aber auch schnell sehr redundant
+- if/else: nice, aber redundant, nicht dynamisch genug
