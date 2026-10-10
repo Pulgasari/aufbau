@@ -157,13 +157,13 @@ already (`@aufbau/gui`).
 after staging, the step walks the module graph from every map key (the walk prune
 does, moved into a shared `graph.js` both use) and reports, per package:
 
-- **unresolved**: a bare specifier no map entry covers
-  (`@pulgasari/canonicalmap` in `@aufbau/element`)
-- **network**: a module url on a host (`https://code.pulgasari.dev/bunker/db/index.js`
-  in `@aufbau/import`), a static import of it fails offline
-- **escapes**: a relative import that leaves its package
-  (`./../core/index.js` in `@bunker/db`), it only works while the siblings
-  happen to sit next to it
+- **unresolved**: a bare specifier no map entry covers (an alias like
+  `@pulgasari/canonicalmap` the project's map forgot)
+- **network**: a module url on a host (`https://code.pulgasari.dev/bunker/db/index.js`,
+  as `@aufbau/import` had it), a static import of it fails offline
+- **escapes**: a relative import that leaves its package (`./../core/index.js`,
+  as the bunker packages had it), it only works while the siblings happen to sit
+  next to it
 - **missing**: a map target the sources do not provide
 - **unmapped**: a package the graph reaches that the map does not name
 
