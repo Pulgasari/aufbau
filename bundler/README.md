@@ -32,7 +32,7 @@ node aufbau/bundler/cli.js bundler.config.js slug=notes out=build/notes/www
 | `out`      |            | the output directory, emptied first, default `dist` |
 | `quiet`    |            | no log lines |
 | `copy`     | `copy`     | `[{ from, to }]`, relative to `root` and `out` |
-| `packages` | `packages` | `{ origin, path, source, clone }` |
+| `packages` | `packages` | `{ origin, path, source, clone }`, or by specifier: `{ importmap, sources, source, clone, pages, strict }` (concept.md) |
 | `start`    | `start`    | the path `/` moves to |
 | `vendor`   | `vendor`   | `{ exclude, hosts, importmap, inject, pages, path }` |
 | `icons`    | `icons`    | `{ element, include, pages, path }` |
