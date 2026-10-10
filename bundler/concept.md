@@ -139,9 +139,13 @@ packages: {
   (`./vendor/@aufbau/gui/index.js`, or the prefix `./vendor/@aufbau/gui/`) names
   a package and the directory it goes to. the map stays as the project wrote it,
   nothing is rewritten.
-- staged on demand: the walk starts at the module scripts of the pages and copies
-  a package once an import reaches it, so a shared map that names 40 packages
-  costs a project only the ones it uses.
+- staged on demand: the walk starts at the module scripts and stylesheets of the
+  pages and copies a package once an import reaches it, so a shared map that
+  names 40 packages costs a project only the ones it uses.
+- css too: a `<link>` to `vendor/@aufbau/css/aufbau.css` stages `@aufbau/css` by
+  its path, and its `@import url('../gestalt/…')` stages `@aufbau/gestalt` next to
+  it. css has no bare specifiers, so a relative path into a sibling package is how
+  a sheet does it and is not reported as escaping; in js it still is.
 - one package, not one repo: the package directory goes along, without tests and
   `SKIP`; prune then drops what nothing reaches.
 - the map is inlined into each page that has none, at the top of `<head>`, and
