@@ -1,14 +1,17 @@
-name: Publish Package to JSR
+name: Publish @aufbau-Package to JSR
 
 on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package to publish"
+        description: "package to publish"
         required: true
         type: choice
         options:
-          - ass
+          - api
+          - bundler
+          - css
+          - devtools
           - element
           - elements
           - filters
@@ -18,7 +21,6 @@ on:
           - patterns
           - signals
           - store
-          - stylescript
           - svg
           - webfonts
       dry_run:
