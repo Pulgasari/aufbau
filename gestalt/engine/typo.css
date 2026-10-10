@@ -117,6 +117,7 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='balance'] { text-wrap: balance; }
   &:[gestalt-typo~='nowrap']  { text-wrap: nowrap; }
   &:[gestalt-typo~='pretty']  { text-wrap: pretty; }
+  &:[gestalt-typo~='wrap']    { text-wrap: wrap; }
 
   /* vertical-align */
   &:[gestalt-typo~='sub']         { vertical-align: sub; }
