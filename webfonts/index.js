@@ -110,11 +110,10 @@ function remove (target, { role } = {}) {
   const only = role && propertyOf(role);
   for (const element of toElements(target)) {
     const props = applied.get(element);
-    const keys  = [...props?.keys() ?? []]
-    for (const property of keys) {
-      if (only && only !== prop) continue;
-      element.style.removeProperty(prop);
-      props.delete(prop);
+    for (const property of [...props?.keys() ?? []]) {
+      if (only && only !== property) continue;
+      element.style.removeProperty(property);
+      props.delete(property);
     }
   }
 }

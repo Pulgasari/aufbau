@@ -112,6 +112,7 @@
 <form id="form"><!-- the whole page is one form: every named control lands in getFormValues() at the end -->
 <!--|::: APP    :::|--><h1>app-</h1>    <htx-part src='./elements.app.htx.html'></htx-part>
 <!--|::: BTN    :::|--><h1>btn-</h1>    <htx-part src='./elements.btn.htx.html'></htx-part>
+<!--|::: DASH   :::|--><h1>dash-</h1>   <htx-part src='./elements.dash.htx.html'></htx-part>
 <!--|::: DATA   :::|--><h1>data-</h1>   <htx-part src='./elements.data.htx.html'></htx-part>
 <!--|::: DIV    :::|--><h1>div-</h1>    <htx-part src='./elements.div.htx.html'></htx-part>
 <!--|::: EMBED  :::|--><h1>embed-</h1>  <htx-part src='./elements.embed.htx.html'></htx-part>
@@ -247,6 +248,15 @@
     // :::::: CRUMBS, INDEX, KEYBOARD, MENU
 
     document.addEventListener('nav-crumbs', event => toast(`crumb: ${event.detail.path}`));
+
+    // chips: the filters are one choice, a removed tag says so
+    $('chip-filters').addEventListener('click', event => {
+      const chip = event.target.closest('btn-chip');
+      if (chip) for (const other of $('chip-filters').children) other.pressed = other === chip;
+    });
+    $('chip-tags').addEventListener('remove', event => toast(`removed: ${event.target.textContent.trim()}`));
+
+    $('dash-demo').addEventListener('sort', event => toast(`order: ${event.detail.order.join(', ')}`));
 
     onChange('menu-placement',  picker => $('menu-demo').setAttribute('placement', picker.value));
     onChange('index-viewmode',  picker => $('index-demo').setAttribute('viewmode',  picker.value));

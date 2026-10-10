@@ -56,6 +56,7 @@ function inputSession (element, event, input) {
     scale           : 1,
     start           : point,
     startTime       : event.timeStamp,
+    path            : event.composedPath(),
     target          : event.target,
     time            : event.timeStamp,
     travel          : 0,

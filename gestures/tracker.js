@@ -114,6 +114,7 @@ function createTracker (element, hooks) {
       maximumPointers : 1,
       modifiers       : { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey },
       movement        : { x: 0, y: 0 },
+      path            : event.composedPath(),
       phase           : 'start',
       pointers        : 1,
       rotation        : 0,

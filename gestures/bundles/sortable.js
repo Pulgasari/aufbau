@@ -20,7 +20,7 @@ const FLIP = { duration: 150, easing: 'ease-out' };
 function sortable (list, options = {}) {
   const {
     axis     = 'y',              // 'y', 'x' or null for a grid, only for touch-action
-    handle   = null,             // a selector inside the item that starts the drag
+    handle   = null,             // a selector inside the item that starts the drag, shadow roots too
     hold     = 350,              // ms of the long press on touch and pen
     items    = null,             // a selector for the items, the children by default
     keyboard = true,
@@ -42,6 +42,12 @@ function sortable (list, options = {}) {
   const itemOf = node => {
     while (node && node.parentElement !== list) node = node.parentElement;
     return node && (!items || node.matches(items)) ? node : null;
+  };
+
+  // the pointer went down on the handle: along the path from where it went down up to the item
+  const onHandle = (gesture, candidate) => {
+    const path = gesture.path ?? [gesture.target];
+    return path.slice(0, path.indexOf(candidate) + 1).some(node => node.matches?.(handle));
   };
 
   // :::::: POSITION
@@ -82,7 +88,7 @@ function sortable (list, options = {}) {
 
   function start (gesture) {
     const candidate = itemOf(gesture.target);
-    if (!candidate || (handle && !gesture.target.closest(handle))) return;
+    if (!candidate || (handle && !onHandle(gesture, candidate))) return;
 
     motion?.stop();
     item  = candidate;
