@@ -27,14 +27,17 @@ SKINS        = ['andromeda', 'monochrome'];
 
 // TOKENS :: the properties gestalt.css and palettes.css read, mirrored as data-* for selectors
 // SHEETS :: the folder of each stylesheet kind
+// ATTRS  :: ergänzt
+const ATTRS   = { layout: 'layouts' };
 const TOKENS  = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin' };      
-const SHEETS  = { layout: 'layouts', look: 'looks' };
+const SHEETS  = { look: 'looks' };
 const current = {};
 
-// the skin sheet belongs to the elements, one adoption in their layer. false or null removes it
-const setSkin = async name => (await import('@aufbau/element')).setSkin(name || null);
-
-const domina = name => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default);
+//
+const setSkin       = async name => (await import('@aufbau/element')).setSkin(name || null);
+const domina        =       name => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default);
+const readToken     =       name => getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim() || null;
+const presetPattern =       prop => new RegExp(`style\\(\\s*--${prop}\\s*:\\s*([\\w-]+)\\s*\\)`);
 
 // :::::: TOKENS
 
@@ -52,22 +55,18 @@ function setToken (name, value) {
   root.dataset[data] = value;
 }
 
-const readToken = name => getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim() || null;
-
 // :::::: SHEETS
 
 async function setSheet (kind, name) {
   const key = `gestalt:${kind}`;
   if (!name) return (await domina('releaseStyleSheet'))(key);
-  return (await domina('adoptStyleSheet'))(`${GESTALT_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
+             return (await domina('adoptStyleSheet'))(`${GESTALT_PATH}/${SHEETS[kind]}/${name}.css`, { key, replace: true });
 }
 
 // :::::: PRESETS
 // the presets are read off the container queries of gestalt/palettes.css,
 // so the stylesheet stays the only place that lists them.
 // loaded once, on first ask
-
-const presetPattern = property => new RegExp(`style\\(\\s*--${property}\\s*:\\s*([\\w-]+)\\s*\\)`);
 
 // @layer and @media nest rules, an @import carries its own sheet
 function presetsOf (rules, pattern, names = []) {
@@ -106,7 +105,13 @@ const palettes = () => presetNames('palettes.css', 'palette');
 
 /** sets any of palette, mode, theme, density, geometry, layout, look and skin. resolves once the stylesheets are in */
 async function set (values = {}) {
+  for (const [key, name] of Object.entries(ATTRS)) {
+    const $app = document.querySelector('app-root') || document.querySelector('#app');
+    $app.dataset[key] = name;
+  }
+    
   for (const [key, name] of Object.entries(TOKENS)) if (key in values) setToken(name, values[key]);
+  
   await Promise.all([
     ...Object.keys(SHEETS).filter(key => key in values).map(key => setSheet(key, values[key])),
     'skin' in values && setSkin(values.skin),
