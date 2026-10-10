@@ -14,12 +14,24 @@ export function fieldHTML (key, spec, value) {
   const inner = options
     ? options.map(option => { const [val, label] = normalizeOption(option); return `<input-option value="${escAttr(val)}">${escText(label)}</input-option>`; }).join('')
     : '';
-  return `<label class="aufbau-field"><span class="aufbau-field-label">${escText(spec.label ?? key)}</span><${tag}${attrStr(attrs)}>${inner}</${tag}></label>`;
+  return `
+    <label class="aufbau-field">
+      <span class="aufbau-field-label">
+        ${escText(spec.label ?? key)}
+      </span>
+      <${tag}${attrStr(attrs)}>${inner}</${tag}>
+    </label>
+  `;
 }
 
 // a section as an html string: a fieldset named by its key
 export function sectionHTML (key, section, values = {}) {
-  return `<fieldset class="aufbau-section" name="${escAttr(key)}"><legend>${escText(key)}</legend>${entriesHTML(sectionFields(section), sectionValues(values, key))}</fieldset>`;
+  return `
+  <fieldset class="aufbau-section" name="${escAttr(key)}">
+    <legend>${escText(key)}</legend>
+    ${entriesHTML(sectionFields(section), sectionValues(values, key))}
+  </fieldset>
+  `;
 }
 
 const entriesHTML = (spec, values) => Object.entries(spec)
