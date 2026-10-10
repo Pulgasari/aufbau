@@ -38,7 +38,7 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | step       | state | does |
 |------------|-------|------|
 | `copy`     | built | the project's own files, everything under a source for now |
-| `packages` | built | repos from a package origin become local copies, the origin is rewritten to them. **draft**: packages by specifier through the project's importmap, see below |
+| `packages` | built | repos from a package origin become local copies, the origin is rewritten to them; or packages by specifier through the project's importmap, see below |
 | `start`    | built | index.html moves / to the start path before the shell reads its route |
 | `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
 | `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `SvgIcon.provide()` |
@@ -110,12 +110,12 @@ directory.
 
 ## packages by specifier
 
-**draft.** the packages step knows one way a project names its packages: an
-origin url with one repo per path segment (`code.pulgasari.dev/aufbau/…`), and it
-copies whole repos. a project that names its packages by bare specifier through
-its own importmap (the capacitor apps in wallpaperfx: `shared/importmap.json`,
-targets like `./vendor/@aufbau/elements/`) has nothing for it to find. this is
-the second way, in the same step.
+**built** (the core; the open points below are not). besides an origin url with
+one repo per path segment (`code.pulgasari.dev/aufbau/…`), whose repos it copies
+whole, the packages step takes a project that names its packages by bare
+specifier through its own importmap (the capacitor apps in wallpaperfx:
+`shared/importmap.json`, targets like `./vendor/@aufbau/elements/`). a config
+with `importmap` switches to this way. first user: `wallpaperfx/apps/cosmonaut`.
 
 ### config
 
@@ -130,22 +130,32 @@ packages: {
   },
   source    : '..',                                     // local checkouts, one directory per repo
   clone     : 'https://github.com/Pulgasari/{repo}.git', // for a repo missing in source
+  pages     : ['index.html'],                           // where the walk starts, where the map goes
+  strict    : true,                                     // a graph problem fails the bundle
 }
 ```
 
-- a map entry whose target is a local path (`./vendor/@aufbau/gui/index.js`, or
-  the prefix `./vendor/@aufbau/gui/`) names a package. the package is copied from
-  its source directory to the directory the target names, so the map stays as
-  the project wrote it, nothing is rewritten.
-- one package, not one repo: only the package directory goes along, and of it
-  only what the package publishes (`files` in package.json, `publish.include` /
-  `exclude` in deno.json, the same set jsr or npm would ship). no tests, no
-  fonts nobody named, no siblings.
-- the map is inlined into the pages that load modules (`inject`, as in vendor),
-  ahead of the first module script.
-- an `origin` next to it keeps working as before: mentions of
-  `${origin}/<repo>/<path>/` in staged files move to the staged directory of the
-  package `sources` puts there (`@aufbau/webfonts`' default `baseUrl`).
+- a map target that is a local path with an `@scope/name/` segment
+  (`./vendor/@aufbau/gui/index.js`, or the prefix `./vendor/@aufbau/gui/`) names
+  a package and the directory it goes to. the map stays as the project wrote it,
+  nothing is rewritten.
+- staged on demand: the walk starts at the module scripts of the pages and copies
+  a package once an import reaches it, so a shared map that names 40 packages
+  costs a project only the ones it uses.
+- one package, not one repo: the package directory goes along, without tests and
+  `SKIP`; prune then drops what nothing reaches.
+- the map is inlined into each page that has none, at the top of `<head>`, and
+  handed to prune (`context.importmap`), which resolves its addresses against
+  the page, as a browser does.
+
+**open**: copy only what a package publishes (`files` in package.json,
+`publish.include` / `exclude` in deno.json, the set jsr or npm would ship);
+prune covers it for now.
+
+**open**: an `origin` next to it, so mentions of `${origin}/<repo>/<path>/` in
+staged files move to the staged directory of the package `sources` puts there
+(`@aufbau/webfonts`' default `baseUrl`). until then an app sets it itself
+(`configure({ baseUrl })`).
 
 **open**: `sources` is knowledge about the ecosystem, not about one project. a
 preset shipped with the bundler (`@aufbau/bundler/sources/pulgasari.js`), or
@@ -154,8 +164,8 @@ already (`@aufbau/gui`).
 
 ### resolve: the graph is checked, not assumed
 
-after staging, the step walks the module graph from every map key (the walk prune
-does, moved into a shared `graph.js` both use) and reports, per package:
+the walk that stages the packages reports (built, its own walker over
+es-module-lexer: static and literal dynamic imports):
 
 - **unresolved**: a bare specifier no map entry covers (an alias like
   `@pulgasari/canonicalmap` the project's map forgot)
@@ -164,12 +174,15 @@ does, moved into a shared `graph.js` both use) and reports, per package:
 - **escapes**: a relative import that leaves its package (`./../core/index.js`,
   as the bunker packages had it), it only works while the siblings happen to sit
   next to it
-- **missing**: a map target the sources do not provide
-- **unmapped**: a package the graph reaches that the map does not name
+- **missing**: a package `sources` does not provide, or a module file that is not
+  there
 
 `strict: true` makes any of them fail the bundle, for ci. without it they are
 listed in the report like `network` is now. the map itself stays hand-written:
 the report says what to add, the bundler does not edit the project.
+
+**open**: one walker for this and prune (prune also follows css, quoted strings
+and loaders), in a shared `graph.js`.
 
 **open**: generate the map's entries from the graph instead (`write: true`), the
 hand-written map then only lists what the app imports itself.
@@ -189,9 +202,9 @@ hand-written map then only lists what the app imports itself.
 ### a capacitor app
 
 ```
-apps/<app>/www/          the source, as written, with the inlined map
-apps/<app>/build/www/    the bundle: copy www/, packages by specifier, icons,
-                         webfonts, prune with entries [app.js]
+apps/<app>/www/          the source, as written, no map
+apps/<app>/build/www/    the bundle: copy www/, packages by specifier (map
+                         inlined), prune
 capacitor.config.json    webDir: build/www
 ```
 

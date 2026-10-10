@@ -107,7 +107,8 @@ async function prune (context) {
     if (excluded(specifier)) return;
     const target = mapped(specifier);
     if (target) {
-      const path = local(target.url, from);
+      // a map's addresses resolve against the page that carries it, not the importer
+      const path = local(target.url, joinPath(out, pages[0]));
       if (target.directory) await reachDirectory(path); else reach(path);
       return;
     }
