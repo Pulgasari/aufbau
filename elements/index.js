@@ -25,9 +25,13 @@ const TAGS = [
   'app-root',
   'app-view',
 
+  'btn-chip',
   'btn-icon',
   'btn-push',
   'btn-tap',
+
+  'dash-board',
+  'dash-panel',
 
   'data-filter',
   'data-index',

@@ -101,6 +101,7 @@ carries a snapshot of it as `detail`. the names are spelled out.
 | `input`       | `mouse`, `pen`, `touch`, and `trackpad` or `wheel` for the sources without pointers |
 | `maximumPointers` | the most pointers that were down at once                      |
 | `modifiers`   | `{ alt, control, meta, shift }`                                  |
+| `path`        | `composedPath()` of the first event, into shadow roots as well   |
 | `phase`       | `start`, `move`, `end` or `cancel`                               |
 | `pointers`    | the pointers down right now                                      |
 | `sourceEvent` | the native event that produced this state                        |

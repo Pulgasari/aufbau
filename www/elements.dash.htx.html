@@ -1,0 +1,25 @@
+<!-- elements.dash.htx.html: the dash- elements of elements.html -->
+
+<section id="dash">
+  <h2>dash-board · dash-panel</h2>
+  <p class="hint">sortable by the header: drag with the mouse, long press on touch, alt + arrow on a focused panel. the order is kept in localStorage.</p>
+  <dash-board id="dash-demo" sortable persist="aufbau:elements:dash" min="14rem">
+    <dash-panel name="cpu" heading="cpu" collapsible>
+      <aufbau-progress value="42" max="100" show-text unit="%"></aufbau-progress>
+    </dash-panel>
+    <dash-panel name="storage" heading="storage" span="2" collapsible>
+      <p>412 gb of 1 tb used</p>
+      <aufbau-progress value="41" max="100"></aufbau-progress>
+    </dash-panel>
+    <dash-panel name="network" heading="network">
+      <btn-icon slot="actions" command="more"></btn-icon>
+      <p>↓ 12 mb/s · ↑ 1.4 mb/s</p>
+    </dash-panel>
+    <dash-panel name="notes" heading="notes" rows="2">
+      <mock-p lines="6"></mock-p>
+    </dash-panel>
+    <dash-panel name="tasks" heading="tasks" collapsed collapsible>
+      <p>3 open</p>
+    </dash-panel>
+  </dash-board>
+</section>

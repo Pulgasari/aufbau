@@ -61,8 +61,8 @@ html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 
 # elements
 
-the building blocks, in families by what they are for: `btn-` buttons, `data-`
-collections, `embed-` content of other sites, `media-` files and players, `nav-`
+the building blocks, in families by what they are for: `btn-` buttons, `dash-`
+dashboards, `data-` collections, `embed-` content of other sites, `media-` files and players, `nav-`
 navigation, `output-` values shown, `pop-` everything that opens over the page,
 `svg-` icons, `widget-` small tools of their own (keyboard, calculator),
 `write-` editors. `mock-` fills a page with placeholders. the controls that hold a value are the input-*
@@ -74,9 +74,12 @@ for now: no better name found yet, and not happy with these.
 [`<aufbau-loop>`](#aufbau-loop) ·
 [`<aufbau-progress>`](#aufbau-progress) ·
 [`<aufbau-skeleton>`](#aufbau-skeleton) ·
+[`<btn-chip>`](#btn-chip) ·
 [`<btn-icon>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-push>`](#btn-push-btn-tap-btn-icon) ·
 [`<btn-tap>`](#btn-push-btn-tap-btn-icon) ·
+[`<dash-board>`](#dash-board-dash-panel) ·
+[`<dash-panel>`](#dash-board-dash-panel) ·
 [`<data-index>`](#data-index) ·
 [`<data-list>`](#data-list) ·
 [`<data-table>`](#data-table) ·
@@ -195,6 +198,25 @@ the command becomes a method (`show-modal` -> `showModal()`, `--my-thing` ->
 `expand` `export` `heart` `import` `menu` `more` `reset` `save` `search` `share`,
 more through `Btn.commands`.
 
+## btn-chip
+
+a compact pill for filters, tags and choices, a button like the others
+(`icon`, `label`, `command`, `disabled`). `pressed` marks it as on.
+`removable` adds an x at the end; it and delete or backspace on the focused
+chip fire a cancelable `remove` event, then the chip leaves the dom and the
+focus goes to a neighbour. a chip a framework renders cancels the event and
+drops the chip from its state.
+
+```html
+<btn-chip pressed>all</btn-chip>
+<btn-chip icon="lucide:video">videos</btn-chip>
+<btn-chip removable>draft</btn-chip>
+```
+
+```js
+tags.addEventListener('remove', event => { event.preventDefault(); drop(event.target.dataset.id); });
+```
+
 ## config
 
 defaults for every element of a kind, set from script. every attribute falls
@@ -208,6 +230,36 @@ setConfig('svg-flag-variant', 'square');
 setConfig({ 'write-code': { theme: 'nord' }, 'pop-toast': { duration: 5000 } });
 setConfig('output-value-date-format', 'medium');   // the format of one type of <output-value>
 ```
+
+## dash-board, dash-panel
+
+a grid of panels. the board fits as many columns of at least `min` (default
+`18rem`) as there is room for, or `columns` fixed ones. a panel takes more cells
+with `span` and `rows`, never more columns than the board has right now.
+
+```html
+<dash-board sortable persist="home:board" min="16rem">
+  <dash-panel name="cpu" heading="cpu" collapsible>…</dash-panel>
+  <dash-panel name="storage" heading="storage" span="2">
+    <btn-icon slot="actions" command="more"></btn-icon>
+    …
+  </dash-panel>
+  <dash-panel name="notes" heading="notes" rows="2">…</dash-panel>
+</dash-board>
+```
+
+`sortable` reorders the panels by their header through `@aufbau/gestures`: the
+mouse drags at once, touch and pen lift a panel by a long press first, alt +
+arrow moves a focused one. every move fires `sort` with `{ from, to, order }`,
+`order` being the panels' names (`name`, else `id`). `persist` keeps the order in
+localStorage under that key and restores it on load. a board a framework renders
+listens to `sort` and renders the panels in that order instead.
+
+a panel: `heading`, slots `start` and `actions` in the header, its content below.
+`collapsible` adds a button that folds the content away, `collapsed` is the
+state, `collapse(force)` turns it and fires `toggle`. looks through
+`--dash-gap`, `--dash-panel-background`, `--dash-panel-radius`,
+`--dash-panel-padding`, `--dash-panel-header-padding`.
 
 ## data-index
 
