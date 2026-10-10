@@ -28,7 +28,7 @@ SKINS        = ['andromeda', 'monochrome'];
 // TOKENS :: the properties gestalt.css and palettes.css read, mirrored as data-* for selectors
 // SHEETS :: the folder of each stylesheet kind
 // ATTRS  :: ergänzt
-const ATTRS   = { layout: 'layouts' };
+const ATTRS   = [ 'layout' ];
 const TOKENS  = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin' };      
 const SHEETS  = { look: 'looks' };
 const current = {};
@@ -105,9 +105,9 @@ const palettes = () => presetNames('palettes.css', 'palette');
 
 /** sets any of palette, mode, theme, density, geometry, layout, look and skin. resolves once the stylesheets are in */
 async function set (values = {}) {
-  for (const [key, name] of Object.entries(ATTRS)) {
+  for (const key of ATTRS) {
     const $app = document.querySelector('app-root') || document.querySelector('#app');
-    $app.dataset[key] = name;
+    if (key in values) $app.dataset[key] = values[key];
   }
     
   for (const [key, name] of Object.entries(TOKENS)) if (key in values) setToken(name, values[key]);
