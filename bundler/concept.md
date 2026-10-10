@@ -38,7 +38,7 @@ a step is `async function (context)` with `{ config, log, out, report, root }`.
 | step       | state | does |
 |------------|-------|------|
 | `copy`     | built | the project's own files, everything under a source for now |
-| `packages` | built | repos from a package origin become local copies, the origin is rewritten to them |
+| `packages` | built | repos from a package origin become local copies, the origin is rewritten to them. **draft**: packages by specifier through the project's importmap, see below |
 | `start`    | built | index.html moves / to the start path before the shell reads its route |
 | `vendor`   | built | third-party modules (esm.sh, jsdelivr, unpkg) become local files, the importmap points at them |
 | `icons`    | built | the icon ids a project uses, their svgs in one module that hands them to `SvgIcon.provide()` |
@@ -107,3 +107,96 @@ app gets ffmpeg's wasm (32 mb) because .shared names it. `webfonts` took 22 mb
 off, `prune` the rest (zugriff podcasts: 63.6 -> 41.6 -> 2.9 mb without
 devtools, 7.6 mb with), once the loaders replaced keeping the whole components
 directory.
+
+## packages by specifier
+
+**draft.** the packages step knows one way a project names its packages: an
+origin url with one repo per path segment (`code.pulgasari.dev/aufbau/…`), and it
+copies whole repos. a project that names its packages by bare specifier through
+its own importmap (the capacitor apps in wallpaperfx: `shared/importmap.json`,
+targets like `./vendor/@aufbau/elements/`) has nothing for it to find. this is
+the second way, in the same step.
+
+### config
+
+```js
+packages: {
+  importmap : 'shared/importmap.json',   // the project's map, its local targets are what gets staged
+  sources   : {                          // a package name -> its directory in a repo
+    '@aufbau/*'    : { repo: 'aufbau',      path: '*' },
+    '@bunker/*'    : { repo: 'bunker',      path: '*' },
+    '@domina/*'    : { repo: 'domina',      path: 'packages/*' },
+    '@pulgasari/*' : { repo: 'js-packages', path: '*' },
+  },
+  source    : '..',                                     // local checkouts, one directory per repo
+  clone     : 'https://github.com/Pulgasari/{repo}.git', // for a repo missing in source
+}
+```
+
+- a map entry whose target is a local path (`./vendor/@aufbau/gui/index.js`, or
+  the prefix `./vendor/@aufbau/gui/`) names a package. the package is copied from
+  its source directory to the directory the target names, so the map stays as
+  the project wrote it, nothing is rewritten.
+- one package, not one repo: only the package directory goes along, and of it
+  only what the package publishes (`files` in package.json, `publish.include` /
+  `exclude` in deno.json, the same set jsr or npm would ship). no tests, no
+  fonts nobody named, no siblings.
+- the map is inlined into the pages that load modules (`inject`, as in vendor),
+  ahead of the first module script.
+- an `origin` next to it keeps working as before: mentions of
+  `${origin}/<repo>/<path>/` in staged files move to the staged directory of the
+  package `sources` puts there (`@aufbau/webfonts`' default `baseUrl`).
+
+**open**: `sources` is knowledge about the ecosystem, not about one project. a
+preset shipped with the bundler (`@aufbau/bundler/sources/pulgasari.js`), or
+read from each package's `repository.directory`, which some packages have
+already (`@aufbau/gui`).
+
+### resolve: the graph is checked, not assumed
+
+after staging, the step walks the module graph from every map key (the walk prune
+does, moved into a shared `graph.js` both use) and reports, per package:
+
+- **unresolved**: a bare specifier no map entry covers
+  (`@pulgasari/canonicalmap` in `@aufbau/element`)
+- **network**: a module url on a host (`https://code.pulgasari.dev/bunker/db/index.js`
+  in `@aufbau/import`), a static import of it fails offline
+- **escapes**: a relative import that leaves its package
+  (`./../core/index.js` in `@bunker/db`), it only works while the siblings
+  happen to sit next to it
+- **missing**: a map target the sources do not provide
+- **unmapped**: a package the graph reaches that the map does not name
+
+`strict: true` makes any of them fail the bundle, for ci. without it they are
+listed in the report like `network` is now. the map itself stays hand-written:
+the report says what to add, the bundler does not edit the project.
+
+**open**: generate the map's entries from the graph instead (`write: true`), the
+hand-written map then only lists what the app imports itself.
+
+### pinning
+
+**open**, two ways:
+
+- checkouts at a commit: a `bundler.lock.json` with `{ repo: sha }`, written
+  on the first run and used by `clone` after that.
+- jsr versions: jsr serves a published package's files as they are
+  (`jsr.io/@scope/name/<version>/<path>`), so `source: 'jsr'` could stage the
+  exact files of a version, unbundled, the version from the map
+  (`"@aufbau/gui": "./vendor/@aufbau/gui@0.1.0/index.js"`) or a lockfile. that
+  needs the packages published, and their `exports` used for subpaths.
+
+### a capacitor app
+
+```
+apps/<app>/www/          the source, as written, with the inlined map
+apps/<app>/build/www/    the bundle: copy www/, packages by specifier, icons,
+                         webfonts, prune with entries [app.js]
+capacitor.config.json    webDir: build/www
+```
+
+ci runs the bundle before `cap sync`. `www/` never holds vendored files.
+
+**open**: running `www/` straight in a browser during development needs the
+targets served, e.g. a dev server that maps `./vendor/<pkg>/` to the
+checkouts.
