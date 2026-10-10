@@ -15,12 +15,6 @@ Element.gestalt.set     (key, value) -> updates/assigns its value
 Element.gestalt.replace (key, value) -> replaces its value
 */
 
-[gestalt-typo] {
-  /* text-transform */
-  &:[gestalt-typo*='lowercase'] { text-transform: lowercase; }
-  &:[gestalt-typo*='uppercase'] { text-transform: uppercase; }
-}
-
 :root {
   --gestalt-engine-typo                : none;
   --gestalt-engine-typo-font-size      : none;
@@ -80,9 +74,19 @@ Element.gestalt.replace (key, value) -> replaces its value
 
   /* text-align */
   &:[gestalt-typo~='center']  { text-align: center; }
+  &:[gestalt-typo~='end']     { text-align: end; }
   &:[gestalt-typo~='justify'] { text-align: justify; }
   &:[gestalt-typo~='left']    { text-align: left; }
   &:[gestalt-typo~='right']   { text-align: right; }
+  &:[gestalt-typo~='start']   { text-align: start; }
+
+  /* text-align-last */
+  &:[gestalt-typo~='/center']  { text-align-last: center; }
+  &:[gestalt-typo~='/end']     { text-align-last: end; }
+  &:[gestalt-typo~='/justify'] { text-align-last: justify; }
+  &:[gestalt-typo~='/left']    { text-align-last: left; }
+  &:[gestalt-typo~='/right']   { text-align-last: right; }
+  &:[gestalt-typo~='/start']   { text-align-last: start; }
 
   /* text-decoration-line */
   &:[gestalt-typo~='line-through'] { text-decoration-line: line-through; }
@@ -110,6 +114,7 @@ Element.gestalt.replace (key, value) -> replaces its value
 
   /* text-transform */
   &:[gestalt-typo~='capitalize'] { text-transform: capitalize; }
+  &:[gestalt-typo~='full-width'] { text-transform: full-width; }
   &:[gestalt-typo~='lowercase']  { text-transform: lowercase; }
   &:[gestalt-typo~='uppercase']  { text-transform: uppercase; }
 
@@ -120,6 +125,8 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='wrap']    { text-wrap: wrap; }
 
   /* vertical-align */
+  &:[gestalt-typo~='baseline']    { vertical-align: baseline; }
+  &:[gestalt-typo~='middle']      { vertical-align: middle; }
   &:[gestalt-typo~='sub']         { vertical-align: sub; }
   &:[gestalt-typo~='super']       { vertical-align: super; }
   &:[gestalt-typo~='text-bottom'] { vertical-align: text-bottom; }
@@ -141,61 +148,6 @@ Element.gestalt.replace (key, value) -> replaces its value
   &:[gestalt-typo~='vertical-rl']   { writing-mode: vertical-rl; }
 }
 
-
-[gestalt-typo] {
-
-  /* direction */
-  &:[gestalt-typo~='ltr']  { direction: ltr; }
-  &:[gestalt-typo~='rtl']  { direction: rtl; }
-
-  /* font-stretch */
-  &:[gestalt-typo~='ultra-condensed']  { font-style: ultra-condensed; }
-
-  /* font-style */
-  &:[gestalt-typo~='italic']  { font-style: italic; }
-  &:[gestalt-typo~='oblique'] { font-style: oblique; }
-
-  /* font-variant-caps */
-  &:[gestalt-typo~='small-caps']  { font-variant-caps: small-caps; }
-
-  /* font-weight */
-  &:[gestalt-typo~='100'] { font-weight: 100; }
-  &:[gestalt-typo~='200'] { font-weight: 200; }
-  &:[gestalt-typo~='300'] { font-weight: 300; }
-  &:[gestalt-typo~='400'] { font-weight: 400; }
-  &:[gestalt-typo~='500'] { font-weight: 500; }
-  &:[gestalt-typo~='600'] { font-weight: 600; }
-  &:[gestalt-typo~='700'] { font-weight: 700; }
-  &:[gestalt-typo~='800'] { font-weight: 800; }
-  &:[gestalt-typo~='900'] { font-weight: 900; }
-  &:[gestalt-typo~='bold']     { font-weight: bold; }
-  &:[gestalt-typo~='bolder']   { font-weight: bolder; }
-  &:[gestalt-typo~='lighter']  { font-weight: lighter; }
-  
-  /* text-align */
-  &:[gestalt-typo~='center']  { text-align: center; }
-  &:[gestalt-typo~='justify'] { text-align: justify; }
-  &:[gestalt-typo~='left']    { text-align: left; }
-
-  /* text-decoration-line */
-  &:[gestalt-typo~='underline']    { text-decoration-line: underline; }
-
-  /* text-transform */
-  &:[gestalt-typo~='capitalize'] { text-transform: capitalize; }
-  &:[gestalt-typo~='lowercase']  { text-transform: lowercase; }
-  &:[gestalt-typo~='uppercase']  { text-transform: uppercase; }
-  
-  /* text-alignment */
-  &:[gestalt-typo~='center'] { text-align: center; }
-  &:[gestalt-typo~='left']   { text-align: left; }
-  &:[gestalt-typo~='right']  { text-align: right; }
-
-  /* font-family */
-  &:[gestalt-typo~='mono']  { font-family: ui-monospace, monospace; }
-  &:[gestalt-typo~='sans']  { font-family: system-ui, sans-serif; }
-  &:[gestalt-typo~='serif'] { font-family: Georgia, serif; }
-}
-
 /*
 font-color  : var(--gestalt-font-color,  inherit);
   font-size   : var(--gestalt-font-size,   inherit);
@@ -209,26 +161,16 @@ font-color  : var(--gestalt-font-color,  inherit);
 */
 
 /*
-* `direction` – `ltr`, `rtl`
-* `font-stretch` – `normal`, `ultra-condensed`, `extra-condensed`, `condensed`, `semi-condensed`, `semi-expanded`, `expanded`, `extra-expanded`, `ultra-expanded`
-* `font-style` – `normal`, `italic`, `oblique`
-* `font-variant-caps` – `normal`, `small-caps`, `all-small-caps`, `petite-caps`, `all-petite-caps`, `unicase`, `titling-caps`
-* `font-weight` – `normal`, `bold`, `bolder`, `lighter`
-* `hyphens` – `none`, `manual`, `auto`
-* `overflow-wrap` – `normal`, `break-word`, `anywhere`
-* `text-align` – `left`, `right`, `center`, `justify`, `start`, `end`
-* `text-align-last` – `auto`, `left`, `right`, `center`, `justify`, `start`, `end`
-* `text-decoration-line` – `none`, `underline`, `overline`, `line-through`
-* `text-decoration-style` – `solid`, `double`, `dotted`, `dashed`, `wavy`
-* `text-orientation` – `mixed`, `upright`, `sideways`
-* `text-overflow` – `clip`, `ellipsis`
-* `text-rendering` – `auto`, `optimizeSpeed`, `optimizeLegibility`, `geometricPrecision`
-* `text-transform` – `none`, `capitalize`, `uppercase`, `lowercase`, `full-width`
-* `text-wrap` – `wrap`, `nowrap`, `balance`, `pretty`
-* `vertical-align` – `baseline`, `sub`, `super`, `top`, `text-top`, `middle`, `bottom`, `text-bottom`
-* `white-space` – `normal`, `nowrap`, `pre`, `pre-wrap`, `pre-line`, `break-spaces`
-* `word-break` – `normal`, `break-all`, `keep-all`, `break-word`
-* `writing-mode` – `horizontal-tb`, `vertical-rl`, `vertical-lr`
+* `hyphens`               – `none`, `manual`, `auto`
+* `overflow-wrap`         – `normal`, `break-word`, `anywhere`
+* `text-align-last`       – `auto`, 
+* `text-decoration-style` – `solid`, `wavy`
+* `text-orientation`      – `mixed`
+* `text-rendering`        – `auto`, `optimizeSpeed`, `optimizeLegibility`, `geometricPrecision`
+* `text-transform`        – `none`, 
+* `vertical-align`        – `top`,  `bottom`, 
+* `white-space`           – `normal`, `nowrap`,
+* `word-break`            – `normal`, `break-all`, `keep-all`, `break-word`
 */
 
 /*
