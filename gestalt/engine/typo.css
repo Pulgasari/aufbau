@@ -1,0 +1,31 @@
+/* typo.css */
+
+/*
+import '@aufbau/gestalt/prototype.js';
+const el = document.querySelector('div');
+el.gestalt.typo = '12px uppercase';
+
+--- keys (with getter and setter)
+typo
+
+--- methods
+Element.gestalt.clear   (key)        -> clears its value to null/''
+Element.gestalt.get     (key)        -> gets its value
+Element.gestalt.set     (key, value) -> updates/assigns its value
+Element.gestalt.replace (key, value) -> replaces its value
+*/
+
+[gestalt-typo] {
+  /* text-transform */
+  &:[gestalt-typo*='lowercase'] { text-transform: lowercase; }
+  &:[gestalt-typo*='uppercase'] { text-transform: uppercase; }
+}
+
+:root {
+  --gestalt-engine-typo                : none;
+  --gestalt-engine-typo-font-size      : none;
+  --gestalt-engine-typo-font-style     : none;
+  --gestalt-engine-typo-line-height    : none;
+  --gestalt-engine-typo-text-transform : none;
+}
+
