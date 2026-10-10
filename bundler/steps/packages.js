@@ -30,9 +30,14 @@
 //     strict    : true,                              // a graph problem fails the bundle
 //   }
 //
-// the walk reports what does not hold offline: a bare specifier the map does not
-// cover (unresolved), a module imported from a host (network), a relative import
-// out of its package (escapes), a module file that is not there (missing).
+// the walk follows the pages' module scripts and stylesheets, js imports and css
+// @import / url(). a path into a directory with an `@scope/name/` segment
+// (`./vendor/@aufbau/css/aufbau.css` in a <link>) stages that package as well.
+// it reports what does not hold offline: a bare specifier the map does not
+// cover (unresolved), a module or sheet loaded from a host (network), a js
+// import out of its package (escapes; css has no bare specifiers, so a sheet
+// reaching a sibling package by relative path is how css does it), a file that
+// is not there (missing).
 //
 // either way, a package names the paths it loads by names built at runtime in
 // its own package.json, relative to itself:
@@ -143,16 +148,33 @@ function sourceOf (sources, name) {
   return null;
 }
 
-// the module scripts of a page: src paths and inline code
-function modulesOfPage (html) {
-  const sources = [], inline = [];
+// what a page loads: module script src paths, inline module code, stylesheets
+function loadsOfPage (html) {
+  const sources = [], inline = [], sheets = [];
   for (const [, attributes, code] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     if (!/type\s*=\s*["']?module/i.test(attributes)) continue;
     const src = /src\s*=\s*["']([^"']+)["']/i.exec(attributes)?.[1];
     if (src) sources.push(src); else inline.push(code);
   }
-  return { inline, sources };
+  for (const [, attributes] of html.matchAll(/<link\b([^>]*)>/gi)) {
+    if (!/rel\s*=\s*["']?stylesheet/i.test(attributes)) continue;
+    const href = /href\s*=\s*["']([^"']+)["']/i.exec(attributes)?.[1];
+    if (href) sheets.push(href);
+  }
+  return { inline, sheets, sources };
 }
+
+// what a stylesheet loads: @import and url() references, comments left out
+function loadsOfSheet (css) {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const refs = [];
+  for (const [, , url] of text.matchAll(/@import\s+(?:url\(\s*)?(["']?)([^"')\s;]+)\1/g)) refs.push(url);
+  for (const [, , url] of text.matchAll(/url\(\s*(["']?)([^"')\s]+)\1\s*\)/g)) refs.push(url);
+  return [...new Set(refs)].filter(url => !/^(data:|#)/.test(url));
+}
+
+// a page-relative path as written, './' added to a bare file name
+const asPath = path => /^[./]/.test(path) || /^[a-z][a-z0-9+.-]*:/i.test(path) ? path : './' + path;
 
 async function bySpecifier (context) {
   const { config, log, out, report, root } = context;
@@ -215,9 +237,11 @@ async function bySpecifier (context) {
       return;
     }
     if (/^[./]/.test(specifier)) {
-      const target = specifier.startsWith('/') ? local(specifier) : joinPath(directoryOf(file), specifier);
+      const target = (specifier.startsWith('/') ? local(specifier) : joinPath(directoryOf(file), specifier)).split(/[?#]/)[0];
       const owner  = ownerOf(file);
-      if (owner && !target.startsWith(owner + '/')) problem('escapes', `\`${specifier}\` in ${label}`);
+      if (owner && !target.startsWith(owner + '/') && !file.endsWith('.css')) problem('escapes', `\`${specifier}\` in ${label}`);
+      const reached = packageOfTarget(outputPath(out, target).slice(1));
+      if (reached && !await stage(reached)) return;
       return visit(target, label);
     }
     const target = mapped(specifier);
@@ -230,8 +254,8 @@ async function bySpecifier (context) {
   for (const page of pages) {
     const file = joinPath(out, page);
     if (!pathExists(file)) continue;
-    const { inline, sources: scripts } = modulesOfPage(await readText(file));
-    for (const src of scripts) await follow(src.startsWith('/') || src.startsWith('.') ? src : './' + src, file, page);
+    const { inline, sheets, sources: scripts } = loadsOfPage(await readText(file));
+    for (const src of [...scripts, ...sheets]) await follow(asPath(src), file, page);
     for (const code of inline) {
       const [found] = parse(code);
       for (const { n: specifier } of found) if (specifier) await follow(specifier, file, page);
@@ -240,10 +264,15 @@ async function bySpecifier (context) {
 
   while (queue.length) {
     const file = queue.shift();
+    const label = outputPath(out, file);
+    if (file.endsWith('.css')) {
+      for (const url of loadsOfSheet(await readText(file))) await follow(asPath(url), file, label);
+      continue;
+    }
     if (!/\.m?js$/.test(file)) continue;
     let found;
     try { [found] = parse(await readText(file)); } catch { continue; }
-    for (const { n: specifier } of found) if (specifier) await follow(specifier, file, outputPath(out, file));
+    for (const { n: specifier } of found) if (specifier) await follow(specifier, file, label);
   }
 
   // :::::: INJECT
@@ -268,7 +297,7 @@ async function bySpecifier (context) {
   log(`packages ${names.length} by specifier, ${lines.length} problems`);
   report('packages', [
     `local: ${names.join(', ') || 'none'}`,
-    `modules reached: ${seen.size}`,
+    `files reached: ${seen.size}`,
     ...context.declarations.map(({ keep, owner }) => `\`${owner}\` keeps ${keep.map(path => `\`${path}\``).join(', ')}`),
     ...lines,
   ]);
