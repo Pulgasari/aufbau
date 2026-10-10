@@ -40,14 +40,12 @@ class GestaltManager {
     }
   }
 
-  // Getter and Setter for shortcut el.gestalt.typo
-  get typo() {
-    return this.get('typo');
-  }
+  //
+  setStyleProp (k,v) { this.#element.style.setProperty(k,v); }
 
-  set typo(value) {
-    this.set('typo', value);
-  }
+  // Getter and Setter for shortcut el.gestalt.typo
+  get typo ()      { return this.get('typo'); }
+  set typo (value) { this.set('typo', value); }
 
   // Parse typo string into dynamic CSS variables and style keywords
   #applyTypo(value) {
