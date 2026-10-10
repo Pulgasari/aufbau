@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/tilt-shift.js
+// @ts-self-types="./tilt-shift.d.ts"
 import { dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'tilt-shift';

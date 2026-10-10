@@ -1,4 +1,5 @@
 // @aufbau/gestures/preact
+// @ts-self-types="./preact.d.ts"
 // useGesture returns a ref callback for a dom element:
 //
 //   const ref = useGesture({ onSwipeLeft: () => next(), onTap: { input: 'touch', handler } });

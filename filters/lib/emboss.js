@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/emboss.js
+// @ts-self-types="./emboss.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'emboss';

@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/threshold.js
+// @ts-self-types="./threshold.d.ts"
 // canvas-only: hard 1-bit cut of the luminance at `level`. (svg can approximate this
 // with a discrete transfer, but it lives here as a plain imageData example.)
 

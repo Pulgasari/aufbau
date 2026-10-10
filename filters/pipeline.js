@@ -1,4 +1,5 @@
 // @aufbau/filters/pipeline.js
+// @ts-self-types="./pipeline.d.ts"
 // a non-destructive filter stack for editor-style use: hold a source (canvas / image /
 // video / bitmap) and an ordered list of stages, and render the whole stack onto a target
 // canvas on demand. the source is never mutated, so tweaking, reordering, toggling or

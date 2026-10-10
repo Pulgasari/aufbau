@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/sharpen.js
+// @ts-self-types="./sharpen.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'sharpen';

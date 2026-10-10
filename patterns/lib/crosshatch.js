@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/crosshatch.js
+// @ts-self-types="./crosshatch.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'crosshatch';

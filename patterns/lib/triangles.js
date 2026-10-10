@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/triangles.js
+// @ts-self-types="./triangles.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'triangles';

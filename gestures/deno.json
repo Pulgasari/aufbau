@@ -1,8 +1,25 @@
 {
   "name": "@aufbau/gestures",
   "version": "2.0.0",
+  "license": "MIT",
+  "nodeModulesDir": "none",
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
+  },
+  "imports": {
+    "preact/hooks": "npm:preact@^10.20.1/hooks"
+  },
   "exports": {
     ".": "./index.js",
     "./preact": "./adapters/preact.js"
+  },
+  "publish": {
+    "exclude": [
+      "concept.md"
+    ]
   }
 }

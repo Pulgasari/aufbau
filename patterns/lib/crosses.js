@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/crosses.js
+// @ts-self-types="./crosses.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'crosses';

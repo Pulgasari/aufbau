@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/waves.js
+// @ts-self-types="./waves.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'waves';

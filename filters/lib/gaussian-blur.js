@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/gaussian-blur.js
+// @ts-self-types="./gaussian-blur.d.ts"
 // webgl, multi-pass: a real separable gaussian blur — one horizontal then one vertical
 // pass (9 taps each, linear-sampled weights). the canonical multi-pass example; unlike
 // the css/svg `blur` this is the gpu path for the editor and realtime video.

@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/grid.js
+// @ts-self-types="./grid.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'grid';

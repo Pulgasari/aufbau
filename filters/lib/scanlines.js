@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/scanlines.js
+// @ts-self-types="./scanlines.d.ts"
 import { anim, dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'scanlines';

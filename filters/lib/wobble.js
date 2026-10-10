@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/wobble.js
+// @ts-self-types="./wobble.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'wobble';

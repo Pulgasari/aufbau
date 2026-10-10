@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/rainbow.js
+// @ts-self-types="./rainbow.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'rainbow';

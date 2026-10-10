@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/bloom.js
+// @ts-self-types="./bloom.d.ts"
 // webgl, multi-pass: threshold the bright areas, blur them (separable h+v), then add the
 // glow back over the original. the classic four-pass bloom, and the showcase for the
 // multi-pass runner (the combine pass reads uSource0 = the untouched original).

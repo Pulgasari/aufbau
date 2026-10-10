@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/solarize.js
+// @ts-self-types="./solarize.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'solarize';

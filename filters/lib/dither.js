@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/dither.js
+// @ts-self-types="./dither.d.ts"
 // canvas-only: ordered (Bayer 4×4) dithering of the luminance to `levels` tones. the
 // classic newsprint / 1-bit look; not expressible with svg filter primitives.
 

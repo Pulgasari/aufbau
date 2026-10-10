@@ -1,4 +1,5 @@
 // @aufbau/gestures
+// @ts-self-types="./index.d.ts"
 // a gesture as easy as a click: gestures(element, { onSwipeLeft, onTap, … }).
 // the tracker measures, the recognizers decide, every gesture is a dom event on
 // the element the pointer went down on. see concept.md.
@@ -120,6 +121,6 @@ function gestures (element, options = {}) {
   };
 }
 
-export { gestures, RECOGNIZERS };
+export { gestures };
 export * from './bundles/index.js';
 export default gestures;

@@ -1,4 +1,5 @@
 // @aufbau/webfonts/google.js
+// @ts-self-types="./google.d.ts"
 
 /**
  * Load Google Fonts dynamically via Google Fonts CSS2 API

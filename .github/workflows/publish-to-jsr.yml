@@ -23,6 +23,10 @@ on:
           - store
           - svg
           - webfonts
+      dry_run:
+        description: "Only check, publish nothing"
+        type: boolean
+        default: false
 
 jobs:
   publish:
@@ -41,4 +45,4 @@ jobs:
 
       - name: Publish package
         working-directory: ${{ inputs.package }}
-        run: deno publish
+        run: deno publish ${{ inputs.dry_run && '--dry-run' || '' }}

@@ -1,4 +1,5 @@
 // @aufbau/patterns/motion.js
+// @ts-self-types="./motion.d.ts"
 // scrolls a background tiling by one tile per cycle, so the loop is seamless.
 // independent of the tile: static and self animating patterns drift the same.
 //

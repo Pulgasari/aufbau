@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/saturate.js
+// @ts-self-types="./saturate.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'saturate';

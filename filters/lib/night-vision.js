@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/night-vision.js
+// @ts-self-types="./night-vision.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'night-vision';

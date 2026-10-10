@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/kaleidoscope.js
+// @ts-self-types="./kaleidoscope.d.ts"
 // webgl-only: folds the image into `segments` mirrored wedges around the centre.
 
 export const id   = 'kaleidoscope';

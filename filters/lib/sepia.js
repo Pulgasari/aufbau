@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/sepia.js
+// @ts-self-types="./sepia.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'sepia';

@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/chevron.js
+// @ts-self-types="./chevron.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'chevron';

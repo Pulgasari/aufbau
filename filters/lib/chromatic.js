@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/chromatic.js
+// @ts-self-types="./chromatic.d.ts"
 // webgl, single-pass: chromatic aberration — the red and blue channels are sampled with
 // an opposite offset along `angle`. the realtime gpu port of the rgb-shift / glitch look,
 // cheap enough to run per video frame.

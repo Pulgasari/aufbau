@@ -1,4 +1,5 @@
 // @aufbau/patterns
+// @ts-self-types="./index.d.ts"
 // tileable svg patterns, painted as a data-uri background-image. every pattern
 // is a plain function in ./lib, the metadata lives in ./manifest.js so the
 // catalogue is cheap and the implementations load on first use.

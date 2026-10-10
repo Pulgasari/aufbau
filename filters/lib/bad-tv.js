@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/bad-tv.js
+// @ts-self-types="./bad-tv.d.ts"
 import { anim, dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'bad-tv';

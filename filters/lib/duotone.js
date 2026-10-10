@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/duotone.js
+// @ts-self-types="./duotone.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'duotone';

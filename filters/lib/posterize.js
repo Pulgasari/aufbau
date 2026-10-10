@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/posterize.js
+// @ts-self-types="./posterize.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'posterize';

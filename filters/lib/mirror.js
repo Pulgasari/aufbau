@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/mirror.js
+// @ts-self-types="./mirror.d.ts"
 // webgl-only: reflect one half of the image onto the other. `vertical` mirrors across
 // the horizontal axis instead; `flip` chooses which half is the source. mirror is a
 // geometry reflection, not a filter primitive — svg cannot do it.

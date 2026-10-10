@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/barrel-blur.js
+// @ts-self-types="./barrel-blur.d.ts"
 import { dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'barrel-blur';

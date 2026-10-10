@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/slices.js
+// @ts-self-types="./slices.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'slices';

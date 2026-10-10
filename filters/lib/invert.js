@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/invert.js
+// @ts-self-types="./invert.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'invert';

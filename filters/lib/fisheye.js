@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/fisheye.js
+// @ts-self-types="./fisheye.d.ts"
 // webgl-only: real lens distortion. positive amount bulges (fisheye), negative pinches
 // (pincushion). not expressible with svg filter primitives.
 

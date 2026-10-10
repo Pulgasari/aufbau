@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/rings.js
+// @ts-self-types="./rings.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'rings';

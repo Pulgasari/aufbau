@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/grayscale.js
+// @ts-self-types="./grayscale.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'grayscale';

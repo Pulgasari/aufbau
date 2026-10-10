@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/diagonal.js
+// @ts-self-types="./diagonal.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'diagonal';

@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/pixel-sort.js
+// @ts-self-types="./pixel-sort.d.ts"
 // canvas-only: the classic databending glitch — within each row (or column), spans of
 // pixels brighter than `threshold` are sorted by luminance. impossible with svg/css.
 

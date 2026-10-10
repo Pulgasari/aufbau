@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/glow.js
+// @ts-self-types="./glow.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'glow';

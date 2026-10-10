@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/diamonds.js
+// @ts-self-types="./diamonds.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'diamonds';
