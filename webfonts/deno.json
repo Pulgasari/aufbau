@@ -1,0 +1,15 @@
+{
+  "name": "@aufbau/webfonts",
+  "version": "1.0.0",
+  "license": "MIT",
+  "nodeModulesDir": "none",
+  "compilerOptions": { "lib": ["dom", "dom.iterable", "esnext"] },
+  "imports": {
+    "@pulgasari/is": "jsr:@pulgasari/is@^1.0.3"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./google": "./google.js"
+  },
+  "publish": { "exclude": ["files", "handpicked.txt", "index_1a.js"] }
+}

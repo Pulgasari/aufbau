@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/linocut.js
+// @ts-self-types="./linocut.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'linocut';

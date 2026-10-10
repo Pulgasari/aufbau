@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/glitch-heavy-cyber.js
+// @ts-self-types="./glitch-heavy-cyber.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'glitch-heavy-cyber';

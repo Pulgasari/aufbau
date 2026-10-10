@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/wave.js
+// @ts-self-types="./wave.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'wave';

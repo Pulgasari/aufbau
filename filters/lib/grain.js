@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/grain.js
+// @ts-self-types="./grain.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'grain';

@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/bricks.js
+// @ts-self-types="./bricks.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'bricks';

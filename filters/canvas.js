@@ -1,4 +1,5 @@
 // @aufbau/filters/canvas.js
+// @ts-self-types="./canvas.d.ts"
 // the canvas 2d backend. two paths:
 //   imageData — the filter's own canvas(image, options) walks pixels (pixelate, dither…).
 //   bridge    — ctx.filter runs the filter's css string, or a baked svg <filter> via

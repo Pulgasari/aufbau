@@ -1,4 +1,5 @@
 // @aufbau/filters
+// @ts-self-types="./index.d.ts"
 // image effects with several backends: css, svg, canvas (imageData or the
 // ctx.filter bridge) and webgl. every filter is a module in ./lib, the metadata
 // lives in ./manifest.js so the catalogue is cheap and the implementations load

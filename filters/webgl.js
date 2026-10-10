@@ -1,4 +1,5 @@
 // @aufbau/filters/webgl.js
+// @ts-self-types="./webgl.d.ts"
 // the webgl backend: a fragment-shader runner supporting single- and multi-pass filters,
 // and chaining several filters gpu-resident (no 2d round-trip between them).
 //

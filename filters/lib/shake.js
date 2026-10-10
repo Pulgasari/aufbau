@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/shake.js
+// @ts-self-types="./shake.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'shake';

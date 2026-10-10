@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/glitch-live.js
+// @ts-self-types="./glitch-live.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'glitch-live';

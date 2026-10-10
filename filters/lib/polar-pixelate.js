@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/polar-pixelate.js
+// @ts-self-types="./polar-pixelate.d.ts"
 // canvas-only: pixelation in polar space around the centre — quantises radius into
 // `rings` and angle into `segments`, then samples the block centre. svg cannot do it.
 

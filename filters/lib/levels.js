@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/levels.js
+// @ts-self-types="./levels.d.ts"
 // canvas-only: photoshop-style levels — remap input [black, white] to full range with a
 // gamma curve. built as a 256-entry lut applied per channel.
 

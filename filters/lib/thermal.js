@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/thermal.js
+// @ts-self-types="./thermal.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'thermal';

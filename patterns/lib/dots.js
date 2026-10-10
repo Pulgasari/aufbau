@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/dots.js
+// @ts-self-types="./dots.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'dots';

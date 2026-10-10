@@ -1,4 +1,5 @@
 // @aufbau/patterns/core.js
+// @ts-self-types="./core.d.ts"
 // string helpers shared by the patterns and the generation script. no dom access
 // at import time, so node can load it.
 

@@ -1,4 +1,5 @@
 // @aufbau/webfonts
+// @ts-self-types="./index.d.ts"
 
 // :::::: IMPORTS
 

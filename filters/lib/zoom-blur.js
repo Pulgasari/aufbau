@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/zoom-blur.js
+// @ts-self-types="./zoom-blur.d.ts"
 // webgl-only: radial/zoom blur — samples along the line toward the centre. this is the
 // real effect our svg `barrel-blur` only approximated with an edge falloff.
 

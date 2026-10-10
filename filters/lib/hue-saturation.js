@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/hue-saturation.js
+// @ts-self-types="./hue-saturation.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'hue-saturation';

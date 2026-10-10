@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/noise.js
+// @ts-self-types="./noise.d.ts"
 // webgl-only: animated film grain via a hash. drive uTime in a rAF loop for live grain;
 // at uTime = 0 it is a fixed grain pattern. the gpu port of the svg `grain` for realtime.
 

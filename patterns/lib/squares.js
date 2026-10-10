@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/squares.js
+// @ts-self-types="./squares.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'squares';

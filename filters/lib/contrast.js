@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/contrast.js
+// @ts-self-types="./contrast.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'contrast';

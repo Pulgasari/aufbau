@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/smear.js
+// @ts-self-types="./smear.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'smear';

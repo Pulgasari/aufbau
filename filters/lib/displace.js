@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/displace.js
+// @ts-self-types="./displace.d.ts"
 // webgl-only: turbulence displacement — warps the image by fbm noise. the realtime gpu
 // port of the svg `wave`/`wobble` displacement (feTurbulence has no glsl equivalent, so
 // this carries its own fbm from noise.js). drive uTime in a rAF loop for a living warp.

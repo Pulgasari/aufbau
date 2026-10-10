@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/rgb-shift.js
+// @ts-self-types="./rgb-shift.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'rgb-shift';

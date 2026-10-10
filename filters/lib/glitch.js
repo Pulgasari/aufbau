@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/glitch.js
+// @ts-self-types="./glitch.d.ts"
 // webgl-only: realtime glitch — horizontal blocks jump sideways and the channels split,
 // all driven by a hash of the row and time. the gpu port of the svg glitch/bad-tv family,
 // cheap enough for video. drive uTime in a rAF loop for the flickering motion.

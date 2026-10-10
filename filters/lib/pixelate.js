@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/pixelate.js
+// @ts-self-types="./pixelate.d.ts"
 // canvas-only: svg filters cannot downsample, so pixelation lives in the imageData
 // backend. averages each size×size block and paints the block with that colour.
 // no default/svg export — this filter is realised only through filterCanvas().

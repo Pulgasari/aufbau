@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/jitter.js
+// @ts-self-types="./jitter.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'jitter';

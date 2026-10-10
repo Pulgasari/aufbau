@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/glitch-rgb.js
+// @ts-self-types="./glitch-rgb.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'glitch-rgb';

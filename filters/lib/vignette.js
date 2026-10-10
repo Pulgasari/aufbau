@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/vignette.js
+// @ts-self-types="./vignette.d.ts"
 import { dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'vignette';

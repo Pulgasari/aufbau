@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/dot-matrix.js
+// @ts-self-types="./dot-matrix.d.ts"
 import { dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'dot-matrix';

@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/edges.js
+// @ts-self-types="./edges.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'edges';

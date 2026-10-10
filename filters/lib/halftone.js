@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/halftone.js
+// @ts-self-types="./halftone.d.ts"
 import { dataUri, filterTag, resolve } from '../core.js';
 
 export const id   = 'halftone';

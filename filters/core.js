@@ -1,4 +1,5 @@
 // @aufbau/filters/core.js
+// @ts-self-types="./core.d.ts"
 // shared string + dom helpers. no svg is fetched at runtime anymore: every filter
 // is a function that builds its own markup, so these helpers just format values,
 // wrap fragments and manage the one shared <defs> host. pure except for the dom

@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/dot-screen.js
+// @ts-self-types="./dot-screen.d.ts"
 // canvas-only: a true half-tone screen — each cell becomes one black dot whose radius
 // grows with the cell's darkness. this is the tone-varying version svg cannot do
 // (the svg `halftone`/`dot-matrix` filters are fixed-grid approximations).

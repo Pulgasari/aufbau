@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/brightness.js
+// @ts-self-types="./brightness.d.ts"
 import { filterTag, resolve } from '../core.js';
 
 export const id   = 'brightness';

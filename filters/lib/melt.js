@@ -1,4 +1,5 @@
 // @aufbau/filters/lib/melt.js
+// @ts-self-types="./melt.d.ts"
 import { anim, filterTag, resolve } from '../core.js';
 
 export const id   = 'melt';

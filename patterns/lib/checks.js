@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/checks.js
+// @ts-self-types="./checks.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'checks';

@@ -1,4 +1,5 @@
 // @aufbau/patterns/lib/stripes.js
+// @ts-self-types="./stripes.d.ts"
 import { patternTag, resolve } from '../core.js';
 
 export const id   = 'stripes';
