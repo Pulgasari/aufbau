@@ -18,7 +18,7 @@ body  { z-index: 1; }
   > *              { display: flex; }
   > *:nth-child(1) { flex: 0; font-weight: 700; }
   > *:nth-child(2) { flex: 1; padding: 2rem; }
-  > *:nth-child(3] { flex: 0; letter-spacing: 2px; }
+  > *:nth-child(3) { flex: 0; letter-spacing: 2px; }
 
   > *:nth-child(1), 
   > *:nth-child(3) {
