@@ -1,5 +1,12 @@
-/* @aufbau/gestalt/gestalt.css
+/* @aufbau/gestalt/gestalt.css */
 
+@import url('./animate/functions.css');
+@import url('./palettes.css');
+@import url('./animate/keyframes.css');
+@import url('./animate/animations.css');
+@import url('./layouts/landing.css');
+
+/*
 document.body.style.setProperty('--bg', 'var(--color-bg)');
 document.body.style.setProperty('--fg', 'var(--color-fg)');
 document.body.style.setProperty('--ink', 'var(--color-ink)');
