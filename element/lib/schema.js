@@ -2,10 +2,6 @@ import { CanonicalMap }                 from '@pulgasari/canonicalmap';
 import { isArray, isFn, isPlainObject } from '@pulgasari/is';
 import { toCamelCase, toKebabCase }     from '@pulgasari/str';
 
-// the one place where an attribute's names are worked out. an entry knows them all:
-// name (itemSize) for js, attribute (item-size) for the dom, var (--item-size) for css.
-// the schema is a CanonicalMap, so itemSize, item-size and item_size find the same entry
-
 const TYPES  = { boolean: Boolean, number: Number, string: String };
 const typeOf = value => TYPES[typeof value] ?? String;
 
@@ -18,8 +14,8 @@ function entryOf (key, spec) {
   else if (isPlainObject(spec)) {
     entry.type     = spec.type ?? typeOf(spec.default);
     entry.fallback = spec.default;
-    entry.values   = isArray(spec.values) ? spec.values : null;
-    entry.fn       = isFn(spec.fn) ? spec.fn : null;
+    entry.values   = isArray (spec.values) ? spec.values : null;
+    entry.fn       = isFn    (spec.fn)     ? spec.fn     : null;
     entry.var      = spec.var === true ? `--${entry.attribute}` : (spec.var ?? null);
   }
   else if (spec != null) {
