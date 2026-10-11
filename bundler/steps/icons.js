@@ -18,7 +18,8 @@
 // still serves it at runtime.
 
 import {
-  extensionOf, importFile, install, joinPath, listFiles, makeDirectory, outputPath, pathExists,
+  extensionOf, importFile, install, joinPath, 
+  listFiles, makeDirectory, outputPath, pathExists,
   readJson, readText, sizeOf, writeText,
 } from './../shared.js';
 
@@ -47,8 +48,8 @@ async function icons ({ config, log, out, report }) {
   // :::::: SETS
 
   const collections = await install('icons-collections', { '@iconify/collections': 'latest', '@iconify/utils': 'latest' }, log);
-  const known  = await readJson(joinPath(collections.modules, '@iconify', 'collections', 'collections.json'));
-  const sets   = [...new Set([...candidates].map(id => id.split(':')[0]))].filter(set => known[set]).sort();
+  const known       = await readJson(joinPath(collections.modules, '@iconify', 'collections', 'collections.json'));
+  const sets        = [...new Set([...candidates].map(id => id.split(':')[0]))].filter(set => known[set]).sort();
   if (!sets.length) return;
 
   const { modules, failed } = await install('icons', Object.fromEntries(sets.map(set => [`@iconify-json/${set}`, 'latest'])), log);
@@ -84,10 +85,11 @@ async function icons ({ config, log, out, report }) {
     if (pathExists(file)) await writeText(file, (await readText(file)).replace(/<\/head>/, `  ${tag}\n</head>`));
   }
 
-  const bytes = await sizeOf(joinPath(target, 'provide.js'));
-  log(`icons ${Object.keys(svgs).length} from ${sets.length} sets -> ${path}`);
+  const svgKeys = Object.keys(svgs);
+  const bytes   = await sizeOf(joinPath(target, 'provide.js'));
+  log(`icons ${svgKeys.length} from ${sets.length} sets -> ${path}`);
   report('icons', [
-    `local: ${Object.keys(svgs).length} icons from ${sets.join(', ')}, ${(bytes / 1024).toFixed(0)} kb`,
+    `local: ${svgKeys.length} icons from ${sets.join(', ')}, ${(bytes / 1024).toFixed(0)} kb`,
     ...failed.map(entry => `**not installed**: ${entry}`),
   ]);
 }
