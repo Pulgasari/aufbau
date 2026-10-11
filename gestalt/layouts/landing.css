@@ -42,25 +42,3 @@ body  { z-index: 1; }
 }
 
 #defs, script { display: none!important; }
-
-
-/*
-nav {
-   display: flex;
-   gap: 1.25rem;
-}
-#welcome {
-   padding: 2rem;
-}
-#logo {
-   display: flex;
-   flex-flow: column nowrap;
-   align-items: center;
-   justify-content: center;
-   gap: 1rem;
-   max-width: 480px;
-   
-   .name { font-size: 5rem; font-weight: 900; }
-   .sub  { font-size: 1rem; font-style: italic; opacity: 0.50; display: none; }
-}
-*/
