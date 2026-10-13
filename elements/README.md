@@ -956,6 +956,15 @@ console.log(greet('aufbau'));
 `clear` wirken nur mit `editable`. paste landet an der cursorposition, beide
 gehen über den nativen undo-stack. `no-copy` bleibt als kurzform erhalten.
 
+eigene sprachen kommen lazy über ein modul, dessen default export die hljs-definition
+ist. eingebaut: `poo`, `rat` und `ratjs` (aus `@rat/syntax`). weitere per config
+`write-code-languages-<name>` oder `WriteCode.registerLanguage(name, specifier | fn)`.
+
+```html
+<write-code lang="rat">…</write-code>
+<write-code lang="ratjs">…</write-code>
+```
+
 ## write-text
 
 mehrzeiliger text, das gegenstück zu [`<output-md>`](#output-md).

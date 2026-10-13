@@ -27,7 +27,11 @@ const getHljs = () => (
 // ::: languages
 
 // built in, the config write-code-languages-<name> adds more
-const languages = new Map([['poo', '@poo/hljs']]);
+const languages = new Map([
+  ['poo',   '@poo/hljs'],
+  ['rat',   '@rat/syntax/hljs/rat.js'],
+  ['ratjs', '@rat/syntax/hljs/ratjs.js'],
+]);
 
 const languageSource = name => languages.get(name) ?? getConfig(`write-code-languages-${name}`);
 
