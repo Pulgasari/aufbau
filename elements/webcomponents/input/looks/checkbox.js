@@ -1,4 +1,4 @@
-import { html }                          from '../../../lib/html.js';
+import { html }                          from '../../../lib/template.js';
 import { control, events, fits, update } from './parts/toggle.js';
 
 export default {

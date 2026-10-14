@@ -1,4 +1,4 @@
-import { html }                                                        from '../../../lib/html.js';
+import { html }                                                        from '../../../lib/template.js';
 import { labelOf, updateSelected }                                     from './parts/options.js';
 import { LISTBOX, isOpen, listbox, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
 

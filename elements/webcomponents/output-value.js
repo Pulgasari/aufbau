@@ -5,7 +5,7 @@
 import { AufbauSourceElement, getConfig } from '@aufbau/element';
 import { TYPES, typeOf }                  from './input/types/index.js';
 import { actionButtons, bindActions }     from '../lib/actions.js';
-import { attrs, html }                    from '../lib/html.js';
+import { attrs, html }                    from '../lib/template.js';
 
 // :::::: CONSTANTS
 
@@ -165,7 +165,7 @@ export default class OutputValue extends AufbauSourceElement {
     const icon = this.iconName();
 
     const body = TIME_TYPES.has(type)
-      ? html`<time ${attrs({ datetime: this.machine })}>${text}</time>`
+      ? html`<time ...${attrs({ datetime: this.machine })}>${text}</time>`
       : html`<span>${text}</span>`;
 
     return html`

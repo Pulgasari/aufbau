@@ -1,4 +1,4 @@
-import { attrs, html } from '../../../../lib/html.js';
+import { attrs, html } from '../../../../lib/template.js';
 import { nextIndex }   from './keys.js';
 
 export const isInactive = item => item.hidden || item.matches(':disabled, [aria-disabled="true"]');
@@ -16,7 +16,7 @@ export function optionButtons (host, part, { iconsOnly = host.getAttr('iconsOnly
 
     return html`
       <button type="button" part="${part}" role="${role}" data-value="${entry.value}" tabindex="-1" aria-checked="false"
-              ${attrs({ 'aria-label': !showLabel && name, disabled: entry.disabled, title: !showLabel && name })}>
+              ...${attrs({ 'aria-label': !showLabel && name, disabled: entry.disabled, title: !showLabel && name })}>
         ${mark && html`<span part="mark"></span>`}
         ${optionIcon(entry)}
         ${showLabel && html`<span part="label">${name}</span>`}

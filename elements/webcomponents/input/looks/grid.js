@@ -1,6 +1,6 @@
 import { debounce } from '@pulgasari/timing';
 
-import { html }                                                             from '../../../lib/html.js';
+import { html }                                                             from '../../../lib/template.js';
 import { GROUP, groupEvents, optionButtons, updateSelected, updateTabStop } from './parts/options.js';
 
 const DEBOUNCE = 250;
@@ -52,7 +52,7 @@ export default {
 
   render (host) {
     const search = hasSearch(host) && html`<input type="search" part="search" placeholder="${host.placeholder || 'search…'}" />`;
-    return html`${search}<div part="options"></div>`;
+    return html`${search}<div part="options">${optionButtons(host, 'option', { iconsOnly: true })}</div>`;
   },
 
   events (host, scope) {
@@ -71,11 +71,10 @@ export default {
   update (host) {
     const container = host.part('options').node;
 
-    // only new options rebuild the tiles
+    // new options are new tiles, the filter of a typed search applies to them too
     const signature = host.options.map(entry => entry.value).join('\n');
     if (container.dataset.signature !== signature) {
       container.dataset.signature = signature;
-      container.innerHTML = optionButtons(host, 'option', { iconsOnly: true });
       const search = host.part('search').node;
       if (search?.value && !host.valueType.list?.query) filter(host, search.value);
     }

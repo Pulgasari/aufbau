@@ -1,5 +1,5 @@
 import { AufbauControlElement } from '@aufbau/element';
-import { attrs, html }          from '../lib/html.js';
+import { attrs, html }          from '../lib/template.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 
@@ -209,7 +209,7 @@ export default class InputFile extends AufbauControlElement {
 
     // the children replace the default text of the drop zone
     return html`
-      <input type="file" hidden ${attrs({ accept, multiple, webkitdirectory: directory })} />
+      <input type="file" hidden ...${attrs({ accept, multiple, webkitdirectory: directory })} />
       <button type="button" part="zone">
         <svg-icon part="icon" icon="lucide:upload"></svg-icon>
         <span part="text"><slot>${text}</slot></span>

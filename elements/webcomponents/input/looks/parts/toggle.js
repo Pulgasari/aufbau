@@ -1,4 +1,4 @@
-import { attrs, html } from '../../../../lib/html.js';
+import { attrs, html } from '../../../../lib/template.js';
 
 export const fits = shape => shape.kind === 'bool';
 
@@ -10,7 +10,7 @@ const iconsOf = host => {
 export function control (host, inner, role) {
   const label = host.getAttr('label');
   return html`
-    <button type="button" part="control" ${attrs({ role })}>
+    <button type="button" part="control" ...${attrs({ role })}>
       ${inner}
       ${iconsOf(host) && html`<svg-icon part="icon"></svg-icon>`}
       ${label && html`<span part="label">${label}</span>`}

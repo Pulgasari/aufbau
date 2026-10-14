@@ -1,4 +1,4 @@
-import { attrs, html } from '../../../lib/html.js';
+import { attrs, html } from '../../../lib/template.js';
 
 const percent = (number, [min, max]) => ((number - min) / ((max - min) || 1)) * 100;
 
@@ -93,7 +93,7 @@ export default {
 
     const handle = index => html`
       <span part="thumb" data-thumb="${index}"></span>
-      <input type="range" part="input" data-index="${index}" ${attrs({ 'aria-label': range && (index ? 'to' : 'from'), max, min, step })} />
+      <input type="range" part="input" data-index="${index}" ...${attrs({ 'aria-label': range && (index ? 'to' : 'from'), max, min, step })} />
     `;
 
     return html`

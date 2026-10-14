@@ -1,4 +1,4 @@
-import { attrs, html }                     from '../../../../lib/html.js';
+import { attrs, html }                     from '../../../../lib/template.js';
 import { place }                           from '../../../../lib/placement.js';
 import { nextIndex }                       from './keys.js';
 import { isInactive, labelOf, optionIcon } from './options.js';
@@ -7,9 +7,9 @@ export const triggerOf = host => host.root.querySelector('[aria-haspopup]');
 export const isOpen    = host => host.part('listbox').matches(':popover-open');
 
 export const listbox = host => html`
-  <div part="listbox" role="listbox" popover="manual" ${attrs({ 'aria-multiselectable': host.count === 'multiple' && 'true' })}>
+  <div part="listbox" role="listbox" popover="manual" ...${attrs({ 'aria-multiselectable': host.count === 'multiple' && 'true' })}>
     ${host.options.map(entry => html`
-      <div part="option" role="option" data-value="${entry.value}" tabindex="-1" aria-selected="false" ${attrs({ 'aria-disabled': entry.disabled && 'true' })}>
+      <div part="option" role="option" data-value="${entry.value}" tabindex="-1" aria-selected="false" ...${attrs({ 'aria-disabled': entry.disabled && 'true' })}>
         ${optionIcon(entry)}
         <span part="label">${labelOf(entry)}</span>
       </div>

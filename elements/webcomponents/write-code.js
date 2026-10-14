@@ -1,13 +1,14 @@
 // <write-code>
 
 import { adoptStyleSheet } from '@domina/methods/adoptStyleSheet.js';
+import { setAttr }         from '@domina/methods/setAttr.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 
 import { AufbauSourceElement, getConfig }           from '@aufbau/element';
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { dedent }                                   from '../lib/dedent.js';
-import { attrs, html }                              from '../lib/html.js';
+import { attrs, html }                              from '../lib/template.js';
 
 const HLJS_VERSION = '11.9.0';
 const HLJS_MODULE  = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;
@@ -179,7 +180,7 @@ export default class WriteCode extends AufbauSourceElement {
       }
     }
   }`;
-j
+
   static registerLanguage (name, source) {
     languages.set(name, source);
     resolved.delete(name);
@@ -278,23 +279,22 @@ j
         <span>${this.lang}</span>
         <div>${actionButtons(this.actions)}</div>
       </header>
-      <pre><code class="language-${this.lang}" ${attrs({
-        contenteditable : editable && 'plaintext-only',
-        spellcheck      : editable && 'false'
-      })}>${this.source}</code></pre>
+      <pre><code class="language-${this.lang}" ...${attrs({ contenteditable: editable && 'plaintext-only' })} textContent=${this.source}></code></pre>
     `;
   }
 
-  async onRender () {
+  // highlight.js replaces the children of the code, so the code is its text
+  // (a prop, no child part to lose) and is highlighted anew whenever it changes
+  async highlight ($code) {
     const source = this.source;
 
     try {
       const hljs = await getHljs();
       await useLanguage(hljs, this.lang);
 
-      const $code = this.output?.querySelector('pre > code');
-      if (!$code || !this.isConnected || this.source !== source) return;
+      if (!$code.isConnected || !this.isConnected || this.source !== source) return;
 
+      delete $code.dataset.highlighted;
       hljs.highlightElement($code);
       this._highlighted = source;
     } catch (error) {
@@ -303,7 +303,7 @@ j
   }
 
   sync () {
-    const { theme } = this.getAttr();
+    const { editable, theme } = this.getAttr();
 
     if (theme) {
       this.setAttribute(THEME_ATTR, theme);
@@ -311,6 +311,18 @@ j
     } else {
       this.removeAttribute(THEME_ATTR);
     }
+
+    const $code = this.output?.querySelector('pre > code');
+    if (!$code) return;
+
+    // an attribute, the prop would turn 'false' into true
+    setAttr($code, { spellcheck: editable && 'false' });
+
+    const key = `${this.lang}\n${this.source}`;
+    if ($code === this._paintedCode && key === this._paintedKey) return;
+    this._paintedCode = $code;
+    this._paintedKey  = key;
+    this.highlight($code);
   }
 }
 

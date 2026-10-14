@@ -1,6 +1,6 @@
 import { AufbauSourceElement }  from '@aufbau/element';
 import { importFile, renderMD } from '@aufbau/import';
-import { html, raw as rawHtml } from '../lib/html.js';
+import { html, raw as rawHtml } from '../lib/template.js';
 import { dedent }               from '../lib/dedent.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
@@ -88,7 +88,7 @@ export default class OutputMd extends AufbauSourceElement {
   render () {
     if (this.state === 'error')   return html`<p role="alert">could not load content.</p>`;
 
-    return rawHtml(this._html ?? '');
+    return html`${rawHtml(this._html ?? '')}`;
   }
 }
 

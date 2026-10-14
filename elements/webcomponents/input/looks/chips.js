@@ -1,4 +1,4 @@
-import { attrs, html } from '../../../lib/html.js';
+import { attrs, html } from '../../../lib/template.js';
 import { FRAME, icon } from './parts/field.js';
 
 const options = host => html`${(host.suggestionList ?? []).map(text => html`<option value="${text}"></option>`)}`;
@@ -34,7 +34,7 @@ export default {
         <button type="button" part="remove" data-index="${index}" aria-label="${`remove ${value}`}" tabindex="-1"><svg-icon icon="lucide:x"></svg-icon></button>
       </span>
     `)}
-    <input part="input" type="${host.valueType.input}" placeholder="${host.placeholder || 'add…'}" enterkeyhint="done" ${attrs({ list: 'suggestionList' in host && 'suggestions' })} />
+    <input part="input" type="${host.valueType.input}" placeholder="${host.placeholder || 'add…'}" enterkeyhint="done" ...${attrs({ list: 'suggestionList' in host && 'suggestions' })} />
     ${'suggestionList' in host ? html`<datalist id="suggestions">${options(host)}</datalist>` : ''}
   `,
 
@@ -54,8 +54,7 @@ export default {
       const found = await host.suggest(text);
       if (input.value !== text) return;   // typed on meanwhile
       host.suggested = Array.isArray(found) ? found.map(String) : [];
-      const list = host.root.querySelector('datalist');
-      if (list) list.innerHTML = String(options(host));
+      host.update();
     });
     scope.$(host.root).on('change', event => { if (event.target === host.part('input').node) add(event.target); });
 

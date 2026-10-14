@@ -1,7 +1,7 @@
 import './input/tags.js';
 
 import { AufbauControlElement } from '@aufbau/element';
-import { attrs, html }          from '../lib/html.js';
+import { attrs, html }          from '../lib/template.js';
 import { localeOf }             from '../lib/locale.js';
 
 // a postal address: street, postcode, city, region and country, in the order
@@ -88,12 +88,15 @@ export default class InputAddress extends AufbauControlElement {
   render () {
     const { disabled, readonly, required } = this.getAttr();
     const flags = { disabled, readonly };
+    const text  = part => attrs({ ...flags, 'aria-label': PLACEHOLDERS[part], placeholder: PLACEHOLDERS[part], required: required && part !== 'region' });
 
+    // part stays static: in a hole it would be set as the prop, the part() of the element
     return html`
-      ${['street', 'postcode', 'city', 'region'].map(part => html`
-        <input-text part="${part}" ${attrs({ ...flags, 'aria-label': PLACEHOLDERS[part], placeholder: PLACEHOLDERS[part], required: required && part !== 'region' })}></input-text>
-      `)}
-      <input-country part="country" ${attrs({ ...flags, 'aria-label': 'country' })}></input-country>
+      <input-text    part="street"   ...${text('street')}></input-text>
+      <input-text    part="postcode" ...${text('postcode')}></input-text>
+      <input-text    part="city"     ...${text('city')}></input-text>
+      <input-text    part="region"   ...${text('region')}></input-text>
+      <input-country part="country"  ...${attrs({ ...flags, 'aria-label': 'country' })}></input-country>
     `;
   }
 

@@ -1,4 +1,4 @@
-import { html }                                    from '../../../lib/html.js';
+import { html }                                    from '../../../lib/template.js';
 import { FRAME, field, fieldEvents, updateFields } from './parts/field.js';
 
 export default {
@@ -26,7 +26,7 @@ export default {
 
   render : host => html`
     <span part="swatch"><input type="color" data-index="0" aria-label="pick a color" /></span>
-    ${field(host, 0, { spellcheck: 'false', type: 'text' })}
+    ${field(host, 0, { spellcheck: false, type: 'text' })}
   `,
 
   events : fieldEvents,
