@@ -152,8 +152,19 @@ every element and returns or downloads `custom-elements.json`: editor support
 ## state
 
 built: 1 to 7 (properties, batching, changed names, getAttr cache, rendering
-through `@domina/render`, errors, manifest). the hand-written setters in `@aufbau/elements` are still in place; they
-keep working, since `init()` leaves names alone that a class defines itself.
+through `@domina/render`, errors, manifest). every element of `@aufbau/elements`
+renders through `elements/lib/template.js` now, `lib/html.js` is gone. the
+mirror setters (btn, btn-chip, dash-panel, input-option) became schema
+accessors; the setters with logic of their own (data-tree, data-table,
+media-json, app-config …) stay.
+
+checked in chromium: the renderer (text, attributes, merged class, events,
+keyed lists, branches, svg, live bindings with @rat/runtime, spreads, refs,
+raw, components, dynamic tags, shorthand tags), the update cycle, and every
+element against main: the same dom before and after an attribute change,
+except `value` that is now a property on the native input of
+widget-calculator, the dropped `data-filled` marker of input-pattern and the
+kept textarea height in write-md (main lost it on every rebuild).
 
 ## order
 
