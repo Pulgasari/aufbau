@@ -82,10 +82,11 @@ handle.recognize('swipe');                         // for listeners added with a
 ## nested elements
 
 a pointer belongs to one session across elements: the first one that claims it
-(a pan, a pinch, a long press …) keeps it, every other session on the same
-pointer is cancelled. nested elements hear the pointer first, so a swipeable
-item inside a sortable list wins over the list. `yield: true` turns that around
-for one element, it steps back when another one already holds the pointer.
+(a pan, a pinch, a long press …) keeps it, a later claim on the same pointer
+steps back. nested elements hear the pointer first, so a swipeable item inside a
+sortable list wins over the list. `yield: true` turns that around for one
+element: it gives the pointer up when another element claims it, even after
+claiming it first.
 
 a session that loses its pointerup (released over an iframe, an alert, a window
 switch) ends on blur, when the page is hidden, or with the next press.

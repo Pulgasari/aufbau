@@ -15,8 +15,9 @@
 //
 // a pointer belongs to one session across all elements once a recognizer claims
 // it (see own()): nested gestures() see the same pointer, the inner one hears it
-// first and wins, an outer session on the same pointer is cancelled. `yielding`
-// turns that around for this tracker: it steps back instead.
+// first and claims first, a later claim on the same pointer steps back. a
+// `yielding` tracker gives its pointer up when another element claims it, even
+// after it claimed first.
 
 const VELOCITY_WINDOW = 100;   // ms of samples the velocity is averaged over
 
@@ -113,16 +114,15 @@ function createTracker (element, hooks, { coalesced = false, yielding = false } 
 
   // :::::: OWNERSHIP
 
-  const control = { abort: () => abort() };
+  const control = { abort: () => abort(), yielding };
 
-  // called through session.own() when a recognizer claims the session. false
-  // means this session stepped back and is cancelled already
+  // called through session.own() when a recognizer claims the session. the first
+  // claim keeps the pointer unless its tracker yields. false means this session
+  // stepped back and is cancelled already
   function own () {
-    if (yielding) {
-      for (const id of pointers.keys()) {
-        const other = owners.get(id);
-        if (other && other !== control) { abort(); return false; }
-      }
+    for (const id of pointers.keys()) {
+      const other = owners.get(id);
+      if (other && other !== control && !other.yielding) { abort(); return false; }
     }
     for (const id of pointers.keys()) {
       const other = owners.get(id);

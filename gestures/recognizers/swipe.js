@@ -5,8 +5,9 @@
 //
 // the direction is the one of the velocity at release, not of the whole delta:
 // a drag to the left that ends in a flick to the right is a swipe to the right,
-// which is what the hand meant. `distance` still has to pass the threshold, so
-// a short twitch is no swipe.
+// which is what the hand meant. the pointer has to have travelled at least
+// `minimumDistance` (the farthest it got, not where it ended), so a short
+// twitch is no swipe.
 //
 // touch-action follows the directions that are listened to or recognized: only
 // left/right leaves vertical scrolling to the browser, only up/down the
@@ -24,7 +25,7 @@ function swipe ({ active, emit, options }) {
 
   function end (session) {
     if (session.claims.has('longPress') || exclusive(session)) return;
-    if (session.distance < minimumDistance || session.velocity.speed < minimumSpeed) return;
+    if (session.travel < minimumDistance || session.velocity.speed < minimumSpeed) return;
     const direction = directionOf(session.velocity.x, session.velocity.y);
     if (!direction) return;
     emit('swipe', session, { direction });

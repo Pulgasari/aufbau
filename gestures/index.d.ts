@@ -212,8 +212,8 @@ export interface GestureOptions extends Handlers, RecognizerOptions {
   /** The `touch-action` of the element instead of the strictest one the recognizers ask for. */
   touchAction? : string;
   /**
-   * Steps back when another element's session already holds the pointer. By default
-   * the session that claims a pointer first keeps it, and nested elements hear it first.
+   * Gives the pointer up when another element claims it, even after claiming it first.
+   * By default the session that claims a pointer first keeps it, and nested elements hear it first.
    */
   yield?       : boolean;
 }

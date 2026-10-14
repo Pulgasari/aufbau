@@ -207,8 +207,8 @@ several recognizers look at the same session. the rules so far:
   session of the same input still runs (its pointerup got lost).
 - **across elements** a pointer belongs to the first session that claims it.
   nested `gestures()` see the same pointer, the inner element hears it first and
-  wins; any other session on that pointer is cancelled. `yield: true` makes an
-  element step back instead.
+  wins; a later claim on that pointer steps back. `yield: true` makes an element
+  give the pointer up when another one claims it, even after claiming first.
 - a recognizer can be switched off or asked per session: `handle.enable('pan',
   gesture => …)`. a disabled recognizer claims nothing.
 
