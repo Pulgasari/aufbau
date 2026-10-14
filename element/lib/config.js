@@ -24,7 +24,7 @@ function flatten (input, prefix = '', out = new Map) {
 // NOTE a key of data-tree-item starts with data-tree- too, so data-tree updates as well. harmless
 function notify (changed) {
   for (const [tag, connected] of elements) {
-    if (changed.some(key => key.startsWith(`${tag}-`))) connected.forEach(element => element.update());
+    if (changed.some(key => key.startsWith(`${tag}-`))) connected.forEach(element => element.configChanged ? element.configChanged() : element.update());
   }
   if (typeof window !== 'undefined') emitEvent(window, CONFIG_EVENT, { changed });
 }

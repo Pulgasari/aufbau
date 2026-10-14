@@ -1,6 +1,20 @@
 type Handler = (this: AufbauElement, event: Event, node: Element) => void;
 
-type AttrEntry = Function | { type?: Function, default?: unknown, values?: unknown[], fn?: Function, var?: boolean | string } | unknown;
+/**
+ * a schema entry: a type, a default value, or the full form. `prop: true` (or the type
+ * Array, Object, Function) stores the value on the instance instead of an attribute,
+ * `state: true` does the same without a public accessor.
+ */
+type AttrEntry = Function | {
+  type?       : Function,
+  default?    : unknown,
+  values?     : unknown[],
+  fn?         : Function,
+  var?        : boolean | string,
+  prop?       : boolean,
+  state?      : boolean,
+  hasChanged? : (value: unknown, old: unknown) => boolean,
+} | unknown;
 
 export declare class Selection implements Iterable<Element> {
   readonly node  : Element | null;
@@ -43,6 +57,8 @@ export declare class Selection implements Iterable<Element> {
 
 export declare class AufbauElement extends HTMLElement {
   static attr?      : Record<string, AttrEntry>;
+  /** `false` updates at once on every change instead of once per microtask. */
+  static batch?     : boolean;
   static internals? : boolean | Partial<ElementInternals>;
   static parts?     : string[];
   static reflect?   : string[];
@@ -85,22 +101,38 @@ export declare class AufbauElement extends HTMLElement {
   hasAttr (name: string): boolean;
   setAttr (map: Record<string, unknown>): this;
 
+  /** Stores the value of a prop entry; an update follows when it changed. */
+  setProp  (name: string, value: unknown): this;
+  /** Stores the value of a state entry; an update follows when it changed. */
+  setState (name: string, value: unknown): this;
 
   setSkeleton (on?: boolean): this;
   setVar      (name: string, value: unknown): this;
   setVar      (map: Record<string, unknown>): this;
 
+  /** Resolves once the pending update ran. */
+  readonly updateComplete : Promise<boolean>;
+
+  /** Marks a name as changed (every name without one) and schedules an update for the next microtask. */
+  requestUpdate (name?: string): this;
+  /** Runs the pending update at once, for code that reads the dom right after a change. */
+  flush         (): this;
+  /** Updates at once; without names every name counts as changed. */
+  update        (changed?: Iterable<string>): this;
+
   invalidate (): this;
   render     (): unknown;
-  sync       (): void;
-  update     (): this;
+  sync       (changed: Set<string>): void;
+  willUpdate (changed: Set<string>): void;
 
   onAdopted          (oldDocument: Document, newDocument: Document): void;
   onAttributeChanged (name: string, oldValue: string | null, newValue: string | null): void;
   onConnected        (): void;
   onConnectedMove    (): void;
   onDisconnected     (): void;
-  onRender           (): void;
+  onError            (error: unknown): void;
+  onFirstRender      (): void;
+  onRender           (changed: Set<string>): void;
 }
 
 type Constructor<T = AufbauElement> = abstract new (...args: any[]) => T;

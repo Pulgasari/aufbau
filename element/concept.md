@@ -36,8 +36,10 @@ static attr = {
 | `state: true` | none public, `this.setState(name, value)` / `getAttr(name)` | the instance | yes |
 
 `init()` defines the accessors on the prototype, as it does for the `$part`
-getters today. a class field with the same name would shadow the accessor
-(the same trap as in lit): `init()` warns when it finds one on the first instance.
+getters today. a name the class already has (a hand-written accessor, a method)
+or the platform has (`title`, `hidden` …) keeps its own. a value on the instance
+(set before the element was defined, or a class field) would hide the accessor:
+on the first connect it is handed to the accessor instead.
 
 the 16 hand-written setters in `@aufbau/elements` become schema entries.
 
@@ -55,9 +57,8 @@ await el.updateComplete;
 `requestUpdate(name)`; the update runs once per microtask. `flush()` runs a
 pending update at once, for code that reads the dom right after a change.
 
-**open**: on by default (3 is a major version) with `static batch = false` as
-the way back per class, or off by default. recommendation: on, the elements
-that read the dom right after a change are few and get a `flush()`.
+decided: on by default, `static batch = false` updates at once per class, and
+`flush()` runs a pending update where code reads the dom right after a change.
 
 ## 3. changed names in the hooks
 
@@ -145,6 +146,12 @@ custom data, jetbrains), docs pages, storybook controls.
 - **ssr and hydration**: `render()` stays free of side effects so a server can
   call it later; the rest waits for a need (see the review notes, 2.6).
 - the smaller points (16.12 in the comparison): one by one when we get there.
+
+## state
+
+built: 1 to 4 and 6 (properties, batching, changed names, getAttr cache,
+errors). the hand-written setters in `@aufbau/elements` are still in place; they
+keep working, since `init()` leaves names alone that a class defines itself.
 
 ## order
 
