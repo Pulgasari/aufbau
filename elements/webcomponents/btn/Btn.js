@@ -3,7 +3,7 @@ import '../svg-icon.js';
 import { AufbauElement } from '@aufbau/element';
 import { isFn }          from '@pulgasari/is';
 import { toCamelCase }   from '@pulgasari/str';
-import { html }          from '../../lib/html.js';
+import { html }          from '../../lib/template.js';
 
 // command -> icon (an alias of @aufbau/svg) and label. Btn.commands takes more
 const COMMANDS = {

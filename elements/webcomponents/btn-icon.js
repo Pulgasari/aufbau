@@ -1,5 +1,5 @@
 import { Btn }  from './btn/Btn.js';
-import { html } from '../lib/html.js';
+import { html } from '../lib/template.js';
 
 // only an icon. the label, the children or the command name it for assistive tech
 export default class BtnIcon extends Btn {

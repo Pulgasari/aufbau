@@ -197,5 +197,7 @@ export declare function html (strings: TemplateStringsArray, ...values: unknown[
 /** A keyed list for a child hole. Without key the position is the key. */
 export declare function each<T> (items: Iterable<T>, key: (item: T, index: number) => unknown, row: (item: T, index: number) => unknown): unknown;
 export declare function each<T> (items: Iterable<T>, row: (item: T, index: number) => unknown): unknown;
+/** Markup as it is for a child hole, parsed only when it changed. */
+export declare function raw (html: string | null | undefined): unknown;
 /** One of two branches for a child hole. */
 export declare function when (condition: unknown, then: () => unknown, otherwise?: (() => unknown) | null): unknown;

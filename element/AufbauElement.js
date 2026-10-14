@@ -287,16 +287,18 @@ export class AufbauElement extends HTMLElement {
       const output = this.render();
       let rebuilt  = false;
 
+      // rebuilt as in 2.x: the markup was built anew, here the first render of a template
       if (isResult(output)) {
         renderInto(this.renderTarget, output);
+        rebuilt = output.program !== this._program;
+        this._program   = output.program;
         this._templated = true;
         this._markup    = undefined;
-        rebuilt = true;
       }
       else if (output != null) {
         const next = String(output);
         if (next !== this._markup) {
-          if (this._templated) { unrender(this.renderTarget); this._templated = false; }
+          if (this._templated) { unrender(this.renderTarget); this._templated = false; this._program = null; }
           this._markup = next;
           this.renderTarget.innerHTML = next;
           rebuilt = true;
