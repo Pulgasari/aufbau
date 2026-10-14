@@ -40,7 +40,7 @@ export default class OutputMd extends AufbauSourceElement {
 
     if (!source) { this._html = ''; return this.finish('idle'); }
 
-    this.setState('loading');
+    this.setPhase('loading');
     if (!this._html) super.update();
 
     try {
@@ -72,14 +72,14 @@ export default class OutputMd extends AufbauSourceElement {
     return root.innerHTML;
   }
 
-  setState (state) {
+  setPhase (state) {
     this._state = state;
     for (const name of STATES) this.states.toggle(name, name === state);
     this.setSkeleton(state === 'loading' && !this._html);
   }
 
   finish (state) {
-    this.setState(state);
+    this.setPhase(state);
     super.update();
     if (state !== 'loading') this.emit('output-md-rendered', { state, src: this.getAttr('src') });
     return this;

@@ -257,8 +257,9 @@ export class AufbauElement extends HTMLElement {
     return this;
   }
 
-  // the pending update, now: for code that reads the dom right after a change
-  flush () { return this._changed ? this.perform(this._changed) : this; }
+  // the pending update, now: for code that reads the dom right after a change.
+  // through update(), so a subclass that overrides it still sees every update
+  flush () { return this._changed ? this.update(this._changed) : this; }
 
   // resolves once the pending update ran
   get updateComplete () { return this._pending ?? Promise.resolve(true); }
