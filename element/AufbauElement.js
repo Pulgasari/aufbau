@@ -14,6 +14,8 @@ import { isFn, isPlainObject, isString } from '@pulgasari/is';
 import { Logger }                        from '@pulgasari/logger';
 import { toCamelCase, toKebabCase }      from '@pulgasari/str';
 
+import { isResult, render as renderInto, unrender } from '@domina/render';
+
 import { Selection, SHORTHANDS } from './Selection.js';
 
 const log = new Logger({ prefix: 'aufbau-core' });
@@ -244,12 +246,21 @@ export class AufbauElement extends HTMLElement {
       this.willUpdate(names);
       this.reflectAttrs();
 
-      const markup = this.render();
+      // a template result is patched (@domina/render): only the holes that changed
+      // are written. a string takes the 2.x path: compared, then set as innerHTML
+      const output = this.render();
       let rebuilt  = false;
 
-      if (markup != null) {
-        const next = String(markup);
+      if (isResult(output)) {
+        renderInto(this.renderTarget, output);
+        this._templated = true;
+        this._markup    = undefined;
+        rebuilt = true;
+      }
+      else if (output != null) {
+        const next = String(output);
         if (next !== this._markup) {
+          if (this._templated) { unrender(this.renderTarget); this._templated = false; }
           this._markup = next;
           this.renderTarget.innerHTML = next;
           rebuilt = true;

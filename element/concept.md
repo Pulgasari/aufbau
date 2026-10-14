@@ -149,8 +149,8 @@ custom data, jetbrains), docs pages, storybook controls.
 
 ## state
 
-built: 1 to 4 and 6 (properties, batching, changed names, getAttr cache,
-errors). the hand-written setters in `@aufbau/elements` are still in place; they
+built: 1 to 6 (properties, batching, changed names, getAttr cache, rendering
+through `@domina/render`, errors). the hand-written setters in `@aufbau/elements` are still in place; they
 keep working, since `init()` leaves names alone that a class defines itself.
 
 ## order

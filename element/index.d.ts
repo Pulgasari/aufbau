@@ -187,3 +187,11 @@ export declare function setSkin         (skin: string | null): void;
 
 export declare const session : unknown;
 export declare const store   : unknown;
+
+/** htx rendered by @domina/render: the result of render() is patched, only changed holes are written. */
+export declare function html (strings: TemplateStringsArray, ...values: unknown[]): { program: unknown; values: unknown[] };
+/** A keyed list for a child hole. Without key the position is the key. */
+export declare function each<T> (items: Iterable<T>, key: (item: T, index: number) => unknown, row: (item: T, index: number) => unknown): unknown;
+export declare function each<T> (items: Iterable<T>, row: (item: T, index: number) => unknown): unknown;
+/** One of two branches for a child hole. */
+export declare function when (condition: unknown, then: () => unknown, otherwise?: (() => unknown) | null): unknown;

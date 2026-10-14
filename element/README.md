@@ -55,7 +55,31 @@ the native callbacks do the base's work and then call a hook of the same name:
 | `onAdopted(oldDocument, newDocument)` | moved into another document |
 | `onConnectedMove()` | moved with `moveBefore()`. by default disconnected and connected again, override it to keep the state |
 
-`willUpdate(changed)` · `render()` · `sync(changed)` · `onRender(changed)` (after a rebuild) · `onFirstRender()` · `onError(error)` · `update()` · `invalidate()`
+`willUpdate(changed)` · `render()` · `sync(changed)` · `onRender(changed)` (after a template render or a string rebuild) · `onFirstRender()` · `onError(error)` · `update()` · `invalidate()`
+
+### rendering
+
+```js
+import { AufbauElement, each, html } from '@aufbau/element';
+
+class TodoList extends AufbauElement {
+  static attr = { title: String, items: { type: Array, default: [] } };
+
+  render () {
+    return html`
+      <h2.title>${this.title}</h2>
+      <ul>${each(this.items, item => item.id, item => html`<li class:done=${item.done}>${item.label}</li>`)}</ul>
+    `;
+  }
+}
+```
+
+`html` is htx (tag selectors, prop groups, merged `class`, shorthand tags)
+rendered by `@domina/render`: the template is cloned once, every later update
+writes only the holes that changed, so focus, input values and listeners inside
+survive. `onRender(changed)` runs after every such render. a `render()` that
+returns a string still works the 2.x way (compared, then `innerHTML`), element
+by element.
 
 ### update cycle
 
