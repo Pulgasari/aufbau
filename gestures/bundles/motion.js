@@ -2,6 +2,10 @@
 // the motion the bundles share: easing to a point, and gliding on after a
 // release. both run on requestAnimationFrame, report every frame and can be
 // stopped; a new gesture stops the motion still running.
+//
+// frame() is the write side of a gesture: events only compute and read, the
+// style is written once per animation frame. reading layout right after a write
+// forces the browser to lay out on the spot, once per pointer event.
 
 const easeOut = t => 1 - (1 - t) ** 3;
 
@@ -51,4 +55,15 @@ function glide (position, velocity, { friction = 0.94, limit = point => point, m
   return { stop: () => { cancelAnimationFrame(frame); frame = null; } };
 }
 
-export { easeOut, glide, tween };
+// one write per animation frame, however many events arrive in between
+function frame (write) {
+  let id = null;
+  const run = () => { id = null; write(); };
+  return {
+    schedule () { id ??= requestAnimationFrame(run); },
+    flush    () { if (id === null) return; cancelAnimationFrame(id); run(); },
+    cancel   () { cancelAnimationFrame(id); id = null; },
+  };
+}
+
+export { easeOut, frame, glide, tween };

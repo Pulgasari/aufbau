@@ -3,6 +3,13 @@
 // optionally locked to an axis, kept within bounds, gliding on after a flick,
 // snapping to a grid or to points, and dropped onto targets.
 //
+// `rubberband` lets it follow past the bounds with resistance (0.15 is a soft
+// edge, 0 the hard one) and pulls it back on release.
+//
+// the drop target under the pointer is looked up before the new position is
+// written, and the position is written once per frame: a lookup right after a
+// write would force a layout on every pointer event.
+//
 // drop targets are found under the pointer by `drop` (a selector). while the
 // element hovers one it carries data-drop-over, the dragged element carries
 // data-dragging. with `revert: true` it returns to its start unless dropped.
@@ -14,26 +21,27 @@
 // named events would clash with the native drag and drop events, the bundle
 // reports through callbacks: onStart, onMove, onEnd, onEnter, onLeave, onDrop.
 
-import gestures        from './../index.js';
-import { glide, tween } from './motion.js';
+import gestures                 from './../index.js';
+import { frame, glide, tween } from './motion.js';
 
 function draggable (element, options = {}) {
   const {
-    axis     = null,    // 'x', 'y' or null
-    bounds   = null,    // 'parent', an element, or null
-    drop     = null,    // selector of drop targets
-    grid     = null,    // a step in px, snapped to on release
-    inertia  = true,
-    keyboard = true,
-    onDrop   = null,
-    onEnd    = null,
-    onEnter  = null,
-    onLeave  = null,
-    onMove   = null,
-    onStart  = null,
-    revert   = false,
-    snap     = null,    // [{ x, y }, …], the nearest one on release
-    step     = 10,
+    axis       = null,    // 'x', 'y' or null
+    bounds     = null,    // 'parent', an element, or null
+    drop       = null,    // selector of drop targets
+    grid       = null,    // a step in px, snapped to on release
+    inertia    = true,
+    keyboard   = true,
+    onDrop     = null,
+    onEnd      = null,
+    onEnter    = null,
+    onLeave    = null,
+    onMove     = null,
+    onStart    = null,
+    revert     = false,
+    rubberband = 0,       // the share it follows past the bounds, 0 is a hard edge
+    snap       = null,    // [{ x, y }, …], the nearest one on release
+    step       = 10,
   } = options;
 
   let position = { x: 0, y: 0 };
@@ -42,7 +50,8 @@ function draggable (element, options = {}) {
   let over     = null;    // the drop target under the pointer
   let motion   = null;
 
-  const render = () => { element.style.translate = `${position.x}px ${position.y}px`; };
+  const render  = () => { element.style.translate = `${position.x}px ${position.y}px`; };
+  const painter = frame(render);
   const report = (callback, extra = {}) => callback?.({ element, position: { ...position }, target: over, ...extra });
 
   // :::::: LIMITS
@@ -63,13 +72,19 @@ function draggable (element, options = {}) {
     };
   }
 
-  const limit = point => {
+  // past a bound, an elastic edge lets it follow a share of the overshoot
+  const clamp = (value, minimum, maximum, elastic) =>
+      value < minimum ? (elastic ? minimum - (minimum - value) * rubberband : minimum)
+    : value > maximum ? (elastic ? maximum + (value - maximum) * rubberband : maximum)
+    :                   value;
+
+  const limit = (point, elastic = false) => {
     let { x, y } = point;
     if (axis === 'x') y = start?.y ?? position.y;
     if (axis === 'y') x = start?.x ?? position.x;
     if (range) {
-      x = Math.min(range.maximumX, Math.max(range.minimumX, x));
-      y = Math.min(range.maximumY, Math.max(range.minimumY, y));
+      x = clamp(x, range.minimumX, range.maximumX, elastic && rubberband > 0);
+      y = clamp(y, range.minimumY, range.maximumY, elastic && rubberband > 0);
     }
     return { x, y };
   };
@@ -112,9 +127,9 @@ function draggable (element, options = {}) {
     onPanCancel : () => finish(false),
     onPanEnd    : gesture => finish(true, gesture),
     onPanMove   : gesture => {
-      position = limit({ x: start.x + gesture.delta.x, y: start.y + gesture.delta.y });
-      render();
       hover(gesture.center);
+      position = limit({ x: start.x + gesture.delta.x, y: start.y + gesture.delta.y }, true);
+      painter.schedule();
       report(onMove);
     },
     onPanStart  : () => {
@@ -128,6 +143,7 @@ function draggable (element, options = {}) {
   });
 
   function finish (released, gesture) {
+    painter.flush();
     delete element.dataset.dragging;
     const target = over;
     if (over) { delete over.dataset.dropOver; over = null; }
@@ -141,6 +157,11 @@ function draggable (element, options = {}) {
     if (revert || !released) { moveTo(start, () => report(onEnd, { dropped: false })); return; }
 
     const done = () => moveTo(settle(position), () => report(onEnd, { dropped: false }));
+
+    // released past an elastic bound: back inside first, no glide out of it
+    const inside = limit(position);
+    if (inside.x !== position.x || inside.y !== position.y) { done(); return; }
+
     const { x, y } = gesture.velocity;
     if (!inertia || Math.hypot(x, y) < 0.1) { done(); return; }
     motion = glide(position, { x: axis === 'y' ? 0 : x, y: axis === 'x' ? 0 : y }, {
@@ -177,6 +198,7 @@ function draggable (element, options = {}) {
     set   : point => { motion?.stop(); position = { ...position, ...point }; render(); },
     destroy () {
       motion?.stop();
+      painter.cancel();
       handle.destroy();
       element.removeEventListener('keydown', keydown);
     },

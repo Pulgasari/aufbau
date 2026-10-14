@@ -25,13 +25,15 @@ handle.destroy();
 
 every handler and every dom event gets the session as a snapshot: `center`,
 `delta`, `distance`, `direction`, `velocity`, `scale`, `rotation`, `pointers`,
-`input`, … the full list is in [concept.md](concept.md).
+`positions`, `input`, `pressure`, `tilt`, `twist`, … the full list is in
+[concept.md](concept.md).
 
 ## gestures
 
 | gesture     | handlers |
 |-------------|----------|
-| tap         | `onTap`, `onDoubleTap` |
+| tap         | `onTap`, `onDoubleTap`, `onTwoFingerTap` |
+| double tap drag | `onDoubleTapDragStart`, `…Move`, `…End`, `…Cancel` (tap, press again, drag: one-handed zoom) |
 | press       | `onPressStart`, `onPressEnd`, `onPressCancel`, `onPressRepeat` |
 | long press  | `onLongPress` |
 | secondary   | `onSecondary` (right click, long press, menu key: the native `contextmenu`) |
@@ -52,6 +54,10 @@ pointer goes down:
 gestures(list, { recognize: ['swipe'] });
 ```
 
+where `onDoubleTap` listens, a single tap waits until no second one can follow,
+so the two exclude each other (`tap: { waitForDoubleTap: false }` fires both at
+once). a swipe takes the direction of the velocity at release.
+
 thresholds go to the recognizer, guards to the handler:
 
 ```javascript
@@ -61,16 +67,53 @@ gestures(element, {
 });
 ```
 
+## at runtime
+
+```javascript
+const handle = gestures(element, { onTap: select });
+
+const off = handle.on('doubleTap', zoom);          // touch-action follows
+handle.set({ swipe: { minimumDistance: 80 } });    // rebuilt after the running session
+handle.enable('pan', false);                       // or a predicate asked at each session start:
+handle.enable('pan', gesture => onEdge(gesture.start));
+handle.recognize('swipe');                         // for listeners added with addEventListener
+```
+
+## nested elements
+
+a pointer belongs to one session across elements: the first one that claims it
+(a pan, a pinch, a long press …) keeps it, every other session on the same
+pointer is cancelled. nested elements hear the pointer first, so a swipeable
+item inside a sortable list wins over the list. `yield: true` turns that around
+for one element, it steps back when another one already holds the pointer.
+
+a session that loses its pointerup (released over an iframe, an alert, a window
+switch) ends on blur, when the page is hidden, or with the next press.
+
+## events adapter
+
+for code that only knows event types (a template binding `onSwipeLeft`,
+`Selection.on('swipeleft')`, a framework's event props):
+
+```javascript
+import { isGestureEvent, listen, configure } from '@aufbau/gestures/events';
+
+const off = listen(node, 'swipeleft', event => next());   // the recognizer turns on for node
+configure(node, { swipe: { minimumDistance: 80 } });
+off();                                                     // and off with the last listener
+```
+
 ## bundles
 
 | bundle          | does |
 |-----------------|------|
 | `adjustable`    | one number by pinching (the item size of a grid), trackpad pinch and ctrl + wheel too, one finger still scrolls |
 | `dismissable`   | follows along an axis and leaves when far or fast enough, snaps back otherwise |
-| `draggable`     | follows the pointer, `axis`, `bounds`, inertia, `grid` and `snap`, `drop` targets |
+| `draggable`     | follows the pointer, `axis`, `bounds` with `rubberband`, inertia, `grid` and `snap`, `drop` targets |
 | `pullable`      | pull to refresh on a scroll container |
-| `sortable`      | reorders a list or grid, the others slide into place |
-| `transformable` | move, pinch, turn and wheel-zoom an element around the fingers |
+| `resizable`     | resize by edges and corners, `aspectRatio`, `grid`, limits; the content keeps every other pointer |
+| `sortable`      | reorders a list or grid, the others slide into place, `group` across lists, auto scroll, announced |
+| `transformable` | move, pinch, turn, wheel-zoom and double-tap-drag-zoom an element around the fingers |
 
 ```javascript
 import { adjustable, transformable } from '@aufbau/gestures';
@@ -80,7 +123,19 @@ const view = transformable(image, { maximumScale: 6 });
 ```
 
 each one has a keyboard counterpart where it makes sense, see the header of
-its file.
+its file. bundles write once per animation frame and read layout before they
+write, never right after.
+
+## tools
+
+```javascript
+import debug    from '@aufbau/gestures/debug';      // overlay: pointers, center, velocity, claims, last gestures
+import simulate from '@aufbau/gestures/simulate';   // synthetic pointer paths: tap, swipe, pinch, doubleTapDrag …
+
+const stop = debug(handle);
+await simulate.swipe(list, { direction: 'left' });
+await simulate.pinch(image, { scale: 2 });
+```
 
 ## preact
 

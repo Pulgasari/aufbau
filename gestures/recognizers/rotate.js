@@ -7,6 +7,7 @@
 // a trackpad rotation only exists in safari (gesture events), it arrives
 // through trackpad.js with input 'trackpad'.
 
+import { claim }          from './../shared.js';
 import { createTrackpad } from './../trackpad.js';
 
 function rotate ({ element, emit, options }) {
@@ -20,8 +21,8 @@ function rotate ({ element, emit, options }) {
   // with everything since the session started, so a handler on Move alone
   // loses nothing that happened before the threshold was crossed
   function begin (session) {
+    if (!claim(session, 'rotate')) return;
     rotating = true;
-    session.claims.add('rotate');
     emit('rotateStart', session, { rotationChange: 0 });
     emit('rotateMove',  session, { rotationChange: changeOf(session) });
   }

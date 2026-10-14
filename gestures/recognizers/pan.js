@@ -11,7 +11,7 @@
 // still scrolls. per input as `{ touch: 'longPress', pen: 'longPress' }`, an
 // input left out drags at once. without `after` a long press rules the pan out.
 
-import { NO_SELECT, toleranceFor } from './../shared.js';
+import { NO_SELECT, claim, exclusive, toleranceFor } from './../shared.js';
 
 function pan ({ emit, options }) {
   const { after = null, axis = null, pointers = 1, tolerance, touchAction = null } = options;
@@ -26,13 +26,13 @@ function pan ({ emit, options }) {
 
     if (!panning) {
       if (event.type !== 'pointermove') return;
-      if (session.pointers !== pointers || session.claims.has('edgeSwipe')) return;
+      if (session.pointers !== pointers || exclusive(session)) return;
 
       const required = waitsFor(session.input);
       if (required) { if (!session.claims.has(required)) return; }
       else if ((after === null && session.claims.has('longPress')) || session.travel <= toleranceFor(tolerance, session.input)) return;
+      if (!claim(session, 'pan')) return;
       panning = true;
-      session.claims.add('pan');
       emit('panStart', session);
     }
     emit('panMove', session);

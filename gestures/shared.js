@@ -26,6 +26,18 @@ const stricterTouchAction = (a, b) => {
   return (TOUCH_ACTION_RANK[b] ?? 0) > (TOUCH_ACTION_RANK[a] ?? 0) ? b : a;
 };
 
+// a recognizer that owns the session says so. for a pointer session this also
+// takes the pointer from any other element's session (see own() in tracker.js);
+// false means this session stepped back and is cancelled, the recognizer stops
+const claim = (session, name) => {
+  session.claims.add(name);
+  return session.own ? session.own() : true;
+};
+
+// claims that rule out every other movement gesture: whoever holds one owns the movement
+const EXCLUSIVE = ['doubleTapDrag', 'edgeSwipe', 'secondary'];
+const exclusive = session => EXCLUSIVE.some(name => session.claims.has(name));
+
 // wheel deltas in pixels whatever the deltaMode (lines, pages)
 const WHEEL_UNIT = { 0: 1, 1: 16, 2: 400 };
 const normalizeWheel = event => ({ x: event.deltaX * WHEEL_UNIT[event.deltaMode], y: event.deltaY * WHEEL_UNIT[event.deltaMode] });
@@ -50,16 +62,21 @@ function inputSession (element, event, input) {
     maximumPointers : 0,
     modifiers       : modifiersOf(event),
     movement        : { x: 0, y: 0 },
+    path            : event.composedPath(),
     phase           : 'start',
+    pointerId       : null,
     pointers        : 0,
+    positions       : [],
+    pressure        : 0,
     rotation        : 0,
     scale           : 1,
     start           : point,
     startTime       : event.timeStamp,
-    path            : event.composedPath(),
     target          : event.target,
+    tilt            : { x: 0, y: 0 },
     time            : event.timeStamp,
     travel          : 0,
+    twist           : 0,
     velocity        : { speed: 0, x: 0, y: 0 },
   };
 }
@@ -67,4 +84,4 @@ function inputSession (element, event, input) {
 // continuous input without an end of its own (wheel events) ends after a pause
 const IDLE = 150;
 
-export { IDLE, NO_SELECT, TOLERANCE, inputSession, modifiersOf, normalizeWheel, stricterTouchAction, toleranceFor };
+export { IDLE, NO_SELECT, TOLERANCE, claim, exclusive, inputSession, modifiersOf, normalizeWheel, stricterTouchAction, toleranceFor };

@@ -3,27 +3,34 @@
 // not follow on release.
 //
 // on touch the platform may open its own menu for the same hold (android fires
-// contextmenu), which is prevented while a long press listens.
+// contextmenu). where secondary listens, the platform's meaning wins: a long
+// press on touch and pen waits `grace` ms longer and steps back if a contextmenu
+// claimed the session meanwhile, so the two never both fire. where secondary
+// does not listen, the native menu is prevented while a long press listens.
 
-import { NO_SELECT, toleranceFor } from './../shared.js';
+import { NO_SELECT, claim, toleranceFor } from './../shared.js';
 
-function longPress ({ element, emit, options }) {
-  const { duration = 500, tolerance } = options;
+function longPress ({ active, element, emit, options }) {
+  const { duration = 500, grace = 200, tolerance } = options;
+  const deferring = active.has('secondary');
   let timer = null;
 
   const stop = () => { clearTimeout(timer); timer = null; };
+
+  const fire = (session, began) => {
+    timer = null;
+    if (session.claims.size || session.pointers === 0 || session.phase === 'cancel') return;
+    if (!claim(session, 'longPress')) return;
+    emit('longPress', session, { duration: performance.now() - began });
+  };
 
   // the timer fires between pointer events, so the session's duration is the one of
   // the last event. the held time is measured here
   function start (session) {
     stop();
     const began = performance.now() - session.duration;
-    timer = setTimeout(() => {
-      timer = null;
-      if (session.claims.size || session.pointers === 0) return;
-      session.claims.add('longPress');
-      emit('longPress', session, { duration: performance.now() - began });
-    }, duration);
+    const wait  = deferring && session.input !== 'mouse' ? duration + grace : duration;
+    timer = setTimeout(() => fire(session, began), wait);
   }
 
   // moving away or a second pointer (a pinch beginning) is no long press
@@ -32,7 +39,7 @@ function longPress ({ element, emit, options }) {
   }
 
   const preventNativeMenu = event => { if (event.pointerType && event.pointerType !== 'mouse') event.preventDefault(); };
-  element.addEventListener('contextmenu', preventNativeMenu);
+  if (!deferring) element.addEventListener('contextmenu', preventNativeMenu);
 
   return {
     start,

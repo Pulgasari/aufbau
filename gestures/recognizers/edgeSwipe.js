@@ -9,7 +9,7 @@
 // edgeSwipeCancel, with the `edge` and a `progress` from 0 to 1 across the
 // element (or viewport) along the swipe.
 
-import { toleranceFor } from './../shared.js';
+import { claim, toleranceFor } from './../shared.js';
 
 const AWAY = {
   bottom : delta => -delta.y > Math.abs(delta.x),
@@ -51,8 +51,8 @@ function edgeSwipe ({ element, emit, options }) {
     if (!swiping) {
       if (session.pointers !== 1 || session.travel <= toleranceFor(tolerance, session.input)) return;
       if (!AWAY[edge](session.delta)) { edge = null; return; }   // along the edge or back: not an edge swipe
+      if (!claim(session, 'edgeSwipe')) { edge = null; return; }
       swiping = true;
-      session.claims.add('edgeSwipe');
       emit('edgeSwipeStart', session, detail(session));
     }
     emit('edgeSwipeMove', session, detail(session));

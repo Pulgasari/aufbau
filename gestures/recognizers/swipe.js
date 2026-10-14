@@ -1,24 +1,34 @@
 // @aufbau/gestures/recognizers/swipe.js
 // a flick: judged on release, far enough and fast enough. it reads the same
-// session as pan, the two coexist. a claimed long press rules it out.
+// session as pan, the two coexist. a long press or an exclusive claim (edge
+// swipe, double tap drag, secondary) rules it out.
 //
-// touch-action follows the directions that are listened to: only left/right
-// leaves vertical scrolling to the browser, only up/down the horizontal one.
+// the direction is the one of the velocity at release, not of the whole delta:
+// a drag to the left that ends in a flick to the right is a swipe to the right,
+// which is what the hand meant. `distance` still has to pass the threshold, so
+// a short twitch is no swipe.
+//
+// touch-action follows the directions that are listened to or recognized: only
+// left/right leaves vertical scrolling to the browser, only up/down the
+// horizontal one, `swipe` itself takes both.
 
-import { NO_SELECT } from './../shared.js';
+import { NO_SELECT, exclusive } from './../shared.js';
+import { directionOf }          from './../tracker.js';
 
-function swipe ({ emit, handled, options }) {
+function swipe ({ active, emit, options }) {
   const { minimumDistance = 30, minimumSpeed = 0.3, touchAction = null } = options;
 
-  const horizontal = handled.has('swipeLeft') || handled.has('swipeRight');
-  const vertical   = handled.has('swipeUp')   || handled.has('swipeDown');
-  const generic    = handled.has('swipe') || (!horizontal && !vertical);   // enabled through `recognize` only counts as generic
+  const horizontal = active.has('swipeLeft') || active.has('swipeRight');
+  const vertical   = active.has('swipeUp')   || active.has('swipeDown');
+  const generic    = active.has('swipe') || (!horizontal && !vertical);
 
   function end (session) {
-    if (session.claims.has('longPress') || session.claims.has('edgeSwipe')) return;
+    if (session.claims.has('longPress') || exclusive(session)) return;
     if (session.distance < minimumDistance || session.velocity.speed < minimumSpeed) return;
-    emit('swipe', session);
-    emit('swipe' + session.direction[0].toUpperCase() + session.direction.slice(1), session);
+    const direction = directionOf(session.velocity.x, session.velocity.y);
+    if (!direction) return;
+    emit('swipe', session, { direction });
+    emit('swipe' + direction[0].toUpperCase() + direction.slice(1), session, { direction });
   }
 
   return {
