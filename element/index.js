@@ -1,5 +1,5 @@
 export { AufbauElement }                     from './AufbauElement.js';
-export { each, html, when }                  from '@htx/js/render';
+export { each, html, raw, when }             from '@htx/js/render';
 export { Selection }                         from './Selection.js';
 export { AufbauControlElement, withControl } from './withControl.js';
 export { AufbauSourceElement, withSource }   from './withSource.js';

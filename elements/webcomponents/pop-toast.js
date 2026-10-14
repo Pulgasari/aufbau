@@ -3,7 +3,7 @@ import { createShift, shift }      from '@pulgasari/shift';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
 import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
-import { html }                           from '../lib/html.js';
+import { html }                           from '../lib/template.js';
 
 const ICONS = {
   error   : 'lucide:alert-circle',

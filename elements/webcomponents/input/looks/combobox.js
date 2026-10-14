@@ -1,4 +1,4 @@
-import { attrs, html }                                                         from '../../../lib/html.js';
+import { attrs, html }                                                         from '../../../lib/template.js';
 import { FRAME, icon }                                                         from './parts/field.js';
 import { labelOf, updateSelected }                                             from './parts/options.js';
 import { LISTBOX, filter, isOpen, listbox, popoverEvents, setOpen, triggerOf } from './parts/popover.js';
@@ -33,7 +33,7 @@ export default {
   render : host => html`
     ${icon(host)}
     <input type="text" part="input" role="combobox" aria-haspopup="listbox" aria-expanded="false"
-           ${attrs({ placeholder: host.placeholder || 'select…', readonly: !host.getAttr('searchable') })} />
+           ...${attrs({ placeholder: host.placeholder || 'select…', readonly: !host.getAttr('searchable') })} />
     <svg-icon part="caret" icon="lucide:chevron-down"></svg-icon>
     ${listbox(host)}
   `,

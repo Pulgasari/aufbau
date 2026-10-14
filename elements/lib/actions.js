@@ -1,4 +1,4 @@
-import { html } from './html.js';
+import { html } from './template.js';
 
 export const ACTIONS = ['copy', 'paste', 'clear', 'reveal', 'calculator'];
 

@@ -1,6 +1,6 @@
 import { AufbauElement } from '@aufbau/element';
 import { importFile }    from '@aufbau/import';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 const ITEM = 'data-node';
 
@@ -70,7 +70,7 @@ export default class DataTree extends AufbauElement {
     if (!Array.isArray(nodes)) return html``;
 
     return html`${nodes.map(node => html`
-      <data-node ${attrs({
+      <data-node ...${attrs({
         expanded : Boolean(node.expanded),
         icon     : node.icon,
         label    : node.label ?? node.name ?? '',

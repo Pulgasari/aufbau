@@ -1,7 +1,7 @@
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { AufbauElement, withControl, withSource }   from '@aufbau/element';
 import { dedent }                                   from '../lib/dedent.js';
-import { attrs, html }                              from '../lib/html.js';
+import { attrs, html }                              from '../lib/template.js';
 import { setAttr }                                  from '@domina/methods/setAttr.js';
 import { setValue }                                 from '@domina/methods/setValue.js';
 
@@ -127,7 +127,7 @@ export default class WriteText extends withSource(withControl(AufbauElement)) {
     const actions = parseActions(this.getAttr('actions'));
 
     return html`
-      <textarea ${attrs({ maxlength, placeholder, rows, spellcheck: String(spellcheck) })}></textarea>
+      <textarea ...${attrs({ maxlength, placeholder, rows })} spellcheck=${spellcheck}></textarea>
       ${(counter || actions.length) && html`
         <footer>
           ${counter && html`<output aria-live="polite"></output>`}

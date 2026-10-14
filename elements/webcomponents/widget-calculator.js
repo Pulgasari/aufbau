@@ -3,7 +3,7 @@
 import './svg-icon.js';
 
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 import { localeOf }      from '../lib/locale.js';
 
 // :::::: PARSER
@@ -352,7 +352,7 @@ export default class WidgetCalculator extends AufbauElement {
     const icon  = ICONS[key];
     const kind  = OPERATORS.has(key) || key === '()' || key === 'alpha' ? 'operator' : null;
 
-    return html`<button type="button" tabindex="-1" ${attrs({ 'aria-label': icon && key, 'aria-pressed': key === 'alpha' && String(this.getAttr('alpha')), 'data-key': key, 'data-kind': kind })}>${icon ? html`<svg-icon icon="${icon}"></svg-icon>` : label}</button>`;
+    return html`<button type="button" tabindex="-1" ...${attrs({ 'aria-label': icon && key, 'aria-pressed': key === 'alpha' && String(this.getAttr('alpha')), 'data-key': key, 'data-kind': kind })}>${icon ? html`<svg-icon icon="${icon}"></svg-icon>` : label}</button>`;
   }
 
   render () {
@@ -366,7 +366,7 @@ export default class WidgetCalculator extends AufbauElement {
         `)}
       </div>
       <div part="screen">
-        <input part="display" id="${this.displayId}" inputmode="none" autocomplete="off" spellcheck="false" value="${value}">
+        <input part="display" id="${this.displayId}" inputmode="none" autocomplete="off" spellcheck="false" value=${value} />
         <output part="preview"></output>
       </div>
       ${alpha

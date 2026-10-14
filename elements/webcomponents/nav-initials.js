@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 import { localeOf }      from '../lib/locale.js';
 
 import { getElement } from '@domina/methods/getElement.js';
@@ -119,7 +119,7 @@ export default class NavInitials extends AufbauElement {
       <ol aria-label="${label}">
         ${sorted.map(initial => {
           const count = this._groups.get(initial)?.length ?? 0;
-          return html`<li><button type="button" ${attrs({ 'data-initial': initial, disabled: !count, title: count })}>${initial}</button></li>`;
+          return html`<li><button type="button" ...${attrs({ 'data-initial': initial, disabled: !count, title: count })}>${initial}</button></li>`;
         })}
       </ol>
     `;

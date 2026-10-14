@@ -3,7 +3,7 @@ import '../svg-icon.js';
 import { isArray } from '@pulgasari/is';
 
 import { AufbauControlElement }    from '@aufbau/element';
-import { html }                    from '../../lib/html.js';
+import { html }                    from '../../lib/template.js';
 import { LOOKS, lookFor, sheetOf } from './looks/index.js';
 import { OptionSource }            from './options.js';
 import { TYPE_ATTRIBUTES, typeOf } from './types/index.js';

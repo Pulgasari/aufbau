@@ -1,4 +1,4 @@
-import { attrs, html }                 from '../../../lib/html.js';
+import { attrs, html }                 from '../../../lib/template.js';
 import { place }                       from '../../../lib/placement.js';
 import { formatPattern, parsePattern } from '../types/pattern.js';
 
@@ -8,7 +8,7 @@ const swatchesOf = host => [...host.root.querySelectorAll('[part~="patterns"] [d
 const idOf = button => button.dataset.pattern === 'none' ? '' : button.dataset.pattern;
 
 const swatch = (id, label, part = 'swatch') => html`
-  <button type="button" part="${part}" data-pattern="${id}" ${attrs({ 'aria-label': label, title: label })}><span></span></button>
+  <button type="button" part="${part}" data-pattern="${id}" ...${attrs({ 'aria-label': label, title: label })}><span></span></button>
 `;
 
 function idsOf (host, catalog) {
@@ -44,18 +44,17 @@ function pick (host, id) {
   }));
 }
 
+// the swatches of the catalog, loaded once, render() draws them
 function fill (host) {
-  const popover = host.part('patterns').node;
-  if (popover.dataset.filled) return;
-  popover.dataset.filled = 'true';
+  if (host._swatches) return;
+  host._swatches = [];
 
   import('@aufbau/patterns').then(({ list }) => {
-    const catalog  = list();
-    const names    = Object.fromEntries(catalog.map(pattern => [pattern.id, pattern.name]));
-    const swatches = idsOf(host, catalog).map(id => swatch(id, names[id] ?? id));
-    const none     = !host.hasAttribute('required') && swatch('none', 'none');
+    const catalog = list();
+    const names   = Object.fromEntries(catalog.map(pattern => [pattern.id, pattern.name]));
+    const none    = host.hasAttribute('required') ? [] : [['none', 'none']];
 
-    popover.innerHTML = html`${none}${swatches}`;
+    host._swatches = [...none, ...idsOf(host, catalog).map(id => [id, names[id] ?? id])];
     host.update();
   });
 }
@@ -140,7 +139,7 @@ export default {
           <input type="color" part="color" data-color="fg" aria-label="pattern color" />
           <input type="color" part="color" data-color="bg" aria-label="background color" />
         </span>`}
-      <div part="patterns" popover="auto" role="radiogroup" aria-label="patterns"></div>
+      <div part="patterns" popover="auto" role="radiogroup" aria-label="patterns">${(host._swatches ?? []).map(([id, label]) => swatch(id, label))}</div>
     `;
   },
 

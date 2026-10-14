@@ -1,7 +1,7 @@
 import './input/tags.js';
 import './input-option.js';
 
-import { attrs, html } from '../lib/html.js';
+import { attrs, html } from '../lib/template.js';
 import PopModal        from './pop-modal.js';
 
 // a question in a modal: a message, maybe a field, cancel and confirm. the field is an
@@ -72,13 +72,13 @@ export default class PopPrompt extends PopModal {
       <p part="message">${message ?? ''}</p>
       <slot></slot>
       ${type && html`
-        <input-value part="field" ${attrs({ autofocus: true, look, type: !options.length && type, value })}>
-          ${options.map(option => html`<input-option ${attrs({ value: option.value })}>${option.label ?? option.value}</input-option>`)}
+        <input-value part="field" ...${attrs({ autofocus: true, look, type: !options.length && type, value })}>
+          ${options.map(option => html`<input-option ...${attrs({ value: option.value })}>${option.label ?? option.value}</input-option>`)}
         </input-value>
       `}
       <form method="dialog" part="actions">
         ${cancel && html`<button value="cancel">${cancel}</button>`}
-        <button value="confirm" ${type ? '' : 'autofocus'}>${confirm}</button>
+        <button value="confirm" autofocus=${!type}>${confirm}</button>
       </form>
     `;
   }

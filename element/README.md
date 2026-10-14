@@ -55,7 +55,7 @@ the native callbacks do the base's work and then call a hook of the same name:
 | `onAdopted(oldDocument, newDocument)` | moved into another document |
 | `onConnectedMove()` | moved with `moveBefore()`. by default disconnected and connected again, override it to keep the state |
 
-`willUpdate(changed)` · `render()` · `sync(changed)` · `onRender(changed)` (after a template render or a string rebuild) · `onFirstRender()` · `onError(error)` · `update()` · `invalidate()`
+`willUpdate(changed)` · `render()` · `sync(changed)` · `onRender(changed)` (after the markup was built anew) · `onFirstRender()` · `onError(error)` · `update()` · `invalidate()`
 
 ### rendering
 
@@ -77,7 +77,8 @@ class TodoList extends AufbauElement {
 `html` is htx (tag selectors, prop groups, merged `class`, shorthand tags)
 rendered by `@domina/render`: the template is cloned once, every later update
 writes only the holes that changed, so focus, input values and listeners inside
-survive. `onRender(changed)` runs after every such render. a `render()` that
+survive. `onRender(changed)` runs when the markup was built anew, as in 2.x: on
+the first render of a template, not on every patch. a `render()` that
 returns a string still works the 2.x way (compared, then `innerHTML`), element
 by element.
 

@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // one symbol of a sprite sheet: <svg><use href="sprite.svg#name"></svg>. the
 // sheet has to be same origin, or inline in the page (no src). fill follows
@@ -29,8 +29,8 @@ export default class SvgSprite extends AufbauElement {
 
   render () {
     const { icon, src, viewbox } = this.getAttr();
-    if (!icon) return '';
-    return html`<svg aria-hidden="true" ${attrs({ viewBox: viewbox })}><use href="${src ?? ''}#${icon}"></use></svg>`;
+    if (!icon) return html``;
+    return html`<svg aria-hidden="true" ...${attrs({ viewBox: viewbox })}><use href="${src ?? ''}#${icon}"></use></svg>`;
   }
 
   sync () {

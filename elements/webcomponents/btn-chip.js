@@ -1,5 +1,5 @@
 import { Btn }  from './btn/Btn.js';
-import { html } from '../lib/html.js';
+import { html } from '../lib/template.js';
 
 // a compact pill: a filter, a tag, a choice. `pressed` marks it as on, `removable`
 // adds an x at the end that removes it, delete and backspace do the same.

@@ -1,4 +1,4 @@
-import { attrs, html } from '../../../../lib/html.js';
+import { attrs, html } from '../../../../lib/template.js';
 
 // the frame of a field like look, on the part box
 export const FRAME = `
@@ -20,7 +20,8 @@ export const icon = host => host.iconName && html`<svg-icon part="icon" icon="${
 export function field (host, index = 0, extra = {}) {
   const { autocomplete, max, maxlength, min, minlength, pattern, step } = host.getAttr();
   const placeholder = host.placeholder;
-  return html`<input part="input" data-index="${index}" ${attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: host.valueType.input, ...extra })} />`;
+  // extra goes in as it is: a boolean prop like spellcheck: false must not be dropped
+  return html`<input part="input" data-index="${index}" ...${{ ...attrs({ autocomplete, max, maxlength, min, minlength, pattern, placeholder, step, type: host.valueType.input }), ...extra }} />`;
 }
 
 export function fieldEvents (host, scope) {

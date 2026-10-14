@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // a gif that can stop: paused, a still of its current frame covers it. starts
 // paused where the reader asked for reduced motion. a click toggles it
@@ -54,8 +54,8 @@ export default class MediaGif extends AufbauElement {
 
   render () {
     const { alt, src } = this.getAttr();
-    if (!src) return '';
-    return html`<img ${attrs({ alt: alt ?? '', src })}><canvas aria-hidden="true"></canvas><span aria-hidden="true">GIF</span>`;
+    if (!src) return html``;
+    return html`<img ...${attrs({ alt: alt ?? '', src })} /><canvas aria-hidden="true"></canvas><span aria-hidden="true">GIF</span>`;
   }
 
   // the still is the frame that is showing right now

@@ -1,6 +1,6 @@
 import { AufbauSourceElement }  from '@aufbau/element';
 import { importFile, renderMD } from '@aufbau/import';
-import { html, raw as rawHtml } from '../lib/html.js';
+import { html, raw as rawHtml } from '../lib/template.js';
 import { dedent }               from '../lib/dedent.js';
 
 const STATES = ['error', 'idle', 'loading', 'ready'];
@@ -40,7 +40,7 @@ export default class OutputMd extends AufbauSourceElement {
 
     if (!source) { this._html = ''; return this.finish('idle'); }
 
-    this.setState('loading');
+    this.setPhase('loading');
     if (!this._html) super.update();
 
     try {
@@ -72,14 +72,14 @@ export default class OutputMd extends AufbauSourceElement {
     return root.innerHTML;
   }
 
-  setState (state) {
+  setPhase (state) {
     this._state = state;
     for (const name of STATES) this.states.toggle(name, name === state);
     this.setSkeleton(state === 'loading' && !this._html);
   }
 
   finish (state) {
-    this.setState(state);
+    this.setPhase(state);
     super.update();
     if (state !== 'loading') this.emit('output-md-rendered', { state, src: this.getAttr('src') });
     return this;
@@ -88,7 +88,7 @@ export default class OutputMd extends AufbauSourceElement {
   render () {
     if (this.state === 'error')   return html`<p role="alert">could not load content.</p>`;
 
-    return rawHtml(this._html ?? '');
+    return html`${rawHtml(this._html ?? '')}`;
   }
 }
 

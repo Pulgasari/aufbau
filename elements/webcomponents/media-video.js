@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { html }          from '../lib/html.js';
+import { html }          from '../lib/template.js';
 
 const YOUTUBE = 'https://www.youtube-nocookie.com/embed/';
 const ALLOW   = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
@@ -38,7 +38,7 @@ export default class MediaVideo extends AufbauElement {
       <iframe src="${YOUTUBE}${encodeURIComponent(youtubeId)}?rel=0" title="${label}" allow="${ALLOW}" allowfullscreen></iframe>
     `;
 
-    return src ? html`<video src="${src}"></video>` : '';
+    return src ? html`<video src="${src}"></video>` : html``;
   }
 
   sync () {

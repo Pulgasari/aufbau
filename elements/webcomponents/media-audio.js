@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { html }          from '../lib/template.js';
 
 const formatTime = (seconds) => {
   if (!Number.isFinite(seconds)) return '0:00';
@@ -116,7 +116,7 @@ export default class MediaAudio extends AufbauElement {
       <button type="button" aria-label="play"><svg-icon icon="lucide:play"></svg-icon></button>
       ${full && html`
         <time>0:00</time>
-        <input type="range" min="0" max="100" step="0.1" value="0" ${attrs({ 'aria-label': 'seek' })} />
+        <input type="range" min="0" max="100" step="0.1" value="0" aria-label="seek" />
         <time>0:00</time>
       `}
     `;

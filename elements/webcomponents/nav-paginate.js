@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 import { getElement } from '@domina/methods/getElement.js';
 
@@ -113,11 +113,11 @@ export default class NavPaginate extends AufbauElement {
 
     return html`
       <ol>
-        <li><button type="button" aria-label="previous page" ${attrs({ 'data-page': current - 1, disabled: current <= 1 })}>‹</button></li>
+        <li><button type="button" aria-label="previous page" ...${attrs({ 'data-page': current - 1, disabled: current <= 1 })}>‹</button></li>
         ${this.numbers().map(page => page === GAP
           ? html`<li aria-hidden="true">${GAP}</li>`
-          : html`<li><button type="button" ${attrs({ 'aria-current': page === current && 'page', 'data-page': page })}>${page}</button></li>`)}
-        <li><button type="button" aria-label="next page" ${attrs({ 'data-page': current + 1, disabled: current >= count })}>›</button></li>
+          : html`<li><button type="button" ...${attrs({ 'aria-current': page === current && 'page', 'data-page': page })}>${page}</button></li>`)}
+        <li><button type="button" aria-label="next page" ...${attrs({ 'data-page': current + 1, disabled: current >= count })}>›</button></li>
       </ol>
     `;
   }

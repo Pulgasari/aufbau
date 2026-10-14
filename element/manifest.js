@@ -53,7 +53,7 @@ function declarationOf (Class, tag) {
 function manifest (entries) {
   const modules = new Map;
 
-  for (const { Class = customElements.get(tag), path = `${tag}.js`, tag } of entries) {
+  for (const { tag, Class = customElements.get(tag), path = `${tag}.js` } of entries) {
     if (!Class) continue;
     const module = modules.get(path) ?? modules.set(path, { declarations: [], exports: [], kind: 'javascript-module', path }).get(path);
     module.declarations.push(declarationOf(Class, tag));

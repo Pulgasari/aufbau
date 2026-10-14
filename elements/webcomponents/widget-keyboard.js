@@ -5,7 +5,7 @@
 import { observe }       from '@domina/observer';
 
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // :::::: LAYOUTS
 
@@ -277,7 +277,7 @@ export default class WidgetKeyboard extends AufbauElement {
     const icon    = special?.icon;
     const pressed = special?.toggle ? this.getAttr(special.toggle) : null;
 
-    return html`<button type="button" tabindex="-1" ${attrs({
+    return html`<button type="button" tabindex="-1" ...${attrs({
       'aria-label'   : icon ? name : false,
       'aria-pressed' : pressed == null ? false : String(Boolean(pressed)),
       'data-key'     : name,

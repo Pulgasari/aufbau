@@ -5,7 +5,7 @@ import setAttr      from '@domina/methods/setAttr.js';
 import { debounce } from '@pulgasari/timing';
 
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 const DEBOUNCE = 150;
 
@@ -69,7 +69,7 @@ export class WriteMd extends AufbauElement {
         <button type="button" role="tab" data-mode="preview" aria-selected="false">preview</button>
       </div>
       <div>
-        <write-text ${attrs({ value: this.firstValue })}></write-text>
+        <write-text ...${attrs({ value: this.firstValue })}></write-text>
         <output-md></output-md>
       </div>
     `;

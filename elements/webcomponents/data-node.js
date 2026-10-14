@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { html }          from '../lib/html.js';
+import { html }          from '../lib/template.js';
 
 const ICONS = {
   file   : 'lucide:file-text',

@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // a file shown by what its type asks for: media-audio, media-video, media-gif,
 // media-pdf, media-json, media-font, an image. anything else becomes a download
@@ -48,20 +48,20 @@ export default class MediaFile extends AufbauElement {
 
   render () {
     const { label, src } = this.getAttr();
-    if (!src) return '';
+    if (!src) return html``;
 
     const kind = this.kind;
     const name = label ?? decodeURIComponent(src.split(/[?#]/)[0].split('/').pop());
     if (ELEMENTS[kind]) import(ELEMENTS[kind]);
 
-    if (kind === 'audio') return html`<media-audio ${attrs({ label: name, src })}></media-audio>`;
-    if (kind === 'video') return html`<media-video ${attrs({ src })}></media-video>`;
-    if (kind === 'font')  return html`<media-font ${attrs({ src })}></media-font>`;
-    if (kind === 'gif')   return html`<media-gif ${attrs({ alt: label ?? '', src })}></media-gif>`;
-    if (kind === 'image') return html`<img ${attrs({ alt: label ?? '', src })}>`;
-    if (kind === 'json')  return html`<media-json ${attrs({ label: name, src })}></media-json>`;
-    if (kind === 'pdf')   return html`<media-pdf ${attrs({ label: name, src })}></media-pdf>`;
-    return html`<a ${attrs({ download: true, href: src })}>${name}</a>`;
+    if (kind === 'audio') return html`<media-audio ...${attrs({ label: name, src })}></media-audio>`;
+    if (kind === 'video') return html`<media-video ...${attrs({ src })}></media-video>`;
+    if (kind === 'font')  return html`<media-font ...${attrs({ src })}></media-font>`;
+    if (kind === 'gif')   return html`<media-gif ...${attrs({ alt: label ?? '', src })}></media-gif>`;
+    if (kind === 'image') return html`<img ...${attrs({ alt: label ?? '', src })} />`;
+    if (kind === 'json')  return html`<media-json ...${attrs({ label: name, src })}></media-json>`;
+    if (kind === 'pdf')   return html`<media-pdf ...${attrs({ label: name, src })}></media-pdf>`;
+    return html`<a ...${attrs({ download: true, href: src })}>${name}</a>`;
   }
 }
 

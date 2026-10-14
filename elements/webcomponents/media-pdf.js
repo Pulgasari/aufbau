@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // a pdf in the browser's own viewer, at `page`. many mobile browsers have none
 // inline, so a link to open it stays below
@@ -25,13 +25,13 @@ export default class MediaPdf extends AufbauElement {
 
   render () {
     const { label, page, src } = this.getAttr();
-    if (!src) return '';
+    if (!src) return html``;
     const name = label ?? decodeURIComponent(src.split(/[?#]/)[0].split('/').pop());
     const url  = page ? `${src.split('#')[0]}#page=${page}` : src;
 
     return html`
-      <iframe ${attrs({ src: url, title: name })}></iframe>
-      <a ${attrs({ href: url, rel: 'noopener', target: '_blank' })}>${name}</a>
+      <iframe ...${attrs({ src: url, title: name })}></iframe>
+      <a ...${attrs({ href: url, rel: 'noopener', target: '_blank' })}>${name}</a>
     `;
   }
 }
