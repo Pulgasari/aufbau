@@ -12,10 +12,18 @@
 // the pointer that went down on the element is followed through window-level
 // listeners instead of pointer capture: capture also retargets the compatibility
 // mouse events, which would swallow the clicks of buttons inside the element.
+//
+// a pointer belongs to one session across all elements once a recognizer claims
+// it (see own()): nested gestures() see the same pointer, the inner one hears it
+// first and wins, an outer session on the same pointer is cancelled. `yielding`
+// turns that around for this tracker: it steps back instead.
 
 const VELOCITY_WINDOW = 100;   // ms of samples the velocity is averaged over
 
 const DIRECTIONS = { down: 'down', left: 'left', right: 'right', up: 'up' };
+
+// pointerId -> the tracker holding it, shared by every tracker on the page
+const owners = new Map;
 
 const directionOf = (x, y) =>
     x === 0 && y === 0          ? null
@@ -28,10 +36,11 @@ const turn = (from, to) => { const difference = (to - from) % 360; return differ
 const angleBetween = (a, b) => Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
 const distanceOf   = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
 
-function createTracker (element, hooks) {
+function createTracker (element, hooks, { coalesced = false, yielding = false } = {}) {
   const pointers = new Map;   // pointerId -> { x, y }
   let session    = null;
   let internal   = null;      // what only the tracker needs
+  let owned      = false;     // this tracker holds its pointers in `owners`
 
   // :::::: MEASURING
 
@@ -63,19 +72,26 @@ function createTracker (element, hooks) {
     const delta  = { x: center.x - session.start.x, y: center.y - session.start.y };
     const time   = event.timeStamp;
 
-    session.buttons   = event.buttons;
-    session.movement  = { x: center.x - session.center.x, y: center.y - session.center.y };
-    session.center    = center;
-    session.delta     = delta;
-    session.direction = directionOf(delta.x, delta.y);
-    session.distance  = Math.hypot(delta.x, delta.y);
-    session.angle     = session.distance ? Math.atan2(delta.y, delta.x) * 180 / Math.PI : 0;
-    session.duration  = time - internal.startTime;
-    session.modifiers = { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey };
+    session.buttons     = event.buttons;
+    session.movement    = { x: center.x - session.center.x, y: center.y - session.center.y };
+    session.center      = center;
+    session.delta       = delta;
+    session.direction   = directionOf(delta.x, delta.y);
+    session.distance    = Math.hypot(delta.x, delta.y);
+    session.angle       = session.distance ? Math.atan2(delta.y, delta.x) * 180 / Math.PI : 0;
+    session.duration    = time - internal.startTime;
+    session.modifiers   = { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey };
+    session.pointerId   = event.pointerId;
     session.pointers    = pointers.size;
+    session.pressure    = event.pressure ?? 0;
     session.sourceEvent = event;
+    session.tilt        = { x: event.tiltX ?? 0, y: event.tiltY ?? 0 };
     session.time        = time;
-    session.travel    = Math.max(session.travel, session.distance);
+    session.travel      = Math.max(session.travel, session.distance);
+    session.twist       = event.twist ?? 0;
+
+    // the points the browser merged into this event, only when asked for: a drawing needs them, a drag does not
+    if (coalesced) session.coalesced = (event.getCoalescedEvents?.() ?? [event]).map(sample => ({ pressure: sample.pressure, time: sample.timeStamp, x: sample.clientX, y: sample.clientY }));
 
     // velocity over the recent samples: a pointer that rested before release reads as still
     const samples = internal.samples;
@@ -94,6 +110,33 @@ function createTracker (element, hooks) {
       session.scale    = internal.pair.scale * distanceOf(a, b) / internal.pair.distance;
     }
   }
+
+  // :::::: OWNERSHIP
+
+  const control = { abort: () => abort() };
+
+  // called through session.own() when a recognizer claims the session. false
+  // means this session stepped back and is cancelled already
+  function own () {
+    if (yielding) {
+      for (const id of pointers.keys()) {
+        const other = owners.get(id);
+        if (other && other !== control) { abort(); return false; }
+      }
+    }
+    for (const id of pointers.keys()) {
+      const other = owners.get(id);
+      if (other && other !== control) other.abort();
+      owners.set(id, control);
+    }
+    owned = true;
+    return true;
+  }
+
+  const release = () => {
+    for (const id of pointers.keys()) if (owners.get(id) === control) owners.delete(id);
+    owned = false;
+  };
 
   // :::::: SESSION
 
@@ -114,24 +157,41 @@ function createTracker (element, hooks) {
       maximumPointers : 1,
       modifiers       : { alt: event.altKey, control: event.ctrlKey, meta: event.metaKey, shift: event.shiftKey },
       movement        : { x: 0, y: 0 },
+      own,
       path            : event.composedPath(),
       phase           : 'start',
+      pointerId       : event.pointerId,
       pointers        : 1,
+      pressure        : event.pressure ?? 0,
       rotation        : 0,
       scale           : 1,
       start           : point,
       target          : event.target,
+      tilt            : { x: event.tiltX ?? 0, y: event.tiltY ?? 0 },
       time            : event.timeStamp,
       travel          : 0,
+      twist           : event.twist ?? 0,
       velocity        : { speed: 0, x: 0, y: 0 },
+      get positions () { return [...pointers].map(([id, { x, y }]) => ({ id, x, y })); },
     };
     listen(true);
   }
 
   function close () {
     listen(false);
+    release();
     pointers.clear();
     session = internal = null;
+  }
+
+  // the session ends without a pointerup: another tracker took the pointer, the
+  // window lost focus, the page was hidden, or a pointerup never arrived
+  function abort () {
+    if (!session) return;
+    session.phase = 'cancel';
+    const cancelled = session;
+    close();
+    hooks.cancel(cancelled, null);
   }
 
   // :::::: EVENTS
@@ -139,6 +199,10 @@ function createTracker (element, hooks) {
   function down (event) {
     // the other mouse buttons are not gestures, the right one arrives as contextmenu
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    // a primary pointer of the same kind while a session runs: its pointerup got
+    // lost (released over an iframe, an alert, a window switch), the old session is over
+    if (session && event.isPrimary && event.pointerType === session.input) abort();
 
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
@@ -149,6 +213,7 @@ function createTracker (element, hooks) {
       return;
     }
 
+    if (owned && !owners.has(event.pointerId)) owners.set(event.pointerId, control);
     session.maximumPointers = Math.max(session.maximumPointers, pointers.size);
     session.phase = 'move';
     rebaseCenter();
@@ -171,6 +236,7 @@ function createTracker (element, hooks) {
     if (!pointers.has(event.pointerId)) return;
 
     if (pointers.size > 1) {
+      if (owners.get(event.pointerId) === control) owners.delete(event.pointerId);
       pointers.delete(event.pointerId);
       session.phase = 'move';
       rebaseCenter();
@@ -200,16 +266,21 @@ function createTracker (element, hooks) {
     hooks.cancel(cancelled, event);
   }
 
+  const hidden = () => { if (document.visibilityState === 'hidden') abort(); };
+
   function listen (on) {
     const method = on ? 'addEventListener' : 'removeEventListener';
     window[method]('pointermove',   move);
     window[method]('pointerup',     up);
     window[method]('pointercancel', cancel);
+    window[method]('blur',          abort);
+    document[method]('visibilitychange', hidden);
   }
 
   element.addEventListener('pointerdown', down);
 
   return {
+    abort,
     get session () { return session; },
     destroy () {
       element.removeEventListener('pointerdown', down);

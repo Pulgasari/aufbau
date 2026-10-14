@@ -7,6 +7,7 @@
 // a trackpad pinch arrives through trackpad.js with input 'trackpad',
 // `trackpad: false` leaves it to the browser.
 
+import { claim }          from './../shared.js';
 import { createTrackpad } from './../trackpad.js';
 
 function pinch ({ element, emit, options }) {
@@ -20,8 +21,8 @@ function pinch ({ element, emit, options }) {
   // with everything since the session started, so a handler on Move alone
   // loses nothing that happened before the threshold was crossed
   function begin (session) {
+    if (!claim(session, 'pinch')) return;
     pinching = true;
-    session.claims.add('pinch');
     emit('pinchStart', session, { scaleChange: 1 });
     emit('pinchMove',  session, { scaleChange: changeOf(session) });
   }

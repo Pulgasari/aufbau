@@ -1,7 +1,8 @@
 // @aufbau/gestures/bundles/transformable.js
 // free move, zoom and turn of an element: one finger moves it, two fingers
 // pinch and turn it around their center, the wheel or a trackpad pinch zooms
-// toward the cursor, a double tap zooms in and back. the point under the
+// toward the cursor, a double tap zooms in and back, a double tap held and
+// dragged zooms with one finger (down: in, up: out). the point under the
 // fingers stays under the fingers.
 //
 // the gestures are taken on `surface` (the parent by default), so the element
@@ -14,7 +15,8 @@
 //   const view = transformable(image, { maximumScale: 6, onChange: state => … });
 //   view.set({ scale: 2 }); view.reset(); view.destroy();
 
-import gestures from './../index.js';
+import gestures   from './../index.js';
+import { frame } from './motion.js';
 
 // :::::: MATRIX
 // { a, b, c, d, e, f } as in matrix(a, b, c, d, e, f), similarities only
@@ -49,6 +51,7 @@ const matrixOf = ({ rotation = 0, scale = 1, x = 0, y = 0 } = {}) => {
 
 function transformable (element, options = {}) {
   const {
+    doubleTapDrag  = 0.01,     // zoom per px of a double tap drag, 0 turns it off
     doubleTapScale = 2,
     initial        = {},
     keyboard       = true,
@@ -87,6 +90,10 @@ function transformable (element, options = {}) {
     onChange?.(stateOf(matrix));
   }
 
+  // gestures write once per frame, the keyboard and set() at once
+  const painter = frame(render);
+  const paint   = () => painter.schedule();
+
   // the scale stays within its bounds, the pivot stays put
   function transform (point, scale = 1, degrees = 0) {
     const current = Math.hypot(matrix.a, matrix.b);
@@ -108,18 +115,19 @@ function transformable (element, options = {}) {
       transform(gesture.center, scale > 1.01 ? 1 / scale : doubleTapScale);
       render();
     },
-    onPanMove    : gesture => { move(gesture); render(); },
+    onPanMove    : gesture => { move(gesture); paint(); },
     onPressStart : () => { base = null; },
     // the pair's movement first, then scale and turn around where the center is now:
     // the point that was under the fingers stays under them
-    onPinchMove  : gesture => { if (gesture.input !== 'trackpad') move(gesture); transform(gesture.center, gesture.scaleChange); render(); },
-    ...(rotate ? { onRotateMove: gesture => { if (gesture.input !== 'trackpad') move(gesture); transform(gesture.center, 1, gesture.rotationChange); render(); } } : {}),
+    onPinchMove  : gesture => { if (gesture.input !== 'trackpad') move(gesture); transform(gesture.center, gesture.scaleChange); paint(); },
+    ...(rotate ? { onRotateMove: gesture => { if (gesture.input !== 'trackpad') move(gesture); transform(gesture.center, 1, gesture.rotationChange); paint(); } } : {}),
+    ...(doubleTapDrag ? { onDoubleTapDragMove: gesture => { transform(gesture.start, Math.exp(gesture.movement.y * doubleTapDrag)); paint(); } } : {}),
     ...(wheel ? {
       onWheelStart: () => { base = null; },
       onWheelMove: gesture => {
         if (wheel === 'pan') matrix = multiply(translation(-gesture.movement.x, -gesture.movement.y), matrix);
         else transform(gesture.center, Math.exp(-gesture.movement.y * wheelIntensity));
-        render();
+        paint();
       },
     } : {}),
     pan    : { pointers: 1 },
@@ -164,6 +172,7 @@ function transformable (element, options = {}) {
     reset : () => { matrix = matrixOf(initial); render(); },
     set   : values => { matrix = matrixOf({ ...stateOf(matrix), ...values }); render(); },
     destroy () {
+      painter.cancel();
       handle.destroy();
       surface.removeEventListener('keydown', keydown);
     },

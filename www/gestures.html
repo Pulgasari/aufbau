@@ -105,7 +105,7 @@
     </div>
     <div>
       <h2>tap · doubleTap, exclusive</h2>
-      <p><code>tap: { waitForDoubleTap: true }</code>: only one of the two fires, a single tap waits 100 ms. taps counted up to 300 ms apart.</p>
+      <p>with <code>onDoubleTap</code> listening, only one of the two fires (the default, <code>waitForDoubleTap: true</code>): a single tap waits until no second one can follow, 300 ms.</p>
       <div class="pad" id="exclusive-pad">press me</div>
     </div>
     <div>

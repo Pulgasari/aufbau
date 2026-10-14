@@ -36,9 +36,9 @@
 /** A point in client pixels. */
 export interface Point {
   /** Pixels from the left. */
-  x: number;
+  x : number;
   /** Pixels from the top. */
-  y: number;
+  y : number;
 }
 
 /** The dominant direction of a movement. */
@@ -64,6 +64,8 @@ export interface Gesture {
   buttons         : number;
   /** The midpoint of all pointers. */
   center          : Point;
+  /** The points the browser merged into this event, with `coalesced: true` only. */
+  coalesced?      : { pressure: number; time: number; x: number; y: number }[];
   /** {@link center} minus where it started, continuous when fingers come and go. */
   delta           : Point;
   /** The dominant axis of {@link delta}, null while it is zero. */
@@ -88,8 +90,14 @@ export interface Gesture {
   path            : EventTarget[];
   /** Where the session is. */
   phase           : 'start' | 'move' | 'end' | 'cancel';
+  /** The pointer behind this event, null for a trackpad or the wheel. */
+  pointerId       : number | null;
   /** The pointers down right now. */
   pointers        : number;
+  /** Each pointer down right now. */
+  positions       : { id: number; x: number; y: number }[];
+  /** The pressure of the pointer behind this event, from 0 to 1 (a mouse reports 0.5 while pressed). */
+  pressure        : number;
   /** Degrees the first two pointers turned since two were down. */
   rotation        : number;
   /** Their spread relative to the moment two were down. */
@@ -100,14 +108,18 @@ export interface Gesture {
   start           : Point;
   /** The element the first pointer went down on, retargeted out of shadow roots. */
   target          : Element;
+  /** The tilt of a pen in degrees, toward x and toward y. */
+  tilt            : Point;
   /** The timestamp of {@link sourceEvent}. */
   time            : number;
   /** The farthest {@link distance} got: what tells a tap from a movement. */
   travel          : number;
+  /** The rotation of a pen around its own axis, in degrees from 0 to 359. */
+  twist           : number;
   /** Pixels per millisecond over the last 100 ms. */
   velocity        : { speed: number; x: number; y: number };
 
-  /** The taps in a row, for tap, doubleTap and pressRepeat. */
+  /** The taps in a row, for tap, doubleTap, twoFingerTap and pressRepeat. */
   count?          : number;
   /** The edge an edge swipe started at. */
   edge?           : Edge;
@@ -138,7 +150,8 @@ export interface Guarded {
 
 /** Every gesture there is. The dom event of one is its name in lowercase. */
 export type GestureName =
-  | 'doubleTap' | 'longPress' | 'secondary' | 'tap'
+  | 'doubleTap' | 'longPress' | 'secondary' | 'tap' | 'twoFingerTap'
+  | 'doubleTapDragCancel' | 'doubleTapDragEnd' | 'doubleTapDragMove' | 'doubleTapDragStart'
   | 'pressCancel' | 'pressEnd' | 'pressRepeat' | 'pressStart'
   | 'swipe' | 'swipeDown' | 'swipeLeft' | 'swipeRight' | 'swipeUp'
   | 'edgeSwipeCancel' | 'edgeSwipeEnd' | 'edgeSwipeMove' | 'edgeSwipeStart'
@@ -150,42 +163,59 @@ export type GestureName =
 /** A handler per gesture, `onTap`, `onSwipeLeft` and so on. */
 export type Handlers = { [K in GestureName as `on${Capitalize<K>}`]?: Handler | Guarded };
 
+/** The name of a recognizer, which reports one or several gestures. */
+export type RecognizerName = 'doubleTapDrag' | 'edgeSwipe' | 'longPress' | 'pan' | 'pinch' | 'press' | 'rotate' | 'secondary' | 'swipe' | 'tap' | 'wheel';
+
 /** The thresholds of the recognizers. */
 export interface RecognizerOptions {
+  /** Tap, then press again and drag. Defaults: 300 ms between the two, a tap lasts 500 ms at most. */
+  doubleTapDrag? : { interval?: number; maximumDuration?: number; tolerance?: Tolerance };
   /** A swipe that starts at an edge. Defaults: edges `['left']`, size 24 px from the element. */
-  edgeSwipe? : { edges?: Edge[]; relativeTo?: 'element' | 'viewport'; size?: number; tolerance?: Tolerance };
-  /** A press held still. Default duration 500 ms. */
-  longPress? : { duration?: number; tolerance?: Tolerance };
+  edgeSwipe?     : { edges?: Edge[]; relativeTo?: 'element' | 'viewport'; size?: number; tolerance?: Tolerance };
+  /**
+   * A press held still. Default duration 500 ms. Where secondary listens, a long
+   * press on touch and pen waits `grace` ms longer (default 200) and steps back
+   * when the platform fired a contextmenu meanwhile.
+   */
+  longPress?     : { duration?: number; grace?: number; tolerance?: Tolerance };
   /**
    * A drag. `after: 'longPress'` starts it only after a long press, per input as
    * `{ touch: 'longPress' }`. `axis` leaves the other axis to native scrolling.
    */
-  pan?       : { after?: 'longPress' | { [input: string]: 'longPress' }; axis?: 'x' | 'y' | null; pointers?: number; tolerance?: Tolerance; touchAction?: string };
+  pan?           : { after?: 'longPress' | { [input: string]: 'longPress' }; axis?: 'x' | 'y' | null; pointers?: number; tolerance?: Tolerance; touchAction?: string };
   /** Two fingers spreading, a trackpad pinch or ctrl + wheel. Default threshold 0.05. */
-  pinch?     : { threshold?: number; trackpad?: boolean; wheelIntensity?: number };
+  pinch?         : { threshold?: number; trackpad?: boolean; wheelIntensity?: number };
   /** Press start, end and repeat while held. Defaults: delay 400 ms, interval 100 ms. */
-  press?     : { delay?: number; interval?: number; tolerance?: Tolerance };
+  press?         : { delay?: number; interval?: number; tolerance?: Tolerance };
   /** Two fingers turning, or a trackpad rotation. Default threshold 10 degrees. */
-  rotate?    : { threshold?: number; trackpad?: boolean };
+  rotate?        : { threshold?: number; trackpad?: boolean };
   /** Right click, long press, menu key. `nativeMenu: true` keeps the browser's menu. */
-  secondary? : { nativeMenu?: boolean };
-  /** A flick. Defaults: 30 px, 0.3 px per ms. */
-  swipe?     : { minimumDistance?: number; minimumSpeed?: number; touchAction?: string };
+  secondary?     : { nativeMenu?: boolean };
+  /** A flick, its direction the one of the velocity at release. Defaults: 30 px, 0.3 px per ms. */
+  swipe?         : { minimumDistance?: number; minimumSpeed?: number; touchAction?: string };
   /**
-   * A tap. Defaults: taps within 300 ms count up, one lasts 500 ms at most.
-   * `waitForDoubleTap` holds a single tap back (100 ms, or a number of ms).
+   * A tap. Defaults: taps within 300 ms count up, one lasts 500 ms at most. Where
+   * doubleTap is listened to, a single tap waits `interval` ms so the two exclude
+   * each other; `waitForDoubleTap` is a shorter wait in ms, or `false` for none.
    */
-  tap?       : { interval?: number; maximumDuration?: number; tolerance?: Tolerance; waitForDoubleTap?: boolean | number };
+  tap?           : { interval?: number; maximumDuration?: number; tolerance?: Tolerance; waitForDoubleTap?: boolean | number };
   /** The wheel, optionally only with a modifier. `nativeScroll: true` lets the page scroll. */
-  wheel?     : { modifier?: 'alt' | 'control' | 'meta' | 'shift' | null; nativeScroll?: boolean };
+  wheel?         : { modifier?: 'alt' | 'control' | 'meta' | 'shift' | null; nativeScroll?: boolean };
 }
 
 /** The options of {@link gestures}: handlers, thresholds and what to recognize. */
 export interface GestureOptions extends Handlers, RecognizerOptions {
+  /** Adds the points the browser merged into each event as `coalesced`, for drawing. */
+  coalesced?   : boolean;
   /** Gestures to recognize without a handler, for listeners added with `addEventListener`. */
-  recognize?   : GestureName[];
+  recognize?   : (GestureName | RecognizerName)[];
   /** The `touch-action` of the element instead of the strictest one the recognizers ask for. */
   touchAction? : string;
+  /**
+   * Steps back when another element's session already holds the pointer. By default
+   * the session that claims a pointer first keeps it, and nested elements hear it first.
+   */
+  yield?       : boolean;
 }
 
 /** What {@link gestures} returns. */
@@ -194,9 +224,23 @@ export interface GestureHandle {
   readonly element : Element;
   /** The session in progress, or null. */
   readonly session : Gesture | null;
+  /**
+   * Turns a recognizer (or the one behind a gesture) on or off, or asks a predicate
+   * at the start of each session, e.g. `enable('pan', gesture => onEdge(gesture.start))`.
+   */
+  enable (name: GestureName | RecognizerName, value?: boolean | ((gesture: Gesture) => boolean)): GestureHandle;
+  /** Adds a handler, returns the function that removes it. `touch-action` follows. */
+  on (name: GestureName, handler: Handler | Guarded): () => void;
+  /** Recognizes gestures without a handler, or stops with `false`. */
+  recognize (names: GestureName | RecognizerName | (GestureName | RecognizerName)[], value?: boolean): GestureHandle;
+  /** Merges new options, handlers or thresholds; the recognizers are rebuilt after the running session. */
+  set (options: GestureOptions): GestureHandle;
   /** Stops recognizing and restores the element's styles. */
   destroy (): void;
 }
+
+/** Every gesture name, sorted. */
+export declare const GESTURES: readonly GestureName[];
 
 /**
  * Recognizes gestures on an element: calls the handlers given and dispatches each
@@ -288,35 +332,37 @@ export interface DragDetail {
 /** The options of {@link draggable}. */
 export interface DraggableOptions {
   /** Locks it to an axis. */
-  axis?     : 'x' | 'y' | null;
+  axis?       : 'x' | 'y' | null;
   /** Keeps it inside its parent or an element. */
-  bounds?   : 'parent' | Element | null;
+  bounds?     : 'parent' | Element | null;
   /** A selector for the drop targets. */
-  drop?     : string | null;
+  drop?       : string | null;
   /** A step in px it snaps to on release. */
-  grid?     : number | null;
+  grid?       : number | null;
   /** Glides on after a flick. Default `true`. */
-  inertia?  : boolean;
+  inertia?    : boolean;
   /** Arrow keys move it once it has focus. Default `true`. */
-  keyboard? : boolean;
+  keyboard?   : boolean;
   /** Called when it is dropped onto a target. */
-  onDrop?   : (detail: DragDetail) => void;
+  onDrop?     : (detail: DragDetail) => void;
   /** Called when a drag ends. */
-  onEnd?    : (detail: DragDetail) => void;
+  onEnd?      : (detail: DragDetail) => void;
   /** Called when it moves over a drop target. */
-  onEnter?  : (detail: DragDetail) => void;
+  onEnter?    : (detail: DragDetail) => void;
   /** Called when it leaves a drop target. */
-  onLeave?  : (detail: DragDetail) => void;
+  onLeave?    : (detail: DragDetail) => void;
   /** Called on every move. */
-  onMove?   : (detail: DragDetail) => void;
+  onMove?     : (detail: DragDetail) => void;
   /** Called when a drag starts. */
-  onStart?  : (detail: DragDetail) => void;
+  onStart?    : (detail: DragDetail) => void;
   /** Returns to its start unless dropped onto a target. Default `false`. */
-  revert?   : boolean;
+  revert?     : boolean;
+  /** The share it follows past the bounds, pulled back on release. Default `0`, a hard edge. */
+  rubberband? : number;
   /** Points it snaps to on release, the nearest one. */
-  snap?     : Point[] | null;
+  snap?       : Point[] | null;
   /** The px an arrow key moves it, shift five times as far. Default `10`. */
-  step?     : number;
+  step?       : number;
 }
 
 /** What {@link draggable} returns. */
@@ -361,24 +407,50 @@ export interface PullableHandle {
 /** Pull to refresh on a scroll container. */
 export declare function pullable (element: Element, options?: PullableOptions): PullableHandle;
 
+/** What {@link sortable} reports when the order changed. */
+export interface SortDetail {
+  /** The index it came from, in its source list. */
+  from   : number;
+  /** The moved item. */
+  item   : Element;
+  /** The list it is in now. */
+  list   : Element;
+  /** The items of that list in their new order. */
+  order  : Element[];
+  /** The list it came from. */
+  source : Element;
+  /** Its index in the list it is in now. */
+  to     : number;
+}
+
 /** The options of {@link sortable}. */
 export interface SortableOptions {
-  /** The axis the list scrolls on, for `touch-action`. Default `y`. */
-  axis?     : 'x' | 'y' | null;
+  /** The text announced to screen readers after a move, or `false`. Default `"3 / 7"`. */
+  announce?   : ((detail: SortDetail & { length: number }) => string) | false;
+  /** Scrolls the scroll container while an item is dragged near its edges. Default `true`. */
+  autoScroll? : boolean;
+  /** The axis the list scrolls on, for `touch-action` and auto scroll. Default `y`. */
+  axis?       : 'x' | 'y' | null;
+  /** The px from the scroll container's edge where auto scroll starts. Default `48`. */
+  edge?       : number;
+  /** Lists with the same group take each other's items. */
+  group?      : string | null;
   /** A selector inside an item that starts the drag, shadow roots too. */
-  handle?   : string | null;
+  handle?     : string | null;
   /** The ms of the long press that lifts an item on touch and pen. Default `350`. */
-  hold?     : number;
+  hold?       : number;
   /** A selector for the items, the children by default. */
-  items?    : string | null;
+  items?      : string | null;
   /** Alt + arrow moves the focused item. Default `true`. */
-  keyboard? : boolean;
+  keyboard?   : boolean;
   /** Called when a drag ends. */
-  onEnd?    : (detail: { from: number; item: Element; to: number }) => void;
+  onEnd?      : (detail: { from: number; item: Element; to: number }) => void;
   /** Called when the order changed. */
-  onSort?   : (detail: { from: number; item: Element; order: Element[]; to: number }) => void;
+  onSort?     : (detail: SortDetail) => void;
   /** Called when a drag starts. */
-  onStart?  : (detail: { from: number; item: Element }) => void;
+  onStart?    : (detail: { from: number; item: Element }) => void;
+  /** The px per frame auto scroll moves at the very edge. Default `16`. */
+  speed?      : number;
 }
 
 /** What {@link sortable} returns. */
@@ -406,6 +478,8 @@ export interface TransformState {
 
 /** The options of {@link transformable}. */
 export interface TransformableOptions {
+  /** The zoom per px of a double tap drag (down zooms in), `0` turns it off. Default `0.01`. */
+  doubleTapDrag?  : number;
   /** The scale a double tap zooms to. Default `2`. */
   doubleTapScale? : number;
   /** Where it starts. */
@@ -442,3 +516,61 @@ export interface TransformableHandle {
 
 /** Free move, zoom and turn of an element; the point under the fingers stays under them. */
 export declare function transformable (element: Element, options?: TransformableOptions): TransformableHandle;
+
+/** A side or a corner of an element. */
+export type ResizeEdge = Edge | 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right';
+
+/** What the callbacks of {@link resizable} get. */
+export interface ResizeDetail {
+  /** The edge being dragged. */
+  edge    : ResizeEdge;
+  /** The resized element. */
+  element : Element;
+  /** Its border box height in px. */
+  height  : number;
+  /** Its border box width in px. */
+  width   : number;
+}
+
+/** The options of {@link resizable}. */
+export interface ResizableOptions {
+  /** Keeps a width to height ratio, `true` the current one. */
+  aspectRatio?   : number | true | null;
+  /** The edges and corners that resize. Default `['right', 'bottom', 'bottom-right']`. */
+  edges?         : ResizeEdge[];
+  /** A step in px the size snaps to. */
+  grid?          : number | null;
+  /** Shift + arrows resize it once it has focus. Default `true`. */
+  keyboard?      : boolean;
+  /** The highest height. */
+  maximumHeight? : number;
+  /** The highest width. */
+  maximumWidth?  : number;
+  /** The lowest height. Default `24`. */
+  minimumHeight? : number;
+  /** The lowest width. Default `24`. */
+  minimumWidth?  : number;
+  /** Called on every change. */
+  onChange?      : (detail: ResizeDetail) => void;
+  /** Called when a resize ends. */
+  onEnd?         : (detail: ResizeDetail) => void;
+  /** Called when a resize starts. */
+  onStart?       : (detail: ResizeDetail) => void;
+  /** The px of the grip zone along an edge. Default `8`. */
+  size?          : number;
+  /** The px a key resizes by. Default `10`. */
+  step?          : number;
+}
+
+/** What {@link resizable} returns. */
+export interface ResizableHandle {
+  /** Its border box size. */
+  get (): { height: number; width: number };
+  /** Resizes it, within its limits. */
+  set (size: Partial<{ height: number; width: number }>): void;
+  /** Stops listening. */
+  destroy (): void;
+}
+
+/** Resizes an element by its edges and corners; anywhere else the content keeps the pointer. */
+export declare function resizable (element: Element, options?: ResizableOptions): ResizableHandle;

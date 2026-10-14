@@ -1,5 +1,6 @@
 // @aufbau/gestures/recognizers/index.js
 
+export * from './doubleTapDrag.js';
 export * from './edgeSwipe.js';
 export * from './longPress.js';
 export * from './pan.js';

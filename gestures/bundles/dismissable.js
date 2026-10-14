@@ -7,8 +7,8 @@
 //
 //   dismissable(toast, { directions: ['right'], onDismiss: ({ direction }) => toast.remove() });
 
-import gestures  from './../index.js';
-import { tween } from './motion.js';
+import gestures          from './../index.js';
+import { frame, tween } from './motion.js';
 
 function dismissable (element, options = {}) {
   const {
@@ -38,6 +38,8 @@ function dismissable (element, options = {}) {
     onMove?.({ element, offset, progress: Math.min(1, Math.abs(offset) / (size * distance)) });
   }
 
+  const painter = frame(render);
+
   const animate = (to, done) => {
     motion?.stop();
     motion = tween({ x: offset, y: 0 }, { x: to, y: 0 }, { onDone: () => { motion = null; done?.(); }, onFrame: point => { offset = point.x; render(); } });
@@ -58,8 +60,9 @@ function dismissable (element, options = {}) {
   // :::::: GESTURES
 
   const handle = gestures(element, {
-    onPanCancel : back,
+    onPanCancel : () => { painter.flush(); back(); },
     onPanEnd    : gesture => {
+      painter.flush();
       const velocity = axis === 'x' ? gesture.velocity.x : gesture.velocity.y;
       const far      = Math.abs(offset) >= size * distance;
       const flicked  = Math.abs(velocity) >= speed && Math.sign(velocity) === Math.sign(offset);
@@ -69,7 +72,7 @@ function dismissable (element, options = {}) {
     onPanMove   : gesture => {
       const raw = axis === 'x' ? gesture.delta.x : gesture.delta.y;
       offset = directions.includes(directionOf(raw)) ? raw : raw / 4;   // resistance where it may not go
-      render();
+      painter.schedule();
     },
     onPanStart  : () => {
       if (gone) return;
@@ -97,6 +100,7 @@ function dismissable (element, options = {}) {
     reset () { motion?.stop(); gone = false; offset = 0; render(); },
     destroy () {
       motion?.stop();
+      painter.cancel();
       handle.destroy();
       element.removeEventListener('keydown', keydown);
     },

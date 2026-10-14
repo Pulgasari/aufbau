@@ -13,8 +13,8 @@
 //
 //   pullable(feed, { onRefresh: () => load(), onPull: ({ progress }) => spinner.style.rotate = progress * 360 + 'deg' });
 
-import gestures  from './../index.js';
-import { tween } from './motion.js';
+import gestures          from './../index.js';
+import { frame, tween } from './motion.js';
 
 function pullable (element, options = {}) {
   const {
@@ -42,6 +42,8 @@ function pullable (element, options = {}) {
     onPull?.({ distance, progress: Math.min(1, distance / threshold), refreshing });
   }
 
+  const painter = frame(render);
+
   const animate = (to, done) => {
     motion?.stop();
     motion = tween({ x: 0, y: distance }, { x: 0, y: to }, { duration: 220, onDone: () => { motion = null; done?.(); }, onFrame: point => { distance = point.y; render(); } });
@@ -56,6 +58,7 @@ function pullable (element, options = {}) {
   }
 
   function release () {
+    painter.flush();
     if (!pulling) return;
     pulling = false;
     if (distance >= threshold && onRefresh) refresh();
@@ -73,12 +76,12 @@ function pullable (element, options = {}) {
   element.addEventListener('touchmove',  touchmove,  { passive: false });
 
   const handle = gestures(element, {
-    onPanCancel : () => { pulling = false; if (!refreshing) animate(0); },
+    onPanCancel : () => { painter.flush(); pulling = false; if (!refreshing) animate(0); },
     onPanEnd    : release,
     onPanMove   : gesture => {
       if (!pulling) return;
       distance = Math.min(threshold * maximum, Math.max(0, gesture.delta.y) * resistance);
-      render();
+      painter.schedule();
     },
     onPanStart  : gesture => {
       pulling = !refreshing && atTop() && gesture.delta.y > 0;
@@ -91,6 +94,7 @@ function pullable (element, options = {}) {
     refresh,
     destroy () {
       motion?.stop();
+      painter.cancel();
       handle.destroy();
       element.removeEventListener('touchstart', touchstart);
       element.removeEventListener('touchmove',  touchmove);
