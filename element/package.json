@@ -18,6 +18,7 @@
     "withControl.js",
     "withSource.js",
     "lib",
+    "manifest.js",
     "README.md"
   ],
   "keywords": [

@@ -1,6 +1,20 @@
 type Handler = (this: AufbauElement, event: Event, node: Element) => void;
 
-type AttrEntry = Function | { type?: Function, default?: unknown, values?: unknown[], fn?: Function, var?: boolean | string } | unknown;
+/**
+ * a schema entry: a type, a default value, or the full form. `prop: true` (or the type
+ * Array, Object, Function) stores the value on the instance instead of an attribute,
+ * `state: true` does the same without a public accessor.
+ */
+type AttrEntry = Function | {
+  type?       : Function,
+  default?    : unknown,
+  values?     : unknown[],
+  fn?         : Function,
+  var?        : boolean | string,
+  prop?       : boolean,
+  state?      : boolean,
+  hasChanged? : (value: unknown, old: unknown) => boolean,
+} | unknown;
 
 export declare class Selection implements Iterable<Element> {
   readonly node  : Element | null;
@@ -43,6 +57,12 @@ export declare class Selection implements Iterable<Element> {
 
 export declare class AufbauElement extends HTMLElement {
   static attr?      : Record<string, AttrEntry>;
+  /** `false` updates at once on every change instead of once per microtask. */
+  static batch?     : boolean;
+  /** The events it fires, name -> description, for the manifest. */
+  static events?    : Record<string, string>;
+  /** Its slots, name ('' for the default one) -> description, for the manifest. */
+  static slots?     : Record<string, string>;
   static internals? : boolean | Partial<ElementInternals>;
   static parts?     : string[];
   static reflect?   : string[];
@@ -85,22 +105,38 @@ export declare class AufbauElement extends HTMLElement {
   hasAttr (name: string): boolean;
   setAttr (map: Record<string, unknown>): this;
 
+  /** Stores the value of a prop entry; an update follows when it changed. */
+  setProp  (name: string, value: unknown): this;
+  /** Stores the value of a state entry; an update follows when it changed. */
+  setState (name: string, value: unknown): this;
 
   setSkeleton (on?: boolean): this;
   setVar      (name: string, value: unknown): this;
   setVar      (map: Record<string, unknown>): this;
 
+  /** Resolves once the pending update ran. */
+  readonly updateComplete : Promise<boolean>;
+
+  /** Marks a name as changed (every name without one) and schedules an update for the next microtask. */
+  requestUpdate (name?: string): this;
+  /** Runs the pending update at once, for code that reads the dom right after a change. */
+  flush         (): this;
+  /** Updates at once; without names every name counts as changed. */
+  update        (changed?: Iterable<string>): this;
+
   invalidate (): this;
   render     (): unknown;
-  sync       (): void;
-  update     (): this;
+  sync       (changed: Set<string>): void;
+  willUpdate (changed: Set<string>): void;
 
   onAdopted          (oldDocument: Document, newDocument: Document): void;
   onAttributeChanged (name: string, oldValue: string | null, newValue: string | null): void;
   onConnected        (): void;
   onConnectedMove    (): void;
   onDisconnected     (): void;
-  onRender           (): void;
+  onError            (error: unknown): void;
+  onFirstRender      (): void;
+  onRender           (changed: Set<string>): void;
 }
 
 type Constructor<T = AufbauElement> = abstract new (...args: any[]) => T;
@@ -155,3 +191,11 @@ export declare function setSkin         (skin: string | null): void;
 
 export declare const session : unknown;
 export declare const store   : unknown;
+
+/** htx rendered by @domina/render: the result of render() is patched, only changed holes are written. */
+export declare function html (strings: TemplateStringsArray, ...values: unknown[]): { program: unknown; values: unknown[] };
+/** A keyed list for a child hole. Without key the position is the key. */
+export declare function each<T> (items: Iterable<T>, key: (item: T, index: number) => unknown, row: (item: T, index: number) => unknown): unknown;
+export declare function each<T> (items: Iterable<T>, row: (item: T, index: number) => unknown): unknown;
+/** One of two branches for a child hole. */
+export declare function when (condition: unknown, then: () => unknown, otherwise?: (() => unknown) | null): unknown;

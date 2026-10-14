@@ -71,9 +71,7 @@ export class Btn extends AufbauElement {
     svg-icon { flex: none; }
   `;
 
-  get disabled ()      { return this.hasAttribute('disabled'); }
-  set disabled (value) { this.toggleAttribute('disabled', Boolean(value)); }
-  get form     ()      { return this.internals?.form ?? null; }
+  get form () { return this.internals?.form ?? null; }
 
   // the preset of the command, {} for none
   get preset    () { return this.constructor.commands[this.getAttr('command')] ?? {}; }

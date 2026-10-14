@@ -3,28 +3,41 @@ import { isArray, isFn, isPlainObject } from '@pulgasari/is';
 import { toCamelCase, toKebabCase }     from '@pulgasari/str';
 
 const TYPES  = { boolean: Boolean, number: Number, string: String };
-const typeOf = value => TYPES[typeof value] ?? String;
+const typeOf = value => isArray(value) ? Array : isPlainObject(value) ? Object : TYPES[typeof value] ?? String;
+
+// values no attribute can carry: such an entry is a property, stored on the instance
+const RICH = new Set([Array, Function, Object]);
 
 const cache = new WeakMap;
 
+// prop: a stored value without attribute, state: the same without a public accessor
 function entryOf (key, spec) {
-  const entry = { name: toCamelCase(key), attribute: toKebabCase(key), type: String, fallback: undefined, values: null, fn: null, var: null };
+  const entry = { name: toCamelCase(key), attribute: toKebabCase(key), type: String, fallback: undefined, values: null, fn: null, var: null, prop: false, state: false, hasChanged: null };
 
   if (isFn(spec)) entry.type = spec;
   else if (isPlainObject(spec)) {
-    entry.type     = spec.type ?? typeOf(spec.default);
-    entry.fallback = spec.default;
-    entry.values   = isArray (spec.values) ? spec.values : null;
-    entry.fn       = isFn    (spec.fn)     ? spec.fn     : null;
-    entry.var      = spec.var === true ? `--${entry.attribute}` : (spec.var ?? null);
+    entry.type       = spec.type ?? typeOf(spec.default);
+    entry.fallback   = spec.default;
+    entry.values     = isArray (spec.values)     ? spec.values     : null;
+    entry.fn         = isFn    (spec.fn)         ? spec.fn         : null;
+    entry.var        = spec.var === true ? `--${entry.attribute}` : (spec.var ?? null);
+    entry.prop       = spec.prop  === true;
+    entry.state      = spec.state === true;
+    entry.hasChanged = isFn    (spec.hasChanged) ? spec.hasChanged : null;
   }
   else if (spec != null) {
     entry.type     = typeOf(spec);
     entry.fallback = spec;
   }
 
+  if (RICH.has(entry.type)) entry.prop = true;
+  if (entry.state) entry.prop = false;
+
   return Object.freeze(entry);
 }
+
+// an entry that lives in an attribute, as opposed to a stored prop or state
+export const isAttribute = entry => !entry.prop && !entry.state;
 
 // a name outside the schema: a string attribute, nothing more
 export const looseEntry = key => entryOf(key);

@@ -35,7 +35,8 @@ MyThing.init();   // <my-thing>
 
 | what | |
 |---|---|
-| `static attr` | the attribute schema: a type, `{ type, default, values, fn, config, var }` or a default value. `var: true` mirrors the value as `--name`, `var: '--other'` under that name |
+| `static attr` | the schema: a type, `{ type, default, values, fn, var, prop, state, hasChanged }` or a default value. `var: true` mirrors the value as `--name`, `var: '--other'` under that name. every entry gets an accessor (`el.size`), see [props and state](#props-and-state) |
+| `static batch` | `false` updates at once on every change instead of once per microtask |
 | `static shadow` | a shadow root of its own |
 | `static styles` | css in the layer `aufbau.elements`, one sheet per class shared by every tree. see [styles](#styles) |
 | `static reflect` | attributes whose resolved value goes back onto the host |
@@ -50,16 +51,96 @@ the native callbacks do the base's work and then call a hook of the same name:
 |---|---|
 | `onConnected()` | in the document, after styles and listeners are set up |
 | `onDisconnected()` | out of the document, listeners are already removed |
-| `onAttributeChanged(name, old, new)` | an attribute of the schema changed, `update()` follows |
+| `onAttributeChanged(name, old, new)` | an attribute of the schema changed, an update follows |
 | `onAdopted(oldDocument, newDocument)` | moved into another document |
 | `onConnectedMove()` | moved with `moveBefore()`. by default disconnected and connected again, override it to keep the state |
 
-`render()` · `sync()` · `onRender()` (after a rebuild) · `update()` · `invalidate()`
+`willUpdate(changed)` · `render()` · `sync(changed)` · `onRender(changed)` (after a template render or a string rebuild) · `onFirstRender()` · `onError(error)` · `update()` · `invalidate()`
+
+### rendering
+
+```js
+import { AufbauElement, each, html } from '@aufbau/element';
+
+class TodoList extends AufbauElement {
+  static attr = { title: String, items: { type: Array, default: [] } };
+
+  render () {
+    return html`
+      <h2.title>${this.title}</h2>
+      <ul>${each(this.items, item => item.id, item => html`<li class:done=${item.done}>${item.label}</li>`)}</ul>
+    `;
+  }
+}
+```
+
+`html` is htx (tag selectors, prop groups, merged `class`, shorthand tags)
+rendered by `@domina/render`: the template is cloned once, every later update
+writes only the holes that changed, so focus, input values and listeners inside
+survive. `onRender(changed)` runs after every such render. a `render()` that
+returns a string still works the 2.x way (compared, then `innerHTML`), element
+by element.
+
+### manifest
+
+`static attr`, `reflect` and `parts` are data, so `custom-elements.json` needs no
+code analysis. `static events` and `static slots` add what the schema can not
+know:
+
+```js
+static events = { change: 'the value changed' };
+static slots  = { '': 'the content', icon: 'an icon before the label' };
+```
+
+`manifest(entries)` from `@aufbau/element/manifest.js` builds it for defined tags,
+`download()` from `@aufbau/elements/manifest.js` does it for every element and
+saves the file.
+
+### update cycle
+
+a change of an attribute, a prop, a state or the config marks its name; the
+update runs once per microtask with every name marked meanwhile. `changed` is a
+`Set` of those names (camelCase), every name of the schema on the first update.
+
+```js
+el.setAttribute('label', 'a');   // marks label
+el.size = 3;                     // marks size
+await el.updateComplete;         // one update with { label, size }
+
+el.flush();                      // the pending update at once, to read the dom right after a change
+el.update();                     // at once, every name counts as changed (as in 2.x)
+```
+
+```js
+willUpdate (changed) { if (changed.has('src')) this.load(); }   // before render
+sync       (changed) { if (changed.has('label')) this.$label.text(this.label); }
+```
+
+`static batch = false` updates at once on every change. what `willUpdate()`,
+`render()` or `sync()` throw is caught: the element gets `:state(error)`, the
+error is logged and handed to `onError()`, the next good update clears it.
+
+### props and state
+
+```js
+static attr = {
+  pressed : Boolean,                       // el.pressed <-> [pressed]
+  size    : { type: Number, default: 2 },  // el.size reads getAttr('size'), writes [size]
+  nodes   : { type: Array, prop: true },   // el.nodes: a stored value, no attribute (Array, Object, Function imply it)
+  hover   : { state: true },               // no attribute, no accessor: this.setState('hover', true), this.getAttr('hover')
+};
+```
+
+a name the class or the platform already has keeps its own accessor (a
+hand-written setter, `title`, `hidden` …). a value set on the element before it
+was defined is handed to the accessor once it connects. a prop or state updates
+when `hasChanged(value, old)` says so, by default when it is not `Object.is` the
+old one.
 
 ### attributes
 
 ```js
-this.getAttr('size')        // typed, default and config included
+this.getAttr('size')        // typed, default and config included, resolved once per update
 this.getAttr()              // all of them: const { label, size } = this.getAttr()
 this.setAttr({ open: true, label: false })   // false removes
 ```

@@ -40,12 +40,6 @@ export default class BtnChip extends Btn {
     }
   `;
 
-  get pressed ()      { return this.hasAttribute('pressed'); }
-  set pressed (value) { this.toggleAttribute('pressed', Boolean(value)); }
-
-  get removable ()      { return this.hasAttribute('removable'); }
-  set removable (value) { this.toggleAttribute('removable', Boolean(value)); }
-
   // fires remove, then leaves the dom unless that was cancelled. true when it left
   dismiss () {
     if (!this.dispatchEvent(new CustomEvent('remove', { bubbles: true, cancelable: true }))) return false;

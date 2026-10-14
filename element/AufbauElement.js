@@ -1,9 +1,9 @@
 // :::::: IMPORTS
 
-import { followConfig, getConfig } from './lib/config.js';
-import { looseEntry, schemaOf }    from './lib/schema.js';
-import { applySkin }               from './lib/skin.js';
-import { adoptClassStyles }        from './lib/styles.js';
+import { followConfig, getConfig }           from './lib/config.js';
+import { isAttribute, looseEntry, schemaOf } from './lib/schema.js';
+import { applySkin }                         from './lib/skin.js';
+import { adoptClassStyles }                  from './lib/styles.js';
 
 import { hasAttr }       from '@domina/methods/hasAttr.js';
 import { setAttr }       from '@domina/methods/setAttr.js';
@@ -14,9 +14,16 @@ import { isFn, isPlainObject, isString } from '@pulgasari/is';
 import { Logger }                        from '@pulgasari/logger';
 import { toCamelCase, toKebabCase }      from '@pulgasari/str';
 
+import { isResult, render as renderInto, unrender } from '@domina/render';
+
 import { Selection, SHORTHANDS } from './Selection.js';
 
 const log = new Logger({ prefix: 'aufbau-core' });
+
+const notEqual = (value, old) => !Object.is(value, old);
+
+// a property of the platform is never shadowed by a schema accessor (title, hidden, id …)
+const NATIVE = new Set(Object.getOwnPropertyNames(HTMLElement.prototype).concat(Object.getOwnPropertyNames(Element.prototype)));
 
 const disposer = () => {
   const entries = new Set;
@@ -119,6 +126,7 @@ export class AufbauElement extends HTMLElement {
 
   connectedCallback () {
     this._mounted = true;
+    if (!this._upgraded) this.upgradeProperties();
     adoptClassStyles(this.constructor, this.root === this ? this.getRootNode() : this.root);
     applySkin();
     this.track(followConfig(this));
@@ -139,9 +147,10 @@ export class AufbauElement extends HTMLElement {
   attributeChangedCallback (name, oldValue, newValue) {
     if (this._reflecting) return;
     this._reflected?.delete(name);   // written by the author now
+    this._cache?.delete(this.entryOf(name).name);
     if (oldValue !== newValue && this._mounted) {
       this.onAttributeChanged(name, oldValue, newValue);
-      this.update();
+      this.requestUpdate(name);
     }
   }
 
@@ -155,7 +164,25 @@ export class AufbauElement extends HTMLElement {
       Object.defineProperty(this.prototype, '$' + toCamelCase(name), { configurable: true, get () { return this.part(name); } });
     }
 
-    const observed = [...schemaOf(this).values()].map(entry => entry.attribute);
+    // an accessor per schema entry: attributes read through getAttr() and write the
+    // attribute, props store their value. a name the class or the platform already
+    // has keeps its own (a hand-written setter, title, hidden …)
+    for (const entry of schemaOf(this).values()) {
+      const { attribute, name, type } = entry;
+      if (entry.state || NATIVE.has(name) || name in this.prototype) continue;
+      Object.defineProperty(this.prototype, name, {
+        configurable : true,
+        get () { return this.getAttr(name); },
+        set (value) {
+          if (entry.prop)          this.setProp(name, value);
+          else if (type === Boolean) this.toggleAttribute(attribute, Boolean(value));
+          else if (value == null)  this.removeAttribute(attribute);
+          else                     this.setAttribute(attribute, String(value));
+        },
+      });
+    }
+
+    const observed = [...schemaOf(this).values()].filter(isAttribute).map(entry => entry.attribute);
     if (observed.length && !Object.getOwnPropertyDescriptor(this, 'observedAttributes')) {
       Object.defineProperty(this, 'observedAttributes', { configurable: true, get: () => observed });
     }
@@ -165,38 +192,102 @@ export class AufbauElement extends HTMLElement {
 
   // ::: hooks, override in subclasses
 
+  // `changed` is the set of names (camelCase) that changed since the last update,
+  // every name of the schema on the first one
+
   onAdopted          (oldDocument, newDocument) {}
   onAttributeChanged (name, oldValue, newValue) {}
   onConnected        () {}
   onConnectedMove    () { this.disconnectedCallback(); this.connectedCallback(); }
   onDisconnected     () {}
-  onRender           () {}
+  onError            (error) {}
+  onFirstRender      () {}
+  onRender           (changed) {}
   render             () { return null; }
-  sync               () {}
+  sync               (changed) {}
+  willUpdate         (changed) {}
 
-  update () {
+  // :::::: UPDATE CYCLE ::::::::::::::::::::::::::::::::::::::::
+
+  // a change marks its name; the update runs once per microtask with all names
+  // marked meanwhile. `static batch = false` updates at once instead
+  requestUpdate (name) {
+    const changed = this._changed ??= new Set;
+    if (name === undefined) for (const entry of this.schema.values()) changed.add(entry.name);
+    else changed.add(this.entryOf(name).name);
+
+    if (!this._mounted) return this;
+    if (this.constructor.batch === false) return this.flush();
+    this._pending ??= Promise.resolve().then(() => { this.flush(); return true; });
+    return this;
+  }
+
+  // the pending update, now: for code that reads the dom right after a change
+  flush () { return this._changed ? this.perform(this._changed) : this; }
+
+  // resolves once the pending update ran
+  get updateComplete () { return this._pending ?? Promise.resolve(true); }
+
+  // at once, with the names marked so far plus `changed`; without `changed` every
+  // name counts as changed, as a direct update() did in 2.x
+  update (changed) {
+    const names = new Set(this._changed);
+    for (const name of changed ?? this.schema.keys()) names.add(this.entryOf(name).name);
+    return this.perform(names);
+  }
+
+  perform (names) {
     if (!this._mounted) return this;
 
-    this.reflectAttrs();
+    this._changed = this._pending = null;
+    this._cache?.clear();
 
-    const markup = this.render();
-    let rebuilt  = false;
+    try {
+      this.willUpdate(names);
+      this.reflectAttrs();
 
-    if (markup != null) {
-      const next = String(markup);
-      if (next !== this._markup) {
-        this._markup = next;
-        this.renderTarget.innerHTML = next;
+      // a template result is patched (@domina/render): only the holes that changed
+      // are written. a string takes the 2.x path: compared, then set as innerHTML
+      const output = this.render();
+      let rebuilt  = false;
+
+      if (isResult(output)) {
+        renderInto(this.renderTarget, output);
+        this._templated = true;
+        this._markup    = undefined;
         rebuilt = true;
       }
+      else if (output != null) {
+        const next = String(output);
+        if (next !== this._markup) {
+          if (this._templated) { unrender(this.renderTarget); this._templated = false; }
+          this._markup = next;
+          this.renderTarget.innerHTML = next;
+          rebuilt = true;
+        }
+      }
+
+      this.applyVars();
+      this.syncSkeleton();
+      this.sync(names);
+      if (rebuilt) this.onRender(names);
+      if (!this._rendered) { this._rendered = true; this.onFirstRender(); }
+      if (this._failed) { this._failed = false; this.states.delete('error'); }
+    }
+    catch (error) {
+      this._failed = true;
+      this.states.add('error');
+      log.error(`<${this.localName}>`, error);
+      this.onError(error);
     }
 
-    this.applyVars();
-    this.syncSkeleton();
-    this.sync();
-    if (rebuilt) this.onRender();
-
     return this;
+  }
+
+  // a config value of this tag changed: every name may resolve differently now
+  configChanged () {
+    this._cache?.clear();
+    return this.requestUpdate();
   }
 
   reflectAttrs () {
@@ -253,11 +344,25 @@ export class AufbauElement extends HTMLElement {
   setAttr (map)  { setAttr(this, map); return this; }
 
   // the attribute, else the config tag-attribute, else the default. getAttr() gives all of them.
-  // an attribute the element reflected itself is no attribute of the author
+  // an attribute the element reflected itself is no attribute of the author.
+  // a prop or state entry gives its stored value. a schema value is resolved once
+  // per update: the cache is cleared by every update, by a change of the attribute
+  // and by a change of the config
   getAttr (name) {
     if (name === undefined) return this.attrProxy();
 
-    const { attribute, fallback, fn, type, values } = this.entryOf(name);
+    const entry = this.entryOf(name);
+    if (!isAttribute(entry)) return this._values?.has(entry.name) ? this._values.get(entry.name) : entry.fallback;
+
+    const cached = this.schema.has(name);
+    if (cached && this._cache?.has(entry.name)) return this._cache.get(entry.name);
+
+    const value = this.resolveAttr(entry);
+    if (cached) (this._cache ??= new Map).set(entry.name, value);
+    return value;
+  }
+
+  resolveAttr ({ attribute, fallback, fn, name, type, values }) {
     const authored   = this.hasAttribute(attribute) && !this._reflected?.has(attribute);
     const configured = () => getConfig(`${this.localName}-${attribute}`);
 
@@ -279,6 +384,33 @@ export class AufbauElement extends HTMLElement {
     }
 
     return value;
+  }
+
+  // :::::: PROPS AND STATE :::::::::::::::::::::::::::::::::::::
+
+  // a stored value: el.nodes = […] for a prop, setState('hover', true) for state.
+  // an update follows when hasChanged (default: not Object.is) says so
+  setProp (name, value) {
+    const entry   = this.entryOf(name);
+    const values  = this._values ??= new Map;
+    const changed = entry.hasChanged ?? notEqual;
+    if (values.has(entry.name) && !changed(value, values.get(entry.name))) return this;
+    values.set(entry.name, value);
+    return this.requestUpdate(entry.name);
+  }
+
+  setState (name, value) { return this.setProp(name, value); }
+
+  // a value set before the element was defined, or a class field, sits on the
+  // instance and hides the accessor: it is handed to the accessor instead
+  upgradeProperties () {
+    this._upgraded = true;
+    for (const { name, state } of this.schema.values()) {
+      if (state || !Object.hasOwn(this, name)) continue;
+      const value = this[name];
+      delete this[name];
+      this[name] = value;   // without an accessor this puts it back where it was
+    }
   }
 
   // const { label, size } = this.getAttr()
