@@ -4,7 +4,7 @@ import { filterElements } from '@domina/methods/filterElements.js';
 import { debounce }       from '@pulgasari/timing';
 
 import { AufbauElement } from '@aufbau/element';
-import { html }          from '../lib/html.js';
+import { html }          from '../lib/template.js';
 
 export default class DataFilter extends AufbauElement {
   static attr = {

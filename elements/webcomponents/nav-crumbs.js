@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 export default class NavCrumbs extends AufbauElement {
   static internals = { role: 'navigation' };
@@ -90,7 +90,7 @@ export default class NavCrumbs extends AufbauElement {
       const index = crumbs.indexOf(entry);
       if (index === last) return html`<span aria-current="page">${entry.label}</span>`;
       if (href) return html`<a href="${href.replaceAll('{path}', encodeURIComponent(entry.path))}">${entry.label}</a>`;
-      return html`<button type="button" ${attrs({ 'data-index': index, 'data-path': entry.path })}>${entry.label}</button>`;
+      return html`<button type="button" ...${attrs({ 'data-index': index, 'data-path': entry.path })}>${entry.label}</button>`;
     };
 
     return html`${shown.map(crumb)}`;

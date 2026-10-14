@@ -3,7 +3,7 @@
 import { AufbauElement } from '@aufbau/element';
 import { importFile }    from '@aufbau/import';
 import { sortElements }  from '@domina/methods/sortElements.js';
-import { html }          from '../lib/html.js';
+import { html }          from '../lib/template.js';
 import { isArray }       from '@pulgasari/is';
 
 export default class DataTable extends AufbauElement {
@@ -112,7 +112,7 @@ export default class DataTable extends AufbauElement {
         </thead>
         <tbody>
           ${rows.map(row => typeof row === 'object' && row !== null
-            ? html`<tr>${keys.map(key => html`<td data-key="${key}">${row[key] ?? ''}</td>`)}</tr>`
+            ? html`<tr>${keys.map(key => html`<td data-key="${key}">${row[key] === true ? 'true' : row[key] ?? ''}</td>`)}</tr>`
             : html`<tr><td>${row}</td></tr>`)}
         </tbody>
       </table>

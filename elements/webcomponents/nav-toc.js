@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { html }          from '../lib/html.js';
+import { html }          from '../lib/template.js';
 
 import { toSlugCase }  from '@pulgasari/str';
 import { getElement }  from '@domina/methods/getElement.js';
@@ -91,7 +91,7 @@ export default class NavToc extends AufbauElement {
 
   render () {
     this._entries = this.collect();
-    if (!this._entries.length) return '';
+    if (!this._entries.length) return html``;
 
     return html`
       <header>${this.getAttr('label')}</header>
