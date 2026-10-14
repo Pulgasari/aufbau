@@ -133,9 +133,11 @@ static events = { change: 'the value changed', open: 'the panel opened' };
 static slots  = { '': 'the content', icon: 'an icon before the label' };
 ```
 
-a script (`element/manifest.js`, run in node or deno) imports the elements,
-reads their schemas and writes `custom-elements.json`: editor support (vs code
-custom data, jetbrains), docs pages, storybook controls.
+`element/manifest.js` builds the manifest from the classes; it runs in the
+browser, where the elements live (they are browser classes resolved through the
+import map, node can not load them without a dom). `elements/manifest.js` loads
+every element and returns or downloads `custom-elements.json`: editor support
+(vs code custom data, jetbrains), docs pages, storybook controls.
 
 ## later
 
@@ -149,8 +151,8 @@ custom data, jetbrains), docs pages, storybook controls.
 
 ## state
 
-built: 1 to 6 (properties, batching, changed names, getAttr cache, rendering
-through `@domina/render`, errors). the hand-written setters in `@aufbau/elements` are still in place; they
+built: 1 to 7 (properties, batching, changed names, getAttr cache, rendering
+through `@domina/render`, errors, manifest). the hand-written setters in `@aufbau/elements` are still in place; they
 keep working, since `init()` leaves names alone that a class defines itself.
 
 ## order

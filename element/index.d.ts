@@ -59,6 +59,10 @@ export declare class AufbauElement extends HTMLElement {
   static attr?      : Record<string, AttrEntry>;
   /** `false` updates at once on every change instead of once per microtask. */
   static batch?     : boolean;
+  /** The events it fires, name -> description, for the manifest. */
+  static events?    : Record<string, string>;
+  /** Its slots, name ('' for the default one) -> description, for the manifest. */
+  static slots?     : Record<string, string>;
   static internals? : boolean | Partial<ElementInternals>;
   static parts?     : string[];
   static reflect?   : string[];

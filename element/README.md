@@ -81,6 +81,21 @@ survive. `onRender(changed)` runs after every such render. a `render()` that
 returns a string still works the 2.x way (compared, then `innerHTML`), element
 by element.
 
+### manifest
+
+`static attr`, `reflect` and `parts` are data, so `custom-elements.json` needs no
+code analysis. `static events` and `static slots` add what the schema can not
+know:
+
+```js
+static events = { change: 'the value changed' };
+static slots  = { '': 'the content', icon: 'an icon before the label' };
+```
+
+`manifest(entries)` from `@aufbau/element/manifest.js` builds it for defined tags,
+`download()` from `@aufbau/elements/manifest.js` does it for every element and
+saves the file.
+
 ### update cycle
 
 a change of an attribute, a prop, a state or the config marks its name; the
