@@ -91,9 +91,6 @@ export class DashPanel extends AufbauElement {
     `;
   }
 
-  get collapsed ()      { return this.hasAttribute('collapsed'); }
-  set collapsed (value) { this.toggleAttribute('collapsed', Boolean(value)); }
-
   // folds the content away, `force` sets the state instead of turning it over
   collapse (force = !this.collapsed) {
     if (force === this.collapsed) return this;
