@@ -57,6 +57,21 @@ html`<input-color 'red' name="color" />`   // <input-color value="red" name="col
 html`<embed-youtube 'dQw4w9WgXcQ' />`      // <embed-youtube src="dQw4w9WgXcQ">
 ```
 
+## editor support
+
+`custom-elements.json` describes every element (attributes with types and values,
+properties, events, slots) and is announced in `package.json` as `customElements`.
+[`@htx/ts-plugin`](https://github.com/pulgasari/htx/tree/main/packages/ts-plugin)
+reads it from there: completion, hover and checks for these tags inside `` html`…` ``,
+together with the shorthand tags from `html.define(elements)` above.
+
+the file is generated in the browser, where the elements are defined:
+
+```js
+import { download } from '@aufbau/elements/manifest.js';
+await download();   // saves custom-elements.json, replace the one in this package
+```
+
 ---
 
 # elements

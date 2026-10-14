@@ -4,6 +4,7 @@
   "description": "Custom elements for the @aufbau ecosystem: the aufbau-* building blocks and the app, div, embed, input and write elements composed of them",
   "type"   : "module",
   "main"   : "./index.js",
+  "customElements": "custom-elements.json",
   "module" : "./index.js",
   "sideEffects": [
     "./webcomponents/*.js",
@@ -15,6 +16,7 @@
     "./*"   : "./*"
   },
   "files": [
+    "custom-elements.json",
     "index.js",
     "index.d.ts",
     "adapters",
