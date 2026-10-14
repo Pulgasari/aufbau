@@ -1,5 +1,5 @@
 import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
-import { html }                           from '../lib/html.js';
+import { html }                           from '../lib/template.js';
 
 const PAGE_STYLES = `:root:has(pop-modal:state(open)) { overflow: hidden; }`;
 

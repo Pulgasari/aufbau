@@ -2,7 +2,7 @@ import './data-tree.js';
 import './data-node.js';
 
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // a json file as a tree to unfold. `depth` levels start open. `value` takes
 // data that is already there instead of `src`
@@ -52,15 +52,15 @@ export default class MediaJson extends AufbauElement {
     const entries = Array.isArray(value) ? value.map((item, index) => [index, item]) : Object.entries(value);
     return entries.map(([key, item]) => {
       const nested = item && typeof item === 'object';
-      return html`<data-node ${attrs({ expanded: nested && level < this.getAttr('depth'), label: `${key}: ${preview(item)}` })}>${nested ? this.nodes(item, level + 1) : ''}</data-node>`;
+      return html`<data-node ...${attrs({ expanded: nested && level < this.getAttr('depth'), label: `${key}: ${preview(item)}` })}>${nested ? this.nodes(item, level + 1) : ''}</data-node>`;
     });
   }
 
   render () {
     const data = this._data;
-    if (data === undefined) return '';
+    if (data === undefined) return html``;
     if (!data || typeof data !== 'object') return html`<code>${JSON.stringify(data)}</code>`;
-    return html`<data-tree ${attrs({ 'aria-label': this.getAttr('label') })}>${this.nodes(data, 0)}</data-tree>`;
+    return html`<data-tree ...${attrs({ 'aria-label': this.getAttr('label') })}>${this.nodes(data, 0)}</data-tree>`;
   }
 
   sync () { this.load(); }

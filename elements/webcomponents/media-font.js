@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { attrs, html }   from '../lib/html.js';
+import { attrs, html }   from '../lib/template.js';
 
 // a font file as a specimen: its name, a sample at a few sizes and the
 // characters. the face is registered under `family`, or a name of its own
@@ -51,13 +51,13 @@ export default class MediaFont extends AufbauElement {
 
   render () {
     const { sizes, src, text } = this.getAttr();
-    if (!src) return '';
+    if (!src) return html``;
     const family = `font-family: "${this.familyName}", var(--font-fallback, sans-serif)`;
 
     return html`
       <header>${this.familyName}</header>
-      ${String(sizes).split(/\s+/).filter(Boolean).map(size => html`<p ${attrs({ style: `${family}; font-size: ${Number(size) || 16}px` })}>${text}</p>`)}
-      <p part="glyphs" ${attrs({ style: family })}>${GLYPHS}</p>
+      ${String(sizes).split(/\s+/).filter(Boolean).map(size => html`<p ...${attrs({ style: `${family}; font-size: ${Number(size) || 16}px` })}>${text}</p>`)}
+      <p part="glyphs" ...${attrs({ style: family })}>${GLYPHS}</p>
     `;
   }
 

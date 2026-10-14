@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { html }          from '../../lib/html.js';
+import { html }          from '../../lib/template.js';
 import { place }         from '../../lib/placement.js';
 
 // the base of pop-over and pop-tip: the element itself is a native popover in the

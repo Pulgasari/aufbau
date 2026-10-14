@@ -1,5 +1,5 @@
 import { AufbauElement } from '@aufbau/element';
-import { html }          from '../lib/html.js';
+import { html }          from '../lib/template.js';
 import { place }         from '../lib/placement.js';
 
 const ENTRY = 'a, button, [role="menuitem"]';

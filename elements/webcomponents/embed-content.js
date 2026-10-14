@@ -1,5 +1,5 @@
 import { AufbauElement, store } from '@aufbau/element';
-import { attrs, html }          from '../lib/html.js';
+import { attrs, html }          from '../lib/template.js';
 
 const ALLOW = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
 
@@ -194,14 +194,14 @@ export default class EmbedContent extends AufbauElement {
 
   render () {
     const embed = this.embed;
-    if (!embed) return '';
+    if (!embed) return html``;
 
     if (!this._active && embed.src && this.consented) this._active = true;
 
     const name = this.getAttr('label') || embed.label;
 
     if (this._active) return html`
-      <iframe ${attrs({ allow: ALLOW, loading: 'lazy', referrerpolicy: 'strict-origin-when-cross-origin', src: embed.src, title: name })}></iframe>
+      <iframe ...${attrs({ allow: ALLOW, loading: 'lazy', referrerpolicy: 'strict-origin-when-cross-origin', src: embed.src, title: name })}></iframe>
     `;
 
     if (!embed.src) return html`
