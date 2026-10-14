@@ -22,6 +22,39 @@ const log = new Logger({ prefix: 'aufbau-core' });
 
 const notEqual = (value, old) => !Object.is(value, old);
 
+// the names a class keeps as fields of its own: assigned in a constructor
+// (this.source = …) or declared as a class field (source = …). a schema entry of
+// that name gets no accessor, the field stays what it was. read from the source
+// text of the class and its ancestors up to AufbauElement
+function fieldsOf (Class) {
+  const names = new Set;
+  for (let current = Class; current && current !== AufbauElement && current !== HTMLElement; current = Object.getPrototypeOf(current)) {
+    const source = Function.prototype.toString.call(current);
+    for (const body of constructorsOf(source)) {
+      for (const [, name] of body.matchAll(/this\.(\w+)\s*(?:=(?![=>])|\?\?=|\|\|=)/g)) names.add(name);
+    }
+    for (const [, name] of source.matchAll(/^ {2}(?!static\b)(\w+)\s*=(?![=>])/gm)) names.add(name);
+  }
+  return names;
+}
+
+// the bodies of `constructor (…) { … }` in a source text, braces counted
+function constructorsOf (source) {
+  const bodies = [];
+  for (const match of source.matchAll(/\bconstructor\s*\([^)]*\)\s*\{/g)) {
+    let depth = 1;
+    let index = match.index + match[0].length;
+    const from = index;
+    while (depth && index < source.length) {
+      const char = source[index++];
+      if (char === '{') depth++;
+      else if (char === '}') depth--;
+    }
+    bodies.push(source.slice(from, index - 1));
+  }
+  return bodies;
+}
+
 // a property of the platform is never shadowed by a schema accessor (title, hidden, id …)
 const NATIVE = new Set(Object.getOwnPropertyNames(HTMLElement.prototype).concat(Object.getOwnPropertyNames(Element.prototype)));
 
@@ -166,10 +199,12 @@ export class AufbauElement extends HTMLElement {
 
     // an accessor per schema entry: attributes read through getAttr() and write the
     // attribute, props store their value. a name the class or the platform already
-    // has keeps its own (a hand-written setter, title, hidden …)
+    // has keeps its own (a hand-written setter, title, hidden …), and so does a name
+    // the class assigns as a field of its own (this.source = …): it stays a field
+    const fields = fieldsOf(this);
     for (const entry of schemaOf(this).values()) {
       const { attribute, name, type } = entry;
-      if (entry.state || NATIVE.has(name) || name in this.prototype) continue;
+      if (entry.state || NATIVE.has(name) || name in this.prototype || (!entry.prop && fields.has(name))) continue;
       Object.defineProperty(this.prototype, name, {
         configurable : true,
         get () { return this.getAttr(name); },
@@ -401,12 +436,13 @@ export class AufbauElement extends HTMLElement {
 
   setState (name, value) { return this.setProp(name, value); }
 
-  // a value set before the element was defined, or a class field, sits on the
-  // instance and hides the accessor: it is handed to the accessor instead
+  // a value set before the element was defined sits on the instance and hides
+  // the accessor: it is handed to the accessor instead. a field the class keeps
+  // itself (see fieldsOf) has no accessor and stays as it is
   upgradeProperties () {
     this._upgraded = true;
     for (const { name, state } of this.schema.values()) {
-      if (state || !Object.hasOwn(this, name)) continue;
+      if (state || !Object.hasOwn(this, name) || !(name in Object.getPrototypeOf(this))) continue;
       const value = this[name];
       delete this[name];
       this[name] = value;   // without an accessor this puts it back where it was
