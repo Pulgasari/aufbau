@@ -16,6 +16,8 @@ body {
   max-height  : 100dvh;
   font-size   : 14px;
   line-height : 1.5;
+
+  --fg: var(--color-fg);
 }
 
 body     { display: flex; }
