@@ -1,5 +1,5 @@
-@import url("https://code.pulgasari.dev/aufbau/css/aufbau.css");
-@import url("https://code.pulgasari.dev/aufbau/gestalt/gestalt.css");
+@import url("https://code.pulgasari.dev/gestalt/packages/css/aufbau.css");
+@import url("https://code.pulgasari.dev/gestalt/packages/css/gestalt.css");
 
 /* @aufbau/www/demo.css
    the package demos: a list on the side, stage, controls and code in main.

@@ -11,19 +11,12 @@
 - [@aufbau/devtools](devtools/)
 - [@aufbau/elements](elements/)
   | [html](https://aufbau.dev/elements.html)
-- [@aufbau/filters](filters/)
-  | [html](https://aufbau.dev/filters.html)
-- [@aufbau/gestalt](gestalt/)
 - [@aufbau/gestures](gestures/)
   | [html](https://aufbau.dev/gestures.html)
 - [@aufbau/gui](gui/)
   | [html](https://aufbau.dev/gui.html)
-- [@aufbau/patterns](patterns/)
-  | [html](https://aufbau.dev/patterns.html)
 - [@aufbau/signals](signals/)
 - [@aufbau/store](store/)
-- [@aufbau/webfonts](webfonts/)
-  | [html](https://aufbau.dev/webfonts.html)
 
 #### packages (experimental)
 - [@aufbau/bundler](bundler/) *(experimental)*
@@ -37,6 +30,4 @@
 - [@rat](https://github.com/pulgasari/rat/)
 
 #### resources
-- [@aufbau/css](css/)
-  | [functions](https://aufbau.dev/cssfn/)
 - [@aufbau/svg](svg/)

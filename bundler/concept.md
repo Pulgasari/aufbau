@@ -143,7 +143,7 @@ packages: {
   pages and copies a package once an import reaches it, so a shared map that
   names 40 packages costs a project only the ones it uses.
 - css too: a `<link>` to `vendor/@aufbau/css/aufbau.css` stages `@aufbau/css` by
-  its path, and its `@import url('../gestalt/…')` stages `@aufbau/gestalt` next to
+  its path, and its `@import url('../gestalt/…')` stages `@gestalt/core` next to
   it. css has no bare specifiers, so a relative path into a sibling package is how
   a sheet does it and is not reported as escaping; in js it still is.
 - one package, not one repo: the package directory goes along, without tests and
@@ -158,7 +158,7 @@ prune covers it for now.
 
 **open**: an `origin` next to it, so mentions of `${origin}/<repo>/<path>/` in
 staged files move to the staged directory of the package `sources` puts there
-(`@aufbau/webfonts`' default `baseUrl`). until then an app sets it itself
+(`@gestalt/webfonts`' default `baseUrl`). until then an app sets it itself
 (`configure({ baseUrl })`).
 
 **open**: `sources` is knowledge about the ecosystem, not about one project. a

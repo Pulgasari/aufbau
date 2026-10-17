@@ -1,6 +1,6 @@
 // @aufbau/stylesheet/skills/pattern.js
 // parses the ass pattern syntax and emits the prebuilt data-uri.
-// all svg work lives in @aufbau/patterns; nothing svg-related happens here.
+// all svg work lives in @gestalt/patterns; nothing svg-related happens here.
 
 const REGEX_TOKEN = /^([a-z-]+)\(([^)]*)\)$/i;
 

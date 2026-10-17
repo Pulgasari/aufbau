@@ -3,10 +3,10 @@
    --bg, --fg and --accent from css/themes.css, resolved on body. the reset is
    linked here, before the typography of css/docs.css */
 
-@import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
-@import url('https://code.pulgasari.dev/aufbau/css/default.css');
-@import url('https://code.pulgasari.dev/aufbau/css/docs.css');
-@import url('https://code.pulgasari.dev/aufbau/css/keyframes.css');
+@import url('https://code.pulgasari.dev/gestalt/packages/css/aufbau.css');
+@import url('https://code.pulgasari.dev/gestalt/packages/css/default.css');
+@import url('https://code.pulgasari.dev/gestalt/packages/css/docs.css');
+@import url('https://code.pulgasari.dev/gestalt/packages/css/keyframes.css');
 
 /* :::::: MIXINS */
 

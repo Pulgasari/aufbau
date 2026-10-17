@@ -10,7 +10,7 @@
 
 const COOKIE = 'aufbau-gestalt';
 
-// the picked name -> the token aufbau's css reads (@aufbau/gestalt)
+// the picked name -> the token aufbau's css reads (@gestalt/core)
 const TOKENS = { density: 'density', geometry: 'geometry', mode: 'scheme', palette: 'palette', skin: 'skin' };
 
 // a preset name or a css color, nothing that could leave the attribute or the declaration

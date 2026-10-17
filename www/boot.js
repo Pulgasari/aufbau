@@ -13,8 +13,8 @@ the former @aufbau/api they used: aufbau.css, the gestalt look, the elements
 */
 
 import { autoloader, load as loadElement, registerAll } from '@aufbau/elements';
-import { CSS_PATH, gestalt }                            from '@aufbau/gestalt';
-import webfonts                                         from '@aufbau/webfonts';
+import { CSS_PATH, gestalt }                            from '@gestalt/core';
+import webfonts                                         from '@gestalt/webfonts';
 import { setConfig }                                    from '@domina/element';
 
 const DEFAULTS = {

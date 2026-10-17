@@ -1,7 +1,0 @@
-{
-  "name": "@aufbau/gestalt",
-  "version": "0.1.0",
-  "exports": {
-    ".": "./index.js"
-  }
-}

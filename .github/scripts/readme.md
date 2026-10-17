@@ -5,8 +5,8 @@ Build-time scripts for the aufbau repo.
 ## generate-assets.mjs
 
 Regenerates the static assets under [`@aufbau/svg`](../../svg) from the source
-functions in [`@aufbau/filters`](../../filters) and
-[`@aufbau/patterns`](../../patterns).
+functions in [`@gestalt/filters`](../../filters) and
+[`@gestalt/patterns`](../../patterns).
 
 Every filter and pattern is a JS function that builds SVG. This script renders
 each one in its **live** (CSS-var-driven) form and writes:

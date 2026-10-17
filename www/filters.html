@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>@aufbau/filters</title>
+  <title>@gestalt/filters</title>
   
   <script src="./fouc.js"></script>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
@@ -41,7 +41,7 @@
   <main>
 
     <aside>
-      <h1>@aufbau/filters</h1>
+      <h1>@gestalt/filters</h1>
       <p id="about"></p>
       <nav class="list" id="list"></nav>
     </aside>
@@ -86,7 +86,7 @@
 
 <script type="module">
   import { boot }          from './boot.js';
-  import { createPipeline, filterCanvas, filterCss, filterSvg, list } from '@aufbau/filters';
+  import { createPipeline, filterCanvas, filterCss, filterSvg, list } from '@gestalt/filters';
   import { render as renderControls } from '@aufbau/gui';
   import getFormValues   from '@domina/methods/getFormValues.js';
   import { settled }     from '@htx/elements';
@@ -188,7 +188,7 @@
           ? `#logo { filter: ${css}; }  /* css backend */`
           : `#logo { filter: url(#aufbau-filter-${filter.id}); }  /* svg backend */`);
         $('dom-js').setAttribute('code',
-          `import { apply } from '@aufbau/filters';\n\n` +
+          `import { apply } from '@gestalt/filters';\n\n` +
           `await apply('#logo', '${filter.id}', ${optionsCode(options)});`);
       },
     };
@@ -223,7 +223,7 @@
           :                                  'bridge: ctx.filter runs a baked svg <filter>.';
 
         $('canvas-js').setAttribute('code',
-          `import { filterCanvas } from '@aufbau/filters';\n\n` +
+          `import { filterCanvas } from '@gestalt/filters';\n\n` +
           `await filterCanvas(canvas, '${filter.id}', ${optionsCode(options)});`);
       },
     };

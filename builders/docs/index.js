@@ -8,8 +8,8 @@
 import initDefaultStylesheet from './ss.js';
 import WriteCode             from '@aufbau/elements/webcomponents/write-code.js';   // for its static themes()
 import { autoloader }         from '@aufbau/elements';
-import { gestalt }            from '@aufbau/gestalt';
-import webfonts               from '@aufbau/webfonts';
+import { gestalt }            from '@gestalt/core';
+import webfonts               from '@gestalt/webfonts';
 import { setConfig }          from '@domina/element';
 import importFile            from '@aufbau/elements/lib/import.js';
 import { effect, signal, typedSignal } from '@aufbau/signals';

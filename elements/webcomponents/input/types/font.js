@@ -6,7 +6,7 @@ export default listType({
   placeholder : 'font…',
 
   async entries (host, locale) {
-    const { fonts }  = await import('@aufbau/webfonts');
+    const { fonts }  = await import('@gestalt/webfonts');
     const categories = listOf(host.getAttribute('categories'), null);
     return fonts
       .filter(font => !categories || categories.includes(font.category))

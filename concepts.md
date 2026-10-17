@@ -101,7 +101,7 @@ observe({
   for the items in it?
 - what wins when an element's own attribute and a root-level default disagree?
 - does the table live in the api (one import for everything) or in each package
-  (`@aufbau/patterns/trait.js`), with the api only collecting them?
+  (`@gestalt/patterns/trait.js`), with the api only collecting them?
 - naming: trait, behavior, directive, mixin?
 
 ---
@@ -139,7 +139,7 @@ android is still in progress. the capacitor build of zugriff runs in the android
 webview, which is chromium, so android 12+ devices have it.
 
 there is always a device without it, so every use needs a fallback: css/svg,
-canvas 2d or webgl, which `@aufbau/filters` has already.
+canvas 2d or webgl, which `@gestalt/filters` has already.
 
 ### typegpu
 
@@ -164,7 +164,7 @@ zugriff; the bundler (`aufbau/bundler`) could run the plugin for production late
 
 ### where it would help
 
-#### filters (@aufbau/filters)
+#### filters (@gestalt/filters)
 
 today: css and svg filters for elements, canvas (imagedata or `ctx.filter`) and
 webgl for a `<canvas>`.
@@ -179,7 +179,7 @@ webgl for a `<canvas>`.
 - the manifest already lists backends per filter, `webgpu` would be one more, with
   webgl as the fallback.
 
-#### patterns (@aufbau/patterns)
+#### patterns (@gestalt/patterns)
 
 today: svg, used as a background image of an element.
 
@@ -252,7 +252,7 @@ today: a server side resizer when there is one, else `createImageBitmap` and a c
 
 1. **thumbnails**: measure `createImageBitmap` with `resizeWidth` against the
    current canvas path on a folder of photos. no gpu yet, maybe the biggest win.
-2. **a webgpu backend for two or three filters** in @aufbau/filters (blur, a
+2. **a webgpu backend for two or three filters** in @gestalt/filters (blur, a
    color matrix, grain), chained, against the webgl backend on a large image.
 3. **a typegpu spike without the plugin**: schemas, buffers and wgsl strings,
    loaded through the importmap, to see how much remains without a build step.
