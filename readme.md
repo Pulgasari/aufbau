@@ -34,7 +34,9 @@
 #### side-projects
 - [@bunker](https://github.com/pulgasari/bunker/)
 - [@domina](https://github.com/pulgasari/domina/)
+- [@gestalt](https://github.com/pulgasari/gestalt/)
 - [@htx](https://github.com/pulgasari/htx/)
+- [@rat](https://github.com/pulgasari/rat/)
 
 #### resources
 - [@aufbau/css](css/)
