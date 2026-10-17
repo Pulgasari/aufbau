@@ -143,7 +143,7 @@
   </main>
 
   <script type="module">
-    import aufbau   from '@aufbau/api';
+    import { boot, gestalt, load as loadElements } from '../boot.js';
     import { CODE } from '../urls.js';
 
     // the files come from the repo, not from where the page is served, see ../urls.js
@@ -409,8 +409,7 @@
 
     // :::::: GESTALT ::::::::::::::::::::::::::::::::::::::::::::
 
-    await aufbau.boot();
-    const { gestalt } = aufbau;
+    await boot();
 
     // without @function and if() nothing here works
     const test = el('div');
@@ -421,7 +420,7 @@
     }
     test.remove();
 
-    await aufbau.elements.load('input-value', 'input-bool', 'input-option');
+    await loadElements('input-value', 'input-bool', 'input-option');
 
     const palettes = await gestalt.palettes().catch(() => []);
     $('palette').append(...palettes.map(name => el('input-option', { textContent: name })));

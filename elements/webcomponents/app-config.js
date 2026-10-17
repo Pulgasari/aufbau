@@ -1,6 +1,6 @@
 import gui from '@aufbau/gui';
 
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 export class AppConfig extends AufbauElement {
 

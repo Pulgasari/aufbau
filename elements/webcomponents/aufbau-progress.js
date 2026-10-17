@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 const clamp = value => Math.min(100, Math.max(0, value));
 

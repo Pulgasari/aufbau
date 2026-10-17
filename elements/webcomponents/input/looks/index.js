@@ -1,4 +1,4 @@
-import { cssOf } from '@aufbau/element';
+import { cssOf } from '@domina/element';
 
 import button   from './button.js';
 import checkbox from './checkbox.js';

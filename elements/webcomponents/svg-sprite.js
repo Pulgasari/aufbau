@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 
 // one symbol of a sprite sheet: <svg><use href="sprite.svg#name"></svg>. the

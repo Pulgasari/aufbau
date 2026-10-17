@@ -13,7 +13,7 @@
 // 'dracula', 'teal', '#ff8800'.
 // look and layout are stylesheets, one per kind, swapped in place, false
 // removes one. skin is both: the --skin token, and the sheet the elements adopt
-// into @layer aufbau.skin (@aufbau/element).
+// into @layer aufbau.skin (@domina/element).
 
 export const 
 CSS_PATH     = 'https://code.pulgasari.dev/aufbau/css',
@@ -34,7 +34,7 @@ const SHEETS  = { look: 'looks' };
 const current = {};
 
 //
-const setSkin       = async name => (await import('@aufbau/element')).setSkin(name || null);
+const setSkin       = async name => (await import('@domina/element')).setSkin(name || null);
 const domina        =       name => import(`@domina/methods/${name}.js`).then(module => module[name] ?? module.default);
 const readToken     =       name => getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim() || null;
 const presetPattern =       prop => new RegExp(`style\\(\\s*--${prop}\\s*:\\s*([\\w-]+)\\s*\\)`);
@@ -84,7 +84,7 @@ async function loadSheet (url) {
     return (await import(url, { with: { type: 'css' } })).default;
   } catch {
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`[@aufbau/api] gestalt: ${response.status} ${response.statusText} - ${url}`);
+    if (!response.ok) throw new Error(`[@aufbau/gestalt] ${response.status} ${response.statusText} - ${url}`);
     return new CSSStyleSheet().replace(await response.text());
   }
 }

@@ -1,6 +1,6 @@
 import './svg-icon.js';
 
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 // a panel of a dash-board: a header with the heading and slotted actions, the
 // content below. `span` and `rows` take more than one cell of the board,

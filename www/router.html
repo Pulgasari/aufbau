@@ -29,12 +29,12 @@
 </app-root>
 
 <script type="module">
-  import aufbau          from '@aufbau/api';
+  import { boot }          from './boot.js';
   import { settled }     from '@htx/elements';
   import { htx, render } from '@htx/preact';
   import { url }         from '@pulgasari/url';
   
-  await aufbau.boot();
+  await boot();
   await settled();
   if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
 

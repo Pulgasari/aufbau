@@ -1,5 +1,5 @@
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
-import { AufbauElement, withControl, withSource }   from '@aufbau/element';
+import { AufbauElement, withControl, withSource }   from '@domina/element';
 import { dedent }                                   from '../lib/dedent.js';
 import { attrs, html }                              from '../lib/template.js';
 import { setAttr }                                  from '@domina/methods/setAttr.js';

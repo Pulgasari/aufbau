@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 // a grid of dash-panels: as many columns of at least `min` as fit, or a fixed
 // number with `columns`. a panel spans more cells with its own span and rows, never

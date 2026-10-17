@@ -13,7 +13,7 @@
 <div id="app"></div>
 
 <script type="module">
-import aufbau                           from '@aufbau/api';
+import { boot }                           from './boot.js';
 import { data, load }                   from '@aufbau/webfonts';
 import htm                              from 'htm';
 import { h, render }                    from 'preact';
@@ -22,7 +22,7 @@ import { computed, signal }             from '@preact/signals';
 
 const html = htm.bind(h);
 
-await aufbau.boot();
+await boot();
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::::
 

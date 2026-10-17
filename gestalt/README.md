@@ -13,7 +13,7 @@ gestalt.colors();           // { bg, fg, ink } as the browser computed them
 await gestalt.palettes();   // the preset names of palettes.css
 ```
 
-`@aufbau/api` hands the same controller on as `aufbau.gestalt`.
+`www/boot.js` hands the same controller on to the pages of the site.
 
 ## files
 

@@ -40,7 +40,7 @@ await mono.load();
 await mono.apply('#editor');
 ```
 
-`init()` loads and applies a list at once, what `@aufbau/api` boots with:
+`init()` loads and applies a list at once, what the pages of `www/` boot with (`www/boot.js`):
 
 ```javascript
 await init(['manrope', { id: 'jetbrains-mono' }, { id: 'vollkorn', role: 'serif', target: '.article' }]);

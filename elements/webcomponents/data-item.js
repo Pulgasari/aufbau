@@ -1,4 +1,4 @@
-import { AufbauElement }           from '@aufbau/element';
+import { AufbauElement }           from '@domina/element';
 import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 export default class DataItem extends AufbauElement {

@@ -9,7 +9,7 @@
     "./*": "./*"
   },
   "peerDependencies": {
-    "@aufbau/element": "^0.1.0",
+    "@domina/element": "^0.1.0",
     "@domina/methods": "*"
   },
   "aufbau": {

@@ -1,4 +1,4 @@
-import { AufbauElement }           from '@aufbau/element';
+import { AufbauElement }           from '@domina/element';
 import { parseLook, resolveShape } from '../lib/itemLook.js';
 
 const parsePx = value => { const number = parseFloat(value); return Number.isFinite(number) ? number : null; };

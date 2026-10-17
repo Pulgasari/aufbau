@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 
 export default class NavCrumbs extends AufbauElement {

@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { importFile }    from '@aufbau/import';
 import { attrs, html }   from '../lib/template.js';
 

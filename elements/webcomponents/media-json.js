@@ -1,7 +1,7 @@
 import './data-tree.js';
 import './data-node.js';
 
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 
 // a json file as a tree to unfold. `depth` levels start open. `value` takes

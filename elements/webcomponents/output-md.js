@@ -1,4 +1,4 @@
-import { AufbauSourceElement }  from '@aufbau/element';
+import { AufbauSourceElement }  from '@domina/element';
 import { importFile, renderMD } from '@aufbau/import';
 import { html, raw as rawHtml } from '../lib/template.js';
 import { dedent }               from '../lib/dedent.js';

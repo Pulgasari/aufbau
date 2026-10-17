@@ -1,4 +1,4 @@
-import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
+import { adoptBaseStyles, AufbauElement } from '@domina/element';
 import { html }                           from '../lib/template.js';
 
 const PAGE_STYLES = `:root:has(pop-modal:state(open)) { overflow: hidden; }`;

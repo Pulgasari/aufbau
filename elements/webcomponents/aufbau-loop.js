@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { onVisible }     from '@domina/observer';
 
 // NOTE provisional name, no better one found yet and not happy with it

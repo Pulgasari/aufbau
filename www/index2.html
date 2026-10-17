@@ -27,10 +27,10 @@
 </app-root>
 
 <script type="module">
-  import aufbau      from '@aufbau/api';
+  import { boot }      from './boot.js';
   import { settled } from '@htx/elements';
 
-  await aufbau.boot();
+  await boot();
   await settled();
   if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
 

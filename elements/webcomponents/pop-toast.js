@@ -2,7 +2,7 @@ import { isPlainObject, isString } from '@pulgasari/is';
 import { createShift, shift }      from '@pulgasari/shift';
 import { setAttr }                 from '@domina/methods/setAttr.js';
 
-import { adoptBaseStyles, AufbauElement } from '@aufbau/element';
+import { adoptBaseStyles, AufbauElement } from '@domina/element';
 import { html }                           from '../lib/template.js';
 
 const ICONS = {

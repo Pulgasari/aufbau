@@ -9,7 +9,6 @@
 #### packages
 - [@aufbau/ass](ass/)
 - [@aufbau/devtools](devtools/)
-- [@aufbau/element](element/)
 - [@aufbau/elements](elements/)
   | [html](https://aufbau.dev/elements.html)
 - [@aufbau/filters](filters/)

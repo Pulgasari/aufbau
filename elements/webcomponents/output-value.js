@@ -2,7 +2,7 @@
 
 // :::::: IMPORTS
 
-import { AufbauSourceElement, getConfig } from '@aufbau/element';
+import { AufbauSourceElement, getConfig } from '@domina/element';
 import { TYPES, typeOf }                  from './input/types/index.js';
 import { actionButtons, bindActions }     from '../lib/actions.js';
 import { attrs, html }                    from '../lib/template.js';

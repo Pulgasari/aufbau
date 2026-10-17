@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { localUrl }      from './svg-icon.js';
 
 const LOGOS = '@aufbau/svg/logos/';

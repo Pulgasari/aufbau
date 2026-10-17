@@ -3,7 +3,7 @@ import './input/tags.js';
 import { filterElements } from '@domina/methods/filterElements.js';
 import { debounce }       from '@pulgasari/timing';
 
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { html }          from '../lib/template.js';
 
 export default class DataFilter extends AufbauElement {

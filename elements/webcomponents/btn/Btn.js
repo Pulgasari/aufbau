@@ -1,6 +1,6 @@
 import '../svg-icon.js';
 
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { isFn }          from '@pulgasari/is';
 import { toCamelCase }   from '@pulgasari/str';
 import { html }          from '../../lib/template.js';

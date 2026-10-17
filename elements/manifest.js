@@ -1,6 +1,6 @@
 // @aufbau/elements/manifest.js
 // the custom elements manifest of every element: loads them all, reads their
-// schemas (see @aufbau/element/manifest.js) and hands back custom-elements.json,
+// schemas (see @domina/element/manifest.js) and hands back custom-elements.json,
 // or saves it as a file. runs in the browser, where the elements live:
 //
 //   import { download } from '@aufbau/elements/manifest.js';
@@ -10,7 +10,7 @@
 // (@htx/ts-plugin finds it through "customElements" in package.json). run it
 // again after an element's schema, events or slots changed.
 
-import { manifest }                    from '@aufbau/element/manifest.js';
+import { manifest }                    from '@domina/element/manifest.js';
 import { TAGS, pathOf, registerAll } from './index.js';
 
 async function manifestAll () {

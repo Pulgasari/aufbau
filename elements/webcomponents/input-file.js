@@ -1,4 +1,4 @@
-import { AufbauControlElement } from '@aufbau/element';
+import { AufbauControlElement } from '@domina/element';
 import { attrs, html }          from '../lib/template.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
