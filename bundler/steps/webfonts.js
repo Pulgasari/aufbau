@@ -1,12 +1,12 @@
 // @aufbau/bundler/steps/webfonts.js
 
 /*
-only the fonts a project uses stay in its copy of an @aufbau/webfonts catalog,
+only the fonts a project uses stay in its copy of an @gestalt/webfonts catalog,
 the files of all others are dropped and the catalog lists the kept ones only,
 so a font picker offers nothing that is not there:
 
 webfonts: {
-  catalog : '_pkg/aufbau/webfonts/data.js', // in the output
+  catalog : '_pkg/gestalt/packages/webfonts/data.js', // in the output
   keep    : ['manrope'],                    // ids or names
   scan    : true,                           // plus every font whose name the staged css and js quote
 }
@@ -23,7 +23,7 @@ const SCANNED = new Set(['.css', '.html', '.js', '.mjs']);
 
 async function webfonts ({ config, log, out, report }) {
   if (!config.webfonts) return;
-  const { catalog = '_pkg/aufbau/webfonts/data.js', keep = [], scan = true } = config.webfonts;
+  const { catalog = '_pkg/gestalt/packages/webfonts/data.js', keep = [], scan = true } = config.webfonts;
 
   const file = joinPath(out, catalog);
   if (!pathExists(file)) return log(`webfonts: no catalog at ${catalog}`);

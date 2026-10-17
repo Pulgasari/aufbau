@@ -19,7 +19,7 @@ function idsOf (host, catalog) {
 }
 
 async function paint (host) {
-  const { use } = await import('@aufbau/patterns');
+  const { use } = await import('@gestalt/patterns');
 
   for (const span of host.root.querySelectorAll('[data-pattern] > span')) {
     const id = idOf(span.parentElement);
@@ -49,7 +49,7 @@ function fill (host) {
   if (host._swatches) return;
   host._swatches = [];
 
-  import('@aufbau/patterns').then(({ list }) => {
+  import('@gestalt/patterns').then(({ list }) => {
     const catalog = list();
     const names   = Object.fromEntries(catalog.map(pattern => [pattern.id, pattern.name]));
     const none    = host.hasAttribute('required') ? [] : [['none', 'none']];

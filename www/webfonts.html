@@ -14,7 +14,7 @@
 
 <script type="module">
 import { boot }                           from './boot.js';
-import { data, load }                   from '@aufbau/webfonts';
+import { data, load }                   from '@gestalt/webfonts';
 import htm                              from 'htm';
 import { h, render }                    from 'preact';
 import { useEffect, useRef, useState }  from 'preact/hooks';
@@ -66,12 +66,12 @@ const groups = computed(() => {
 
 // :::::: FONT LOADING ::::::::::::::::::::::::::::::::::::::::::
 
-// font.id -> Promise, the fonts that started loading. @aufbau/webfonts
+// font.id -> Promise, the fonts that started loading. @gestalt/webfonts
 // registers every face once, this only tells a card whether it may skip the observer
 const registry = new Map();
 
 /**
- * loads every face of a font through @aufbau/webfonts.
+ * loads every face of a font through @gestalt/webfonts.
  * @param {object} font - manifest entry
  * @returns {Promise<void>} rejects when not a single face loaded
  */
@@ -195,7 +195,7 @@ function Toolbar () {
 function App () {
   return html`
     <header class="masthead">
-      <h1>@aufbau/webfonts</h1>
+      <h1>@gestalt/webfonts</h1>
       <p>${filtered.value.length} von ${fonts.value.length} Schriften</p>
     </header>
 

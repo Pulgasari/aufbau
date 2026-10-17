@@ -39,7 +39,7 @@ export async function patternStyle (value, { name = 'pattern', opacity = 1 } = {
   if (parts.bg) colors.bg = parts.bg;
 
   try {
-    const { use } = await import('@aufbau/patterns');
+    const { use } = await import('@gestalt/patterns');
     const image   = await use(parts.id, colors).image();
     return { [`--${name}-image`]: image, [`--${name}-opacity`]: String(parts.opacity ?? opacity) };
   }

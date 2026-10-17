@@ -6,11 +6,11 @@ svg-dateien und icon-aliases von aufbau, früher getrennt als `@aufbau/icons`.
 | ----------- | ------ |
 | `icons/`    | eigene icons, in `<svg-icon>` unter dem präfix `aufbau` |
 | `logos/`    | logos, in `<svg-logo>` |
-| `filters/`  | generiert aus `@aufbau/filters` (`.github/scripts/generate-assets.mjs`) |
-| `patterns/` | generiert aus `@aufbau/patterns`, ebenso |
+| `filters/`  | generiert aus `@gestalt/filters` (`.github/scripts/generate-assets.mjs`) |
+| `patterns/` | generiert aus `@gestalt/patterns`, ebenso |
 | `data/`     | die alias-listen |
 
-bei den icons ein hybrid wie `@aufbau/webfonts`:
+bei den icons ein hybrid wie `@gestalt/webfonts`:
 - einerseits opinionated aufbau-standard-icons (die alias-liste in `data/`)
 - andererseits allgemein: jedes iconify-icon geht per voller id (`lucide:save`)
 

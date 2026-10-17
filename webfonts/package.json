@@ -1,8 +1,0 @@
-{
-  "name": "@aufbau/webfonts",
-  "type": "module",
-  "exports": {
-    "."        : "./index.js",
-    "./google" : "./google.js"
-  }
-}

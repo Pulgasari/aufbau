@@ -64,7 +64,7 @@ const joinPath     = (...parts) => join(...parts);
 const relativePath = (from, to) => relative(from, to);
 const resolvePath  = (...parts) => resolve(...parts);
 
-// a file of the output as the page sees it, '/_pkg/aufbau/css/aufbau.css'
+// a file of the output as the page sees it, '/_pkg/gestalt/packages/css/aufbau.css'
 const outputPath = (out, path) => '/' + relative(out, path).split(sep).join('/');
 
 const isText = path => TEXT.has(extname(path));

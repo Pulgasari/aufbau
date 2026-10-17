@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>@aufbau/patterns</title>
+  <title>@gestalt/patterns</title>
   <script src="https://code.pulgasari.dev/importmap.js"></script>
   <link rel="stylesheet" href="./demo.css"/>
   <style>
@@ -13,7 +13,7 @@
 <body>
 
   <aside>
-    <h1>@aufbau/patterns</h1>
+    <h1>@gestalt/patterns</h1>
     <p>patterns are js functions that generate svg. pick one and tweak it live.</p>
     <nav class="list" id="list"></nav>
   </aside>
@@ -31,7 +31,7 @@
 
   <script type="module">
     import { boot } from './boot.js';
-    import { list, patternImage, patternSvg } from '@aufbau/patterns';
+    import { list, patternImage, patternSvg } from '@gestalt/patterns';
     import { render as renderControls } from '@aufbau/gui';
 
     await boot();
@@ -68,7 +68,7 @@
       $('svg').setAttribute('code', await patternSvg(current.id, options));
       $('css').setAttribute('code', `.box {\n  background-image: ${image};\n  background-repeat: repeat;\n}`);
       $('js').setAttribute('code',
-        `import { apply } from '@aufbau/patterns';\n\n` +
+        `import { apply } from '@gestalt/patterns';\n\n` +
         `await apply('.box', '${current.id}', ${optionsCode(options)});`);
     }
 
