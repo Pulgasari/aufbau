@@ -6,7 +6,6 @@
 - [@aufbau/filters]($repo/filters/) svg, css, canvas and webgl filters
 - [@aufbau/gestures]($repo/gestures/) pointer gestures
 - [@aufbau/gui]($repo/gui/) spec driven controls
-- [@aufbau/import]($repo/import/) files of any format as values
 - [@aufbau/patterns]($repo/patterns/) svg patterns
 - [@aufbau/signals]($repo/signals/) typed and persisted signals
 - [@aufbau/store]($repo/store/) the store

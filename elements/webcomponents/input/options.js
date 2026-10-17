@@ -1,4 +1,4 @@
-import { importFile }                    from '@aufbau/import';
+import { importFile }                    from '../../lib/import.js';
 import { localeOf }                      from '../../lib/locale.js';
 import { normalizeOptions, readOptions } from '../../lib/options.js';
 

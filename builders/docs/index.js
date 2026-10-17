@@ -11,7 +11,7 @@ import { autoloader }         from '@aufbau/elements';
 import { gestalt }            from '@aufbau/gestalt';
 import webfonts               from '@aufbau/webfonts';
 import { setConfig }          from '@domina/element';
-import importFile            from '@aufbau/import';
+import importFile            from '@aufbau/elements/lib/import.js';
 import { effect, signal, typedSignal } from '@aufbau/signals';
 import { isArray, isFn, isString }     from '@pulgasari/is';
 import { toSlugCase }        from '@pulgasari/str';

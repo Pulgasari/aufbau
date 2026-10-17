@@ -654,7 +654,7 @@ setzt `page` und feuert `nav-paginate` mit `{ page, pages }`.
 <div id="layout">
   <!-- Content area that gets mutated by markdown import -->
   <main id="markdown-container">
-    <!-- HTML injected via @aufbau/import -->
+    <!-- the html of a markdown file, e.g. from importFile() of lib/import.js -->
   </main>
 
   <!-- Autonomous TOC Component -->
@@ -670,8 +670,7 @@ jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelese
 ## output-md
 
 lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
-über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
-selbst von einem cdn.
+über `lib/import.js` des pakets (marked, beim ersten gebrauch geladen).
 
 `src`, `raw` oder die kinder als quelle. die kinder bleiben unangetastet und
 werden bei änderung neu gerendert, die ausgabe ist ein `<article>` im light dom.

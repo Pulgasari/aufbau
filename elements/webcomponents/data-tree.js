@@ -1,5 +1,5 @@
 import { AufbauElement } from '@domina/element';
-import { importFile }    from '@aufbau/import';
+import { importFile }    from '../lib/import.js';
 import { attrs, html }   from '../lib/template.js';
 
 const ITEM = 'data-node';
