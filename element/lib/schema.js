@@ -1,6 +1,5 @@
 import { CanonicalMap }                 from '@pulgasari/canonicalmap';
-import { isArray, isFn, isPlainObject } from '@pulgasari/is';
-import { toCamelCase, toKebabCase }     from '@pulgasari/str';
+import { isArray, isFn, isPlainObject, toCamelCase, toKebabCase } from './shared.js';
 
 const TYPES  = { boolean: Boolean, number: Number, string: String };
 const typeOf = value => isArray(value) ? Array : isPlainObject(value) ? Object : TYPES[typeof value] ?? String;
