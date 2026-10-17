@@ -1,6 +1,6 @@
-import { AufbauElement }    from '@aufbau/element';
+import { AufbauElement }    from '@domina/element';
 import { normalizeOptions } from '../lib/options.js';
-import { importFile }       from '@aufbau/import';
+import { importFile }       from '../lib/import.js';
 
 export default class DataList extends AufbauElement {
   static attr = {

@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 
 // a font file as a specimen: its name, a sample at a few sizes and the

@@ -202,12 +202,12 @@
   </script>
 
   <script type="module">
-    import aufbau         from '@aufbau/api';
+    import { boot }         from './boot.js';
     import { autoloader } from '@aufbau/elements';
 
     autoloader();
 
-    //await aufbau.boot();
+    //await boot();
 
     const $    = id => document.getElementById(id);
     const KEYS = { css: 'aufbau:www:css:css', html: 'aufbau:www:css:html', tab: 'aufbau:www:css:tab' };

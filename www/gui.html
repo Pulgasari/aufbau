@@ -76,10 +76,10 @@
   </main>
 
   <script type="module">
-    import aufbau from '@aufbau/api';
+    import { boot, load } from './boot.js';
     import { readValues, render } from '@aufbau/gui';
 
-    await aufbau.boot();
+    await boot();
 
     const $ = id => document.getElementById(id);
 
@@ -220,7 +220,7 @@
         ``,
         `const spec = ${source};`,
         ``,
-        `// the aufbau-* controls it emits are registered by the page, e.g. aufbau.boot()`,
+        `// the aufbau-* controls it emits are registered by the page, e.g. boot()`,
         `const panel = render(spec, {`,
         `  onChange : (values, name) => console.log(name, values),`,
         `});`,
@@ -340,7 +340,7 @@
     });
     document.querySelector('[role="tab"]').setAttribute('aria-selected', 'true');
 
-    await aufbau.elements.load('aufbau-toast');
+    await load('aufbau-toast');
 
     // a shared link brings its preset or its spec, the first preset otherwise
     const shared = new URLSearchParams(location.search).get('preset');

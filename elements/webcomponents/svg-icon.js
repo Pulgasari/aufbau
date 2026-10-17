@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 const API      = 'https://api.iconify.design';
 const DEFAULTS = '@aufbau/svg/aliases.js';

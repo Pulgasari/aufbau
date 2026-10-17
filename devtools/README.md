@@ -25,7 +25,7 @@ e.g. only with `?dev` in the url:
 if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
 ```
 
-it uses `@aufbau/element`, `@aufbau/elements`, `@domina/methods` and `@htx/js`
+it uses `@domina/element`, `@aufbau/elements`, `@domina/methods` and `@htx/js`
 from the import map.
 
 ## elements

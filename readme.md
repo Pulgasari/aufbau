@@ -9,7 +9,6 @@
 #### packages
 - [@aufbau/ass](ass/)
 - [@aufbau/devtools](devtools/)
-- [@aufbau/element](element/)
 - [@aufbau/elements](elements/)
   | [html](https://aufbau.dev/elements.html)
 - [@aufbau/filters](filters/)
@@ -19,7 +18,6 @@
   | [html](https://aufbau.dev/gestures.html)
 - [@aufbau/gui](gui/)
   | [html](https://aufbau.dev/gui.html)
-- [@aufbau/import](import/)
 - [@aufbau/patterns](patterns/)
   | [html](https://aufbau.dev/patterns.html)
 - [@aufbau/signals](signals/)

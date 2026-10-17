@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 // a placeholder and nothing else: lines, a block or a circle
 // NOTE provisional name, no better one found yet and not happy with it

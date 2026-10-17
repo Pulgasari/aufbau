@@ -85,4 +85,4 @@ the lifecycle already does.
 
 - does a family need its own registry (all `pop-`) or one per class?
 - `instances` on the base (`AufbauElement.instancesOf(Class)`) or per class?
-- how much of this belongs to `@aufbau/element` and how much to the elements?
+- how much of this belongs to `@domina/element` and how much to the elements?

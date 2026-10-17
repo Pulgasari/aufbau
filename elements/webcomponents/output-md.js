@@ -1,5 +1,5 @@
-import { AufbauSourceElement }  from '@aufbau/element';
-import { importFile, renderMD } from '@aufbau/import';
+import { AufbauSourceElement }  from '@domina/element';
+import { importFile, renderMD } from '../lib/import.js';
 import { html, raw as rawHtml } from '../lib/template.js';
 import { dedent }               from '../lib/dedent.js';
 

@@ -1,6 +1,6 @@
 import './svg-icon.js';
 
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 
 export class AppPanel extends AufbauElement {
 

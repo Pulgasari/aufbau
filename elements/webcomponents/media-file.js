@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 
 // a file shown by what its type asks for: media-audio, media-video, media-gif,

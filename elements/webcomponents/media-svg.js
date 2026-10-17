@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { loadSvg }       from '../lib/svg.js';
 
 // an svg file to look at: inline (scripts and handlers dropped) and fit to the

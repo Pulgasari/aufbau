@@ -1,4 +1,4 @@
-import { AufbauElement, store } from '@aufbau/element';
+import { AufbauElement, store } from '@domina/element';
 import { attrs, html }          from '../lib/template.js';
 
 const ALLOW = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';

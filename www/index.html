@@ -33,7 +33,7 @@
   </footer>
 
   <script type="module">
-    import aufbau           from '@aufbau/api';
+    import { boot, gestalt }           from './boot.js';
     import { applyFilter } from '@aufbau/filters';
 
     const pick = list => list[Math.floor(Math.random() * list.length)];
@@ -49,7 +49,7 @@
     applyFilter('body', filter, FILTERS[filter]);
 
     // index.css brings the reset itself
-    await aufbau.boot({ css: { palette: pick(await aufbau.gestalt.palettes()), reset: false } });
+    await boot({ css: { palette: pick(await gestalt.palettes()), reset: false } });
   </script>
 
 </body>

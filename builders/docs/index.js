@@ -1,14 +1,17 @@
 // @aufbau/builders/docs/index.js
 // a docs site from markdown files: a hash router over the files, a sidebar, a
-// table of contents and the theme controls. aufbau.boot() brings reset, theme,
-// skin, elements and webfonts, index.ass the shell around them.
+// table of contents and the theme controls. gestalt brings theme and skin,
+// the elements autoload, webfonts the fonts, index.ass the shell around them.
 //
 //   createDocsFW({ index: '$repo/readme.md', sidebar: { … }, vars: { repo: '../' } });
 
 import initDefaultStylesheet from './ss.js';
 import WriteCode             from '@aufbau/elements/webcomponents/write-code.js';   // for its static themes()
-import aufbau                from '@aufbau/api';
-import importFile            from '@aufbau/import';
+import { autoloader }         from '@aufbau/elements';
+import { gestalt }            from '@aufbau/gestalt';
+import webfonts               from '@aufbau/webfonts';
+import { setConfig }          from '@domina/element';
+import importFile            from '@aufbau/elements/lib/import.js';
 import { effect, signal, typedSignal } from '@aufbau/signals';
 import { isArray, isFn, isString }     from '@pulgasari/is';
 import { toSlugCase }        from '@pulgasari/str';
@@ -193,15 +196,17 @@ export function createDocsFW (config = {}) {
 
   // index.ass links the reset: linked sheets come before adopted ones in the
   // cascade, an adopted reset would undo the typography of css/docs.css
-  aufbau.boot({ css: { palette: pagePalette.value, reset: false }, font: ['manrope', 'jetbrains-mono'] });
+  gestalt.set({ look: 'flat', palette: pagePalette.value, skin: 'monochrome' });
+  autoloader();
+  webfonts.init(['manrope', 'jetbrains-mono']);
   initDefaultStylesheet(import.meta.resolve('./index.ass'));
   if (sw) navigator.serviceWorker?.register(sw, { type: 'module' }).catch(console.error);
 
-  effect(() => { aufbau.gestalt.set({ palette: pagePalette.value }); });
-  effect(() => { aufbau.elements.setConfig({ 'write-code': { theme: codeTheme.value } }); });
+  effect(() => { gestalt.set({ palette: pagePalette.value }); });
+  effect(() => { setConfig({ 'write-code': { theme: codeTheme.value } }); });
 
   const withActive = (list, active) => list.includes(active) ? list : [active, ...list];
-  aufbau.gestalt.palettes().then(list => { pagePalettes.value = withActive(list, pagePalette.value); });
+  gestalt.palettes().then(list => { pagePalettes.value = withActive(list, pagePalette.value); });
   WriteCode.themes().then(list => { codeThemes.value = withActive(list, codeTheme.value); });
 
   // :::::: STATE

@@ -216,11 +216,11 @@
 </app-root>
   
 <script type="module">
-  import aufbau          from '@aufbau/api';
+  import { boot }          from './boot.js';
   import { settled }     from '@htx/elements';
   //import { htx, render } from '@htx/preact';
 
-    aufbau.boot();
+    boot();
     // the sections of the form come from elements.<namespace>.htx.html, through
     // <htx-part>. everything below reads them by id, so they have to be in first
     await settled();

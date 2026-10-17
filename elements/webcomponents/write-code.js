@@ -5,7 +5,7 @@ import { setAttr }         from '@domina/methods/setAttr.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 
-import { AufbauSourceElement, getConfig }           from '@aufbau/element';
+import { AufbauSourceElement, getConfig }           from '@domina/element';
 import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { dedent }                                   from '../lib/dedent.js';
 import { attrs, html }                              from '../lib/template.js';

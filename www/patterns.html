@@ -30,11 +30,11 @@
   </main>
 
   <script type="module">
-    import aufbau from '@aufbau/api';
+    import { boot } from './boot.js';
     import { list, patternImage, patternSvg } from '@aufbau/patterns';
     import { render as renderControls } from '@aufbau/gui';
 
-    await aufbau.boot();
+    await boot();
 
     const $ = id => document.getElementById(id);
 

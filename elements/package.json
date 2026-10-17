@@ -26,11 +26,10 @@
     "README.md"
   ],
   "dependencies": {
-    "@aufbau/element": "^0.1.0"
+    "@domina/element": "^0.1.0"
   },
   "peerDependencies": {
-    "@aufbau/gui": "^0.1.0",
-    "@aufbau/import": "^1.0.0"
+    "@aufbau/gui": "^0.1.0"
   },
   "keywords": [
     "aufbau",

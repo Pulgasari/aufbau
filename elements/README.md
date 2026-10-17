@@ -2,7 +2,7 @@
 
 official **aufbau** custom elements: the building blocks and what is composed of
 them, in one package. what they build on, the base class, config and skin, is
-[`@aufbau/element`](../element/README.md).
+[`@domina/element`](../element/README.md).
 
 | folder           | what it is |
 |------------------|------------|
@@ -36,10 +36,10 @@ import '@aufbau/elements/webcomponents/input/tags.js';
 ```
 
 the entry is side effect free. the base class and the config come from
-`@aufbau/element`:
+`@domina/element`:
 
 ```js
-import { AufbauElement, getConfig, setConfig } from '@aufbau/element';
+import { AufbauElement, getConfig, setConfig } from '@domina/element';
 ```
 
 ## htx
@@ -239,7 +239,7 @@ back to the key `tag-attribute`, an attribute on the element wins. the elements
 of that tag update when it changes.
 
 ```js
-import { setConfig } from '@aufbau/element';
+import { setConfig } from '@domina/element';
 
 setConfig('svg-flag-variant', 'square');
 setConfig({ 'write-code': { theme: 'nord' }, 'pop-toast': { duration: 5000 } });
@@ -654,7 +654,7 @@ setzt `page` und feuert `nav-paginate` mit `{ page, pages }`.
 <div id="layout">
   <!-- Content area that gets mutated by markdown import -->
   <main id="markdown-container">
-    <!-- HTML injected via @aufbau/import -->
+    <!-- the html of a markdown file, e.g. from importFile() of lib/import.js -->
   </main>
 
   <!-- Autonomous TOC Component -->
@@ -670,8 +670,7 @@ jeder eintrag trägt seine ebene als `aria-level`, der eintrag der gerade gelese
 ## output-md
 
 lädt prosa. hiess vorher `<aufbau-text>`. markdown läuft für `src` und `raw`
-über denselben compiler aus `@aufbau/import`, das element holt sich nichts mehr
-selbst von einem cdn.
+über `lib/import.js` des pakets (marked, beim ersten gebrauch geladen).
 
 `src`, `raw` oder die kinder als quelle. die kinder bleiben unangetastet und
 werden bei änderung neu gerendert, die ausgabe ist ein `<article>` im light dom.
@@ -822,7 +821,7 @@ und wegwischen per touch. hover und fokus halten den countdown an.
 
 ```js
 import { notify }    from '@aufbau/elements/webcomponents/pop-toast.js';
-import { setConfig } from '@aufbau/element';
+import { setConfig } from '@domina/element';
 
 notify('Gespeichert');
 notify({ success: 'Export fertig', heading: 'Dateien' });

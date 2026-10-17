@@ -143,12 +143,12 @@
 </app-root>
 
   <script type="module">
-    import aufbau          from '@aufbau/api';
+    import { boot, gestalt, load } from './boot.js';
     import getFormValues   from '@domina/methods/getFormValues.js';
     import { settled }     from '@htx/elements';
     import { htx, render } from '@htx/preact';
 
-    aufbau.boot();
+    boot();
     // the sections of the form come from elements.<namespace>.htx.html, through
     // <htx-part>. everything below reads them by id, so they have to be in first
     await settled();
@@ -156,7 +156,6 @@
     
     if (new URLSearchParams(location.search).has('dev')) await import('@aufbau/devtools/boot.js');
 
-    const { gestalt } = aufbau;
     const $ = id => document.getElementById(id);
 
     $('chips-demo').transform = text => text.toLowerCase();
@@ -164,7 +163,7 @@
     // :::::: TOASTS
     // every [data-toast] on the page, buttons and menu entries alike
 
-    await aufbau.elements.load('pop-toast');
+    await load('pop-toast');
     const Toast = customElements.get('pop-toast');
     const toast = (message, type = 'info') => Toast.notify({ message, type });
 
@@ -289,7 +288,7 @@
       if (button) $('modal-demo').close(button.dataset.close);
     });
 
-    await aufbau.elements.load('pop-prompt');
+    await load('pop-prompt');
     const Prompt = customElements.get('pop-prompt');
 
     $('prompt-confirm').addEventListener('click', async () => toast(`confirmed: ${await Prompt.confirm('delete it?', { heading: 'delete', confirm: 'delete' })}`));

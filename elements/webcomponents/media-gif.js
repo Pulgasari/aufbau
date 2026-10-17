@@ -1,4 +1,4 @@
-import { AufbauElement } from '@aufbau/element';
+import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 
 // a gif that can stop: paused, a still of its current frame covers it. starts

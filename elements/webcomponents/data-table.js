@@ -1,7 +1,7 @@
 // <data-table>
 
-import { AufbauElement } from '@aufbau/element';
-import { importFile }    from '@aufbau/import';
+import { AufbauElement } from '@domina/element';
+import { importFile }    from '../lib/import.js';
 import { sortElements }  from '@domina/methods/sortElements.js';
 import { html }          from '../lib/template.js';
 import { isArray }       from '@pulgasari/is';

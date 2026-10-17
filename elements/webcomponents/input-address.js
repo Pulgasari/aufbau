@@ -1,6 +1,6 @@
 import './input/tags.js';
 
-import { AufbauControlElement } from '@aufbau/element';
+import { AufbauControlElement } from '@domina/element';
 import { attrs, html }          from '../lib/template.js';
 import { localeOf }             from '../lib/locale.js';
 
