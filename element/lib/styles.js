@@ -1,5 +1,5 @@
 import adoptStyleSheet         from '@domina/methods/adoptStyleSheet.js';
-import { isFn, isPlainObject } from '@pulgasari/is';
+import { isFn, isPlainObject } from './shared.js';
 
 export const BASE_LAYER = 'aufbau.elements';
 export const SKIN_LAYER = 'aufbau.skin';
