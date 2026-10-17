@@ -1,5 +1,6 @@
-import { CanonicalMap }  from '@pulgasari/canonicalmap';
-import { isPlainObject } from '@pulgasari/is';
+// config.js
+
+import { CanonicalMap, isPlainObject } from './shared.js';
 import { emitEvent }     from '@domina/methods/emitEvent.js';
 import { onEvent }       from '@domina/methods/onEvent.js';
 
