@@ -1,5 +1,5 @@
 import { createStorage } from '@bunker/storage';
-import { Logger }        from '@pulgasari/logger';
+import { Logger }        from '@pulgasari/logger'; // todo: remove it as dependency ?
 
 const namespace = 'aufbau';
 const version   = 1;
