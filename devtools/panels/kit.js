@@ -1,7 +1,7 @@
 // panels/kit.js
 // the controls more than one panel builds
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 
 /**
  * destructive actions take two taps: the first arms the button and relabels it,

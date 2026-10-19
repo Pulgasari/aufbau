@@ -7,7 +7,7 @@
 3. polling only runs while the panel is actually visible.
 */
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 import fmt           from '../fmt.js';
 import settings      from '../settings.js';
 import { button }    from './kit.js';

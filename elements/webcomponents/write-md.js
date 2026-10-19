@@ -1,7 +1,7 @@
 import './output-md.js';
 import './write-text.js';
 
-import setAttr      from '@domina/methods/setAttr.js';
+import setAttr      from '@domina/verbs/setAttr.js';
 import { debounce } from '@pulgasari/timing';
 
 import { AufbauElement } from '@domina/element';

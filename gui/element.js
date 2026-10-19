@@ -1,11 +1,11 @@
 // @aufbau/gui/element.js
 
-// dom renderer. builds real nodes via @domina/methods; 
+// dom renderer. builds real nodes via @domina/verbs; 
 // the input-* controls it emits must be registered by the consumer.
 
-import createElement  from '@domina/methods/createElement.js';
-import createFragment from '@domina/methods/createFragment.js';
-import onEvent        from '@domina/methods/onEvent.js';
+import createElement  from '@domina/verbs/createElement.js';
+import createFragment from '@domina/verbs/createFragment.js';
+import onEvent        from '@domina/verbs/onEvent.js';
 
 import { isSection, normalizeOption, sectionFields, sectionValues, toControl } from './control.js';
 import { readValues }                                                          from './read.js';

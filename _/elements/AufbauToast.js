@@ -3,7 +3,7 @@
 // children, laid out by a grid on the host. notify() is the imperative entry.
 
 import { isPlainObject, isString } from '@pulgasari/is';
-import { setAttr }                 from '@domina/methods/setAttr.js';
+import { setAttr }                 from '@domina/verbs/setAttr.js';
 
 import { AufbauElement }   from './core/index.js';
 import { html }            from './core/html.js';

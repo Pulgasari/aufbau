@@ -119,6 +119,6 @@ changed field name off the nearest named control (composite controls like
 
 - `control.js` — spec entry -> `{ tag, attrs, options? }` (pure, no dom)
 - `html.js` — html-string output (pure, no dom, no `@domina`)
-- `element.js` — dom output via `@domina/methods`
+- `element.js` — dom output via `@domina/verbs`
 - `read.js` — typed readback from a rendered container
 - `index.js` — `render` / `field` dispatch + `readValues`

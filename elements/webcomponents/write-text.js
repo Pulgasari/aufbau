@@ -2,8 +2,8 @@ import { actionButtons, bindActions, parseActions } from '../lib/actions.js';
 import { AufbauElement, withControl, withSource }   from '@domina/element';
 import { dedent }                                   from '../lib/dedent.js';
 import { attrs, html }                              from '../lib/template.js';
-import { setAttr }                                  from '@domina/methods/setAttr.js';
-import { setValue }                                 from '@domina/methods/setValue.js';
+import { setAttr }                                  from '@domina/verbs/setAttr.js';
+import { setValue }                                 from '@domina/verbs/setValue.js';
 
 export default class WriteText extends withSource(withControl(AufbauElement)) {
   static reflect = ['look', 'resize'];

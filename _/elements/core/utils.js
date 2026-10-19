@@ -1,7 +1,7 @@
 // @aufbau/elements/core/utils.js
 
-import { offEvent } from '@domina/methods/offEvent.js';
-import { onEvent }  from '@domina/methods/onEvent.js';
+import { offEvent } from '@domina/verbs/offEvent.js';
+import { onEvent }  from '@domina/verbs/onEvent.js';
 
 export const arrayfied = value => Array.isArray(value) ? value : [value];
 

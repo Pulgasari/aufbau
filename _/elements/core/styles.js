@@ -1,6 +1,6 @@
 // @aufbau/elements/core/styles.js
 
-import adoptStylesheet from '@domina/methods/adoptStylesheet.js';
+import adoptStylesheet from '@domina/verbs/adoptStylesheet.js';
 import { isFn }        from '@pulgasari/is';
 import { arrayfied }   from './utils.js';
 

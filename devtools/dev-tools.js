@@ -4,7 +4,7 @@
 // every panel is an element of its own (panels/*.js) and works without it.
 
 import { AufbauElement } from '@domina/element';
-import createElement     from '@domina/methods/createElement.js';
+import createElement     from '@domina/verbs/createElement.js';
 
 import settings, { SPEC } from './settings.js';
 

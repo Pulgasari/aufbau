@@ -1,6 +1,6 @@
 import './input/tags.js';
 
-import { filterElements } from '@domina/methods/filterElements.js';
+import { filterElements } from '@domina/verbs/filterElements.js';
 import { debounce }       from '@pulgasari/timing';
 
 import { AufbauElement } from '@domina/element';

@@ -5,7 +5,7 @@
 // as this module evaluates, so stored css paints with the first frame instead of
 // waiting for the panel to be opened.
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 import settings      from '../settings.js';
 import { DevPanel }  from './DevPanel.js';
 

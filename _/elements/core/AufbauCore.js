@@ -8,15 +8,15 @@ import { adoptClassStyles } from './styles.js';
 import { decorate, decorateAll } from './utils.js';
 import { canonicalKey, CONFIG_EVENT, configKeys, resolveConfig } from './AufbauConfig.js';
 
-import { delegateEvent }  from '@domina/methods/delegateEvent.js';
-import { emitEvent }      from '@domina/methods/emitEvent.js';
-import { getElement }     from '@domina/methods/getElement.js';
-import { getElementById } from '@domina/methods/getElementById.js';
-import { getElements }    from '@domina/methods/getElements.js';
-import { hasAttr }        from '@domina/methods/hasAttr.js';
-import { offEvent }       from '@domina/methods/offEvent.js';
-import { onEvent }        from '@domina/methods/onEvent.js';
-import { setAttr }        from '@domina/methods/setAttr.js';
+import { delegateEvent }  from '@domina/verbs/delegateEvent.js';
+import { emitEvent }      from '@domina/verbs/emitEvent.js';
+import { getElement }     from '@domina/verbs/getElement.js';
+import { getElementById } from '@domina/verbs/getElementById.js';
+import { getElements }    from '@domina/verbs/getElements.js';
+import { hasAttr }        from '@domina/verbs/hasAttr.js';
+import { offEvent }       from '@domina/verbs/offEvent.js';
+import { onEvent }        from '@domina/verbs/onEvent.js';
+import { setAttr }        from '@domina/verbs/setAttr.js';
 
 import { coerce, toBoolean }                      from '@pulgasari/coerce';
 import { isArray, isFn, isPlainObject, isString } from '@pulgasari/is';

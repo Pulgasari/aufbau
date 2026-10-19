@@ -23,8 +23,8 @@ option, around at both ends. with every look, never with `multiple`.
 import { importFile } from '@aufbau/import';
 import { isArray }    from '@pulgasari/is';
 
-import setAttr  from '@domina/methods/setAttr.js';
-import setValue from '@domina/methods/setValue.js';
+import setAttr  from '@domina/verbs/setAttr.js';
+import setValue from '@domina/verbs/setValue.js';
 
 import { AufbauControl, normalizeOptions, observeOptions, readOptions } from './core/index.js';
 import { attrs, html } from './core/html.js';

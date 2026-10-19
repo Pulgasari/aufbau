@@ -10,8 +10,8 @@ import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { AufbauControl } from './core/index.js';
 import { dedent }        from './core/utils.js';
 import { attrs, html }   from './core/html.js';
-import { setAttr }       from '@domina/methods/setAttr.js';
-import { setValue }      from '@domina/methods/setValue.js';
+import { setAttr }       from '@domina/verbs/setAttr.js';
+import { setValue }      from '@domina/verbs/setValue.js';
 
 export default class AufbauWriter extends AufbauControl {
   static reflect = ['look', 'resize'];

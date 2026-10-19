@@ -10,7 +10,7 @@ in gui.js's format, so swapping this file for a gui.controls() call is a local
 change if that trade ever stops being worth it.
 */
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 import settings, { SECTIONS, SPEC } from '../settings.js';
 import { DevPanel } from './DevPanel.js';
 

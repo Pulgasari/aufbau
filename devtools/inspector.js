@@ -14,7 +14,7 @@
 // on first open has neither problem, and gets the disclosure triangle and the
 // keyboard handling from the platform.
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 
 const el = createElement;
 

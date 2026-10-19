@@ -9,7 +9,7 @@ files written by @bunker/opfs for values that are not plain bytes start with a
 container header. the preview recognises it and shows the json instead of bytes.
 */
 
-import createElement      from '@domina/methods/createElement.js';
+import createElement      from '@domina/verbs/createElement.js';
 import fmt                from '../fmt.js';
 import { armAction, button } from './kit.js';
 import { DevPanel }      from './DevPanel.js';
