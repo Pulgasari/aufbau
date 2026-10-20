@@ -2,9 +2,11 @@
 // the aufbau default alias list, alias -> icon id. data only, it imports no
 // element, so <svg-icon> can load it lazily without a package cycle.
 
-import brands from './data/brands.json' with { type: 'json' };
-import code   from './data/code.json'   with { type: 'json' };
-import icons  from './data/icons.json'  with { type: 'json' };
+// fetched instead of imported with { type: 'json' }: json modules are too new for
+// some browsers still in use, the whole list would be missing there
+const load = name => fetch(new URL(`./data/${name}.json`, import.meta.url)).then(response => response.ok ? response.json() : {});
+
+const [brands, code, icons] = await Promise.all(['brands', 'code', 'icons'].map(load));
 
 export { brands, code, icons };
 

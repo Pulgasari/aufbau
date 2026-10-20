@@ -93,7 +93,7 @@ export default class SvgIcon extends AufbauElement {
   static loadDefaults () {
     return defaults ??= import(DEFAULTS)
       .then(module => { this.register(module.default); })
-      .catch(() => warnOnce(DEFAULTS, `default aliases unavailable, "${DEFAULTS}" could not be imported.`))
+      .catch(error => warnOnce(DEFAULTS, `default aliases unavailable, "${DEFAULTS}" could not be imported: ${error?.message ?? error}`))
       .finally(() => { defaultsLoaded = true; });
   }
 
