@@ -1,7 +1,7 @@
 // <write-code>
 
-import { adoptStyleSheet } from '@domina/methods/adoptStyleSheet.js';
-import { setAttr }         from '@domina/methods/setAttr.js';
+import { adoptStyleSheet } from '@domina/verbs/adoptStyleSheet.js';
+import { setAttr }         from '@domina/verbs/setAttr.js';
 import { isFn }            from '@pulgasari/is';
 import { debounce }        from '@pulgasari/timing';
 

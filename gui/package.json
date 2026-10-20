@@ -17,7 +17,7 @@
     "./read": "./read.js"
   },
   "dependencies": {
-    "@domina/methods": "^0.1.0"
+    "@domina/verbs": "^0.1.0"
   },
   "peerDependencies": {
     "@aufbau/elements": "^2.0.0"

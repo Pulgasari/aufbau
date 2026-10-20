@@ -9,8 +9,8 @@ import { Logger }       from '@pulgasari/logger';
 import { isArray, isPlainObject, isString } from '@pulgasari/is';
 import { toJson }       from '@pulgasari/coerce';
 import { str }          from '@pulgasari/str';
-import { emitEvent } from '@domina/methods/emitEvent.js';
-import { onEvent } from '@domina/methods/onEvent.js';
+import { emitEvent } from '@domina/verbs/emitEvent.js';
+import { onEvent } from '@domina/verbs/onEvent.js';
 const { toKebabCase } = str;
 
 // ::::::

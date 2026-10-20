@@ -2,7 +2,7 @@ import { AufbauElement } from '@domina/element';
 import { attrs, html }   from '../lib/template.js';
 import { localeOf }      from '../lib/locale.js';
 
-import { getElement } from '@domina/methods/getElement.js';
+import { getElement } from '@domina/verbs/getElement.js';
 
 const OTHER = '#';
 

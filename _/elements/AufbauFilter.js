@@ -5,7 +5,7 @@
 
 import { AufbauElement }  from './core/index.js';
 import { html }           from './core/html.js';
-import { filterElements } from '@domina/methods/filterElements.js';
+import { filterElements } from '@domina/verbs/filterElements.js';
 
 export default class AufbauFilter extends AufbauElement {
   static attr = {

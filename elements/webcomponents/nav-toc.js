@@ -2,8 +2,8 @@ import { AufbauElement } from '@domina/element';
 import { html }          from '../lib/template.js';
 
 import { toSlugCase }  from '@pulgasari/str';
-import { getElement }  from '@domina/methods/getElement.js';
-import { getElements } from '@domina/methods/getElements.js';
+import { getElement }  from '@domina/verbs/getElement.js';
+import { getElements } from '@domina/verbs/getElements.js';
 import { observe }     from '@domina/observer';
 
 export default class NavToc extends AufbauElement {

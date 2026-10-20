@@ -12,8 +12,8 @@ import { AufbauControl, TYPE_NAMES, valueType }     from './core/index.js';
 import { actionButtons, bindActions, parseActions } from './core/actions.js';
 import { attrs, html }                              from './core/html.js';
 
-import setAttr  from '@domina/methods/setAttr.js';
-import setValue from '@domina/methods/setValue.js';
+import setAttr  from '@domina/verbs/setAttr.js';
+import setValue from '@domina/verbs/setValue.js';
 
 // :::::: 
 

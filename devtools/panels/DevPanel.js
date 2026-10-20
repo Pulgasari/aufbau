@@ -5,8 +5,8 @@
 // panel polls only while it is on screen.
 
 import { AufbauElement } from '@domina/element';
-import adoptStyleSheet   from '@domina/methods/adoptStyleSheet.js';
-import createElement     from '@domina/methods/createElement.js';
+import adoptStyleSheet   from '@domina/verbs/adoptStyleSheet.js';
+import createElement     from '@domina/verbs/createElement.js';
 
 adoptStyleSheet(new URL('../devtools.css?v=2', import.meta.url).href, { key: 'devtools' });
 

@@ -12,7 +12,7 @@ recorder (devtools dropped into a page that has no shim) it patches console
 itself and simply starts from the moment it loaded.
 */
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 
 import settings                from '../settings.js';
 import { inspector, preview }  from '../inspector.js';

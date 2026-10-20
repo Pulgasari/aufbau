@@ -2,7 +2,7 @@
 
 import { AufbauElement } from '@domina/element';
 import { importFile }    from '../lib/import.js';
-import { sortElements }  from '@domina/methods/sortElements.js';
+import { sortElements }  from '@domina/verbs/sortElements.js';
 import { html }          from '../lib/template.js';
 import { isArray }       from '@pulgasari/is';
 

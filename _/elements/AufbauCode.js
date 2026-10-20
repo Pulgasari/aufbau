@@ -6,7 +6,7 @@ import { AufbauElement }        from './core/index.js';
 import { dedent }               from './core/utils.js';
 import { getConfig, setConfig } from './core/AufbauConfig.js';
 
-import { adoptStylesheet } from '@domina/methods/adoptStylesheet.js';
+import { adoptStylesheet } from '@domina/verbs/adoptStylesheet.js';
 import { isFn }            from '@pulgasari/is';
 
 const HLJS_VERSION = '11.9.0';

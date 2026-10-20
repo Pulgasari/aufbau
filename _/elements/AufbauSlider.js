@@ -5,7 +5,7 @@
 
 import { AufbauControl, AXIS_TYPES, valueType } from './core/index.js';
 import { attrs, html } from './core/html.js';
-import { setValue } from '@domina/methods/setValue.js';
+import { setValue } from '@domina/verbs/setValue.js';
 
 export default class AufbauSlider extends AufbauControl {
   static attr = {

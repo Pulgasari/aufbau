@@ -6,7 +6,7 @@
 import '@aufbau/elements/AufbauEmbed.js';
 
 import { AufbauElement } from '@aufbau/elements/core/index.js';
-import setAttr           from '@domina/methods/setAttr.js';
+import setAttr           from '@domina/verbs/setAttr.js';
 
 const FORWARD = ['consent', 'height', 'label', 'poster', 'ratio', 'remember', 'width'];
 

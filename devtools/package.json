@@ -14,7 +14,7 @@
   "peerDependencies": {
     "@domina/element": "^0.1.0",
     "@aufbau/elements": "^2.0.0",
-    "@domina/methods": "*",
+    "@domina/verbs": "*",
     "@htx/js": "*"
   },
   "keywords": [

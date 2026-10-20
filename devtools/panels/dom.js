@@ -12,7 +12,7 @@ the panel's own subtree is excluded everywhere: it is in the document it is insp
 and without the guard the tree contains itself and every pick lands on a devtools row.
 */
 
-import createElement from '@domina/methods/createElement.js';
+import createElement from '@domina/verbs/createElement.js';
 import fmt from '../fmt.js';
 import { DevPanel } from './DevPanel.js';
 

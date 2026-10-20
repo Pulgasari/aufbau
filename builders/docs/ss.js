@@ -2,7 +2,7 @@
 
 import { compile }     from '@aufbau/ass';
 import { createCache } from '@bunker/cache';
-import adoptStyleSheet from '@domina/methods/adoptStyleSheet.js';
+import adoptStyleSheet from '@domina/verbs/adoptStyleSheet.js';
 
 const KEY      = 'aufbau:docs:shell';
 const cssCache = createCache({ name: 'aufbau-docs-css' });

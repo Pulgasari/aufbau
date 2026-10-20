@@ -9,7 +9,7 @@
 // the component's `value` reads and writes through to it.
 
 import { AufbauElement } from '@aufbau/elements/core/index.js';
-import setAttr           from '@domina/methods/setAttr.js';
+import setAttr           from '@domina/verbs/setAttr.js';
 
 // forwarded by every component, a subclass adds its own through static forward
 const FORWARD = ['disabled', 'label', 'name', 'persist', 'readonly', 'required'];
