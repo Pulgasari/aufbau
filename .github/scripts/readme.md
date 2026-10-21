@@ -5,8 +5,9 @@ Build-time scripts for the aufbau repo.
 ## generate-assets.mjs
 
 Regenerates the static assets under [`@aufbau/svg`](../../svg) from the source
-functions in [`@gestalt/filters`](../../filters) and
-[`@gestalt/patterns`](../../patterns).
+functions in `@gestalt/filters` and `@gestalt/patterns` of the
+[gestalt repo](https://github.com/Pulgasari/gestalt), read from a checkout next to
+this one (`../gestalt`) or from `GESTALT_DIR`.
 
 Every filter and pattern is a JS function that builds SVG. This script renders
 each one in its **live** (CSS-var-driven) form and writes:
@@ -25,5 +26,5 @@ npm run generate        # from the repo root
 ```
 
 CI runs this via [`.github/workflows/generate-assets.yml`](../workflows/generate-assets.yml)
-on any change to `filters/lib`, `patterns/lib`, the package `core.js` files, or
-this script.
+once a day, by hand, and on any change to this script. it checks out the gestalt
+repo next to this one and commits only what changed.

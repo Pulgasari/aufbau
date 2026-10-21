@@ -4,23 +4,29 @@
 // under @aufbau/svg — the .svg files plus the data.json5 catalogues — so external,
 // build-free consumers keep working without importing the js. run it after editing
 // any lib/*.js: `npm run generate` (see the generate-assets workflow for ci).
+//
+// the filters and patterns live in the gestalt repo. it is read from a checkout next to
+// this repo (../gestalt, as on code.pulgasari.dev), or from GESTALT_DIR.
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath }    from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { wrapSvg }                                        from '../../filters/core.js';
-import { backendsOf, load, manifest as filterManifest }    from '../../filters/lib/registry.js';
-import { manifest as patternManifest }                     from '../../patterns/manifest.js';
+const ROOT    = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const GESTALT = resolve(ROOT, process.env.GESTALT_DIR ?? '../gestalt', 'packages');
+const from    = path => import(pathToFileURL(resolve(GESTALT, path)).href);
+
+const { wrapSvg }                                     = await from('filters/core.js');
+const { backendsOf, load, manifest: filterManifest } = await from('filters/lib/registry.js');
+const { manifest: patternManifest }                  = await from('patterns/manifest.js');
 
 // every implementation, loaded through the manifests
 const filters  = await Promise.all(Object.keys(filterManifest).map(load));
 const patterns = await Promise.all(Object.keys(patternManifest).map(async id => {
-  const module = await import(`../../patterns/lib/${id}.js`);
+  const module = await from(`patterns/lib/${id}.js`);
   return { id, name: module.name, vars: module.vars, render: module.default };
 }));
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SVG  = resolve(ROOT, 'svg');
 
 // :::::: FORMATTING :::::::::::::::::::::::::::::::::::::::::::::

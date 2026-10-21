@@ -1,16 +1,17 @@
 name: Generate SVG assets
 
 # regenerates svg/filters/*, svg/patterns/* and their data.json5 catalogues from the
-# filter/pattern functions whenever the source lib changes. the committed .json5 then
-# triggers the convert-json5 workflow, which emits the matching .json.
+# filter/pattern functions of the gestalt repo. a push there cannot start a run here
+# (that needs a token with access to both repos), so it runs once a day and by hand,
+# and commits only when something changed. the committed .json5 then triggers the
+# convert-json5 workflow, which emits the matching .json.
 
 on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
   push:
     paths:
-      - 'filters/lib/**'
-      - 'filters/core.js'
-      - 'patterns/lib/**'
-      - 'patterns/core.js'
       - '.github/scripts/generate-assets.mjs'
 
 jobs:
@@ -22,13 +23,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout gestalt
+        uses: actions/checkout@v4
+        with:
+          repository: Pulgasari/gestalt
+          path: .gestalt
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Generate assets
         run: node .github/scripts/generate-assets.mjs
+        env:
+          GESTALT_DIR: .gestalt
 
       - name: Commit and push regenerated assets
         uses: stefanzweifel/git-auto-commit-action@v5
