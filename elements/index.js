@@ -13,118 +13,123 @@ a tag maps onto its module:
 
 */// :::: TAGS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-const TAGS = [
-  'aufbau-loop',
-  'aufbau-progress',
-  'aufbau-skeleton',
+// a static import() per tag, so a bundler sees every module and splits them into chunks
+const inputs = () => import('./webcomponents/input/tags.js');
 
-  'app-area',
-  'app-config',
-  'app-float',
-  'app-panel',
-  'app-root',
-  'app-view',
+const MODULES = {
+  'aufbau-loop'       : () => import('./webcomponents/aufbau-loop.js'),
+  'aufbau-progress'   : () => import('./webcomponents/aufbau-progress.js'),
+  'aufbau-skeleton'   : () => import('./webcomponents/aufbau-skeleton.js'),
 
-  'btn-chip',
-  'btn-icon',
-  'btn-push',
-  'btn-tap',
+  'app-area'          : () => import('./webcomponents/app-area.js'),
+  'app-config'        : () => import('./webcomponents/app-config.js'),
+  'app-float'         : () => import('./webcomponents/app-float.js'),
+  'app-panel'         : () => import('./webcomponents/app-panel.js'),
+  'app-root'          : () => import('./webcomponents/app-root.js'),
+  'app-view'          : () => import('./webcomponents/app-view.js'),
 
-  'dash-board',
-  'dash-panel',
+  'btn-chip'          : () => import('./webcomponents/btn-chip.js'),
+  'btn-icon'          : () => import('./webcomponents/btn-icon.js'),
+  'btn-push'          : () => import('./webcomponents/btn-push.js'),
+  'btn-tap'           : () => import('./webcomponents/btn-tap.js'),
 
-  'data-filter',
-  'data-index',
-  'data-item',
-  'data-list',
-  'data-node',
-  'data-table',
-  'data-tree',
+  'dash-board'        : () => import('./webcomponents/dash-board.js'),
+  'dash-panel'        : () => import('./webcomponents/dash-panel.js'),
 
-  'div-x',
-  'div-y',
+  'data-filter'       : () => import('./webcomponents/data-filter.js'),
+  'data-index'        : () => import('./webcomponents/data-index.js'),
+  'data-item'         : () => import('./webcomponents/data-item.js'),
+  'data-list'         : () => import('./webcomponents/data-list.js'),
+  'data-node'         : () => import('./webcomponents/data-node.js'),
+  'data-table'        : () => import('./webcomponents/data-table.js'),
+  'data-tree'         : () => import('./webcomponents/data-tree.js'),
 
-  'embed-bandcamp',
-  'embed-content',
-  'embed-mastodon',
-  'embed-soundcloud',
-  'embed-spotify',
-  'embed-vimeo',
-  'embed-youtube',
+  'div-x'             : () => import('./webcomponents/div-x.js'),
+  'div-y'             : () => import('./webcomponents/div-y.js'),
 
-  'input-bool',
-  'input-chips',
-  'input-color',
-  'input-country',
-  'input-currency',
-  'input-date',
-  'input-datetime',
-  'input-duration',
-  'input-email',
-  'input-emoji',
-  'input-address',
-  'input-file',
-  'input-font',
-  'input-hotkey',
-  'input-icon',
-  'input-language',
-  'input-locale',
-  'input-number',
-  'input-option',
-  'input-password',
-  'input-pattern',
-  'input-phone',
-  'input-search',
-  'input-slug',
-  'input-text',
-  'input-time',
-  'input-timezone',
-  'input-unit',
-  'input-url',
-  'input-value',
-  'input-year',
+  'embed-bandcamp'    : () => import('./webcomponents/embed-bandcamp.js'),
+  'embed-content'     : () => import('./webcomponents/embed-content.js'),
+  'embed-mastodon'    : () => import('./webcomponents/embed-mastodon.js'),
+  'embed-soundcloud'  : () => import('./webcomponents/embed-soundcloud.js'),
+  'embed-spotify'     : () => import('./webcomponents/embed-spotify.js'),
+  'embed-vimeo'       : () => import('./webcomponents/embed-vimeo.js'),
+  'embed-youtube'     : () => import('./webcomponents/embed-youtube.js'),
 
-  'media-audio',
-  'media-file',
-  'media-font',
-  'media-gif',
-  'media-json',
-  'media-pdf',
-  'media-svg',
-  'media-video',
-  'media-wave',
+  'input-bool'        : inputs,
+  'input-chips'       : inputs,
+  'input-color'       : inputs,
+  'input-country'     : inputs,
+  'input-currency'    : inputs,
+  'input-date'        : inputs,
+  'input-datetime'    : inputs,
+  'input-duration'    : inputs,
+  'input-email'       : inputs,
+  'input-emoji'       : inputs,
+  'input-address'     : () => import('./webcomponents/input-address.js'),
+  'input-file'        : () => import('./webcomponents/input-file.js'),
+  'input-font'        : inputs,
+  'input-hotkey'      : inputs,
+  'input-icon'        : inputs,
+  'input-language'    : inputs,
+  'input-locale'      : inputs,
+  'input-number'      : inputs,
+  'input-option'      : () => import('./webcomponents/input-option.js'),
+  'input-password'    : inputs,
+  'input-pattern'     : inputs,
+  'input-phone'       : inputs,
+  'input-search'      : inputs,
+  'input-slug'        : inputs,
+  'input-text'        : inputs,
+  'input-time'        : inputs,
+  'input-timezone'    : inputs,
+  'input-unit'        : inputs,
+  'input-url'         : inputs,
+  'input-value'       : inputs,
+  'input-year'        : inputs,
 
-  'mock-img',
-  'mock-p',
+  'media-audio'       : () => import('./webcomponents/media-audio.js'),
+  'media-file'        : () => import('./webcomponents/media-file.js'),
+  'media-font'        : () => import('./webcomponents/media-font.js'),
+  'media-gif'         : () => import('./webcomponents/media-gif.js'),
+  'media-json'        : () => import('./webcomponents/media-json.js'),
+  'media-pdf'         : () => import('./webcomponents/media-pdf.js'),
+  'media-svg'         : () => import('./webcomponents/media-svg.js'),
+  'media-video'       : () => import('./webcomponents/media-video.js'),
+  'media-wave'        : () => import('./webcomponents/media-wave.js'),
 
-  'nav-crumbs',
-  'nav-initials',
-  'nav-paginate',
-  'nav-toc',
+  'mock-img'          : () => import('./webcomponents/mock-img.js'),
+  'mock-p'            : () => import('./webcomponents/mock-p.js'),
 
-  'output-md',
-  'output-value',
+  'nav-crumbs'        : () => import('./webcomponents/nav-crumbs.js'),
+  'nav-initials'      : () => import('./webcomponents/nav-initials.js'),
+  'nav-paginate'      : () => import('./webcomponents/nav-paginate.js'),
+  'nav-toc'           : () => import('./webcomponents/nav-toc.js'),
 
-  'pop-menu',
-  'pop-modal',
-  'pop-over',
-  'pop-prompt',
-  'pop-tip',
-  'pop-toast',
+  'output-md'         : () => import('./webcomponents/output-md.js'),
+  'output-value'      : () => import('./webcomponents/output-value.js'),
 
-  'svg-file',
-  'svg-flag',
-  'svg-icon',
-  'svg-logo',
-  'svg-sprite',
+  'pop-menu'          : () => import('./webcomponents/pop-menu.js'),
+  'pop-modal'         : () => import('./webcomponents/pop-modal.js'),
+  'pop-over'          : () => import('./webcomponents/pop-over.js'),
+  'pop-prompt'        : () => import('./webcomponents/pop-prompt.js'),
+  'pop-tip'           : () => import('./webcomponents/pop-tip.js'),
+  'pop-toast'         : () => import('./webcomponents/pop-toast.js'),
 
-  'widget-calculator',
-  'widget-keyboard',
+  'svg-file'          : () => import('./webcomponents/svg-file.js'),
+  'svg-flag'          : () => import('./webcomponents/svg-flag.js'),
+  'svg-icon'          : () => import('./webcomponents/svg-icon.js'),
+  'svg-logo'          : () => import('./webcomponents/svg-logo.js'),
+  'svg-sprite'        : () => import('./webcomponents/svg-sprite.js'),
 
-  'write-code',
-  'write-md',
-  'write-text',
-];
+  'widget-calculator' : () => import('./webcomponents/widget-calculator.js'),
+  'widget-keyboard'   : () => import('./webcomponents/widget-keyboard.js'),
+
+  'write-code'        : () => import('./webcomponents/write-code.js'),
+  'write-md'          : () => import('./webcomponents/write-md.js'),
+  'write-text'        : () => import('./webcomponents/write-text.js'),
+};
+
+const TAGS = Object.keys(MODULES);
 
 const known = new Set(TAGS);
 
@@ -138,15 +143,16 @@ function pathOf (tag) {
 
 // :::::: LOADING :::::::::::::::::::::::::::::::::::::::::::::::
 
-let   baseURL = import.meta.url;
+let   baseURL = null;
 const loading = new Map;
 
 function load (tag) {
   if (!known.has(tag)) return Promise.resolve(null);
   if (!loading.has(tag)) {
-    const url = new URL(pathOf(tag), baseURL).href;
-    loading.set(tag, import(url).catch(error => {
-      console.warn(`[@aufbau/elements] could not load <${tag}> from "${url}":`, error);
+    // autoloader({ base }) loads from elsewhere, past the bundler
+    const url = baseURL && new URL(pathOf(tag), baseURL).href;
+    loading.set(tag, (url ? import(/* @vite-ignore */ url) : MODULES[tag]()).catch(error => {
+      console.warn(`[@aufbau/elements] could not load <${tag}> from "${url ?? pathOf(tag)}":`, error);
       loading.delete(tag);
       return null;
     }));
