@@ -130,4 +130,4 @@ export default class NavInitials extends AufbauElement {
   }
 }
 
-NavInitials.init();
+NavInitials.init('nav-initials');

@@ -47,4 +47,4 @@ export default class DataFilter extends AufbauElement {
   }
 }
 
-DataFilter.init();
+DataFilter.init('data-filter');

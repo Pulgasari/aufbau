@@ -5,4 +5,4 @@ export default class BtnTap extends Btn {
   static styles = `:host { padding: var(--btn-padding, --space(small)); }`;
 }
 
-BtnTap.init();
+BtnTap.init('btn-tap');

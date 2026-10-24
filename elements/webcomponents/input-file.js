@@ -236,4 +236,4 @@ export default class InputFile extends AufbauControlElement {
   }
 }
 
-InputFile.init();
+InputFile.init('input-file');

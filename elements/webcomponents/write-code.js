@@ -326,4 +326,4 @@ export default class WriteCode extends AufbauSourceElement {
   }
 }
 
-WriteCode.init();
+WriteCode.init('write-code');

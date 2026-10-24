@@ -130,4 +130,4 @@ export default class DataTable extends AufbauElement {
   }
 }
 
-DataTable.init();
+DataTable.init('data-table');

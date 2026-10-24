@@ -125,4 +125,4 @@ export default class DataTree extends AufbauElement {
   }
 }
 
-DataTree.init();
+DataTree.init('data-tree');

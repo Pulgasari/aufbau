@@ -42,4 +42,4 @@ export default class PopTip extends Pop {
   }
 }
 
-PopTip.init();
+PopTip.init('pop-tip');

@@ -79,4 +79,4 @@ export default class BtnChip extends Btn {
   }
 }
 
-BtnChip.init();
+BtnChip.init('btn-chip');

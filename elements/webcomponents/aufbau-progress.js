@@ -105,4 +105,4 @@ export default class AufbauProgress extends AufbauElement {
   }
 }
 
-AufbauProgress.init();
+AufbauProgress.init('aufbau-progress');

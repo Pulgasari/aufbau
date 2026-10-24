@@ -55,4 +55,4 @@ export default class SvgLogo extends AufbauElement {
   }
 }
 
-SvgLogo.init();
+SvgLogo.init('svg-logo');

@@ -58,4 +58,4 @@ export default class SvgFile extends AufbauElement {
   }
 }
 
-SvgFile.init();
+SvgFile.init('svg-file');

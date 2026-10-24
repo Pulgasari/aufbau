@@ -314,4 +314,4 @@ export default class WidgetKeyboard extends AufbauElement {
   }
 }
 
-WidgetKeyboard.init();
+WidgetKeyboard.init('widget-keyboard');

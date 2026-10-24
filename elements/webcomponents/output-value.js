@@ -176,4 +176,4 @@ export default class OutputValue extends AufbauSourceElement {
   }
 }
 
-OutputValue.init();
+OutputValue.init('output-value');

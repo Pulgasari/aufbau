@@ -160,4 +160,4 @@ export default class WriteText extends withSource(withControl(AufbauElement)) {
   }
 }
 
-WriteText.init();
+WriteText.init('write-text');

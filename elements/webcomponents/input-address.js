@@ -110,4 +110,4 @@ export default class InputAddress extends AufbauControlElement {
   }
 }
 
-InputAddress.init();
+InputAddress.init('input-address');

@@ -63,4 +63,4 @@ export default class MockP extends AufbauElement {
   }
 }
 
-MockP.init();
+MockP.init('mock-p');

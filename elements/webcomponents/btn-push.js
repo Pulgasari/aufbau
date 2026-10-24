@@ -16,4 +16,4 @@ export default class BtnPush extends Btn {
   `;
 }
 
-BtnPush.init();
+BtnPush.init('btn-push');

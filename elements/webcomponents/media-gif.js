@@ -82,4 +82,4 @@ export default class MediaGif extends AufbauElement {
   }
 }
 
-MediaGif.init();
+MediaGif.init('media-gif');

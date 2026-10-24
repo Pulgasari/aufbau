@@ -36,4 +36,4 @@ export default class MediaPdf extends AufbauElement {
   }
 }
 
-MediaPdf.init();
+MediaPdf.init('media-pdf');

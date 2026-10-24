@@ -270,4 +270,4 @@ export const notify = Object.assign((input, options) => PopToast.notify(input, o
   warning : (input, options) => PopToast.warning (input, options),
 });
 
-PopToast.init();
+PopToast.init('pop-toast');

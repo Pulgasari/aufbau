@@ -23,4 +23,4 @@ export default class BtnIcon extends Btn {
   }
 }
 
-BtnIcon.init();
+BtnIcon.init('btn-icon');

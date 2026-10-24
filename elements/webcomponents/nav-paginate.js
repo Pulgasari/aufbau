@@ -146,4 +146,4 @@ export default class NavPaginate extends AufbauElement {
   }
 }
 
-NavPaginate.init();
+NavPaginate.init('nav-paginate');

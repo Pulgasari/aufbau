@@ -136,4 +136,4 @@ export default class NavToc extends AufbauElement {
   }
 }
 
-NavToc.init();
+NavToc.init('nav-toc');

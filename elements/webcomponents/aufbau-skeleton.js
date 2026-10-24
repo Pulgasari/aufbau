@@ -35,4 +35,4 @@ export default class AufbauSkeleton extends AufbauElement {
   }
 }
 
-AufbauSkeleton.init();
+AufbauSkeleton.init('aufbau-skeleton');

@@ -55,4 +55,4 @@ export default class MediaSvg extends AufbauElement {
   }
 }
 
-MediaSvg.init();
+MediaSvg.init('media-svg');
