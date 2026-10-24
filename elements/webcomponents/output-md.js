@@ -92,4 +92,4 @@ export default class OutputMd extends AufbauSourceElement {
   }
 }
 
-OutputMd.init('output-md');
+OutputMd.init();

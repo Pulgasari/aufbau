@@ -37,4 +37,4 @@ export default class DataItem extends AufbauElement {
   }
 }
 
-DataItem.init('data-item');
+DataItem.init();

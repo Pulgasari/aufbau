@@ -122,4 +122,4 @@ export default class PopMenu extends AufbauElement {
   }
 }
 
-PopMenu.init('pop-menu');
+PopMenu.init();

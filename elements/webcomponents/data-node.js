@@ -123,4 +123,4 @@ export default class DataNode extends AufbauElement {
 
 }
 
-DataNode.init('data-node');
+DataNode.init();

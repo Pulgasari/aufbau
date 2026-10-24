@@ -49,4 +49,4 @@ export default class SvgFlag extends AufbauElement {
   }
 }
 
-SvgFlag.init('svg-flag');
+SvgFlag.init();

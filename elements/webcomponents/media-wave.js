@@ -159,4 +159,4 @@ export default class MediaWave extends AufbauElement {
   }
 }
 
-MediaWave.init('media-wave');
+MediaWave.init();

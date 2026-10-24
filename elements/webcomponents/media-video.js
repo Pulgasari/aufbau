@@ -53,4 +53,4 @@ export default class MediaVideo extends AufbauElement {
   }
 }
 
-MediaVideo.init('media-video');
+MediaVideo.init();

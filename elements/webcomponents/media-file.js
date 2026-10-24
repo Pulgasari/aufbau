@@ -65,4 +65,4 @@ export default class MediaFile extends AufbauElement {
   }
 }
 
-MediaFile.init('media-file');
+MediaFile.init();

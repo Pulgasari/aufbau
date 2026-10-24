@@ -64,4 +64,4 @@ export default class MediaFont extends AufbauElement {
   sync () { this.load(); }
 }
 
-MediaFont.init('media-font');
+MediaFont.init();

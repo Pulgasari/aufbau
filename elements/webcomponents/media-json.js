@@ -66,4 +66,4 @@ export default class MediaJson extends AufbauElement {
   sync () { this.load(); }
 }
 
-MediaJson.init('media-json');
+MediaJson.init();

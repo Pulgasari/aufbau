@@ -133,4 +133,4 @@ export default class AufbauLoop extends AufbauElement {
   }
 }
 
-AufbauLoop.init('aufbau-loop');
+AufbauLoop.init();

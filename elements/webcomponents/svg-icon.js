@@ -125,4 +125,4 @@ export default class SvgIcon extends AufbauElement {
   }
 }
 
-SvgIcon.init('svg-icon');
+SvgIcon.init();

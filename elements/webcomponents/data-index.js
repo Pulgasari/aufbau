@@ -176,5 +176,5 @@ export default class DataIndex extends AufbauElement {
   }
 }
 
-DataIndex.init('data-index');
+DataIndex.init();
 

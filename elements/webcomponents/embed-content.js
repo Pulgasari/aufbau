@@ -236,4 +236,4 @@ export default class EmbedContent extends AufbauElement {
   }
 }
 
-EmbedContent.init('embed-content');
+EmbedContent.init();

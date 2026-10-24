@@ -120,4 +120,4 @@ export default class DashBoard extends AufbauElement {
   }
 }
 
-DashBoard.init('dash-board');
+DashBoard.init();

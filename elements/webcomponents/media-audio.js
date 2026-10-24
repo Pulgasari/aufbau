@@ -161,4 +161,4 @@ export default class MediaAudio extends AufbauElement {
   }
 }
 
-MediaAudio.init('media-audio');
+MediaAudio.init();

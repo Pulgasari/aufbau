@@ -5,4 +5,4 @@ import { Pop } from './pop/Pop.js';
 //   <pop-over id="info">…</pop-over>
 export default class PopOver extends Pop {}
 
-PopOver.init('pop-over');
+PopOver.init();

@@ -59,4 +59,4 @@ export default class MockImg extends AufbauElement {
   }
 }
 
-MockImg.init('mock-img');
+MockImg.init();

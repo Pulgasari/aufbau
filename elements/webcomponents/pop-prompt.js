@@ -84,4 +84,4 @@ export default class PopPrompt extends PopModal {
   }
 }
 
-PopPrompt.init('pop-prompt');
+PopPrompt.init();

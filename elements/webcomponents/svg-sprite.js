@@ -45,4 +45,4 @@ export default class SvgSprite extends AufbauElement {
   }
 }
 
-SvgSprite.init('svg-sprite');
+SvgSprite.init();

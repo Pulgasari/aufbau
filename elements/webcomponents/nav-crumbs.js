@@ -108,4 +108,4 @@ export default class NavCrumbs extends AufbauElement {
   }
 }
 
-NavCrumbs.init('nav-crumbs');
+NavCrumbs.init();

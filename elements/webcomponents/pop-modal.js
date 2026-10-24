@@ -162,4 +162,4 @@ export default class PopModal extends AufbauElement {
   }
 }
 
-PopModal.init('pop-modal');
+PopModal.init();

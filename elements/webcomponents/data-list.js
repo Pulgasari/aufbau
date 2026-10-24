@@ -59,4 +59,4 @@ export default class DataList extends AufbauElement {
   }
 }
 
-DataList.init('data-list');
+DataList.init();

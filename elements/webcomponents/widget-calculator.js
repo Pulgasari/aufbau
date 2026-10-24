@@ -379,4 +379,4 @@ export default class WidgetCalculator extends AufbauElement {
   onRender () { this.setExpression(this.display?.value ?? ''); }
 }
 
-WidgetCalculator.init('widget-calculator');
+WidgetCalculator.init();
