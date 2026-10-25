@@ -49,7 +49,7 @@ export function iconUrl (id) {
   const name = rest.join(':');
   if (!collection || !name) return null;
   if (LOCAL[collection]) return localUrl(LOCAL[collection], name);
-  return `${API}/${encodeURIComponent(collection)}:${encodeURIComponent(name)}.svg`;
+  return `${API}/${encodeURIComponent(collection)}/${encodeURIComponent(name)}.svg`;   // prefix:name.svg is a 404 there
 }
 
 export default class SvgIcon extends AufbauElement {
