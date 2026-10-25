@@ -10,18 +10,32 @@ what it can not read, keeps the whole library: never wrong, only bigger.
 - handle.on(name) with a name from a variable
 */
 
+// :::::: IMPORT
+
 import { parse }          from 'acorn';
 import { createUnplugin } from 'unplugin';
 import * as recognizers   from '@aufbau/gestures/recognizers/index.js';
 
+// :::::: HELPERS
+
+const // predicates
+isArray = Array.isArray,
+isString = (sth) => typeof sth === 'string';
+
+// ::::::  CONSTANTS
+
 const PACKAGE = '@aufbau/gestures';
 
 // gesture -> recognizer, from the library itself: doubleTap -> tap
-const OWNERS = Object.fromEntries(Object.entries(recognizers).flatMap(([name, recognizer]) => recognizer.gestures.map(gesture => [gesture, name])));
+const OWNERS = Object.fromEntries(
+  Object.entries(recognizers).flatMap(
+    ([name, recognizer]) => recognizer.gestures.map(gesture => [gesture, name])
+  )
+);
 
-const ownerOf   = name => OWNERS[name] ?? (recognizers[name] ? name : null);
-const gestureOf = key  => key[2].toLowerCase() + key.slice(3);   // onLongPress -> longPress
-const keyOf     = node => node.key?.name ?? node.key?.value;
+const ownerOf   = (name) => OWNERS[name] ?? (recognizers[name] ? name : null);
+const gestureOf = (key)  => key[2].toLowerCase() + key.slice(3);   // onLongPress -> longPress
+const keyOf     = (node) => node.key?.name ?? node.key?.value;
 
 function walk (node, visit, parent = null) {
   if (!node || typeof node.type !== 'string') return;
@@ -29,7 +43,7 @@ function walk (node, visit, parent = null) {
   for (const key in node) {
     const value = node[key];
     if (Array.isArray(value)) value.forEach(child => walk(child, visit, node));
-    else if (value && typeof value.type === 'string') walk(value, visit, node);
+    else if (value && isString(value.type)) walk(value, visit, node);
   }
 }
 
@@ -39,7 +53,7 @@ function neededBy (program, local) {
   let   known  = true;
 
   const name = value => {
-    const owner = typeof value === 'string' ? ownerOf(value) : null;
+    const owner = isString(value) ? ownerOf(value) : null;
     if (owner) needed.add(owner);
     else known = false;
   };
@@ -108,3 +122,13 @@ export const unplugin = createUnplugin(() => ({
 }));
 
 export default unplugin.vite;
+
+/*
+Ehrliche Grenze: In noisy steht @gestures={{ onLongPress }} als Behavior.
+rats Compiler macht daraus `$$.use(gestures, () => ({ onLongPress: … }))`,
+gestures wird also als Wert weitergereicht und nicht direkt aufgerufen.
+Das Plugin gibt dort auf, und es bleibt beim Ganzen. 
+Damit es greift, müsste rat Behaviors als Aufruf kompilieren, 
+z.B. `use((element, value) => gestures(element, value), …)` mit sichtbarem Objekt. 
+Oder das Plugin kennt zusätzlich das Muster `use(gestures, () => ({ … }))`.
+*/
