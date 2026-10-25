@@ -14,8 +14,8 @@ const manifest = JSON.parse(readFileSync(new URL('./custom-elements.json', impor
 const MODULES = Object.fromEntries(
   manifest.modules.flatMap(
     module => (module.declarations ?? [])
-      .filter(declaration => declaration.tagName)
-      .map(declaration => [declaration.tagName, module.path])
+      . filter (declaration => declaration.tagName)
+      . map    (declaration => [declaration.tagName, module.path])
   )
 );
 
