@@ -93,7 +93,8 @@ export default class SvgIcon extends AufbauElement {
   static loadDefaults () {
     // the specifier written out: a bundler sees it and puts the aliases into a chunk of their own
     return defaults ??= import('@aufbau/svg/aliases.js')
-      .then(module => { this.register(module.default); })
+      // a name the app gave already stays the app's
+      .then(module => { for (const [alias, id] of Object.entries(module.default ?? {})) if (!aliases.has(alias)) aliases.set(alias, id); })
       .catch(error => warnOnce(DEFAULTS, `default aliases unavailable, "${DEFAULTS}" could not be imported: ${error?.message ?? error}`))
       .finally(() => { defaultsLoaded = true; });
   }
