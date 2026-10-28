@@ -30,9 +30,9 @@
 - [@aufbau/svg](svg/)
 
 #### deprecated
-- [@aufbau/ass](ass/)
-- [@aufbau/signals](signals/)
-- [@aufbau/store](store/)
+- [@aufbau/ass](ass/) (replaced by `@gestalt`)
+- [@aufbau/signals](signals/) (replaced by `@rat/signals` + `@rat/types`)
+- [@aufbau/store](store/) (replaced new `@bunker`, currently in rat)
 
 #### move
 - [@aufbau/devtools](devtools/) -> `@domina/inspector`
