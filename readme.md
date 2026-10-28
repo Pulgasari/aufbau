@@ -7,16 +7,13 @@
 *read the fucking [docs](https://aufbau.dev/docs/)! >.<*
 
 #### packages
-- [@aufbau/ass](ass/)
-- [@aufbau/devtools](devtools/)
+
 - [@aufbau/elements](elements/)
   | [html](https://aufbau.dev/elements.html)
 - [@aufbau/gestures](gestures/)
   | [html](https://aufbau.dev/gestures.html)
 - [@aufbau/gui](gui/)
   | [html](https://aufbau.dev/gui.html)
-- [@aufbau/signals](signals/)
-- [@aufbau/store](store/)
 
 #### packages (experimental)
 - [@aufbau/bundler](bundler/) *(experimental)*
@@ -31,3 +28,11 @@
 
 #### resources
 - [@aufbau/svg](svg/)
+
+#### deprecated
+- [@aufbau/ass](ass/)
+- [@aufbau/signals](signals/)
+- [@aufbau/store](store/)
+
+#### move
+- [@aufbau/devtools](devtools/) -> `@domina/inspector`
